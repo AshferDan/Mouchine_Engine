@@ -1,3 +1,0 @@
-C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/imgui-subbuild/CMakeFiles/imgui-populate.dir
-C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/imgui-subbuild/CMakeFiles/ALL_BUILD.dir
-C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/imgui-subbuild/CMakeFiles/ZERO_CHECK.dir
