@@ -23,4 +23,4 @@ Release
 *.vcxproj.filters
 *.json
 *.html
-./_deps
+_deps
