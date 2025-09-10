@@ -1,0 +1,14 @@
+# Target labels
+ glfw-populate
+# Source files and their labels
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/glfw-populate
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/1282e635ae844d001c93fca9c8ad72f7/glfw-populate.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/522524e7724bea54727d900fd97950e6/glfw-populate-complete.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-build.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-configure.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-download.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-install.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-mkdir.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-patch.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-test.rule
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glfw-subbuild/CMakeFiles/2f6b9fb9fa31ecdecdafd38a2459363b/glfw-populate-update.rule

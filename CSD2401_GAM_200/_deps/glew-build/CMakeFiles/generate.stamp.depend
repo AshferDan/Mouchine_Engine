@@ -1,0 +1,6 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindOpenGL.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindPackageMessage.cmake
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glew-src/CMakeLists.txt
+C:/Users/Jonathan/Documents/SIT/CMake/GAM_200_AME_TEST/_deps/glew-src/GeneratePkgConfig.cmake
