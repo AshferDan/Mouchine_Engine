@@ -37,6 +37,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/glfw-src/cmake_install.cmake")
   include("C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/glm-build/cmake_install.cmake")
   include("C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/glew-build/cmake_install.cmake")
+  include("C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/json-build/cmake_install.cmake")
 
 endif()
 

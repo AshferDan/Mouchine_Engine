@@ -17,3 +17,5 @@ C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200
 C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/glew-build/CMakeFiles/libglew_shared.dir
 C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/glew-build/CMakeFiles/INSTALL.dir
 C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/glew-build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/json-build/CMakeFiles/INSTALL.dir
+C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/_deps/json-build/CMakeFiles/ALL_BUILD.dir

@@ -69,7 +69,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -79,7 +79,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -89,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -99,7 +99,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\_deps\glew-src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
