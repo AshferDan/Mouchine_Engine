@@ -14,6 +14,7 @@ to OpenGL implementations.
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
 #include "graphics.h"
+#include "glslshader.h"
 #include <glm/glm.hpp>
 #include <iostream>
 #include <sstream>
@@ -36,6 +37,10 @@ GLfloat GLApp::clear_color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 GLboolean GLApp::keystateR = GL_FALSE;
 GLboolean GLApp::keystateG = GL_FALSE;
 GLboolean GLApp::keystateB = GL_FALSE;
+// Global handles
+static GLSLShader shdr_pgm;
+static GLuint vao_hdl;
+static GLuint tex_hdl;
 
 /*  _________________________________________________________________________ */
 /*! init
@@ -139,8 +144,96 @@ bool GLApp::init(GLint w, GLint h, std::string t) {
     glfwGetFramebufferSize(ptr_window, &vp_width_height.x, &vp_width_height.y);
     GLApp::fbsize_cb(ptr_window, vp_width_height.x, vp_width_height.y);
 
+
+    //// Load shaders
+    //std::vector<std::pair<GLenum, std::string>> shdr_files;
+    //shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../Build/Graphics/vertices.vert"));
+    //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../Build/Graphics/vertices.vert"));
+
+    //shdr_pgm.CompileLinkValidate(shdr_files);
+    //if (GL_FALSE == shdr_pgm.IsLinked()) {
+    //    std::cout << "Unable to compile/link/validate shader programs" << std::endl;
+    //    std::cout << shdr_pgm.GetLog() << std::endl;
+    //    std::exit(EXIT_FAILURE);
+    //}
+
+    //setup_vao(); // Set up geometry
+
+    //// Load texture
+    //tex_hdl = setup_texobj("../images/duck-rgba-256.tex");
+
+    //// Set initial texture wrap modes
+    //glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
     return true;
 }
+
+void GLApp::setup_vao() {
+    struct Vertex {
+        glm::vec2 pos;
+        glm::vec3 clr;
+        glm::vec2 tex;
+    };
+
+    std::vector<Vertex> vertices = {
+        { {-1.f, -1.f}, {1.f, 0.f, 0.f}, {0.f, 0.f} },
+        { { 1.f, -1.f}, {0.f, 1.f, 0.f}, {1.f, 0.f} },
+        { {-1.f,  1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f} },
+        { { 1.f,  1.f}, {1.f, 1.f, 1.f}, {1.f, 1.f} }
+    };
+
+    glCreateVertexArrays(1, &vao_hdl);
+    glBindVertexArray(vao_hdl);
+
+    GLuint vbo_hdl;
+    glCreateBuffers(1, &vbo_hdl);
+    glNamedBufferStorage(vbo_hdl, sizeof(Vertex) * vertices.size(), vertices.data(), 0);
+
+    glVertexArrayVertexBuffer(vao_hdl, 0, vbo_hdl, 0, sizeof(Vertex));
+
+    // Position
+    glVertexArrayAttribFormat(vao_hdl, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
+    glVertexArrayAttribBinding(vao_hdl, 0, 0);
+    glEnableVertexArrayAttrib(vao_hdl, 0);
+
+    // Color
+    glVertexArrayAttribFormat(vao_hdl, 1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, clr));
+    glVertexArrayAttribBinding(vao_hdl, 1, 0);
+    glEnableVertexArrayAttrib(vao_hdl, 1);
+
+    // Texture coordinates
+    glVertexArrayAttribFormat(vao_hdl, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
+    glVertexArrayAttribBinding(vao_hdl, 2, 0);
+    glEnableVertexArrayAttrib(vao_hdl, 2);
+}
+
+GLuint GLApp::setup_texobj(std::string const& pathname) {
+    GLuint width = 256, height = 256, bytes_per_texel = 4;
+    GLsizei size = width * height * bytes_per_texel;
+
+    // Open file
+    std::ifstream ifs(pathname, std::ios::binary);
+    if (!ifs) {
+        std::cerr << "Unable to open texture file: " << pathname << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+
+    // Read texture data
+    GLubyte* ptr_texels = new GLubyte[size];
+    ifs.read(reinterpret_cast<char*>(ptr_texels), size);
+    ifs.close();
+
+    // Create and initialize texture object
+    GLuint texobj_hdl;
+    glCreateTextures(GL_TEXTURE_2D, 1, &texobj_hdl);
+    glTextureStorage2D(texobj_hdl, 1, GL_RGBA8, width, height);
+    glTextureSubImage2D(texobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ptr_texels);
+
+    delete[] ptr_texels;
+    return texobj_hdl;
+}
+
 
 /*  _________________________________________________________________________ */
 /*! update

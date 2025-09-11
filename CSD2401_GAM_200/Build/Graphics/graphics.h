@@ -22,6 +22,8 @@ objects participating in the application.
 #include <GL/glew.h> // for access to OpenGL API declarations 
 #include <GLFW/glfw3.h>
 #include <string>
+#include <iostream>
+#include <fstream>
 
 /*  _________________________________________________________________________ */
 struct GLApp
@@ -32,6 +34,9 @@ struct GLApp
 	static void update();
 	static void draw();
 	static void cleanup();
+
+	static void setup_vao();
+	static GLuint setup_texobj(std::string const& pathname);
 
 	// callbacks ...
 	static void error_cb(int error, char const* description);
