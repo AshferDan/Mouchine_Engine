@@ -15,7 +15,6 @@ add_definitions(-DUSE_CSD3151_AUTOMATION=0)
 set(Audio_DIR         ./Build/Audio)
 set(Camera_DIR        ./Build/Camera)
 set(Collision_DIR     ./Build/Collision)
-set(EntityManger_DIR  ./Build/EntityManger)
 set(GameManager_DIR   ./Build/GameManager)
 set(Graphics_DIR      ./Build/Graphics)
 set(LevelEditor_DIR   ./Build/LevelEditor)
@@ -38,9 +37,6 @@ file(GLOB_RECURSE Camera_HEAD      "${Camera_DIR}/*.h" "${Camera_DIR}/*.hpp")
 
 file(GLOB_RECURSE Collision_SRC    "${Collision_DIR}/*.cpp")
 file(GLOB_RECURSE Collision_HEAD   "${Collision_DIR}/*.h" "${Collision_DIR}/*.hpp")
-
-file(GLOB_RECURSE EntityManger_SRC "${EntityManger_DIR}/*.cpp")
-file(GLOB_RECURSE EntityManger_HEAD "${EntityManger_DIR}/*.h" "${EntityManger_DIR}/*.hpp")
 
 file(GLOB_RECURSE GameManager_SRC  "${GameManager_DIR}/*.cpp")
 file(GLOB_RECURSE GameManager_HEAD "${GameManager_DIR}/*.h" "${GameManager_DIR}/*.hpp")
@@ -90,9 +86,6 @@ source_group("Camera\\Source Files" FILES ${Camera_SRC})
 source_group("Collision\\Header Files" FILES ${Collision_HEAD})
 source_group("Collision\\Source Files" FILES ${Collision_SRC})
 
-source_group("EntityManger\\Header Files" FILES ${EntityManger_HEAD})
-source_group("EntityManger\\Source Files" FILES ${EntityManger_SRC})
-
 source_group("GameManager\\Header Files" FILES ${GameManager_HEAD})
 source_group("GameManager\\Source Files" FILES ${GameManager_SRC})
 
@@ -134,7 +127,6 @@ set(ALL_SOURCES
     ${Audio_SRC}
     ${Camera_SRC}
     ${Collision_SRC}
-    ${EntityManger_SRC}
     ${GameManager_SRC}
     ${Graphics_SRC}
     ${LevelEditor_SRC}
@@ -153,7 +145,6 @@ set(ALL_HEADERS
     ${Audio_HEAD}
     ${Camera_HEAD}
     ${Collision_HEAD}
-    ${EntityManger_HEAD}
     ${GameManager_HEAD}
     ${Graphics_HEAD}
     ${LevelEditor_HEAD}
@@ -222,7 +213,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     ${Audio_DIR}
     ${Camera_DIR}
     ${Collision_DIR}
-    ${EntityManger_DIR}
     ${GameManager_DIR}
     ${Graphics_DIR}
     ${LevelEditor_DIR}
