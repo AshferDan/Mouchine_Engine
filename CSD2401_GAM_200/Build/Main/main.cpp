@@ -1,76 +1,17 @@
-/*!
-@file    	main.cpp
-@author  	pghali@digipen.edu
-@co-author  parminder.singh@digipen.edu
-@date    	17/04/2024
-
-This file uses functionality defined in type GLApp to initialize an OpenGL
-context and implement a game loop.
-
-*//*__________________________________________________________________________*/
-
-/*                                                                   includes
------------------------------------------------------------------------------ */
-// Extension loader library's header must be included before GLFW's header!!!
-//#include "./graphics.h"
-//#include "./core.h"
-//#include "./factory.h"
-//#include "./main.h"
-//#include <iostream>
-//
-//void Main_init() {
-//    // start with a 16:9 aspect ratio
-//    GLApp::init(2400, 1350, "Tutorial 0 | Setting up OpenGL 4.5");
-//}
-//
-// void Main_Update() {
-//    GLApp::update();
-//     
-//}
-//
-// void Main_Unload() {
-//     GLApp::cleanup();
-// }
-//
-// 
-// int main() {
-//
-//     Main_init();
-//
-//     while (!glfwWindowShouldClose(GLApp::ptr_window)) {
-//         Main_Update();
-//
-//     }
-//     Main_Unload();
-// }
-
+#include <iostream>
+#include <GLFW/glfw3.h>
 #include "core.h"
 #include "factory.h"
 #include "GameObjectSystem.h"
 #include "transform.h"
 #include "physics.h"
-#include <iostream>
-#include <GLFW/glfw3.h>
+#include "InputManager.h"
 
-// Global variables for input handling
-bool keyA = false;
-bool keyD = false;
+
 GLFWwindow* window = nullptr;
 
-// Key callback function
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    if (key == GLFW_KEY_A) {
-        keyA = (action == GLFW_PRESS || action == GLFW_REPEAT);
-    }
-    if (key == GLFW_KEY_D) {
-        keyD = (action == GLFW_PRESS || action == GLFW_REPEAT);
-    }
 
-    // ESC to close window
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
-}
+// Key callback function
 
 // Function to draw a square at the given position
 void DrawSquare(float x, float y, float size) {
@@ -86,7 +27,7 @@ void DrawSquare(float x, float y, float size) {
 }
 
 int main() {
-    std::cout << "=== Component System Test with GLFW Input ===" << std::endl;
+    std::cout << "=== 2D Component System Test ===" << std::endl;
 
     // Initialize GLFW
     if (!glfwInit()) {
@@ -95,7 +36,7 @@ int main() {
     }
 
     // Create window
-    window = glfwCreateWindow(800, 600, "Player Movement Demo", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "2D Player Movement", NULL, NULL);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -103,19 +44,13 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, keyCallback);
+    glfwSetKeyCallback(window, InputManager::keyCallback);
 
     CoreEngine engine;
-
-    // Add the GameObject system
     engine.AddSystem<GameObjectSystem>();
-
-    // Initialize
-    std::cout << "\n--- Initializing Engine ---" << std::endl;
     engine.Init();
 
-    // Create only the player
-    std::cout << "\n--- Creating Player ---" << std::endl;
+    // Create player
     auto& factory = GameObjectFactory::Instance();
     GameObject* player = factory.CreatePlayer("Hero", 0, 0, 0);
 
@@ -126,78 +61,61 @@ int main() {
 
     // Game loop variables
     double lastTime = glfwGetTime();
-    const float targetFPS = 60.0f;
-    const float targetDeltaTime = 1.0f / targetFPS;
+    const float targetDeltaTime = 1.0f / 60.0f;
 
-    // Set up orthographic projection
+    // Set up 2D orthographic projection (no Z-axis needed)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-10.0, 10.0, -10.0, 10.0, -1.0, 1.0); // 20x20 unit view
+    glOrtho(-10.0, 10.0, -10.0, 10.0, 0.0, 1.0); // Near=0, Far=1 (2D only)
     glMatrixMode(GL_MODELVIEW);
 
     // Main game loop
     while (!glfwWindowShouldClose(window)) {
-        // Calculate delta time
-        double currentTime = glfwGetTime();
-        float deltaTime = static_cast<float>(currentTime - lastTime);
-        lastTime = currentTime;
+        float deltaTime = static_cast<float>(glfwGetTime() - lastTime);
+        lastTime = glfwGetTime();
 
-        // Cap delta time to avoid large jumps
-        if (deltaTime > 0.1f) {
-            deltaTime = targetDeltaTime;
-        }
+        if (deltaTime > 0.1f) deltaTime = targetDeltaTime;
 
-        // Process input
         glfwPollEvents();
 
-        // Handle player movement based on input
+        // Handle player movement (2D only - X axis)
         if (auto* transform = player->GetComponent<TransformComponent>()) {
-            float moveSpeed = 2.0f * deltaTime; // 2.0 units per second
+            float moveSpeed = 5.0f * deltaTime;
 
-            if (keyA) {
-                transform->Move(-moveSpeed, 0.0f, 0.0f);
-            }
-            if (keyD) {
-                transform->Move(moveSpeed, 0.0f, 0.0f);
-            }
+            if (InputManager::keyA) transform->Move(-moveSpeed, 0.0f, 0.0f);
+            if (InputManager::keyD) transform->Move(moveSpeed, 0.0f, 0.0f);
+            if (InputManager::keyW) transform->Move(0.0f, moveSpeed, 0.0f);
+            if (InputManager::keyS) transform->Move(0.0f, -moveSpeed, 0.0f);
         }
 
-        // Update all systems
-        auto& gameObjects = factory.GetAllGameObjects();
-        for (auto& obj : gameObjects) {
-            if (obj->IsActive()) {
-                obj->Update(deltaTime);
-            }
+        // Update game objects
+        for (auto& obj : factory.GetAllGameObjects()) {
+            if (obj->IsActive()) obj->Update(deltaTime);
         }
 
         // Rendering
         glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-        // Draw the player as a square
+        // Draw player (2D only)
         if (auto* transform = player->GetComponent<TransformComponent>()) {
             float x, y, z;
             transform->GetPosition(x, y, z);
-            DrawSquare(x, y, 1.0f); // Draw 1x1 square at player position
+            DrawSquare(x, y, 1.0f);
         }
 
-        // Swap buffers
         glfwSwapBuffers(window);
 
-        // Sleep to maintain target FPS
-        double endTime = glfwGetTime();
-        double frameTime = endTime - currentTime;
+        // Maintain frame rate
+        double frameTime = glfwGetTime() - lastTime;
         if (frameTime < targetDeltaTime) {
-            double sleepTime = targetDeltaTime - frameTime;
-            glfwWaitEventsTimeout(sleepTime);
+            glfwWaitEventsTimeout(targetDeltaTime - frameTime);
         }
     }
 
     // Cleanup
     glfwDestroyWindow(window);
     glfwTerminate();
-
-    std::cout << "\n=== Game Loop Complete ===" << std::endl;
-
+    std::cout << "\n=== Game Complete ===" << std::endl;
     return 0;
 }
