@@ -59,5 +59,8 @@ struct GLApp
 	static GLboolean keystateG;
 	static GLboolean keystateB;
 };
+void graphic_init();
+void graphic_update();
+void graphic_draw();
 
 #endif /* GLAPP_H */;

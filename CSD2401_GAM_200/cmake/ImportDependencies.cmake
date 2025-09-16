@@ -54,6 +54,19 @@ macro(import_glew)
     endif()
 endmacro()
 
+# Macro to import nlohmann/json
+macro(import_json)
+    if(NOT TARGET nlohmann_json::nlohmann_json)  # Fixed target name and typo
+        include(FetchContent)
+        FetchContent_Declare(
+            json
+            GIT_REPOSITORY https://github.com/nlohmann/json.git
+            GIT_TAG v3.11.3  # Use a stable version instead of master
+        )
+        FetchContent_MakeAvailable(json)
+    endif()
+endmacro()
+
 # Macro to import ImGui
 macro(import_imgui)
     if(NOT TARGET imgui)  # Guard to prevent multiple inclusion
@@ -89,7 +102,6 @@ macro(import_imgui)
         set_property(TARGET imgui PROPERTY CXX_STANDARD_REQUIRED ON)
     endif()
 endmacro()
-
 # Macro to import all dependencies
 macro(importDependencies)
     message(STATUS "Starting to import dependencies...")
@@ -105,6 +117,10 @@ macro(importDependencies)
     message(STATUS "Importing GLEW...")
     import_glew()
     message(STATUS "GLEW imported successfully.")
+
+    message(STATUS "Importing nlohmann/json...")
+    import_json()
+    message(STATUS "nlohmann/json imported successfully.")
 
     message(STATUS "Importing ImGui...")
     import_imgui()

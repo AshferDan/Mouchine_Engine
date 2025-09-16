@@ -1,98 +1,57 @@
-/*!
-@file    	main.cpp
-@author  	pghali@digipen.edu
-@co-author  parminder.singh@digipen.edu
-@date    	17/04/2024
+ #include "Core.h"
+ #include "Factory.h"
+ #include "GameObjectSystem.h"
+ #include "Transform.h"
+ #include "Physics.h"
+ #include <iostream>
+ #include <cmath>
 
-This file uses functionality defined in type GLApp to initialize an OpenGL
-context and implement a game loop.
+ int main() {
+     std::cout << "=== 2D Component System Test ===" << std::endl;
 
-*//*__________________________________________________________________________*/
+     CoreEngine engine;
 
-/*                                                                   includes
------------------------------------------------------------------------------ */
-// Extension loader library's header must be included before GLFW's header!!!
-#include "./graphics.h"
-#include <iostream>
+     // Add the GameObject system
+     engine.AddSystem<GameObjectSystem>();
 
-/*                                                   type declarations
------------------------------------------------------------------------------ */
+     // Initialize
+     std::cout << "\n--- Initializing Engine ---" << std::endl;
+     engine.Init();
 
-/*                                                      function declarations
------------------------------------------------------------------------------ */
-static void draw();
-static void update();
-static void init();
+     // Create 2D game objects
+     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
+     auto& factory = GameObjectFactory::Instance();
 
-/*                                                   objects with file scope
------------------------------------------------------------------------------ */
+     GameObject* player = factory.CreatePlayer("Hero", 0, 5);
+     GameObject* enemy = factory.CreateEnemy("Goblin", 10, 0);
+     GameObject* platform = factory.CreatePlatform("Ground", 0, -2, 20, 1);
+     GameObject* bullet = factory.CreateProjectile("Bullet", 1, 6, 0.785f, 15.0f); // 45 degrees, speed 15
 
-/*                                                      function definitions
------------------------------------------------------------------------------ */
-/*  _________________________________________________________________________ */
-/*! main
+     // Test 2D component interactions
+     std::cout << "\n--- Testing 2D Component Interactions ---" << std::endl;
+     // Test transform methods
+     if (auto* transform = player->GetComponent<TransformComponent>()) {
+         transform->SetRotation(0.785f); // 45 degrees
+         std::cout << "Set player rotation to 45 degrees" << std::endl;
+     }
 
-@param none
+     std::cout << "\n--- Starting 2D Simulation (8 frames) ---" << std::endl;
 
-@return int
+     // Simulate frames to see 2D physics in action
+     float deltaTime = 0.016f; // ~60 FPS
+     for (int frame = 1; frame <= 8; ++frame) {
+         std::cout << "\n--- Frame " << frame << " ---" << std::endl;
 
-Indicates how the program existed. Normal exit is signaled by a return value of
-0. Abnormal termination is signaled by a non-zero return value.
-Note that the C++ compiler will insert a return 0 statement if one is missing.
-*/
-int main() {
-    // start with a 16:9 aspect ratio
-    if (!GLApp::init(2400, 1350, "Tutorial 0 | Setting up OpenGL 4.5")) {
-        std::cout << "Unable to create OpenGL context" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+         // Update all systems
+         auto& gameObjects = factory.GetAllGameObjects();
+         for (auto& obj : gameObjects) {
+             if (obj->IsActive()) {
+                 obj->Update(deltaTime);
+             }
+         }
+     }
 
-    // window's close flag is set by clicking close widget or Alt+F4
-    while (!glfwWindowShouldClose(GLApp::ptr_window)) {
-        draw();
-        update();
-    }
+     std::cout << "\n=== 2D Test Complete ===" << std::endl;
 
-    GLApp::cleanup();
-}
-
-/*  _________________________________________________________________________ */
-/*! draw
-
-@param none
-
-@return none
-
-Call application to draw and then swap front and back frame buffers ...
-Uses GLHelper::GLFWWindow* to get handle to OpenGL context.
-*/
-static void draw() {
-    // render scene
-    GLApp::draw();
-
-    // swap buffers: front <-> back
-    // GLApp::ptr_window is handle to window that defines the OpenGL context
-    glfwSwapBuffers(GLApp::ptr_window);
-}
-
-/*  _________________________________________________________________________ */
-/*! update
-
-@param none
-
-@return none
-
-Make sure callbacks are invoked when state changes in input devices occur.
-Ensure time per frame and FPS are recorded.
-Let application update state changes (such as animation).
-*/
-static void update() {
-    // process events if any associated with input devices
-    glfwPollEvents();
-
-    // main loop computes fps and other time related stuff once for all apps ...
-    GLApp::update_time(1.0);
-
-    // animate scene
-    GLApp::update();
-}
+     return 0;
+ }

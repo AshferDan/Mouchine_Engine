@@ -296,6 +296,10 @@ void GLApp::update() {
         clear_color[3] = 1.0f;
 
     }
+    GLApp::update_time(1.0);
+    glfwPollEvents();
+    glfwSwapBuffers(GLApp::ptr_window);
+    GLApp::draw();
 }
 
 /*  _________________________________________________________________________ */

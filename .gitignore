@@ -24,3 +24,4 @@ Release
 *.json
 *.html
 _deps
+CmakeCache.txt
