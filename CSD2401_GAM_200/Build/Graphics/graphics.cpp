@@ -13,6 +13,8 @@ to OpenGL implementations.
 
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include "graphics.h"
 #include "glslshader.h"
 #include <glm/glm.hpp>
@@ -33,7 +35,7 @@ GLdouble GLApp::fps;
 GLdouble GLApp::delta_time;
 std::string GLApp::title;
 GLFWwindow* GLApp::ptr_window;
-GLfloat GLApp::clear_color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+GLfloat GLApp::clear_color[] = { 1.0f, 0.0f, 1.0f, 1.0f };
 GLboolean GLApp::keystateR = GL_FALSE;
 GLboolean GLApp::keystateG = GL_FALSE;
 GLboolean GLApp::keystateB = GL_FALSE;
@@ -145,42 +147,42 @@ bool GLApp::init(GLint w, GLint h, std::string t) {
     GLApp::fbsize_cb(ptr_window, vp_width_height.x, vp_width_height.y);
 
 
-    //// Load shaders
-    //std::vector<std::pair<GLenum, std::string>> shdr_files;
-    //shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "../Build/Graphics/vertices.vert"));
-    //shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "../Build/Graphics/vertices.vert"));
+    // Load shaders
+    std::vector<std::pair<GLenum, std::string>> shdr_files;
+    shdr_files.push_back(std::make_pair(GL_VERTEX_SHADER, "./Build/Graphics/vertices.vert"));
+    shdr_files.push_back(std::make_pair(GL_FRAGMENT_SHADER, "./Build/Graphics/fragment.frag"));
 
-    //shdr_pgm.CompileLinkValidate(shdr_files);
-    //if (GL_FALSE == shdr_pgm.IsLinked()) {
-    //    std::cout << "Unable to compile/link/validate shader programs" << std::endl;
-    //    std::cout << shdr_pgm.GetLog() << std::endl;
-    //    std::exit(EXIT_FAILURE);
-    //}
+    shdr_pgm.CompileLinkValidate(shdr_files);
+    if (GL_FALSE == shdr_pgm.IsLinked()) {
+        std::cout << "Unable to compile/link/validate shader programs" << std::endl;
+        std::cout << shdr_pgm.GetLog() << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 
-    //setup_vao(); // Set up geometry
+    setup_vao(); // Set up geometry
 
-    //// Load texture
-    //tex_hdl = setup_texobj("../images/duck-rgba-256.tex");
+    // Load texture
+    tex_hdl = setup_texobj("./Sprite/protosprite.jpg");
 
-    //// Set initial texture wrap modes
-    //glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    //glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Set initial texture wrap modes
+    glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTextureParameteri(tex_hdl, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     return true;
 }
 
 void GLApp::setup_vao() {
     struct Vertex {
-        glm::vec2 pos;
+        glm::vec3 pos;
         glm::vec3 clr;
         glm::vec2 tex;
     };
 
     std::vector<Vertex> vertices = {
-        { {-1.f, -1.f}, {1.f, 0.f, 0.f}, {0.f, 0.f} },
-        { { 1.f, -1.f}, {0.f, 1.f, 0.f}, {1.f, 0.f} },
-        { {-1.f,  1.f}, {0.f, 0.f, 1.f}, {0.f, 1.f} },
-        { { 1.f,  1.f}, {1.f, 1.f, 1.f}, {1.f, 1.f} }
+        { {-1.f, -1.f, 0.f}, {1.f, 0.f, 0.f}, {0.f, 0.f} },
+        { { 1.f, -1.f, 0.f}, {0.f, 1.f, 0.f}, {1.f, 0.f} },
+        { {-1.f,  1.f, 0.f}, {0.f, 0.f, 1.f}, {0.f, 1.f} },
+        { { 1.f,  1.f, 0.f}, {1.f, 1.f, 1.f}, {1.f, 1.f} }
     };
 
     glCreateVertexArrays(1, &vao_hdl);
@@ -193,45 +195,63 @@ void GLApp::setup_vao() {
     glVertexArrayVertexBuffer(vao_hdl, 0, vbo_hdl, 0, sizeof(Vertex));
 
     // Position
-    glVertexArrayAttribFormat(vao_hdl, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
+    glVertexArrayAttribFormat(vao_hdl, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
     glVertexArrayAttribBinding(vao_hdl, 0, 0);
     glEnableVertexArrayAttrib(vao_hdl, 0);
 
     // Color
-    glVertexArrayAttribFormat(vao_hdl, 1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, clr));
-    glVertexArrayAttribBinding(vao_hdl, 1, 0);
-    glEnableVertexArrayAttrib(vao_hdl, 1);
-
-    // Texture coordinates
-    glVertexArrayAttribFormat(vao_hdl, 2, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
+    glVertexArrayAttribFormat(vao_hdl, 2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, clr));
     glVertexArrayAttribBinding(vao_hdl, 2, 0);
     glEnableVertexArrayAttrib(vao_hdl, 2);
+
+    // Texture coordinates
+    glVertexArrayAttribFormat(vao_hdl, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
+    glVertexArrayAttribBinding(vao_hdl, 1, 0);
+    glEnableVertexArrayAttrib(vao_hdl, 1);
 }
 
 GLuint GLApp::setup_texobj(std::string const& pathname) {
-    GLuint width = 256, height = 256, bytes_per_texel = 4;
-    GLsizei size = width * height * bytes_per_texel;
+    //GLuint width = 256, height = 256, bytes_per_texel = 4;
+    //GLsizei size = width * height * bytes_per_texel;
 
-    // Open file
-    std::ifstream ifs(pathname, std::ios::binary);
-    if (!ifs) {
-        std::cerr << "Unable to open texture file: " << pathname << std::endl;
+    //// Open file
+    //std::ifstream ifs(pathname, std::ios::binary);
+    //if (!ifs) {
+    //    std::cerr << "Unable to open texture file: " << pathname << std::endl;
+    //    std::exit(EXIT_FAILURE);
+    //}
+
+    //// Read texture data
+    //GLubyte* ptr_texels = new GLubyte[size];
+    //ifs.read(reinterpret_cast<char*>(ptr_texels), size);
+    //ifs.close();
+
+    //// Create and initialize texture object
+    //GLuint texobj_hdl;
+    //glCreateTextures(GL_TEXTURE_2D, 1, &texobj_hdl);
+    //glTextureStorage2D(texobj_hdl, 1, GL_RGBA8, width, height);
+    //glTextureSubImage2D(texobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ptr_texels);
+
+    //delete[] ptr_texels;
+    //return texobj_hdl;
+
+    int width, height, channels;
+    stbi_set_flip_vertically_on_load(1);
+    unsigned char* data = stbi_load(pathname.c_str(), &width, &height, &channels, 4);
+    if (!data) {
+        std::cerr << "Failed to load image: " << pathname << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
-    // Read texture data
-    GLubyte* ptr_texels = new GLubyte[size];
-    ifs.read(reinterpret_cast<char*>(ptr_texels), size);
-    ifs.close();
+    GLuint textobj_hdl;
+    glCreateTextures(GL_TEXTURE_2D, 1, &textobj_hdl);
+    glTextureStorage2D(textobj_hdl, 1, GL_RGBA8, width, height);
+    glTextureSubImage2D(textobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-    // Create and initialize texture object
-    GLuint texobj_hdl;
-    glCreateTextures(GL_TEXTURE_2D, 1, &texobj_hdl);
-    glTextureStorage2D(texobj_hdl, 1, GL_RGBA8, width, height);
-    glTextureSubImage2D(texobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, ptr_texels);
+    stbi_image_free(data);
+    return textobj_hdl;
 
-    delete[] ptr_texels;
-    return texobj_hdl;
+
 }
 
 
@@ -292,6 +312,28 @@ void GLApp::draw() {
     // clear colorbuffer with RGBA value in glClearColor ...
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
+
+    shdr_pgm.Use();
+    glBindVertexArray(vao_hdl);
+    glBindTextureUnit(0, tex_hdl);
+
+    glm::mat4 identity = glm::mat4(1.0f);
+    shdr_pgm.SetUniform("uMVP", identity);
+
+    glm::vec4 color = glm::vec4(clear_color[0], clear_color[1], clear_color[2], 1.0f);
+    shdr_pgm.SetUniform("uColor", color);
+
+    glm::vec2 tiling(1.0f, 1.0f);
+    shdr_pgm.SetUniform("uTiling", tiling);
+
+    shdr_pgm.SetUniform("uTexture", 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindVertexArray(0);
+    shdr_pgm.UnUse();
+
+
 }
 
 /*  _________________________________________________________________________ */
