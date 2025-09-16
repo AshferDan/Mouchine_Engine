@@ -1,121 +1,57 @@
-#include <iostream>
-#include <GLFW/glfw3.h>
-#include "core.h"
-#include "factory.h"
-#include "GameObjectSystem.h"
-#include "transform.h"
-#include "physics.h"
-#include "InputManager.h"
+ #include "Core.h"
+ #include "Factory.h"
+ #include "GameObjectSystem.h"
+ #include "Transform.h"
+ #include "Physics.h"
+ #include <iostream>
+ #include <cmath>
 
+ int main() {
+     std::cout << "=== 2D Component System Test ===" << std::endl;
 
-GLFWwindow* window = nullptr;
+     CoreEngine engine;
 
+     // Add the GameObject system
+     engine.AddSystem<GameObjectSystem>();
 
-// Key callback function
+     // Initialize
+     std::cout << "\n--- Initializing Engine ---" << std::endl;
+     engine.Init();
 
-// Function to draw a square at the given position
-void DrawSquare(float x, float y, float size) {
-    float halfSize = size / 2.0f;
+     // Create 2D game objects
+     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
+     auto& factory = GameObjectFactory::Instance();
 
-    glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f); // Red color
-    glVertex2f(x - halfSize, y - halfSize);
-    glVertex2f(x + halfSize, y - halfSize);
-    glVertex2f(x + halfSize, y + halfSize);
-    glVertex2f(x - halfSize, y + halfSize);
-    glEnd();
-}
+     GameObject* player = factory.CreatePlayer("Hero", 0, 5);
+     GameObject* enemy = factory.CreateEnemy("Goblin", 10, 0);
+     GameObject* platform = factory.CreatePlatform("Ground", 0, -2, 20, 1);
+     GameObject* bullet = factory.CreateProjectile("Bullet", 1, 6, 0.785f, 15.0f); // 45 degrees, speed 15
 
-int main() {
-    std::cout << "=== 2D Component System Test ===" << std::endl;
+     // Test 2D component interactions
+     std::cout << "\n--- Testing 2D Component Interactions ---" << std::endl;
+     // Test transform methods
+     if (auto* transform = player->GetComponent<TransformComponent>()) {
+         transform->SetRotation(0.785f); // 45 degrees
+         std::cout << "Set player rotation to 45 degrees" << std::endl;
+     }
 
-    // Initialize GLFW
-    if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
+     std::cout << "\n--- Starting 2D Simulation (8 frames) ---" << std::endl;
 
-    // Create window
-    window = glfwCreateWindow(800, 600, "2D Player Movement", NULL, NULL);
-    if (!window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
+     // Simulate frames to see 2D physics in action
+     float deltaTime = 0.016f; // ~60 FPS
+     for (int frame = 1; frame <= 8; ++frame) {
+         std::cout << "\n--- Frame " << frame << " ---" << std::endl;
 
-    glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, InputManager::keyCallback);
+         // Update all systems
+         auto& gameObjects = factory.GetAllGameObjects();
+         for (auto& obj : gameObjects) {
+             if (obj->IsActive()) {
+                 obj->Update(deltaTime);
+             }
+         }
+     }
 
-    CoreEngine engine;
-    engine.AddSystem<GameObjectSystem>();
-    engine.Init();
+     std::cout << "\n=== 2D Test Complete ===" << std::endl;
 
-    // Create player
-    auto& factory = GameObjectFactory::Instance();
-    GameObject* player = factory.CreatePlayer("Hero", 0, 0, 0);
-
-    std::cout << "\n--- Controls ---" << std::endl;
-    std::cout << "A: Move left (2.0 units/sec)" << std::endl;
-    std::cout << "D: Move right (2.0 units/sec)" << std::endl;
-    std::cout << "ESC: Exit" << std::endl;
-
-    // Game loop variables
-    double lastTime = glfwGetTime();
-    const float targetDeltaTime = 1.0f / 60.0f;
-
-    // Set up 2D orthographic projection (no Z-axis needed)
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-10.0, 10.0, -10.0, 10.0, 0.0, 1.0); // Near=0, Far=1 (2D only)
-    glMatrixMode(GL_MODELVIEW);
-
-    // Main game loop
-    while (!glfwWindowShouldClose(window)) {
-        float deltaTime = static_cast<float>(glfwGetTime() - lastTime);
-        lastTime = glfwGetTime();
-
-        if (deltaTime > 0.1f) deltaTime = targetDeltaTime;
-
-        glfwPollEvents();
-
-        // Handle player movement (2D only - X axis)
-        if (auto* transform = player->GetComponent<TransformComponent>()) {
-            float moveSpeed = 5.0f * deltaTime;
-
-            if (InputManager::keyA) transform->Move(-moveSpeed, 0.0f, 0.0f);
-            if (InputManager::keyD) transform->Move(moveSpeed, 0.0f, 0.0f);
-            if (InputManager::keyW) transform->Move(0.0f, moveSpeed, 0.0f);
-            if (InputManager::keyS) transform->Move(0.0f, -moveSpeed, 0.0f);
-        }
-
-        // Update game objects
-        for (auto& obj : factory.GetAllGameObjects()) {
-            if (obj->IsActive()) obj->Update(deltaTime);
-        }
-
-        // Rendering
-        glClear(GL_COLOR_BUFFER_BIT);
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-        // Draw player (2D only)
-        if (auto* transform = player->GetComponent<TransformComponent>()) {
-            float x, y, z;
-            transform->GetPosition(x, y, z);
-            DrawSquare(x, y, 1.0f);
-        }
-
-        glfwSwapBuffers(window);
-
-        // Maintain frame rate
-        double frameTime = glfwGetTime() - lastTime;
-        if (frameTime < targetDeltaTime) {
-            glfwWaitEventsTimeout(targetDeltaTime - frameTime);
-        }
-    }
-
-    // Cleanup
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    std::cout << "\n=== Game Complete ===" << std::endl;
-    return 0;
-}
+     return 0;
+ }

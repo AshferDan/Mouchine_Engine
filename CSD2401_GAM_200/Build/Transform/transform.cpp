@@ -1,56 +1,76 @@
  #include "transform.h"
  #include "GameObject.h"
  #include <iostream>
+ #include <cmath>
 
- TransformComponent::TransformComponent(GameObject* owner, float x, float y, float z)
-     : IComponent(owner), posX(x), posY(y), posZ(z),
-       rotX(0), rotY(0), rotZ(0),
-       scaleX(1), scaleY(1), scaleZ(1) {
+ TransformComponent::TransformComponent(GameObject* owner, float x, float y)
+     : IComponent(owner), posX(x), posY(y), rotation(0), scaleX(1), scaleY(1) {
  }
 
  void TransformComponent::Update(float deltaTime) {
      // Debug output for transform changes
-     static float lastPosX = posX, lastPosY = posY, lastPosZ = posZ;
+     static float lastPosX = posX, lastPosY = posY;
 
-     if (posX != lastPosX || posY != lastPosY || posZ != lastPosZ) {
+     if (posX != lastPosX || posY != lastPosY) {
          std::cout << owner->GetName() << " Transform Update - Position changed to ("
-                   << posX << ", " << posY << ", " << posZ << ")" << std::endl;
-         lastPosX = posX; lastPosY = posY; lastPosZ = posZ;
+                   << posX << ", " << posY << ")" << std::endl;
+         lastPosX = posX; lastPosY = posY;
      }
  }
 
- void TransformComponent::SetPosition(float x, float y, float z) {
-     posX = x; posY = y; posZ = z;
+ void TransformComponent::SetPosition(float x, float y) {
+     posX = x; 
+     posY = y;
  }
 
- void TransformComponent::GetPosition(float& x, float& y, float& z) const {
-     x = posX; y = posY; z = posZ;
+ void TransformComponent::GetPosition(float& x, float& y) const {
+     x = posX; 
+     y = posY;
  }
 
- void TransformComponent::SetRotation(float x, float y, float z) {
-     rotX = x; rotY = y; rotZ = z;
+ void TransformComponent::SetRotation(float angle) {
+     rotation = angle;
  }
 
- void TransformComponent::GetRotation(float& x, float& y, float& z) const {
-     x = rotX; y = rotY; z = rotZ;
+ float TransformComponent::GetRotation() const {
+     return rotation;
  }
 
- void TransformComponent::SetScale(float x, float y, float z) {
-     scaleX = x; scaleY = y; scaleZ = z;
+ void TransformComponent::SetScale(float x, float y) {
+     scaleX = x; 
+     scaleY = y;
  }
 
- void TransformComponent::GetScale(float& x, float& y, float& z) const {
-     x = scaleX; y = scaleY; z = scaleZ;
+ void TransformComponent::SetScale(float uniformScale) {
+     scaleX = scaleY = uniformScale;
  }
 
- void TransformComponent::Move(float deltaX, float deltaY, float deltaZ) {
+ void TransformComponent::GetScale(float& x, float& y) const {
+     x = scaleX; 
+     y = scaleY;
+ }
+
+ void TransformComponent::Move(float deltaX, float deltaY) {
      posX += deltaX;
      posY += deltaY;
-     posZ += deltaZ;
  }
 
- void TransformComponent::Rotate(float deltaX, float deltaY, float deltaZ) {
-     rotX += deltaX;
-     rotY += deltaY;
-     rotZ += deltaZ;
+ void TransformComponent::Rotate(float deltaAngle) {
+     rotation += deltaAngle;
+ }
+
+ void TransformComponent::LookAt(float targetX, float targetY) {
+     float deltaX = targetX - posX;
+     float deltaY = targetY - posY;
+     rotation = std::atan2(deltaY, deltaX);
+ }
+
+ void TransformComponent::MoveForward(float distance) {
+     posX += std::cos(rotation) * distance;
+     posY += std::sin(rotation) * distance;
+ }
+
+ void TransformComponent::MoveRight(float distance) {
+     posX += std::cos(rotation + 1.5708f) * distance; // +90 degrees
+     posY += std::sin(rotation + 1.5708f) * distance;
  }

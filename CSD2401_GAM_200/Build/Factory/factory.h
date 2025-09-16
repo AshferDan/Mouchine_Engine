@@ -14,10 +14,12 @@ public:
     // Create GameObject
     GameObject* CreateGameObject(const std::string& name = "GameObject");
 
-    // Create predefined types
-    GameObject* CreatePlayer(const std::string& name, float x, float y, float z);
-    GameObject* CreateEnemy(const std::string& name, float x, float y, float z);
-    GameObject* CreateStaticProp(const std::string& name, float x, float y, float z, const std::string& meshName);
+    // Create predefined 2D types
+    GameObject* CreatePlayer(const std::string& name, float x, float y);
+    GameObject* CreateEnemy(const std::string& name, float x, float y);
+    GameObject* CreateStaticProp(const std::string& name, float x, float y, const std::string& spriteName = "");
+    GameObject* CreateProjectile(const std::string& name, float x, float y, float directionAngle, float speed);
+    GameObject* CreatePlatform(const std::string& name, float x, float y, float width, float height);
 
     // Management
     GameObject* GetGameObject(EntityID id);
