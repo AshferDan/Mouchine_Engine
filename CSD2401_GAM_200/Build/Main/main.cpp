@@ -23,10 +23,6 @@
      auto& factory = GameObjectFactory::Instance();
 
      GameObject* player = factory.CreatePlayer("Hero", 0, 5);
-     GameObject* enemy = factory.CreateEnemy("Goblin", 10, 0);
-     GameObject* platform = factory.CreatePlatform("Ground", 0, -2, 20, 1);
-     GameObject* bullet = factory.CreateProjectile("Bullet", 1, 6, 0.785f, 15.0f); // 45 degrees, speed 15
-
      // Test 2D component interactions
      std::cout << "\n--- Testing 2D Component Interactions ---" << std::endl;
      // Test transform methods

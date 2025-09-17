@@ -175,6 +175,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
     PRIVATE libglew_static
     PRIVATE imgui
     PRIVATE nlohmann_json::nlohmann_json 
+    #PRIVATE freetype
 )
 
 # ======================= Platform-specific Libraries ================

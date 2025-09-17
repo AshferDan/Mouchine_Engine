@@ -102,6 +102,31 @@ macro(import_imgui)
         set_property(TARGET imgui PROPERTY CXX_STANDARD_REQUIRED ON)
     endif()
 endmacro()
+
+
+# Macro to import FreeType
+macro(import_freetype)
+    if(NOT TARGET freetype)  # Guard to prevent multiple inclusion
+        FetchContent_Declare(
+            freetype
+            GIT_REPOSITORY https://github.com/freetype/freetype.git
+            GIT_TAG VER-2-13-2  # Use a stable version instead of master
+        )
+        
+        # Set FreeType options before making it available
+        set(FT_DISABLE_ZLIB ON CACHE BOOL "Disable zlib support" FORCE)
+        set(FT_DISABLE_BZIP2 ON CACHE BOOL "Disable bzip2 support" FORCE)
+        set(FT_DISABLE_PNG ON CACHE BOOL "Disable PNG support" FORCE)
+        set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "Disable HarfBuzz support" FORCE)
+        set(FT_DISABLE_BROTLI ON CACHE BOOL "Disable Brotli support" FORCE)
+        
+        FetchContent_MakeAvailable(freetype)
+        
+        # Include directories are handled automatically by FetchContent_MakeAvailable
+    endif()
+endmacro()
+ 
+
 # Macro to import all dependencies
 macro(importDependencies)
     message(STATUS "Starting to import dependencies...")
