@@ -20,10 +20,13 @@ public:
         if (HasComponent<T>()) {
             return GetComponent<T>();
         }
-
+        //if not then with the new created object add a component or more
+        //args... is a way to get the variable number of contstrutor arguments
+        //with std::forward it helps to forward  the other args to the component construtor
         auto component = std::make_unique<T>(this, std::forward<Args>(args)...);
         T* componentPtr = component.get();
 
+        //std::type index is to get each of the unique ID for each component type
         std::type_index typeIndex(typeid(T));
         components[typeIndex] = std::move(component);
 
