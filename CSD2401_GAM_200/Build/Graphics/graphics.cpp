@@ -13,8 +13,8 @@ to OpenGL implementations.
 
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+//#define STB_IMAGE_IMPLEMENTATION
+//#include <stb_image.h>
 #include "graphics.h"
 #include "glslshader.h"
 #include <glm/glm.hpp>
@@ -235,23 +235,21 @@ GLuint GLApp::setup_texobj(std::string const& pathname) {
     //delete[] ptr_texels;
     //return texobj_hdl;
 
-    int width, height, channels;
-    stbi_set_flip_vertically_on_load(1);
-    unsigned char* data = stbi_load(pathname.c_str(), &width, &height, &channels, 4);
-    if (!data) {
-        std::cerr << "Failed to load image: " << pathname << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+    //int width, height, channels;
+    //stbi_set_flip_vertically_on_load(1);
+    //unsigned char* data = stbi_load(pathname.c_str(), &width, &height, &channels, 4);
+    //if (!data) {
+    //    std::cerr << "Failed to load image: " << pathname << std::endl;
+    //    std::exit(EXIT_FAILURE);
+    //}
 
     GLuint textobj_hdl;
-    glCreateTextures(GL_TEXTURE_2D, 1, &textobj_hdl);
-    glTextureStorage2D(textobj_hdl, 1, GL_RGBA8, width, height);
-    glTextureSubImage2D(textobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    //glCreateTextures(GL_TEXTURE_2D, 1, &textobj_hdl);
+    //glTextureStorage2D(textobj_hdl, 1, GL_RGBA8, width, height);
+    //glTextureSubImage2D(textobj_hdl, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-    stbi_image_free(data);
+    //stbi_image_free(data);
     return textobj_hdl;
-
-
 }
 
 
