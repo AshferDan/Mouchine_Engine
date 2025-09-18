@@ -407,7 +407,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Collision\Collision.cpp" />
     <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\GameManager\GameManager.cpp" />
     <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Graphics\glslshader.cpp" />
-    <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Graphics\graphics.cpp" />
     <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\LevelEditor\LevelEditor.cpp" />
     <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Logic\logic.cpp" />
     <ClCompile Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Main\main.cpp" />
@@ -428,7 +427,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Collision\Collision.h" />
     <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\GameManager\GameManager.h" />
     <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Graphics\glslshader.h" />
-    <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Graphics\graphics.h" />
     <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Graphics\stb_image.h" />
     <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\LevelEditor\LevelEditor.h" />
     <ClInclude Include="C:\Users\shaoj\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\Logic\logic.h" />
