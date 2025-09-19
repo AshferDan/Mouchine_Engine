@@ -1,47 +1,31 @@
-#pragma once
-#include <unordered_map>
+#ifndef INPUTMANAGER_H
+#define INPUTMANAGER_H
+
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <string>
 
-// Represents the current state of a key
-enum class KeyState {
-    Idle,
-    Pressed,
-    Held,
-    Released
+struct InputManager
+{
+    // Initialization
+    static bool init(GLint width, GLint height, std::string title);
+    static void cleanup();
+
+    // Callbacks
+    static void key_cb(GLFWwindow* pwin, int key, int scancode, int action, int mods);
+    static void mousebutton_cb(GLFWwindow* pwin, int button, int action, int mods);
+    static void mousepos_cb(GLFWwindow* pwin, double xpos, double ypos);
+    static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
+    static void setup_event_callbacks();
+
+    // Window info
+    static GLint width, height;
+    static std::string title;
+    static GLFWwindow* ptr_window;
+
+    // Mouse position / scroll
+    static double mouseX, mouseY;
+    static double scrollX, scrollY;
 };
 
-// Represents game actions
-enum class InputAction {
-    None = 0,
-    MoveLeft,
-    MoveRight,
-    Jump,
-    Dash,
-    Pause
-};
-
-class InputManager {
-public:
-    InputManager();
-    ~InputManager() = default;
-
-    void initialize(GLFWwindow* window);
-
-    void bindKey(int keyCode, InputAction const& action);
-
-    void update();
-
-    bool isPressed(InputAction const& action) const;
-    bool isHeld(InputAction const& action) const;
-    bool isReleased(InputAction const& action) const;
-
-private:
-    GLFWwindow* window;
-    std::unordered_map<int, InputAction> bindings; // keyCode -> action
-    std::unordered_map<int, KeyState> keyStates;   // keyCode -> state
-
-    // Helper to check if an action is in a desired state
-    bool check(InputAction const& action, KeyState const& desired) const;
-
-    static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-};
+#endif
