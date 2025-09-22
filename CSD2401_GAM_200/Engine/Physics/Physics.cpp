@@ -16,7 +16,7 @@
  void PhysicsComponent::Update(float deltaTime) {
      if (isStatic) return;
 
-     std::cout << owner->GetName() << " Physics Update - ";
+     //std::cout << owner->GetName() << " Physics Update - ";
 
      // Apply gravity
      if (useGravity) {
@@ -43,9 +43,9 @@
      // Debug output
      auto* transform = owner->GetComponent<TransformComponent>();
      if (transform) {
-         std::cout << "Pos(" << transform->posX << ", " << transform->posY << ") ";
-         std::cout << "Vel(" << velocityX << ", " << velocityY << ") ";
-         std::cout << "Rot(" << transform->rotation << ")" << std::endl;
+         //std::cout << "Pos(" << transform->posX << ", " << transform->posY << ") ";
+         //std::cout << "Vel(" << velocityX << ", " << velocityY << ") ";
+         //std::cout << "Rot(" << transform->rotation << ")" << std::endl;
      }
  }
 
