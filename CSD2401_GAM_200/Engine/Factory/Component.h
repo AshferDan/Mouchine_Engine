@@ -1,18 +1,26 @@
+/*==================================================================================
+Jonathan
+Brief
+this file is the blueprint for all components where it has the class icomponent
+with this file it gives all gameobject where the component are being store 
+must haves like the component must haves
+-Initialize();
+-Update();
+-Destroy();
+-GetName() - the component must have a name
+-enable and disable 
+===================================================================================*/
+
 #pragma once
 #include <string>
 
-// Forward declaration
+
 class GameObject;
 
 // Base Component class - contains both data and behavior
 class IComponent {
 public:
     //Set up the component so to start one is to use any of them
-    //its setting the gameobject to active.
-
-    //GameObject* player = factory.CreatePlayer("Name_of_GameObject", x, y);
-    //GameObject* Enemies = factorry.CreateEnemies("Name_of_Enemies",x,y);
-    //GameObject* StaticProps = factory.CreateEnemies("Name_of_props,x,y);
     IComponent(GameObject* owner) : owner(owner), enabled(true) {}
     virtual ~IComponent() = default;
 
