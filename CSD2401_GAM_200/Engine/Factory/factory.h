@@ -22,16 +22,16 @@ public:
     GameObject* CreatePlatform(const std::string& name, float x, float y, float width, float height);
 
     // Management
-    GameObject* GetGameObject(EntityID id);
+    GameObject* GetGameObject(GameObjectID);
     GameObject* FindGameObject(const std::string& name);
     const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
 
-    void DestroyGameObject(EntityID id);
+    void DestroyGameObject(GameObjectID id);
     void Clear();
 
 private:
-    GameObjectFactory() : nextEntityID(1) {}
-    EntityID nextEntityID;
+    GameObjectFactory() : nextGameObjectID(1) {}
+    GameObjectID nextGameObjectID;
     std::vector<std::unique_ptr<GameObject>> gameObjects;
-    std::unordered_map<EntityID, size_t> entityToIndex;
+    std::unordered_map<GameObjectID, size_t> entityToIndex;
 };

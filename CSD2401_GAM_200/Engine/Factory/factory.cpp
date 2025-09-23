@@ -5,7 +5,7 @@
 #include <cmath>
 
 GameObject* GameObjectFactory::CreateGameObject(const std::string& name) {
-    EntityID id = nextEntityID++;
+    GameObjectID id = nextGameObjectID++;
     auto gameObject = std::make_unique<GameObject>(id, name);
     GameObject* ptr = gameObject.get();
 
@@ -85,7 +85,7 @@ GameObject* GameObjectFactory::CreatePlatform(const std::string& name, float x, 
     return platform;
 }
 
-GameObject* GameObjectFactory::GetGameObject(EntityID id) {
+GameObject* GameObjectFactory::GetGameObject(GameObjectID id) {
     auto it = entityToIndex.find(id);
     if (it != entityToIndex.end() && it->second < gameObjects.size()) {
         return gameObjects[it->second].get();
@@ -106,7 +106,7 @@ const std::vector<std::unique_ptr<GameObject>>& GameObjectFactory::GetAllGameObj
     return gameObjects;
 }
 
-void GameObjectFactory::DestroyGameObject(EntityID id) {
+void GameObjectFactory::DestroyGameObject(GameObjectID id) {
     auto it = entityToIndex.find(id);
     if (it != entityToIndex.end()) {
         size_t index = it->second;
@@ -124,5 +124,5 @@ void GameObjectFactory::DestroyGameObject(EntityID id) {
 void GameObjectFactory::Clear() {
     gameObjects.clear();
     entityToIndex.clear();
-    nextEntityID = 1;
+    nextGameObjectID = 1;
 }

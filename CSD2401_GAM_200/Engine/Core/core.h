@@ -4,6 +4,10 @@
 #include <memory>
 #include "System.h"
 
+// Forward declarations
+class GameObjectSystem;
+class GraphicsSystem;
+
 class CoreEngine {
 public:
     CoreEngine();
@@ -21,8 +25,20 @@ public:
         return systemPtr;
     }
 
+    // Direct access to commonly used systems
+    GameObjectSystem* GetGameObjectSystem() const {
+        return gameObjectSystem;
+    }
+
+    GraphicsSystem* GetGraphicsSystem() const {
+        return graphicsSystem;
+    }
+
 private:
+    void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
+    GameObjectSystem* gameObjectSystem = nullptr;
+    GraphicsSystem* graphicsSystem = nullptr;
     unsigned LastTime;
     bool GameActive;
 };
