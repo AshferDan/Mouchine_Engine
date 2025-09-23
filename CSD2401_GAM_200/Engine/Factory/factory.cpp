@@ -89,13 +89,25 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
     GameObject* obj = CreateGameObject(name);
 
     auto* transform = obj->AddComponent<TransformComponent>(x, y);
+
+    auto render = obj->AddComponent<RenderComponent>(shape, color);
+
+    if (shape == RenderComponent::ShapeType::Line) {
+        render->SetLine(glm::vec2(x, y), glm::vec2(w, h));
+    }
+    else if (shape == RenderComponent::ShapeType::Point) {
+        render->SetPoint(glm::vec2(x, y), w);
+    }
+    else {
+        transform->SetScale(w, h);
+    }
+
     transform->SetScale(w, h);
-
-    obj->AddComponent<RenderComponent>(shape, color);
-
     //testing TO BE REMOVED
     std::cout << "Created "
-        << (shape == RenderComponent::ShapeType::Circle ? "Circle" : "Square")
+        << (shape == RenderComponent::ShapeType::Circle ? "Circle" :
+            shape == RenderComponent::ShapeType::Square ? "Square" :
+            shape == RenderComponent::ShapeType::Line ? "Line" : "Point")
         << ": " << name << " at (" << x << "," << y << ")\n";
 
     return obj;

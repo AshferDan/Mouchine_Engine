@@ -18,9 +18,11 @@ void main() {
     }
 
     if(uIsCircle == 1) {
-        if(dot(CircleCoord, CircleCoord) > 1.0){
-            discard;
-        }
+        float dist = dot(CircleCoord, CircleCoord); // distance squared from center
+        float edge = 0.01; // width of the edge fade
+        float alpha = 1.0 - smoothstep(1.0 - edge, 1.0, dist);
+        baseColor.a *= alpha;
+        if(alpha <= 0.0) discard;
     }
 
     FragColor = baseColor;
