@@ -120,33 +120,29 @@ void GraphicsSystem::Update(float dt) {
         model = glm::scale(model, glm::vec3(sx, sy, 1.0f));
 
         shader.SetUniform("uMVP", vp * model);
-        shader.SetUniform("uColor", glm::vec4(1.0f));
-        shader.SetUniform("uTiling", glm::vec2(1.0f, 1.0f));
 
         if (auto* rend = obj->GetComponent<RenderComponent>()) {
-            GLuint texID = rend->GetTextureID();
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texID);
-            shader.SetUniform("uTexture", 0);
-        }
-        else {
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
+            shader.SetUniform("uColor", glm::vec4(rend->GetColor()));
+            shader.SetUniform("uTiling", glm::vec2(1.0f));
 
-        //glBindTexture(GL_TEXTURE_2D, texID);
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            if (rend->GetTextureID() > 0) {
+                shader.SetUniform("uHasTexture", 1);
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, rend->GetTextureID());
+                shader.SetUniform("uTexture", 0);
+            }
+            else {
+                shader.SetUniform("uHasTexture", 0);
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
 
-        //glBindVertexArray(vao);
-        //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
+
+            glBindVertexArray(vao);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            
+        }
     }
-
-    //glm::mat4 mvp = glm::mat4(1.0f); // identity
-    //shader.SetUniform("uMVP", mvp);
-    //shader.SetUniform("uColor", glm::vec4(1.0f));
-
-    //glBindVertexArray(vao);
-    //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glfwSwapBuffers(window);
     glfwPollEvents();

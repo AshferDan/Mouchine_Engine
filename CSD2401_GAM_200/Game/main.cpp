@@ -25,14 +25,16 @@
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
 
+     GameObject* SquareShape = factory.CreateShape("Square", RenderComponent::ShapeType::Square, 5, 5, 5, 5, glm::vec4(0.f, 0.f, 1.f, 1.f));
      GameObject* player = factory.CreatePlayer("Hero", 0, 0);
      GameObject* enemy = factory.CreateEnemy("Goblin", 3, 0);
      GameObject* platform = factory.CreatePlatform("Ground", 0, -3, 6, 1);
      GameObject* bullet = factory.CreateProjectile("Bullet", -2, 1, 0.785f, 0); // velocity 0
+     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 1, 1, 10, 10, glm::vec4(1.f, 0.f, 0.f, 1.f));
 
      // Stop physics from moving them
      if (auto* phys = player->GetComponent<PhysicsComponent>())
-         phys->SetGravity(true);
+         phys->SetGravity(false);
 
      // Scale for visibility
      player->GetComponent<TransformComponent>()->SetScale(10.0f, 10.0f);

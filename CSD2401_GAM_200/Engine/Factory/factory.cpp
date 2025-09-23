@@ -85,6 +85,22 @@ GameObject* GameObjectFactory::CreatePlatform(const std::string& name, float x, 
     return platform;
 }
 
+GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color) {
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    transform->SetScale(w, h);
+
+    obj->AddComponent<RenderComponent>(shape, color);
+
+    //testing TO BE REMOVED
+    std::cout << "Created "
+        << (shape == RenderComponent::ShapeType::Circle ? "Circle" : "Square")
+        << ": " << name << " at (" << x << "," << y << ")\n";
+
+    return obj;
+}
+
 GameObject* GameObjectFactory::GetGameObject(EntityID id) {
     auto it = entityToIndex.find(id);
     if (it != entityToIndex.end() && it->second < gameObjects.size()) {

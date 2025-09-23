@@ -2,10 +2,19 @@
 #include "Component.h"
 #include <GL/glew.h>
 
+
 class RenderComponent : public IComponent {
 public:
-    RenderComponent(GameObject* owner, GLuint texID)
-        : IComponent(owner), textureID(texID) {}
+    enum class ShapeType {
+        Square,
+        Circle
+    };
+
+    //Constructor for textured object
+    RenderComponent(GameObject* owner, GLuint texID) : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f) {}
+
+    //Constructor for shape
+    RenderComponent(GameObject* owner, ShapeType type, const glm::vec4& color) : IComponent(owner), shape(type), textureID(0), color(color) {};
 
     // Lifecycle overrides
     void Initialize() override {}
@@ -17,7 +26,11 @@ public:
 
     // Getter for texture
     GLuint GetTextureID() const { return textureID; }
+    ShapeType GetShapeType() const { return shape; }
+    glm::vec4 GetColor() const { return color; }
 
 private:
+    ShapeType shape;
     GLuint textureID;
+    glm::vec4 color;
 };
