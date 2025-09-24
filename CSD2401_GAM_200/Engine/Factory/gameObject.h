@@ -37,11 +37,13 @@ i didnt know about only after using abit of AI to look at examples
 #include <unordered_map>
 #include <string>
 
-using GameObjectID = std::uint32_t;
+using EntityID = std::uint32_t;
 
 class GameObject {
 public:
-    GameObject(GameObjectID id, const std::string& name = "GameObject");
+
+    GameObject(EntityID id, const std::string& name = "GameObject");
+
     ~GameObject();
 
     // Component management
@@ -112,7 +114,7 @@ public:
     void Destroy();
 
     // Getters
-    GameObjectID GetID() const { return GObjID; }
+    EntityID GetID() const { return entityID; }
     const std::string& GetName() const { return name; }
 
     // Enable/disable
@@ -120,7 +122,7 @@ public:
     bool IsActive() const { return isActive; }
 
 private:
-    GameObjectID GObjID;
+    EntityID entityID;
     std::string name;
     bool isActive;
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;

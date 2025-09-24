@@ -13,10 +13,6 @@
 
      CoreEngine engine;
 
-     // Add the GameObject system
-     engine.AddSystem<GameObjectSystem>();
-     engine.AddSystem<GraphicsSystem>();
-
      // Initialize
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
