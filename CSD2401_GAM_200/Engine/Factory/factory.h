@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <glm/glm.hpp>
+#include "RenderComponent.h"
 
 class GameObjectFactory {
 public:
@@ -17,20 +19,22 @@ public:
     // Create predefined 2D types
     GameObject* CreatePlayer(const std::string& name, float x, float y);
     GameObject* CreateEnemy(const std::string& name, float x, float y);
-    GameObject* CreateDefault(float x, float y);
-
+    GameObject* CreateStaticProp(const std::string& name, float x, float y, const std::string& spriteName = "");
+    GameObject* CreateProjectile(const std::string& name, float x, float y, float directionAngle, float speed);
+    GameObject* CreatePlatform(const std::string& name, float x, float y, float width, float height);
+    GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color);
 
     // Management
-    GameObject* GetGameObject(GameObjectID);
+    GameObject* GetGameObject(EntityID id);
     GameObject* FindGameObject(const std::string& name);
     const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
 
-    void DestroyGameObject(GameObjectID id);
+    void DestroyGameObject(EntityID id);
     void Clear();
 
 private:
-    GameObjectFactory() : nextGameObjectID(1) {}
-    GameObjectID nextGameObjectID;
+    GameObjectFactory() : nextEntityID(1) {}
+    EntityID nextEntityID;
     std::vector<std::unique_ptr<GameObject>> gameObjects;
-    std::unordered_map<GameObjectID, size_t> entityToIndex;
+    std::unordered_map<EntityID, size_t> entityToIndex;
 };
