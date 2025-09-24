@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include <glm/glm.hpp>
+#include "RenderComponent.h"
 
 class GameObjectFactory {
 public:
@@ -20,6 +22,7 @@ public:
     GameObject* CreateStaticProp(const std::string& name, float x, float y, const std::string& spriteName = "");
     GameObject* CreateProjectile(const std::string& name, float x, float y, float directionAngle, float speed);
     GameObject* CreatePlatform(const std::string& name, float x, float y, float width, float height);
+    GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color);
 
     // Management
     GameObject* GetGameObject(EntityID id);
