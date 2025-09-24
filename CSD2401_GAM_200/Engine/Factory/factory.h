@@ -17,9 +17,8 @@ public:
     // Create predefined 2D types
     GameObject* CreatePlayer(const std::string& name, float x, float y);
     GameObject* CreateEnemy(const std::string& name, float x, float y);
-    GameObject* CreateStaticProp(const std::string& name, float x, float y, const std::string& spriteName = "");
-    GameObject* CreateProjectile(const std::string& name, float x, float y, float directionAngle, float speed);
-    GameObject* CreatePlatform(const std::string& name, float x, float y, float width, float height);
+    GameObject* CreateDefault(float x, float y);
+
 
     // Management
     GameObject* GetGameObject(GameObjectID);

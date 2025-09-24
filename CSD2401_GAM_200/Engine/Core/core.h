@@ -34,6 +34,10 @@ public:
         return graphicsSystem;
     }
 
+    static double GetFPS() { return fps; }
+    static double GetDeltaTime() { return delta_time; }
+
+
 private:
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
@@ -41,6 +45,9 @@ private:
     GraphicsSystem* graphicsSystem = nullptr;
     unsigned LastTime;
     bool GameActive;
+    static double fps;
+    static double delta_time;
+    void update_time(double fps_calc_interval = 1.0);
 };
 
 extern CoreEngine* CORE;

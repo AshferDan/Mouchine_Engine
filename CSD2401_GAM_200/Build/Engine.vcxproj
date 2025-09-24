@@ -342,7 +342,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Serialization\Serialization.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Transform\transform.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Input\InputManager.cpp" />
-    <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\Component.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\GameObjectSystem.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\factory.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\gameObject.cpp" />

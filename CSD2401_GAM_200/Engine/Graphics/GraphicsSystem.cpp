@@ -1,6 +1,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "GraphicsSystem.h"
+#include "graphics.h"
 #include "stb_image.h"
+#include <sstream>
+#include "core.h"
 
 
 GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0) {}
@@ -19,7 +22,13 @@ void GraphicsSystem::Initialize() {
     }
 
     // Simple fixed window size for now
-    window = glfwCreateWindow(800, 600, "Game Engine", nullptr, nullptr);
+    window = glfwCreateWindow(800, 640, " ", nullptr, nullptr);
+    std::stringstream sstr;
+    sstr << "Game Engine ";
+    sstr << "FPS: " << std::to_string(static_cast<GLint>(CoreEngine::GetFPS()));
+    glfwSetWindowTitle(window, sstr.str().c_str());
+
+
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();
@@ -150,6 +159,7 @@ void GraphicsSystem::Update(float dt) {
 
     glfwSwapBuffers(window);
     glfwPollEvents();
+    
 }
 
 

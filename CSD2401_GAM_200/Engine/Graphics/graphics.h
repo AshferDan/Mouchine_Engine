@@ -50,12 +50,5 @@ struct GLApp
 	static std::string title;
 	static GLFWwindow* ptr_window;
 	static GLfloat clear_color[4]; // rgba normalize components in range 0.0f to 1.0f
-	static GLboolean keystateR;
-	static GLboolean keystateG;
-	static GLboolean keystateB;
 };
-void graphic_init();
-void graphic_update();
-void graphic_draw();
-
 #endif /* GLAPP_H */;

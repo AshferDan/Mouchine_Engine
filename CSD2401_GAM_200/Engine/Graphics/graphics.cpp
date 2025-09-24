@@ -33,9 +33,6 @@ GLdouble GLApp::delta_time;
 std::string GLApp::title;
 GLFWwindow* GLApp::ptr_window;
 GLfloat GLApp::clear_color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-GLboolean GLApp::keystateR = GL_FALSE;
-GLboolean GLApp::keystateG = GL_FALSE;
-GLboolean GLApp::keystateB = GL_FALSE;
 
 /*  _________________________________________________________________________ */
 /*! init
@@ -157,32 +154,6 @@ void GLApp::update() {
     std::stringstream sstr;
     sstr << std::fixed << std::setprecision(2) << GLApp::title << " | " << GLApp::fps;
     glfwSetWindowTitle(GLApp::ptr_window, sstr.str().c_str());
-
-    if (keystateR == GL_TRUE) {
-
-        clear_color[0] = 1.0f;
-        clear_color[1] = 0.0f;
-        clear_color[2] = 0.0f;
-        clear_color[3] = 1.0f;
-    }
-
-    if (keystateG == GL_TRUE) {
-
-        clear_color[0] = 0.0f;
-        clear_color[1] = 1.0f;
-        clear_color[2] = 0.0f;
-        clear_color[3] = 1.0f;
-
-    }
-
-    if (keystateB == GL_TRUE) {
-
-        clear_color[0] = 0.0f;
-        clear_color[1] = 0.0f;
-        clear_color[2] = 1.0f;
-        clear_color[3] = 1.0f;
-
-    }
     GLApp::update_time(1.0);
     glfwPollEvents();
     glfwSwapBuffers(GLApp::ptr_window);
@@ -256,21 +227,6 @@ void GLApp::key_cb(GLFWwindow* pwin, int key, int scancode, int action, int mod)
 #ifdef _DEBUG
         std::cout << "Key pressed" << std::endl;
 #endif
-        if (key == 'R') {
-            keystateR = GL_TRUE;
-            keystateG = GL_FALSE;
-            keystateB = GL_FALSE;
-        }
-        else if (key == 'G') {
-            keystateR = GL_FALSE;
-            keystateG = GL_TRUE;
-            keystateB = GL_FALSE;
-        }
-        else if (key == 'B') {
-            keystateR = GL_FALSE;
-            keystateG = GL_FALSE;
-            keystateB = GL_TRUE;
-        }
     }
     else if (GLFW_REPEAT == action) {
 #ifdef _DEBUG

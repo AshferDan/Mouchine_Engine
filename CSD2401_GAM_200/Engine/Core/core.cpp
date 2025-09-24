@@ -2,12 +2,15 @@
 #include "System.h"
 #include "GameObjectSystem.h"
 #include "GraphicsSystem.h"
+#include "Graphics.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <thread>
 #include <chrono>
 
 CoreEngine* CORE;
+double CoreEngine::fps = 0.0;
+double CoreEngine::delta_time = 0.0;
 
 CoreEngine::CoreEngine() {
     LastTime = 0;
@@ -46,13 +49,15 @@ void CoreEngine::Init() {
 
 void CoreEngine::GameLoop() {
     // Initialize the last time variable
-    LastTime = static_cast<unsigned>(glfwGetTime() * 1000);
+    LastTime = static_cast<unsigned>(glfwGetTime());
 
     std::cout << "Starting game loop..." << std::endl;
 
-    while (GameActive) {
-        unsigned currenttime = static_cast<unsigned>(glfwGetTime() * 1000);
-        float dt = (currenttime - LastTime) / 1000.0f;
+    while (!glfwWindowShouldClose(glfwGetCurrentContext())) {
+       
+        update_time(1.0);
+        unsigned currenttime = static_cast<unsigned>(glfwGetTime());
+        float dt = (currenttime - LastTime);
         LastTime = currenttime;
 
         // Update every system
@@ -66,13 +71,39 @@ void CoreEngine::GameLoop() {
         if (frameCount > 300) {
             GameActive = false;
             std::cout << "Stopping game loop after " << frameCount << " frames" << std::endl;
+            std::cout << "Final FPS: " << fps << ", Final Delta Time: " << delta_time << "s" << std::endl;
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
 }
+
 
 void CoreEngine::DestroySystems() {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
+}
+
+void CoreEngine::update_time(double fps_calc_interval) {
+    // EXACT COPY FROM YOUR IMAGE with static variables:
+    // get elapsed time (in seconds) between previous and current frames
+    static double prev_time = glfwGetTime();
+    double curr_time = glfwGetTime();
+    delta_time = curr_time - prev_time;  // Now using static delta_time
+    prev_time = curr_time;
+
+    // fps calculations
+    static double count = 0.0; // number of game loop iterations
+    static double start_time = glfwGetTime();
+    // get elapsed time since very beginning (in seconds) ...
+    double elapsed_time = curr_time - start_time;
+
+    ++count;
+
+    // update fps at least every 10 seconds ...
+    fps_calc_interval = (fps_calc_interval < 0.0) ? 0.0 : fps_calc_interval;
+    fps_calc_interval = (fps_calc_interval > 10.0) ? 10.0 : fps_calc_interval;
+    if (elapsed_time > fps_calc_interval) {
+        fps = count / elapsed_time;  // Now using static fps
+        start_time = curr_time;
+        count = 0.0;
+    }
 }
