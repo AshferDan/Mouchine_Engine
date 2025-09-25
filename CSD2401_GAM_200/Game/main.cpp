@@ -2,6 +2,7 @@
  #include "Factory.h"
  #include "GameObjectSystem.h"
  #include "GraphicsSystem.h"
+ #include "ImGuiSystem.h"
  #include "Transform.h"
  #include "Physics.h"
  #include "RenderComponent.h"
@@ -16,6 +17,7 @@
      // Add the GameObject system
      engine.AddSystem<GameObjectSystem>();
      engine.AddSystem<GraphicsSystem>();
+     engine.AddSystem<ImGuiSystem>();
 
      // Initialize
      std::cout << "\n--- Initializing Engine ---" << std::endl;
