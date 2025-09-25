@@ -17,7 +17,7 @@ public:
     GameObject* CreateGameObject(const std::string& name = "GameObject");
 
     // Create predefined 2D types
-    GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y , float w, float h,glm::vec4 color);
+    GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y , float w, float h,const glm::vec4 color);
     GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w , float h, const char* sprite);
     GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color);
     

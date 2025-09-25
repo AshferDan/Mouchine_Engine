@@ -7,6 +7,7 @@
 // Forward declarations
 class GameObjectSystem;
 class GraphicsSystem;
+class ImGuiSystem;
 
 class CoreEngine {
 public:
@@ -34,6 +35,10 @@ public:
         return graphicsSystem;
     }
 
+    ImGuiSystem* GetImguiSystem() const {
+        return imguiSystem;
+    }
+
     static double GetFPS() { return fps; }
     static double GetDeltaTime() { return delta_time; }
 
@@ -41,8 +46,11 @@ public:
 private:
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
+
     GameObjectSystem* gameObjectSystem = nullptr;
     GraphicsSystem* graphicsSystem = nullptr;
+    ImGuiSystem* imguiSystem = nullptr;
+
     unsigned LastTime;
     bool GameActive;
     static double fps;

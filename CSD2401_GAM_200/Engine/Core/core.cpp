@@ -8,6 +8,7 @@
 #include <thread>
 #include <chrono>
 #include <Physics.h>
+#include "ImGuiSystem.h"
 
 CoreEngine* CORE;
 double CoreEngine::fps = 0.0;
@@ -33,6 +34,7 @@ void CoreEngine::InitSystems() {
     std::cout << "Initializing default systems..." << std::endl;
     gameObjectSystem = AddSystem<GameObjectSystem>();
     graphicsSystem = AddSystem<GraphicsSystem>();
+    imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
@@ -45,6 +47,7 @@ void CoreEngine::Init() {
         Systems[i]->Initialize();
     }
 
+
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
 
@@ -54,16 +57,14 @@ void CoreEngine::GameLoop() {
 
     std::cout << "Starting game loop..." << std::endl;
 
-    while (!glfwWindowShouldClose(glfwGetCurrentContext())) {
+    while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
        
         
-        //unsigned currenttime = static_cast<unsigned>(glfwGetTime());
-        //float dt = (currenttime - LastTime);
-        //LastTime = currenttime;
+        //update_time(1.0);
 
-        // Update every system
+       
         for (size_t i = 0; i < Systems.size(); ++i) {
-            Systems[i]->Update(1);
+            Systems[i]->Update(0.1);  // Use the actual delta_time
         }
         //std::cout << "Final FPS: " << fps << ", Final Delta Time: " << delta_time << "s" << std::endl;
     }
