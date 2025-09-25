@@ -1,4 +1,5 @@
 #include "ImGuiSystem.h"
+#include <iostream>
 
 ImGuiSystem::ImGuiSystem(GLFWwindow* window) : m_window(window) {};
 
@@ -57,6 +58,10 @@ void ImGuiSystem::Update(float dt) {
 	//Render ImGui
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	glfwSwapBuffers(m_window);
+	glfwPollEvents();
+
 }
 
 //void ImGuiSystem::Destroy() {
@@ -67,4 +72,8 @@ void ImGuiSystem::Shutdown() {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+std::string ImGuiSystem::GetName() {
+	return "ImGui System";
 }

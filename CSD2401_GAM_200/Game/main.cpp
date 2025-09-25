@@ -16,8 +16,8 @@
 
      // Add the GameObject system
      engine.AddSystem<GameObjectSystem>();
-     engine.AddSystem<GraphicsSystem>();
-     engine.AddSystem<ImGuiSystem>();
+     GraphicsSystem* graphics = engine.AddSystem<GraphicsSystem>();
+     engine.AddSystem<ImGuiSystem>(graphics->getWindow());
 
      // Initialize
      std::cout << "\n--- Initializing Engine ---" << std::endl;

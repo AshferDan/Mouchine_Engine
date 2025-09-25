@@ -22,6 +22,8 @@ public:
 	std::string GetName() override;
 	static GLuint LoadTexture(const char* filepath);
 
+	GLFWwindow* getWindow() {return window;}
+
 private:
 	GLFWwindow* window;
 	GLSLShader shader;

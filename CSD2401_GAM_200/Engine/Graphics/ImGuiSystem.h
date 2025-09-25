@@ -18,6 +18,8 @@ public:
 	//void Destroy();
 
 	std::string GetName() override;
+
+	//void SetWindow(GLFWwindow* window) { m_window = window; }
 private:
 	void Shutdown();
 

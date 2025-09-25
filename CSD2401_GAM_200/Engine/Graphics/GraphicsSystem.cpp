@@ -3,16 +3,7 @@
 #include "stb_image.h"
 
 
-GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0) {}
-
-GraphicsSystem::~GraphicsSystem() {
-    if (window) {
-        glfwDestroyWindow(window);
-        glfwTerminate();
-    }
-}
-
-void GraphicsSystem::Initialize() {
+GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
@@ -26,6 +17,16 @@ void GraphicsSystem::Initialize() {
         return;
     }
     glfwMakeContextCurrent(window);
+}
+
+GraphicsSystem::~GraphicsSystem() {
+    if (window) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+}
+
+void GraphicsSystem::Initialize() {
 
     if (glewInit() != GLEW_OK) {
         std::cerr << "Failed to initialize GLEW\n";
@@ -207,8 +208,6 @@ void GraphicsSystem::Update(float dt) {
             }
         }
     }
-        glfwSwapBuffers(window);
-        glfwPollEvents();
     
 }
 
