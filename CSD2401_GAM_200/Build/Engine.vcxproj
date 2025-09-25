@@ -328,10 +328,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="animations.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Audio\audio.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Camera\Camera.cpp" />
-    <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collision.cpp" />
+    <ClCompile Include="..\Engine\Collision\collision.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\GameManager\GameManager.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\RenderComponent.cpp" />
@@ -400,10 +399,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\examples\recording_playback.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\examples\simple_event.cpp" />
     <ClCompile Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\MathLib.cpp" />
-    <ClInclude Include="animations.h" />
     <ClInclude Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Audio\audio.h" />
     <ClInclude Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Camera\Camera.h" />
-    <ClInclude Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collision.h" />
+    <ClInclude Include="..\Engine\Collision\collision.h" />
     <ClInclude Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\GameManager\GameManager.h" />
     <ClInclude Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\GraphicsSystem.h" />
     <ClInclude Include="C:\Users\admin\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\RenderComponent.h" />
