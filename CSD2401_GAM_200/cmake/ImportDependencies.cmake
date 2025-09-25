@@ -110,22 +110,83 @@ macro(import_freetype)
         FetchContent_Declare(
             freetype
             GIT_REPOSITORY https://github.com/freetype/freetype.git
-            GIT_TAG VER-2-13-2  # Use a stable version instead of master
+            GIT_TAG master
         )
-        
-        # Set FreeType options before making it available
-        set(FT_DISABLE_ZLIB ON CACHE BOOL "Disable zlib support" FORCE)
-        set(FT_DISABLE_BZIP2 ON CACHE BOOL "Disable bzip2 support" FORCE)
-        set(FT_DISABLE_PNG ON CACHE BOOL "Disable PNG support" FORCE)
-        set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "Disable HarfBuzz support" FORCE)
-        set(FT_DISABLE_BROTLI ON CACHE BOOL "Disable Brotli support" FORCE)
-        
         FetchContent_MakeAvailable(freetype)
         
-        # Include directories are handled automatically by FetchContent_MakeAvailable
+        # Include directories
+        include_directories(${freetype_SOURCE_DIR}/include)
     endif()
 endmacro()
- 
+
+macro(import_fmod)
+    if(NOT TARGET fmod)
+        set(FMOD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/FMOD")
+        
+        if(NOT EXISTS "${FMOD_ROOT_DIR}")
+            message(STATUS "FMOD directory not found. Skipping FMOD integration.")
+            return()
+        endif()
+        
+        find_path(FMOD_INCLUDE_DIR 
+            NAMES fmod.h
+            PATHS ${FMOD_ROOT_DIR}/api/core/inc
+            NO_DEFAULT_PATH
+        )
+        
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(FMOD_LIB_DIR "${FMOD_ROOT_DIR}/api/core/lib/x64")
+            set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x64")
+        else()
+            set(FMOD_LIB_DIR "${FMOD_ROOT_DIR}/api/core/lib/x86")
+            set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x86")
+        endif()
+        
+        find_file(FMOD_LIBRARY_FILE
+            NAMES fmod_vc.lib fmodL_vc.lib
+            PATHS ${FMOD_LIB_DIR}
+            NO_DEFAULT_PATH
+        )
+        
+        if(FMOD_INCLUDE_DIR AND FMOD_LIBRARY_FILE AND EXISTS "${FMOD_LIBRARY_FILE}")
+            add_library(fmod STATIC IMPORTED)
+            
+            set_target_properties(fmod PROPERTIES
+                IMPORTED_LOCATION "${FMOD_LIBRARY_FILE}"
+                INTERFACE_INCLUDE_DIRECTORIES "${FMOD_INCLUDE_DIR}"
+            )
+            
+            message(STATUS "FMOD configured successfully")
+            
+            find_file(FMOD_STUDIO_LIBRARY_FILE
+                NAMES fmodstudio_vc.lib fmodstudioL_vc.lib
+                PATHS ${FMOD_STUDIO_LIB_DIR}
+                NO_DEFAULT_PATH
+            )
+            
+            if(FMOD_STUDIO_LIBRARY_FILE AND EXISTS "${FMOD_STUDIO_LIBRARY_FILE}")
+                find_path(FMOD_STUDIO_INCLUDE_DIR 
+                    NAMES fmod_studio.h
+                    PATHS ${FMOD_ROOT_DIR}/api/studio/inc
+                    NO_DEFAULT_PATH
+                )
+                
+                if(FMOD_STUDIO_INCLUDE_DIR)
+                    add_library(fmodstudio STATIC IMPORTED)
+                    
+                    set_target_properties(fmodstudio PROPERTIES
+                        IMPORTED_LOCATION "${FMOD_STUDIO_LIBRARY_FILE}"
+                        INTERFACE_INCLUDE_DIRECTORIES "${FMOD_STUDIO_INCLUDE_DIR}"
+                    )
+                    
+                    message(STATUS "FMOD Studio configured successfully")
+                endif()
+            endif()
+        else()
+            message(STATUS "FMOD not found. Continuing without FMOD...")
+        endif()
+    endif()
+endmacro()
 
 # Macro to import all dependencies
 macro(importDependencies)
@@ -150,6 +211,14 @@ macro(importDependencies)
     message(STATUS "Importing ImGui...")
     import_imgui()
     message(STATUS "ImGui imported successfully.")
+
+    message(STATUS "Importing freetype...")
+    import_freetype()
+    message(STATUS "freetype imported successfully.")
+
+    message(STATUS "Importing FMOD...")
+    import_fmod()
+    message(STATUS "FMOD imported successfully.")
 
     message(STATUS "All dependencies have been imported successfully.")
 endmacro()
