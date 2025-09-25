@@ -7,6 +7,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <Physics.h>
 
 CoreEngine* CORE;
 double CoreEngine::fps = 0.0;
@@ -55,24 +56,16 @@ void CoreEngine::GameLoop() {
 
     while (!glfwWindowShouldClose(glfwGetCurrentContext())) {
        
-        update_time(1.0);
-        unsigned currenttime = static_cast<unsigned>(glfwGetTime());
-        float dt = (currenttime - LastTime);
-        LastTime = currenttime;
+        
+        //unsigned currenttime = static_cast<unsigned>(glfwGetTime());
+        //float dt = (currenttime - LastTime);
+        //LastTime = currenttime;
 
         // Update every system
         for (size_t i = 0; i < Systems.size(); ++i) {
-            Systems[i]->Update(dt);
+            Systems[i]->Update(1);
         }
-
-        // Simple exit condition for testing
-        static int frameCount = 0;
-        frameCount++;
-        if (frameCount > 300) {
-            GameActive = false;
-            std::cout << "Stopping game loop after " << frameCount << " frames" << std::endl;
-            std::cout << "Final FPS: " << fps << ", Final Delta Time: " << delta_time << "s" << std::endl;
-        }
+        //std::cout << "Final FPS: " << fps << ", Final Delta Time: " << delta_time << "s" << std::endl;
     }
 }
 
@@ -83,7 +76,6 @@ void CoreEngine::DestroySystems() {
 }
 
 void CoreEngine::update_time(double fps_calc_interval) {
-    // EXACT COPY FROM YOUR IMAGE with static variables:
     // get elapsed time (in seconds) between previous and current frames
     static double prev_time = glfwGetTime();
     double curr_time = glfwGetTime();

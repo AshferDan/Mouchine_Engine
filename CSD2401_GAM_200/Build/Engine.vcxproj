@@ -342,9 +342,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Serialization\Serialization.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Transform\transform.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Input\InputManager.cpp" />
+    <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\Component.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\GameObjectSystem.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\factory.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\gameObject.cpp" />
+    <ClCompile Include="..\Engine\Core\FrameSystem.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Core\core.cpp" />
     <ClCompile Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\examples\3d.cpp">
       <ObjectFileName>$(IntDir)/Extern/FMOD/api/core/examples/3d.cpp.obj</ObjectFileName>
@@ -417,6 +419,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\factory.h" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\gameObject.h" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Factory\gameObjectSystem.h" />
+    <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Core\FrameSystem.h" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Core\System.h" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Core\core.h" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\examples\common.h" />
@@ -438,7 +441,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc\fmod_studio.hpp" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc\fmod_studio_common.h" />
     <ClInclude Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\MathLib.h" />
-    <ClInclude Include="InputTester.h" />
     <Natvis Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\nlohmann_json.natvis">
     </Natvis>
   </ItemGroup>
