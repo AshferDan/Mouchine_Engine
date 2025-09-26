@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "System.h"
+#include <fstream>
 
 // Forward declarations
 class GameObjectSystem;
@@ -38,6 +39,13 @@ public:
     ImGuiSystem* GetImguiSystem() const {
         return imguiSystem;
     }
+    void ConfigFile(const char* configF);
+
+    void setWindsize(int w, int h) {
+        WindWidth = w;
+        WindHeight = h;
+    };
+
 
     static double GetFPS() { return fps; }
     static double GetDeltaTime() { return delta_time; }
@@ -55,6 +63,8 @@ private:
     bool GameActive;
     static double fps;
     static double delta_time;
+    int WindWidth;
+    int WindHeight;
     void update_time(double fps_calc_interval = 1.0);
 };
 

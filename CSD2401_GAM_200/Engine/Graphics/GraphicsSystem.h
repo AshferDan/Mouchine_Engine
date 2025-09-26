@@ -11,10 +11,12 @@
 #include "transform.h"
 #include <iostream>
 #include <RenderComponent.h>
+#include <fstream>
 
 class GraphicsSystem : public ISystem {
 public:
 	GraphicsSystem();
+	GraphicsSystem(GLint W, GLint H);
 	~GraphicsSystem();
 
 	void Initialize() override;
@@ -24,10 +26,13 @@ public:
 
 	GLFWwindow* getWindow() {return window;}
 
+	
+
 private:
 	GLFWwindow* window;
 	GLSLShader shader;
 	GLuint vao, vbo, tex;
+	GLint Wwidth, Wheight;
 
 };
 

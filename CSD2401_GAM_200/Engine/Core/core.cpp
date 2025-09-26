@@ -10,6 +10,7 @@
 #include <Physics.h>
 #include "ImGuiSystem.h"
 
+
 CoreEngine* CORE;
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
@@ -18,7 +19,7 @@ CoreEngine::CoreEngine() {
     LastTime = 0;
     GameActive = true;
     CORE = this;
-
+    
     std::cout << "CoreEngine constructed" << std::endl;
 
     // Initialize default systems automatically
@@ -30,10 +31,27 @@ CoreEngine::~CoreEngine() {
     std::cout << "CoreEngine destroyed" << std::endl;
 }
 
+void CoreEngine::ConfigFile(const char* configF)
+{
+    std::ifstream fp{ configF };
+    if (!fp) {
+        std::cout << "Cannot find file";
+        glfwTerminate();
+    }
+
+    int WindWid = 0, WindHei = 0;
+    std::string temp;
+    fp >> temp >> WindWid;
+    fp >> temp >> WindHei;
+    setWindsize(WindWid, WindHei);
+}
+
 void CoreEngine::InitSystems() {
+    CoreEngine::ConfigFile("../Logs/config.txt");
+    std::cout << WindWidth << WindHeight << "HERE IS THE WINDOW SIZESSSSS\n";
     std::cout << "Initializing default systems..." << std::endl;
     gameObjectSystem = AddSystem<GameObjectSystem>();
-    graphicsSystem = AddSystem<GraphicsSystem>();
+    graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;

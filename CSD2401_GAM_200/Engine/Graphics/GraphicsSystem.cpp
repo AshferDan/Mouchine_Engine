@@ -2,15 +2,31 @@
 #include "GraphicsSystem.h"
 #include "stb_image.h"
 
+const char* configFile = "../Logs/config.txt";
 
-GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0) {
+
+GraphicsSystem::GraphicsSystem() : window(nullptr),vao(0), vbo(0),Wwidth(800),Wheight(600) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
     }
-
     // Simple fixed window size for now
-    window = glfwCreateWindow(800, 600, "Game Engine", nullptr, nullptr);
+    window = glfwCreateWindow(Wwidth, Wheight, "Game Engine", nullptr, nullptr);
+    if (!window) {
+        std::cerr << "Failed to create window\n";
+        glfwTerminate();
+        return;
+    }
+    glfwMakeContextCurrent(window);
+}
+
+GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h) {
+    if (!glfwInit()) {
+        std::cerr << "Failed to initialize GLFW\n";
+        return;
+    }
+    // Simple fixed window size for now
+    window = glfwCreateWindow(Wwidth, Wheight, "Game Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();
