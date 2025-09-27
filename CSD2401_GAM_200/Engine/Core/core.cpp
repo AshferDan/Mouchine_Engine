@@ -8,6 +8,7 @@
 #include <chrono>
 #include <Physics.h>
 #include "ImGuiSystem.h"
+#include "InputManager.h"
 
 
 CoreEngine* CORE;
@@ -51,6 +52,7 @@ void CoreEngine::InitSystems() {
     gameObjectSystem = AddSystem<GameObjectSystem>();
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
+    inputManager = AddSystem<InputManager>(graphicsSystem->getWindow());
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
