@@ -4,6 +4,7 @@
 #include <memory>
 #include "System.h"
 #include <fstream>
+#include <iomanip>
 
 // Forward declarations
 class GameObjectSystem;
@@ -45,7 +46,7 @@ public:
         WindWidth = w;
         WindHeight = h;
     };
-
+    
 
     static double GetFPS() { return fps; }
     static double GetDeltaTime() { return delta_time; }

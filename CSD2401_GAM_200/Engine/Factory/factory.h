@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 #include "RenderComponent.h"
+#include <string>
 
 class GameObjectFactory {
 public:

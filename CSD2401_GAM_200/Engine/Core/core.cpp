@@ -2,7 +2,6 @@
 #include "System.h"
 #include "GameObjectSystem.h"
 #include "GraphicsSystem.h"
-#include "Graphics.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <thread>
@@ -48,7 +47,6 @@ void CoreEngine::ConfigFile(const char* configF)
 
 void CoreEngine::InitSystems() {
     CoreEngine::ConfigFile("../Logs/config.txt");
-    std::cout << WindWidth << WindHeight << "HERE IS THE WINDOW SIZESSSSS\n";
     std::cout << "Initializing default systems..." << std::endl;
     gameObjectSystem = AddSystem<GameObjectSystem>();
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
@@ -68,23 +66,15 @@ void CoreEngine::Init() {
 
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
-
 void CoreEngine::GameLoop() {
-    // Initialize the last time variable
-    LastTime = static_cast<unsigned>(glfwGetTime());
-
-    std::cout << "Starting game loop..." << std::endl;
-
+    double fps_interval = 1.0; 
     while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
-       
-        
-        //update_time(1.0);
+        update_time(fps_interval); 
 
-       
         for (size_t i = 0; i < Systems.size(); ++i) {
-            Systems[i]->Update(0.1);  // Use the actual delta_time
+            
+            Systems[i]->Update(CoreEngine::GetDeltaTime());
         }
-        //std::cout << "Final FPS: " << fps << ", Final Delta Time: " << delta_time << "s" << std::endl;
     }
 }
 
@@ -95,7 +85,6 @@ void CoreEngine::DestroySystems() {
 }
 
 void CoreEngine::update_time(double fps_calc_interval) {
-    // get elapsed time (in seconds) between previous and current frames
     static double prev_time = glfwGetTime();
     double curr_time = glfwGetTime();
     delta_time = curr_time - prev_time;  // Now using static delta_time
@@ -104,17 +93,32 @@ void CoreEngine::update_time(double fps_calc_interval) {
     // fps calculations
     static double count = 0.0; // number of game loop iterations
     static double start_time = glfwGetTime();
-    // get elapsed time since very beginning (in seconds) ...
     double elapsed_time = curr_time - start_time;
 
     ++count;
 
-    // update fps at least every 10 seconds ...
-    fps_calc_interval = (fps_calc_interval < 0.0) ? 0.0 : fps_calc_interval;
-    fps_calc_interval = (fps_calc_interval > 10.0) ? 10.0 : fps_calc_interval;
     if (elapsed_time > fps_calc_interval) {
         fps = count / elapsed_time;  // Now using static fps
-        start_time = curr_time;
         count = 0.0;
+        start_time = curr_time;
+    }
+
+    std::stringstream iostream;
+    std::string tempfps , tempdt;
+    std::string title_str;
+    tempfps = iostream.str();
+    
+    iostream << CoreEngine::fps;
+    tempfps = iostream.str();
+
+    iostream << CoreEngine::delta_time;
+    tempdt = iostream.str();
+
+
+    title_str = "Game Engine | FPS:" + tempfps + "|DT : " + tempdt;
+    
+    GLFWwindow* Wind = CORE->GetGraphicsSystem()->getWindow();
+    if (Wind) {
+        glfwSetWindowTitle(Wind,title_str.c_str());
     }
 }

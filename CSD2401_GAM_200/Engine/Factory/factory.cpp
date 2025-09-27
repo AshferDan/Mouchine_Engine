@@ -4,6 +4,7 @@
 #include "physics.h"
 #include <iostream>
 #include <cmath>
+#include <sstream>
 
 GameObject* GameObjectFactory::CreateGameObject(const std::string& name) {
     EntityID id = nextEntityID++;
@@ -61,7 +62,6 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
     else {
         transform->SetScale(w, h);
     }
-
     //testing TO BE REMOVED
     std::cout << "Created "
         << (shape == RenderComponent::ShapeType::Circle ? "Circle" :
@@ -71,6 +71,8 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
 
     return obj;
 }
+
+
 
 GameObject* GameObjectFactory::GetGameObject(EntityID id) {
     auto it = entityToIndex.find(id);
