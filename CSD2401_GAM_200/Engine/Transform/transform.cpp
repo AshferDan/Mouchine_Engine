@@ -16,7 +16,7 @@
                   // << posX << ", " << posY << ")" << std::endl;
          lastPosX = posX; lastPosY = posY;
      }
-     throw std::runtime_error("Test crash: runtime error");
+     //throw std::runtime_error("Test crash: runtime error");
  }
  std::unique_ptr<IComponent> TransformComponent::Clone(GameObject* NewClone) const {
      auto clonedComponents = std::make_unique<TransformComponent>(NewClone, this->posX, this->posY);

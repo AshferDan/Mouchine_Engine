@@ -5,7 +5,7 @@
 const char* configFile = "../Logs/config.txt";
 
 
-GraphicsSystem::GraphicsSystem() : window(nullptr),vao(0), vbo(0),Wwidth(800),Wheight(600) {
+GraphicsSystem::GraphicsSystem() : window(nullptr),vao(0), vbo(0),Wwidth(800),Wheight(600),tex(0) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
