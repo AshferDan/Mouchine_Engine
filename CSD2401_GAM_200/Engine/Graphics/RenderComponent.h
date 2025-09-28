@@ -37,11 +37,13 @@ public:
 
     // Required by IComponent
     std::string GetName() const override { return "RenderComponent"; }
+    std::unique_ptr<IComponent>Clone(GameObject* NewClone) const override;
 
     // Getter for texture
     GLuint GetTextureID() const { return textureID; }
     ShapeType GetShapeType() const { return shape; }
     glm::vec4 GetColor() const { return color; }
+    
 
     //setters for point and line
     void SetLine(const glm::vec2& start, const glm::vec2& end) { line = { start, end, color }; }

@@ -68,13 +68,31 @@ void CoreEngine::Init() {
 }
 void CoreEngine::GameLoop() {
     double fps_interval = 1.0; 
-    while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
-        update_time(fps_interval); 
+    try {
+        while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
+            update_time(fps_interval);
 
-        for (size_t i = 0; i < Systems.size(); ++i) {
-            
-            Systems[i]->Update(CoreEngine::GetDeltaTime());
+            for (size_t i = 0; i < Systems.size(); ++i) {
+
+                Systems[i]->Update(CoreEngine::GetDeltaTime());
+            }
         }
+    }
+    catch (const std::exception& e) {
+        // Log standard exceptions to debuglog.txt
+        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        log << "[EXCEPTION] " << e.what() << std::endl;
+        log.close();
+
+        std::cerr << "Exception caught in CoreEngine::GameLoop(): " << e.what() << std::endl;
+    }
+    catch (...) {
+        // Log unknown exceptions
+        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        log << "[UNKNOWN EXCEPTION]" << std::endl;
+        log.close();
+
+        std::cerr << "Unknown exception caught in CoreEngine::GameLoop()" << std::endl;
     }
 }
 

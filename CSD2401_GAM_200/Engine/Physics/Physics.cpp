@@ -1,8 +1,5 @@
  #include "Physics.h"
- #include "Transform.h"
- #include "GameObject.h"
- #include <iostream>
- #include <cmath>
+
 
  PhysicsComponent::PhysicsComponent(GameObject* owner, float m, bool static_)
      : IComponent(owner), 
@@ -12,6 +9,33 @@
        mass(m), drag(0.98f), isStatic(static_), useGravity(true),
        gravityX(0), gravityY(-9.81f) {
  }
+
+ std::unique_ptr<IComponent>PhysicsComponent::Clone(GameObject* NewClone) const {
+
+     // 1. Create a new PhysicsComponent, passing mass and isStatic status
+     auto clonedComponent = std::make_unique<PhysicsComponent>(
+         NewClone,
+         this->mass,        // Get mass
+         this->isStatic     // Get isStatic status
+     );
+
+     // 2. Copy the remaining physics state
+     clonedComponent->velocityX = this->velocityX;
+     clonedComponent->velocityY = this->velocityY;
+     clonedComponent->angularVelocity = this->angularVelocity;
+
+     // Copy properties
+     clonedComponent->drag = this->drag;
+     clonedComponent->useGravity = this->useGravity;
+     clonedComponent->gravityX = this->gravityX;
+     clonedComponent->gravityY = this->gravityY;
+
+     // Clone the enabled state
+     clonedComponent->SetEnabled(this->IsEnabled());
+
+     return clonedComponent;
+ }
+
 
  void PhysicsComponent::Update(float deltaTime) {
      if (isStatic) return;

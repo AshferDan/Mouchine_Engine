@@ -257,3 +257,35 @@ GLuint GraphicsSystem::LoadTexture(const char* filepath) {
     stbi_image_free(data);
     return texture;
 }
+std::unique_ptr<IComponent> RenderComponent::Clone(GameObject* NewClone) const {
+
+    // 1. Determine which constructor to use based on the original component's state.
+    std::unique_ptr<RenderComponent> clonedComponent;
+
+    // Check if the component uses a texture (textureID is non-zero)
+    if (this->textureID != 0) {
+        // Use the constructor for textured objects: 
+        // RenderComponent(owner, GLuint texID)
+        clonedComponent = std::make_unique<RenderComponent>(NewClone, this->textureID);
+    }
+    else {
+        // Use the constructor for shape/color: 
+        // RenderComponent(owner, ShapeType type, const glm::vec4& color)
+        clonedComponent = std::make_unique<RenderComponent>(NewClone, this->shape, this->color);
+    }
+
+    // 2. Clone specialized data for Line or Point types.
+    if (this->shape == RenderComponent::ShapeType::Line) {
+        // Copy the line data using the public setter
+        clonedComponent->SetLine(this->line.start, this->line.end);
+    }
+    else if (this->shape == RenderComponent::ShapeType::Point) {
+        // Copy the point data using the public setter
+        clonedComponent->SetPoint(this->point.pos, this->point.size);
+    }
+
+    // 3. Clone the enabled state.
+    clonedComponent->SetEnabled(this->IsEnabled());
+
+    return clonedComponent;
+}

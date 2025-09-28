@@ -48,6 +48,11 @@ void ImGuiSystem::Update(float dt) {
 				if (ImGui::DragFloat("Rotation", &rot, 0.1f)) {
 					transform->SetRotation(rot);
 				}
+				if (ImGui::Button("Clone"))
+				{
+
+					std::cout << "button clicked";
+				}
 			}
 			ImGui::TreePop();
 		}

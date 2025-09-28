@@ -16,6 +16,14 @@
                   // << posX << ", " << posY << ")" << std::endl;
          lastPosX = posX; lastPosY = posY;
      }
+     throw std::runtime_error("Test crash: runtime error");
+ }
+ std::unique_ptr<IComponent> TransformComponent::Clone(GameObject* NewClone) const {
+     auto clonedComponents = std::make_unique<TransformComponent>(NewClone, this->posX, this->posY);
+     clonedComponents->SetRotation(this->rotation);
+     clonedComponents->SetScale(this->scaleX, this->scaleY);
+     clonedComponents->SetEnabled(this->IsEnabled());
+     return clonedComponents;
  }
 
  void TransformComponent::SetPosition(float x, float y) {

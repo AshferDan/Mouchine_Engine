@@ -6,8 +6,10 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
+#include "factory.h"
 
-
+class GameObject;
+class GameObjectFactory;
 class ImGuiSystem : public ISystem {
 public:
 	ImGuiSystem(GLFWwindow* window);
