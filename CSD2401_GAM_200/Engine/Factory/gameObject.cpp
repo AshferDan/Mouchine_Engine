@@ -1,8 +1,7 @@
-
 #include "GameObject.h"
 #include <iostream>
 
-GameObject::GameObject(EntityID id, const std::string& name) 
+GameObject::GameObject(EntityID id, const std::string& name)
     : entityID(id), name(name), isActive(true) {
 }
 

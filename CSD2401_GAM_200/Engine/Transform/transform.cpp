@@ -12,8 +12,8 @@
      static float lastPosX = posX, lastPosY = posY;
 
      if (posX != lastPosX || posY != lastPosY) {
-       //  std::cout << owner->GetName() << " Transform Update - Position changed to ("
-                 //  << posX << ", " << posY << ")" << std::endl;
+         //std::cout << owner->GetName() << " Transform Update - Position changed to ("
+                  // << posX << ", " << posY << ")" << std::endl;
          lastPosX = posX; lastPosY = posY;
      }
  }

@@ -3,6 +3,14 @@
 #include <vector>
 #include <memory>
 #include "System.h"
+#include <fstream>
+#include <iomanip>
+
+// Forward declarations
+class GameObjectSystem;
+class GraphicsSystem;
+class ImGuiSystem;
+class InputManager;
 
 class CoreEngine {
 public:
@@ -21,10 +29,50 @@ public:
         return systemPtr;
     }
 
+    // Direct access to commonly used systems
+    GameObjectSystem* GetGameObjectSystem() const {
+        return gameObjectSystem;
+    }
+
+    GraphicsSystem* GetGraphicsSystem() const {
+        return graphicsSystem;
+    }
+
+    ImGuiSystem* GetImguiSystem() const {
+        return imguiSystem;
+    }
+
+    InputManager* GetInputManager() const {
+        return inputManager;
+    }
+    void ConfigFile(const char* configF);
+
+    void setWindsize(int w, int h) {
+        WindWidth = w;
+        WindHeight = h;
+    };
+    
+
+    static double GetFPS() { return fps; }
+    static double GetDeltaTime() { return delta_time; }
+
+
 private:
+    void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
+
+    GameObjectSystem* gameObjectSystem = nullptr;
+    GraphicsSystem* graphicsSystem = nullptr;
+    ImGuiSystem* imguiSystem = nullptr;
+    InputManager* inputManager = nullptr;
+
     unsigned LastTime;
     bool GameActive;
+    static double fps;
+    static double delta_time;
+    int WindWidth;
+    int WindHeight;
+    void update_time(double fps_calc_interval = 1.0);
 };
 
 extern CoreEngine* CORE;
