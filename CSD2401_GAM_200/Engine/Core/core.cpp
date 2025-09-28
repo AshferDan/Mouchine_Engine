@@ -68,18 +68,36 @@ void CoreEngine::Init() {
 
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
-void CoreEngine::GameLoop() {
-    double fps_interval = 1.0; 
-    while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
-        update_time(fps_interval); 
 
-        for (size_t i = 0; i < Systems.size(); ++i) {
-            
-            Systems[i]->Update(CoreEngine::GetDeltaTime());
+void CoreEngine::GameLoop() {
+    double fps_interval = 1.0;
+
+    try {
+        while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
+            update_time(fps_interval);
+
+            for (size_t i = 0; i < Systems.size(); ++i) {
+                Systems[i]->Update(CoreEngine::GetDeltaTime());
+            }
         }
     }
-}
+    catch (const std::exception& e) {
+        // Log standard exceptions to debuglog.txt
+        std::ofstream log("debuglog.txt", std::ios::app);
+        log << "[EXCEPTION] " << e.what() << std::endl;
+        log.close();
 
+        std::cerr << "Exception caught in CoreEngine::GameLoop(): " << e.what() << std::endl;
+    }
+    catch (...) {
+        // Log unknown exceptions
+        std::ofstream log("debuglog.txt", std::ios::app);
+        log << "[UNKNOWN EXCEPTION]" << std::endl;
+        log.close();
+
+        std::cerr << "Unknown exception caught in CoreEngine::GameLoop()" << std::endl;
+    }
+}
 
 void CoreEngine::DestroySystems() {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
