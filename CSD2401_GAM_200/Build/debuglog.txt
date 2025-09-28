@@ -1,2 +1,5 @@
 [EXCEPTION] Test crash: runtime error
 [EXCEPTION] Test crash: runtime error
+[CRASH] Signal: Segmentation Fault (SIGSEGV) (11) Frame: 0
+[CRASH] Signal: Abort (SIGABRT) Signal Code: (22)
+[CRASH] Signal: Segmentation Fault (SIGSEGV) Signal Code: (11)
