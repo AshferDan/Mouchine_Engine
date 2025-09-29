@@ -24,10 +24,9 @@
      // Create 2D game objects
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
-
-     GameObject* player = factory.CreatePlayer("Hero",RenderComponent::ShapeType::Circle,0,0, 1, 1,"../Assets/protosprite.png");
-     float x, y;
-     player->GetComponent<TransformComponent>()->GetPosition(x, y);
+         GameObject* player = factory.CreatePlayer("Hero", RenderComponent::ShapeType::Circle, 0, 0, 1, 1, "../Assets/protosprite.png");
+         float x, y;
+         player->GetComponent<TransformComponent>()->GetPosition(x, y);
      
 
      //Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle), 

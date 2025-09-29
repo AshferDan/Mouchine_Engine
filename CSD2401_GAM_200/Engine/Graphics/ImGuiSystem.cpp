@@ -50,7 +50,8 @@ void ImGuiSystem::Update(float dt) {
 				}
 				if (ImGui::Button("Clone"))
 				{
-
+					GameObjectFactory& factory = GameObjectFactory::Instance();
+					GameObject* clonedObj = factory.CloneGameobject(obj->GetID(),obj->GetName());
 					std::cout << "button clicked";
 				}
 			}

@@ -20,8 +20,10 @@
  }
  std::unique_ptr<IComponent> TransformComponent::Clone(GameObject* NewClone) const {
      auto clonedComponents = std::make_unique<TransformComponent>(NewClone, this->posX, this->posY);
-     clonedComponents->SetRotation(this->rotation);
-     clonedComponents->SetScale(this->scaleX, this->scaleY);
+     clonedComponents->rotation=this->rotation;
+     clonedComponents->scaleX = this->scaleX;
+     clonedComponents->scaleY = this->scaleY;
+
      clonedComponents->SetEnabled(this->IsEnabled());
      return clonedComponents;
  }

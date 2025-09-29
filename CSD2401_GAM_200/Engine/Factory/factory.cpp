@@ -47,6 +47,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     return player;
 }
 
+
 GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color) {
     GameObject* obj = CreateGameObject(name);
 
@@ -71,6 +72,18 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
         << ": " << name << " at (" << x << "," << y << ")\n";
 
     return obj;
+}
+
+GameObject* GameObjectFactory::CloneGameobject(EntityID id ,const std::string& newName)
+{
+    GameObject* original = GetGameObject(id);
+
+    if (original) {
+        // Delegate the cloning logic to the GameObject itself
+        return original->Clone(newName);
+    }
+    return nullptr;
+    return nullptr;
 }
 
 
