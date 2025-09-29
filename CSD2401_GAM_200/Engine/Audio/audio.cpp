@@ -13,6 +13,7 @@ bool AudioEngine::initialiseAudio() {
 		return false;
 	}
 
+	// set 32 as max amt of sounds playing at once
 	result = system->init(32, FMOD_INIT_NORMAL, nullptr);
 	if (result != FMOD_OK) {
 		checkError(result, "System init");
@@ -24,6 +25,7 @@ bool AudioEngine::initialiseAudio() {
 }
 
 void AudioEngine::updateAudio() {
+	// must be called every frame in game loop
 	if (system) {
 		system->update();
 	}
@@ -50,11 +52,11 @@ bool AudioEngine::loadSound(const std::string& name, const std::string& filepath
 	}
 	// check sound exist
 	if (sounds.find(name) != sounds.end()) {
-		std::cout << "sound: " << name << " loaded" << std::endl;
+		std::cout << "sound: " << name << " alr loaded" << std::endl;
 		return true;
 	}
 	FMOD::Sound* sound = nullptr;
-	FMOD_MODE mode = FMOD_DEFAULT;
+	FMOD_MODE mode = FMOD_DEFAULT;	// basic audio settings
 
 	if (loop) {
 		mode |= FMOD_LOOP_NORMAL;
@@ -62,6 +64,15 @@ bool AudioEngine::loadSound(const std::string& name, const std::string& filepath
 	else {
 		mode |= FMOD_LOOP_OFF;
 	}
+	// load the audio file
+	FMOD_RESULT result = system->createSound(filepath.c_str(), mode, nullptr, &sound);
+	if (result != FMOD_OK) {
+		checkError(result, "loading sound " + filepath);
+		return false;
+	}
+	sounds[name] = sound;
+	std::cout << "loaded sound from " << filepath << std::endl;
+	return true;
 }
 
 void AudioEngine::unloadSound(const std::string& name) {
@@ -111,21 +122,80 @@ bool AudioEngine::playSound(const std::string& name, const std::string& channelN
 	return true;
 }
 
-void AudioEngine::stopSound(const std::string& channelName) {}
+void AudioEngine::stopSound(const std::string& channelName) {
+	auto it = channels.find(channelName);
+	if (it != channels.end() && it->second) {
+		bool isPlaying = false;
 
-void AudioEngine::stopAllSound() {}
+		it->second->isPlaying(&isPlaying);
+		if (isPlaying) {
+			it->second->stop();
+			std::cout << "stopped sound on channle: " << channelName << std::endl;
+		}
+		channels.erase(it);
+	}
+}
 
-bool AudioEngine::eventPlaying(const std::string& eventName) {}
+void AudioEngine::stopAllSound() {
+	for (auto& pair : channels) {
+		if (pair.second) {
+			bool isPlaying = false;
+			pair.second->isPlaying(&isPlaying);
+			if (isPlaying) {
+				pair.second->stop();
+			}
+		}
+	}
+	channels.clear();
+	std::cout << "stopped all sounds" << std::endl;
+}
+
+bool AudioEngine::eventPlaying(const std::string& eventName) {
+	// to be implemented when theres 'events'
+	return isPlaying(eventName);
+}
 
 /*  Volume and effects controls  */
 
-void AudioEngine::setVolume(const std::string& channelName, float volume) {}
+void AudioEngine::setVolume(const std::string& channelName, float volume) {
+	auto it = channels.find(channelName);
+	if (it != channels.end() && it->second) {
+		volume = std::max(0.0f, std::min(1.0f, volume));
+		it->second->setVolume(volume); // set volume for only that channel
+	}
+}
 
-void AudioEngine::updateVolume(float volume) {}
+void AudioEngine::masterVolume(float volume) {
+	if (system) {
+		FMOD::ChannelGroup* masterGroup = nullptr;
+		system->getMasterChannelGroup(&masterGroup);
+		if (masterGroup) {
+			volume = std::max(0.0f, std::min(1.0f, volume));
+			masterGroup->setVolume(volume); // set volume for all audio
+			std::cout << "set master volume to" << volume << std::endl;
+		}
+	}
+}
 
-void AudioEngine::isPlaying(const std::string& channelName) {}
+bool AudioEngine::isPlaying(const std::string& channelName) {
+	auto it = channels.find(channelName);
+	if (it != channels.end() && it->second) {
+		bool isPlaying = false;
+		it->second->isPlaying(&isPlaying);
+		return isPlaying; // true if playing, false if stopped
+	}
+	return false;
+}
 
-void AudioEngine::muteSound(float volume) {}
+void AudioEngine::muteSound(const std::string& channelName) {
+	auto it = channels.find(channelName);
+	if (it != channels.end() && it->second) {
+		bool muted = false;
+		it->second->getMute(&muted); // current mute state
+		it->second->setMute(!muted); // if muted, unmute it,  if unmuted, mute it
+		std::cout << (muted ? "unmuted" : "muted") << "channel" << channelName << std::endl;
+	}
+}
 
 /*  Error Handling  */
 

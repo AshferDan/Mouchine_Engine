@@ -40,9 +40,9 @@ public:
 	
 	// volume and effects
 	void setVolume(const std::string& channelName, float volume);
-	void updateVolume(float volume);
-	void isPlaying(const std::string& channelName);
-	void muteSound(float volume);
+	void masterVolume(float volume);
+	bool isPlaying(const std::string& channelName);
+	void muteSound(const std::string& channelName);
 
 	// error handling
 	void checkError(FMOD_RESULT result, const std::string& operation);
