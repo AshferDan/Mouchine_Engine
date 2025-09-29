@@ -21,21 +21,21 @@ public:
     GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y , float w, float h,const glm::vec4 color);
     GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w , float h, const char* sprite);
     GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color);
-    GameObject* CloneGameobject(EntityID id, const std::string& name);
+    GameObject* CloneGameObject(EntityID id, const std::string& newName = "");
 
 
     // Management
     GameObject* GetGameObject(EntityID id);
     GameObject* FindGameObject(const std::string& name);
     const std::vector<std::unique_ptr<GameObject>>& GetAllGameObjects() const;
-
+    unsigned int GetCloneCounter() { return cloneCounter; }
     void DestroyGameObject(EntityID id);
     void Clear();
 
 private:
-    GameObjectFactory() : nextEntityID(1) {}
+    GameObjectFactory() : nextEntityID(1), cloneCounter(0) {}
     EntityID nextEntityID;
     std::vector<std::unique_ptr<GameObject>> gameObjects;
     std::unordered_map<EntityID, size_t> entityToIndex;
-    unsigned int cloneCounter = 0;
+    unsigned int cloneCounter;
 };

@@ -74,27 +74,33 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
     return obj;
 }
 
-GameObject* GameObjectFactory::CloneGameobject(EntityID id ,const std::string& newName)
-{
+GameObject* GameObjectFactory::CloneGameObject(EntityID id, const std::string& newName) {
     GameObject* original = GetGameObject(id);
 
     if (original) {
         std::string finalName;
 
         if (newName.empty()) {
-            // Generate unique name: "OriginalName (Clone)X"
             std::stringstream ss;
-            ss << original->GetName() << " (Clone)" << ++cloneCounter;
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos)
+            { length = original->GetName().length(); }
+            
+            ++cloneCounter;
+            ss << original->GetName().substr(0,length) << "(" << cloneCounter << ")";
             finalName = ss.str();
         }
         else {
+            // Use the provided unique name if one was specified
             finalName = newName;
         }
 
         // Delegate the cloning logic to the GameObject itself, passing the final name
         return original->Clone(finalName);
     }
+    return nullptr;
 }
+
 
 
 

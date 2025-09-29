@@ -7,27 +7,32 @@ GameObject::GameObject(EntityID id, const std::string& name)
     : entityID(id), name(name), isActive(true) {
 }
 
-GameObject* GameObject::Clone(const std::string& newName) const
-{
+GameObject* GameObject::Clone(const std::string& newName) const {
     GameObjectFactory& factory = GameObjectFactory::Instance();
 
-    std::string name = !newName.empty() ? (this->name + " (Clone)") : newName;
-    std::cout << name;
-    GameObject* clone = factory.CreateGameObject(name);
-    for (const auto& componentPair : components) {
-        // Get the values of the componments first then clone the components into the new cloned gameobject.
-        // the unordered map is the <std::type_index, std::unique_ptr<IComponent>>; so will be the second one.
-        //                                 ^^First         ^^second
-        //as for the std::move is because the type_index is a unique_ptr so need to move a new copy to the cloneComponent;
-        const std::unique_ptr<IComponent>& ogComponent = componentPair.second;
-        std::unique_ptr<IComponent> cloneComponent = ogComponent->Clone(clone);
-        clone->components[componentPair.first] = std::move(cloneComponent);
+    // Ensure we use the unique name passed by the factory, with a fallback
+    std::string finalName = newName.empty() ? (this->name + " (FallbackClone)") : newName;
+
+    // 1. Create the new GameObject using the unique name
+    GameObject* clone = factory.CreateGameObject(finalName);
+
+    // 2. Iterate over all components and clone them
+    for (const auto& pair : components) {
+        const std::unique_ptr<IComponent>& originalComponent = pair.second;
+
+        // Call the component's virtual Clone method
+        std::unique_ptr<IComponent> clonedComponent = originalComponent->Clone(clone);
+
+        // Move the cloned component into the new GameObject's map
+        clone->components[pair.first] = std::move(clonedComponent);
     }
+
+    // 3. Copy state and initialize
     clone->isActive = this->isActive;
     clone->Initialize();
+
     return clone;
 }
-
 GameObject::~GameObject() {
     Destroy();
 }
