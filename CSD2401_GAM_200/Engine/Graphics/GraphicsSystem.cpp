@@ -203,30 +203,9 @@ void GraphicsSystem::Update(float dt) {
 
             case RenderComponent::ShapeType::Line:
             {
-                auto line = rend->GetLine();
-                shader.SetUniform("uColor", line.color);
-                shader.SetUniform("uHasTexture", 0);
-
-                glm::vec2 verts[2] = { line.start, line.end };
-
-                GLuint tempVBO, tempVAO;
-                glGenVertexArrays(1, &tempVAO);
-                glGenBuffers(1, &tempVBO);
-
-                glBindVertexArray(tempVAO);
-                glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_DYNAMIC_DRAW);
-
-                glEnableVertexAttribArray(0);
-                glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
-
-                shader.SetUniform("uMVP", vp);
-
-                glDrawArrays(GL_LINES, 0, 2);
-
-                glDeleteBuffers(1, &tempVBO);
-                glDeleteVertexArrays(1, &tempVAO);
-
+                //auto line = rend->GetLine();
+                //DrawLine(line.start, line.end, line.color, vp);
+                DrawLine({ 0,0 }, { Wwidth, Wheight }, { 1,0,0,1 }, vp);
                 break;
             }
 
@@ -261,6 +240,35 @@ void GraphicsSystem::Update(float dt) {
         }
     }
     
+}
+
+void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
+    const glm::vec4& color, const glm::mat4& vp) {
+    shader.SetUniform("uColor", color);
+    shader.SetUniform("uHasTexture", 0);
+
+    glm::vec3 verts[2] = {
+        { start.x, start.y, 0.0f },
+        { end.x,   end.y,   0.0f }
+    };
+
+    GLuint tempVBO, tempVAO;
+    glGenVertexArrays(1, &tempVAO);
+    glGenBuffers(1, &tempVBO);
+
+    glBindVertexArray(tempVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    shader.SetUniform("uMVP", vp);
+
+    glDrawArrays(GL_LINES, 0, 2);
+
+    glDeleteBuffers(1, &tempVBO);
+    glDeleteVertexArrays(1, &tempVAO);
 }
 
 

@@ -27,6 +27,17 @@ public:
 	GLFWwindow* getWindow() {return window;}
 
 	
+	void DrawLine(const glm::vec2& start, const glm::vec2& end,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	void DrawPoint(const glm::vec2& pos,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	void DrawRectOutline(float x, float y, float w, float h,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	void DrawCircleOutline(float cx, float cy, float r, int segments,
+		const glm::vec4& color, const glm::mat4& vp);
 
 private:
 	GLFWwindow* window;
