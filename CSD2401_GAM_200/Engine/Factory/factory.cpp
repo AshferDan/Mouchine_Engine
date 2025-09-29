@@ -82,8 +82,7 @@ GameObject* GameObjectFactory::CloneGameobject(EntityID id ,const std::string& n
         // Delegate the cloning logic to the GameObject itself
         return original->Clone(newName);
     }
-    return nullptr;
-    return nullptr;
+     return nullptr;
 }
 
 

@@ -48,11 +48,13 @@ void ImGuiSystem::Update(float dt) {
 				if (ImGui::DragFloat("Rotation", &rot, 0.1f)) {
 					transform->SetRotation(rot);
 				}
-				if (ImGui::Button("Clone"))
-				{
-					GameObjectFactory& factory = GameObjectFactory::Instance();
-					GameObject* clonedObj = factory.CloneGameobject(obj->GetID(),obj->GetName());
-					std::cout << "button clicked";
+				if (obj->GetName() != "Hero") {
+					if (ImGui::Button("Clone"))
+					{
+						GameObjectFactory& factory = GameObjectFactory::Instance();
+						GameObject* clonedObj = factory.CloneGameobject(obj->GetID(), obj->GetName());
+						std::cout << "button clicked";
+					}
 				}
 			}
 			ImGui::TreePop();
