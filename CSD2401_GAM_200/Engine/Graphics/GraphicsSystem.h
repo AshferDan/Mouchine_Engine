@@ -25,7 +25,6 @@ public:
 	static GLuint LoadTexture(const char* filepath);
 
 	GLFWwindow* getWindow() {return window;}
-
 	
 
 private:

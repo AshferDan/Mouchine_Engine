@@ -21,8 +21,9 @@ public:
     GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y , float w, float h,const glm::vec4 color);
     GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w , float h, const char* sprite);
     GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color);
+    GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char* filename);
     GameObject* CloneGameObject(EntityID id, const std::string& newName = "");
-
+    GameObject* CreateImage(const std::string& name, RenderComponent::ShapeType shape, float x, float y,float w,float h, char const* filename);
 
     // Management
     GameObject* GetGameObject(EntityID id);

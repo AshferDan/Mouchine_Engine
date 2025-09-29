@@ -1,5 +1,6 @@
 #include "Factory.h"
 #include "GraphicsSystem.h"
+
 #include "transform.h"
 #include "physics.h"
 #include <iostream>
@@ -74,6 +75,32 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
     return obj;
 }
 
+GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char* filename) {
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    GLuint texID = GraphicsSystem::LoadTexture(filename);
+    auto render = obj->AddComponent<RenderComponent>(texID);
+
+    if (shape == RenderComponent::ShapeType::Line) {
+        render->SetLine(glm::vec2(x, y), glm::vec2(w, h));
+    }
+    else if (shape == RenderComponent::ShapeType::Point) {
+        render->SetPoint(glm::vec2(x, y), w);
+    }
+    else {
+        transform->SetScale(w, h);
+    }
+    //testing TO BE REMOVED
+    std::cout << "Created "
+        << (shape == RenderComponent::ShapeType::Circle ? "Circle" :
+            shape == RenderComponent::ShapeType::Square ? "Square" :
+            shape == RenderComponent::ShapeType::Line ? "Line" : "Point")
+        << ": " << name << " at (" << x << "," << y << ")\n";
+
+    return obj;
+}
+
 GameObject* GameObjectFactory::CloneGameObject(EntityID id, const std::string& newName) {
     GameObject* original = GetGameObject(id);
 
@@ -91,14 +118,23 @@ GameObject* GameObjectFactory::CloneGameObject(EntityID id, const std::string& n
             finalName = ss.str();
         }
         else {
-            // Use the provided unique name if one was specified
             finalName = newName;
         }
 
-        // Delegate the cloning logic to the GameObject itself, passing the final name
         return original->Clone(finalName);
     }
     return nullptr;
+}
+
+GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderComponent::ShapeType shape, float x, float y,float w ,float h, char const* filename)
+{
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    GLint texID = GraphicsSystem::LoadTexture(filename);
+    auto render = obj->AddComponent<RenderComponent>(texID);
+    transform->SetScale(w, h);
+    return obj;
 }
 
 
