@@ -79,10 +79,21 @@ GameObject* GameObjectFactory::CloneGameobject(EntityID id ,const std::string& n
     GameObject* original = GetGameObject(id);
 
     if (original) {
-        // Delegate the cloning logic to the GameObject itself
-        return original->Clone(newName);
+        std::string finalName;
+
+        if (newName.empty()) {
+            // Generate unique name: "OriginalName (Clone)X"
+            std::stringstream ss;
+            ss << original->GetName() << " (Clone)" << ++cloneCounter;
+            finalName = ss.str();
+        }
+        else {
+            finalName = newName;
+        }
+
+        // Delegate the cloning logic to the GameObject itself, passing the final name
+        return original->Clone(finalName);
     }
-     return nullptr;
 }
 
 

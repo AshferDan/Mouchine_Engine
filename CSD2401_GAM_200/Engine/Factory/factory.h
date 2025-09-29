@@ -37,4 +37,5 @@ private:
     EntityID nextEntityID;
     std::vector<std::unique_ptr<GameObject>> gameObjects;
     std::unordered_map<EntityID, size_t> entityToIndex;
+    unsigned int cloneCounter = 0;
 };

@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "factory.h"
 #include <iostream>
+#include <sstream>
 
 GameObject::GameObject(EntityID id, const std::string& name)
     : entityID(id), name(name), isActive(true) {
@@ -9,6 +10,7 @@ GameObject::GameObject(EntityID id, const std::string& name)
 GameObject* GameObject::Clone(const std::string& newName) const
 {
     GameObjectFactory& factory = GameObjectFactory::Instance();
+
     std::string name = !newName.empty() ? (this->name + " (Clone)") : newName;
     std::cout << name;
     GameObject* clone = factory.CreateGameObject(name);

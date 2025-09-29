@@ -126,8 +126,7 @@ void CoreEngine::update_time(double fps_calc_interval) {
     std::stringstream iostream;
     std::string tempfps , tempdt;
     std::string title_str;
-    tempfps = iostream.str();
-    
+
     iostream << CoreEngine::fps;
     tempfps = iostream.str();
 
