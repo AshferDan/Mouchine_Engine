@@ -1,136 +1,96 @@
 #include "collision.h"
-#include "GameObject.h"
-#include <iostream>
-#include <cmath>
+#include <algorithm> // for std::min, std::max
+#include <cmath>     // for sqrtf, fmaxf, fminf
 
-//this should be in maths library
-//#define max(a , b) (((a) > (b)) ? (a) : (b))
-//#define min(a , b) (((a) < (b)) ? (a) : (b))
+// --------------------------------------------------
+// Static Intersections
+// --------------------------------------------------
 
-//still need to implement dt whenever we make that
-// g_fixedDT = ??
-
-// g_dt = ????
-
-// g_appTime = ????
-
-bool CollisionIntersection_RectRect_Static(	const AABB& aabb1,
-											const AABB& aabb2)
+// AABB vs AABB
+bool CollisionIntersection_RectRect_Static(const AABB& aabb1, const AABB& aabb2)
 {
-	if
-		(
-			aabb1.max.x < aabb2.min.x ||
-			aabb1.min.x > aabb2.max.x ||
-			aabb1.max.y < aabb2.min.y ||
-			aabb1.min.y > aabb2.max.y
-			)
-	{
-		return false;
-	}
-	return true;
-};
+    if (aabb1.max.x < aabb2.min.x) return false;
+    if (aabb1.min.x > aabb2.max.x) return false;
+    if (aabb1.max.y < aabb2.min.y) return false;
+    if (aabb1.min.y > aabb2.max.y) return false;
+    return true;
+}
 
+// Circle vs Circle
+bool CollisionIntersection_CircleCircle_Static(const Circle& c1, const Circle& c2)
+{
+    float dx = c1.center.x - c2.center.x;
+    float dy = c1.center.y - c2.center.y;
+    float distSq = dx * dx + dy * dy;
+    float radiusSum = c1.radius + c2.radius;
+    return distSq <= radiusSum * radiusSum;
+}
+
+// AABB vs Circle
+bool CollisionIntersection_RectCircle_Static(const AABB& rect, const Circle& circle)
+{
+    // Clamp circle center to the edges of the rectangle
+    float closestX = std::max(rect.min.x, std::min(circle.center.x, rect.max.x));
+    float closestY = std::max(rect.min.y, std::min(circle.center.y, rect.max.y));
+
+    float dx = circle.center.x - closestX;
+    float dy = circle.center.y - closestY;
+
+    return (dx * dx + dy * dy) <= (circle.radius * circle.radius);
+}
+
+// --------------------------------------------------
+// Dynamic Intersections
+// --------------------------------------------------
+
+// Swept AABB vs AABB
 bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1,
-											const Vec2& vel1,
-											const AABB& aabb2,
-											const Vec2& vel2,
-											float& firstTimeOfCollision)
+    const Vec2& vel1,
+    const AABB& aabb2,
+    const Vec2& vel2,
+    float& firstTimeOfCollision)
 {
-	// relative vector of B to A
-	Vec2 Vb = { vel2.x - vel1.x, vel2.y - vel1.y };
-	//float dt = (float)g_dt;
+    // Relative velocity of B wrt A
+    Vec2 relVel = { vel2.x - vel1.x, vel2.y - vel1.y };
 
-	//Time for first collision
-	Vec2 tFirst = { 0.f,0.f };
+    // Initialize times
+    float tFirst = 0.0f;
+    float tLast = 1.0f; // normalized to frame [0,1]
 
-	//Time for last collision
-	Vec2 tLast = { 0.f/*dt*/, 0.f/*dt*/}; //Don't forget to replace the 0.f with dt
+    // For both axes
+    for (int axis = 0; axis < 2; ++axis) {
+        float v = (axis == 0 ? relVel.x : relVel.y);
+        float aMin = (axis == 0 ? aabb1.min.x : aabb1.min.y);
+        float aMax = (axis == 0 ? aabb1.max.x : aabb1.max.y);
+        float bMin = (axis == 0 ? aabb2.min.x : aabb2.min.y);
+        float bMax = (axis == 0 ? aabb2.max.x : aabb2.max.y);
 
-	// X-axis checks
-	if (Vb.x < 0.f)															// If square B is moving left
-	{
-		if (aabb1.min.x > aabb2.max.x)										// If square B is to the left of A, their x values will not touch
-		{
-			return false;
-		}
-		if (aabb1.max.x < aabb2.min.x)										// If square B is to the right of A, their x values will touch
-		{
-			tFirst.x = fmax((aabb1.max.x - aabb2.min.x) / Vb.x, tFirst.x);	// Time of first x intersection
-			tLast.x = fmin((aabb1.min.x - aabb2.max.x) / Vb.x, tLast.x);	// Time of last x intersection
-		}
-	}
-	else if (Vb.x > 0.f)													// If square B is moving right
-	{
-		if (aabb1.min.x > aabb2.max.x)										// If square B is to the left of A, their x values will touch
-		{
-			tFirst.x =fmax((aabb1.min.x - aabb2.max.x) / Vb.x, tFirst.x);	// Time of first x intersection
-			tLast.x = fmin((aabb1.max.x - aabb2.min.x) / Vb.x, tLast.x);	// Time of last x intersection
-		}
-		if (aabb1.max.x < aabb2.min.x)										// If square B is to the right of A, their x values will not touch
-		{
-			return false;
-		}
-	}
-	else if (Vb.x == 0.f)													// If square B is not moving on the x-axis
-	{
-		if (aabb1.max.x < aabb2.min.x)										// If square A is to the left of square B
-		{
-			return false;
-		}
-		else if (aabb1.min.x > aabb2.max.x)									// If square A is to the right of square B
-		{
-			return false;
-		}
-	}
+        if (v < 0.0f) {
+            if (aMin > bMax) return false; // moving away
+            float tEnter = (aMax - bMin) / v;
+            float tExit = (aMin - bMax) / v;
+            tFirst = std::max(tFirst, tEnter);
+            tLast = std::min(tLast, tExit);
+        }
+        else if (v > 0.0f) {
+            if (aMax < bMin) return false; // moving away
+            float tEnter = (aMin - bMax) / v;
+            float tExit = (aMax - bMin) / v;
+            tFirst = std::max(tFirst, tEnter);
+            tLast = std::min(tLast, tExit);
+        }
+        else {
+            // v == 0 ? check overlap
+            if (aMax < bMin || aMin > bMax) {
+                return false; // no movement, no overlap
+            }
+        }
+    }
 
-	// Y-axis checks
-	if (Vb.y < 0.f)															// If square B is moving down
-	{
-		if (aabb1.min.y > aabb2.max.y)										// If square B is below A, their y values will not touch
-		{
-			return false;
-		}
-		if (aabb1.max.y < aabb2.min.y)										// If square B is above A, their y values will touch
-		{
-			tFirst.y = fmax((aabb1.max.y - aabb2.min.y) / Vb.y, tFirst.y);	// Time of first y intersection
-			tLast.y = fmin((aabb1.min.y - aabb2.max.y) / Vb.y, tLast.y);		// Time of last y intersection
-		}
-	}
-	else if (Vb.y > 0.f)													// If square B is moving up
-	{
-		if (aabb1.min.y > aabb2.max.y)										// If square B is below A, their y values will touch
-		{
-			tFirst.y = fmax((aabb1.min.y - aabb2.max.y) / Vb.y, tFirst.y);	// Time of first y intersection
-			tLast.y = fmin((aabb1.max.y - aabb2.min.y) / Vb.y, tLast.y);	// Time of last y intersection
-		}
-		if (aabb1.max.y < aabb2.min.y)										// If square B is above A, their y values will not touch
-		{
-			return false;
-		}
-	}
-	else if (Vb.y == 0.f)													// If square B is not moving on the y-axis
-	{
-		if (aabb1.max.y < aabb2.min.y)										// If square A below square B
-		{
-			return false;
-		}
-		else if (aabb1.min.y > aabb2.max.y)									// If square A above square B
-		{
-			return false;
-		}
-	}
+    if (tFirst > tLast) {
+        return false;
+    }
 
-	if (tFirst.x > tLast.y || tFirst.y > tLast.x)							// Check if the square A is not in the path of square B
-	{
-		return false;
-	}
-	else
-	{
-		firstTimeOfCollision = fmax(tFirst.x, tFirst.y);					// Assign value to firstTimeOfCollision
-		if (!firstTimeOfCollision)											// If value == 0, squares are already colliding
-		{
-			return true;
-		}
-		return firstTimeOfCollision;										// return time of collision
-	}
+    firstTimeOfCollision = tFirst;
+    return true;
 }

@@ -310,7 +310,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Audio\audio.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Camera\Camera.cpp" />
+    <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collidercomponent.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collision.cpp" />
+    <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\CollisionSystem.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\GameManager\GameManager.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\ImGuiSystem.cpp" />
@@ -381,7 +383,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\ResourceManager\ResourceManager.cpp" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Audio\audio.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Camera\Camera.h" />
+    <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collidercomponent.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collision.h" />
+    <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\CollisionSystem.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\GameManager\GameManager.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\GraphicsSystem.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\ImGuiSystem.h" />

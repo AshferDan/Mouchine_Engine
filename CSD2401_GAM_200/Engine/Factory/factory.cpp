@@ -1,6 +1,8 @@
 #include "Factory.h"
 #include "GraphicsSystem.h"
 #include "transform.h"
+#include "collision.h"
+#include "collidercomponent.h"
 #include "physics.h"
 #include <iostream>
 #include <cmath>
@@ -42,6 +44,15 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     physics->SetVelocity(0, 0);
     physics->SetGravity(false);
 
+    if (shape == RenderComponent::ShapeType::Circle) {
+        player->AddComponent<ColliderComponent>(ColliderComponent::Type::Circle, w);
+        std::cout << "Added Circle collider with radius: " << (w * 0.5f) << std::endl;
+    }
+    else if (shape == RenderComponent::ShapeType::Square) {
+        player->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h);
+        std::cout << "Added Square collider with size: " << w << "x" << h << std::endl;
+    }
+
     std::cout << "Created Player: " << name << " at (" << x << ", " << y << ")" << std::endl;
 
     return player;
@@ -62,6 +73,14 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
     }
     else {
         transform->SetScale(w, h);
+
+        // Attach collider automatically
+        if (shape == RenderComponent::ShapeType::Circle) {
+            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Circle, w);
+        }
+        else if (shape == RenderComponent::ShapeType::Square) {
+            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h);
+        }
     }
     //testing TO BE REMOVED
     std::cout << "Created "
