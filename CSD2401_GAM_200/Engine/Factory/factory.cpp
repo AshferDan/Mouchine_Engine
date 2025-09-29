@@ -24,7 +24,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     auto* physics = player->AddComponent<PhysicsComponent>(0,0);
     auto render = player->AddComponent<RenderComponent>(shape,color);
     transform->SetScale(w, h);
-    physics->SetVelocity(1, 0);
+    physics->SetVelocity(0, 0);
     physics->SetGravity(false);
     
     std::cout << "Created Player: " << name << " at (" << x << ", " << y << ")" << std::endl;
@@ -39,7 +39,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     auto render = player->AddComponent<RenderComponent>(texID);
     transform->SetScale(w, h);
-    physics->SetVelocity(10, 0);
+    physics->SetVelocity(0, 0);
     physics->SetGravity(false);
 
     std::cout << "Created Player: " << name << " at (" << x << ", " << y << ")" << std::endl;
