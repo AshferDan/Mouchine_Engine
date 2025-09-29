@@ -26,8 +26,8 @@
      // Initialise Audio System
      std::cout << "\n--- Initialising Audio System ---" << std::endl;
      if (!audio.initialiseAudio()) {
-         std::cout << "WARNING: Audio system failed to initialise!" << std::endl;
-         std::cout << "Continuing without audio..." << std::endl;
+         std::cout << "audio system failed to initialise" << std::endl;
+         std::cout << "continuing without audio..." << std::endl;
      }
      else {
          std::cout << "Audio system initialised successfully!" << std::endl;
@@ -36,12 +36,12 @@
          std::cout << "\n--- Loading Audio Files ---" << std::endl;
 
          // Background music (looping)
-         audio.loadSound("bgm", "../Assets/Audio/background.wav", true);
+         audio.loadSound("bgm", "../Assets/audio/wind1.wav", true);
 
          // Sound effects (one-shot)
-         audio.loadSound("jump", "../Assets/Audio/jump.wav", false);
-         audio.loadSound("coin", "../Assets/Audio/coin.wav", false);
-         audio.loadSound("hit", "../Assets/Audio/hit.wav", false);
+         //audio.loadSound("jump", "../Assets/Audio/jump.wav", false);
+         //audio.loadSound("coin", "../Assets/Audio/coin.wav", false);
+         //audio.loadSound("hit", "../Assets/Audio/hit.wav", false);
 
          // Start playing background music
          std::cout << "Starting background music..." << std::endl;
