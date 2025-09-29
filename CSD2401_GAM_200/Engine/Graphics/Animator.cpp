@@ -101,21 +101,25 @@ void Spritesheet::LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float 
 	SetCols(static_cast<int>(rows * loop) + startFrameIdx);
 }
 
+// can add custom alpha here if want
 void Spritesheet::DrawSpritesheetAnim(GameObject* GO, float width, float height, bool flip)
 {
 	if (flip)
 	{
 		width = -width;
 	}
-	// set render mode
-	// set alpha value
-	// draw image w specific row n col
-	// draw image at gameobject position
+
+	// set render mode (dont need apparently bc overload for colour and const char texture)
 	
-	// either
-	// (harder?) we attach texture to a unit square mesh, so we can distort it for extra visual effects, and just attach the mesh to GO position (dynamic!)
-	// or 
-	// (easier) just draw texture only -> no scaling/ distorting of mesh separate from game object
+	// set alpha 
+	//RenderComponent::SetAlpha(alpha);
+	 
+	// draw image w specific row n col
+	
+	
+
+	// draw image one mesh and plug gameobject position
+	// unit square mesh, scale it up, apply texture to mesh, mesh position = GO position
 	
 	// draw texture!
 
