@@ -11,13 +11,31 @@ GraphicsSystem::GraphicsSystem() : window(nullptr),vao(0), vbo(0),Wwidth(800),Wh
         return;
     }
     // Simple fixed window size for now
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     window = glfwCreateWindow(Wwidth, Wheight, "Game Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();
         return;
     }
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height) {
+        glViewport(0, 0, width, height);
+
+        // optional: store width/height in GraphicsSystem if you use them later
+        auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
+        if (gs) {
+            gs->Wwidth = width;
+            gs->Wheight = height;
+        }
+        });
+
     glfwMakeContextCurrent(window);
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth, fbHeight);
+    Wwidth = fbWidth;
+    Wheight = fbHeight;
 }
 
 GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h) {
@@ -26,13 +44,30 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(
         return;
     }
     // Simple fixed window size for now
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     window = glfwCreateWindow(Wwidth, Wheight, "Game Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();
         return;
     }
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height) {
+        glViewport(0, 0, width, height);
+
+        // optional: store width/height in GraphicsSystem if you use them later
+        auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
+        if (gs) {
+            gs->Wwidth = width;
+            gs->Wheight = height;
+        }
+        });
     glfwMakeContextCurrent(window);
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth, fbHeight);
+    Wwidth = fbWidth;
+    Wheight = fbHeight;
 }
 
 GraphicsSystem::~GraphicsSystem() {
@@ -100,7 +135,8 @@ void GraphicsSystem::Update(float dt) {
 
     shader.Use();
 
-    glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f);
+    float aspect = static_cast<float>(Wwidth) / static_cast<float>(Wheight);
+    glm::mat4 projection = glm::ortho(-10.0f * aspect, 10.0f * aspect, -10.0f, 10.0f);
 
     glm::vec3 camPos(0.0f);
     GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
