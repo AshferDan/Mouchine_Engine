@@ -35,7 +35,7 @@ public:
 	bool playSound(const std::string& name, const std::string& channelName = "");
 	void stopSound(const std::string& channelName);
 	void stopAllSound();
-	bool eventPlaying(const std::string& eventName);
+	//bool eventPlaying(const std::string& eventName);
 	//void stopEvent (const string& eventName);
 	
 	// volume and effects

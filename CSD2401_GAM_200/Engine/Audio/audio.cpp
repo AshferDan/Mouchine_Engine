@@ -150,10 +150,12 @@ void AudioEngine::stopAllSound() {
 	std::cout << "stopped all sounds" << std::endl;
 }
 
+/*
 bool AudioEngine::eventPlaying(const std::string& eventName) {
 	// to be implemented when theres 'events'
 	return isPlaying(eventName);
 }
+*/
 
 /*  Volume and effects controls  */
 
@@ -204,4 +206,3 @@ void AudioEngine::checkError(FMOD_RESULT result, const std::string& operation) {
 		std::cout << "fmod error in " << operation << ": " << FMOD_ErrorString(result) << result << std::endl;
 	}
 }
-
