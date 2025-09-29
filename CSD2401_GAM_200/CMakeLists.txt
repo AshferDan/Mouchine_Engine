@@ -275,5 +275,5 @@ set_target_properties(Game PROPERTIES
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(Game PRIVATE -Wall ${DisableWarnings})
 elseif (MSVC)
-    target_compile_options(Game PRIVATE /W3 /WX-)
+    target_compile_options(Game PRIVATE /W4 /WX-)
 endif()

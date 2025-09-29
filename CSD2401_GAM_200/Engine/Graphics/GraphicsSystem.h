@@ -25,7 +25,6 @@ public:
 	static GLuint LoadTexture(const char* filepath);
 
 	GLFWwindow* getWindow() {return window;}
-
 	
 	void DrawLine(const glm::vec2& start, const glm::vec2& end,
 		const glm::vec4& color, const glm::mat4& vp);
@@ -42,7 +41,7 @@ public:
 private:
 	GLFWwindow* window;
 	GLSLShader shader;
-	GLuint vao, vbo, tex;
+	GLuint vao = 0, vbo = 0, tex = 0;
 	GLint Wwidth, Wheight;
 
 };
