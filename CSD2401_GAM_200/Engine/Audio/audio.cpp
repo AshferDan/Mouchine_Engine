@@ -95,7 +95,7 @@ void AudioEngine::unloadAllSound() {
 
 /*  Playback controls  */
 
-bool AudioEngine::playSound(const std::string& name, const std::string& channelName = "") {
+bool AudioEngine::playSound(const std::string& name, const std::string& channelName) {
 	if (!system) {
 		std::cout << "audio system not initialised..." << std::endl;
 		return false;

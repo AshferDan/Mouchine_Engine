@@ -6,6 +6,7 @@
  #include "Transform.h"
  #include "Physics.h"
  #include "RenderComponent.h"
+ #include "audio.h"
  #include <iostream>
  #include <cmath>
 
@@ -13,6 +14,7 @@
      std::cout << "=== 2D Component System Test ===" << std::endl;
 
      CoreEngine engine;
+     AudioEngine audio;
 
      // Add the GameObject system
   
@@ -20,6 +22,33 @@
      // Initialize
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
+
+     // Initialise Audio System
+     std::cout << "\n--- Initialising Audio System ---" << std::endl;
+     if (!audio.initialiseAudio()) {
+         std::cout << "WARNING: Audio system failed to initialise!" << std::endl;
+         std::cout << "Continuing without audio..." << std::endl;
+     }
+     else {
+         std::cout << "Audio system initialised successfully!" << std::endl;
+
+         // Load audio files
+         std::cout << "\n--- Loading Audio Files ---" << std::endl;
+
+         // Background music (looping)
+         audio.loadSound("bgm", "../Assets/Audio/background.wav", true);
+
+         // Sound effects (one-shot)
+         audio.loadSound("jump", "../Assets/Audio/jump.wav", false);
+         audio.loadSound("coin", "../Assets/Audio/coin.wav", false);
+         audio.loadSound("hit", "../Assets/Audio/hit.wav", false);
+
+         // Start playing background music
+         std::cout << "Starting background music..." << std::endl;
+         audio.playSound("bgm", "bgm_channel");
+         audio.setVolume("bgm_channel", 0.5f); // Set to 50% volume
+     }
+
 
      // Create 2D game objects
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
@@ -49,6 +78,8 @@
      std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
      engine.GameLoop();
 
+     // clean up when audioengine destructor is called
+     std::cout << "\n--- Shutting down ---" << std::endl;
 
      return 0;
  }
