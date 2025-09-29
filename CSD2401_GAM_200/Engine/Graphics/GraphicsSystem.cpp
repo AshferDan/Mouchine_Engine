@@ -136,7 +136,8 @@ void GraphicsSystem::Update(float dt) {
     shader.Use();
 
     float aspect = static_cast<float>(Wwidth) / static_cast<float>(Wheight);
-    glm::mat4 projection = glm::ortho(-10.0f * aspect, 10.0f * aspect, -10.0f, 10.0f);
+    glm::mat4 projection = glm::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+
 
     glm::vec3 camPos(0.0f);
     GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
