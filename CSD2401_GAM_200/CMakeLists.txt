@@ -35,6 +35,7 @@ set(Transform_DIR     ./Engine/Transform)
 set(Input_DIR         ./Engine/Input)
 set(Factory_DIR       ./Engine/Factory)
 set(Core_DIR          ./Engine/Core)
+set(Resource_DIR      ./Engine/ResourceManager)
 
 # External dependencies
 set(Extern_DIR        ./Extern)
@@ -84,9 +85,14 @@ file(GLOB_RECURSE Factory_HEAD     "${Factory_DIR}/*.h" "${Factory_DIR}/*.hpp")
 file(GLOB_RECURSE Core_SRC         "${Core_DIR}/*.cpp")
 file(GLOB_RECURSE Core_HEAD        "${Core_DIR}/*.h" "${Core_DIR}/*.hpp")
 
+file(GLOB_RECURSE Resource_SRC  "${Resource_DIR}/*.cpp")
+file(GLOB_RECURSE Resource_HEAD "${Resource_DIR}/*.h" "${Resource_DIR}/*.hpp")
+
+
 # External files (if any cpp/h files exist in Extern)
 file(GLOB_RECURSE Extern_SRC       "${Extern_DIR}/*.cpp")
 file(GLOB_RECURSE Extern_HEAD      "${Extern_DIR}/*.h" "${Extern_DIR}/*.hpp")
+
 
 # ======================= Collect Engine Sources =========================
 set(ENGINE_SOURCES
@@ -104,6 +110,7 @@ set(ENGINE_SOURCES
     ${Factory_SRC}
     ${Core_SRC}
     ${Extern_SRC}
+    ${Resource_SRC}
 )
 
 set(ENGINE_HEADERS
@@ -121,6 +128,7 @@ set(ENGINE_HEADERS
     ${Factory_HEAD}
     ${Core_HEAD}
     ${Extern_HEAD}
+    ${Resource_HEAD}
 )
 
 # ======================= Create Engine Static Library ===============
@@ -173,6 +181,9 @@ source_group("Factory\\Header Files" FILES ${Factory_HEAD})
 source_group("Core\\Source Files" FILES ${Core_SRC})
 source_group("Core\\Header Files" FILES ${Core_HEAD})
 
+source_group("ResourceManager\\Source Files" FILES ${Resource_SRC})
+source_group("ResourceManager\\Header Files" FILES ${Resource_HEAD})
+
 source_group("Extern\\Source Files" FILES ${Extern_SRC})
 source_group("Extern\\Header Files" FILES ${Extern_HEAD})
 
@@ -192,6 +203,7 @@ target_include_directories(Engine PUBLIC
     ${Core_DIR}
     ${Factory_DIR}
     ${Extern_DIR}
+    ${Resource_DIR}
 )
 
 # ======================= Link Libraries to Engine ===================

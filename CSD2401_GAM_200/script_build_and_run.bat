@@ -69,8 +69,6 @@ echo.
 REM Run the application
 echo Running the application...
 echo.
-cd Sandbox\Debug
-MyGame.exe
 if %errorlevel% neq 0 (
     echo.
     echo Application exited with error code: %errorlevel%
