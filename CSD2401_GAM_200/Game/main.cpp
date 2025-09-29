@@ -33,7 +33,7 @@
 
      //Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
-     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 0, 0, 5, 5, glm::vec4(1.f, 0.f, 0.f, 1.f));
+     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 20, 0, 5, 5, glm::vec4(1.f, 0.f, 0.f, 1.f));
      float x2, y2;
      CircleShape->GetComponent<TransformComponent>()->GetPosition(x2, y2);
 
