@@ -20,7 +20,8 @@ void InputManager::Initialize() {
 
 void InputManager::Update(float dt) {
     static std::unordered_map<int, bool> singleTriggerKeys = {
-    {GLFW_KEY_SPACE, false}  // jump
+        {GLFW_KEY_SPACE, false},
+        {GLFW_KEY_F1, false}
     };
 
     ImGuiIO& io = ImGui::GetIO();
@@ -58,6 +59,26 @@ void InputManager::Update(float dt) {
          std::cout << "DOWN" << std::endl;
          y -= (double)movementspeed;
      }
+
+
+     for (auto& kv : singleTriggerKeys) {
+         int key = kv.first;
+         bool& wasPressed = kv.second;
+
+         if (glfwGetKey(window, key) == GLFW_PRESS) {
+             if (!wasPressed) {
+                 if (key == GLFW_KEY_F1) {
+                     CORE->GetGraphicsSystem()->toggleDebugMode();
+                     std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
+                 }
+             }
+             wasPressed = true;
+         }
+         else {
+             wasPressed = false;
+         }
+     }
+
 
      if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
          if (!isJumping) {

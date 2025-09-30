@@ -151,7 +151,7 @@ void GraphicsSystem::Update(float dt) {
     }
 
     glm::mat4 view = glm::translate(glm::mat4(1.0f), -camPos);
-    glm::mat4 vp = projection * view;
+    vp = projection * view;
 
     auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
     int count = 0;
@@ -170,46 +170,73 @@ void GraphicsSystem::Update(float dt) {
             case RenderComponent::ShapeType::Square:
             case RenderComponent::ShapeType::Circle:
             {
-                shader.SetUniform("uColor", glm::vec4(rend->GetColor()));
-                shader.SetUniform("uTiling", glm::vec2(1.0f));
-                shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
-                shader.SetUniform("uIsLine", 0);
-                glm::vec2 uvScale = glm::vec2(1.0f);
-                glm::vec2 uvOffset = glm::vec2(0.0f);
-
-                if (auto* animator = obj->GetComponent<Spritesheet>()) {
-                    uvScale = animator->GetUVScale();     // Scale (1/Cols, 1/Rows)
-                    uvOffset = animator->GetUVOffset();   // Current frame's offset
-                }
-
-                shader.SetUniform("uTiling", uvScale);
-                shader.SetUniform("uTexOffset", uvOffset);
-
-
-                if (rend->GetTextureID() > 0) {
-                    shader.SetUniform("uHasTexture", 1);
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, rend->GetTextureID());
-                    shader.SetUniform("uTexture", 0);
-                }
-                else {
-                    shader.SetUniform("uHasTexture", 0);
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                };
-
                 float x, y, sx, sy;
                 transform->GetPosition(x, y);
                 transform->GetScale(sx, sy);
                 float rot = transform->GetRotation();
 
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-                model = glm::rotate(model, rot, glm::vec3(0, 0, 1));
-                model = glm::scale(model, glm::vec3(sx, sy, 1.0f));
+                if (debugMode) {
+                    if (rend->GetShapeType() == RenderComponent::ShapeType::Square) {
+                        DrawRectOutline(x, y, sx, sy, { 1,0,0,1 }, vp);
+                    }
+                    else {
+                        DrawCircleOutline(x, y, sx * 0.5, 36, { 0,1,0,1 }, vp);
+                    }
 
-                shader.SetUniform("uMVP", vp * model);
+                    auto& debugShapes = CORE->GetDebugSystem()->GetShapes();
+                    for (auto& shape : debugShapes) {
+                        switch (shape.type) {
+                        case DebugSystem::DebugShape::LINE:
+                            DrawLine(shape.p1, shape.p2, shape.color, vp);
+                            break;
+                        case DebugSystem::DebugShape::RECT:
+                            DrawRectOutline(shape.p1.x, shape.p1.y, shape.p2.x, shape.p2.y, shape.color, vp);
+                            break;
+                        case DebugSystem::DebugShape::CIRCLE:
+                            DrawCircleOutline(shape.p1.x, shape.p1.y, shape.radius, shape.segments, shape.color, vp);
+                            break;
+                        case DebugSystem::DebugShape::POINT:
+                            DrawPoint(shape.p1, shape.color, vp);
+                        }
+                    }
+                }
+                else {
+                    shader.SetUniform("uColor", glm::vec4(rend->GetColor()));
+                    shader.SetUniform("uTiling", glm::vec2(1.0f));
+                    shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
+                    shader.SetUniform("uIsLine", 0);
+                    glm::vec2 uvScale = glm::vec2(1.0f);
+                    glm::vec2 uvOffset = glm::vec2(0.0f);
 
-                glBindVertexArray(vao);
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                    if (auto* animator = obj->GetComponent<Spritesheet>()) {
+                        uvScale = animator->GetUVScale();     // Scale (1/Cols, 1/Rows)
+                        uvOffset = animator->GetUVOffset();   // Current frame's offset
+                    }
+
+                    shader.SetUniform("uTiling", uvScale);
+                    shader.SetUniform("uTexOffset", uvOffset);
+
+
+                    if (rend->GetTextureID() > 0) {
+                        shader.SetUniform("uHasTexture", 1);
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, rend->GetTextureID());
+                        shader.SetUniform("uTexture", 0);
+                    }
+                    else {
+                        shader.SetUniform("uHasTexture", 0);
+                        glBindTexture(GL_TEXTURE_2D, 0);
+                    };
+
+                    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
+                    model = glm::rotate(model, rot, glm::vec3(0, 0, 1));
+                    model = glm::scale(model, glm::vec3(sx, sy, 1.0f));
+
+                    shader.SetUniform("uMVP", vp * model);
+
+                    glBindVertexArray(vao);
+                    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+                }
                 break;
             }
 
@@ -293,10 +320,13 @@ void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
 
 void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
     const glm::vec4& color, const glm::mat4& vp) {
-    glm::vec2 p1(x, y);
-    glm::vec2 p2(x + w, y);
-    glm::vec2 p3(x + w, y + h);
-    glm::vec2 p4(x, y + h);
+    float halfW = w / 2;
+    float halfH = h / 2;
+
+    glm::vec2 p1(x - halfW, y - halfH);
+    glm::vec2 p2(x + halfW, y - halfH);
+    glm::vec2 p3(x + halfW, y + halfH);
+    glm::vec2 p4(x - halfW, y + halfH);
 
     // 4 sides
     DrawLine(p1, p2, color, vp);

@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "factory.h"
 #include "transform.h"
+#include "DebugSystem.h"
 #include <iostream>
 #include <RenderComponent.h>
 #include <fstream>
@@ -40,12 +41,17 @@ public:
 	void DrawCircleOutline(float cx, float cy, float r, int segments,
 		const glm::vec4& color, const glm::mat4& vp);
 
+	bool isDebugModeOn() const { return debugMode; }
+	void toggleDebugMode() { debugMode = !debugMode; }
+	const glm::mat4& getVp() const { return vp; }
+
 private:
+	glm::mat4 vp;
+	bool debugMode = false;
 	GLFWwindow* window;
 	GLSLShader shader;
 	GLuint vao = 0, vbo = 0, tex = 0;
 	GLint Wwidth, Wheight;
-
 };
 
 
