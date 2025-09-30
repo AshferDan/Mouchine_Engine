@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include "RenderComponent.h"
 #include <string>
-#include "Animator.hpp"
 
 class GameObjectFactory {
 public:
@@ -25,10 +24,6 @@ public:
     GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char* filename);
     GameObject* CloneGameObject(EntityID id, const std::string& newName = "");
     GameObject* CreateImage(const std::string& name, RenderComponent::ShapeType shape, float x, float y,float w,float h, char const* filename);
-    GameObject* CreateAnimatedImage(const std::string& name, float x, float y, float w, float h,
-        char const* filename, int numRows, int numCols,
-        int startFrame, int endFrame, float fps);
-
 
     // Management
     GameObject* GetGameObject(EntityID id);

@@ -19,14 +19,13 @@ public:
 	void Destroy() override {}
 	std::unique_ptr<IComponent> Clone(GameObject* NewClone) const override;
 	
-	GLuint GetTextureID() const { return textureID; }
 	void SetAnimation(int startFrameIdx, int endFrameIdx, float fps);
 	void Unload();
 
 	glm::vec2 GetUVScale() const;
 	glm::vec2 GetUVOffset() const;
 
-
+	// Setter Getters for row n cols
 	int GetRows();
 	void SetRows(int val);
 
@@ -38,15 +37,16 @@ public:
 
 
 private:
-	const int rows, cols;					
-	int currRow, currCol;					
-	const float uv_width, uv_height;				
-	float timePerFrame;        
-	float currentFrameTime;     
-	int startFrame, endFrame;  
-
+	const int rows, cols;					// Amount of rows and calls, ideally anims will be separated by rows
+	int currRow, currCol;					// Current row and col (specific sprite)
+	const float uv_width, uv_height;				// Width and Height for textures
+	float timePerFrame;         // Time for one frame
+	float currentFrameTime;     // Time accumulated since last frame change
+	int startFrame, endFrame;   // The frame range for the current animation
+	// incl texture here
 	const char* SpriteFile;
 	const GLuint textureID;
 	float alpha;
 
+	// include unit square mesh to apply transforms here
 };

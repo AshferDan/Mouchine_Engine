@@ -9,7 +9,6 @@
 
 class GameObject;
 class GameObjectFactory;
-class Serialize_Writer;
 class ImGuiSystem : public ISystem {
 public:
 	ImGuiSystem(GLFWwindow* window);

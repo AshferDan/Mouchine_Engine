@@ -1,5 +1,4 @@
 #include "ImGuiSystem.h"
-#include "Serialization.h"
 #include <iostream>
 
 ImGuiSystem::ImGuiSystem(GLFWwindow* window) : m_window(window) {};
@@ -12,7 +11,9 @@ void ImGuiSystem::Initialize() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+
 	ImGui::StyleColorsDark();
+
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
@@ -47,32 +48,15 @@ void ImGuiSystem::Update(float dt) {
 				if (ImGui::DragFloat("Rotation", &rot, 0.1f)) {
 					transform->SetRotation(rot);
 				}
-			}
-
-			if (obj->GetName() != "Hero") {
-				if (ImGui::Button("Clone")) {
-					GameObjectFactory& factory = GameObjectFactory::Instance();
-					GameObject* clonedObj = factory.CloneGameObject(obj->GetID());
-
-					// Save cloned object data
-					Serialize_Writer writer("../Logs/GameObjectData.txt");
-					if (writer.IsStreamGood()) {
-						writer.WriteGameObjectData(*clonedObj, 0);
-						std::cout << "Cloned object data saved!\n";
-					}
-
-					std::cout << "button clicked";
-				}
-
-				if (ImGui::Button("Save Data")) {
-					Serialize_Writer writer("../Logs/GameObjectData.txt");
-					if (writer.IsStreamGood()) {
-						writer.WriteGameObjectData(*obj, 0);
-						std::cout << "GameObject data saved!\n";
+				if (obj->GetName() != "Hero") {
+					if (ImGui::Button("Clone"))
+					{
+						GameObjectFactory& factory = GameObjectFactory::Instance();
+						GameObject* clonedObj = factory.CloneGameObject(obj->GetID());
+						std::cout << "button clicked";
 					}
 				}
 			}
-
 			ImGui::TreePop();
 		}
 	}
@@ -82,9 +66,15 @@ void ImGuiSystem::Update(float dt) {
 	//Render ImGui
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 	glfwSwapBuffers(m_window);
 	glfwPollEvents();
+
 }
+
+//void ImGuiSystem::Destroy() {
+//	Shutdown();
+//}
 
 void ImGuiSystem::Shutdown() {
 	ImGui_ImplOpenGL3_Shutdown();

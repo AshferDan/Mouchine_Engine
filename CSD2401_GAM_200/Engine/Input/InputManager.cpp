@@ -45,19 +45,19 @@ void InputManager::Update(float dt) {
 
      if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
          std::cout << "UP" << std::endl;
-         y += movementspeed;
+         y += (double)movementspeed;
      }
      if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
          std::cout << "LEFT" << std::endl;
-         x -= movementspeed;
+         x -= (double)movementspeed;
      }
      if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
          std::cout << "RIGHT" << std::endl;
-         x += movementspeed;
+         x += (double)movementspeed;
      }
      if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
          std::cout << "DOWN" << std::endl;
-         y -= movementspeed;
+         y -= (double)movementspeed;
      }
 
 
