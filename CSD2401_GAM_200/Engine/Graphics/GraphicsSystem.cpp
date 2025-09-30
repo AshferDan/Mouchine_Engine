@@ -131,7 +131,7 @@ void GraphicsSystem::Update(float dt) {
     glClearColor(0.2f, 0.5f, 0.5f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glLineWidth(2.f);
-    glPointSize(5.f);
+    glPointSize(50.f);
 
     shader.Use();
 
@@ -173,6 +173,7 @@ void GraphicsSystem::Update(float dt) {
                 shader.SetUniform("uColor", glm::vec4(rend->GetColor()));
                 shader.SetUniform("uTiling", glm::vec2(1.0f));
                 shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
+                shader.SetUniform("uIsLine", 0);
 
                 if (rend->GetTextureID() > 0) {
                     shader.SetUniform("uHasTexture", 1);
@@ -203,37 +204,16 @@ void GraphicsSystem::Update(float dt) {
 
             case RenderComponent::ShapeType::Line:
             {
-                //auto line = rend->GetLine();
-                //DrawLine(line.start, line.end, line.color, vp);
-                DrawLine({ 0,0 }, { Wwidth, Wheight }, { 1,0,0,1 }, vp);
+                auto line = rend->GetLine();
+                DrawLine(line.start, line.end, line.color, vp);
+                //DrawLine({ 0,0 }, { Wwidth, Wheight }, { 1,0,0,1 }, vp);
                 break;
             }
 
             case RenderComponent::ShapeType::Point:
             {
                 auto point = rend->GetPoint();
-                shader.SetUniform("uColor", point.color);
-                shader.SetUniform("uHasTexture", 0);
-
-                glm::vec2 pos = point.pos;
-
-                GLuint tempVBO, tempVAO;
-                glGenVertexArrays(1, &tempVAO);
-                glGenBuffers(1, &tempVBO);
-
-                glBindVertexArray(tempVAO);
-                glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(pos), &pos, GL_DYNAMIC_DRAW);
-
-                glEnableVertexAttribArray(0);
-                glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
-
-                shader.SetUniform("uMVP", vp);
-
-                glDrawArrays(GL_POINTS, 0, 1);
-
-                glDeleteBuffers(1, &tempVBO);
-                glDeleteVertexArrays(1, &tempVAO);
+                DrawPoint(point.pos, point.color, vp);
                 break;
             }
             }
@@ -244,8 +224,10 @@ void GraphicsSystem::Update(float dt) {
 
 void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
     const glm::vec4& color, const glm::mat4& vp) {
+    shader.SetUniform("uIsLine", 1);
     shader.SetUniform("uColor", color);
     shader.SetUniform("uHasTexture", 0);
+    shader.SetUniform("uIsCircle", 0);
 
     glm::vec3 verts[2] = {
         { start.x, start.y, 0.0f },
@@ -271,6 +253,62 @@ void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
     glDeleteVertexArrays(1, &tempVAO);
 }
 
+void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
+    const glm::vec4& color, const glm::mat4& vp) {
+    shader.SetUniform("uIsLine", 0);
+    shader.SetUniform("uColor", color);
+    shader.SetUniform("uHasTexture", 0);
+
+    glm::vec2 pos = ppos;
+
+    GLuint tempVBO, tempVAO;
+    glGenVertexArrays(1, &tempVAO);
+    glGenBuffers(1, &tempVBO);
+
+    glBindVertexArray(tempVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, tempVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(pos), &pos, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+
+    shader.SetUniform("uMVP", vp);
+
+    glDrawArrays(GL_POINTS, 0, 1);
+
+    glDeleteBuffers(1, &tempVBO);
+    glDeleteVertexArrays(1, &tempVAO);
+}
+
+void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
+    const glm::vec4& color, const glm::mat4& vp) {
+    glm::vec2 p1(x, y);
+    glm::vec2 p2(x + w, y);
+    glm::vec2 p3(x + w, y + h);
+    glm::vec2 p4(x, y + h);
+
+    // 4 sides
+    DrawLine(p1, p2, color, vp);
+    DrawLine(p2, p3, color, vp);
+    DrawLine(p3, p4, color, vp);
+    DrawLine(p4, p1, color, vp);
+}
+
+void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments,
+    const glm::vec4& color, const glm::mat4& vp) {
+    if (segments < 8) segments = 8; // minimum for circle shape
+
+    float step = glm::two_pi<float>() / segments;
+    for (int i = 0; i < segments; i++) {
+        float theta1 = step * i;
+        float theta2 = step * (i + 1);
+
+        glm::vec2 p1 = { cx + r * cos(theta1), cy + r * sin(theta1) };
+        glm::vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
+
+        DrawLine(p1, p2, color, vp);
+    }
+}
 
 std::string GraphicsSystem::GetName() {
     return "Graphics System";

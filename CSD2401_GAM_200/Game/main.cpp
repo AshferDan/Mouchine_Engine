@@ -31,11 +31,15 @@
 
      //Line Object -> name, object type (Line), x1, y1 (start points), x2, y2 (end points),
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
-    // GameObject* Line = factory.CreateShape("Line", RenderComponent::ShapeType::Line, 1, 1, 10, 10, { 0,1,0,1 });
+     //GameObject* Line = factory.CreateShape("Line", RenderComponent::ShapeType::Line, 1, 1, 960, 540, { 0,1,0,1 });
+     //GameObject* Line1 = factory.CreateShape("Line1", RenderComponent::ShapeType::Line, 1, 1, -960, -540, { 0,1,0,1 });
+     //GameObject* Line2 = factory.CreateShape("Line2", RenderComponent::ShapeType::Line, 1, 1, -960, 540, { 0,1,0,1 });
+     //GameObject* Line3 = factory.CreateShape("Line3", RenderComponent::ShapeType::Line, 1, 1, 960, -540, { 0,1,0,1 });
+
 
      //Point Object -> name, object type (Point), x coord, y coord, size scaling, 6TH ARGUMENT IS REDANDUNT JUST PUT 0 IT DOES NOT CHANGE ANYTHING, 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
-    // GameObject* Point = factory.CreateShape("Point", RenderComponent::ShapeType::Point, 5, 5, 10, 0, { 1,0,0,1 });
+     //GameObject* Point = factory.CreateShape("Point", RenderComponent::ShapeType::Point, 5, 5, 10, 0, { 1,0,0,1 });
      //Start engine main loop
      std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
      engine.GameLoop();
