@@ -43,6 +43,22 @@ public:
     GLuint GetTextureID() const { return textureID; }
     ShapeType GetShapeType() const { return shape; }
     glm::vec4 GetColor() const { return color; }
+
+    // Getter for strings
+    const char* GetShapeTypeName()
+    {
+        switch (static_cast<int>(GetShapeType()))
+        {
+        case static_cast<int>(ShapeType::Square):
+            return "Square";
+        case static_cast<int>(ShapeType::Circle):
+            return "Circle";
+        case static_cast<int>(ShapeType::Line):
+            return "Line";
+        case static_cast<int>(ShapeType::Point):
+            return "Point";
+        }
+    }
     
     void SetColor(glm::vec4 newColor) {
         color = newColor ;
