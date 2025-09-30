@@ -1,6 +1,6 @@
-#define STB_IMAGE_IMPLEMENTATION
+
 #include "GraphicsSystem.h"
-#include "stb_image.h"
+#include "Animator.hpp"
 
 const char* configFile = "../Logs/config.txt";
 
@@ -174,6 +174,17 @@ void GraphicsSystem::Update(float dt) {
                 shader.SetUniform("uTiling", glm::vec2(1.0f));
                 shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
                 shader.SetUniform("uIsLine", 0);
+                glm::vec2 uvScale = glm::vec2(1.0f);
+                glm::vec2 uvOffset = glm::vec2(0.0f);
+
+                if (auto* animator = obj->GetComponent<Spritesheet>()) {
+                    uvScale = animator->GetUVScale();     // Scale (1/Cols, 1/Rows)
+                    uvOffset = animator->GetUVOffset();   // Current frame's offset
+                }
+
+                shader.SetUniform("uTiling", uvScale);
+                shader.SetUniform("uTexOffset", uvOffset);
+
 
                 if (rend->GetTextureID() > 0) {
                     shader.SetUniform("uHasTexture", 1);

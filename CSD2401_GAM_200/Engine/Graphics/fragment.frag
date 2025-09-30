@@ -6,6 +6,7 @@ out vec4 FragColor;
 uniform sampler2D uTexture;
 uniform vec4 uColor;
 uniform vec2 uTiling;
+uniform vec2 uTexOffset;
 uniform int uIsCircle;
 uniform int uHasTexture;
 uniform int uIsLine;
@@ -18,9 +19,11 @@ void main() {
         return;
     }
 
-    if(uHasTexture == 1) {
-        vec4 tex = texture(uTexture, TexCoord * uTiling);
-       baseColor *= tex;
+   if(uHasTexture == 1) {
+      vec2 finalTexCoord = TexCoord * uTiling + uTexOffset; 
+        
+        vec4 tex = texture(uTexture, finalTexCoord);
+        baseColor *= tex;
     }
 
     if(uIsCircle == 1) {
