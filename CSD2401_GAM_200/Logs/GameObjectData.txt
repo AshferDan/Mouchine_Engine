@@ -1,0 +1,1 @@
+GO Name: bgImage(1) | Shape: Square | Position (x,y): (0,0) | Size (w,h): (1920,1080) | Colour: (1,1,1,1)

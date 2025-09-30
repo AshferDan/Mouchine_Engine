@@ -101,30 +101,6 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
     return obj;
 }
 
-GameObject* GameObjectFactory::CloneGameObject(EntityID id, const std::string& newName) {
-    GameObject* original = GetGameObject(id);
-
-    if (original) {
-        std::string finalName;
-
-        if (newName.empty()) {
-            std::stringstream ss;
-            size_t length = original->GetName().find_first_of('(');
-            if (length == std::string::npos)
-            { length = original->GetName().length(); }
-            
-            ++cloneCounter;
-            ss << original->GetName().substr(0,length) << "(" << cloneCounter << ")";
-            finalName = ss.str();
-        }
-        else {
-            finalName = newName;
-        }
-
-        return original->Clone(finalName);
-    }
-    return nullptr;
-}
 
 GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderComponent::ShapeType shape, float x, float y,float w ,float h, char const* filename)
 {
@@ -165,6 +141,150 @@ GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, floa
     return obj;
 }
 
+
+GameObject* GameObjectFactory::ClonePlayer(EntityID id, const std::string& newName) {
+    GameObject* original = GetGameObject(id);
+
+    if (original) {
+        std::string finalName;
+
+        if (newName.empty()) {
+            std::stringstream ss;
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos) {
+                length = original->GetName().length();
+            }
+
+            ++cloneCounter;
+            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
+            finalName = ss.str();
+        }
+        else {
+            finalName = newName;
+        }
+
+        GameObject* clone = original->Clone(finalName);
+
+        std::cout << "Cloned Player: " << finalName << " from " << original->GetName() << std::endl;
+
+        return clone;
+    }
+    return nullptr;
+}
+
+GameObject* GameObjectFactory::CloneGameObject(EntityID id, const std::string& newName) {
+    GameObject* original = GetGameObject(id);
+
+    if (original) {
+        std::string finalName;
+
+        if (newName.empty()) {
+            std::stringstream ss;
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos)
+            { length = original->GetName().length(); }
+            
+            ++cloneCounter;
+            ss << original->GetName().substr(0,length) << "(" << cloneCounter << ")";
+            finalName = ss.str();
+        }
+        else {
+            finalName = newName;
+        }
+
+        return original->Clone(finalName);
+    }
+    return nullptr;
+}
+GameObject* GameObjectFactory::CloneShape(EntityID id, const std::string& newName) {
+    GameObject* original = GetGameObject(id);
+
+    if (original) {
+        std::string finalName;
+
+        if (newName.empty()) {
+            std::stringstream ss;
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos) {
+                length = original->GetName().length();
+            }
+
+            ++cloneCounter;
+            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
+            finalName = ss.str();
+        }
+        else {
+            finalName = newName;
+        }
+
+        GameObject* clone = original->Clone(finalName);
+
+        std::cout << "Cloned Shape: " << finalName << " from " << original->GetName() << std::endl;
+
+        return clone;
+    }
+    return nullptr;
+}
+
+GameObject* GameObjectFactory::CloneImage(EntityID id, const std::string& newName) {
+    GameObject* original = GetGameObject(id);
+
+    if (original) {
+        std::string finalName;
+
+        if (newName.empty()) {
+            std::stringstream ss;
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos) {
+                length = original->GetName().length();
+            }
+
+            ++cloneCounter;
+            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
+            finalName = ss.str();
+        }
+        else {
+            finalName = newName;
+        }
+
+        GameObject* clone = original->Clone(finalName);
+
+        std::cout << "Cloned Image: " << finalName << " from " << original->GetName() << std::endl;
+
+        return clone;
+    }
+    return nullptr;
+}
+
+GameObject* GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string& newName) {
+    GameObject* original = GetGameObject(id);
+
+    if (original) {
+        std::string finalName;
+
+        if (newName.empty()) {
+            std::stringstream ss;
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos) {
+                length = original->GetName().length();
+            }
+
+            ++cloneCounter;
+            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
+            finalName = ss.str();
+        }
+        else {
+            finalName = newName;
+        }
+
+        GameObject* clone = original->Clone(finalName);
+
+        std::cout << "Cloned Animated Image: " << finalName << " from " << original->GetName() << std::endl;
+
+        return clone;
+    }
+    return nullptr;
+}
 GameObject* GameObjectFactory::GetGameObject(EntityID id) {
     auto it = entityToIndex.find(id);
     if (it != entityToIndex.end() && it->second < gameObjects.size()) {

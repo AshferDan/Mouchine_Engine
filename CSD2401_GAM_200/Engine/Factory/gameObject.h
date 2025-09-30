@@ -122,6 +122,38 @@ public:
         return raw_ptr;
     }
 
+    /*======================================================================================
+
+    ========================================================================================*/
+    std::vector<IComponent*> GetAllComponentPointers() {
+        std::vector<IComponent*> ComponentArray;
+        ComponentArray.reserve(components.size());
+            for (auto& pair : components) {
+                ComponentArray.push_back(pair.second.get());
+            }
+            return ComponentArray;
+    }
+
+/*======================================================================================
+
+========================================================================================*/
+    std::vector<std::string> GetAllComponentName() {
+        std::vector<std::string> ComponentArray;
+        ComponentArray.reserve(components.size());
+        for (auto& pair : components) {
+            ComponentArray.push_back(pair.second->GetName());
+        }
+        return ComponentArray;
+    }
+
+/*======================================================================================
+
+========================================================================================*/
+    size_t GetComponentCount() const {
+        return components.size();
+}
+
+
     // GameObject lifecycle
     void Initialize();
     void Update(float deltaTime);
