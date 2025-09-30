@@ -1,6 +1,6 @@
 #include "audio.h"
 
-AudioEngine::AudioEngine() : sounds(), channels(), system(nullptr){}
+AudioEngine::AudioEngine() : sounds(), channels(), system(nullptr) {}
 AudioEngine::~AudioEngine() { stopAudio(); }
 
 /*  Core Functionalities  */
@@ -129,7 +129,7 @@ bool AudioEngine::playSound(const std::string& name, const std::string& channelN
 		checkError(result, "playing sound: " + name);
 		return false;
 	}
-	
+
 	if (!channelName.empty()) {
 		channels[channelName] = channel;
 	}

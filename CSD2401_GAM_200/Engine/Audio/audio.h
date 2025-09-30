@@ -20,7 +20,7 @@ private:
 public:
 	AudioEngine();
 	~AudioEngine();
-	
+
 	// core functionalities
 	bool initialiseAudio();
 	void updateAudio();
@@ -38,7 +38,7 @@ public:
 	void stopAllSound();
 	//bool eventPlaying(const std::string& eventName);
 	//void stopEvent (const string& eventName);
-	
+
 	// volume and effects
 	void setVolume(const std::string& channelName, float volume);
 	void masterVolume(float volume);
