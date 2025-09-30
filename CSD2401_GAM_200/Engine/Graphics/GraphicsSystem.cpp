@@ -194,14 +194,6 @@ void GraphicsSystem::Update(float dt)
 
                 if (debugMode)
                 {
-                    if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
-                    {
-                        DrawRectOutline(x, y, sx, sy, {1, 0, 0, 1}, vp);
-                    }
-                    else
-                    {
-                        DrawCircleOutline(x, y, sx * 0.5, 36, {0, 1, 0, 1}, vp);
-                    }
 
                     auto &debugShapes = CORE->GetDebugSystem()->GetShapes();
                     for (auto &shape : debugShapes)
@@ -222,8 +214,7 @@ void GraphicsSystem::Update(float dt)
                         }
                     }
                 }
-                else
-                {
+                    shader.SetUniform("uIsLine", 0);
                     shader.SetUniform("uColor", glm::vec4(rend->GetColor()));
                     shader.SetUniform("uTiling", glm::vec2(1.0f));
                     shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
@@ -261,7 +252,14 @@ void GraphicsSystem::Update(float dt)
 
                     glBindVertexArray(vao);
                     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-                }
+                    if (debugMode) {
+                        if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
+                            DrawCircleOutline(x, y, sx*0.5, sy, { 0,1,0,1 }, vp);
+                        }
+                        else {
+                            DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
+                        }
+                    }
                 break;
             }
 
