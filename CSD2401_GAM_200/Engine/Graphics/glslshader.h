@@ -37,6 +37,7 @@ class GLSLShader {
   */
 public:
 
+
   // default ctor required to initialize GLSLShader object to safe state
   GLSLShader() : pgm_handle(0), is_linked(GL_FALSE) { /* empty by design */ }
 
@@ -146,6 +147,8 @@ public:
   void SetUniform(GLchar const* name, glm::mat2 const& val);
   void SetUniform(GLchar const* name, glm::mat3 const& val);
   void SetUniform(GLchar const* name, glm::mat4 const& val);
+  void SetUniformVec2(GLchar const* name, glm::vec2 const& v);
+  void SetUniform2f(GLchar const* name, glm::vec2 const& v);
 
   // display the list of active vertex attributes used by vertex shader
   void PrintActiveAttribs() const;
