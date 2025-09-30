@@ -9,13 +9,54 @@
  #include <iostream>
  #include <cmath>
 #include "Animator.hpp"
+#include "ResourceManager.h"
+#include "audio.h"
 
  int main() {
      std::cout << "=== 2D Component System Test ===" << std::endl;
      CoreEngine engine;
+     AudioEngine audio;
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
 
+     // Initialise Audio System
+     std::cout << "\n--- Initialising Audio System ---" << std::endl;
+     if (!audio.initialiseAudio())
+     {
+         std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
+     }
+     else
+     {
+         std::cout << "audio system initialised successfully!" << std::endl;
+     }
+
+     // Initialising ResourceManager
+     std::cout << "\n--- Initializing Resource Manager ---" << std::endl;
+     auto& resourceMgr = ResourceManager::Instance();
+
+     // link audio engine to resource manager for audio loading
+     resourceMgr.SetAudioEngine(&audio);
+     std::cout << "\n--- Loading Resources ---" << std::endl;
+
+     // load textures
+     resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
+
+     // load audio files
+     resourceMgr.LoadAudio("bgm", "../Assets/audio/awesomeness.wav", true); // looping
+     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
+
+     // print loaded resources
+     resourceMgr.PrintLoadedResources();
+
+     // register the sound with audio engine to play it
+     std::cout << "\n--- Starting Background Music ---" << std::endl;
+     AudioResource* bgMusic = resourceMgr.GetAudio("bgm");
+     if (bgMusic && bgMusic->IsLoaded())
+     {
+         audio.registerSound("bgm", bgMusic->GetSound());
+         audio.playSound("bgm", "bgm_channel");
+         audio.setVolume("bgm_channel", 1.0f);
+     }
 
 
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
