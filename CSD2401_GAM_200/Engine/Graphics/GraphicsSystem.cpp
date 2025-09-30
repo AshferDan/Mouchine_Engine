@@ -176,6 +176,7 @@ void GraphicsSystem::Update(float dt) {
                 glm::vec2 uvScale = glm::vec2(1.0f);
                 glm::vec2 uvOffset = glm::vec2(0.0f);
 
+                // to check there a spritesheet component
                 if (auto* animator = obj->GetComponent<Spritesheet>()) {
                     uvScale = animator->GetUVScale();     // Scale (1/Cols, 1/Rows)
                     uvOffset = animator->GetUVOffset();   // Current frame's offset

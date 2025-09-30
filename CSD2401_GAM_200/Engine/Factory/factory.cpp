@@ -136,9 +136,34 @@ GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderCompon
     transform->SetScale(w, h);
     return obj;
 }
+GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, float x, float y, float w, float h,
+    char const* filename, int numRows, int numCols,
+    int startFrame, int endFrame, float fps)
+{
+    GameObject* obj = CreateGameObject(name);
 
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    transform->SetScale(-w, h);
 
+    
+    auto spritesheetComp = std::make_unique<Spritesheet>(
+        obj,
+        filename,
+        numRows,
+        numCols
+    );
 
+    GLuint textureID = spritesheetComp->GetTextureID();
+
+    obj->AddComponent<RenderComponent>(textureID);
+
+    Spritesheet* anim = spritesheetComp.get();
+    obj->AddComponent(std::move(spritesheetComp));
+
+    anim->SetAnimation(startFrame, endFrame, fps);
+
+    return obj;
+}
 
 GameObject* GameObjectFactory::GetGameObject(EntityID id) {
     auto it = entityToIndex.find(id);
