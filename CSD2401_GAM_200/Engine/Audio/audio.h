@@ -4,6 +4,8 @@
 #include "fmod.hpp"
 #include "fmod_studio.hpp"
 #include "fmod_errors.h"
+#include "System.h"
+#include "Message.h"
 
 #include <iostream>
 #include <string>
@@ -48,6 +50,7 @@ public:
 	// error handling
 	void checkError(FMOD_RESULT result, const std::string& operation);
 	FMOD::System* GetFMODSystem() const { return system; }
+
 };
 
 

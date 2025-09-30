@@ -9,11 +9,12 @@
 #include "transform.h"
 #include "imgui.h"
 #include <imgui_impl_glfw.h>
+#include "audio.h"
 
 class InputManager : public ISystem
 {
 public:
-    InputManager(GLFWwindow* window);
+    InputManager(GLFWwindow* window, AudioEngine* audio = nullptr);
     ~InputManager();
 
     void Initialize();
@@ -44,6 +45,7 @@ private:
     GLFWwindow* window;
     int width, height;
     std::string title; //dont think we need this
+    AudioEngine* audioEngine;
 
     // Mouse position / scroll
     double mouseX, mouseY;

@@ -8,14 +8,15 @@
  #include "RenderComponent.h"
  #include <iostream>
  #include <cmath>
-#include "Animator.hpp"
-#include "ResourceManager.h"
-#include "audio.h"
+ #include "Animator.hpp"
+ #include "ResourceManager.h"
+ #include "audio.h"
 
  int main() {
      std::cout << "=== 2D Component System Test ===" << std::endl;
      CoreEngine engine;
      AudioEngine audio;
+     engine.SetAudioEngine(&audio);
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
 
@@ -44,6 +45,7 @@
      // load audio files
      resourceMgr.LoadAudio("bgm", "../Assets/audio/awesomeness.wav", true); // looping
      // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
+     resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false); // when jumping only
 
      // print loaded resources
      resourceMgr.PrintLoadedResources();
@@ -56,6 +58,12 @@
          audio.registerSound("bgm", bgMusic->GetSound());
          audio.playSound("bgm", "bgm_channel");
          audio.setVolume("bgm_channel", 1.0f);
+         //SendMessage(new soundMessage("jump"));
+     }
+     AudioResource* jumpSound = resourceMgr.GetAudio("jump_sfx");
+     if (jumpSound && jumpSound->IsLoaded()) {
+         audio.registerSound("jump_sfx", jumpSound->GetSound());
+         //audio.setVolume("jump_channel", 0.5f);
      }
 
 

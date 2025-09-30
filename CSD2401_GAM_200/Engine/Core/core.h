@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "System.h"
+#include "audio.h"
 #include <fstream>
 #include <iomanip>
 
@@ -45,6 +46,9 @@ public:
     InputManager* GetInputManager() const {
         return inputManager;
     }
+
+    void SetAudioEngine(AudioEngine* audio) { audioEngine = audio; }
+
     void ConfigFile(const char* configF);
 
     void setWindsize(int w, int h) {
@@ -65,6 +69,7 @@ private:
     GraphicsSystem* graphicsSystem = nullptr;
     ImGuiSystem* imguiSystem = nullptr;
     InputManager* inputManager = nullptr;
+    AudioEngine* audioEngine = nullptr;
 
     unsigned LastTime;
     bool GameActive;

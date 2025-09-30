@@ -22,8 +22,7 @@ CoreEngine::CoreEngine() {
     
     std::cout << "CoreEngine constructed" << std::endl;
 
-    // Initialize default systems automatically
-    InitSystems();
+
 }
 
 CoreEngine::~CoreEngine() {
@@ -52,12 +51,14 @@ void CoreEngine::InitSystems() {
     gameObjectSystem = AddSystem<GameObjectSystem>();
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
-    inputManager = AddSystem<InputManager>(graphicsSystem->getWindow());
+    inputManager = AddSystem<InputManager>(graphicsSystem->getWindow(), audioEngine);
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
 
 void CoreEngine::Init() {
+    // Initialize default systems automatically
+    InitSystems();
     std::cout << "Initializing CoreEngine with " << Systems.size() << " systems" << std::endl;
 
     for (size_t i = 0; i < Systems.size(); ++i) {

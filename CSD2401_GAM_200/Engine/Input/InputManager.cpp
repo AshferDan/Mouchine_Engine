@@ -2,8 +2,15 @@
 #include <iostream>
 #include <unordered_map>
 
-InputManager::InputManager(GLFWwindow* window) : window(window), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0){
+InputManager::InputManager(GLFWwindow* window, AudioEngine* audio) : window(window), audioEngine(audio) , width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0){
     glfwSetWindowUserPointer(window, this);
+
+    if (audioEngine) {
+        std::cout << "InputManager: AudioEngine successfully linked" << std::endl;
+    }
+    else {
+        std::cout << "InputManager: WARNING - AudioEngine is NULL!" << std::endl;
+    }
 }
 
 InputManager::~InputManager() {}
@@ -63,6 +70,12 @@ void InputManager::Update(float dt) {
          if (!isJumping) {
              isJumping = true;
              jumpStartY = y;
+             
+      
+             // play jump effect
+             if (audioEngine) {
+                 audioEngine->playSound("jump_sfx", "jump_channel");
+             }
          }
 
          if (y < jumpStartY + jumpMaxHeight) {
