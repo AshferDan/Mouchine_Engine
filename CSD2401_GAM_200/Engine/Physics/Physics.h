@@ -1,10 +1,5 @@
 #pragma once
 #include "Component.h"
-#include <memory>
-#include "Transform.h"
-#include "GameObject.h"
-#include <iostream>
-#include <cmath>
 
 class TransformComponent; // Forward declaration
 
@@ -14,7 +9,7 @@ public:
 
     void Update(float deltaTime) override;
     std::string GetName() const override { return "PhysicsComponent"; }
-    std::unique_ptr<IComponent>Clone(GameObject* NewClone) const override;
+
     // Velocity
     void SetVelocity(float x, float y);
     void GetVelocity(float& x, float& y) const;

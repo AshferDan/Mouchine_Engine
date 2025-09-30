@@ -43,8 +43,7 @@ class GameObject {
 public:
 
     GameObject(EntityID id, const std::string& name = "GameObject");
-    GameObject* Clone(const std::string& newName = "")const;
-    
+
     ~GameObject();
 
     // Component management

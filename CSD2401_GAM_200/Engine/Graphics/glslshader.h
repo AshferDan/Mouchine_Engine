@@ -36,8 +36,6 @@ class GLSLShader {
   /*! GLSLShader class.
   */
 public:
-   void SetUniformVec2(GLchar const* name, glm::vec2 const& v);
-   void SetUniform2f(GLchar const* name, glm::vec2 const& v);
 
   // default ctor required to initialize GLSLShader object to safe state
   GLSLShader() : pgm_handle(0), is_linked(GL_FALSE) { /* empty by design */ }

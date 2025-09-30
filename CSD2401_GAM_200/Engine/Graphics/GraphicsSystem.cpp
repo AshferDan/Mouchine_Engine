@@ -1,41 +1,23 @@
-
+#define STB_IMAGE_IMPLEMENTATION
 #include "GraphicsSystem.h"
-#include "Animator.hpp"
+#include "stb_image.h"
 
 const char* configFile = "../Logs/config.txt";
 
 
-GraphicsSystem::GraphicsSystem() : window(nullptr),vao(0), vbo(0),Wwidth(800),Wheight(600),tex(0) {
+GraphicsSystem::GraphicsSystem() : window(nullptr),vao(0), vbo(0),Wwidth(800),Wheight(600) {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return;
     }
     // Simple fixed window size for now
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     window = glfwCreateWindow(Wwidth, Wheight, "Game Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();
         return;
     }
-    glfwSetWindowUserPointer(window, this);
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height) {
-        glViewport(0, 0, width, height);
-
-        // optional: store width/height in GraphicsSystem if you use them later
-        auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
-        if (gs) {
-            gs->Wwidth = width;
-            gs->Wheight = height;
-        }
-        });
-
     glfwMakeContextCurrent(window);
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
-    Wwidth = fbWidth;
-    Wheight = fbHeight;
 }
 
 GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h) {
@@ -44,30 +26,13 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(
         return;
     }
     // Simple fixed window size for now
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     window = glfwCreateWindow(Wwidth, Wheight, "Game Engine", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create window\n";
         glfwTerminate();
         return;
     }
-    glfwSetWindowUserPointer(window, this);
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height) {
-        glViewport(0, 0, width, height);
-
-        // optional: store width/height in GraphicsSystem if you use them later
-        auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
-        if (gs) {
-            gs->Wwidth = width;
-            gs->Wheight = height;
-        }
-        });
     glfwMakeContextCurrent(window);
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
-    Wwidth = fbWidth;
-    Wheight = fbHeight;
 }
 
 GraphicsSystem::~GraphicsSystem() {
@@ -135,8 +100,7 @@ void GraphicsSystem::Update(float dt) {
 
     shader.Use();
 
-    float aspect = static_cast<float>(Wwidth) / static_cast<float>(Wheight);
-    glm::mat4 projection = glm::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+    glm::mat4 projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f);
 
     glm::vec3 camPos(0.0f);
     GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
@@ -145,8 +109,8 @@ void GraphicsSystem::Update(float dt) {
         if (transform) {
             float px{ 0 }, py{ 0 };
             transform->GetPosition(px, py);
-            camPos.x = px - Wwidth / 2.0f;
-            camPos.y = py - Wheight / 2.0f;
+            camPos.x = px + 2.5f;
+            camPos.y = py;
         }
     }
 
@@ -173,17 +137,6 @@ void GraphicsSystem::Update(float dt) {
                 shader.SetUniform("uColor", glm::vec4(rend->GetColor()));
                 shader.SetUniform("uTiling", glm::vec2(1.0f));
                 shader.SetUniform("uIsCircle", rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
-                glm::vec2 uvScale = glm::vec2(1.0f);
-                glm::vec2 uvOffset = glm::vec2(0.0f);
-
-                if (auto* animator = obj->GetComponent<Spritesheet>()) {
-                    uvScale = animator->GetUVScale();     // Scale (1/Cols, 1/Rows)
-                    uvOffset = animator->GetUVOffset();   // Current frame's offset
-                }
-
-                shader.SetUniform("uTiling", uvScale);
-                shader.SetUniform("uTexOffset", uvOffset);
-
 
                 if (rend->GetTextureID() > 0) {
                     shader.SetUniform("uHasTexture", 1);
@@ -303,36 +256,4 @@ GLuint GraphicsSystem::LoadTexture(const char* filepath) {
 
     stbi_image_free(data);
     return texture;
-}
-std::unique_ptr<IComponent> RenderComponent::Clone(GameObject* NewClone) const {
-
-    // 1. Determine which constructor to use based on the original component's state.
-    std::unique_ptr<RenderComponent> clonedComponent;
-
-    // Check if the component uses a texture (textureID is non-zero)
-    if (this->textureID != 0) {
-        // Use the constructor for textured objects: 
-        // RenderComponent(owner, GLuint texID)
-        clonedComponent = std::make_unique<RenderComponent>(NewClone, this->textureID);
-    }
-    else {
-        // Use the constructor for shape/color: 
-        // RenderComponent(owner, ShapeType type, const glm::vec4& color)
-        clonedComponent = std::make_unique<RenderComponent>(NewClone, this->shape, this->color);
-    }
-
-    // 2. Clone specialized data for Line or Point types.
-    if (this->shape == RenderComponent::ShapeType::Line) {
-        // Copy the line data using the public setter
-        clonedComponent->SetLine(this->line.start, this->line.end);
-    }
-    else if (this->shape == RenderComponent::ShapeType::Point) {
-        // Copy the point data using the public setter
-        clonedComponent->SetPoint(this->point.pos, this->point.size);
-    }
-
-    // 3. Clone the enabled state.
-    clonedComponent->SetEnabled(this->IsEnabled());
-
-    return clonedComponent;
 }

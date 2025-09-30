@@ -13,7 +13,6 @@ must haves like the component must haves
 
 #pragma once
 #include <string>
-#include <memory>
 
 
 class GameObject;
@@ -33,8 +32,6 @@ public:
 
     // Component info
     virtual std::string GetName() const = 0;
-    //cloning virtual
-    virtual std::unique_ptr<IComponent>Clone(GameObject* NewClone) const = 0;
 
     // Enable/disable component
     void SetEnabled(bool enable) { enabled = enable; }

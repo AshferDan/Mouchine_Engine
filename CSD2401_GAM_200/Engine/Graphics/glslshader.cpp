@@ -229,17 +229,6 @@ void GLSLShader::BindFragDataLocation(GLuint color_number, GLchar const* name) {
   glBindFragDataLocation(pgm_handle, color_number, name);
 }
 
-void GLSLShader::SetUniformVec2(GLchar const* name, glm::vec2 const& v) {
-    GLint location = GetUniformLocation(name, false);
-    if (location >= 0) {
-        glUniform2f(location, v.x, v.y);
-    }
-}
-
-void GLSLShader::SetUniform2f(GLchar const* name, glm::vec2 const& v) {
-    GLint loc = GetUniformLocation(name, true);
-    glUniform2f(loc, v.x, v.y);
-}
 void GLSLShader::SetUniform(GLchar const* name, GLboolean val) {
   GLint loc = glGetUniformLocation(pgm_handle, name);
   if (loc >= 0) {
