@@ -9,6 +9,7 @@
 #include <Physics.h>
 #include "ImGuiSystem.h"
 #include "InputManager.h"
+#include "DebugSystem.h"
 
 
 CoreEngine* CORE;
@@ -53,6 +54,7 @@ void CoreEngine::InitSystems() {
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
     inputManager = AddSystem<InputManager>(graphicsSystem->getWindow());
+    debugSystem = AddSystem<DebugSystem>();
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }

@@ -7,6 +7,8 @@
 #include "System.h"
 #include "factory.h"
 #include "transform.h"
+#include "GraphicsSystem.h"
+#include "core.h"
 #include "imgui.h"
 #include <imgui_impl_glfw.h>
 
