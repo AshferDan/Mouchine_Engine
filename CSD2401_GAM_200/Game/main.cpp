@@ -17,13 +17,13 @@
 
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
-     GameObject* Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0, 0, 1920, 1080, "../Assets/wallpaper_transparent.png");
-       GameObject* player = factory.CreatePlayer("Hero", RenderComponent::ShapeType::Circle, 0, 0, 100, 100, "../Assets/protosprite.png");
+     GameObject* Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 1920.f, 1080.f, "../Assets/wallpaper_transparent.png");
+       GameObject* player = factory.CreatePlayer("Hero", RenderComponent::ShapeType::Circle, 0.f, 0.f, 100.f, 100.f, "../Assets/protosprite.png");
      
 
      //Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
-     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 20, 0, 5, 5, glm::vec4(1.f, 0.f, 0.f, 1.f));
+     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 20.f, 0.f, 5.f, 5.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
 
      //Square Object -> name, object type (square), x coord, y coord, width, height (if you want rectangle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)

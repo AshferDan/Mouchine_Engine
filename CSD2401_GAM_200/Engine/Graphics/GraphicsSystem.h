@@ -1,4 +1,5 @@
 #pragma once
+#include "stb_image.h"
 #include "System.h"
 #include "gameObject.h"
 #include "glslshader.h"
@@ -12,6 +13,7 @@
 #include <iostream>
 #include <RenderComponent.h>
 #include <fstream>
+
 
 class GraphicsSystem : public ISystem {
 public:

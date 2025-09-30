@@ -49,7 +49,8 @@ macro(import_glew)
         set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libs" FORCE)
         FetchContent_MakeAvailable(glew)
 
-        # Optional: include directories if needed manually (though target_link_libraries handles it)
+        # Optional: include directories 
+        # if needed manually (though target_link_libraries handles it)
         include_directories(${glew_SOURCE_DIR}/include)
     endif()
 endmacro()
@@ -119,6 +120,32 @@ macro(import_freetype)
     endif()
 endmacro()
 
+# Macro to import stb_image (Added from previous step)
+# This fetches the stb repository and compiles the implementation into a library.
+macro(import_stb_image)
+    if(NOT TARGET stb_image)
+        FetchContent_Declare(
+            stb
+            GIT_REPOSITORY https://github.com/nothings/stb.git
+            GIT_TAG master 
+        )
+        FetchContent_MakeAvailable(stb)
+
+        # 1. Define the implementation file for stb_image in the binary directory.
+        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.c
+            "#define STB_IMAGE_IMPLEMENTATION\n#include \"${stb_SOURCE_DIR}/stb_image.h\"\n"
+        )
+
+        # 2. Create the static library target named 'stb_image'
+        add_library(stb_image STATIC ${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.c)
+
+        # 3. Set the public include directory so other targets can find "stb_image.h"
+        target_include_directories(stb_image PUBLIC
+            $<BUILD_INTERFACE:${stb_SOURCE_DIR}>
+        )
+    endif()
+endmacro()
+
 macro(import_fmod)
     if(NOT TARGET fmod)
         set(FMOD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/FMOD")
@@ -142,29 +169,52 @@ macro(import_fmod)
             set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x86")
         endif()
         
-        find_file(FMOD_LIBRARY_FILE
-            NAMES fmod_vc.lib fmodL_vc.lib
+        # --- FMOD Core Library Setup (Configuration-Specific Linking) ---
+        # Find Release library (fmod_vc.lib)
+        find_file(FMOD_RELEASE_LIBRARY_FILE
+            NAMES fmod_vc.lib
             PATHS ${FMOD_LIB_DIR}
             NO_DEFAULT_PATH
         )
         
-        if(FMOD_INCLUDE_DIR AND FMOD_LIBRARY_FILE AND EXISTS "${FMOD_LIBRARY_FILE}")
+        # Find Debug library (fmodL_vc.lib)
+        find_file(FMOD_DEBUG_LIBRARY_FILE
+            NAMES fmodL_vc.lib
+            PATHS ${FMOD_LIB_DIR}
+            NO_DEFAULT_PATH
+        )
+
+        # Check if both versions and includes were found
+        if(FMOD_INCLUDE_DIR AND FMOD_RELEASE_LIBRARY_FILE AND FMOD_DEBUG_LIBRARY_FILE)
             add_library(fmod STATIC IMPORTED)
             
             set_target_properties(fmod PROPERTIES
-                IMPORTED_LOCATION "${FMOD_LIBRARY_FILE}"
+                # Set all four standard MSVC configurations
+                IMPORTED_LOCATION_DEBUG "${FMOD_DEBUG_LIBRARY_FILE}"
+                IMPORTED_LOCATION_RELEASE "${FMOD_RELEASE_LIBRARY_FILE}"
+                IMPORTED_LOCATION_MINSIZEREL "${FMOD_RELEASE_LIBRARY_FILE}"  # Map to Release
+                IMPORTED_LOCATION_RELWITHDEBINFO "${FMOD_RELEASE_LIBRARY_FILE}" # Map to Release
                 INTERFACE_INCLUDE_DIRECTORIES "${FMOD_INCLUDE_DIR}"
             )
             
             message(STATUS "FMOD configured successfully")
             
-            find_file(FMOD_STUDIO_LIBRARY_FILE
-                NAMES fmodstudio_vc.lib fmodstudioL_vc.lib
+            # --- FMOD Studio Library Setup (Configuration-Specific Linking) ---
+            # Find Release Studio library (fmodstudio_vc.lib)
+            find_file(FMOD_STUDIO_RELEASE_LIBRARY_FILE
+                NAMES fmodstudio_vc.lib
                 PATHS ${FMOD_STUDIO_LIB_DIR}
                 NO_DEFAULT_PATH
             )
             
-            if(FMOD_STUDIO_LIBRARY_FILE AND EXISTS "${FMOD_STUDIO_LIBRARY_FILE}")
+            # Find Debug Studio library (fmodstudioL_vc.lib)
+            find_file(FMOD_STUDIO_DEBUG_LIBRARY_FILE
+                NAMES fmodstudioL_vc.lib
+                PATHS ${FMOD_STUDIO_LIB_DIR}
+                NO_DEFAULT_PATH
+            )
+            
+            if(FMOD_STUDIO_RELEASE_LIBRARY_FILE AND FMOD_STUDIO_DEBUG_LIBRARY_FILE)
                 find_path(FMOD_STUDIO_INCLUDE_DIR 
                     NAMES fmod_studio.h
                     PATHS ${FMOD_ROOT_DIR}/api/studio/inc
@@ -175,7 +225,11 @@ macro(import_fmod)
                     add_library(fmodstudio STATIC IMPORTED)
                     
                     set_target_properties(fmodstudio PROPERTIES
-                        IMPORTED_LOCATION "${FMOD_STUDIO_LIBRARY_FILE}"
+                        # Set all four standard MSVC configurations
+                        IMPORTED_LOCATION_DEBUG "${FMOD_STUDIO_DEBUG_LIBRARY_FILE}"
+                        IMPORTED_LOCATION_RELEASE "${FMOD_STUDIO_RELEASE_LIBRARY_FILE}"
+                        IMPORTED_LOCATION_MINSIZEREL "${FMOD_STUDIO_RELEASE_LIBRARY_FILE}" # Map to Release
+                        IMPORTED_LOCATION_RELWITHDEBINFO "${FMOD_STUDIO_RELEASE_LIBRARY_FILE}" # Map to Release
                         INTERFACE_INCLUDE_DIRECTORIES "${FMOD_STUDIO_INCLUDE_DIR}"
                     )
                     
@@ -215,6 +269,10 @@ macro(importDependencies)
     message(STATUS "Importing freetype...")
     import_freetype()
     message(STATUS "freetype imported successfully.")
+
+    message(STATUS "Importing stb_image...")
+    import_stb_image()
+    message(STATUS "stb_image imported successfully.")
 
     message(STATUS "Importing FMOD...")
     import_fmod()
