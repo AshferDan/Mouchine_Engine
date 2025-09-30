@@ -78,9 +78,10 @@ void CoreEngine::GameLoop() {
             Systems[i]->Update(CoreEngine::GetDeltaTime());
         }
 
-        //if (audioEngine) {
-        //    audioEngine->updateAudio();
-        //}
+        // Update audio system every frame
+        if (audioEngine) {
+            audioEngine->updateAudio();
+        }
     }
 }
 

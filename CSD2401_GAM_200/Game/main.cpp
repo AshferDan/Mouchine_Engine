@@ -7,6 +7,7 @@
  #include "Physics.h"
  #include "RenderComponent.h"
  #include "audio.h"
+ #include "ResourceManager.h"
  #include <iostream>
  #include <cmath>
 
@@ -26,29 +27,38 @@
      // Initialise Audio System
      std::cout << "\n--- Initialising Audio System ---" << std::endl;
      if (!audio.initialiseAudio()) {
-         std::cout << "audio system failed to initialise" << std::endl;
-         std::cout << "continuing without audio..." << std::endl;
+         std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
      }
      else {
-         std::cout << "Audio system initialised successfully!" << std::endl;
-
-         // Load audio files
-         std::cout << "\n--- Loading Audio Files ---" << std::endl;
-
-         // Background music (looping)
-         audio.loadSound("bgm", "../Assets/audio/awesomeness.wav", true);
-
-         // Sound effects (one-shot)
-         //audio.loadSound("wind", "../Assets/Audio/wind.wav", false);
-         //audio.loadSound("coin", "../Assets/Audio/coin.wav", false);
-         //audio.loadSound("hit", "../Assets/Audio/hit.wav", false);
-
-         // Start playing background music
-         std::cout << "Starting background music..." << std::endl;
-         audio.playSound("bgm", "bgm_channel");
-         audio.setVolume("bgm_channel", 1.0f); // Set to 50% volume
+         std::cout << "audio system initialised successfully!" << std::endl;
      }
-     
+
+     // Initialising ResourceManager
+     std::cout << "\n--- Initializing Resource Manager ---" << std::endl;
+     auto& resourceMgr = ResourceManager::Instance();
+
+     // link audio engine to resource manager for audio loading
+     resourceMgr.SetAudioEngine(&audio);
+     std::cout << "\n--- Loading Resources ---" << std::endl;
+
+     // load textures
+     resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
+
+     // load audio files
+     resourceMgr.LoadAudio("bgm", "../Assets/audio/awesomeness.wav", true); // looping
+     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
+
+     // print loaded resources
+     resourceMgr.PrintLoadedResources();
+
+     // register the sound with audio engine to play it
+     std::cout << "\n--- Starting Background Music ---" << std::endl;
+     AudioResource* bgMusic = resourceMgr.GetAudio("bgm");
+     if (bgMusic && bgMusic->IsLoaded()) {
+         audio.registerSound("bgm", bgMusic->GetSound());
+         audio.playSound("bgm", "bgm_channel");
+         audio.setVolume("bgm_channel", 1.0f);
+     }
 
      // Create 2D game objects
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
@@ -78,8 +88,6 @@
      std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
      engine.GameLoop();
 
-     // clean up when audioengine destructor is called
-     std::cout << "\n--- Shutting down ---" << std::endl;
 
      return 0;
  }

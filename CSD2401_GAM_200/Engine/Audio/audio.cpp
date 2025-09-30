@@ -45,6 +45,23 @@ void AudioEngine::stopAudio() {
 }
 
 /*   Sound loading  */
+bool AudioEngine::registerSound(const std::string& name, FMOD::Sound* sound) {
+	if (!system) {
+		std::cout << "audio system not initialised" << std::endl;
+		return false;
+	}
+
+	// check if sound already exists
+	if (sounds.find(name) != sounds.end()) {
+		std::cout << "sound: " << name << " already registered" << std::endl;
+		return true;
+	}
+
+	sounds[name] = sound;
+	std::cout << "registered sound: " << name << std::endl;
+	return true;
+}
+
 bool AudioEngine::loadSound(const std::string& name, const std::string& filepath, bool loop) {
 	if (!system) {
 		std::cout << "o man its not initialised" << std::endl;
@@ -90,11 +107,10 @@ void AudioEngine::unloadAllSound() {
 	}
 	sounds.clear();
 	channels.clear();
-	std::cout << "all sounds unloaded: " << std::endl;
+	std::cout << "all sounds unloaded" << std::endl;
 }
 
 /*  Playback controls  */
-
 bool AudioEngine::playSound(const std::string& name, const std::string& channelName) {
 	if (!system) {
 		std::cout << "audio system not initialised..." << std::endl;
@@ -158,7 +174,6 @@ bool AudioEngine::eventPlaying(const std::string& eventName) {
 */
 
 /*  Volume and effects controls  */
-
 void AudioEngine::setVolume(const std::string& channelName, float volume) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -200,7 +215,6 @@ void AudioEngine::muteSound(const std::string& channelName) {
 }
 
 /*  Error Handling  */
-
 void AudioEngine::checkError(FMOD_RESULT result, const std::string& operation) {
 	if (result != FMOD_OK) {
 		std::cout << "fmod error in " << operation << ": " << FMOD_ErrorString(result) << result << std::endl;

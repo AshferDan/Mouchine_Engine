@@ -27,6 +27,7 @@ public:
 	void stopAudio();
 
 	// sound loading
+	bool registerSound(const std::string& name, FMOD::Sound* sound);
 	bool loadSound(const std::string& name, const std::string& filepath, bool loop = false);
 	void unloadSound(const std::string& name);
 	void unloadAllSound();
@@ -46,6 +47,7 @@ public:
 
 	// error handling
 	void checkError(FMOD_RESULT result, const std::string& operation);
+	FMOD::System* GetFMODSystem() const { return system; }
 };
 
 
