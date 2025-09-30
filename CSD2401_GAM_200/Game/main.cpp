@@ -33,9 +33,15 @@
 
      //Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
-     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 20, 0, 5, 5, glm::vec4(1.f, 0.f, 0.f, 1.f));
-     float x2, y2;
-     CircleShape->GetComponent<TransformComponent>()->GetPosition(x2, y2);
+     GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 10, 0, 3, 3, glm::vec4(1.f, 0.f, 0.f, 1.f));
+     auto* physics1 = CircleShape->AddComponent<PhysicsComponent>(1.0f, false);
+     physics1->SetVelocity(-5.0f, 0.0f);  // Moving right
+     physics1->SetGravity(false);  // Disable gravity
+
+     GameObject* CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, 0, -10, 3, 3, glm::vec4(1.f, 0.f, 0.f, 1.f));
+     auto* physics2 = CircleShape2->AddComponent<PhysicsComponent>(1.0f, false);
+     physics2->SetVelocity(0.0f, 5.0f);  // Moving left
+     physics2->SetGravity(false);  // Disable gravity
 
      //Square Object -> name, object type (square), x coord, y coord, width, height (if you want rectangle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
