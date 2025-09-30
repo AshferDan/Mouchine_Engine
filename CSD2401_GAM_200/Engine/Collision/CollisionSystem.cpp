@@ -1,6 +1,8 @@
 #include "CollisionSystem.h"
 #include "GameObject.h"
 #include "Factory.h"
+#include "Physics.h"
+#include "Component.h"
 #include "ColliderComponent.h"
 #include "Collision.h"
 #include <iostream>

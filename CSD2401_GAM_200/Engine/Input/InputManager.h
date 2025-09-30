@@ -48,7 +48,7 @@ private:
     // Mouse position / scroll
     double mouseX, mouseY;
     double scrollX, scrollY;
-    double movementspeed = 0.01f;
+    double movementspeed = 0.1f;
     bool isJumping = false;
     float jumpStartY = 0.0f;
     float jumpMaxHeight = 5.0f; // max height relative to start

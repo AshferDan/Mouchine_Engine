@@ -37,7 +37,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
 GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char* filename) {
     GameObject* player = CreateGameObject(name);
     auto* transform = player->AddComponent<TransformComponent>(x, y);
-    auto* physics = player->AddComponent<PhysicsComponent>(30, 0);
+    auto* physics = player->AddComponent<PhysicsComponent>(0, 0);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     auto render = player->AddComponent<RenderComponent>(texID);
     transform->SetScale(w, h);

@@ -7,9 +7,8 @@
  PhysicsComponent::PhysicsComponent(GameObject* owner, float m, bool static_)
      : IComponent(owner), 
        velocityX(0), velocityY(0),
-       forceX(0), forceY(0),
-       angularVelocity(0), torque(0),
-       mass(m), drag(0.98f), isStatic(static_), useGravity(true),
+       mass(m), isStatic(static_), useGravity(true),
+       isGrounded(true), isJumping(false), wasGrounded(true),
        gravityX(0), gravityY(-9.81f) {
  }
 
@@ -24,21 +23,16 @@
      }
 
      // Apply forces to velocity
-     velocityX += (forceX / mass) * deltaTime;
-     velocityY += (forceY / mass) * deltaTime;
+     velocityX += mass * deltaTime;
+     velocityY += mass * deltaTime;
 
-     // Apply torque to angular velocity
-     angularVelocity += (torque / mass) * deltaTime;
-
-     // Reset forces and torque
-     forceX = forceY = torque = 0;
-
-     // Apply drag
-     ApplyDrag(deltaTime);
-
-     // Update position and rotation
+     // Update position
      UpdatePosition(deltaTime);
-     UpdateRotation(deltaTime);
+
+     // Reset jump flag when grounded
+     if (isGrounded && velocityY <= 0) {
+         isJumping = false;
+     }
 
      // Debug output
      auto* transform = owner->GetComponent<TransformComponent>();
@@ -64,18 +58,14 @@
      velocityY += y;
  }
 
- void PhysicsComponent::AddForce(float x, float y) {
-     forceX += x;
-     forceY += y;
- }
+ void PhysicsComponent::Jump(float jumpForce) {
+     if (isGrounded) {
+         velocityY = jumpForce;
+         isJumping = true;
+         isGrounded = false;
 
- void PhysicsComponent::AddImpulse(float x, float y) {
-     velocityX += x / mass;
-     velocityY += y / mass;
- }
-
- void PhysicsComponent::AddTorque(float t) {
-     torque += t;
+         std::cout << owner->GetName() << " jumped!" << std::endl;
+     }
  }
 
  float PhysicsComponent::GetSpeed() const {
@@ -96,22 +86,9 @@
      velocityY += gravityY * deltaTime;
  }
 
- void PhysicsComponent::ApplyDrag(float deltaTime) {
-     velocityX *= std::pow(drag, deltaTime);
-     velocityY *= std::pow(drag, deltaTime);
-     angularVelocity *= std::pow(drag, deltaTime);
- }
-
  void PhysicsComponent::UpdatePosition(float deltaTime) {
      auto* transform = owner->GetComponent<TransformComponent>();
      if (transform) {
          transform->Move(velocityX * deltaTime, velocityY * deltaTime);
-     }
- }
-
- void PhysicsComponent::UpdateRotation(float deltaTime) {
-     auto* transform = owner->GetComponent<TransformComponent>();
-     if (transform) {
-         transform->Rotate(angularVelocity * deltaTime);
      }
  }

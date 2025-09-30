@@ -27,7 +27,7 @@
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
 
-     GameObject* player = factory.CreatePlayer("Hero",RenderComponent::ShapeType::Circle,0,0, 1, 1,"../Assets/protosprite.png");
+     GameObject* player = factory.CreatePlayer("Hero",RenderComponent::ShapeType::Square,0,0, 1, 1,"../Assets/protosprite.png");
      float x, y;
      player->GetComponent<TransformComponent>()->GetPosition(x, y);
 
