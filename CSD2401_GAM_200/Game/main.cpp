@@ -30,17 +30,15 @@
          std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
      }
      else {
-         std::cout << "Audio system initialised successfully!" << std::endl;
+         std::cout << "audio system initialised successfully!" << std::endl;
      }
 
-     // === Initialize ResourceManager ===
+     // Initialising ResourceManager
      std::cout << "\n--- Initializing Resource Manager ---" << std::endl;
      auto& resourceMgr = ResourceManager::Instance();
 
      // link audio engine to resource manager for audio loading
      resourceMgr.SetAudioEngine(&audio);
-
-     // load resources
      std::cout << "\n--- Loading Resources ---" << std::endl;
 
      // load textures
@@ -53,17 +51,15 @@
      // print loaded resources
      resourceMgr.PrintLoadedResources();
 
-     // play bgm
-     std::cout << "\n--- Starting Background Music ---" << std::endl;
      // register the sound with audio engine to play it
+     std::cout << "\n--- Starting Background Music ---" << std::endl;
      AudioResource* bgMusic = resourceMgr.GetAudio("bgm");
      if (bgMusic && bgMusic->IsLoaded()) {
          audio.registerSound("bgm", bgMusic->GetSound());
-
-         // Now play it
          audio.playSound("bgm", "bgm_channel");
          audio.setVolume("bgm_channel", 1.0f);
      }
+
      // Create 2D game objects
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();

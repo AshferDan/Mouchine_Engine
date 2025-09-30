@@ -111,7 +111,6 @@ void AudioEngine::unloadAllSound() {
 }
 
 /*  Playback controls  */
-
 bool AudioEngine::playSound(const std::string& name, const std::string& channelName) {
 	if (!system) {
 		std::cout << "audio system not initialised..." << std::endl;
@@ -175,7 +174,6 @@ bool AudioEngine::eventPlaying(const std::string& eventName) {
 */
 
 /*  Volume and effects controls  */
-
 void AudioEngine::setVolume(const std::string& channelName, float volume) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -217,7 +215,6 @@ void AudioEngine::muteSound(const std::string& channelName) {
 }
 
 /*  Error Handling  */
-
 void AudioEngine::checkError(FMOD_RESULT result, const std::string& operation) {
 	if (result != FMOD_OK) {
 		std::cout << "fmod error in " << operation << ": " << FMOD_ErrorString(result) << result << std::endl;
