@@ -206,6 +206,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{679E1F16-BAC2-3AF1-95E3-3B1551B9530E}</Project>
       <Name>libglew_static</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\stb_image.vcxproj">
+      <Project>{92D59E8C-5702-3ED6-ABE8-CE83C30F5A48}</Project>
+      <Name>stb_image</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

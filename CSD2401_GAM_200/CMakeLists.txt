@@ -209,13 +209,15 @@ target_include_directories(Engine PUBLIC
 # ======================= Link Libraries to Engine ===================
 target_link_libraries(Engine PUBLIC
     glfw
-    libglew_static
+    libglew_static 
+    glm
+    nlohmann_json::nlohmann_json
     imgui
-    nlohmann_json::nlohmann_json 
     freetype
-    opengl32
+    stb_image
+    fmod
+    fmodstudio
 )
-
 # Link FMOD to Engine if available
 if(TARGET fmod)
     target_link_libraries(Engine PUBLIC fmod)
@@ -275,5 +277,5 @@ set_target_properties(Game PROPERTIES
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(Game PRIVATE -Wall ${DisableWarnings})
 elseif (MSVC)
-    target_compile_options(Game PRIVATE /W3 /WX-)
+    target_compile_options(Game PRIVATE /W4 /WX-)
 endif()

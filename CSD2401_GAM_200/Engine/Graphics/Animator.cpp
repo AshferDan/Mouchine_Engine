@@ -1,63 +1,115 @@
+
 #include "Animator.hpp"
 
-Spritesheet::Spritesheet() : rows{}, cols{}, currRow{}, currCol{}, uv_width{}, uv_height{}, loop{ 0.f }, textureID{}, alpha{ 1 }
+Spritesheet::Spritesheet(GameObject* owner)
+	: IComponent(owner),
+	rows(1),
+	cols(1),
+	currRow(0),
+	currCol(0),
+	uv_width(1.0f),
+	uv_height(1.0f),
+	timePerFrame(0.0f),
+	currentFrameTime(0.0f),
+	startFrame(0),
+	endFrame(0),
+	textureID(0)
 {
-
+}
+Spritesheet::Spritesheet(GameObject* owner, const char* textureFile, int numRows, int numCols)
+	: IComponent(owner),
+	rows(numRows),
+	cols(numCols),
+	currRow(0),
+	currCol(0),
+	uv_width(1.0f / (float)numCols), // Calculate 1/Cols
+	uv_height(1.0f / (float)numRows), // Calculate 1/Rows
+	timePerFrame(0.0f),
+	currentFrameTime(0.0f),
+	startFrame(0),
+	endFrame(0),
+	textureID(GraphicsSystem::LoadTexture(textureFile))
+{
+}
+Spritesheet::Spritesheet(Spritesheet const& rhs, GameObject* NewClone)
+	: IComponent(NewClone), // Assign to the new GameObject
+	rows(rhs.rows),
+	cols(rhs.cols),
+	currRow(rhs.currRow),
+	currCol(rhs.currCol),
+	uv_width(rhs.uv_width),
+	uv_height(rhs.uv_height),
+	timePerFrame(rhs.timePerFrame),
+	currentFrameTime(rhs.currentFrameTime),
+	startFrame(rhs.startFrame),
+	endFrame(rhs.endFrame),
+	textureID(rhs.textureID)
+{
 }
 
-Spritesheet::Spritesheet(const char* textureFile, int numRows, int numCols): 
-	rows {numRows}, cols{numCols}, currRow{0}, currCol{0}, uv_width{1.f/rows}, uv_height{1.f/cols}, loop{ 0.f }, textureID{GraphicsSystem::LoadTexture(textureFile)}, alpha{1}
+std::unique_ptr<IComponent> Spritesheet::Clone(GameObject* NewClone) const
 {
-	// Load texture
-	// Create mesh based off uv size
-
-	// from AE
-	//texture = AEGfxTextureLoad(texture_file);
-
-	//AEGfxMeshStart();										// Make the mesh based on UV size
-
-	//AEGfxTriAdd(
-	//	-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, uv_height,				// bottom left
-	//	0.5f, -0.5f, 0xFFFFFFFF, uv_width, uv_height,			// bottom right 
-	//	-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);					// top left
-
-	//AEGfxTriAdd(
-	//	0.5f, -0.5f, 0xFFFFFFFF, uv_width, uv_height,			// bottom right 
-	//	0.5f, 0.5f, 0xFFFFFFFF, uv_width, 0.0f,					// top right
-	//	-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);					// bottom left
-
-	//mesh = AEGfxMeshEnd();									// End mesh
+	return std::make_unique<Spritesheet>(*this, NewClone);
 }
 
-Spritesheet::Spritesheet(Spritesheet const& rhs) : 
-	rows{rhs.rows}, cols{rhs.cols}, uv_width{rhs.uv_width}, uv_height{rhs.uv_height}, textureID{rhs.textureID}, alpha{rhs.alpha}
+void Spritesheet::Update(float dt)
 {
-	currRow = rhs.currRow;
-	currCol = rhs.currCol;
-	loop = rhs.loop;
+	if (startFrame == endFrame) return;
+
+	currentFrameTime += dt;
+
+	if (currentFrameTime >= timePerFrame) {
+		currentFrameTime -= timePerFrame;
+
+		int currentFrameIndex = currRow * cols + currCol;
+		int nextFrameIndex = currentFrameIndex + 1;
+
+		if (nextFrameIndex > endFrame) {
+			nextFrameIndex = startFrame;
+		}
+		currRow = nextFrameIndex / cols;
+		currCol = nextFrameIndex % cols;
+	}
 }
 
-Spritesheet::~Spritesheet() 
+glm::vec2 Spritesheet::GetUVScale() const
+{
+
+	return glm::vec2(uv_width, uv_height);
+}
+
+glm::vec2 Spritesheet::GetUVOffset() const
+{
+	
+	return glm::vec2(uv_width * currCol, uv_height * currRow);
+}
+
+void Spritesheet::SetAnimation(int startFrameIdx, int endFrameIdx, float fps) {
+	startFrame = startFrameIdx;
+	endFrame = endFrameIdx;
+	timePerFrame = 1.0f / fps;
+	currentFrameTime = 0.0f;
+
+	// Set initial frame to startFrame
+	currRow = startFrame / cols;
+	currCol = startFrame % cols;
+}
+
+Spritesheet::~Spritesheet()
 {
 
 }
 
 void Spritesheet::Unload()
 {
-	// if (texture) free texture
-	//if (textureID) 
-	//{
-	//	
-	//}
 
-	// if (mesh) free mesh
 }
 
-int Spritesheet::GetRows() 
+int Spritesheet::GetRows()
 {
 	return currRow;
 }
-void Spritesheet::SetRows(int val) 
+void Spritesheet::SetRows(int val)
 {
 	if (val < 0 || val >= rows)
 	{
@@ -70,7 +122,7 @@ int Spritesheet::GetCols()
 {
 	return currCol;
 }
-void Spritesheet::SetCols(int val) 
+void Spritesheet::SetCols(int val)
 {
 	if (val < 0 || val >= cols)
 	{
@@ -83,58 +135,10 @@ void Spritesheet::SetCols(int val)
 // endFrameIdx	 - index of last frame of spritesheet
 // duration		 - length of entire anim (start frame to end frame)
 //eg: ~player_sprite.Loop(0, 7, .8f);~ means go from frame 0 to 7 within 0.8s
-void Spritesheet::LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float duration) 
+void Spritesheet::LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float duration)
 {
-	if (startFrameIdx < 0 || endFrameIdx >= rows)					// Outside spritesheet range!
-	{
-		_CrtDbgBreak();
-	}
-
-	int rowIdx = endFrameIdx + 1 - startFrameIdx;
-	// get dt here
-	loop += static_cast<float>(CoreEngine::GetDeltaTime()) / duration;
-	if (loop > 1.f)
-	{
-		loop = 0;
-	}
-	// Sets col to be of correct frame WRT loop values
-	SetCols(static_cast<int>(rows * loop) + startFrameIdx);
 }
 
-// can add custom alpha here if want
-void Spritesheet::DrawSpritesheetAnim(GameObject* GO, float width, float height, bool flip)
-{
-	if (flip)
-	{
-		width = -width;
-	}
-
-	// set render mode (dont need apparently bc overload for colour and const char texture)
-	
-	// set alpha 
-	//RenderComponent::SetAlpha(alpha);
-	 
-	// draw image w specific row n col
-	
-	
-
-	// draw image one mesh and plug gameobject position
-	// unit square mesh, scale it up, apply texture to mesh, mesh position = GO position
-	
-	// draw texture!
-
-
-	//AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-
-	//AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
-	//AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
-	//AEGfxSetTransparency(1.0f);
-	//AEGfxSetTransform(Transform.m);
-
-	//AEGfxTextureSet(texture, uv_width * curr_col, uv_height * curr_row);
-
-	//AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-}
 
 
 //// ----------------------------------------------------------------------------
