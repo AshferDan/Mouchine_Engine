@@ -26,30 +26,24 @@
      // Initialise Audio System
      std::cout << "\n--- Initialising Audio System ---" << std::endl;
      if (!audio.initialiseAudio()) {
-         std::cout << "audio system failed to initialise" << std::endl;
-         std::cout << "continuing without audio..." << std::endl;
+         std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
      }
      else {
-         std::cout << "Audio system initialised successfully!" << std::endl;
-
          // Load audio files
          std::cout << "\n--- Loading Audio Files ---" << std::endl;
 
          // Background music (looping)
          audio.loadSound("bgm", "../Assets/audio/awesomeness.wav", true);
 
-         // Sound effects (one-shot)
-         //audio.loadSound("wind", "../Assets/Audio/wind.wav", false);
-         //audio.loadSound("coin", "../Assets/Audio/coin.wav", false);
-         //audio.loadSound("hit", "../Assets/Audio/hit.wav", false);
+         // Sound effects (oneshot)
+         //audio.loadSound("wind", "../Assets/Audio/wind1.wav", false);
 
          // Start playing background music
-         std::cout << "Starting background music..." << std::endl;
+         std::cout << "starting background music..." << std::endl;
          audio.playSound("bgm", "bgm_channel");
-         audio.setVolume("bgm_channel", 1.0f); // Set to 50% volume
+         audio.setVolume("bgm_channel", 1.0f); // Set to 100% volume
      }
      
-
      // Create 2D game objects
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
@@ -78,8 +72,6 @@
      std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
      engine.GameLoop();
 
-     // clean up when audioengine destructor is called
-     std::cout << "\n--- Shutting down ---" << std::endl;
 
      return 0;
  }

@@ -90,7 +90,7 @@ void AudioEngine::unloadAllSound() {
 	}
 	sounds.clear();
 	channels.clear();
-	std::cout << "all sounds unloaded: " << std::endl;
+	std::cout << "all sounds unloaded" << std::endl;
 }
 
 /*  Playback controls  */

@@ -46,6 +46,7 @@ public:
 
 	// error handling
 	void checkError(FMOD_RESULT result, const std::string& operation);
+	FMOD::System* GetFMODSystem() const { return system; }
 };
 
 
