@@ -45,6 +45,23 @@ void AudioEngine::stopAudio() {
 }
 
 /*   Sound loading  */
+bool AudioEngine::registerSound(const std::string& name, FMOD::Sound* sound) {
+	if (!system) {
+		std::cout << "audio system not initialised" << std::endl;
+		return false;
+	}
+
+	// check if sound already exists
+	if (sounds.find(name) != sounds.end()) {
+		std::cout << "sound: " << name << " already registered" << std::endl;
+		return true;
+	}
+
+	sounds[name] = sound;
+	std::cout << "registered sound: " << name << std::endl;
+	return true;
+}
+
 bool AudioEngine::loadSound(const std::string& name, const std::string& filepath, bool loop) {
 	if (!system) {
 		std::cout << "o man its not initialised" << std::endl;

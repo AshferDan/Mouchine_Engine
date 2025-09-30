@@ -7,6 +7,7 @@
  #include "Physics.h"
  #include "RenderComponent.h"
  #include "audio.h"
+ #include "ResourceManager.h"
  #include <iostream>
  #include <cmath>
 
@@ -29,21 +30,40 @@
          std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
      }
      else {
-         // Load audio files
-         std::cout << "\n--- Loading Audio Files ---" << std::endl;
-
-         // Background music (looping)
-         audio.loadSound("bgm", "../Assets/audio/awesomeness.wav", true);
-
-         // Sound effects (oneshot)
-         //audio.loadSound("wind", "../Assets/Audio/wind1.wav", false);
-
-         // Start playing background music
-         std::cout << "starting background music..." << std::endl;
-         audio.playSound("bgm", "bgm_channel");
-         audio.setVolume("bgm_channel", 1.0f); // Set to 100% volume
+         std::cout << "Audio system initialised successfully!" << std::endl;
      }
-     
+
+     // === Initialize ResourceManager ===
+     std::cout << "\n--- Initializing Resource Manager ---" << std::endl;
+     auto& resourceMgr = ResourceManager::Instance();
+
+     // link audio engine to resource manager for audio loading
+     resourceMgr.SetAudioEngine(&audio);
+
+     // load resources
+     std::cout << "\n--- Loading Resources ---" << std::endl;
+
+     // load textures
+     resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
+
+     // load audio files
+     resourceMgr.LoadAudio("bgm", "../Assets/audio/awesomeness.wav", true); // looping
+     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
+
+     // print loaded resources
+     resourceMgr.PrintLoadedResources();
+
+     // play bgm
+     std::cout << "\n--- Starting Background Music ---" << std::endl;
+     // register the sound with audio engine to play it
+     AudioResource* bgMusic = resourceMgr.GetAudio("bgm");
+     if (bgMusic && bgMusic->IsLoaded()) {
+         audio.registerSound("bgm", bgMusic->GetSound());
+
+         // Now play it
+         audio.playSound("bgm", "bgm_channel");
+         audio.setVolume("bgm_channel", 1.0f);
+     }
      // Create 2D game objects
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
