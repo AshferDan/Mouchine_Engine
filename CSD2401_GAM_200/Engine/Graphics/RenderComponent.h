@@ -58,6 +58,21 @@ public:
     LineData GetLine() const { return line; }
     PointData GetPoint() const { return point; }
 
+    const char* GetShapeTypeName()
+    {
+        switch (static_cast<int>(GetShapeType()))
+        {
+        case static_cast<int>(ShapeType::Square):
+            return "Square";
+        case static_cast<int>(ShapeType::Circle):
+            return "Circle";
+        case static_cast<int>(ShapeType::Line):
+            return "Line";
+        case static_cast<int>(ShapeType::Point):
+            return "Point";
+        }
+    }
+
 private:
     ShapeType shape;
     GLuint textureID;
