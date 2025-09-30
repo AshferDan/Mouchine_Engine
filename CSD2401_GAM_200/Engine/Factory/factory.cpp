@@ -136,9 +136,40 @@ GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderCompon
     transform->SetScale(w, h);
     return obj;
 }
+GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, float x, float y, float w, float h,
+    char const* filename, int numRows, int numCols,
+    int startFrame, int endFrame, float fps)
+{
+    GameObject* obj = CreateGameObject(name);
 
+    // 1. Add Transform Component (Scale is set below)
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    transform->SetScale(w, h);
 
+    // 2. Create the Spritesheet Component (This loads the texture)
+    auto spritesheetComp = std::make_unique<Spritesheet>(
+        obj,
+        filename,
+        numRows,
+        numCols
+    );
 
+    // 3. Get the Texture ID loaded by the Spritesheet component
+    // NOTE: Requires a public 'GetTextureID()' in your Spritesheet class!
+    GLuint textureID = spritesheetComp->GetTextureID();
+
+    // 4. Add Render Component using the texture ID
+    obj->AddComponent<RenderComponent>(textureID);
+
+ 
+    Spritesheet* anim = spritesheetComp.get();
+    obj->AddComponent(std::move(spritesheetComp));
+
+    // 6. Set and start the animation
+    anim->SetAnimation(startFrame, endFrame, fps);
+
+    return obj;
+}
 
 GameObject* GameObjectFactory::GetGameObject(EntityID id) {
     auto it = entityToIndex.find(id);

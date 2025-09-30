@@ -8,6 +8,7 @@
  #include "RenderComponent.h"
  #include <iostream>
  #include <cmath>
+#include "Animator.hpp"
 
  int main() {
      std::cout << "=== 2D Component System Test ===" << std::endl;
@@ -15,11 +16,24 @@
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
 
+
+
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();
+
+
      GameObject* Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 1920.f, 1080.f, "../Assets/wallpaper_transparent.png");
        GameObject* player = factory.CreatePlayer("Hero", RenderComponent::ShapeType::Circle, 0.f, 0.f, 100.f, 100.f, "../Assets/protosprite.png");
-     
+       
+       GameObject* animatedMouch = factory.CreateAnimatedImage(
+           "MouchRunner",           // name
+           100.0f, 100.0f,          // x, y position
+           500.0f, 500.0f,            // width, height (scale)
+           "../Assets/Mouch_Running.png", // filename
+           1, 2,                    // 1 row, 8 columns
+           0, 7,                    // start frame 0, end frame 7
+           9.0f                    // 12 frames per second
+       );
 
      //Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
