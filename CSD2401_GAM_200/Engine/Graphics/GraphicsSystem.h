@@ -1,4 +1,5 @@
 #pragma once
+#include "stb_image.h"
 #include "System.h"
 #include "gameObject.h"
 #include "glslshader.h"
@@ -13,6 +14,7 @@
 #include <RenderComponent.h>
 #include <fstream>
 
+
 class GraphicsSystem : public ISystem {
 public:
 	GraphicsSystem();
@@ -25,13 +27,12 @@ public:
 	static GLuint LoadTexture(const char* filepath);
 
 	GLFWwindow* getWindow() {return window;}
-
 	
 
 private:
 	GLFWwindow* window;
 	GLSLShader shader;
-	GLuint vao, vbo, tex;
+	GLuint vao = 0, vbo = 0, tex = 0;
 	GLint Wwidth, Wheight;
 
 };

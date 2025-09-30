@@ -7,7 +7,8 @@
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
 
-
+class GameObject;
+class GameObjectFactory;
 class ImGuiSystem : public ISystem {
 public:
 	ImGuiSystem(GLFWwindow* window);
