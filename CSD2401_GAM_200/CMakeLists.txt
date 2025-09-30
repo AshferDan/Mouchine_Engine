@@ -209,11 +209,12 @@ target_include_directories(Engine PUBLIC
 # ======================= Link Libraries to Engine ===================
 target_link_libraries(Engine PUBLIC
     glfw
-    libglew_static
+    libglew_static 
+    glm
+    nlohmann_json::nlohmann_json
     imgui
-    nlohmann_json::nlohmann_json 
     freetype
-    opengl32
+    stb_image
 )
 
 # Link FMOD to Engine if available
@@ -271,9 +272,93 @@ set_target_properties(Game PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Build/Release"
 )
 
+# ======================= Copy FMOD DLLs to Build Directory =================
+if(TARGET fmod)
+    set(FMOD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/FMOD")
+    
+    # Determine architecture
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(FMOD_DLL_DIR "${FMOD_ROOT_DIR}/api/core/lib/x64")
+        set(FMOD_STUDIO_DLL_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x64")
+    else()
+        set(FMOD_DLL_DIR "${FMOD_ROOT_DIR}/api/core/lib/x86")
+        set(FMOD_STUDIO_DLL_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x86")
+    endif()
+    
+    # Find FMOD DLLs
+    find_file(FMOD_DEBUG_DLL
+        NAMES fmodL.dll
+        PATHS ${FMOD_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    find_file(FMOD_RELEASE_DLL
+        NAMES fmod.dll
+        PATHS ${FMOD_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    # Find FMOD Studio DLLs
+    find_file(FMOD_STUDIO_DEBUG_DLL
+        NAMES fmodstudioL.dll
+        PATHS ${FMOD_STUDIO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    find_file(FMOD_STUDIO_RELEASE_DLL
+        NAMES fmodstudio.dll
+        PATHS ${FMOD_STUDIO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    # Copy Debug DLLs
+    if(FMOD_DEBUG_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${FMOD_DEBUG_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying fmodL.dll to Debug build directory"
+        )
+        message(STATUS "Will copy fmodL.dll: ${FMOD_DEBUG_DLL}")
+    endif()
+    
+    if(FMOD_STUDIO_DEBUG_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${FMOD_STUDIO_DEBUG_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying fmodstudioL.dll to Debug build directory"
+        )
+        message(STATUS "Will copy fmodstudioL.dll: ${FMOD_STUDIO_DEBUG_DLL}")
+    endif()
+    
+    # Copy Release DLLs
+    if(FMOD_RELEASE_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${FMOD_RELEASE_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying fmod.dll to Release build directory"
+        )
+        message(STATUS "Will copy fmod.dll: ${FMOD_RELEASE_DLL}")
+    endif()
+    
+    if(FMOD_STUDIO_RELEASE_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${FMOD_STUDIO_RELEASE_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying fmodstudio.dll to Release build directory"
+        )
+        message(STATUS "Will copy fmodstudio.dll: ${FMOD_STUDIO_RELEASE_DLL}")
+    endif()
+    
+    message(STATUS "FMOD DLL copy commands configured successfully")
+endif()
+
 # ======================= Compiler Warnings for Game =================
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(Game PRIVATE -Wall ${DisableWarnings})
 elseif (MSVC)
-    target_compile_options(Game PRIVATE /W3 /WX-)
+    target_compile_options(Game PRIVATE /W4 /WX-)
 endif()

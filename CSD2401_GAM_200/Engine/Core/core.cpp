@@ -9,35 +9,11 @@
 #include <Physics.h>
 #include "ImGuiSystem.h"
 #include "InputManager.h"
-#include <csignal>
 
 
 CoreEngine* CORE;
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
-
-// Signal handler for real crashes
-void CrashHandler(int signal) {
-    const char* signalName = "Unknown";
-
-    if (signal == SIGSEGV) signalName = "Segmentation Fault (SIGSEGV)";
-    else if (signal == SIGFPE) signalName = "Floating Point Exception (SIGFPE)";
-    else if (signal == SIGABRT) signalName = "Abort (SIGABRT)";
-    else if (signal == SIGILL) signalName = "Illegal Instruction (SIGILL)";
-    else if (signal == SIGTERM) signalName = "Termination (SIGTERM)";
-
-    std::cerr << "=== CRASH DETECTED ===" << std::endl;
-    std::cerr << "Signal: " << signalName << " Signal Code: (" << signal << ")" << std::endl;
-
-    // Log to file
-    std::ofstream log("debuglog.txt", std::ios::app);
-    if (log.is_open()) {
-        log << "[CRASH] Signal: " << signalName << " Signal Code: (" << signal << ")" << std::endl;
-        log.close();
-    }
-
-    std::_Exit(signal); // exit immediately
-}
 
 CoreEngine::CoreEngine() {
     LastTime = 0;
@@ -92,29 +68,21 @@ void CoreEngine::Init() {
 
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
-
 void CoreEngine::GameLoop() {
-    // Register OS-level crash signals
-    std::signal(SIGSEGV, CrashHandler);
-    std::signal(SIGFPE, CrashHandler);
-    std::signal(SIGABRT, CrashHandler);
-    std::signal(SIGILL, CrashHandler);
-    std::signal(SIGTERM, CrashHandler);
-
-    double fps_interval = 1.0;
-
+    double fps_interval = 1.0; 
     try {
         while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
             update_time(fps_interval);
 
             for (size_t i = 0; i < Systems.size(); ++i) {
+
                 Systems[i]->Update(CoreEngine::GetDeltaTime());
             }
         }
     }
     catch (const std::exception& e) {
         // Log standard exceptions to debuglog.txt
-        std::ofstream log("debuglog.txt", std::ios::app);
+        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
         log << "[EXCEPTION] " << e.what() << std::endl;
         log.close();
 
@@ -122,13 +90,14 @@ void CoreEngine::GameLoop() {
     }
     catch (...) {
         // Log unknown exceptions
-        std::ofstream log("debuglog.txt", std::ios::app);
+        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
         log << "[UNKNOWN EXCEPTION]" << std::endl;
         log.close();
 
         std::cerr << "Unknown exception caught in CoreEngine::GameLoop()" << std::endl;
     }
 }
+
 
 void CoreEngine::DestroySystems() {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
@@ -157,8 +126,7 @@ void CoreEngine::update_time(double fps_calc_interval) {
     std::stringstream iostream;
     std::string tempfps , tempdt;
     std::string title_str;
-    tempfps = iostream.str();
-    
+
     iostream << CoreEngine::fps;
     tempfps = iostream.str();
 

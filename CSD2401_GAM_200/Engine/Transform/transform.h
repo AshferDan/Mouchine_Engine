@@ -7,7 +7,7 @@ public:
 
     void Update(float deltaTime) override;
     std::string GetName() const override { return "TransformComponent"; }
-
+    std::unique_ptr<IComponent>Clone(GameObject* NewClone) const override;
     // Position
     void SetPosition(float x, float y);
     void GetPosition(float& x, float& y) const;
