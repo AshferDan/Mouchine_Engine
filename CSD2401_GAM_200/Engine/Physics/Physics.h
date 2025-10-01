@@ -12,7 +12,6 @@ class PhysicsComponent : public IComponent {
 public:
     PhysicsComponent(GameObject* owner, float mass = 1.0f, bool isStatic = false);
 
-    void Update(float deltaTime) override;
     std::string GetName() const override { return "PhysicsComponent"; }
     std::unique_ptr<IComponent>Clone(GameObject* NewClone) const override;
     // Velocity
@@ -20,9 +19,12 @@ public:
     void GetVelocity(float& x, float& y) const;
     void AddVelocity(float x, float y);
 
-    // Forces
-    void AddForce(float x, float y);
-    void AddImpulse(float x, float y); // Instant velocity change
+    // ===== Jump System =====
+    void Jump(float jumpForce);
+    void SetGrounded(bool grounded) { isGrounded = grounded; }
+    bool IsGrounded() const { return isGrounded; }
+    bool IsFalling() const { return velocityY < 0 && !isGrounded; }
+    bool IsRising() const { return velocityY > 0; }
 
     // Properties
     void SetMass(float m) { mass = m; }
@@ -32,9 +34,6 @@ public:
 
     // 2D Physics settings
     void SetGravity(bool useGrav) { useGravity = useGrav; }
-    void SetDrag(float dragCoeff) { drag = dragCoeff; }
-    void SetAngularVelocity(float angVel) { angularVelocity = angVel; }
-    void AddTorque(float torque);
 
     // 2D specific helpers
     float GetSpeed() const;
@@ -43,24 +42,21 @@ public:
 
 private:
     void ApplyGravity(float deltaTime);
-    void ApplyDrag(float deltaTime);
     void UpdatePosition(float deltaTime);
-    void UpdateRotation(float deltaTime);
 
 public:
     // Linear motion
     float velocityX, velocityY;
-    float forceX, forceY;
-
-    // Angular motion (2D rotation)
-    float angularVelocity;
-    float torque;
 
     // Properties
-    float mass;
-    float drag;                // Air resistance
+    float mass;               
     bool isStatic;
     bool useGravity;
+
+    // State Flages
+    bool isGrounded;
+    bool wasGrounded;
+    bool isJumping;
 
     // 2D gravity (can be changed for different effects)
     float gravityX, gravityY;

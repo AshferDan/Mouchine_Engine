@@ -1,1 +1,1 @@
-GO Name: bgImage(1) | Shape: Square | Position (x,y): (0,0) | Size (w,h): (1920,1080) | Colour: (1,1,1,1)
+GO Name: ball(1) | Shape: Circle | Position (x,y): (-8.8,-74.2) | Size (w,h): (50,50) | Colour: (0.66609,0,0.686275,1)

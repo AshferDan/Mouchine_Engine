@@ -43,7 +43,7 @@ public:
     GLuint GetTextureID() const { return textureID; }
     ShapeType GetShapeType() const { return shape; }
     glm::vec4 GetColor() const { return color; }
-    
+
     void SetColor(glm::vec4 newColor) {
         color = newColor ;
     }
@@ -81,3 +81,34 @@ private:
     LineData line;
     PointData point;
 };
+
+inline void ShapeEnumToString(std::string& shapeName, RenderComponent::ShapeType& shapeEnum) {
+    if (!shapeName.empty()) 
+    {
+        if (shapeName == "Square") { shapeEnum = RenderComponent::ShapeType::Square; }
+        else if (shapeName == "Circle") { shapeEnum = RenderComponent::ShapeType::Circle; }
+        else if (shapeName == "Line") { shapeEnum = RenderComponent::ShapeType::Line;}
+        else if (shapeName == "Point") { shapeEnum = RenderComponent::ShapeType::Point;}
+        else return;
+    }
+    else 
+    {
+        switch (shapeEnum)
+        {
+        case RenderComponent::ShapeType::Square:
+            shapeName = "Square";
+            break;
+        case RenderComponent::ShapeType::Circle:
+            shapeName = "Circle";
+            break;
+        case RenderComponent::ShapeType::Line:
+            shapeName = "Line";
+            break;
+        case RenderComponent::ShapeType::Point:
+            shapeName = "Point";
+            break;
+        default: 
+            break;
+        }
+    }
+}
