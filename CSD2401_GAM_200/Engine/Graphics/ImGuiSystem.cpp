@@ -1,6 +1,12 @@
 #include "ImGuiSystem.h"
 #include "Serialization.h"
 #include <iostream>
+#include <chrono>
+#include <map>
+#include <string>
+
+extern std::map<std::string, double> g_systemTimings;
+extern double g_totalLoopTime;
 
 ImGuiSystem::ImGuiSystem(GLFWwindow* window) : m_window(window) {};
 
@@ -75,6 +81,21 @@ void ImGuiSystem::Update(float dt) {
 
 			ImGui::TreePop();
 		}
+	}
+
+	// Performance Profiler
+	ImGui::Separator();
+	ImGui::Text("=== Performance Profiler ===");
+	
+	// Display Bars
+	std::map<std::string, double>::iterator it;
+	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
+		const std::string& name = it->first;
+		double ms = it->second;
+		double percent = (g_totalLoopTime > 0.0) ? (ms / g_totalLoopTime) * 100.0 : 0.0;
+
+		ImGui::Text("%-20s %.4f ms (%.1f%%)", name.c_str(), ms, percent);
+		ImGui::ProgressBar((float)(percent / 100.0f), ImVec2(0.0f, 0.0f));
 	}
 
 	ImGui::End();
