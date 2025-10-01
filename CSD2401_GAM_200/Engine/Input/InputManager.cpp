@@ -75,6 +75,13 @@ void InputManager::Update(float dt) {
      else {
          isJumping = false;
      }
+     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+         DemoM1_SpawnGameObjects();
+     }
+     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+         DemoM1_DestroyGameObjects();
+     }
+     
 
      transform->SetPosition(x, y);
 

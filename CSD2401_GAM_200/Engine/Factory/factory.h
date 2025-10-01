@@ -45,3 +45,6 @@ private:
     std::unordered_map<EntityID, size_t> entityToIndex;
     unsigned int cloneCounter;
 };
+
+void DemoM1_SpawnGameObjects();
+void DemoM1_DestroyGameObjects();
