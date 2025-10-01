@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "ColliderComponent.h"
 #include <memory>
 #include <vector>
 #include <unordered_map>
@@ -18,9 +19,9 @@ public:
     GameObject* CreateGameObject(const std::string& name = "GameObject");
 
     // Create predefined 2D types
-    GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y , float w, float h,const glm::vec4 color);
-    GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w , float h, const char* sprite);
-    GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color);
+    GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y , float w, float h,const glm::vec4 color, CollisionLayer layer);
+    GameObject* CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w , float h, const char* sprite, CollisionLayer layer);
+    GameObject* CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color, CollisionLayer layer);
     
     // Management
     GameObject* GetGameObject(EntityID id);

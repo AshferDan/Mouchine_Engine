@@ -1,8 +1,8 @@
 #include "ColliderComponent.h"
 #include "GameObject.h"
 
-ColliderComponent::ColliderComponent(GameObject* owner, Type type, float w, float h)
-    : IComponent(owner), type(type), width(w), height(h), radius(w * 0.5f) {
+ColliderComponent::ColliderComponent(GameObject* owner, Type type, float w, float h, CollisionLayer layer)
+    : IComponent(owner), type(type), width(w), height(h), radius(w * 0.5f), layer(layer) {
 }
 
 // Convert Transform position to AABB

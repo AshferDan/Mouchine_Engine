@@ -5,17 +5,32 @@
 
 class TransformComponent;
 
+// Collision layers enum
+enum class CollisionLayer {
+    Player,
+    Ground,
+    Wall,
+    Enemy,
+    Platform,
+    Default  // For objects without a specific layer
+};
+
 class ColliderComponent : public IComponent {
 public:
     enum class Type { Square, Circle };
 
-    ColliderComponent(GameObject* owner, Type type, float w, float h = 0.0f);
+    ColliderComponent(GameObject* owner, Type type, float w, float h = 0.0f,
+        CollisionLayer layer = CollisionLayer::Default);
 
     std::string GetName() const override { return "ColliderComponent"; }
 
     // Getters for collision shapes
     AABB   GetAABB() const;
     Circle GetCircle() const;
+
+    // Layer management
+    CollisionLayer GetLayer() const { return layer; }
+    void SetLayer(CollisionLayer newLayer) { layer = newLayer; }
 
     // Debug info
     Type GetType() const { return type; }
@@ -25,4 +40,5 @@ private:
     float width;
     float height;
     float radius;
+    CollisionLayer layer;
 };

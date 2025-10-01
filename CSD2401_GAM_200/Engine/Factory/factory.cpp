@@ -2,7 +2,6 @@
 #include "GraphicsSystem.h"
 #include "transform.h"
 #include "collision.h"
-#include "collidercomponent.h"
 #include "physics.h"
 #include <iostream>
 #include <cmath>
@@ -19,7 +18,7 @@ GameObject* GameObjectFactory::CreateGameObject(const std::string& name) {
     return ptr;
 }
 
-GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y,float w,float h, const glm::vec4 color) {
+GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y,float w,float h, const glm::vec4 color, CollisionLayer layer) {
     GameObject* player = CreateGameObject(name);
 
     auto* transform = player->AddComponent<TransformComponent>(x, y);
@@ -34,7 +33,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     return player;
 }
 
-GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char* filename) {
+GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char* filename, CollisionLayer layer) {
     GameObject* player = CreateGameObject(name);
     auto* transform = player->AddComponent<TransformComponent>(x, y);
     auto* physics = player->AddComponent<PhysicsComponent>(0, 0);
@@ -45,11 +44,11 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     physics->SetGravity(false);
 
     if (shape == RenderComponent::ShapeType::Circle) {
-        player->AddComponent<ColliderComponent>(ColliderComponent::Type::Circle, w);
+        player->AddComponent<ColliderComponent>(ColliderComponent::Type::Circle, w,0.0f, layer);
         std::cout << "Added Circle collider with radius: " << (w * 0.5f) << std::endl;
     }
     else if (shape == RenderComponent::ShapeType::Square) {
-        player->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h);
+        player->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h, layer);
         std::cout << "Added Square collider with size: " << w << "x" << h << std::endl;
     }
 
@@ -58,7 +57,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     return player;
 }
 
-GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color) {
+GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color, CollisionLayer layer) {
     GameObject* obj = CreateGameObject(name);
 
     auto* transform = obj->AddComponent<TransformComponent>(x, y);
@@ -76,10 +75,10 @@ GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderCompon
 
         // Attach collider automatically
         if (shape == RenderComponent::ShapeType::Circle) {
-            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Circle, w);
+            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Circle, w,0.0f, layer);
         }
         else if (shape == RenderComponent::ShapeType::Square) {
-            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h);
+            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h, layer);
         }
     }
     //testing TO BE REMOVED
