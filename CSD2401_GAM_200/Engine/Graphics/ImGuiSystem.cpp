@@ -1,12 +1,6 @@
 #include "ImGuiSystem.h"
 #include "Serialization.h"
 #include <iostream>
-#include <chrono>
-#include <map>
-#include <string>
-
-extern std::map<std::string, double> g_systemTimings;
-extern double g_totalLoopTime;
 
 ImGuiSystem::ImGuiSystem(GLFWwindow* window) : m_window(window) {};
 
@@ -24,8 +18,6 @@ void ImGuiSystem::Initialize() {
 }
 
 void ImGuiSystem::Update(float dt) {
-	auto start = std::chrono::high_resolution_clock::now();
-
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -83,26 +75,6 @@ void ImGuiSystem::Update(float dt) {
 
 			ImGui::TreePop();
 		}
-	}
-
-	// Performance Profiler
-	ImGui::Separator();
-	ImGui::Text("=== Performance Profiler ===");
-
-	// Update timing for ImGui System so the bar shows
-	g_systemTimings["ImGui System"] = 0.0;
-	auto end = std::chrono::high_resolution_clock::now();
-	g_systemTimings["ImGui System"] = std::chrono::duration<double, std::milli>(end - start).count();
-
-
-	std::map<std::string, double>::iterator it;
-	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
-		const std::string& name = it->first;
-		double ms = it->second;
-		double percent = (g_totalLoopTime > 0.0) ? (ms / g_totalLoopTime) * 100.0 : 0.0;
-
-		ImGui::Text("%-20s %.4f ms (%.1f%%)", name.c_str(), ms, percent);
-		ImGui::ProgressBar((float)(percent / 100.0f), ImVec2(0.0f, 0.0f));
 	}
 
 	ImGui::End();
