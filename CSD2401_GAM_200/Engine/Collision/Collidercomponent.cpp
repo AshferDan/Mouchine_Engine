@@ -16,6 +16,8 @@ AABB ColliderComponent::GetAABB() const {
     return { {pos.x - half.x, pos.y - half.y}, {pos.x + half.x, pos.y + half.y} };
 }
 
+
+
 // Convert Transform position to Circle
 Circle ColliderComponent::GetCircle() const {
     auto* transform = owner->GetComponent<TransformComponent>();
@@ -23,4 +25,22 @@ Circle ColliderComponent::GetCircle() const {
 
     Vec2 pos{ transform->posX, transform->posY };
     return { pos, radius };
+}
+
+std::unique_ptr<IComponent> ColliderComponent::Clone(GameObject* newOwner) const {
+    auto cloned = std::make_unique<ColliderComponent>(
+        newOwner,
+        this->type,
+        this->width,
+        this->height,
+        this->layer
+    );
+    cloned->SetEnabled(this->IsEnabled());
+    return cloned;
+}
+
+void ColliderComponent::Update(float deltaTime) {
+    // Colliders typically don't need per-frame updates
+    // They're queried by the collision system
+    // Leave empty or add any specific update logic you need
 }

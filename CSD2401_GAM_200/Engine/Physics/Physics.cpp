@@ -29,9 +29,6 @@ std::unique_ptr<IComponent> PhysicsComponent::Clone(GameObject *NewClone) const
 
     clonedComponent->velocityX = this->velocityX;
     clonedComponent->velocityY = this->velocityY;
-    clonedComponent->angularVelocity = this->angularVelocity;
-
-    clonedComponent->drag = this->drag;
     clonedComponent->useGravity = this->useGravity;
     clonedComponent->gravityX = this->gravityX;
     clonedComponent->gravityY = this->gravityY;
@@ -40,11 +37,6 @@ std::unique_ptr<IComponent> PhysicsComponent::Clone(GameObject *NewClone) const
 
     return clonedComponent;
 }
-
-void PhysicsComponent::Update(float deltaTime)
-{
-    if (isStatic)
-        return;
 
     void PhysicsComponent::GetVelocity(float &x, float &y) const
     {

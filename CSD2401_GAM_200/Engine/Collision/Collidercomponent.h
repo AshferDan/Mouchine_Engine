@@ -32,6 +32,9 @@ public:
     CollisionLayer GetLayer() const { return layer; }
     void SetLayer(CollisionLayer newLayer) { layer = newLayer; }
 
+    std::unique_ptr<IComponent> Clone(GameObject* newOwner) const override;
+    void Update(float deltaTime) override;
+
     // Debug info
     Type GetType() const { return type; }
 
