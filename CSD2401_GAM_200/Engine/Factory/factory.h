@@ -37,6 +37,9 @@ public:
     GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer layer);
     GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *sprite, CollisionLayer layer);
     GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color, CollisionLayer layer);
+    GameObject* CreateAnimatedImage(const std::string& name, float x, float y, float w, float h,
+        char const* filename, int numRows, int numCols,
+        int startFrame, int endFrame, float fps,CollisionLayer layer);
 
     GameObject *CloneGameObject(EntityID id, const std::string &newName = "");
     GameObject *ClonePlayer(EntityID id, const std::string &newName = "");

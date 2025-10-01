@@ -106,6 +106,8 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     return obj;
 }
 
+
+
 GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color) {
     GameObject* obj = CreateGameObject(name);
 
@@ -139,6 +141,7 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     auto *transform = obj->AddComponent<TransformComponent>(x, y);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     auto render = obj->AddComponent<RenderComponent>(texID);
+
 
     if (shape == RenderComponent::ShapeType::Line)
     {
@@ -223,6 +226,38 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
     obj->AddComponent<RenderComponent>(textureID);
 
     Spritesheet *anim = spritesheetComp.get();
+    obj->AddComponent(std::move(spritesheetComp));
+
+    anim->SetAnimation(startFrame, endFrame, fps);
+
+    return obj;
+}
+
+GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, float x, float y, float w, float h, char const* filename, int numRows, int numCols, int startFrame, int endFrame, float fps, CollisionLayer layer)
+{
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
+    GLuint texID = GraphicsSystem::LoadTexture(filename);
+    auto render = obj->AddComponent<RenderComponent>(texID);
+    physics->SetGravity(true); // Enable/Disable gravity
+    physics->SetStatic(false);
+    transform->SetScale(w, h);
+    physics->SetVelocity(0, 0);
+    physics->SetGravity(true);
+    obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h, layer);
+    auto spritesheetComp = std::make_unique<Spritesheet>(
+        obj,
+        filename,
+        numRows,
+        numCols);
+
+    GLuint textureID = spritesheetComp->GetTextureID();
+
+    obj->AddComponent<RenderComponent>(textureID);
+
+    Spritesheet* anim = spritesheetComp.get();
     obj->AddComponent(std::move(spritesheetComp));
 
     anim->SetAnimation(startFrame, endFrame, fps);

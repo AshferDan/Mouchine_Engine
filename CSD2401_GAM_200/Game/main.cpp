@@ -83,7 +83,22 @@ int main()
     auto &factory = GameObjectFactory::Instance();
 
     GameObject *Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 1920.f, 1080.f, "../Assets/wallpaper_transparent.png");
-    GameObject *player = factory.CreatePlayer("Hero", RenderComponent::ShapeType::Square, -7, 0, 100, 100, "../Assets/protosprite.png", CollisionLayer::Player);
+    
+    GameObject* animatedMouch = factory.CreateAnimatedImage(
+        "Hero",                 // name
+        100.0f, 100.0f,                // x, y position
+        300.0f, 300.0f,                // width, height (scale)
+        "../Assets/Mouch_idle.png", // filename
+        1, 2,                          //row,columns
+        0, 7,                          // start frame , end frame
+        2.0f,                          // 12 frames per second
+        CollisionLayer::Player                           
+    );
+    auto* playerPhysics = animatedMouch->AddComponent<PhysicsComponent>(1.0f, true);
+    playerPhysics->SetGravity(true);
+    playerPhysics->SetStatic(false);
+
+
     // Create ground at the bottom of the screen (black rectangle)
     GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
     // Make ground static so it doesn't fall
@@ -108,28 +123,16 @@ int main()
     physics1->SetVelocity(-250.0f, 0.0f); // Moving right
     physics1->SetGravity(true);           // Disable gravity
 
-    // Button that has the 2.5k GOs spawning/ despawn
-    GameObject *EvilButton = factory.CreateGameObject("Evil Button");
-
-    // Square Object -> name, object type (square), x coord, y coord, width, height (if you want rectangle),
-    //  RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
-    // GameObject* SquareShape = factory.CreateShape("Square", RenderComponent::ShapeType::Square, 5, 5, 5, 5, glm::vec4(0.f, 0.f, 1.f, 1.f));
+    
+ 
     GameObject *CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, -150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics2 = CircleShape2->AddComponent<PhysicsComponent>(1.0f, false);
     physics2->SetVelocity(250.0f, 0.0f); // Moving left
     physics2->SetGravity(true);          // Disable gravity
+    // Button that has the 2.5k GOs spawning/ despawn
+    GameObject* EvilButton = factory.CreateGameObject("Evil Button");
 
-    // GameObject *animatedMouch = factory.CreateAnimatedImage(
-    //     "MouchRunner",                 // name
-    //     100.0f, 100.0f,                // x, y position
-    //     500.0f, 500.0f,                // width, height (scale)
-    //     "../Assets/Mouch_Running.png", // filename
-    //     1, 2,                          // 1 row, 8 columns
-    //     0, 7,                          // start frame 0, end frame 7
-    //     9.0f                           // 12 frames per second
-    //);
 
-    CORE->GetDebugSystem()->DrawLine({0.f, 0.f}, {960, 540}, {1, 0, 0, 1});
     std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
     engine.GameLoop();
 

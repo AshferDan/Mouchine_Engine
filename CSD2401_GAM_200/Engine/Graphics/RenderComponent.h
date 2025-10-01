@@ -41,6 +41,7 @@ public:
     
     // Getter for texture
     GLuint GetTextureID() const { return textureID; }
+    void SetTextureID(GLuint newID) { textureID = newID; }
     ShapeType GetShapeType() const { return shape; }
     glm::vec4 GetColor() const { return color; }
 
