@@ -106,6 +106,32 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     return obj;
 }
 
+GameObject* GameObjectFactory::CreateShape(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4& color) {
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+
+    auto render = obj->AddComponent<RenderComponent>(shape, color);
+
+    if (shape == RenderComponent::ShapeType::Line) {
+        render->SetLine(glm::vec2(x, y), glm::vec2(w, h));
+    }
+    else if (shape == RenderComponent::ShapeType::Point) {
+        render->SetPoint(glm::vec2(x, y), w);
+    }
+    else {
+        transform->SetScale(w, h);
+    }
+    //testing TO BE REMOVED
+    std::cout << "Created "
+        << (shape == RenderComponent::ShapeType::Circle ? "Circle" :
+            shape == RenderComponent::ShapeType::Square ? "Square" :
+            shape == RenderComponent::ShapeType::Line ? "Line" : "Point")
+        << ": " << name << " at (" << x << "," << y << ")\n";
+
+    return obj;
+}
+
 GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *filename)
 {
     GameObject *obj = CreateGameObject(name);
@@ -239,36 +265,6 @@ GameObject *GameObjectFactory::ClonePlayer(EntityID id, const std::string &newNa
     return nullptr;
 }
 
-GameObject *GameObjectFactory::CloneGameObject(EntityID id, const std::string &newName)
-{
-    GameObject *original = GetGameObject(id);
-
-    if (original)
-    {
-        std::string finalName;
-
-        if (newName.empty())
-        {
-            std::stringstream ss;
-            size_t length = original->GetName().find_first_of('(');
-            if (length == std::string::npos)
-            {
-                length = original->GetName().length();
-            }
-
-            ++cloneCounter;
-            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
-            finalName = ss.str();
-        }
-        else
-        {
-            finalName = newName;
-        }
-
-        return original->Clone(finalName);
-    }
-    return nullptr;
-}
 GameObject *GameObjectFactory::CloneShape(EntityID id, const std::string &newName)
 {
     GameObject *original = GetGameObject(id);
@@ -373,8 +369,7 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
     }
     return nullptr;
 }
-GameObject *GameObjectFactory::GetGameObject(EntityID id)
-{
+
     GameObject *GameObjectFactory::GetGameObject(EntityID id)
     {
         auto it = entityToIndex.find(id);

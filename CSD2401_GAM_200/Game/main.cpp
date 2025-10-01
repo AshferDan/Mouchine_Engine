@@ -16,8 +16,22 @@
 #include "audio.h"
 #include "InputManager.h"
 
+void EnableMemoryLeakChecking(int breakAlloc = -1)
+{
+    // Set the leak checking flag
+    int tmpDbgFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+    tmpDbgFlag |= _CRTDBG_LEAK_CHECK_DF;
+    _CrtSetDbgFlag(tmpDbgFlag);
+
+    // If a valid break alloc provided set the breakAlloc
+    if (breakAlloc != -1)
+        _CrtSetBreakAlloc(breakAlloc);
+}
+
+
 int main()
 {
+    EnableMemoryLeakChecking();
     std::cout << "=== 2D Component System Test ===" << std::endl;
     CoreEngine engine;
     AudioEngine audio;
@@ -65,16 +79,6 @@ int main()
     // print loaded resources
     resourceMgr.PrintLoadedResources();
 
-    // register the sound with audio engine to play it
-    std::cout << "\n--- Starting Background Music ---" << std::endl;
-    AudioResource *bgMusic = resourceMgr.GetAudio("bgm");
-    if (bgMusic && bgMusic->IsLoaded())
-    {
-        audio.registerSound("bgm", bgMusic->GetSound());
-        audio.playSound("bgm", "bgm_channel");
-        audio.setVolume("bgm_channel", 1.0f);
-    }
-
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
 
@@ -88,9 +92,14 @@ int main()
 
     // Create ground at the bottom of the screen (black rectangle)
     GameObject *wall = factory.CreateShape("Wall", RenderComponent::ShapeType::Square, 1500, -500, 1000, 3000, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
-    // Make ground static so it doesn't fall
-    auto *wallPhysics = wall->AddComponent<PhysicsComponent>(1.0f, true);
+    auto* wallPhysics = wall->AddComponent<PhysicsComponent>(1.0f, true);
     wallPhysics->SetGravity(false);
+
+    GameObject* wall2 = factory.CreateShape("Wall2", RenderComponent::ShapeType::Square, -1500, -500, 1000, 3000, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
+
+    // Make ground static so it doesn't fall
+    auto *wall2Physics = wall2->AddComponent<PhysicsComponent>(1.0f, true);
+    wall2Physics->SetGravity(false);
 
     // Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle),
     //  RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)

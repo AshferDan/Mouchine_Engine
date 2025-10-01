@@ -28,6 +28,7 @@ public:
     GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color);
     GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *filename);
 
+
     GameObject *CreateImage(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, char const *filename);
     GameObject *CreateAnimatedImage(const std::string &name, float x, float y, float w, float h,
                                     char const *filename, int numRows, int numCols,
