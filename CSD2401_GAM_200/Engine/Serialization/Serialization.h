@@ -124,6 +124,7 @@ public:
 			std::cerr << "File Stream: " << filePath << " is not good!\n";
 			return false;
 		}
+		ifs.clear();
 		ifs.read(destination, size);
 
 		while (ifs.peek() != EOF) {
@@ -153,6 +154,54 @@ private:
 	std::string filePath;
 	std::ifstream ifs;
 };
+
+// Will store in logs for now
+void CreatePrefab(GameObject& GO) 
+{
+	std::string filePath{ "../Logs/Prefab_" + GO.GetName() + ".txt" };
+	std::ofstream ofs(filePath);
+
+	if (!ofs.good()) 
+	{
+		std::cerr << "File Stream: " << filePath << " is not good!\n";
+		return;
+	}
+
+	auto* transform = GO.GetComponent<TransformComponent>();
+	auto* render = GO.GetComponent<RenderComponent>();
+	glm::vec4 color = render->GetColor();
+
+	// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA
+	ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " "  << 
+		transform->scaleX << " " << transform->scaleY << " " << color.r << " " << color.g << " " << color.b << " " << color.a << std::endl;
+
+	std::cout << "Prefab created successfully!";
+	ofs.clear();
+	ofs.close();
+}
+
+std::string ReadPrefabData(const char* destination)
+{
+	std::ifstream ifs(destination);
+	if (!ifs.good()) 
+	{
+		std::cerr << "File Stream: " << destination << " is not good!\n";
+		ifs.clear();
+		ifs.close();
+		return "";
+	}
+
+	std::string data{};
+	std::stringstream ss;
+
+	ss << ifs.rdbuf();  // Read all content into buffer
+	data = ss.str();
+
+	ifs.clear();
+	ifs.close();
+	return data;
+}
+
 
 class Serializable {
 public:

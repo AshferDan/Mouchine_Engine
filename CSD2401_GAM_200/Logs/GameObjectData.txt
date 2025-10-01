@@ -1,1 +1,1 @@
-GO Name: Demo Circles(1) | Shape: Circle | Position (x,y): (439,268) | Size (w,h): (40,40) | Colour: (1,0,0,1)
+GO Name: ball(1) | Shape: Circle | Position (x,y): (-8.8,-74.2) | Size (w,h): (50,50) | Colour: (0.66609,0,0.686275,1)
