@@ -12,10 +12,14 @@
 #include "CollisionSystem.h"
 #include "PhysicsSystem.h"
 #include "DebugSystem.h"
+#include <map>
 
 CoreEngine *CORE;
+
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
+double g_totalLoopTime = 0.0;
+std::map<std::string, double> g_systemTimings;
 
 CoreEngine::CoreEngine()
 {
@@ -92,6 +96,7 @@ void CoreEngine::Init()
 
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
+
 void CoreEngine::GameLoop()
 {
     double fps_interval = 1.0;
@@ -101,10 +106,37 @@ void CoreEngine::GameLoop()
         {
             update_time(fps_interval);
 
+            // 1. Clear previous frame timings and reset total time
+            g_systemTimings.clear();
+            g_totalLoopTime = 0.0; // Reset total time for the new frame
+
+            // 2. Update all systems and collect timings
             for (size_t i = 0; i < Systems.size(); ++i)
             {
+                if (Systems[i]->GetName() == "ImGui_System")
+                    continue;
 
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
                 Systems[i]->Update(CoreEngine::GetDeltaTime());
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[Systems[i]->GetName()] = ms;
+                g_totalLoopTime += ms; // Accumulate total time
+            }
+
+            // 3. Update ImGui System (Time it like any other system)
+            if (imguiSystem)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+
+                imguiSystem->Update(CoreEngine::GetDeltaTime());
+
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[imguiSystem->GetName()] = ms;
+                g_totalLoopTime += ms; // Add ImGui time to total loop time
             }
         }
     }
@@ -161,6 +193,9 @@ void CoreEngine::update_time(double fps_calc_interval)
 
     iostream << CoreEngine::fps;
     tempfps = iostream.str();
+
+    iostream.str("");
+    iostream.clear();
 
     iostream << CoreEngine::delta_time;
     tempdt = iostream.str();

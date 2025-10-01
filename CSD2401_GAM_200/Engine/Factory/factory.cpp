@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <random>       // For M1 demo, spawning 2.5k GOs
 
 GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 {
@@ -43,9 +44,11 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(0, 0);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     auto render = player->AddComponent<RenderComponent>(texID);
+    physics->SetGravity(true); // Enable/Disable gravity
+    physics->SetStatic(false);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);
-    physics->SetGravity(false);
+    physics->SetGravity(true);
 
     if (shape == RenderComponent::ShapeType::Circle)
     {
@@ -251,4 +254,37 @@ void GameObjectFactory::Clear()
     gameObjects.clear();
     entityToIndex.clear();
     nextEntityID = 1;
+}
+
+// FUNCTIONS TO SPAWN 2.5K OBJECTS FOR M1 DEMO!!
+
+std::vector<GameObject*> vecGOs;
+void DemoM1_SpawnGameObjects() 
+{
+    auto& factory = GameObjectFactory::Instance();
+    
+    std::random_device randomDevice; 
+    std::mt19937 gen(randomDevice());
+    std::uniform_int_distribution<int> distributionX(-960, 960); 
+    std::uniform_int_distribution<int> distributionY(-540, 540);
+
+    // spawn 2.5k small circles
+    for (size_t i = 0; i < 2500; i++) 
+    {
+        int intX{ distributionX(gen) }, intY{ distributionY(gen) };
+        GameObject* newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+        //GameObject* newGO = factory.CreateAnimatedImage("MouchRunner", static_cast<float>(intX), static_cast<float>(intY), 100.0f, 100.0f, "../Assets/Mouch_Running.png", 1, 2, 0, 7,9.0f);
+        vecGOs.push_back(newGO);
+    }
+}
+
+void DemoM1_DestroyGameObjects()
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    for (GameObject* &GO : vecGOs) 
+    {
+        factory.DestroyGameObject(GO->GetID());
+    }
+    vecGOs.clear();
 }

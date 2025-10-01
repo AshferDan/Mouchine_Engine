@@ -33,6 +33,29 @@ void InputManager::Update(float dt)
         return;
     }
 
+    for (auto &kv : singleTriggerKeys)
+    {
+        int key = kv.first;
+        bool &wasPressed = kv.second;
+
+        if (glfwGetKey(window, key) == GLFW_PRESS)
+        {
+            if (!wasPressed)
+            {
+                if (key == GLFW_KEY_F1)
+                {
+                    CORE->GetGraphicsSystem()->toggleDebugMode();
+                    std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
+                }
+            }
+            wasPressed = true;
+        }
+        else
+        {
+            wasPressed = false;
+        }
+    }
+
     auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
     if (!player)
     {
@@ -53,6 +76,15 @@ void InputManager::Update(float dt)
 
     float vx, vy;
     physics->GetVelocity(vx, vy);
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        DemoM1_SpawnGameObjects();
+    }
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    {
+        DemoM1_DestroyGameObjects();
+    }
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
