@@ -58,7 +58,7 @@ void InputManager::Update(float dt)
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
-    float moveSpeed = 5.0f;  // Movement speed
+    float moveSpeed = 200.0f;  // Movement speed
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         vx = -moveSpeed;
@@ -75,7 +75,7 @@ void InputManager::Update(float dt)
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         // Only jump if grounded
         if (physics->IsGrounded()) {
-            physics->Jump(10.0f);  // Jump force
+            physics->Jump(400.0f);  // Jump force
             physics->GetVelocity(vx, vy);
         }
     }

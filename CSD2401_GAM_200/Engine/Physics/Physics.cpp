@@ -9,7 +9,7 @@ PhysicsComponent::PhysicsComponent(GameObject *owner, float m, bool static_)
       velocityX(0), velocityY(0),
       mass(m), isStatic(static_), useGravity(true),
       isGrounded(true), isJumping(false), wasGrounded(true),
-      gravityX(0), gravityY(-9.81f)
+      gravityX(0), gravityY(-381.f)
 {
 }
 

@@ -132,7 +132,7 @@ void PhysicsSystem::ResolveCircleCircle(GameObject* obj1, GameObject* obj2,
     float overlap = radiusSum - distance;
 
     // Safety: ignore collision if overlap is unreasonably large
-    if (overlap < 0 || overlap > 10.0f) return;
+    if (overlap < 0 || overlap > 100.0f) return;
 
     if (overlap > 0) {
         auto* transform1 = obj1->GetComponent<TransformComponent>();
@@ -300,7 +300,7 @@ void PhysicsSystem::ResolveMixed(GameObject* obj1, GameObject* obj2,
             circleTransform->Move(nx * penetration, ny * penetration);
 
             // Apply bounce
-            float restitution = 0.6f;
+            float restitution = 0.9f;
             float dot = cvx * nx + cvy * ny;
 
             cvx = cvx - (1 + restitution) * dot * nx;
