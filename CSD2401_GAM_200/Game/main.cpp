@@ -82,7 +82,7 @@ int main()
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
 
-    GameObject *Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 1920.f, 1080.f, "../Assets/wallpaper_transparent.png");
+    GameObject *Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "../Assets/wallpaper_transparent.png");
     
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                 // name
