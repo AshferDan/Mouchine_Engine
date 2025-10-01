@@ -78,7 +78,7 @@ void InputManager::Update(float dt) {
      if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
          DemoM1_SpawnGameObjects();
      }
-     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
          DemoM1_DestroyGameObjects();
      }
      

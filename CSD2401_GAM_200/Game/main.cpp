@@ -56,7 +56,7 @@
      {
          audio.registerSound("bgm", bgMusic->GetSound());
          audio.playSound("bgm", "bgm_channel");
-         audio.setVolume("bgm_channel", 1.0f);
+         audio.setVolume("bgm_channel", 0.1f);
      }
 
 
@@ -80,6 +80,9 @@
      //Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle), 
      // RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
      GameObject* CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 20.f, 0.f, 5.f, 5.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+
+     // Button that has the 2.5k GOs spawning/ despawn
+     GameObject* EvilButton = factory.CreateGameObject("Evil Button");
         
 
      //Square Object -> name, object type (square), x coord, y coord, width, height (if you want rectangle), 

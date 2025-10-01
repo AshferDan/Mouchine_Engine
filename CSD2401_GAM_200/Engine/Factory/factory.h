@@ -48,3 +48,4 @@ private:
 
 void DemoM1_SpawnGameObjects();
 void DemoM1_DestroyGameObjects();
+void DemoM1_SpawnGameObjectsTest(int val = 0);
