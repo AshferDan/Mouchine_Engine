@@ -9,9 +9,15 @@ uniform vec2 uTiling;
 uniform vec2 uTexOffset;
 uniform int uIsCircle;
 uniform int uHasTexture;
+uniform int uIsLine;
 
 void main() {
     vec4 baseColor = uColor;
+
+    if (uIsLine == 1) {
+        FragColor = uColor; // just draw solid color
+        return;
+    }
 
    if(uHasTexture == 1) {
       vec2 finalTexCoord = TexCoord * uTiling + uTexOffset; 
