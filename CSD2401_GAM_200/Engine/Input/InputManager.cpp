@@ -54,27 +54,6 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        std::cout << "UP" << std::endl;
-        y += movementspeed * dt;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        std::cout << "LEFT" << std::endl;
-        x -= movementspeed * dt;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        std::cout << "RIGHT" << std::endl;
-        x += movementspeed * dt;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        std::cout << "DOWN" << std::endl;
-        y -= movementspeed * dt;
-    }
-
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
     float moveSpeed = 200.0f; // Movement speed
