@@ -17,6 +17,9 @@
      std::cout << "=== 2D Component System Test ===" << std::endl;
      CoreEngine engine;
      AudioEngine audio;
+     double g_totalLoopTime = 0.0;
+     std::map<std::string, double> g_systemTimings; // ms per system
+
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
 
