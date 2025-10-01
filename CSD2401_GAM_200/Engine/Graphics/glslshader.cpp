@@ -1,18 +1,3 @@
-/* !
-@file    	glslshader.h
-@author  	pghali@digipen.edu
-@co-author	parminder.singh@digipen.edu, shaojun.g@digipen.edu
-@date    	15/06/2024
-
-Note: The contents of this file must not be updated by students. Otherwise,
-something that works for you will not work for me. If you want something to be
-modified, updated, or altered and it is useful for the entire class, please
-speak to me.
-
-This file contains definitions of member functions of class GLShader.
-Please see the class declaration for information about these functions.
-
-*//*__________________________________________________________________________*/
 #include <glslshader.h>
 #include <iostream>
 #include <fstream>
@@ -229,6 +214,17 @@ void GLSLShader::BindFragDataLocation(GLuint color_number, GLchar const* name) {
   glBindFragDataLocation(pgm_handle, color_number, name);
 }
 
+void GLSLShader::SetUniformVec2(GLchar const* name, glm::vec2 const& v) {
+    GLint location = GetUniformLocation(name, false);
+    if (location >= 0) {
+        glUniform2f(location, v.x, v.y);
+    }
+}
+
+void GLSLShader::SetUniform2f(GLchar const* name, glm::vec2 const& v) {
+    GLint loc = GetUniformLocation(name, true);
+    glUniform2f(loc, v.x, v.y);
+}
 void GLSLShader::SetUniform(GLchar const* name, GLboolean val) {
   GLint loc = glGetUniformLocation(pgm_handle, name);
   if (loc >= 0) {

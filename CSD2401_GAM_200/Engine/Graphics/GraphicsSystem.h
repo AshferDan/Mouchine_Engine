@@ -1,4 +1,5 @@
 #pragma once
+#include "stb_image.h"
 #include "System.h"
 #include "gameObject.h"
 #include "glslshader.h"
@@ -9,9 +10,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "factory.h"
 #include "transform.h"
+#include "DebugSystem.h"
 #include <iostream>
 #include <RenderComponent.h>
 #include <fstream>
+
 
 class GraphicsSystem : public ISystem {
 public:
@@ -25,15 +28,30 @@ public:
 	static GLuint LoadTexture(const char* filepath);
 
 	GLFWwindow* getWindow() {return window;}
-
 	
+	void DrawLine(const glm::vec2& start, const glm::vec2& end,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	void DrawPoint(const glm::vec2& pos,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	void DrawRectOutline(float x, float y, float w, float h,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	void DrawCircleOutline(float cx, float cy, float r, int segments,
+		const glm::vec4& color, const glm::mat4& vp);
+
+	bool isDebugModeOn() const { return debugMode; }
+	void toggleDebugMode() { debugMode = !debugMode; }
+	const glm::mat4& getVp() const { return vp; }
 
 private:
+	glm::mat4 vp;
+	bool debugMode = false;
 	GLFWwindow* window;
 	GLSLShader shader;
-	GLuint vao, vbo, tex;
+	GLuint vao = 0, vbo = 0, tex = 0;
 	GLint Wwidth, Wheight;
-
 };
 
 

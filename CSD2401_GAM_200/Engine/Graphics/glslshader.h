@@ -1,23 +1,3 @@
-/* !
-@file       glslshader.h
-@author  	  pghali@digipen.edu
-@co-author  parminder.singh@digipen.edu, shaojun.g@digipen.edu
-@date    	  15/06/2024
-
-Note: The contents of this file must not be updated by students. Otherwise,
-something that works for you will not work for me. If you want something to be
-modified, updated, or altered and it is useful for the entire class, please
-speak to me.
-
-This file contains the declaration of class GLSLShader that encapsulates the
-functionality required to load shader source; compile shader source; link
-shader objects into a program object, validate program object; log msesages
-from compiling linking, and validation steps; install program object in
-appropriate shaders; and pass uniform variables from the client to the
-program object.
-
-*//*__________________________________________________________________________*/
-
 /*                                                                      guard
 ----------------------------------------------------------------------------- */
 #ifndef GLSLSHADER_H
@@ -36,6 +16,7 @@ class GLSLShader {
   /*! GLSLShader class.
   */
 public:
+
 
   // default ctor required to initialize GLSLShader object to safe state
   GLSLShader() : pgm_handle(0), is_linked(GL_FALSE) { /* empty by design */ }
@@ -146,6 +127,8 @@ public:
   void SetUniform(GLchar const* name, glm::mat2 const& val);
   void SetUniform(GLchar const* name, glm::mat3 const& val);
   void SetUniform(GLchar const* name, glm::mat4 const& val);
+  void SetUniformVec2(GLchar const* name, glm::vec2 const& v);
+  void SetUniform2f(GLchar const* name, glm::vec2 const& v);
 
   // display the list of active vertex attributes used by vertex shader
   void PrintActiveAttribs() const;

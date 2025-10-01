@@ -43,7 +43,8 @@ class GameObject {
 public:
 
     GameObject(EntityID id, const std::string& name = "GameObject");
-
+    GameObject* Clone(const std::string& newName = "")const;
+    
     ~GameObject();
 
     // Component management
@@ -108,6 +109,19 @@ public:
     /*======================================================================================
 
    ========================================================================================*/
+
+    template<typename T>
+    T* AddComponent(std::unique_ptr<T> component) {
+        // 1. Get the raw pointer to return before moving ownership
+        T* raw_ptr = component.get();
+
+        // 2. Insert the component into the map, casting the unique_ptr to the base type
+        std::type_index typeIndex(typeid(T));
+        components[typeIndex] = std::move(component);
+
+        return raw_ptr;
+    }
+
     // GameObject lifecycle
     void Initialize();
     void Update(float deltaTime);
