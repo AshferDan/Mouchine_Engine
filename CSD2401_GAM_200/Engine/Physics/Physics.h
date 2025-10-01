@@ -7,7 +7,6 @@ class PhysicsComponent : public IComponent {
 public:
     PhysicsComponent(GameObject* owner, float mass = 1.0f, bool isStatic = false);
 
-    void Update(float deltaTime) override;
     std::string GetName() const override { return "PhysicsComponent"; }
 
     // Velocity

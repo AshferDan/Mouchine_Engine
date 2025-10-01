@@ -12,27 +12,6 @@ PhysicsComponent::PhysicsComponent(GameObject* owner, float m, bool static_)
     gravityX(0), gravityY(-9.81f) {
 }
 
-void PhysicsComponent::Update(float deltaTime) {
-    if (isStatic) return;
-
-    // Apply gravity
-    if (useGravity) {
-        ApplyGravity(deltaTime);
-    }
-
-    // REMOVED THE BUGGY LINES THAT WERE ADDING mass * deltaTime TO VELOCITY
-    // velocityX += mass * deltaTime;  // THIS WAS WRONG
-    // velocityY += mass * deltaTime;  // THIS WAS WRONG
-
-    // Update position based on current velocity
-    UpdatePosition(deltaTime);
-
-    // Reset jump flag when grounded
-    if (isGrounded && velocityY <= 0) {
-        isJumping = false;
-    }
-}
-
 void PhysicsComponent::SetVelocity(float x, float y) {
     velocityX = x;
     velocityY = y;
@@ -54,7 +33,8 @@ void PhysicsComponent::Jump(float jumpForce) {
         isJumping = true;
         isGrounded = false;
 
-        std::cout << owner->GetName() << " jumped!" << std::endl;
+        std::cout << owner->GetName() << " jumped with force " << jumpForce
+            << "! New VelY: " << velocityY << std::endl;
     }
 }
 

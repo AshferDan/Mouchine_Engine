@@ -34,49 +34,88 @@ void InputManager::Update(float dt) {
         return;
     }
 
-    TransformComponent* transform = player->GetComponent<TransformComponent>();
+     auto* physics = player->GetComponent<PhysicsComponent>();
+     if (!physics) {
+         return;
+     }
+
+     TransformComponent* transform = player->GetComponent<TransformComponent>();
      if (!transform) {
          return;
      }
 
-     float x, y;
-     transform->GetPosition(x, y);
+     //float x, y;
+     //transform->GetPosition(x, y);
 
-     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-         std::cout << "UP" << std::endl;
-         y += movementspeed;
-     }
+     // Get current velocity
+     float vx, vy;
+     physics->GetVelocity(vx, vy);
+
+     //-----------------OLD SYSTEM USING TRANSFORM FOR MOVEMENT -----------------//
+     // 
+     //if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+     //    std::cout << "UP" << std::endl;
+     //    y += movementspeed;
+     //}
+     //if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+     //    std::cout << "LEFT" << std::endl;
+     //    x -= movementspeed;
+     //}
+     //if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+     //    std::cout << "RIGHT" << std::endl;
+     //    x += movementspeed;
+     //}
+     //if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+     //    std::cout << "DOWN" << std::endl;
+     //    y -= movementspeed;
+     //}
+
+     //if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+     //    if (!isJumping) {
+     //        isJumping = true;
+     //        jumpStartY = y;
+     //    }
+
+     //    if (y < jumpStartY + jumpMaxHeight) {
+     //        y += jumpSpeed * dt;
+     //        if (y > jumpStartY + jumpMaxHeight) {
+     //            y = jumpStartY + jumpMaxHeight;
+     //        }
+     //    }
+     //}
+     //else {
+     //    isJumping = false;
+     //}
+
+     //transform->SetPosition(x, y);
+
+
+     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
+     // Horizontal movement
+     float moveSpeed = 5.0f;  // Movement speed
+
      if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-         std::cout << "LEFT" << std::endl;
-         x -= movementspeed;
+         vx = -moveSpeed;
      }
-     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-         std::cout << "RIGHT" << std::endl;
-         x += movementspeed;
-     }
-     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-         std::cout << "DOWN" << std::endl;
-         y -= movementspeed;
-     }
-
-     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-         if (!isJumping) {
-             isJumping = true;
-             jumpStartY = y;
-         }
-
-         if (y < jumpStartY + jumpMaxHeight) {
-             y += jumpSpeed * dt;
-             if (y > jumpStartY + jumpMaxHeight) {
-                 y = jumpStartY + jumpMaxHeight;
-             }
-         }
+     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+         vx = moveSpeed;
      }
      else {
-         isJumping = false;
+         // No horizontal input - slow down
+         vx = 0.0f;
      }
 
-     transform->SetPosition(x, y);
+     // Jump
+     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+         // Only jump if grounded
+         if (physics->IsGrounded()) {
+             physics->Jump(10.0f);  // Jump force
+             physics->GetVelocity(vx, vy);
+         }
+     }
+
+     // Apply the horizontal velocity (vertical is handled by gravity/jump)
+     physics->SetVelocity(vx, vy);
 
      //Mouse
      if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {

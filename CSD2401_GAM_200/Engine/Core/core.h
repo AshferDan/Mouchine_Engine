@@ -12,6 +12,7 @@ class GraphicsSystem;
 class ImGuiSystem;
 class InputManager;
 class CollisionSystem;
+class PhysicsSystem;
 
 class CoreEngine {
 public:
@@ -51,6 +52,10 @@ public:
         return collisionSystem;
     }
 
+    PhysicsSystem* GetPhysicsSystem() const {
+        return physicsSystem;
+    }
+
     void ConfigFile(const char* configF);
 
     void setWindsize(int w, int h) {
@@ -72,6 +77,7 @@ private:
     ImGuiSystem* imguiSystem = nullptr;
     InputManager* inputManager = nullptr;
     CollisionSystem* collisionSystem = nullptr;
+    PhysicsSystem* physicsSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;

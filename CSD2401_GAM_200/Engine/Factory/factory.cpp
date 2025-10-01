@@ -22,7 +22,7 @@ GameObject* GameObjectFactory::CreatePlayer(const std::string& name, RenderCompo
     GameObject* player = CreateGameObject(name);
 
     auto* transform = player->AddComponent<TransformComponent>(x, y);
-    auto* physics = player->AddComponent<PhysicsComponent>(0,0);
+    auto* physics = player->AddComponent<PhysicsComponent>(1.0f,false);
     auto render = player->AddComponent<RenderComponent>(shape,color);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);

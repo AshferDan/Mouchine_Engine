@@ -10,6 +10,7 @@
 #include "ImGuiSystem.h"
 #include "InputManager.h"
 #include "CollisionSystem.h"
+#include "PhysicsSystem.h"
 
 
 CoreEngine* CORE;
@@ -50,11 +51,27 @@ void CoreEngine::ConfigFile(const char* configF)
 void CoreEngine::InitSystems() {
     CoreEngine::ConfigFile("../Logs/config.txt");
     std::cout << "Initializing default systems..." << std::endl;
-    gameObjectSystem = AddSystem<GameObjectSystem>();
-    graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
-    collisionSystem = AddSystem<CollisionSystem>();
+    // 1. Graphics first (needed for window)
+    graphicsSystem = AddSystem<GraphicsSystem>(WindWidth, WindHeight);
+
+    // 2. ImGui (needs graphics window)
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
+
+    // 3. Input Manager - MUST BE EARLY to capture input before physics updates
     inputManager = AddSystem<InputManager>(graphicsSystem->getWindow());
+
+    // 4. GameObject System
+    gameObjectSystem = AddSystem<GameObjectSystem>();
+
+    // 5. Collision System - detects collisions
+    collisionSystem = AddSystem<CollisionSystem>();
+
+    // 6. Physics System - processes collisions and applies physics
+    physicsSystem = AddSystem<PhysicsSystem>();
+
+    // Connect CollisionSystem to PhysicsSystem
+    collisionSystem->SetPhysicsSystem(physicsSystem);
+
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
