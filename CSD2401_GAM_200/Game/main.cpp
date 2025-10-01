@@ -66,14 +66,14 @@ int main()
     resourceMgr.PrintLoadedResources();
 
     // register the sound with audio engine to play it
-    std::cout << "\n--- Starting Background Music ---" << std::endl;
-    AudioResource *bgMusic = resourceMgr.GetAudio("bgm");
-    if (bgMusic && bgMusic->IsLoaded())
-    {
-        audio.registerSound("bgm", bgMusic->GetSound());
-        audio.playSound("bgm", "bgm_channel");
-        audio.setVolume("bgm_channel", 1.0f);
-    }
+    //std::cout << "\n--- Starting Background Music ---" << std::endl;
+    //AudioResource *bgMusic = resourceMgr.GetAudio("bgm");
+    //if (bgMusic && bgMusic->IsLoaded())
+    //{
+    //    audio.registerSound("bgm", bgMusic->GetSound());
+    //    audio.playSound("bgm", "bgm_channel");
+    //    audio.setVolume("bgm_channel", 1.0f);
+    //}
 
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();

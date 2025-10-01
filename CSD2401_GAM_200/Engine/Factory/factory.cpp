@@ -272,7 +272,7 @@ void DemoM1_SpawnGameObjects()
     for (size_t i = 0; i < 2500; i++) 
     {
         int intX{ distributionX(gen) }, intY{ distributionY(gen) };
-        GameObject* newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+        GameObject* newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Default);
         //GameObject* newGO = factory.CreateAnimatedImage("MouchRunner", static_cast<float>(intX), static_cast<float>(intY), 100.0f, 100.0f, "../Assets/Mouch_Running.png", 1, 2, 0, 7,9.0f);
         vecGOs.push_back(newGO);
     }
