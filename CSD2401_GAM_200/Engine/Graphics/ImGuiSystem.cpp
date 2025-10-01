@@ -24,6 +24,8 @@ void ImGuiSystem::Initialize() {
 }
 
 void ImGuiSystem::Update(float dt) {
+	auto start = std::chrono::high_resolution_clock::now();
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -86,8 +88,13 @@ void ImGuiSystem::Update(float dt) {
 	// Performance Profiler
 	ImGui::Separator();
 	ImGui::Text("=== Performance Profiler ===");
-	
-	// Display Bars
+
+	// Update timing for ImGui System so the bar shows
+	g_systemTimings["ImGui System"] = 0.0;
+	auto end = std::chrono::high_resolution_clock::now();
+	g_systemTimings["ImGui System"] = std::chrono::duration<double, std::milli>(end - start).count();
+
+
 	std::map<std::string, double>::iterator it;
 	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
 		const std::string& name = it->first;

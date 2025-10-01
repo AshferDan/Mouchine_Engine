@@ -81,20 +81,22 @@ void CoreEngine::GameLoop() {
             // Clear previous frame timings
             g_systemTimings.clear();
 
+            // Update all systems that do NOT depend on ImGui
             for (size_t i = 0; i < Systems.size(); ++i) {
+                if (Systems[i]->GetName() == "ImGui System") continue; // Skip ImGui for now
+
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-
                 Systems[i]->Update(CoreEngine::GetDeltaTime());
-
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
 
-                // Record timing
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[Systems[i]->GetName()] = ms;
             }
 
+            // Update ImGui System
+            imguiSystem->Update(CoreEngine::GetDeltaTime());
+
             // Total loop time
-            std::chrono::high_resolution_clock::time_point loopEnd = std::chrono::high_resolution_clock::now();
             g_totalLoopTime = 0.0;
             std::map<std::string, double>::iterator it;
             for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
