@@ -43,9 +43,11 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(0, 0);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     auto render = player->AddComponent<RenderComponent>(texID);
+    physics->SetGravity(true); // Enable/Disable gravity
+    physics->SetStatic(false);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);
-    physics->SetGravity(false);
+    physics->SetGravity(true);
 
     if (shape == RenderComponent::ShapeType::Circle)
     {

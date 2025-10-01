@@ -67,12 +67,6 @@ int main()
 
     GameObject *Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 1920.f, 1080.f, "../Assets/wallpaper_transparent.png");
     GameObject *player = factory.CreatePlayer("Hero", RenderComponent::ShapeType::Square, -7, 0, 100, 100, "../Assets/protosprite.png", CollisionLayer::Player);
-    float x, y;
-    player->GetComponent<TransformComponent>()->GetPosition(x, y);
-    auto *playerPhysics = player->GetComponent<PhysicsComponent>();
-    playerPhysics->SetGravity(true); // Enable/Disable gravity
-    playerPhysics->SetStatic(false);
-
     // Create ground at the bottom of the screen (black rectangle)
     GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
     // Make ground static so it doesn't fall

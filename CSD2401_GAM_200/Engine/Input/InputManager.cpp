@@ -33,6 +33,24 @@ void InputManager::Update(float dt)
         return;
     }
 
+    for (auto& kv : singleTriggerKeys) {
+        int key = kv.first;
+        bool& wasPressed = kv.second;
+
+        if (glfwGetKey(window, key) == GLFW_PRESS) {
+            if (!wasPressed) {
+                if (key == GLFW_KEY_F1) {
+                    CORE->GetGraphicsSystem()->toggleDebugMode();
+                    std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
+                }
+            }
+            wasPressed = true;
+        }
+        else {
+            wasPressed = false;
+        }
+    }
+
     auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
     if (!player)
     {
@@ -54,26 +72,6 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        std::cout << "UP" << std::endl;
-        y += movementspeed * dt;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        std::cout << "LEFT" << std::endl;
-        x -= movementspeed * dt;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        std::cout << "RIGHT" << std::endl;
-        x += movementspeed * dt;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        std::cout << "DOWN" << std::endl;
-        y -= movementspeed * dt;
-    }
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
