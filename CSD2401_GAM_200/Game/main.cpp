@@ -17,6 +17,7 @@
      CoreEngine engine;
      AudioEngine audio;
      engine.SetAudioEngine(&audio);
+
      std::cout << "\n--- Initializing Engine ---" << std::endl;
      engine.Init();
 
@@ -24,48 +25,33 @@
      std::cout << "\n--- Initialising Audio System ---" << std::endl;
      if (!audio.initialiseAudio())
      {
-         std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
+         std::cout << "Audio system failed to initialise, continuing without audio" << std::endl;
      }
      else
      {
-         std::cout << "audio system initialised successfully!" << std::endl;
+         std::cout << "Audio system initialised successfully" << std::endl;
      }
 
      // Initialising ResourceManager
-     std::cout << "\n--- Initializing Resource Manager ---" << std::endl;
+     std::cout << "\n--- Initialising Resource Manager ---" << std::endl;
      auto& resourceMgr = ResourceManager::Instance();
-
-     // link audio engine to resource manager for audio loading
      resourceMgr.SetAudioEngine(&audio);
-     std::cout << "\n--- Loading Resources ---" << std::endl;
 
      // load textures
      resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
 
      // load audio files
      resourceMgr.LoadAudio("bgm", "../Assets/audio/awesomeness.wav", true); // looping
-     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
      resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false); // when jumping only
+     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
 
      // print loaded resources
      resourceMgr.PrintLoadedResources();
 
-     // register the sound with audio engine to play it
+     // register the sound with audio engine
      std::cout << "\n--- Starting Background Music ---" << std::endl;
-     AudioResource* bgMusic = resourceMgr.GetAudio("bgm");
-     if (bgMusic && bgMusic->IsLoaded())
-     {
-         audio.registerSound("bgm", bgMusic->GetSound());
-         audio.playSound("bgm", "bgm_channel");
-         audio.setVolume("bgm_channel", 1.0f);
-         //SendMessage(new soundMessage("jump"));
-     }
-     AudioResource* jumpSound = resourceMgr.GetAudio("jump_sfx");
-     if (jumpSound && jumpSound->IsLoaded()) {
-         audio.registerSound("jump_sfx", jumpSound->GetSound());
-         //audio.setVolume("jump_channel", 0.5f);
-     }
-
+     audio.playSound("bgm", "bgm_channel"); 
+     audio.setVolume("bgm_channel", 1.0f);
 
      std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
      auto& factory = GameObjectFactory::Instance();

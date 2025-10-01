@@ -20,7 +20,7 @@ bool AudioEngine::initialiseAudio() {
 		return false;
 	}
 
-	std::cout << "audio initialised sucessfully" << std::endl;
+	std::cout << "Audio initialised sucessfully" << std::endl;
 	return true;
 }
 
@@ -41,24 +41,24 @@ void AudioEngine::stopAudio() {
 		system = nullptr;
 	}
 
-	std::cout << "audio stopped successfully" << std::endl;
+	std::cout << "Audio stopped successfully" << std::endl;
 }
 
 /*   Sound loading  */
 bool AudioEngine::registerSound(const std::string& name, FMOD::Sound* sound) {
 	if (!system) {
-		std::cout << "audio system not initialised" << std::endl;
+		std::cout << "Audio system not initialised" << std::endl;
 		return false;
 	}
 
 	// check if sound already exists
 	if (sounds.find(name) != sounds.end()) {
-		std::cout << "sound: " << name << " already registered" << std::endl;
+		std::cout << "Sound " << name << " already registered" << std::endl;
 		return true;
 	}
 
 	sounds[name] = sound;
-	std::cout << "registered sound: " << name << std::endl;
+	std::cout << "Registered sound: " << name << std::endl;
 	return true;
 }
 
@@ -69,7 +69,7 @@ bool AudioEngine::loadSound(const std::string& name, const std::string& filepath
 	}
 	// check sound exist
 	if (sounds.find(name) != sounds.end()) {
-		std::cout << "sound: " << name << " alr loaded" << std::endl;
+		std::cout << "Sound: " << name << " alr loaded" << std::endl;
 		return true;
 	}
 	FMOD::Sound* sound = nullptr;
@@ -84,11 +84,11 @@ bool AudioEngine::loadSound(const std::string& name, const std::string& filepath
 	// load the audio file
 	FMOD_RESULT result = system->createSound(filepath.c_str(), mode, nullptr, &sound);
 	if (result != FMOD_OK) {
-		checkError(result, "loading sound " + filepath);
+		checkError(result, "Loading sound " + filepath);
 		return false;
 	}
 	sounds[name] = sound;
-	std::cout << "loaded sound from " << filepath << std::endl;
+	std::cout << "Loaded sound from " << filepath << std::endl;
 	return true;
 }
 
@@ -97,7 +97,7 @@ void AudioEngine::unloadSound(const std::string& name) {
 	if (it != sounds.end()) {
 		it->second->release();
 		sounds.erase(it);
-		std::cout << "unloaded sound: " << name << std::endl;
+		std::cout << "Unloaded sound: " << name << std::endl;
 	}
 }
 
@@ -107,26 +107,26 @@ void AudioEngine::unloadAllSound() {
 	}
 	sounds.clear();
 	channels.clear();
-	std::cout << "all sounds unloaded" << std::endl;
+	std::cout << "All sound unloaded" << std::endl;
 }
 
 /*  Playback controls  */
 bool AudioEngine::playSound(const std::string& name, const std::string& channelName) {
 	if (!system) {
-		std::cout << "audio system not initialised..." << std::endl;
+		std::cout << "Audio system not initialised..." << std::endl;
 		return false;
 	}
 
 	auto soundIt = sounds.find(name);
 	if (soundIt == sounds.end()) {
-		std::cout << "sound cant be found: " << name << std::endl;
+		std::cout << "Sound cant be found: " << name << std::endl;
 		return false;
 	}
 
 	FMOD::Channel* channel = nullptr;
 	FMOD_RESULT result = system->playSound(soundIt->second, nullptr, false, &channel);
 	if (result != FMOD_OK) {
-		checkError(result, "playing sound: " + name);
+		checkError(result, "Sound playing: " + name);
 		return false;
 	}
 
@@ -134,7 +134,7 @@ bool AudioEngine::playSound(const std::string& name, const std::string& channelN
 		channels[channelName] = channel;
 	}
 
-	std::cout << "playing soundd: " << name << std::endl;
+	std::cout << "Sound playing: " << name << std::endl;
 	return true;
 }
 
@@ -146,7 +146,7 @@ void AudioEngine::stopSound(const std::string& channelName) {
 		it->second->isPlaying(&isPlaying);
 		if (isPlaying) {
 			it->second->stop();
-			std::cout << "stopped sound on channle: " << channelName << std::endl;
+			std::cout << "Stopped sound on channel: " << channelName << std::endl;
 		}
 		channels.erase(it);
 	}
@@ -163,7 +163,7 @@ void AudioEngine::stopAllSound() {
 		}
 	}
 	channels.clear();
-	std::cout << "stopped all sounds" << std::endl;
+	std::cout << "Stopped all sound" << std::endl;
 }
 
 /*
@@ -189,7 +189,7 @@ void AudioEngine::masterVolume(float volume) {
 		if (masterGroup) {
 			volume = std::max(0.0f, std::min(1.0f, volume));
 			masterGroup->setVolume(volume); // set volume for all audio
-			std::cout << "set master volume to" << volume << std::endl;
+			std::cout << "Set master volume to" << volume << std::endl;
 		}
 	}
 }
