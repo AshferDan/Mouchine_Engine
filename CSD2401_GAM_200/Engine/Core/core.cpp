@@ -9,15 +9,12 @@
 #include <Physics.h>
 #include "ImGuiSystem.h"
 #include "InputManager.h"
-#include <map>
-#include <string>
-#include <chrono>
+#include "DebugSystem.h"
+
 
 CoreEngine* CORE;
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
-double g_totalLoopTime = 0.0;
-std::map<std::string, double> g_systemTimings; // ms per system
 
 CoreEngine::CoreEngine() {
     LastTime = 0;
@@ -57,6 +54,7 @@ void CoreEngine::InitSystems() {
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth,WindHeight);
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
     inputManager = AddSystem<InputManager>(graphicsSystem->getWindow());
+    debugSystem = AddSystem<DebugSystem>();
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
@@ -78,29 +76,9 @@ void CoreEngine::GameLoop() {
         while (!glfwWindowShouldClose(graphicsSystem->getWindow())) {
             update_time(fps_interval);
 
-            // Clear previous frame timings
-            g_systemTimings.clear();
-
-            // Update all systems that do NOT depend on ImGui
             for (size_t i = 0; i < Systems.size(); ++i) {
-                if (Systems[i]->GetName() == "ImGui System") continue; // Skip ImGui for now
 
-                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
                 Systems[i]->Update(CoreEngine::GetDeltaTime());
-                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[Systems[i]->GetName()] = ms;
-            }
-
-            // Update ImGui System
-            imguiSystem->Update(CoreEngine::GetDeltaTime());
-
-            // Total loop time
-            g_totalLoopTime = 0.0;
-            std::map<std::string, double>::iterator it;
-            for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
-                g_totalLoopTime += it->second;
             }
         }
     }

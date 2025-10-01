@@ -11,6 +11,7 @@ class GameObjectSystem;
 class GraphicsSystem;
 class ImGuiSystem;
 class InputManager;
+class DebugSystem;
 
 class CoreEngine {
 public:
@@ -45,6 +46,11 @@ public:
     InputManager* GetInputManager() const {
         return inputManager;
     }
+
+    DebugSystem* GetDebugSystem() const {
+        return debugSystem;
+    }
+
     void ConfigFile(const char* configF);
 
     void setWindsize(int w, int h) {
@@ -65,6 +71,7 @@ private:
     GraphicsSystem* graphicsSystem = nullptr;
     ImGuiSystem* imguiSystem = nullptr;
     InputManager* inputManager = nullptr;
+    DebugSystem* debugSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;
