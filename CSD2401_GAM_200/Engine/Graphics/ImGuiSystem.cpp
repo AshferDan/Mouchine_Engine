@@ -4,7 +4,7 @@
 #include <chrono>
 #include <map>
 #include <string>
-
+#include "core.h"
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals 
 // being populated by CoreEngine *before* ImGui's display pass.
 extern std::map<std::string, double> g_systemTimings;
@@ -126,24 +126,6 @@ void ImGuiSystem::Update(float dt) {
 			ImGui::TreePop();
 		}
 	}
-	ImGui::Separator();
-	ImGui::Text("=== Performance Profiler ===");
-
-	std::map<std::string, double>::iterator it;
-	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
-		const std::string& name = it->first;
-		double ms = it->second;
-		double percent = (g_totalLoopTime > 0.0) ? (ms / g_totalLoopTime) * 100.0 : 0.0;
-
-		// Add a small ImGui::Text displaying the total frame time first for context
-		if (it == g_systemTimings.begin()) {
-			ImGui::Text("Total System Time: %.3f ms (Excludes GLFW swap/poll)", g_totalLoopTime);
-			ImGui::Separator();
-		}
-
-		ImGui::Text("%-20s %.4f ms (%.1f%%)", name.c_str(), ms, percent);
-		ImGui::ProgressBar((float)(percent / 100.0f), ImVec2(0.0f, 0.0f));
-	}
 
 	ImGui::End();
 
@@ -263,6 +245,29 @@ void ImGuiSystem::Update(float dt) {
 
 		ImGui::End();
 	}
+
+	ImGui::Begin("=== Performance Profiler ===");
+	ImVec2 IMwindpos{ 1400,100 };
+	ImGui::SetWindowPos(IMwindpos);
+
+	std::map<std::string, double>::iterator it;
+	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
+		const std::string& name = it->first;
+		double ms = it->second;
+		double percent = (g_totalLoopTime > 0.0) ? (ms / g_totalLoopTime) * 100.0 : 0.0;
+
+		// Add a small ImGui::Text displaying the total frame time first for context
+		if (it == g_systemTimings.begin()) {
+			ImGui::Text("Total System Time: %.3f ms", g_totalLoopTime);
+			ImGui::Text("Total Frame Per Seconds: %f ms", CoreEngine::GetFPS());
+			ImGui::Text("Total Delta Time: %f ms", CoreEngine::GetDeltaTime());
+			ImGui::Separator();
+		}
+
+		ImGui::Text("%-20s %.4f ms (%.1f%%)", name.c_str(), ms, percent);
+		ImGui::ProgressBar((float)(percent / 100.0f), ImVec2(0.0f, 0.0f));
+	}
+	ImGui::End();
 
 
 	//Render ImGui

@@ -1,6 +1,7 @@
 #include "inputmanager.h"
 #include <iostream>
 #include <unordered_map>
+#include "Animator.hpp"
 
 InputManager::InputManager(GLFWwindow *window) : window(window), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
 {
@@ -89,18 +90,24 @@ void InputManager::Update(float dt)
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
     float moveSpeed = 200.0f; // Movement speed
-
+    float moveDirectionX = 0.0f; // Track intended direction (1=Right, -1=Left)
+    bool is_jumping= false;
+   
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
         vx = -moveSpeed;
+     
+        moveDirectionX = -1.0f;
     }
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         vx = moveSpeed;
+       
+        moveDirectionX = 1.0f;
     }
     else
     {
-        // No horizontal input - slow down
+   
         vx = 0.0f;
     }
 
@@ -108,10 +115,69 @@ void InputManager::Update(float dt)
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
         // Only jump if grounded
+        is_jumping = true;
         if (physics->IsGrounded())
         {
+            is_jumping = false;
             physics->Jump(400.0f); // Jump force
-            physics->GetVelocity(vx, vy);
+            physics->GetVelocity(vx, vy); // Get updated VY after jump
+        }
+    }
+    auto* anim = player->GetComponent<Spritesheet>();
+
+    if (transform && anim) {
+
+        // --- A. HORIZONTAL FLIP LOGIC ---
+        // ... (Your flip logic is fine here) ...
+        if (std::abs(moveDirectionX) > 0.0f) {
+            float baseWidth = std::abs(transform->scaleX);
+            float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
+            transform->SetScale(newScaleX, transform->scaleY);
+        }
+
+        // --- B. ANIMATION SWITCHING LOGIC (Idling vs Running) ---
+
+        // **Animation Constants - CORRECTED END FRAME INDEX (0 and 1 for 2 columns)**
+        const char* IDLE_SS = "../Assets/Mouch_Idle.png";
+        int _ROWS = 1;
+        int _COLS = 2;
+        const int FRAME_START = 0;
+        const int FRAME_END = 1; 
+        const float IDLE_FPS = 4.0f;
+        const float RUN_FPS = 7.0f;
+        const char* RUN_SS = "../Assets/Mouch_Running.png";
+        const char* JUMP_SS = "../Assets/Mouch_jump.png";
+        // --------------------------------------------------------
+
+        float newFPS;
+        const char* newSpritesheet;
+
+        if (std::abs(vx) > 0.0f) // Player is running/moving
+        {
+            newFPS = RUN_FPS;
+            newSpritesheet = RUN_SS;
+        }
+        else if (is_jumping) {
+            _COLS = 1;
+            newFPS = 0;
+            newSpritesheet = JUMP_SS;
+        }
+        else // Player is stopped (vx is 0)
+        {
+            newFPS = IDLE_FPS;
+            newSpritesheet = IDLE_SS;
+        }
+
+        float desiredTimePerFrame = 1.0f / newFPS;
+
+        
+        if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
+        {
+            // 1. Load the new texture (This is the crucial step that was being skipped)
+            anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
+
+            // 2. Set the new animation speed and range
+            anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
         }
     }
 

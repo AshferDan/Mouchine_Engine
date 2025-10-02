@@ -138,7 +138,7 @@ void GraphicsSystem::Update(float dt)
     if (!window)
         return;
 
-    glClearColor(0.2f, 0.5f, 0.5f, 0.0f);
+    glClearColor(0.6f, 0.5f, 0.45f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glLineWidth(2.f);
     glPointSize(50.f);
