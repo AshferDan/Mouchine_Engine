@@ -52,7 +52,7 @@ public:
 	void Initialize() override;
 
 	// Called each frame to handle rendering updates.
-	void Update(float dt) override;
+	void Update(float) override;
 
 	/// Returns system name for debugging/identification.
 	std::string GetName() override;
@@ -81,7 +81,7 @@ public:
 	 *   gfx.DrawLine({0,0}, {1,1}, {1,0,0,1}, cameraVP);
 	 */
 	void DrawLine(const glm::vec2& start, const glm::vec2& end,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
 	/**
 	 * @brief Draws a debug point at a position.
@@ -90,7 +90,7 @@ public:
 	 * @param vp View-projection matrix.
 	 */
 	void DrawPoint(const glm::vec2& pos,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
 	/**
 	 * @brief Draws the outline of a rectangle.
@@ -102,7 +102,7 @@ public:
 	 * @param vp View-projection matrix.
 	 */
 	void DrawRectOutline(float x, float y, float w, float h,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
 	/**
 	 * @brief Draws a circle outline using line segments.
@@ -117,7 +117,7 @@ public:
 	 *   gfx.DrawCircleOutline(0, 0, 1.0f, 32, {0,1,0,1}, cameraVP);
 	 */
 	void DrawCircleOutline(float cx, float cy, float r, int segments,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
 	// Returns whether debug mode is enabled.
 	bool isDebugModeOn() const { return debugMode; }

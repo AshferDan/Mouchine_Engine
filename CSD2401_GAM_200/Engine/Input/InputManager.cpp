@@ -28,7 +28,7 @@ void InputManager::Initialize()
     // glfwSetScrollCallback(window, InputManager::mousescroll_cb);
 }
 
-void InputManager::Update(float dt)
+void InputManager::Update(float)
 {
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},

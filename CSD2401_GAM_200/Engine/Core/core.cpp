@@ -8,7 +8,7 @@ double CoreEngine::delta_time = 0.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 
-CoreEngine::CoreEngine()
+CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0)
 {
     LastTime = 0;
     GameActive = true;
@@ -102,7 +102,7 @@ void CoreEngine::GameLoop()
                     continue;
 
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                Systems[i]->Update(CoreEngine::GetDeltaTime());
+                Systems[i]->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
 
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
@@ -115,7 +115,7 @@ void CoreEngine::GameLoop()
             {
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
 
-                imguiSystem->Update(CoreEngine::GetDeltaTime());
+                imguiSystem->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
 
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
 

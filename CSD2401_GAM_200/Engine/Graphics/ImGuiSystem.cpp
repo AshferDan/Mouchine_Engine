@@ -44,7 +44,7 @@ void ImGuiSystem::Initialize() {
 	ShowCreateGOMenu = false;
 }
 
-void ImGuiSystem::Update(float dt) {
+void ImGuiSystem::Update(float) {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -251,7 +251,7 @@ void ImGuiSystem::Update(float dt) {
 	static std::map<std::string, float> smoothedMs;
 	static std::map<std::string, float> smoothedPercent;
 
-	const float lerpSpeed = 0.05; // smaller = smoother
+	const float lerpSpeed = static_cast<float>(0.05); // smaller = smoother
 
 	std::map<std::string, double>::iterator it;
 	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {

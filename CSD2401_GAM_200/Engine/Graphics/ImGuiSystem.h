@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ImGuiSystem.h
-\author     Guan Shao Jun [100%]
+\author     Guan Shao Jun [95%]
 \par        shaojun.g@digipen.edu
 \date       October 02 2025
 
@@ -54,7 +54,7 @@ public:
      * @brief Update and render ImGui elements each frame.
      * @param dt Delta time since last frame.
      */
-    void Update(float dt) override;
+    void Update(float) override;
 
     /**
      * @brief Return the system's name for identification.

@@ -18,7 +18,7 @@ void DebugSystem::Initialize() {
 	// Initialize the DebugSystem (currently empty)
 }
 
-void DebugSystem::Update(float dt) {
+void DebugSystem::Update(float) {
 	// Update the DebugSystem each frame (currently empty)
 }
 

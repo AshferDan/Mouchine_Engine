@@ -67,7 +67,7 @@ GraphicsSystem::GraphicsSystem()
     Wheight = fbHeight;
 }
 
-GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h)
+GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(0)
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -188,7 +188,7 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribBinding(vao, 1, 0); // bind attribute 1 to binding point 0
 }
 
-void GraphicsSystem::Update(float dt)
+void GraphicsSystem::Update(float)
 {
     if (!window)
         return; // Skip if no valid window.
@@ -202,7 +202,6 @@ void GraphicsSystem::Update(float dt)
     // Use main shader program
     shader.Use();
 
-    float aspect = static_cast<float>(Wwidth) / static_cast<float>(Wheight);
     // Orthographic projection: origin at bottom-left, size = window width/height
     glm::mat4 projection = glm::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
 
@@ -229,7 +228,7 @@ void GraphicsSystem::Update(float dt)
 
     // === Render All Active GameObjects ===
     auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
-    int count = 0;
+    //int count = 0;
     for (auto& obj : gameObjects)
     {
         if (!obj->IsActive())
@@ -322,7 +321,7 @@ void GraphicsSystem::Update(float dt)
                     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                     if (debugMode) {
                         if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
-                            DrawCircleOutline(x, y, sx*0.5, sy, { 0,1,0,1 }, vp);
+                            DrawCircleOutline(x, y, static_cast<float>(sx*0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
                         }
                         else {
                             DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
@@ -353,7 +352,7 @@ void GraphicsSystem::Update(float dt)
 
 // Draw a line between two points in world space
 void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
-    const glm::vec4& color, const glm::mat4& vp)
+    const glm::vec4& color, const glm::mat4& viewProjection)
 {
     // Tell shader this is a line draw
     shader.SetUniform("uIsLine", 1);
@@ -380,7 +379,7 @@ void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
     // Send MVP matrix
-    shader.SetUniform("uMVP", vp);
+    shader.SetUniform("uMVP", viewProjection);
 
     // Draw the line
     glDrawArrays(GL_LINES, 0, 2);
@@ -392,7 +391,7 @@ void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
 
 // Draw a single point in world space
 void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
-    const glm::vec4& color, const glm::mat4& vp)
+    const glm::vec4& color, const glm::mat4& viewProjection)
 {
     // Tell shader this is NOT a line
     shader.SetUniform("uIsLine", 0);
@@ -417,7 +416,7 @@ void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
     // Send MVP matrix
-    shader.SetUniform("uMVP", vp);
+    shader.SetUniform("uMVP", viewProjection);
 
     // Make point visible (default = 1px, often too small)
     glPointSize(5.0f);
@@ -434,7 +433,7 @@ void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
 // Draw an axis-aligned rectangle outline centered at (x, y)
 // w = width, h = height
 void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
-    const glm::vec4& color, const glm::mat4& vp)
+    const glm::vec4& color, const glm::mat4& viewProjection)
 {
     // Half extents (distance from center to edge)
     float halfW = w / 2;
@@ -447,16 +446,16 @@ void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
     glm::vec2 p4(x - halfW, y + halfH); // top-left
 
     // Connect corners with lines (in order)
-    DrawLine(p1, p2, color, vp);
-    DrawLine(p2, p3, color, vp);
-    DrawLine(p3, p4, color, vp);
-    DrawLine(p4, p1, color, vp);
+    DrawLine(p1, p2, color, viewProjection);
+    DrawLine(p2, p3, color, viewProjection);
+    DrawLine(p3, p4, color, viewProjection);
+    DrawLine(p4, p1, color, viewProjection);
 }
 
 // Draw a circle outline centered at (cx, cy)
 // r = radius, segments = how many line segments to approximate the circle
 void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments,
-    const glm::vec4& color, const glm::mat4& vp)
+    const glm::vec4& color, const glm::mat4& viewProjection)
 {
     // Clamp to a minimum number of segments (otherwise circle looks too blocky)
     if (segments < 8)
@@ -476,7 +475,7 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
         glm::vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
 
         // Draw line between them
-        DrawLine(p1, p2, color, vp);
+        DrawLine(p1, p2, color, viewProjection);
     }
 }
 

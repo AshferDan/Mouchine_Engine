@@ -54,7 +54,7 @@ public:
 		ofs.write(reinterpret_cast<const char*>(&data), size);
 		return true;
 	}
-	bool WriteGameObjectData(GameObject& GO, size_t size) {
+	bool WriteGameObjectData(GameObject& GO, size_t) {
 		auto* transform = GO.GetComponent<TransformComponent>();
 		auto* render = GO.GetComponent<RenderComponent>();
 		if (!transform || !render) {
@@ -135,7 +135,7 @@ public:
 		return true;
 	}
 
-	bool ReadGameObjectData(GameObject const& GO, size_t size, std::stringstream& ss) {
+	bool ReadGameObjectData(GameObject const&, size_t, std::stringstream& ss) {
 		// name of GO, shape, pos (x,y), size (w, h), colour (vec4)
 		if (!IsStreamGood())
 		{

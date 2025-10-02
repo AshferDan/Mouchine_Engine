@@ -56,7 +56,8 @@ public:
         @param texID OpenGL texture ID
     */
     RenderComponent(GameObject* owner, GLuint texID)
-        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f) {
+        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point() {
+
     }
 
     /*! @brief Constructor for a shape
@@ -65,14 +66,14 @@ public:
         @param color Shape color
     */
     RenderComponent(GameObject* owner, ShapeType type, const glm::vec4& color)
-        : IComponent(owner), shape(type), textureID(0), color(color) {
+        : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
     };
 
     /*! @brief Lifecycle override: initialize component */
     void Initialize() override {}
 
     /*! @brief Lifecycle override: update component */
-    void Update(float dt) override {}
+    void Update(float) override {}
 
     /*! @brief Lifecycle override: destroy component */
     void Destroy() override {}
