@@ -41,7 +41,7 @@ void CoreEngine::ConfigFile(const char *configF)
 
 void CoreEngine::InitSystems()
 {
-    CoreEngine::ConfigFile("../Logs/config.txt");
+    CoreEngine::ConfigFile("./Logs/config.txt");
     std::cout << "Initializing default systems..." << std::endl;
     // 1. Graphics first (needed for window)
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth, WindHeight);
@@ -128,7 +128,7 @@ void CoreEngine::GameLoop()
     catch (const std::exception &e)
     {
         // Log standard exceptions to debuglog.txt
-        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        std::ofstream log("./Logs/CrashLog.txt", std::ios::app);
         log << "[EXCEPTION] " << e.what() << std::endl;
         log.close();
 
@@ -137,7 +137,7 @@ void CoreEngine::GameLoop()
     catch (...)
     {
         // Log unknown exceptions
-        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        std::ofstream log("./Logs/CrashLog.txt", std::ios::app);
         log << "[UNKNOWN EXCEPTION]" << std::endl;
         log.close();
 

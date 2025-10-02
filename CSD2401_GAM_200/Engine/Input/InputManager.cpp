@@ -170,15 +170,15 @@ void InputManager::Update(float dt)
         // --- B. ANIMATION SWITCHING LOGIC (Idling vs Running) ---
 
         // **Animation Constants - CORRECTED END FRAME INDEX (0 and 1 for 2 columns)**
-        const char* IDLE_SS = "../Assets/Mouch_Idle.png";
+        const char* IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1; 
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char* RUN_SS = "../Assets/Mouch_Running.png";
-        const char* JUMP_SS = "../Assets/Mouch_jump.png";
+        const char* RUN_SS = "./Assets/Mouch_Running.png";
+        const char* JUMP_SS = "./Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;

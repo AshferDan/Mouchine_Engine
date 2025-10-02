@@ -2,7 +2,7 @@
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
 
-const char *configFile = "../Logs/config.txt";
+const char *configFile = "./Logs/config.txt";
 
 GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0)
 {
@@ -97,8 +97,8 @@ void GraphicsSystem::Initialize()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Compile/link shaders
-    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Engine/Graphics/vertices.vert"},
-                                {GL_FRAGMENT_SHADER, "../Engine/Graphics/fragment.frag"}});
+    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "./Shaders/vertices.vert"},
+                                {GL_FRAGMENT_SHADER, "./Shaders/fragment.frag"}});
 
     // Quad geometry
     struct Vertex
