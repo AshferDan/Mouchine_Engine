@@ -84,7 +84,7 @@ int main()
 
     GameObject* animatedMouchidle = factory.CreateAnimatedImage(
         "AniImage",                 // name
-        -800.0f, 100.0f,                // x, y position
+        -700.0f, 100.0f,                // x, y position
         300.0f, 300.0f,                // width, height (scale)
         "../Assets/Mouch_idle.png",     // filename
         1, 2,                          //row,columns
@@ -94,7 +94,7 @@ int main()
 
     GameObject* animatedMouchRun = factory.CreateAnimatedImage(
         "AniImage",                 // name
-        800.0f, 100.0f,                // x, y position
+        700.0f, 100.0f,                // x, y position
         300.0f, 300.0f,                // width, height (scale)
         "../Assets/Mouch_Running.png", // filename
         1, 2,                          //row,columns
