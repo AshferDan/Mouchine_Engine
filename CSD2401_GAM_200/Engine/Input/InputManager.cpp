@@ -149,11 +149,11 @@ void InputManager::Update(float dt)
             is_jumping = false;
             physics->Jump(400.0f); // Jump force
             physics->GetVelocity(vx, vy); // Get updated VY after jump
+            // Play jump sound effect
+            if (audioEngine) {
+                audioEngine->playSound("jump_sfx", "jump_channel");
+            }
         }
-             // Play jump sound effect
-             if (audioEngine) {
-                 audioEngine->playSound("jump_sfx", "jump_channel");
-             }
     }
     auto* anim = player->GetComponent<Spritesheet>();
 

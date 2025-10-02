@@ -56,7 +56,7 @@ int main()
      // register the sound with audio engine
      std::cout << "\n--- Starting Background Music ---" << std::endl;
      audio.playSound("bgm", "bgm_channel"); 
-     audio.setVolume("bgm_channel", 1.0f);
+     audio.setVolume("bgm_channel", 0.5f);
 
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
