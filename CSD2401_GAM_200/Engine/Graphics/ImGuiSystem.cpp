@@ -247,8 +247,6 @@ void ImGuiSystem::Update(float dt) {
 	}
 
 	ImGui::Begin("=== Performance Profiler ===");
-	ImVec2 IMwindpos{ 1400,100 };
-	ImGui::SetWindowPos(IMwindpos);
 
 	std::map<std::string, double>::iterator it;
 	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
