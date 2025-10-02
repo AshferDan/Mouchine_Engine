@@ -1,6 +1,6 @@
 #include "Factory.h"
 #include "GraphicsSystem.h"
-
+#include "ResourceManager.h"
 #include "transform.h"
 #include "collision.h"
 #include "physics.h"
@@ -43,7 +43,7 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *transform = player->AddComponent<TransformComponent>(x, y);
     auto *physics = player->AddComponent<PhysicsComponent>(0, 0);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
-    // resource manager - check it out and return texture id
+    ResourceManager::Instance().PrintLoadedResources();
     auto render = player->AddComponent<RenderComponent>(texID);
     physics->SetGravity(true); // Enable/Disable gravity
     physics->SetStatic(false);

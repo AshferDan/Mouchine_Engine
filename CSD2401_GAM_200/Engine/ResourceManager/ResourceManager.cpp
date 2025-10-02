@@ -200,7 +200,9 @@ void ResourceManager::PrintLoadedResources() const {
 
     std::cout << "Textures (" << textures.size() << "):" << std::endl;
     for (const auto& pair : textures) {
-        std::cout << "  - " << pair.first << " -> " << pair.second->GetFilePath() << std::endl;
+        std::cout << "  - " << pair.first
+            << " (ID: " << pair.second->GetTextureID() << ")"
+            << " -> " << pair.second->GetFilePath() << std::endl;
     }
 
     std::cout << "Audio (" << audioResources.size() << "):" << std::endl;
