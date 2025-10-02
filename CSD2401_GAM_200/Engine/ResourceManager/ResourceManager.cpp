@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       ResourceManager.cpp
+\author     Leck Xin Yee [100%]
+\par        xinyee.leck@digipen.edu
+\date       October 02 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "ResourceManager.h"
 #include "GraphicsSystem.h"
 #include "audio.h"
@@ -9,7 +23,7 @@ TextureResource::~TextureResource() {
 
 bool TextureResource::Load(const std::string& filepath) {
     if (loaded) {
-        std::cout << "texture already loaded: " << filepath << std::endl;
+        std::cout << "Texture already loaded: " << filepath << std::endl;
         return true;
     }
 
@@ -23,7 +37,7 @@ bool TextureResource::Load(const std::string& filepath) {
     }
 
     loaded = true;
-    std::cout << "texture loaded successfully: " << filepath << " (id: " << textureID << ")" << std::endl;
+    std::cout << "Texture loaded successfully: " << filepath << " (id: " << textureID << ")" << std::endl;
 
     return true;
 }
@@ -33,7 +47,7 @@ void TextureResource::Unload() {
         glDeleteTextures(1, &textureID);
         textureID = 0;
         loaded = false;
-        std::cout << "texture unloaded: " << filepath << std::endl;
+        std::cout << "Texture unloaded: " << filepath << std::endl;
     }
 }
 
@@ -44,53 +58,58 @@ AudioResource::~AudioResource() {
 
 bool AudioResource::Load(const std::string& filepath) {
     if (loaded) {
+        std::cout << "Audio already loaded: " << filepath << std::endl;
         return true;
     }
 
-    if (!fmodSystem) {
-        std::cerr << "cannot load audio cause fmod system not set" << std::endl;
+    if (!audioEngine) {
+        std::cerr << "Cannot load audio: AudioEngine not set" << std::endl;
         return false;
     }
 
     this->filepath = filepath;
 
-    // fmod mode flags
-    FMOD_MODE mode = FMOD_DEFAULT;
-    if (loop) {
-        mode |= FMOD_LOOP_NORMAL;
-    }
-    else {
-        mode |= FMOD_LOOP_OFF;
-    }
+    // use audio engine load sound
+    bool success = audioEngine->loadSound(name, filepath, loop);
 
-    // load sound using fmod
-    FMOD_RESULT result = fmodSystem->createSound(filepath.c_str(), mode, nullptr, &sound);
-    if (result != FMOD_OK) {
-        std::cerr << "failed to load audio: " << filepath << " error: " << FMOD_ErrorString(result) << std::endl;
+    if (!success) {
+        std::cerr << "Failed to load audio through audio engine: " << filepath << std::endl;
         return false;
     }
 
     loaded = true;
-    std::cout << "audio loaded successfully: " << filepath << std::endl;
-
+    std::cout << "Audio loaded successfully through audio engine: " << filepath << std::endl;
     return true;
 }
 
 void AudioResource::Unload() {
-    if (loaded && sound) {
-        sound->release();
-        sound = nullptr;
+    if (loaded && audioEngine) {
+        // use audio engine unload sound
         loaded = false;
-        std::cout << "audio unloaded: " << filepath << std::endl;
+        std::cout << "Audio unloaded: " << filepath << std::endl;
     }
 }
 
+
 /*  Resource Manager Implementation  */
+//void ResourceManager::Initialize() {
+//    std::cout << "Resource Manager System initialized" << std::endl;
+//}
+//
+//void ResourceManager::Update(float dt) {
+//    // Empty for now - could add async loading, resource streaming, etc. later
+//    // You can leave this empty or add: (void)dt; to suppress unused parameter warning
+//}
+//
+//std::string ResourceManager::GetName() {
+//    return "Resource Manager System";
+//}
+
 TextureResource* ResourceManager::LoadTexture(const std::string& name, const std::string& filepath) {
     // Check if already loaded
     auto it = textures.find(name);
     if (it != textures.end()) {
-        std::cout << "texture '" << name << "' already loaded, returning existing resource" << std::endl;
+        std::cout << "Texture '" << name << "' already loaded, returning existing resource" << std::endl;
         return it->second.get();
     }
 
@@ -117,37 +136,34 @@ void ResourceManager::UnloadTexture(const std::string& name) {
     auto it = textures.find(name);
     if (it != textures.end()) {
         textures.erase(it);
-        std::cout << "texture '" << name << "' unloaded from resource manager" << std::endl;
+        std::cout << "Texture '" << name << "' unloaded from resource manager" << std::endl;
     }
 }
 
 AudioResource* ResourceManager::LoadAudio(const std::string& name, const std::string& filepath, bool loop) {
-    // check if already loaded
     auto it = audioResources.find(name);
     if (it != audioResources.end()) {
-        std::cout << "audio '" << name << "' already loaded, returning existing resource" << std::endl;
+        std::cout << "Audio '" << name << "' already loaded, returning existing resource" << std::endl;
         return it->second.get();
     }
 
     if (!audioEngine) {
-        std::cerr << "loading audio failed" << std::endl;
+        std::cerr << "Audio engine not set in resource manager" << std::endl;
         return nullptr;
     }
 
-    // create new audio resource
     auto audio = std::make_unique<AudioResource>();
     audio->SetName(name);
     audio->SetLoop(loop);
-    audio->SetFMODSystem(audioEngine->GetFMODSystem());
+    audio->SetAudioEngine(audioEngine);
 
     if (!audio->Load(filepath)) {
-        std::cerr << "failed to load audio: " << name << " from " << filepath << std::endl;
+        std::cerr << "Failed to load audio: " << name << " from " << filepath << std::endl;
         return nullptr;
     }
 
     AudioResource* ptr = audio.get();
     audioResources[name] = std::move(audio);
-
     return ptr;
 }
 
@@ -159,23 +175,23 @@ void ResourceManager::UnloadAudio(const std::string& name) {
     auto it = audioResources.find(name);
     if (it != audioResources.end()) {
         audioResources.erase(it);
-        std::cout << "audio '" << name << "' unloaded from resource manager" << std::endl;
+        std::cout << "Audio '" << name << "' unloaded from resource manager" << std::endl;
     }
 }
 
 void ResourceManager::UnloadAll() {
-    std::cout << "unloading all resources..." << std::endl;
+    std::cout << "Unloading all resources..." << std::endl;
     UnloadAllTextures();
     UnloadAllAudio();
 }
 
 void ResourceManager::UnloadAllTextures() {
-    std::cout << "unloading " << textures.size() << " textures" << std::endl;
+    std::cout << "Unloading " << textures.size() << " textures" << std::endl;
     textures.clear();
 }
 
 void ResourceManager::UnloadAllAudio() {
-    std::cout << "unloading " << audioResources.size() << " audio resources" << std::endl;
+    std::cout << "Unloading " << audioResources.size() << " audio resources" << std::endl;
     audioResources.clear();
 }
 
@@ -196,7 +212,7 @@ void ResourceManager::PrintLoadedResources() const {
 void ResourceManager::SetAudioEngine(AudioEngine* engine) {
     audioEngine = engine;
     if (audioEngine) {
-        std::cout << "audio engine set in resource manager" << std::endl;
+        std::cout << "Audio engine set in resource manager" << std::endl;
     }
 }
 
@@ -208,6 +224,6 @@ Resource* ResourceManager::GetResource(const std::string& name, std::map<std::st
         return it->second.get();
     }
 
-    std::cerr << "resource not found: " << name << std::endl;
+    std::cerr << "Resource not found: " << name << std::endl;
     return nullptr;
 }

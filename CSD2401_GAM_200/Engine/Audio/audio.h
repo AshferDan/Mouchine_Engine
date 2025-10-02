@@ -1,9 +1,24 @@
+/* Start Header ************************************************************************/
+/*!
+\file       audio.h
+\author     Leck Xin Yee [100%]
+\par        xinyee.leck@digipen.edu
+\date       October 02 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #ifndef AUDIO_H
 #define AUDIO_H
 
 #include "fmod.hpp"
 #include "fmod_studio.hpp"
 #include "fmod_errors.h"
+#include "System.h"
 
 #include <iostream>
 #include <string>
@@ -36,6 +51,7 @@ public:
 	bool playSound(const std::string& name, const std::string& channelName = "");
 	void stopSound(const std::string& channelName);
 	void stopAllSound();
+	void pauseSound(const std::string& channelName, bool pause);
 	//bool eventPlaying(const std::string& eventName);
 	//void stopEvent (const string& eventName);
 
@@ -48,6 +64,7 @@ public:
 	// error handling
 	void checkError(FMOD_RESULT result, const std::string& operation);
 	FMOD::System* GetFMODSystem() const { return system; }
+
 };
 
 
