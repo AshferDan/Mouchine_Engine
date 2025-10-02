@@ -122,7 +122,6 @@ void InputManager::Update(float dt)
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
@@ -140,6 +139,7 @@ void InputManager::Update(float dt)
         }
            
     }
+
     auto* anim = player->GetComponent<Spritesheet>();
 
     if (transform && anim) {
