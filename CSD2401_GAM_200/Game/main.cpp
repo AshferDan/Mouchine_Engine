@@ -66,7 +66,7 @@ int main()
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                 // name
         0.0f, 0.0f,                // x, y position
-        300.0f, 300.0f,                // width, height (scale)
+        150.0f, 150.0f,                // width, height (scale)
         "../Assets/Mouch_idle.png", // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame
