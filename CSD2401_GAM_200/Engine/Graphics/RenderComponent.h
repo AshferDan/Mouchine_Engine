@@ -41,9 +41,10 @@ public:
     
     // Getter for texture
     GLuint GetTextureID() const { return textureID; }
+    void SetTextureID(GLuint newID) { textureID = newID; }
     ShapeType GetShapeType() const { return shape; }
     glm::vec4 GetColor() const { return color; }
-    
+
     void SetColor(glm::vec4 newColor) {
         color = newColor ;
     }
@@ -58,6 +59,21 @@ public:
     LineData GetLine() const { return line; }
     PointData GetPoint() const { return point; }
 
+    const char* GetShapeTypeName()
+    {
+        switch (static_cast<int>(GetShapeType()))
+        {
+        case static_cast<int>(ShapeType::Square):
+            return "Square";
+        case static_cast<int>(ShapeType::Circle):
+            return "Circle";
+        case static_cast<int>(ShapeType::Line):
+            return "Line";
+        case static_cast<int>(ShapeType::Point):
+            return "Point";
+        }
+    }
+
 private:
     ShapeType shape;
     GLuint textureID;
@@ -66,3 +82,34 @@ private:
     LineData line;
     PointData point;
 };
+
+inline void ShapeEnumToString(std::string& shapeName, RenderComponent::ShapeType& shapeEnum) {
+    if (!shapeName.empty()) 
+    {
+        if (shapeName == "Square") { shapeEnum = RenderComponent::ShapeType::Square; }
+        else if (shapeName == "Circle") { shapeEnum = RenderComponent::ShapeType::Circle; }
+        else if (shapeName == "Line") { shapeEnum = RenderComponent::ShapeType::Line;}
+        else if (shapeName == "Point") { shapeEnum = RenderComponent::ShapeType::Point;}
+        else return;
+    }
+    else 
+    {
+        switch (shapeEnum)
+        {
+        case RenderComponent::ShapeType::Square:
+            shapeName = "Square";
+            break;
+        case RenderComponent::ShapeType::Circle:
+            shapeName = "Circle";
+            break;
+        case RenderComponent::ShapeType::Line:
+            shapeName = "Line";
+            break;
+        case RenderComponent::ShapeType::Point:
+            shapeName = "Point";
+            break;
+        default: 
+            break;
+        }
+    }
+}

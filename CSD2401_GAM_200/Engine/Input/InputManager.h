@@ -7,6 +7,9 @@
 #include "System.h"
 #include "factory.h"
 #include "transform.h"
+#include "physics.h"
+#include "GraphicsSystem.h"
+#include "core.h"
 #include "imgui.h"
 #include <imgui_impl_glfw.h>
 #include "audio.h"
@@ -21,28 +24,30 @@ public:
     void Update(float dt) override;
     std::string GetName() override;
 
-    //State getters
+    // State getters
     double GetMouseX() const { return mouseX; }
     double GetMouseY() const { return mouseY; }
     double GetScrollX() const { return scrollX; }
     double GetScrollY() const { return scrollY; }
 
-//private:
-//
-//    // Callbacks
-//    static void key_cb(GLFWwindow* pwin, int key, int scancode, int action, int mods);
-//    static void mousebutton_cb(GLFWwindow* pwin, int button, int action, int mods);
-//    static void mousepos_cb(GLFWwindow* pwin, double xpos, double ypos);
-//    static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
-//
-//    void HandleKey(int key, int action);
-//    void HandleMouseButton(int button, int action);
-//    void HandleMouseMove(double xpos, double ypos);
-//    void HandleScroll(double xoffset, double yoffset);
+    static bool KeyStateQuit;
+
+    // private:
+    //
+    //     // Callbacks
+    //     static void key_cb(GLFWwindow* pwin, int key, int scancode, int action, int mods);
+    //     static void mousebutton_cb(GLFWwindow* pwin, int button, int action, int mods);
+    //     static void mousepos_cb(GLFWwindow* pwin, double xpos, double ypos);
+    //     static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
+    //
+    //     void HandleKey(int key, int action);
+    //     void HandleMouseButton(int button, int action);
+    //     void HandleMouseMove(double xpos, double ypos);
+    //     void HandleScroll(double xoffset, double yoffset);
 
 private:
     // Window info
-    GLFWwindow* window;
+    GLFWwindow *window;
     int width, height;
     std::string title; //dont think we need this
     AudioEngine* audioEngine;
@@ -50,11 +55,11 @@ private:
     // Mouse position / scroll
     double mouseX, mouseY;
     double scrollX, scrollY;
-    double movementspeed = 0.5f;
+    double movementspeed = 300.f;
     bool isJumping = false;
     float jumpStartY = 0.0f;
     float jumpMaxHeight = 5.0f; // max height relative to start
-    float jumpSpeed = 10.0f;     // units per second
+    float jumpSpeed = 10.0f;    // units per second
 };
 
 #endif

@@ -20,6 +20,7 @@ public:
 	std::unique_ptr<IComponent> Clone(GameObject* NewClone) const override;
 	
 	GLuint GetTextureID() const { return textureID; }
+	void LoadNewSpritesheet(const char* textureFile, int numRows, int numCols);
 	void SetAnimation(int startFrameIdx, int endFrameIdx, float fps);
 	void Unload();
 
@@ -29,6 +30,9 @@ public:
 
 	int GetRows();
 	void SetRows(int val);
+	int GetCurrentStartFrame() const { return startFrame; }
+	float GetTimePerFrame() const { return timePerFrame; }
+
 
 	int GetCols();
 	void SetCols(int val);
@@ -38,15 +42,15 @@ public:
 
 
 private:
-	const int rows, cols;					
+	int rows, cols;					
 	int currRow, currCol;					
-	const float uv_width, uv_height;				
+	float uv_width, uv_height;				
 	float timePerFrame;        
 	float currentFrameTime;     
 	int startFrame, endFrame;  
 
 	const char* SpriteFile;
-	const GLuint textureID;
+	 GLuint textureID;
 	float alpha;
 
 };

@@ -1,0 +1,1 @@
+GO Name: Circle(1) | Shape: Circle | Position (x,y): (166.557,-163.212) | Size (w,h): (100,100) | Colour: (1,0,0,1)

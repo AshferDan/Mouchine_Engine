@@ -232,7 +232,7 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(Engine PRIVATE -Wall ${DisableWarnings})
 elseif (MSVC)
-    target_compile_options(Engine PRIVATE /W3 /WX-)
+    target_compile_options(Engine PRIVATE /W4 /WX-)
 endif()
 
 # ======================= Create Game Executable ===================

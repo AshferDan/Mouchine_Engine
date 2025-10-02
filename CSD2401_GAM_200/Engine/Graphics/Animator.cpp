@@ -54,7 +54,7 @@ std::unique_ptr<IComponent> Spritesheet::Clone(GameObject* NewClone) const
 
 void Spritesheet::Update(float dt)
 {
-	if (startFrame == endFrame) return;
+	if (startFrame > endFrame) return;
 
 	currentFrameTime += dt;
 
@@ -84,6 +84,34 @@ glm::vec2 Spritesheet::GetUVOffset() const
 	return glm::vec2(uv_width * currCol, uv_height * currRow);
 }
 
+void Spritesheet::LoadNewSpritesheet(const char* textureFile, int numRows, int numCols) {
+	// 1. Unload the old texture to free memory (optional but good practice)
+	if (textureID != 0) {
+		
+		Unload();
+	}
+
+	
+	textureID = GraphicsSystem::LoadTexture(textureFile);
+
+	
+	rows = numRows;
+	cols = numCols;
+	uv_width = 1.0f / (float)numCols;
+	uv_height = 1.0f / (float)numRows;
+
+	// 4. Reset animation state
+	currRow = 0;
+	currCol = 0;
+	startFrame = 0;
+	endFrame = 0;
+
+
+	if (auto* render = owner->GetComponent<RenderComponent>()) {
+		render->SetTextureID(textureID); 
+	}
+}
+
 void Spritesheet::SetAnimation(int startFrameIdx, int endFrameIdx, float fps) {
 	startFrame = startFrameIdx;
 	endFrame = endFrameIdx;
@@ -97,17 +125,24 @@ void Spritesheet::SetAnimation(int startFrameIdx, int endFrameIdx, float fps) {
 
 Spritesheet::~Spritesheet()
 {
-
+	Unload();
 }
 
 void Spritesheet::Unload()
 {
+	if (textureID != 0)
+	{
+		// Tell OpenGL to delete the texture handle
+		glDeleteTextures(1, &textureID);
 
+		// Reset the ID to prevent double-freeing
+		textureID = 0;
+	}
 }
 
 int Spritesheet::GetRows()
 {
-	return currRow;
+	return rows;
 }
 void Spritesheet::SetRows(int val)
 {
@@ -120,7 +155,7 @@ void Spritesheet::SetRows(int val)
 
 int Spritesheet::GetCols()
 {
-	return currCol;
+	return cols;
 }
 void Spritesheet::SetCols(int val)
 {

@@ -6,9 +6,13 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
+#include <map>
 
+
+using SystemTimingsMap = std::map<std::string, double>;
 class GameObject;
 class GameObjectFactory;
+class Serialize_Writer;
 class ImGuiSystem : public ISystem {
 public:
 	ImGuiSystem(GLFWwindow* window);
