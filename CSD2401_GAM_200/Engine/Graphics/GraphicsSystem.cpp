@@ -15,7 +15,7 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
 
-const char *configFile = "../Logs/config.txt";
+const char *configFile = "./Logs/config.txt";
 
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(0)
@@ -143,8 +143,8 @@ void GraphicsSystem::Initialize()
     // Compile and link the default shader program for rendering.
     // Requires "vertices.vert" (vertex shader) and "fragment.frag" (fragment shader).
     shader.CompileLinkValidate({
-        {GL_VERTEX_SHADER, "../Engine/Graphics/vertices.vert"},
-        {GL_FRAGMENT_SHADER, "../Engine/Graphics/fragment.frag"}
+        {GL_VERTEX_SHADER, "./Shaders/vertices.vert"},
+        {GL_FRAGMENT_SHADER, "./Shaders/fragment.frag"}
         });
 
     // Define vertex structure for a textured quad.
@@ -461,7 +461,7 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
     if (segments < 8)
         segments = 8;
 
-    // Angle step per segment (full 360° / segments)
+    // Angle step per segment (full 360ï¿½ / segments)
     float step = glm::two_pi<float>() / segments;
 
     // Generate connected line segments around the circle
@@ -470,7 +470,7 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
         float theta1 = step * i;
         float theta2 = step * (i + 1);
 
-        // Two consecutive points on the circle’s circumference
+        // Two consecutive points on the circleï¿½s circumference
         glm::vec2 p1 = { cx + r * cos(theta1), cy + r * sin(theta1) };
         glm::vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
 
