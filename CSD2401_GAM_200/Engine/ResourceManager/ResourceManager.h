@@ -90,7 +90,7 @@ public:
     AudioResource* GetAudio(const std::string& name);
     void UnloadAudio(const std::string& name);
 
-    // AudioEngine reference for loading audio
+    // Audio engine reference for loading audio
     void SetAudioEngine(AudioEngine* engine);
     AudioEngine* GetAudioEngine() const { return audioEngine; }
 
