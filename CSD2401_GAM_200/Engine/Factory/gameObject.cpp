@@ -3,10 +3,26 @@
 #include <iostream>
 #include <sstream>
 
+/**
+     * @brief Constructs a ColliderComponent
+     * @param owner GameObject that owns this component
+     * @param type Shape type (Square or Circle)
+     * @param w Width for squares or diameter for circles
+     * @param h Height for squares (ignored for circles)
+     * @param layer Collision layer for filtering
+     */
 GameObject::GameObject(EntityID id, const std::string& name)
     : entityID(id), name(name), isActive(true) {
 }
 
+/**
+     * @brief Constructs a ColliderComponent
+     * @param owner GameObject that owns this component
+     * @param type Shape type (Square or Circle)
+     * @param w Width for squares or diameter for circles
+     * @param h Height for squares (ignored for circles)
+     * @param layer Collision layer for filtering
+     */
 GameObject* GameObject::Clone(const std::string& newName) const {
     GameObjectFactory& factory = GameObjectFactory::Instance();
 

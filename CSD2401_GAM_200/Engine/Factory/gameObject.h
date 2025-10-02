@@ -24,8 +24,6 @@ memory leaks and auto the parameters and since each gameobject has their own uni
 
 as for the template that has args... or basically Variadic Templates since different system have different parameters that they take in of course
 i didnt know about only after using abit of AI to look at examples
-
-
 ======================================================================*/
 
 

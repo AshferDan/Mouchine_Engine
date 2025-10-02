@@ -12,12 +12,6 @@
      //// Update all GameObjects (which will update their components)
      auto& gameObjects = factory.GetAllGameObjects();
 
-     //for (auto& obj : gameObjects) {
-     //    if (obj->IsActive()) {
-     //        obj->Update(timeslice);
-     //    }
-     //}
-
      for (auto& obj_unique_ptr : gameObjects) {
          GameObject* obj = obj_unique_ptr.get(); // Get the raw pointer
 

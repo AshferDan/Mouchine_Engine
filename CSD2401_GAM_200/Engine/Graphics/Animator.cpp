@@ -1,21 +1,6 @@
 
 #include "Animator.hpp"
 
-Spritesheet::Spritesheet(GameObject* owner)
-	: IComponent(owner),
-	rows(1),
-	cols(1),
-	currRow(0),
-	currCol(0),
-	uv_width(1.0f),
-	uv_height(1.0f),
-	timePerFrame(0.0f),
-	currentFrameTime(0.0f),
-	startFrame(0),
-	endFrame(0),
-	textureID(0)
-{
-}
 Spritesheet::Spritesheet(GameObject* owner, const char* textureFile, int numRows, int numCols)
 	: IComponent(owner),
 	rows(numRows),
@@ -85,7 +70,7 @@ glm::vec2 Spritesheet::GetUVOffset() const
 }
 
 void Spritesheet::LoadNewSpritesheet(const char* textureFile, int numRows, int numCols) {
-	// 1. Unload the old texture to free memory (optional but good practice)
+
 	if (textureID != 0) {
 		
 		Unload();

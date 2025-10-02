@@ -1,6 +1,6 @@
 #pragma once
-#include "crtdbg.h"		// For debugging
-#include "core.h"		// For DT
+#include "crtdbg.h"	
+#include "core.h"		
 #include "GraphicsSystem.h"
 #include "RenderComponent.h"
 #include "gameObject.h"
@@ -8,7 +8,6 @@
 // Class that handles spritesheet Animations
 class Spritesheet : public IComponent{
 public:
-	Spritesheet(GameObject* owner);
 	Spritesheet(GameObject* owner ,const char* textureFile, int numRows, int numCols);
 	Spritesheet(Spritesheet const& rhs,GameObject* newClone);
 	~Spritesheet();

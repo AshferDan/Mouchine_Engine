@@ -159,17 +159,13 @@ void InputManager::Update(float dt)
 
     if (transform && anim) {
 
-        // --- A. HORIZONTAL FLIP LOGIC ---
-        // ... (Your flip logic is fine here) ...
+
         if (std::abs(moveDirectionX) > 0.0f) {
             float baseWidth = std::abs(transform->scaleX);
             float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        // --- B. ANIMATION SWITCHING LOGIC (Idling vs Running) ---
-
-        // **Animation Constants - CORRECTED END FRAME INDEX (0 and 1 for 2 columns)**
         const char* IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
@@ -205,15 +201,13 @@ void InputManager::Update(float dt)
         
         if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
         {
-            // 1. Load the new texture (This is the crucial step that was being skipped)
+            
             anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
 
-            // 2. Set the new animation speed and range
             anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
         }
     }
 
-    // Apply the horizontal velocity (vertical is handled by gravity/jump)
     physics->SetVelocity(vx, vy);
 
     // Mouse
@@ -231,7 +225,6 @@ void InputManager::Update(float dt)
     mouseX = xpos;
     mouseY = ypos;
 
-    // scroll not added
 }
 
 std::string InputManager::GetName()
