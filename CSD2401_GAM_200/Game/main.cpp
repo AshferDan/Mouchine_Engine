@@ -56,7 +56,7 @@ int main()
      // register the sound with audio engine
      std::cout << "\n--- Starting Background Music ---" << std::endl;
      audio.playSound("bgm", "bgm_channel"); 
-     audio.setVolume("bgm_channel", 1.0f);
+     audio.setVolume("bgm_channel", 0.5f);
 
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
@@ -66,7 +66,7 @@ int main()
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                 // name
         0.0f, 0.0f,                // x, y position
-        300.0f, 300.0f,                // width, height (scale)
+        150.0f, 150.0f,                // width, height (scale)
         "../Assets/Mouch_idle.png", // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame

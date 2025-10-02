@@ -133,11 +133,12 @@ void InputManager::Update(float dt)
             is_jumping = false;
             physics->Jump(400.0f); // Jump force
             physics->GetVelocity(vx, vy); // Get updated VY after jump
+            // Play jump sound effect
+            if (audioEngine) {
+                audioEngine->playSound("jump_sfx", "jump_channel");
+            }
         }
-             // Play jump sound effect
-             if (audioEngine) {
-                 audioEngine->playSound("jump_sfx", "jump_channel");
-             }
+           
     }
     auto* anim = player->GetComponent<Spritesheet>();
 
@@ -159,7 +160,7 @@ void InputManager::Update(float dt)
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1; 
-        const float IDLE_FPS = 4.0f;
+        const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
         const char* RUN_SS = "../Assets/Mouch_Running.png";
         const char* JUMP_SS = "../Assets/Mouch_jump.png";
