@@ -37,6 +37,7 @@ public:
 	bool playSound(const std::string& name, const std::string& channelName = "");
 	void stopSound(const std::string& channelName);
 	void stopAllSound();
+	void pauseSound(const std::string& channelName, bool pause);
 	//bool eventPlaying(const std::string& eventName);
 	//void stopEvent (const string& eventName);
 

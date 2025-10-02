@@ -166,6 +166,14 @@ void AudioEngine::stopAllSound() {
 	std::cout << "Stopped all sound" << std::endl;
 }
 
+void AudioEngine::pauseSound(const std::string& channelName, bool pause) {
+	auto it = channels.find(channelName);
+	if (it != channels.end() && it->second) {
+		it->second->setPaused(pause);
+		std::cout << (pause ? "paused" : "playing") << channelName << std::endl;
+	}
+}
+
 /*
 bool AudioEngine::eventPlaying(const std::string& eventName) {
 	// to be implemented when theres 'events'

@@ -32,13 +32,29 @@ void InputManager::Update(float dt)
 {
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
-        {GLFW_KEY_F1, false}};
+        {GLFW_KEY_F1, false},
+        {GLFW_KEY_M, false}, // toggle pause (for now)
+    };
 
     ImGuiIO &io = ImGui::GetIO();
 
     if (io.WantCaptureKeyboard)
     {
         return;
+    }
+
+    // handle M key for pausing and resuming background music
+    static bool bgmPaused = false;
+
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        if (!singleTriggerKeys[GLFW_KEY_M]) {
+            if (audioEngine) {
+                bgmPaused = !bgmPaused;
+                audioEngine->pauseSound("bgm_channel", bgmPaused);
+                std::cout << "bgm paused" << std::endl;
+            }
+            singleTriggerKeys[GLFW_KEY_M] = true;
+        }
     }
 
     for (auto &kv : singleTriggerKeys)
