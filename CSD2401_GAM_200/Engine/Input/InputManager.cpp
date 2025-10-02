@@ -2,10 +2,17 @@
 #include <iostream>
 #include <unordered_map>
 #include "Animator.hpp"
-
-InputManager::InputManager(GLFWwindow *window) : window(window), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
+#include "core.h"
+InputManager::InputManager(GLFWwindow *window, AudioEngine* audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
 {
     glfwSetWindowUserPointer(window, this);
+
+    if (audioEngine) {
+        std::cout << "InputManager: AudioEngine successfully linked" << std::endl;
+    }
+    else {
+        std::cout << "InputManager: WARNING - AudioEngine is NULL!" << std::endl;
+    }
 }
 
 InputManager::~InputManager() {}
@@ -25,13 +32,29 @@ void InputManager::Update(float dt)
 {
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
-        {GLFW_KEY_F1, false}};
+        {GLFW_KEY_F1, false},
+        {GLFW_KEY_M, false}, // toggle pause (for now)
+    };
 
     ImGuiIO &io = ImGui::GetIO();
 
     if (io.WantCaptureKeyboard)
     {
         return;
+    }
+
+    // handle M key for pausing and resuming background music
+    static bool bgmPaused = false;
+
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
+        if (!singleTriggerKeys[GLFW_KEY_M]) {
+            if (audioEngine) {
+                bgmPaused = !bgmPaused;
+                audioEngine->pauseSound("bgm_channel", bgmPaused);
+                std::cout << "bgm paused" << std::endl;
+            }
+            singleTriggerKeys[GLFW_KEY_M] = true;
+        }
     }
 
     for (auto &kv : singleTriggerKeys)
@@ -111,6 +134,10 @@ void InputManager::Update(float dt)
         vx = 0.0f;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        KeyStateQuit = true;
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
@@ -121,8 +148,13 @@ void InputManager::Update(float dt)
             is_jumping = false;
             physics->Jump(400.0f); // Jump force
             physics->GetVelocity(vx, vy); // Get updated VY after jump
+            // Play jump sound effect
+            if (audioEngine) {
+                audioEngine->playSound("jump_sfx", "jump_channel");
+            }
         }
     }
+
     auto* anim = player->GetComponent<Spritesheet>();
 
     if (transform && anim) {
@@ -143,7 +175,7 @@ void InputManager::Update(float dt)
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1; 
-        const float IDLE_FPS = 4.0f;
+        const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
         const char* RUN_SS = "../Assets/Mouch_Running.png";
         const char* JUMP_SS = "../Assets/Mouch_jump.png";
@@ -206,6 +238,8 @@ std::string InputManager::GetName()
 {
     return "Input System";
 }
+
+
 
 //-----------------OLD SYSTEM USING TRANSFORM FOR MOVEMENT -----------------//
 //

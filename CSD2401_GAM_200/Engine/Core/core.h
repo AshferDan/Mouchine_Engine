@@ -3,8 +3,22 @@
 #include <vector>
 #include <memory>
 #include "System.h"
+#include "audio.h"
 #include <fstream>
 #include <iomanip>
+#include "GameObjectSystem.h"
+#include "GraphicsSystem.h"
+#include <GLFW/glfw3.h>
+#include <thread>
+#include <chrono>
+#include <Physics.h>
+#include "ImGuiSystem.h"
+#include "InputManager.h"
+#include "CollisionSystem.h"
+#include "PhysicsSystem.h"
+#include "DebugSystem.h"
+#include <map>
+#include "MathLib.h"
 
 // Forward declarations
 class GameObjectSystem;
@@ -22,6 +36,7 @@ public:
 
     void GameLoop();
     void DestroySystems();
+    void exit();
     void Init();
 
     template <typename T, typename... Args>
@@ -63,10 +78,13 @@ public:
     {
         return physicsSystem;
     }
+
     DebugSystem *GetDebugSystem() const
     {
         return debugSystem;
     }
+
+    void SetAudioEngine(AudioEngine* audio) { audioEngine = audio; }
 
     void ConfigFile(const char *configF);
 
@@ -90,6 +108,8 @@ private:
     CollisionSystem *collisionSystem = nullptr;
     PhysicsSystem *physicsSystem = nullptr;
     DebugSystem *debugSystem = nullptr;
+    AudioEngine* audioEngine = nullptr;
+    
     unsigned LastTime;
     bool GameActive;
     static double fps;

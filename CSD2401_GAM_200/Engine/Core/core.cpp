@@ -1,19 +1,6 @@
-#include "core.h"
-#include "System.h"
-#include "GameObjectSystem.h"
-#include "GraphicsSystem.h"
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include <Physics.h>
-#include "ImGuiSystem.h"
-#include "InputManager.h"
-#include "CollisionSystem.h"
-#include "PhysicsSystem.h"
-#include "DebugSystem.h"
-#include <map>
 
+#include "core.h"
+bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
@@ -28,9 +15,6 @@ CoreEngine::CoreEngine()
     CORE = this;
 
     std::cout << "CoreEngine constructed" << std::endl;
-
-    // Initialize default systems automatically
-    InitSystems();
 }
 
 CoreEngine::~CoreEngine()
@@ -66,7 +50,7 @@ void CoreEngine::InitSystems()
     imguiSystem = AddSystem<ImGuiSystem>(graphicsSystem->getWindow());
 
     // 3. Input Manager - MUST BE EARLY to capture input before physics updates
-    inputManager = AddSystem<InputManager>(graphicsSystem->getWindow());
+    inputManager = AddSystem<InputManager>(graphicsSystem->getWindow(), audioEngine);
     debugSystem = AddSystem<DebugSystem>();
 
     // 4. GameObject System
@@ -86,6 +70,7 @@ void CoreEngine::InitSystems()
 
 void CoreEngine::Init()
 {
+    InitSystems();
     std::cout << "Initializing CoreEngine with " << Systems.size() << " systems" << std::endl;
 
     for (size_t i = 0; i < Systems.size(); ++i)
@@ -158,6 +143,8 @@ void CoreEngine::GameLoop()
 
         std::cerr << "Unknown exception caught in CoreEngine::GameLoop()" << std::endl;
     }
+    CoreEngine::DestroySystems();
+    glfwTerminate();
 }
 
 void CoreEngine::DestroySystems()
@@ -165,6 +152,7 @@ void CoreEngine::DestroySystems()
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
 }
+
 
 void CoreEngine::update_time(double fps_calc_interval)
 {

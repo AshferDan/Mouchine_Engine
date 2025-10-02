@@ -12,11 +12,12 @@
 #include "core.h"
 #include "imgui.h"
 #include <imgui_impl_glfw.h>
+#include "audio.h"
 
 class InputManager : public ISystem
 {
 public:
-    InputManager(GLFWwindow *window);
+    InputManager(GLFWwindow* window, AudioEngine* audio = nullptr);
     ~InputManager();
 
     void Initialize();
@@ -28,6 +29,8 @@ public:
     double GetMouseY() const { return mouseY; }
     double GetScrollX() const { return scrollX; }
     double GetScrollY() const { return scrollY; }
+
+    static bool KeyStateQuit;
 
     // private:
     //
@@ -46,7 +49,8 @@ private:
     // Window info
     GLFWwindow *window;
     int width, height;
-    std::string title; // dont think we need this
+    std::string title; //dont think we need this
+    AudioEngine* audioEngine;
 
     // Mouse position / scroll
     double mouseX, mouseY;

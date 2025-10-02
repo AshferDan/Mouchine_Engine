@@ -1,20 +1,4 @@
-#include "Core.h"
-#include "Factory.h"
-#include "GameObjectSystem.h"
-#include "GraphicsSystem.h"
-#include "ImGuiSystem.h"
-#include "DebugSystem.h"
-#include "Transform.h"
-#include "Collision.h"
-#include "Collidercomponent.h"
-#include "Physics.h"
-#include "RenderComponent.h"
-#include <iostream>
-#include <cmath>
-#include "Animator.hpp"
-#include "ResourceManager.h"
-#include "audio.h"
-#include "InputManager.h"
+#include "main.h"
 
 void EnableMemoryLeakChecking(int breakAlloc = -1)
 {
@@ -35,49 +19,44 @@ int main()
     std::cout << "=== 2D Component System Test ===" << std::endl;
     CoreEngine engine;
     AudioEngine audio;
+    engine.SetAudioEngine(&audio);
     double g_totalLoopTime = 0.0;
     std::map<std::string, double> g_systemTimings; // ms per system
 
     std::cout << "\n--- Initializing Engine ---" << std::endl;
     engine.Init();
 
-    // Initialise Audio System
-    std::cout << "\n--- Initialising Audio System ---" << std::endl;
-    if (!audio.initialiseAudio())
-    {
-        std::cout << "audio system failed to initialise, continuing without audio" << std::endl;
-    }
-    else
-    {
-        std::cout << "audio system initialised successfully!" << std::endl;
-    }
+     // Initialise Audio System
+     std::cout << "\n--- Initialising Audio System ---" << std::endl;
+     if (!audio.initialiseAudio())
+     {
+         std::cout << "Audio system failed to initialise, continuing without audio" << std::endl;
+     }
+     else
+     {
+         std::cout << "Audio system initialised successfully" << std::endl;
+     }
 
-    // Initialising ResourceManager
-    std::cout << "\n--- Initializing Resource Manager ---" << std::endl;
-    auto &resourceMgr = ResourceManager::Instance();
+     // Initialise ResourceManager
+     std::cout << "\n--- Initialising Resource Manager ---" << std::endl;
+     auto& resourceMgr = ResourceManager::Instance();
+     resourceMgr.SetAudioEngine(&audio);
 
-    // link audio engine to resource manager for audio loading
-    resourceMgr.SetAudioEngine(&audio);
-    std::cout << "\n--- Loading Resources ---" << std::endl;
+     // load textures
+     resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
 
-    // load textures
-    resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
+     // load audio files
+     resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true); // looping
+     resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false); // when jumping only
+     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
 
-    // load audio files
-    resourceMgr.LoadAudio("bgm", "../Assets/audio/awesomeness.wav", true); // looping
-                                                                           // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
+     // print loaded resources
+     resourceMgr.PrintLoadedResources();
 
-    // register the sound with audio engine to play it
-    std::cout << "\n--- Starting Background Music ---" << std::endl;
-    AudioResource *bgMusic = resourceMgr.GetAudio("bgm");
-    if (bgMusic && bgMusic->IsLoaded())
-    {
-        audio.registerSound("bgm", bgMusic->GetSound());
-        audio.playSound("bgm", "bgm_channel");
-        audio.setVolume("bgm_channel", 0.1f);
-    }
-    // print loaded resources
-    resourceMgr.PrintLoadedResources();
+     // register the sound with audio engine
+     std::cout << "\n--- Starting Background Music ---" << std::endl;
+     audio.playSound("bgm", "bgm_channel"); 
+     audio.setVolume("bgm_channel", 0.5f);
 
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
@@ -86,8 +65,8 @@ int main()
     
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                 // name
-        100.0f, 100.0f,                // x, y position
-        300.0f, 300.0f,                // width, height (scale)
+        0.0f, 0.0f,                // x, y position
+        150.0f, 150.0f,                // width, height (scale)
         "../Assets/Mouch_idle.png", // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame
@@ -98,6 +77,25 @@ int main()
     playerPhysics->SetGravity(true);
     playerPhysics->SetStatic(false);
 
+    GameObject* animatedMouchidle = factory.CreateAnimatedImage(
+        "AniImage",                 // name
+        -700.0f, 100.0f,                // x, y position
+        300.0f, 300.0f,                // width, height (scale)
+        "../Assets/Mouch_idle.png",     // filename
+        1, 2,                          //row,columns
+        0, 7,                          // start frame , end frame
+        2.0f                         // 12 frames per second
+    );
+
+    GameObject* animatedMouchRun = factory.CreateAnimatedImage(
+        "AniImage",                 // name
+        700.0f, 100.0f,                // x, y position
+        300.0f, 300.0f,                // width, height (scale)
+        "../Assets/Mouch_Running.png", // filename
+        1, 2,                          //row,columns
+        0, 7,                          // start frame , end frame
+        2.0f                          // 12 frames per second
+    );
 
     // Create ground at the bottom of the screen (black rectangle)
     GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);

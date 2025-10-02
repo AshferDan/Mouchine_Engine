@@ -247,14 +247,27 @@ void ImGuiSystem::Update(float dt) {
 	}
 
 	ImGui::Begin("=== Performance Profiler ===");
-	ImVec2 IMwindpos{ 1400,100 };
-	ImGui::SetWindowPos(IMwindpos);
+
+	static std::map<std::string, float> smoothedMs;
+	static std::map<std::string, float> smoothedPercent;
+
+	const float lerpSpeed = 0.05; // smaller = smoother
 
 	std::map<std::string, double>::iterator it;
 	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {
 		const std::string& name = it->first;
 		double ms = it->second;
 		double percent = (g_totalLoopTime > 0.0) ? (ms / g_totalLoopTime) * 100.0 : 0.0;
+
+		// Initalize if first time
+		if (smoothedMs.find(name) == smoothedMs.end()) {
+			smoothedMs[name] = (float)ms;
+			smoothedPercent[name] = (float)percent;
+		}
+
+		// Lerp towards raw ms and percent
+		smoothedMs[name]	  += (float)(ms - smoothedMs[name]) * lerpSpeed;
+		smoothedPercent[name] += (float)(percent - smoothedPercent[name]) * lerpSpeed;
 
 		// Add a small ImGui::Text displaying the total frame time first for context
 		if (it == g_systemTimings.begin()) {
@@ -264,8 +277,8 @@ void ImGuiSystem::Update(float dt) {
 			ImGui::Separator();
 		}
 
-		ImGui::Text("%-20s %.4f ms (%.1f%%)", name.c_str(), ms, percent);
-		ImGui::ProgressBar((float)(percent / 100.0f), ImVec2(0.0f, 0.0f));
+		ImGui::Text("%-20s %.4f ms (%.1f%%)", name.c_str(), smoothedMs[name], smoothedPercent[name]);
+		ImGui::ProgressBar((float)(smoothedPercent[name] / 100.0f), ImVec2(0.0f, 0.0f));
 	}
 	ImGui::End();
 
