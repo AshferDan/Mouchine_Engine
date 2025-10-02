@@ -4,7 +4,7 @@
 
 const char *configFile = "../Logs/config.txt";
 
-GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0)
+GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(0)
 {
     if (!glfwInit())
     {
@@ -40,7 +40,7 @@ GraphicsSystem::GraphicsSystem() : window(nullptr), vao(0), vbo(0), Wwidth(800),
     Wheight = fbHeight;
 }
 
-GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h)
+GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(0)
 {
     if (!glfwInit())
     {
@@ -145,7 +145,7 @@ void GraphicsSystem::Update(float dt)
 
     shader.Use();
 
-    float aspect = static_cast<float>(Wwidth) / static_cast<float>(Wheight);
+    //float aspect = static_cast<float>(Wwidth) / static_cast<float>(Wheight);
     glm::mat4 projection = glm::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
 
     glm::vec3 camPos(0.0f);
@@ -254,7 +254,7 @@ void GraphicsSystem::Update(float dt)
                     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
                     if (debugMode) {
                         if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
-                            DrawCircleOutline(x, y, sx*0.5, sy, { 0,1,0,1 }, vp);
+                            DrawCircleOutline(x, y, static_cast<float>(sx*0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
                         }
                         else {
                             DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
