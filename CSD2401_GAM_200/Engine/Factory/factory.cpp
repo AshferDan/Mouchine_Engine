@@ -1,4 +1,17 @@
-//392
+
+/* Start Header ************************************************************************/
+/*!
+\file       factory.cpp
+\author     Jonathan Fam Qian Wei [100% - 392 lines]
+\par        Fam.q@digipen.edu
+\date       October, 2, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 
 
 #include "Factory.h"

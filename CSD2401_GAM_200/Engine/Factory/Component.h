@@ -4,10 +4,9 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Component.h
-\author     Jonathan Fam [100%]
-\co-author  -
-\par        fam.q@digipen.edu
-\date       10-3-2025
+\author     Jonathan Fam Qian Wei [100% - 19 lines]
+\par        Fam.q@digipen.edu
+\date       October, 2, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

@@ -26,6 +26,18 @@ as for the template that has args... or basically Variadic Templates since diffe
 i didnt know about only after using abit of AI to look at examples
 ======================================================================*/
 
+/* Start Header ************************************************************************/
+/*!
+\file       gameObject.h
+\author     Jonathan Fam Qian Wei [100% - 87 lines]
+\par        Fam.q@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 
 #pragma once
 #include "Component.h"

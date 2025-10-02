@@ -1,4 +1,20 @@
- #include "GameObjectSystem.h"
+/* Start Header ************************************************************************/
+/*!
+\file       gameObjectSystem.cpp
+\author     Jonathan Fam Qian Wei [100% - 20 lines]
+\par        Fam.q@digipen.edu
+\date       October, 2, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+#include "GameObject.h"
+
+#include "GameObjectSystem.h"
  #include "Factory.h"
  #include <iostream>
 
@@ -9,19 +25,19 @@
  }
 
  void GameObjectSystem::Update(float timeslice) {
-     //// Update all GameObjects (which will update their components)
+    
      auto& gameObjects = factory.GetAllGameObjects();
 
      for (auto& obj_unique_ptr : gameObjects) {
-         GameObject* obj = obj_unique_ptr.get(); // Get the raw pointer
+         GameObject* obj = obj_unique_ptr.get(); 
 
-         // This check confirms if the unique_ptr became null unexpectedly
+        
          if (obj == nullptr) {
              std::cerr << "ERROR: Null GameObject pointer found in factory list!" << std::endl;
-             continue; // Skip the corrupted object
+             continue; 
          }
 
-         if (obj->IsActive()) { // Now it's safe to call IsActive()
+         if (obj->IsActive()) { 
              obj->Update(timeslice);
          }
      }
