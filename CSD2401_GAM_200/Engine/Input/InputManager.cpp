@@ -2,7 +2,7 @@
 #include <iostream>
 #include <unordered_map>
 #include "Animator.hpp"
-
+#include "core.h"
 InputManager::InputManager(GLFWwindow *window) : window(window), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
 {
     glfwSetWindowUserPointer(window, this);
@@ -111,6 +111,11 @@ void InputManager::Update(float dt)
         vx = 0.0f;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        KeyStateQuit = true;
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
@@ -206,6 +211,8 @@ std::string InputManager::GetName()
 {
     return "Input System";
 }
+
+
 
 //-----------------OLD SYSTEM USING TRANSFORM FOR MOVEMENT -----------------//
 //

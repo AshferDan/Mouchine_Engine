@@ -1,19 +1,6 @@
-#include "core.h"
-#include "System.h"
-#include "GameObjectSystem.h"
-#include "GraphicsSystem.h"
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <thread>
-#include <chrono>
-#include <Physics.h>
-#include "ImGuiSystem.h"
-#include "InputManager.h"
-#include "CollisionSystem.h"
-#include "PhysicsSystem.h"
-#include "DebugSystem.h"
-#include <map>
 
+#include "core.h"
+bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
@@ -158,6 +145,8 @@ void CoreEngine::GameLoop()
 
         std::cerr << "Unknown exception caught in CoreEngine::GameLoop()" << std::endl;
     }
+    CoreEngine::DestroySystems();
+    glfwTerminate();
 }
 
 void CoreEngine::DestroySystems()
@@ -165,6 +154,7 @@ void CoreEngine::DestroySystems()
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
 }
+
 
 void CoreEngine::update_time(double fps_calc_interval)
 {

@@ -125,12 +125,19 @@ void Spritesheet::SetAnimation(int startFrameIdx, int endFrameIdx, float fps) {
 
 Spritesheet::~Spritesheet()
 {
-
+	Unload();
 }
 
 void Spritesheet::Unload()
 {
+	if (textureID != 0)
+	{
+		// Tell OpenGL to delete the texture handle
+		glDeleteTextures(1, &textureID);
 
+		// Reset the ID to prevent double-freeing
+		textureID = 0;
+	}
 }
 
 int Spritesheet::GetRows()

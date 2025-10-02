@@ -29,6 +29,8 @@ public:
     double GetScrollX() const { return scrollX; }
     double GetScrollY() const { return scrollY; }
 
+    static bool KeyStateQuit;
+
     // private:
     //
     //     // Callbacks

@@ -1,20 +1,4 @@
-#include "Core.h"
-#include "Factory.h"
-#include "GameObjectSystem.h"
-#include "GraphicsSystem.h"
-#include "ImGuiSystem.h"
-#include "DebugSystem.h"
-#include "Transform.h"
-#include "Collision.h"
-#include "Collidercomponent.h"
-#include "Physics.h"
-#include "RenderComponent.h"
-#include <iostream>
-#include <cmath>
-#include "Animator.hpp"
-#include "ResourceManager.h"
-#include "audio.h"
-#include "InputManager.h"
+#include "main.h"
 
 void EnableMemoryLeakChecking(int breakAlloc = -1)
 {
@@ -74,7 +58,7 @@ int main()
     {
         audio.registerSound("bgm", bgMusic->GetSound());
         audio.playSound("bgm", "bgm_channel");
-        audio.setVolume("bgm_channel", 0.1f);
+        audio.setVolume("bgm_channel", 0.05f);
     }
     // print loaded resources
     resourceMgr.PrintLoadedResources();
@@ -86,7 +70,7 @@ int main()
     
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                 // name
-        100.0f, 100.0f,                // x, y position
+        0.0f, 0.0f,                // x, y position
         300.0f, 300.0f,                // width, height (scale)
         "../Assets/Mouch_idle.png", // filename
         1, 2,                          //row,columns
@@ -98,6 +82,25 @@ int main()
     playerPhysics->SetGravity(true);
     playerPhysics->SetStatic(false);
 
+    GameObject* animatedMouchidle = factory.CreateAnimatedImage(
+        "AniImage",                 // name
+        -800.0f, 100.0f,                // x, y position
+        300.0f, 300.0f,                // width, height (scale)
+        "../Assets/Mouch_idle.png",     // filename
+        1, 2,                          //row,columns
+        0, 7,                          // start frame , end frame
+        2.0f                         // 12 frames per second
+    );
+
+    GameObject* animatedMouchRun = factory.CreateAnimatedImage(
+        "AniImage",                 // name
+        800.0f, 100.0f,                // x, y position
+        300.0f, 300.0f,                // width, height (scale)
+        "../Assets/Mouch_Running.png", // filename
+        1, 2,                          //row,columns
+        0, 7,                          // start frame , end frame
+        2.0f                          // 12 frames per second
+    );
 
     // Create ground at the bottom of the screen (black rectangle)
     GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
