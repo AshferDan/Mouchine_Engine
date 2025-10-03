@@ -2,14 +2,14 @@
 
 by AvidMoustacheEnjoyers - CSD2401f25-UXG2400f25-DAA2402f25
 
-   Guan Shao Jun                       		shaojun.g@digipen.edu
-   Jonathan Fam Qian Wei                	fam.q@digipen.edu
-   Lee Hwee Min                         	l.hweemin@digipen.edu
-   Khalil Belabadia                     	khalil.b@digipen.edu
-   Leck Xin Yee                       		xinyee.leck@digipen.edu
-   Muhammad Ashfer Danishkhan Bin Afzalkhan	m.binafzalkhan@digipen.edu
-   Joann Bisseling				joann.b@digipen.edu
-   Li Runtian					r.li@digipen.edu
+   Guan Shao Jun                       		shaojun.g@digipen.edu		Programmer - Graphics Champion
+   Jonathan Fam Qian Wei                	fam.q@digipen.edu		Technical Lead - Programmer - Engine Champion
+   Lee Hwee Min                         	l.hweemin@digipen.edu		Programmer - Input Champion
+   Khalil Belabadia                     	khalil.b@digipen.edu		Programmer - Designer - Physics Champion
+   Leck Xin Yee                       		xinyee.leck@digipen.edu		Programmer - Designer - Level Design Champion
+   Muhammad Ashfer Danishkhan Bin Afzalkhan	m.binafzalkhan@digipen.edu	Programmer - Design Lead - "Systems" Designer Champion
+   Joann Bisseling				joann.b@digipen.edu		Product Manager - Audio Lead - Product Champion
+   Li Runtian					r.li@digipen.edu		Art Lead - Art Champion
 
 Moustach've Been The Wind is a single-player 2D speedrunning platformer where you play as Mr. Mouch, a grumpy barber on a 
 frantic race to fix haircut disasters using chained powerful movement abilities while navigating fast-paced challenging
@@ -28,11 +28,12 @@ Player Controls
 
 System
 
-- Mouse
-  Left click          	Control IMGUI Windows
+- IMGUI
+  Left click     	Control IMGUI Windows
+  P			Turn on/off IMGUI Windows
 
 - Debug
-  F1                    Toggle debug mode
+  F1                    Toggle on/off debug mode
 
 - Batch Rendering
   1                  	Spawn 2500 entities on screen
