@@ -28,7 +28,7 @@ Technology is prohibited.
 #include <iostream>
 #include <RenderComponent.h>
 #include <fstream>
-#include "../Engine/Extern/MathLib.h"
+#include "MathLib.h"
 
 
 /**

@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
-#include "../Engine/Extern/MathLib.h"
+#include "MathLib.h"
 
 
 /*  _________________________________________________________________________ */

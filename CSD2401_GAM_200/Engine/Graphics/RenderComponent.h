@@ -15,7 +15,7 @@ Technology is prohibited.
 #pragma once
 #include "Component.h"
 #include <GL/glew.h>
-#include "../Engine/Extern/MathLib.h"
+#include "MathLib.h"
 #include <iostream>
 
 /*! @class RenderComponent

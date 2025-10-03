@@ -18,7 +18,7 @@ Technology is prohibited.
 #include <iostream>
 #include "System.h"
 #include "GraphicsSystem.h"
-#include "../Engine/Extern/MathLib.h"
+#include "MathLib.h"
 
 /**
  * @class DebugSystem
