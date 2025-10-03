@@ -63,6 +63,16 @@ private:
     unsigned int cloneCounter;
 };
 
+
+/**
+* @brief Spawns 2500 Circle Game Objects on screen randomly within the 1920x1080 resolution window. 
+         (Can spawn more - at your own risk!)
+*/
 void DemoM1_SpawnGameObjects();
+
+
+/**
+* @brief Function that removes all Circle Game Objects spawned from the function above. 
+         (Yes even if you chose to spawn more than 2500)
+*/
 void DemoM1_DestroyGameObjects();
-void DemoM1_SpawnGameObjectsTest(int val = 0);

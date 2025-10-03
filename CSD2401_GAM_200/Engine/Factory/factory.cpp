@@ -406,87 +406,99 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
     return nullptr;
 }
 
-    GameObject *GameObjectFactory::GetGameObject(EntityID id)
+GameObject *GameObjectFactory::GetGameObject(EntityID id)
+{
+    auto it = entityToIndex.find(id);
+    if (it != entityToIndex.end() && it->second < gameObjects.size())
     {
-        auto it = entityToIndex.find(id);
-        if (it != entityToIndex.end() && it->second < gameObjects.size())
-        {
-            return gameObjects[it->second].get();
-        }
-        return nullptr;
+        return gameObjects[it->second].get();
     }
+    return nullptr;
+}
 
-    GameObject *GameObjectFactory::FindGameObject(const std::string &name)
+GameObject *GameObjectFactory::FindGameObject(const std::string &name)
+{
+    for (auto &obj : gameObjects)
     {
-        for (auto &obj : gameObjects)
+        if (obj->GetName() == name)
         {
-            if (obj->GetName() == name)
-            {
-                return obj.get();
-            }
-        }
-        return nullptr;
-    }
-
-    const std::vector<std::unique_ptr<GameObject>> &GameObjectFactory::GetAllGameObjects() const
-    {
-        return gameObjects;
-    }
-
-    void GameObjectFactory::DestroyGameObject(EntityID id)
-    {
-        auto it = entityToIndex.find(id);
-        if (it != entityToIndex.end())
-        {
-            size_t index = it->second;
-
-            if (index < gameObjects.size() - 1)
-            {
-                std::swap(gameObjects[index], gameObjects.back());
-                entityToIndex[gameObjects[index]->GetID()] = index;
-            }
-
-            gameObjects.pop_back();
-            entityToIndex.erase(it);
+            return obj.get();
         }
     }
+    return nullptr;
+}
 
-    void GameObjectFactory::Clear()
+const std::vector<std::unique_ptr<GameObject>> &GameObjectFactory::GetAllGameObjects() const
+{
+    return gameObjects;
+}
+
+void GameObjectFactory::DestroyGameObject(EntityID id)
+{
+    auto it = entityToIndex.find(id);
+    if (it != entityToIndex.end())
     {
-        gameObjects.clear();
-        entityToIndex.clear();
-        nextEntityID = 1;
-    }
+        size_t index = it->second;
 
-    // FUNCTIONS TO SPAWN 2.5K OBJECTS FOR M1 DEMO!!
-
-    std::vector<GameObject *> vecGOs;
-    void DemoM1_SpawnGameObjects()
-    {
-        auto &factory = GameObjectFactory::Instance();
-
-        std::random_device randomDevice;
-        std::mt19937 gen(randomDevice());
-        std::uniform_int_distribution<int> distributionX(-960, 960);
-        std::uniform_int_distribution<int> distributionY(-540, 540);
-
-        // spawn 2.5k small circles
-        for (size_t i = 0; i < 2500; i++)
+        if (index < gameObjects.size() - 1)
         {
-            int intX{distributionX(gen)}, intY{distributionY(gen)};
-            GameObject *newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
-            // GameObject* newGO = factory.CreateAnimatedImage("MouchRunner", static_cast<float>(intX), static_cast<float>(intY), 100.0f, 100.0f, "../Assets/Mouch_Running.png", 1, 2, 0, 7,9.0f);
-            vecGOs.push_back(newGO);
+            std::swap(gameObjects[index], gameObjects.back());
+            entityToIndex[gameObjects[index]->GetID()] = index;
         }
-    }
 
-    void DemoM1_DestroyGameObjects()
+        gameObjects.pop_back();
+        entityToIndex.erase(it);
+    }
+}
+
+void GameObjectFactory::Clear()
+{
+    gameObjects.clear();
+    entityToIndex.clear();
+    nextEntityID = 1;
+}
+
+
+#pragma region M1 Showcase - 2500 GOs Test
+
+// Vector to store all GOs made by test function
+std::vector<GameObject*> vecGOs;
+
+/**
+* @brief Spawns 2500 Circle Game Objects on screen randomly within the 1920x1080 resolution window.
+            (Can spawn more - at your own risk!)
+*/
+void DemoM1_SpawnGameObjects()
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    std::random_device randomDevice;
+    std::mt19937 gen(randomDevice());
+    std::uniform_int_distribution<int> distributionX(-960, 960);
+    std::uniform_int_distribution<int> distributionY(-540, 540);
+
+    // spawn 2.5k small circles
+    for (size_t i = 0; i < 2500; i++)
     {
-        auto &factory = GameObjectFactory::Instance();
-
-        for (GameObject *&GO : vecGOs)
-        {
-            factory.DestroyGameObject(GO->GetID());
-        }
-        vecGOs.clear();
+        int intX{ distributionX(gen) }, intY{ distributionY(gen) };
+        GameObject* newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+        vecGOs.push_back(newGO);
     }
+}
+
+/**
+* @brief Function that removes all Circle Game Objects spawned from the function above.
+            (Yes even if you chose to spawn more than 2500)
+*/
+void DemoM1_DestroyGameObjects()
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    for (GameObject*& GO : vecGOs)
+    {
+        factory.DestroyGameObject(GO->GetID());
+    }
+    vecGOs.clear();
+}
+
+#pragma endregion

@@ -101,10 +101,9 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    {
-        DemoM1_SpawnGameObjects();
-    }
+    /**
+    * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
+    */
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         DemoM1_DestroyGameObjects();
