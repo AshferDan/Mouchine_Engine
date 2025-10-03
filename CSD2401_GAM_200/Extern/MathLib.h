@@ -22,8 +22,6 @@ Technology is prohibited.
  * @brief Represents a two-dimensional vector with components x and y.
  *        Provides common vector operations such as addition, subtraction, scaling,
  *        dot product, cross product, length calculation, angle computation, and normalization.
- * @param X component 
- * @param Y component 
  */
 struct vec2 {
     float x, y;
@@ -51,9 +49,6 @@ struct vec2 {
  * @brief Represents a three-dimensional vector with components x, y, and z.
  *        Provides common vector operations such as addition, subtraction, scaling,
  *        dot product, cross product, length calculation, and normalization.
- * @param X component 
- * @param Y component 
- * @param Z component 
  */
 struct vec3 {
     float x, y, z;
@@ -80,10 +75,6 @@ struct vec3 {
  * @brief Represents a four-dimensional vector with components x, y, z, and w.
  *        Provides common vector operations such as addition, subtraction, scaling,
  *        dot product, length calculation, and normalization.
- * @param X component 
- * @param Y component 
- * @param Z component
- * @param W component 
  */
 struct vec4 {
     float x, y, z, w;

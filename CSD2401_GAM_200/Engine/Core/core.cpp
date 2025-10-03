@@ -138,6 +138,7 @@ void CoreEngine::GameLoop()
     {
         // Log unknown exceptions
         std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        log << "[File:Line] " << __FILE__ << ":" << __LINE__ << "\n";
         log << "[UNKNOWN EXCEPTION]" << std::endl;
         log.close();
 
