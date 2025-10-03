@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "Animator.hpp"
 #include "core.h"
 
+bool InputManager::KeyStateImgui = true;
 /**
  * @brief Constructs an InputManager with specified parameters.
  * @param window Pointer to the GLFW window.
@@ -166,6 +167,15 @@ void InputManager::Update(float dt)
     {
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    /**
+        * @brief Toggle on and off imgui
+        */
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+    {
+        InputManager::KeyStateImgui= (!InputManager::KeyStateImgui) ? true : false;
+        std::cout << InputManager::KeyStateImgui << std::endl;
+
     }
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)

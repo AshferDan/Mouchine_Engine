@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       MathLib.cpp
+\author     Lee Hwee Min [100% - 124 lines]
+\par        l.hweemin@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "MathLib.h"
 
 //----------------- vec2 -----------------//
@@ -217,10 +230,13 @@ mat4 mat4::rotateZ(float rad)
 mat4 mat4::operator*(mat4 const &o) const
 {
     mat4 r;
-    for (int col = 0; col < 4; ++col) {
-        for (int row = 0; row < 4; ++row) {
+    for (int col = 0; col < 4; ++col)
+    {
+        for (int row = 0; row < 4; ++row)
+        {
             r.m[col * 4 + row] = 0.0f;
-            for (int k = 0; k < 4; ++k) {
+            for (int k = 0; k < 4; ++k)
+            {
                 r.m[col * 4 + row] += m[k * 4 + row] * o.m[col * 4 + k];
             }
         }

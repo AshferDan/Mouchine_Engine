@@ -296,10 +296,17 @@ add_custom_command(TARGET Game POST_BUILD
 )
 
 add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern/Mathlib.h"
         "$<TARGET_FILE_DIR:Game>"
-    COMMENT "Copying Assets folder to configuration directory"
+    COMMENT "Copying Mathlib.h folder to configuration directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern/Mathlib.cpp"
+        "$<TARGET_FILE_DIR:Game>"
+    COMMENT "Copying Mathlib.cpp folder to configuration directory"
 )
 
 
