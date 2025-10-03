@@ -1,9 +1,8 @@
-
 /* Start Header ************************************************************************/
 /*!
 \file       system.h
 \author     Jonathan Fam Qian Wei [100% - 10 lines]
-\par        Fam.q@digipen.edu 
+\par        Fam.q@digipen.edu
 \date       October, 2, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -18,19 +17,27 @@ Technology is prohibited.
 class ISystem
 {
 public:
-    ///Systems can receive all message send to the Core. 
-    ///See Message.h for details.
     //virtual void SendMessage(Message* message) { UNREFERENCED_PARAMETER(message); };
 
-    ///All systems are updated every game frame.
+    /**
+     * @brief Called every game frame to update the system's logic.
+     * @param timeslice The time elapsed since the last frame (delta time).
+     */
     virtual void Update(float timeslice) = 0;
 
-    ///All systems provide a string name for debugging.
+    /**
+     * @brief Gets the debug name of the system.
+     * @return A string representing the system's name.
+     */
     virtual std::string GetName() = 0;
 
-    ///Initialize the system.
+    /**
+     * @brief Initializes the system.
+     */
     virtual void Initialize() {}
 
-    ///All systems need a virtual destructor to have their destructor called 
+    /**
+     * @brief Virtual destructor to ensure proper cleanup of derived system classes.
+     */
     virtual ~ISystem() {}
 };

@@ -23,7 +23,9 @@ As for the unique ptrs during my research most of the ecs have these ptrs lookin
 memory leaks and auto the parameters and since each gameobject has their own unique typeID and component array.
 
 as for the template that has args... or basically Variadic Templates since different system have different parameters that they take in of course
-i didnt know about only after using abit of AI to look at examples
+i didnt know about only after using abit of AI to look at examples.
+
+
 ======================================================================*/
 
 /* Start Header ************************************************************************/
@@ -32,6 +34,7 @@ i didnt know about only after using abit of AI to look at examples
 \author     Jonathan Fam Qian Wei [100% - 87 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
+
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
 without the prior written consent of DigiPen Institute of
@@ -52,15 +55,37 @@ using EntityID = std::uint32_t;
 class GameObject {
 public:
 
+    /**
+     * @brief Constructs a GameObject with a unique ID and name.
+     * @param id The unique EntityID assigned by the GameObjectFactory.
+     * @param name The desired name for the GameObject (defaults to "GameObject").
+     */
     GameObject(EntityID id, const std::string& name = "GameObject");
+
+    /**
+     * @brief Creates a deep clone of this GameObject, copying all its components.
+     * @param newName An optional new name for the cloned GameObject.
+     * @return A pointer to the newly created GameObject clone.
+     */
     GameObject* Clone(const std::string& newName = "")const;
-    
+
+    /**
+     * @brief Destructor for the GameObject.
+     */
     ~GameObject();
 
     // Component management
-     /*======================================================================================
-
-    ========================================================================================*/
+     /**
+     * @brief Adds a component of type T to the GameObject.
+     *
+     * If a component of type T already exists, it is returned. Otherwise, a new component
+     * is created, initialized, and added, taking ownership of the unique_ptr.
+     *
+     * @tparam T The type of the component to add (must derive from IComponent).
+     * @tparam Args The types of the constructor arguments.
+     * @param args The constructor arguments forwarded to the component's constructor.
+     * @return A raw pointer to the added or existing component.
+     */
     template<typename T, typename... Args>
     T* AddComponent(Args&&... args) {
         // Check if component already exists
@@ -82,9 +107,12 @@ public:
 
         return componentPtr;
     }
-    /*======================================================================================
-    
-    ========================================================================================*/
+
+    /**
+     * @brief Retrieves a component of type T from the GameObject.
+     * @tparam T The type of the component to retrieve.
+     * @return A raw pointer to the component, or nullptr if not found.
+     */
     template<typename T>
     T* GetComponent() {
         std::type_index typeIndex(typeid(T));
@@ -95,18 +123,24 @@ public:
         return nullptr;
     }
 
-    /*======================================================================================
-
-   ========================================================================================*/
+    /**
+     * @brief Checks if a component of type T exists on the GameObject.
+     * @tparam T The type of the component to check for.
+     * @return true if the component exists, false otherwise.
+     */
     template<typename T>
     bool HasComponent() {
         std::type_index typeIndex(typeid(T));
         return components.find(typeIndex) != components.end();
     }
-    /*======================================================================================
 
-   ========================================================================================*/
-
+    /**
+     * @brief Removes and destroys a component of type T from the GameObject.
+     *
+     * The component's Destroy() method is called before it is removed.
+     *
+     * @tparam T The type of the component to remove.
+     */
     template<typename T>
     void RemoveComponent() {
         std::type_index typeIndex(typeid(T));
@@ -116,10 +150,13 @@ public:
             components.erase(it);
         }
     }
-    /*======================================================================================
 
-   ========================================================================================*/
-
+    /**
+     * @brief Adds a pre-existing component to the GameObject, taking ownership.
+     * @tparam T The type of the component to add.
+     * @param component A unique pointer to the component to add.
+     * @return A raw pointer to the newly added component.
+     */
     template<typename T>
     T* AddComponent(std::unique_ptr<T> component) {
         // 1. Get the raw pointer to return before moving ownership
@@ -132,21 +169,23 @@ public:
         return raw_ptr;
     }
 
-    /*======================================================================================
-
-    ========================================================================================*/
+    /**
+     * @brief Gets a vector of raw pointers to all components on the GameObject.
+     * @return A vector of IComponent* pointers.
+     */
     std::vector<IComponent*> GetAllComponentPointers() {
         std::vector<IComponent*> ComponentArray;
         ComponentArray.reserve(components.size());
-            for (auto& pair : components) {
-                ComponentArray.push_back(pair.second.get());
-            }
-            return ComponentArray;
+        for (auto& pair : components) {
+            ComponentArray.push_back(pair.second.get());
+        }
+        return ComponentArray;
     }
 
-/*======================================================================================
-
-========================================================================================*/
+    /**
+     * @brief Gets a vector of the names of all components on the GameObject.
+     * @return A vector of strings containing the component names.
+     */
     std::vector<std::string> GetAllComponentName() {
         std::vector<std::string> ComponentArray;
         ComponentArray.reserve(components.size());
@@ -156,25 +195,56 @@ public:
         return ComponentArray;
     }
 
-/*======================================================================================
-
-========================================================================================*/
+    /**
+     * @brief Gets the count of components currently attached to the GameObject.
+     * @return The number of components as a size_t.
+     */
     size_t GetComponentCount() const {
         return components.size();
-}
+    }
 
 
     // GameObject lifecycle
+    /**
+     * @brief Initializes the GameObject and all its components.
+     */
     void Initialize();
+
+    /**
+     * @brief Updates the GameObject and all its components.
+     * @param deltaTime The time elapsed since the last frame.
+     */
     void Update(float deltaTime);
+
+    /**
+     * @brief Destroys the GameObject and calls Destroy() on all its components.
+     */
     void Destroy();
 
     // Getters
+    /**
+     * @brief Gets the unique EntityID of the GameObject.
+     * @return The EntityID.
+     */
     EntityID GetID() const { return entityID; }
+
+    /**
+     * @brief Gets the name of the GameObject.
+     * @return A constant reference to the GameObject's name string.
+     */
     const std::string& GetName() const { return name; }
 
     // Enable/disable
+    /**
+     * @brief Sets the active state of the GameObject.
+     * @param active If true, the GameObject is active; otherwise, it's inactive.
+     */
     void SetActive(bool active) { isActive = active; }
+
+    /**
+     * @brief Checks if the GameObject is currently active.
+     * @return true if the GameObject is active, false otherwise.
+     */
     bool IsActive() const { return isActive; }
 
 private:
