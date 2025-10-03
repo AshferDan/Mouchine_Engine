@@ -319,6 +319,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\GraphicsSystem.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\ImGuiSystem.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\RenderComponent.cpp" />
+    <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\TextComponent.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\glslshader.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\LevelEditor\LevelEditor.cpp" />
     <ClCompile Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Logic\logic.cpp" />
@@ -395,6 +396,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\GraphicsSystem.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\ImGuiSystem.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\RenderComponent.h" />
+    <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\TextComponent.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\glslshader.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Graphics\stb_image.h" />
     <ClInclude Include="C:\Users\admin\Documents\CSD2401\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\LevelEditor\LevelEditor.h" />
