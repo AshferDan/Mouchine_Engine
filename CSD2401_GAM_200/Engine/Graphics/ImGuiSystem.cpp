@@ -48,7 +48,7 @@ struct TempGOData
 };
 
 // 2 Temp GO Structs - for Game Object Creator & Prefab Loader
-TempGOData tempGO;
+TempGOData tempGO{"Game Object"};
 TempGOData tempPrefab;
 
 // Flags for IMGUI (current selection in drop down for GO Creator, and showing of some screens)
@@ -92,11 +92,12 @@ void ImGuiSystem::Initialize()
  */
 void ImGuiSystem::Update(float dt)
 {
-	if (InputManager::KeyStateImgui) {
-		ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
-		ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
-		ImGui::NewFrame();			  // Start ImGui frame
+	ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
+	ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
+	ImGui::NewFrame();			  // Start ImGui frame
 
+	if (InputManager::KeyStateImgui) 
+	{
 		// Begin main GameObject Inspector window
 		ImGui::Begin("GameObject Inspector",&InputManager::KeyStateImgui);
 
@@ -372,13 +373,12 @@ void ImGuiSystem::Update(float dt)
 			ImGui::ProgressBar((float)(smoothedPercent[name] / 100.0f), ImVec2(0.0f, 0.0f));
 		}
 		ImGui::End();
-
-		// Render ImGui frame
-		ImGui::Render();										// Finish ImGui frame
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Render draw data via OpenGL3 backend
-		glfwSwapBuffers(m_window);								// Swap GLFW window buffers
-		glfwPollEvents();// Poll input events
 	}
+	// Render ImGui frame
+	ImGui::Render();										// Finish ImGui frame
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Render draw data via OpenGL3 backend
+	glfwSwapBuffers(m_window);								// Swap GLFW window buffers
+	glfwPollEvents();// Poll input events
 }
 
 /**
