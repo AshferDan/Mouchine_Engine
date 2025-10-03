@@ -29,6 +29,7 @@ Technology is prohibited.
 #include <cmath>
 #include <sstream>
 #include <random> // For M1 demo, spawning 2.5k GOs
+#include "ResourceManager.h"
 
 class GameObjectFactory
 {
