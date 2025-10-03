@@ -26,7 +26,6 @@ std::map<std::string, double> g_systemTimings;
    Constuctor
 
    */
-CoreEngine::CoreEngine()
 CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0)
 {
     LastTime = 0;

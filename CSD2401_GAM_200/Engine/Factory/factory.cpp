@@ -184,12 +184,6 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     {
         transform->SetScale(w, h);
     }
-    // testing TO BE REMOVED
-    // std::cout << "Created "
-    //          << (shape == RenderComponent::ShapeType::Circle ? "Circle" : shape == RenderComponent::ShapeType::Square ? "Square"
-    //                                                                   : shape == RenderComponent::ShapeType::Line     ? "Line"
-    //                                                                                                                   : "Point")
-    //          << ": " << name << " at (" << x << "," << y << ")\n";
 
     return obj;
 }
@@ -198,36 +192,6 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     /brief
      This is the blueprint for the normal image gameobject, wer would this function to be images that we wanna like the background
 */
-GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, char const *filename)
-{
-    GameObject *obj = CreateGameObject(name);
-
-    if (original)
-    {
-        std::string finalName;
-
-        if (newName.empty())
-        {
-            std::stringstream ss;
-            size_t length = original->GetName().find_first_of('(');
-            if (length == std::string::npos)
-            {
-                length = original->GetName().length();
-            }
-
-            ++cloneCounter;
-            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
-            finalName = ss.str();
-        }
-        else
-        {
-            finalName = newName;
-        }
-
-        return original->Clone(finalName);
-    }
-    return nullptr;
-}
 
 GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType, float x, float y, float w, float h, char const *filename)
 {

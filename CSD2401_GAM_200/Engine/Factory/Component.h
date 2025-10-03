@@ -53,12 +53,11 @@ public:
      * @brief Called every game frame to update the component's logic.
      * @param deltaTime The time elapsed since the last frame.
      */
-    virtual void Update(float deltaTime) {}
+    virtual void Update(float) {}
 
     /**
      * @brief Cleans up the component's resources. Called once before component deletion.
      */
-    virtual void Update(float) {}
     virtual void Destroy() {}
 
     // Component info
