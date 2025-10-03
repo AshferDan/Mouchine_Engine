@@ -39,7 +39,7 @@ std::unique_ptr<IComponent> ColliderComponent::Clone(GameObject* newOwner) const
     return cloned;
 }
 
-void ColliderComponent::Update(float deltaTime) {
+void ColliderComponent::Update(float) {
     // Colliders typically don't need per-frame updates
     // They're queried by the collision system
     // Leave empty or add any specific update logic you need

@@ -19,7 +19,8 @@ Technology is prohibited.
  * @class TransformComponent
  * @brief Component that handles position, rotation, and scale of a GameObject in 2D space
  */
-class TransformComponent : public IComponent {
+class TransformComponent : public IComponent
+{
 public:
     /**
      * @brief Constructs a TransformComponent with initial position
@@ -27,7 +28,7 @@ public:
      * @param x Initial X position
      * @param y Initial Y position
      */
-    TransformComponent(GameObject* owner, float x = 0, float y = 0);
+    TransformComponent(GameObject *owner, float x = 0, float y = 0);
 
     /**
      * @brief Updates the transform component each frame
@@ -46,7 +47,7 @@ public:
      * @param NewClone GameObject that will own the cloned component
      * @return Unique pointer to the cloned TransformComponent
      */
-    std::unique_ptr<IComponent>Clone(GameObject* NewClone) const override;
+    std::unique_ptr<IComponent> Clone(GameObject *NewClone) const override;
 
     // Position
     /**
@@ -61,7 +62,7 @@ public:
      * @param x Reference to store X coordinate
      * @param y Reference to store Y coordinate
      */
-    void GetPosition(float& x, float& y) const;
+    void GetPosition(float &x, float &y) const;
 
     // Rotation (single angle in 2D)
     /**
@@ -95,7 +96,7 @@ public:
      * @param x Reference to store X scale factor
      * @param y Reference to store Y scale factor
      */
-    void GetScale(float& x, float& y) const;
+    void GetScale(float &x, float &y) const;
 
     // Movement
     /**
@@ -132,7 +133,7 @@ public:
     void MoveRight(float distance);
 
 public:
-    float posX, posY;        // Position
-    float rotation;          // Rotation angle in radians
-    float scaleX, scaleY;    // Scale factors
+    float posX, posY;     // Position
+    float rotation;       // Rotation angle in radians
+    float scaleX, scaleY; // Scale factors
 };

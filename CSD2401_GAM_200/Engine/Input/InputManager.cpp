@@ -28,7 +28,7 @@ void InputManager::Initialize()
     // glfwSetScrollCallback(window, InputManager::mousescroll_cb);
 }
 
-void InputManager::Update(float dt)
+void InputManager::Update(float)
 {
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
@@ -101,10 +101,9 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    {
-        DemoM1_SpawnGameObjects();
-    }
+    /**
+    * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
+    */
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         DemoM1_DestroyGameObjects();
@@ -159,26 +158,22 @@ void InputManager::Update(float dt)
 
     if (transform && anim) {
 
-        // --- A. HORIZONTAL FLIP LOGIC ---
-        // ... (Your flip logic is fine here) ...
+
         if (std::abs(moveDirectionX) > 0.0f) {
             float baseWidth = std::abs(transform->scaleX);
             float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        // --- B. ANIMATION SWITCHING LOGIC (Idling vs Running) ---
-
-        // **Animation Constants - CORRECTED END FRAME INDEX (0 and 1 for 2 columns)**
-        const char* IDLE_SS = "../Assets/Mouch_Idle.png";
+        const char* IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1; 
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char* RUN_SS = "../Assets/Mouch_Running.png";
-        const char* JUMP_SS = "../Assets/Mouch_jump.png";
+        const char* RUN_SS = "./Assets/Mouch_Running.png";
+        const char* JUMP_SS = "./Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;
@@ -205,15 +200,13 @@ void InputManager::Update(float dt)
         
         if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
         {
-            // 1. Load the new texture (This is the crucial step that was being skipped)
+            
             anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
 
-            // 2. Set the new animation speed and range
             anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
         }
     }
 
-    // Apply the horizontal velocity (vertical is handled by gravity/jump)
     physics->SetVelocity(vx, vy);
 
     // Mouse
@@ -231,7 +224,6 @@ void InputManager::Update(float dt)
     mouseX = xpos;
     mouseY = ypos;
 
-    // scroll not added
 }
 
 std::string InputManager::GetName()

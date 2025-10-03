@@ -21,7 +21,7 @@ public:
     ~InputManager();
 
     void Initialize();
-    void Update(float dt) override;
+    void Update(float) override;
     std::string GetName() override;
 
     // State getters

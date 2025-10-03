@@ -17,24 +17,28 @@ Technology is prohibited.
 #include "audio.h"
 
 // Texture Resource Implementation
-TextureResource::~TextureResource() {
+TextureResource::~TextureResource()
+{
     Unload();
 }
 
 /**
  * @brief Loads a texture from file using GraphicsSystem
  */
-bool TextureResource::Load(const std::string& filepath) {
-    if (loaded) {
-        std::cout << "Texture already loaded: " << filepath << std::endl;
+bool TextureResource::Load(const std::string &filepath)
+{
+    if (loaded)
+    {
+        std::cout << "Texture already loaded: " << path << std::endl;
         return true;
     }
 
-    this->filepath = filepath;
+    this->filepath = path;
 
     textureID = GraphicsSystem::LoadTexture(filepath.c_str());
 
-    if (textureID == 0) {
+    if (textureID == 0)
+    {
         std::cerr << "failed to load texture: " << filepath << std::endl;
         return false;
     }
@@ -48,8 +52,10 @@ bool TextureResource::Load(const std::string& filepath) {
 /**
  * @brief Unloads the texture and deletes OpenGL texture object
  */
-void TextureResource::Unload() {
-    if (loaded && textureID != 0) {
+void TextureResource::Unload()
+{
+    if (loaded && textureID != 0)
+    {
         glDeleteTextures(1, &textureID);
         textureID = 0;
         loaded = false;
@@ -58,30 +64,35 @@ void TextureResource::Unload() {
 }
 
 // Audio Resource Implementation
-AudioResource::~AudioResource() {
+AudioResource::~AudioResource()
+{
     Unload();
 }
 
 /**
  * @brief Loads an audio file through the AudioEngine
  */
-bool AudioResource::Load(const std::string& filepath) {
-    if (loaded) {
-        std::cout << "Audio already loaded: " << filepath << std::endl;
+bool AudioResource::Load(const std::string &filepath)
+{
+    if (loaded)
+    {
+        std::cout << "Audio already loaded: " << path << std::endl;
         return true;
     }
 
-    if (!audioEngine) {
+    if (!audioEngine)
+    {
         std::cerr << "Cannot load audio: AudioEngine not set" << std::endl;
         return false;
     }
 
-    this->filepath = filepath;
+    this->filepath = path;
 
     // Use audio engine load sound
     bool success = audioEngine->loadSound(name, filepath, loop);
 
-    if (!success) {
+    if (!success)
+    {
         std::cerr << "Failed to load audio through audio engine: " << filepath << std::endl;
         return false;
     }
@@ -94,8 +105,10 @@ bool AudioResource::Load(const std::string& filepath) {
 /**
  * @brief Unloads the audio resource
  */
-void AudioResource::Unload() {
-    if (loaded && audioEngine) {
+void AudioResource::Unload()
+{
+    if (loaded && audioEngine)
+    {
         // Use audio engine unload sound
         loaded = false;
         std::cout << "Audio unloaded: " << filepath << std::endl;
@@ -106,10 +119,12 @@ void AudioResource::Unload() {
 /**
  * @brief Loads a texture resource or returns existing one if already loaded
  */
-TextureResource* ResourceManager::LoadTexture(const std::string& name, const std::string& filepath) {
+TextureResource *ResourceManager::LoadTexture(const std::string &name, const std::string &filepath)
+{
     // Check if already loaded
     auto it = textures.find(name);
-    if (it != textures.end()) {
+    if (it != textures.end())
+    {
         std::cout << "Texture '" << name << "' already loaded, returning existing resource" << std::endl;
         return it->second.get();
     }
@@ -118,12 +133,13 @@ TextureResource* ResourceManager::LoadTexture(const std::string& name, const std
     auto texture = std::make_unique<TextureResource>();
     texture->SetName(name);
 
-    if (!texture->Load(filepath)) {
+    if (!texture->Load(filepath))
+    {
         std::cerr << "faailed to load texture: " << name << " from " << filepath << std::endl;
         return nullptr;
     }
 
-    TextureResource* ptr = texture.get();
+    TextureResource *ptr = texture.get();
     textures[name] = std::move(texture);
 
     return ptr;
@@ -132,16 +148,19 @@ TextureResource* ResourceManager::LoadTexture(const std::string& name, const std
 /**
  * @brief Retrieves a loaded texture resource by name
  */
-TextureResource* ResourceManager::GetTexture(const std::string& name) {
+TextureResource *ResourceManager::GetTexture(const std::string &name)
+{
     return GetResource<TextureResource>(name, textures);
 }
 
 /**
  * @brief Unloads a specific texture resource from the manager
- */ 
-void ResourceManager::UnloadTexture(const std::string& name) {
+ */
+void ResourceManager::UnloadTexture(const std::string &name)
+{
     auto it = textures.find(name);
-    if (it != textures.end()) {
+    if (it != textures.end())
+    {
         textures.erase(it);
         std::cout << "Texture '" << name << "' unloaded from resource manager" << std::endl;
     }
@@ -150,14 +169,17 @@ void ResourceManager::UnloadTexture(const std::string& name) {
 /**
  * @brief Loads an audio resource or returns existing one if already loaded
  */
-AudioResource* ResourceManager::LoadAudio(const std::string& name, const std::string& filepath, bool loop) {
+AudioResource *ResourceManager::LoadAudio(const std::string &name, const std::string &filepath, bool loop)
+{
     auto it = audioResources.find(name);
-    if (it != audioResources.end()) {
+    if (it != audioResources.end())
+    {
         std::cout << "Audio '" << name << "' already loaded, returning existing resource" << std::endl;
         return it->second.get();
     }
 
-    if (!audioEngine) {
+    if (!audioEngine)
+    {
         std::cerr << "Audio engine not set in resource manager" << std::endl;
         return nullptr;
     }
@@ -167,12 +189,13 @@ AudioResource* ResourceManager::LoadAudio(const std::string& name, const std::st
     audio->SetLoop(loop);
     audio->SetAudioEngine(audioEngine);
 
-    if (!audio->Load(filepath)) {
+    if (!audio->Load(filepath))
+    {
         std::cerr << "Failed to load audio: " << name << " from " << filepath << std::endl;
         return nullptr;
     }
 
-    AudioResource* ptr = audio.get();
+    AudioResource *ptr = audio.get();
     audioResources[name] = std::move(audio);
     return ptr;
 }
@@ -180,16 +203,19 @@ AudioResource* ResourceManager::LoadAudio(const std::string& name, const std::st
 /**
  * @brief Retrieves a loaded audio resource by name
  */
-AudioResource* ResourceManager::GetAudio(const std::string& name) {
+AudioResource *ResourceManager::GetAudio(const std::string &name)
+{
     return GetResource<AudioResource>(name, audioResources);
 }
 
 /**
  * @brief Unloads a specific audio resource from the manager
  */
-void ResourceManager::UnloadAudio(const std::string& name) {
+void ResourceManager::UnloadAudio(const std::string &name)
+{
     auto it = audioResources.find(name);
-    if (it != audioResources.end()) {
+    if (it != audioResources.end())
+    {
         audioResources.erase(it);
         std::cout << "Audio '" << name << "' unloaded from resource manager" << std::endl;
     }
@@ -198,7 +224,8 @@ void ResourceManager::UnloadAudio(const std::string& name) {
 /**
  * @brief Unloads all textures and audio resources
  */
-void ResourceManager::UnloadAll() {
+void ResourceManager::UnloadAll()
+{
     std::cout << "Unloading all resources..." << std::endl;
     UnloadAllTextures();
     UnloadAllAudio();
@@ -207,7 +234,8 @@ void ResourceManager::UnloadAll() {
 /**
  * @brief Unloads all texture resources and clears the texture map
  */
-void ResourceManager::UnloadAllTextures() {
+void ResourceManager::UnloadAllTextures()
+{
     std::cout << "Unloading " << textures.size() << " textures" << std::endl;
     textures.clear();
 }
@@ -215,7 +243,8 @@ void ResourceManager::UnloadAllTextures() {
 /**
  * @brief Unloads all audio resources and clears the audio map
  */
-void ResourceManager::UnloadAllAudio() {
+void ResourceManager::UnloadAllAudio()
+{
     std::cout << "Unloading " << audioResources.size() << " audio resources" << std::endl;
     audioResources.clear();
 }
@@ -223,18 +252,21 @@ void ResourceManager::UnloadAllAudio() {
 /**
  * @brief Prints detailed information about all loaded resources
  */
-void ResourceManager::PrintLoadedResources() const {
+void ResourceManager::PrintLoadedResources() const
+{
     std::cout << "\n=== Loaded Resources ===" << std::endl;
 
     std::cout << "Textures (" << textures.size() << "):" << std::endl;
-    for (const auto& pair : textures) {
+    for (const auto &pair : textures)
+    {
         std::cout << "  - " << pair.first
-            << " (ID: " << pair.second->GetTextureID() << ")"
-            << " -> " << pair.second->GetFilePath() << std::endl;
+                  << " (ID: " << pair.second->GetTextureID() << ")"
+                  << " -> " << pair.second->GetFilePath() << std::endl;
     }
 
     std::cout << "Audio (" << audioResources.size() << "):" << std::endl;
-    for (const auto& pair : audioResources) {
+    for (const auto &pair : audioResources)
+    {
         std::cout << "  - " << pair.first << " -> " << pair.second->GetFilePath() << std::endl;
     }
 }
@@ -242,9 +274,11 @@ void ResourceManager::PrintLoadedResources() const {
 /**
  * @brief Sets the AudioEngine reference for loading audio resources
  */
-void ResourceManager::SetAudioEngine(AudioEngine* engine) {
+void ResourceManager::SetAudioEngine(AudioEngine *engine)
+{
     audioEngine = engine;
-    if (audioEngine) {
+    if (audioEngine)
+    {
         std::cout << "Audio engine set in resource manager" << std::endl;
     }
 }
@@ -253,10 +287,12 @@ void ResourceManager::SetAudioEngine(AudioEngine* engine) {
 /**
  * @brief Template helper to retrieve resources from resource maps
  */
-template<typename Resource>
-Resource* ResourceManager::GetResource(const std::string& name, std::map<std::string, std::unique_ptr<Resource>>& resourceMap) {
+template <typename Resource>
+Resource *ResourceManager::GetResource(const std::string &name, std::map<std::string, std::unique_ptr<Resource>> &resourceMap)
+{
     auto it = resourceMap.find(name);
-    if (it != resourceMap.end()) {
+    if (it != resourceMap.end())
+    {
         return it->second.get();
     }
 

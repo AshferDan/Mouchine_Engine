@@ -205,8 +205,8 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
     float overlapX = std::min(aabb1.max.x - aabb2.min.x, aabb2.max.x - aabb1.min.x);
     float overlapY = std::min(aabb1.max.y - aabb2.min.y, aabb2.max.y - aabb1.min.y);
 
-    std::cout << "ResolveSquareSquare: " << obj1->GetName() << " <-> " << obj2->GetName()
-        << " overlapX=" << overlapX << " overlapY=" << overlapY << std::endl;
+    //std::cout << "ResolveSquareSquare: " << obj1->GetName() << " <-> " << obj2->GetName()
+        //<< " overlapX=" << overlapX << " overlapY=" << overlapY << std::endl;
 
     if (overlapX < overlapY) {
         // Resolve on X axis
@@ -223,7 +223,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             transform2->Move(-direction * overlapX * 0.5f, 0);
             physics2->SetVelocity(0, physics2->velocityY);
         }
-        std::cout << "  Resolved on X axis" << std::endl;
+        //std::cout << "  Resolved on X axis" << std::endl;
     }
     else {
         // Resolve on Y axis
@@ -232,7 +232,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
         auto* transform1 = obj1->GetComponent<TransformComponent>();
         auto* transform2 = obj2->GetComponent<TransformComponent>();
 
-        std::cout << "  Resolving on Y axis, direction=" << direction << std::endl;
+        //std::cout << "  Resolving on Y axis, direction=" << direction << std::endl;
 
         if (!physics1->IsStatic() && transform1) {
             transform1->Move(0, direction * overlapY * 0.5f);
@@ -240,7 +240,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             // obj1 is ABOVE obj2 when direction > 0, so it's landing on top
             if (direction > 0 && physics1->velocityY <= 0) {
                 physics1->SetGrounded(true);
-                std::cout << "  " << obj1->GetName() << " IS NOW GROUNDED!" << std::endl;
+                //std::cout << "  " << obj1->GetName() << " IS NOW GROUNDED!" << std::endl;
             }
         }
         if (!physics2->IsStatic() && transform2) {
@@ -249,7 +249,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             // obj2 is ABOVE obj1 when direction < 0, so it's landing on top
             if (direction < 0 && physics2->velocityY <= 0) {
                 physics2->SetGrounded(true);
-                std::cout << "  " << obj2->GetName() << " IS NOW GROUNDED!" << std::endl;
+                //std::cout << "  " << obj2->GetName() << " IS NOW GROUNDED!" << std::endl;
             }
         }
     }

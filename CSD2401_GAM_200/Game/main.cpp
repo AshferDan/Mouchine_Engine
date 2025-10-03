@@ -20,7 +20,7 @@ int main()
     CoreEngine engine;
     AudioEngine audio;
     engine.SetAudioEngine(&audio);
-    double g_totalLoopTime = 0.0;
+    //double g_totalLoopTime = 0.0;
     std::map<std::string, double> g_systemTimings; // ms per system
 
     std::cout << "\n--- Initializing Engine ---" << std::endl;
@@ -43,11 +43,11 @@ int main()
      resourceMgr.SetAudioEngine(&audio);
 
      // load textures
-     resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
+     resourceMgr.LoadTexture("player_sprite", "./Assets/protosprite.png");
 
      // load audio files
-     resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true); // looping
-     resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false); // when jumping only
+     resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true); // looping
+     resourceMgr.LoadAudio("jump_sfx", "./Assets/audio/jump.wav", false); // when jumping only
      // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
 
      // print loaded resources
@@ -61,13 +61,13 @@ int main()
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
 
-    GameObject *Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "../Assets/wallpaper_transparent.png");
+    factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "./Assets/wallpaper_transparent.png");
     
     GameObject* animatedMouch = factory.CreateAnimatedImage(
-        "Hero",                 // name
-        0.0f, 0.0f,                // x, y position
+        "Hero",                        // name
+        0.0f, 0.0f,                    // x, y position
         150.0f, 150.0f,                // width, height (scale)
-        "../Assets/Mouch_idle.png", // filename
+        "./Assets/Mouch_idle.png",    // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame
         2.0f,                          // 12 frames per second
@@ -77,24 +77,24 @@ int main()
     playerPhysics->SetGravity(true);
     playerPhysics->SetStatic(false);
 
-    GameObject* animatedMouchidle = factory.CreateAnimatedImage(
-        "AniImage",                 // name
-        -700.0f, 100.0f,                // x, y position
-        300.0f, 300.0f,                // width, height (scale)
-        "../Assets/Mouch_idle.png",     // filename
-        1, 2,                          //row,columns
-        0, 7,                          // start frame , end frame
-        2.0f                         // 12 frames per second
+    factory.CreateAnimatedImage(
+        "AniImage",                      // name
+        -700.0f, 100.0f,                 // x, y position
+        300.0f, 300.0f,                  // width, height (scale)
+        "./Assets/Mouch_idle.png",      // filename
+        1, 2,                            //row,columns
+        0, 7,                            // start frame , end frame
+        2.0f                             // 12 frames per second
     );
 
-    GameObject* animatedMouchRun = factory.CreateAnimatedImage(
-        "AniImage",                 // name
+    factory.CreateAnimatedImage(
+        "AniImage",                    // name
         700.0f, 100.0f,                // x, y position
         300.0f, 300.0f,                // width, height (scale)
-        "../Assets/Mouch_Running.png", // filename
+        "./Assets/Mouch_Running.png", // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame
-        2.0f                          // 12 frames per second
+        2.0f                           // 12 frames per second
     );
 
     // Create ground at the bottom of the screen (black rectangle)
@@ -114,21 +114,20 @@ int main()
     auto *wall2Physics = wall2->AddComponent<PhysicsComponent>(1.0f, true);
     wall2Physics->SetGravity(false);
 
-    // Circle Object -> name, object type (circle), x coord, y coord, width, height (if you want uneven circle),
-    //  RGBA color (0 is black , 1 is white, you probably need go online to convert if you want exact color of your liking)
+
     GameObject *CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics1 = CircleShape->AddComponent<PhysicsComponent>(1.0f, false);
-    physics1->SetVelocity(-250.0f, 0.0f); // Moving right
-    physics1->SetGravity(true);           // Disable gravity
+    physics1->SetVelocity(-250.0f, 0.0f);
+    physics1->SetGravity(true);           
 
     
  
     GameObject *CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, -150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics2 = CircleShape2->AddComponent<PhysicsComponent>(1.0f, false);
-    physics2->SetVelocity(250.0f, 0.0f); // Moving left
-    physics2->SetGravity(true);          // Disable gravity
-    // Button that has the 2.5k GOs spawning/ despawn
-    GameObject* EvilButton = factory.CreateGameObject("Evil Button");
+    physics2->SetVelocity(250.0f, 0.0f); 
+    physics2->SetGravity(true);         
+    
+    factory.CreateGameObject("Evil Button");
 
 
     std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;

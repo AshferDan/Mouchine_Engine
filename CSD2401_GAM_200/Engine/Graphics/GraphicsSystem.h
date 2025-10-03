@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       GraphicsSystem.h
+\author     Guan Shao Jun [100%]
+\par        shaojun.g@digipen.edu
+\date       October 02 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "stb_image.h"
 #include "System.h"
@@ -14,44 +28,113 @@
 #include <iostream>
 #include <RenderComponent.h>
 #include <fstream>
+#include "MathLib.h"
 
 
+/**
+ * @class GraphicsSystem
+ * @brief Handles window creation, rendering, and debug drawing utilities (lines, points, shapes).
+ *
+ * Typical usage:
+ *   GraphicsSystem gfx(1280, 720);
+ *   gfx.Initialize();
+ *   while (!glfwWindowShouldClose(gfx.getWindow())) {
+ *       gfx.Update(deltaTime);
+ *   }
+ */
 class GraphicsSystem : public ISystem {
 public:
 	GraphicsSystem();
 	GraphicsSystem(GLint W, GLint H);
 	~GraphicsSystem();
 
+	// Initializes OpenGL context, shaders, and buffers.
 	void Initialize() override;
-	void Update(float dt) override;
+
+	// Called each frame to handle rendering updates.
+	void Update(float) override;
+
+	/// Returns system name for debugging/identification.
 	std::string GetName() override;
+
+	/**
+	 * @brief Loads a 2D texture from file.
+	 * @param filepath Path to an image file (e.g., PNG, JPG).
+	 * @return GLuint handle to the OpenGL texture.
+	 *
+	 * Example:
+	 *   GLuint tex = GraphicsSystem::LoadTexture("assets/texture.png");
+	 */
 	static GLuint LoadTexture(const char* filepath);
 
-	GLFWwindow* getWindow() {return window;}
-	
+	/// Returns the GLFW window pointer (for input handling, context checks).
+	GLFWwindow* getWindow() { return window; }
+
+	/**
+	 * @brief Draws a debug line between two 2D points.
+	 * @param start World/Screen coordinate for line start.
+	 * @param end World/Screen coordinate for line end.
+	 * @param color RGBA color of the line.
+	 * @param vp View-projection matrix.
+	 *
+	 * Example:
+	 *   gfx.DrawLine({0,0}, {1,1}, {1,0,0,1}, cameraVP);
+	 */
 	void DrawLine(const glm::vec2& start, const glm::vec2& end,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
+	/**
+	 * @brief Draws a debug point at a position.
+	 * @param pos Position in 2D space.
+	 * @param color RGBA color of the point.
+	 * @param vp View-projection matrix.
+	 */
 	void DrawPoint(const glm::vec2& pos,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
+	/**
+	 * @brief Draws the outline of a rectangle.
+	 * @param x Left corner x position.
+	 * @param y Bottom corner y position.
+	 * @param w Width of rectangle.
+	 * @param h Height of rectangle.
+	 * @param color RGBA color of outline.
+	 * @param vp View-projection matrix.
+	 */
 	void DrawRectOutline(float x, float y, float w, float h,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
+	/**
+	 * @brief Draws a circle outline using line segments.
+	 * @param cx Center X position.
+	 * @param cy Center Y position.
+	 * @param r Radius of circle.
+	 * @param segments Number of line segments (higher = smoother).
+	 * @param color RGBA color.
+	 * @param vp View-projection matrix.
+	 *
+	 * Example:
+	 *   gfx.DrawCircleOutline(0, 0, 1.0f, 32, {0,1,0,1}, cameraVP);
+	 */
 	void DrawCircleOutline(float cx, float cy, float r, int segments,
-		const glm::vec4& color, const glm::mat4& vp);
+		const glm::vec4& color, const glm::mat4& viewProjection);
 
+	// Returns whether debug mode is enabled.
 	bool isDebugModeOn() const { return debugMode; }
+
+	// Toggles debug drawing mode (on/off).
 	void toggleDebugMode() { debugMode = !debugMode; }
+
+	// Returns the current view-projection matrix.
 	const glm::mat4& getVp() const { return vp; }
 
 private:
-	glm::mat4 vp;
-	bool debugMode = false;
-	GLFWwindow* window;
-	GLSLShader shader;
-	GLuint vao = 0, vbo = 0, tex = 0;
-	GLint Wwidth, Wheight;
+	glm::mat4 vp;               // Current view-projection matrix.
+	bool debugMode = false;     // Debug mode flag for showing shapes.
+	GLFWwindow* window;         // GLFW window handle.
+	GLSLShader shader;          // Shader used for debug rendering.
+	GLuint vao = 0, vbo = 0, tex = 0; // OpenGL buffers and texture.
+	GLint Wwidth, Wheight;      // Window dimensions.
 };
 
 
