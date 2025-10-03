@@ -1,5 +1,22 @@
+/* Start Header ************************************************************************/
+/*!
+\file       main.cpp
+\author     Lee Hwee Min [100% - 95 lines]
+\par        l.hweemin@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "main.h"
 
+/**
+ * @brief Enables memory leak checking in debug mode.
+ * @param breakAlloc, Allocation number to break on for debugging.
+ */
 void EnableMemoryLeakChecking(int breakAlloc = -1)
 {
     // Set the leak checking flag
@@ -12,7 +29,14 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
-
+/**
+ * @brief Main entry point of the program.
+ *
+ * Initializes the engine, resource manager, audio, and game objects.
+ * Loads textures, audio files, sets up the scene, then enters the main loop.
+ *
+ * @return Program exit code (0 = success).
+ */
 int main()
 {
     EnableMemoryLeakChecking();
@@ -114,13 +138,10 @@ int main()
     auto *wall2Physics = wall2->AddComponent<PhysicsComponent>(1.0f, true);
     wall2Physics->SetGravity(false);
 
-
     GameObject *CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics1 = CircleShape->AddComponent<PhysicsComponent>(1.0f, false);
     physics1->SetVelocity(-250.0f, 0.0f);
-    physics1->SetGravity(true);           
-
-    
+    physics1->SetGravity(true);            
  
     GameObject *CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, -150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics2 = CircleShape2->AddComponent<PhysicsComponent>(1.0f, false);
@@ -128,7 +149,6 @@ int main()
     physics2->SetGravity(true);         
     
     GameObject* EvilButton = factory.CreateGameObject("Evil Button");
-
 
     std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
     engine.GameLoop();

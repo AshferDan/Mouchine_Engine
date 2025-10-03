@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       InputManager.h
+\author     Lee Hwee Min [100% - 41 lines]
+\par        l.hweemin@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
@@ -14,47 +27,87 @@
 #include <imgui_impl_glfw.h>
 #include "audio.h"
 
+/**
+ * @class InputManager
+ * @brief Handles keyboard, mouse, and input-related events for the game engine.
+ *
+ * The InputManager processes player inputs, manages key states,
+ * handles mouse positions, and communicates with other subsystems
+ * such as audio and graphics.
+ */
+
 class InputManager : public ISystem
 {
 public:
+    /**
+     * @brief Constructs an InputManager.
+     * @param window Pointer to the GLFW window.
+     * @param audio Optional pointer to the AudioEngine for sound control.
+     */
     InputManager(GLFWwindow* window, AudioEngine* audio = nullptr);
+
+    /**
+     * @brief Destructor for InputManager.
+     */
     ~InputManager();
 
+    /**
+     * @brief Initializes the input system (fetches window size, etc.).
+     */
     void Initialize();
+
+    /**
+     * @brief Updates input handling each frame.
+     * @param dt Delta time since last frame.
+     */
     void Update(float dt) override;
+
+    /**
+     * @brief Returns the name of this system.
+     * @return "Input System"
+     */
     std::string GetName() override;
 
-    // State getters
+    // ------------------- Getters -------------------
+
+    /**
+     * @brief Gets the current X position of the mouse.
+     * @return Mouse X position in screen coordinates.
+     */
     double GetMouseX() const { return mouseX; }
+
+    /**
+     * @brief Gets the current Y position of the mouse.
+     * @return Mouse Y position in screen coordinates.
+     */
     double GetMouseY() const { return mouseY; }
+
+    /**
+    * @brief Gets the scroll X offset.
+    * @return Horizontal scroll offset.
+    */
     double GetScrollX() const { return scrollX; }
+
+    /**
+    * @brief Gets the scroll Y offset.
+    * @return Vertical scroll offset.
+    */
     double GetScrollY() const { return scrollY; }
 
+    // Static quit flag triggered when Escape is pressed.
     static bool KeyStateQuit;
-
-    // private:
-    //
-    //     // Callbacks
-    //     static void key_cb(GLFWwindow* pwin, int key, int scancode, int action, int mods);
-    //     static void mousebutton_cb(GLFWwindow* pwin, int button, int action, int mods);
-    //     static void mousepos_cb(GLFWwindow* pwin, double xpos, double ypos);
-    //     static void mousescroll_cb(GLFWwindow* pwin, double xoffset, double yoffset);
-    //
-    //     void HandleKey(int key, int action);
-    //     void HandleMouseButton(int button, int action);
-    //     void HandleMouseMove(double xpos, double ypos);
-    //     void HandleScroll(double xoffset, double yoffset);
 
 private:
     // Window info
     GLFWwindow *window;
     int width, height;
-    std::string title; //dont think we need this
     AudioEngine* audioEngine;
 
     // Mouse position / scroll
     double mouseX, mouseY;
     double scrollX, scrollY;
+
+    // Movement and jump
     double movementspeed = 300.f;
     bool isJumping = false;
     float jumpStartY = 0.0f;

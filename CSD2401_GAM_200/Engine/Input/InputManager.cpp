@@ -1,8 +1,27 @@
+/* Start Header ************************************************************************/
+/*!
+\file       InputManager.cpp
+\author     Lee Hwee Min [100% - 181 lines]
+\par        l.hweemin@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "inputmanager.h"
 #include <iostream>
 #include <unordered_map>
 #include "Animator.hpp"
 #include "core.h"
+
+/**
+ * @brief Constructs an InputManager with specified parameters.
+ * @param window Pointer to the GLFW window.
+ * @param audio Optional pointer to the AudioEngine.
+ */
 InputManager::InputManager(GLFWwindow *window, AudioEngine* audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
 {
     glfwSetWindowUserPointer(window, this);
@@ -15,19 +34,24 @@ InputManager::InputManager(GLFWwindow *window, AudioEngine* audio) : window(wind
     }
 }
 
+/**
+ * @brief Destructor for InputManager.
+ */
 InputManager::~InputManager() {}
 
+/**
+ * @brief Initializes the InputManager by fetching window size.
+ */
 void InputManager::Initialize()
 {
     glfwGetWindowSize(window, &width, &height);
-
-    // ImGui_ImplGlfw_InitForOpenGL(window, true);
-    // glfwSetKeyCallback(window, InputManager::key_cb);
-    // glfwSetMouseButtonCallback(window, InputManager::mousebutton_cb);
-    // glfwSetCursorPosCallback(window, InputManager::mousepos_cb);
-    // glfwSetScrollCallback(window, InputManager::mousescroll_cb);
 }
 
+/**
+ * @brief Updates input handling, including key presses, mouse events,
+ *        player movement, jumping, animations, and quitting logic.
+ * @param dt Delta time since the last frame.
+ */
 void InputManager::Update(float dt)
 {
     static std::unordered_map<int, bool> singleTriggerKeys = {
@@ -234,119 +258,11 @@ void InputManager::Update(float dt)
     // scroll not added
 }
 
+/**
+ * @brief Gets the system name.
+ * @return The string "Input System".
+ */
 std::string InputManager::GetName()
 {
     return "Input System";
 }
-
-
-
-//-----------------OLD SYSTEM USING TRANSFORM FOR MOVEMENT -----------------//
-//
-// if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-//    std::cout << "UP" << std::endl;
-//    y += movementspeed;
-//}
-// if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-//    std::cout << "LEFT" << std::endl;
-//    x -= movementspeed;
-//}
-// if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-//    std::cout << "RIGHT" << std::endl;
-//    x += movementspeed;
-//}
-// if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-//    std::cout << "DOWN" << std::endl;
-//    y -= movementspeed;
-//}
-
-// if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-//     if (!isJumping) {
-//         isJumping = true;
-//         jumpStartY = y;
-//     }
-
-//    if (y < jumpStartY + jumpMaxHeight) {
-//        y += jumpSpeed * dt;
-//        if (y > jumpStartY + jumpMaxHeight) {
-//            y = jumpStartY + jumpMaxHeight;
-//        }
-//    }
-//}
-// else {
-//    isJumping = false;
-//}
-
-// transform->SetPosition(x, y);
-// Key callback: handles held keys(long press) and single-trigger actions
-// void InputManager::key_cb(GLFWwindow* pwin, int key, int, int action, int) {
-//    // ----- Map for single-trigger keys (key -> triggered flag) -----
-//    static std::unordered_map<int, bool> singleTriggerKeys = {
-//        {GLFW_KEY_SPACE, false}, // jump
-//        {GLFW_KEY_P, false}      // pause
-//    };
-//
-//    // Check if this key is a single-trigger key
-//    std::unordered_map<int, bool>::iterator it = singleTriggerKeys.find(key);
-//    if (it != singleTriggerKeys.end()) {
-//        if (action == GLFW_PRESS && !(it->second)) {
-//            switch (key) {
-//            case GLFW_KEY_SPACE:
-//                std::cout << "Jump triggered!" << std::endl;
-//                break;
-//            case GLFW_KEY_P:
-//                std::cout << "Pause toggled!" << std::endl;
-//                break;
-//            }
-//            it->second = true; // mark as triggered
-//        }
-//        else if (action == GLFW_RELEASE) {
-//            it->second = false; // reset flag
-//        }
-//        return; // exit early
-//    }
-//
-//    // ----- Continuous actions (held) -----
-//    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-//        switch (key) {
-//        case GLFW_KEY_W:
-//            std::cout << "Move forward (held or pressed)" << std::endl;
-//            break;
-//        case GLFW_KEY_A:
-//            std::cout << "Move left (held or pressed)" << std::endl;
-//            break;
-//        case GLFW_KEY_D:
-//            std::cout << "Move right (held or pressed)" << std::endl;
-//            break;
-//        case GLFW_KEY_ESCAPE:
-//            glfwSetWindowShouldClose(pwin, GLFW_TRUE);
-//            break;
-//        }
-//    }
-//}
-//
-//// Mouse buttons
-// void InputManager::mousebutton_cb(GLFWwindow*, int button, int action, int) {
-//     if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-//         switch (button) {
-//         case GLFW_MOUSE_BUTTON_LEFT:
-//             std::cout << "Left mouse action" << std::endl;
-//             break;
-//         case GLFW_MOUSE_BUTTON_RIGHT:
-//             std::cout << "Right mouse action" << std::endl;
-//             break;
-//         }
-//     }
-// }
-//
-//// Mouse position
-// void InputManager::mousepos_cb(GLFWwindow*, double xpos, double ypos) {
-//     mouseX = xpos;
-//     mouseY = ypos;
-// }
-//
-//// Scroll
-// void InputManager::mousescroll_cb(GLFWwindow*, double xoffset, double yoffset) {
-//     scrollX = xoffset;
-//     scrollY = yoffset;
-// }
