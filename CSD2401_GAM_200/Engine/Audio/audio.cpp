@@ -3,7 +3,7 @@
 \file       audio.cpp
 \author     Leck Xin Yee [100% - 183 lines]
 \par        xinyee.leck@digipen.edu
-\date       October, 2, 2025
+\date       October 02 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -93,7 +93,7 @@ bool AudioEngine::registerSound(const std::string& name, FMOD::Sound* sound) {
  */
 bool AudioEngine::loadSound(const std::string& name, const std::string& filepath, bool loop) {
 	if (!system) {
-		std::cout << "o man its not initialised" << std::endl;
+		std::cout << "It's not initialised" << std::endl;
 		return false;
 	}
 	// check sound exist
@@ -228,7 +228,7 @@ bool AudioEngine::eventPlaying(const std::string& eventName) {
 }
 */
 
-/*  Volume and effects controls  */
+// Volume and effects controls
 /**
  * @brief Sets the volume for a specific channel (clamped between 0.0 and 1.0)
  */

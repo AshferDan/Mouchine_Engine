@@ -3,7 +3,7 @@
 \file       ResourceManager.cpp
 \author     Leck Xin Yee [100% - 156 lines]
 \par        xinyee.leck@digipen.edu
-\date       October, 2, 2025
+\date       October 02 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -16,7 +16,7 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include "audio.h"
 
-/*  Texture Resource Implementation  */
+// Texture Resource Implementation
 TextureResource::~TextureResource() {
     Unload();
 }
@@ -57,7 +57,7 @@ void TextureResource::Unload() {
     }
 }
 
-/*  Audio Resource Implementation  */
+// Audio Resource Implementation
 AudioResource::~AudioResource() {
     Unload();
 }
@@ -78,7 +78,7 @@ bool AudioResource::Load(const std::string& filepath) {
 
     this->filepath = filepath;
 
-    // use audio engine load sound
+    // Use audio engine load sound
     bool success = audioEngine->loadSound(name, filepath, loop);
 
     if (!success) {
@@ -96,13 +96,13 @@ bool AudioResource::Load(const std::string& filepath) {
  */
 void AudioResource::Unload() {
     if (loaded && audioEngine) {
-        // use audio engine unload sound
+        // Use audio engine unload sound
         loaded = false;
         std::cout << "Audio unloaded: " << filepath << std::endl;
     }
 }
 
-/*  Resource Manager Implementation  */
+// Resource Manager Implementation
 /**
  * @brief Loads a texture resource or returns existing one if already loaded
  */
@@ -249,7 +249,7 @@ void ResourceManager::SetAudioEngine(AudioEngine* engine) {
     }
 }
 
-/*  Template Helper  */
+// Template Helper
 /**
  * @brief Template helper to retrieve resources from resource maps
  */
