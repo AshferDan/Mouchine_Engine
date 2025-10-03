@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Collision.cpp
+\author     Khalil Belabadia [100% - 68 lines]
+\par        khalil.b@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "collision.h"
 #include <algorithm> // for std::min, std::max
 #include <cmath>     // for sqrtf, fmaxf, fminf
@@ -6,7 +19,9 @@
 // Static Intersections
 // --------------------------------------------------
 
-// AABB vs AABB
+/**
+ * @brief Performs AABB vs AABB intersection test using separating axis theorem
+ */
 bool CollisionIntersection_RectRect_Static(const AABB& aabb1, const AABB& aabb2)
 {
     if (aabb1.max.x < aabb2.min.x) return false;
@@ -16,7 +31,9 @@ bool CollisionIntersection_RectRect_Static(const AABB& aabb1, const AABB& aabb2)
     return true;
 }
 
-// Circle vs Circle
+/**
+ * @brief Performs Circle vs Circle intersection test using distance check
+ */
 bool CollisionIntersection_CircleCircle_Static(const Circle& c1, const Circle& c2)
 {
     float dx = c1.center.x - c2.center.x;
@@ -26,7 +43,9 @@ bool CollisionIntersection_CircleCircle_Static(const Circle& c1, const Circle& c
     return distSq <= radiusSum * radiusSum;
 }
 
-// AABB vs Circle
+/**
+ * @brief Performs AABB vs Circle intersection test by finding closest point on rect
+ */
 bool CollisionIntersection_RectCircle_Static(const AABB& rect, const Circle& circle)
 {
     // Clamp circle center to the edges of the rectangle
@@ -43,15 +62,18 @@ bool CollisionIntersection_RectCircle_Static(const AABB& rect, const Circle& cir
 // Dynamic Intersections
 // --------------------------------------------------
 
-// Swept AABB vs AABB
+/**
+ * @brief Performs swept AABB collision detection for moving objects
+ * Uses relative velocity and separating axis theorem to find collision time
+ */
 bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1,
-    const Vec2& vel1,
+    const vec2& vel1,
     const AABB& aabb2,
-    const Vec2& vel2,
+    const vec2& vel2,
     float& firstTimeOfCollision)
 {
     // Relative velocity of B wrt A
-    Vec2 relVel = { vel2.x - vel1.x, vel2.y - vel1.y };
+    vec2 relVel = { vel2.x - vel1.x, vel2.y - vel1.y };
 
     // Initialize times
     float tFirst = 0.0f;
@@ -80,7 +102,7 @@ bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1,
             tLast = std::min(tLast, tExit);
         }
         else {
-            // v == 0 ? check overlap
+            // v == 0
             if (aMax < bMin || aMin > bMax) {
                 return false; // no movement, no overlap
             }

@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       PhysicsSystem.cpp
+\author     Khalil Belabadia [100% - 231 lines]
+\par        khalil.b@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "PhysicsSystem.h"
 #include "GameObject.h"
 #include "Factory.h"
@@ -7,16 +20,29 @@
 #include <iostream>
 #include <cmath>
 
+/**
+ * @brief Default constructor
+ */
 PhysicsSystem::PhysicsSystem() {
 }
 
+/**
+ * @brief Destructor
+ */
 PhysicsSystem::~PhysicsSystem() {
 }
 
+/**
+ * @brief Initializes the physics system
+ */
 void PhysicsSystem::Initialize() {
     std::cout << "Initializing system: PhysicsSystem" << std::endl;
 }
 
+/**
+ * @brief Main physics update loop
+ * Applies gravity, integrates velocity, clears grounded states, and resolves collisions
+ */
 void PhysicsSystem::Update(float deltaTime) {
     auto& factory = GameObjectFactory::Instance();
     const auto& gameObjects = factory.GetAllGameObjects();
@@ -77,20 +103,33 @@ void PhysicsSystem::Update(float deltaTime) {
     pendingCollisions.clear();
 }
 
+/**
+ * @brief Stores collision for later resolution in physics update
+ */
 void PhysicsSystem::ReportCollision(GameObject* obj1, GameObject* obj2,
     ColliderComponent* col1, ColliderComponent* col2) {
     pendingCollisions.push_back({ obj1, obj2, col1, col2 });
 }
 
+/**
+ * @brief Applies gravity force to physics object's velocity
+ */
 void PhysicsSystem::ApplyGravity(PhysicsComponent* physics, float deltaTime) {
     physics->velocityX += physics->gravityX * deltaTime;
     physics->velocityY += physics->gravityY * deltaTime;
 }
 
+/**
+ * @brief Updates position based on velocity
+ */
 void PhysicsSystem::IntegrateVelocity(PhysicsComponent* physics, TransformComponent* transform, float deltaTime) {
     transform->Move(physics->velocityX * deltaTime, physics->velocityY * deltaTime);
 }
 
+/**
+ * @brief Resolves elastic collision between two circles
+ * Handles separation and momentum transfer
+ */
 void PhysicsSystem::ResolveCircleCircle(GameObject* obj1, GameObject* obj2,
     ColliderComponent* col1, ColliderComponent* col2) {
     auto* physics1 = obj1->GetComponent<PhysicsComponent>();
@@ -191,6 +230,10 @@ void PhysicsSystem::ResolveCircleCircle(GameObject* obj1, GameObject* obj2,
     }
 }
 
+/**
+ * @brief Resolves collision between two AABBs
+ * Separates on shortest axis and handles grounding
+ */
 void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
     ColliderComponent* col1, ColliderComponent* col2) {
     auto* physics1 = obj1->GetComponent<PhysicsComponent>();
@@ -205,8 +248,8 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
     float overlapX = std::min(aabb1.max.x - aabb2.min.x, aabb2.max.x - aabb1.min.x);
     float overlapY = std::min(aabb1.max.y - aabb2.min.y, aabb2.max.y - aabb1.min.y);
 
-    std::cout << "ResolveSquareSquare: " << obj1->GetName() << " <-> " << obj2->GetName()
-        << " overlapX=" << overlapX << " overlapY=" << overlapY << std::endl;
+    //std::cout << "ResolveSquareSquare: " << obj1->GetName() << " <-> " << obj2->GetName()
+        //<< " overlapX=" << overlapX << " overlapY=" << overlapY << std::endl;
 
     if (overlapX < overlapY) {
         // Resolve on X axis
@@ -223,7 +266,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             transform2->Move(-direction * overlapX * 0.5f, 0);
             physics2->SetVelocity(0, physics2->velocityY);
         }
-        std::cout << "  Resolved on X axis" << std::endl;
+        //std::cout << "  Resolved on X axis" << std::endl;
     }
     else {
         // Resolve on Y axis
@@ -232,7 +275,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
         auto* transform1 = obj1->GetComponent<TransformComponent>();
         auto* transform2 = obj2->GetComponent<TransformComponent>();
 
-        std::cout << "  Resolving on Y axis, direction=" << direction << std::endl;
+        //std::cout << "  Resolving on Y axis, direction=" << direction << std::endl;
 
         if (!physics1->IsStatic() && transform1) {
             transform1->Move(0, direction * overlapY * 0.5f);
@@ -240,7 +283,7 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             // obj1 is ABOVE obj2 when direction > 0, so it's landing on top
             if (direction > 0 && physics1->velocityY <= 0) {
                 physics1->SetGrounded(true);
-                std::cout << "  " << obj1->GetName() << " IS NOW GROUNDED!" << std::endl;
+                //std::cout << "  " << obj1->GetName() << " IS NOW GROUNDED!" << std::endl;
             }
         }
         if (!physics2->IsStatic() && transform2) {
@@ -249,12 +292,16 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             // obj2 is ABOVE obj1 when direction < 0, so it's landing on top
             if (direction < 0 && physics2->velocityY <= 0) {
                 physics2->SetGrounded(true);
-                std::cout << "  " << obj2->GetName() << " IS NOW GROUNDED!" << std::endl;
+                //std::cout << "  " << obj2->GetName() << " IS NOW GROUNDED!" << std::endl;
             }
         }
     }
 }
 
+/**
+ * @brief Resolves collision between circle and square
+ * Handles separation and bounce physics
+ */
 void PhysicsSystem::ResolveMixed(GameObject* obj1, GameObject* obj2,
     ColliderComponent* col1, ColliderComponent* col2) {
     ColliderComponent* squareCol = (col1->GetType() == ColliderComponent::Type::Square) ? col1 : col2;

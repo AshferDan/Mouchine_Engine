@@ -1,3 +1,16 @@
+#/* Start Header ************************************************************************/
+#\file       CMakeLists.txt
+#\author     Jonathan Fam Qian Wei [100% - 309 lines]
+#\par        Fam.q@digipen.edu
+#\date       October, 2, 2025
+
+#Copyright (C) 2025 DigiPen Institute of Technology.
+#Reproduction or disclosure of this file or its contents
+#without the prior written consent of DigiPen Institute of
+#Technology is prohibited.
+#/* End Header **************************************************************************/
+
+
 # ======================= Project Configuration =========================
 cmake_minimum_required(VERSION 3.13)
 cmake_policy(VERSION 3.13)

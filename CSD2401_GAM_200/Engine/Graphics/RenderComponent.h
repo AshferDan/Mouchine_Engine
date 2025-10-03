@@ -16,18 +16,19 @@ Technology is prohibited.
 #include "Component.h"
 #include <GL/glew.h>
 #include "../Engine/Extern/MathLib.h"
-
+#include <iostream>
 
 /*! @class RenderComponent
     @brief Component for rendering shapes or textured objects.
 */
-class RenderComponent : public IComponent {
+class RenderComponent : public IComponent
+{
 public:
-
     /*! @enum ShapeType
         @brief Types of shapes supported by RenderComponent.
     */
-    enum class ShapeType {
+    enum class ShapeType
+    {
         Square, /*!< Square shape */
         Circle, /*!< Circle shape */
         Line,   /*!< Line shape */
@@ -56,9 +57,9 @@ public:
         @param owner The GameObject this component belongs to
         @param texID OpenGL texture ID
     */
-    RenderComponent(GameObject* owner, GLuint texID)
-        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point() {
-
+    RenderComponent(GameObject *owner, GLuint texID)
+        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point()
+    {
     }
 
     /*! @brief Constructor for a shape
@@ -68,7 +69,7 @@ public:
     */
     RenderComponent(GameObject* owner, ShapeType type, const vec4& color)
         : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
-    };
+          };
 
     /*! @brief Lifecycle override: initialize component */
     void Initialize() override {}
@@ -88,7 +89,7 @@ public:
         @param NewClone Pointer to the new GameObject
         @return Unique pointer to the cloned component
     */
-    std::unique_ptr<IComponent> Clone(GameObject* NewClone) const override;
+    std::unique_ptr<IComponent> Clone(GameObject *NewClone) const override;
 
     /*! @brief Get texture ID
         @return OpenGL texture ID
@@ -143,68 +144,64 @@ public:
     PointData GetPoint() const { return point; }
 
     /**
-     * @brief Returns the name of the current shape type as a C-string.
-     *
-     * This function converts the ShapeType enum of this RenderComponent
-     * into a human-readable string.
-     *
-     * @return const char* Name of the shape ("Square", "Circle", "Line", or "Point").
+     * @brief Return the shape's name as a c string
      */
     const char* GetShapeTypeName()
     {
-        switch (shape) // use the member variable directly
+        switch (static_cast<int>(GetShapeType()))               // Return corresponding name depending on object's shape enum
         {
-        case ShapeType::Square:
+        case static_cast<int>(ShapeType::Square):
             return "Square";
-        case ShapeType::Circle:
+        case static_cast<int>(ShapeType::Circle):
             return "Circle";
-        case ShapeType::Line:
+        case static_cast<int>(ShapeType::Line):
             return "Line";
-        case ShapeType::Point:
+        case static_cast<int>(ShapeType::Point):
             return "Point";
-        default:
-            return "Unknown"; // handle unexpected values
         }
     }
 
 private:
-    ShapeType shape; /*!< Shape type of this component */
+    ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
     vec4 color; /*!< Color of the shape */
 
-    LineData line; /*!< Line data if ShapeType::Line */
+    LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
 };
 
 /**
- * @brief Synchronizes a shape name string and a ShapeType enum.
- *
- * If `shapeName` is not empty, this function converts it to the corresponding
- * `RenderComponent::ShapeType` enum. If `shapeName` is empty, it converts the
- * given `shapeEnum` to its string representation.
- *
- * @param shapeName Reference to the string representing the shape (input or output)
- * @param shapeEnum Reference to the ShapeType enum (input or output)
+ * @brief Takes in references to a string and a enum int, and depending on which value is null, it'll assign the null value the corresponding value of the shape id.
+ *        Basically used to get the shape enum from shape string name, and vice versa.
+ *        If no match for either, print to cout and return out.
+ * @param shapeName Ref to string containing shape name
+ * @param shapeEnum Ref to enum int containing value in shape enum
  */
-inline void ShapeEnumToString(std::string& shapeName, RenderComponent::ShapeType& shapeEnum) {
-    // If the string is already provided, map it to the enum
-    if (!shapeName.empty())
+inline void ShapeEnumToString(std::string &shapeName, RenderComponent::ShapeType &shapeEnum)
+{
+    if (!shapeName.empty()) // If theres a name in shapeName, find a match and assign the enum int the corresponding shape value
     {
-        if (shapeName == "Square") {
+        if (shapeName == "Square")
+        {
             shapeEnum = RenderComponent::ShapeType::Square;
         }
-        else if (shapeName == "Circle") {
+        else if (shapeName == "Circle")
+        {
             shapeEnum = RenderComponent::ShapeType::Circle;
         }
-        else if (shapeName == "Line") {
+        else if (shapeName == "Line")
+        {
             shapeEnum = RenderComponent::ShapeType::Line;
         }
-        else if (shapeName == "Point") {
+        else if (shapeName == "Point")
+        {
             shapeEnum = RenderComponent::ShapeType::Point;
         }
-        else return; // Unrecognized string, do nothing
+        else
+            std::cout << "No matching shape name!\n";
+        return;
     }
-    else // If the string is empty, convert enum to string
+    else // If string is empty, look to the enum int to assign the string the corresponding shape's name
     {
         switch (shapeEnum)
         {
@@ -220,8 +217,10 @@ inline void ShapeEnumToString(std::string& shapeName, RenderComponent::ShapeType
         case RenderComponent::ShapeType::Point:
             shapeName = "Point";
             break;
+
         default:
-            break; // Unknown enum value, do nothing
+            std::cout << "No matching shape enum!\n";
+            break;
         }
     }
 }
