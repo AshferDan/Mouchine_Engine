@@ -14,7 +14,7 @@ public:
     ~CollisionSystem() override;
 
     void Initialize() override;
-    void Update(float deltaTime) override;
+    void Update(float) override;
     std::string GetName() override { return "CollisionSystem"; }
 
     // Set the physics system to report collisions to

@@ -60,7 +60,7 @@ bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2
     return true;
 }
 
-void CollisionSystem::Update(float deltaTime) {
+void CollisionSystem::Update(float) {
     auto& factory = GameObjectFactory::Instance();
     const auto& gameObjects = factory.GetAllGameObjects();
 
