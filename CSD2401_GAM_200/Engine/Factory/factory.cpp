@@ -15,16 +15,13 @@ Technology is prohibited.
 
 
 #include "Factory.h"
-#include "GraphicsSystem.h"
 
-#include "transform.h"
-#include "collision.h"
-#include "physics.h"
-#include <iostream>
-#include <cmath>
-#include <sstream>
-#include <random> // For M1 demo, spawning 2.5k GOs
 
+/*
+    /brief
+    Creation of the Gameobjects. it the single argument constructor create and 
+    pushes the gameobject id in to the gameobject system.
+*/
 GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 {
     EntityID id = nextEntityID++;
@@ -36,6 +33,14 @@ GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 
     return ptr;
 }
+/*
+    /brief
+     This is the blueprint for the player creation where 
+     it has 2 overloads with the sprite and the color, 
+     color overload is for the creating the shape and the sprite is for the texture.
+     in the future will create a hidden variable for player as the camera and inputs shld be on the player gameobject only.
+
+*/
 
 GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer layer)
 {
@@ -82,6 +87,14 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
 
     return player;
 }
+
+/*
+    /brief
+     This is the blueprint for the normal gameobject creation where
+     it has 3 overloads with the sprite and the color and one more for the collsions,
+     color overload is for the creating the shape and the sprite is for the texture and the last one is the collision layer.
+
+*/
 
 GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color, CollisionLayer layer)
 {
@@ -182,54 +195,28 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     return obj;
 }
 
-GameObject *GameObjectFactory::CloneGameObject(EntityID id, const std::string &newName)
+/*
+    /brief
+     This is the blueprint for the normal image gameobject, wer would this function to be images that we wanna like the background
+*/
+GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderComponent::ShapeType shape, float x, float y, float w, float h, char const* filename)
 {
-    GameObject *original = GetGameObject(id);
+    GameObject* obj = CreateGameObject(name);
 
-    if (original)
-    {
-        std::string finalName;
-
-        if (newName.empty())
-        {
-            std::stringstream ss;
-            size_t length = original->GetName().find_first_of('(');
-            if (length == std::string::npos)
-            {
-                length = original->GetName().length();
-            }
-
-            ++cloneCounter;
-            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
-            finalName = ss.str();
-        }
-        else
-        {
-            finalName = newName;
-        }
-
-        return original->Clone(finalName);
-    }
-    return nullptr;
-}
-
-GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, char const *filename)
-{
-    GameObject *obj = CreateGameObject(name);
-
-    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
     GLint texID = GraphicsSystem::LoadTexture(filename);
     auto render = obj->AddComponent<RenderComponent>(texID);
     transform->SetScale(w, h);
     return obj;
 }
-GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, float x, float y, float w, float h,
-                                                   char const *filename, int numRows, int numCols,
-                                                   int startFrame, int endFrame, float fps)
-{
-    GameObject *obj = CreateGameObject(name);
 
-    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, float x, float y, float w, float h,
+    char const* filename, int numRows, int numCols,
+    int startFrame, int endFrame, float fps)
+{
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
     transform->SetScale(-w, h);
 
     auto spritesheetComp = std::make_unique<Spritesheet>(
@@ -242,13 +229,19 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
 
     obj->AddComponent<RenderComponent>(textureID);
 
-    Spritesheet *anim = spritesheetComp.get();
+    Spritesheet* anim = spritesheetComp.get();
     obj->AddComponent(std::move(spritesheetComp));
 
     anim->SetAnimation(startFrame, endFrame, fps);
 
     return obj;
 }
+
+/*
+    /brief
+     This is the blueprint for the CreateAnimatedImage gameobject, this is where the we create the sprite animation gameobject if we need to
+     this might removed in the future once we set up the player gamoboject better.
+*/
 
 GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, float x, float y, float w, float h, char const* filename, int numRows, int numCols, int startFrame, int endFrame, float fps, CollisionLayer layer)
 {
@@ -281,6 +274,45 @@ GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, floa
 
     return obj;
 }
+
+/*
+    /brief
+     This is the blueprint for cloning each type of gameobject we have 4 types so 
+     4 different function for GameObject,Player,Image and Animted Image
+
+*/
+GameObject *GameObjectFactory::CloneGameObject(EntityID id, const std::string &newName)
+{
+    GameObject *original = GetGameObject(id);
+
+    if (original)
+    {
+        std::string finalName;
+
+        if (newName.empty())
+        {
+            std::stringstream ss;
+
+            size_t length = original->GetName().find_first_of('(');
+            if (length == std::string::npos)
+            {
+                length = original->GetName().length();
+            }
+
+            ++cloneCounter;
+            ss << original->GetName().substr(0, length) << "(" << cloneCounter << ")";
+            finalName = ss.str();
+        }
+        else
+        {
+            finalName = newName;
+        }
+
+        return original->Clone(finalName);
+    }
+    return nullptr;
+}
+
 
 GameObject *GameObjectFactory::ClonePlayer(EntityID id, const std::string &newName)
 {
@@ -422,6 +454,12 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
     return nullptr;
 }
 
+/*
+    /brief
+     This is the function that calls the getGameObject to return the gameobject.
+
+*/
+
     GameObject *GameObjectFactory::GetGameObject(EntityID id)
     {
         auto it = entityToIndex.find(id);
@@ -432,6 +470,11 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
         return nullptr;
     }
 
+    /*
+    /brief
+     This is the function that calls the findGameObject to find the gameobject.
+
+*/
     GameObject *GameObjectFactory::FindGameObject(const std::string &name)
     {
         for (auto &obj : gameObjects)
@@ -448,6 +491,11 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
     {
         return gameObjects;
     }
+    /*
+/brief
+ This is the function that calls the destroyGameObject to destroy/ delete/ set unactive the gameobject.
+
+*/
 
     void GameObjectFactory::DestroyGameObject(EntityID id)
     {
@@ -466,6 +514,11 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
             entityToIndex.erase(it);
         }
     }
+ /*
+/brief
+ This is the function that calls the ClearGameObject to clear the gameobject from the systems
+
+*/
 
     void GameObjectFactory::Clear()
     {
@@ -475,6 +528,10 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
     }
 
     // FUNCTIONS TO SPAWN 2.5K OBJECTS FOR M1 DEMO!!
+    /* brief
+        This is the function that calls the spawning of 2.5k gameobjects to stress test our engine.
+
+        */
 
     std::vector<GameObject *> vecGOs;
     void DemoM1_SpawnGameObjects()
@@ -495,7 +552,11 @@ GameObject *GameObjectFactory::CloneAnimatedImage(EntityID id, const std::string
             vecGOs.push_back(newGO);
         }
     }
+    /*
+    /* brief
+        This is the function that calls the destroying of 2.5k gameobjects to stress test our engine.
 
+        */
     void DemoM1_DestroyGameObjects()
     {
         auto &factory = GameObjectFactory::Instance();

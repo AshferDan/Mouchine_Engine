@@ -17,11 +17,19 @@ Technology is prohibited.
 #include <iostream>
 #include <sstream>
 
+ /* brief
+   the constructor for the gameobejcts
 
+    */
 GameObject::GameObject(EntityID id, const std::string& name)
     : entityID(id), name(name), isActive(true) {
 }
 
+/* brief
+  this function is the cloning of the gamebjects copying the parameters and values from a gameobject 
+  to a new a new with the same values and parameters
+
+   */
 GameObject* GameObject::Clone(const std::string& newName) const {
     GameObjectFactory& factory = GameObjectFactory::Instance();
 
@@ -48,16 +56,26 @@ GameObject* GameObject::Clone(const std::string& newName) const {
 
     return clone;
 }
+/* brief
+  deconstructor
+
+   */
 GameObject::~GameObject() {
     Destroy();
 }
+/* brief
+   initializes the components a gameobject
 
+   */
 void GameObject::Initialize() {
     for (auto& [type, component] : components) {
         component->Initialize();
     }
 }
+/* brief
+   update the components a gameobject if it is enabled  call the updates
 
+   */
 void GameObject::Update(float deltaTime) {
     if (!isActive) return;
 
@@ -67,7 +85,10 @@ void GameObject::Update(float deltaTime) {
         }
     }
 }
+/* brief
+   destorys the gameobject and calls the destroy function for the components
 
+   */
 void GameObject::Destroy() {
     for (auto& [type, component] : components) {
         component->Destroy();

@@ -21,6 +21,11 @@ double CoreEngine::delta_time = 0.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 
+
+/* brief
+   Constuctor
+
+   */
 CoreEngine::CoreEngine()
 {
     LastTime = 0;
@@ -29,13 +34,20 @@ CoreEngine::CoreEngine()
 
     std::cout << "CoreEngine constructed" << std::endl;
 }
-
+/* brief
+   deonstuctor
+   */
 CoreEngine::~CoreEngine()
 {
     DestroySystems();
     std::cout << "CoreEngine destroyed" << std::endl;
 }
 
+/* brief
+   function loads the config.txt file from the folder  directory and loads the 
+   window width and height to the graphics system
+
+   */
 void CoreEngine::ConfigFile(const char *configF)
 {
     std::ifstream fp{configF};
@@ -52,6 +64,10 @@ void CoreEngine::ConfigFile(const char *configF)
     setWindsize(WindWid, WindHei);
 }
 
+/* brief
+   This function init the systems and add the systems into the enigne
+
+   */
 void CoreEngine::InitSystems()
 {
     CoreEngine::ConfigFile("./Logs/config.txt");
@@ -80,6 +96,10 @@ void CoreEngine::InitSystems()
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
+/* brief
+   This function init the engine and add the systems into the enigne and as well as initialze the added systems.
+
+   */
 
 void CoreEngine::Init()
 {
@@ -95,6 +115,11 @@ void CoreEngine::Init()
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
 
+/* brief
+   This function starts the core engine loop to start the game engine process
+   there is the a exeception error checker too to get error thrown too
+
+   */
 void CoreEngine::GameLoop()
 {
     double fps_interval = 1.0;
@@ -160,12 +185,15 @@ void CoreEngine::GameLoop()
     glfwTerminate();
 }
 
+/* brief
+   This function deletes the engines and stops the engine processes and clears all systems
+
+   */
 void CoreEngine::DestroySystems()
 {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
 }
-
 
 void CoreEngine::update_time(double fps_calc_interval)
 {

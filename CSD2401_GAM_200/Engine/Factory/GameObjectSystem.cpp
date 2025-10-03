@@ -12,17 +12,24 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "GameObject.h"
-
 #include "GameObjectSystem.h"
- #include "Factory.h"
- #include <iostream>
-
+#include "GameObject.h"
+#include "Factory.h"
+#include <iostream>
  GameObjectSystem::GameObjectSystem() : factory(GameObjectFactory::Instance()) {}
 
+
+ /* brief
+    this is to inititalize the gameobjectSystem.
+
+    */
  void GameObjectSystem::Initialize() {
      std::cout << "GameObjectSystem initialized" << std::endl;
  }
+ /* brief
+   this is the update function that loops together engine loop to check whether the gameobjects are active and update accordingly to the 
+
+   */
 
  void GameObjectSystem::Update(float timeslice) {
     

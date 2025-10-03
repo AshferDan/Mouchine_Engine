@@ -21,6 +21,14 @@ Technology is prohibited.
 #include "RenderComponent.h"
 #include <string>
 #include "Animator.hpp"
+#include "GraphicsSystem.h"
+#include "transform.h"
+#include "collision.h"
+#include "physics.h"
+#include <iostream>
+#include <cmath>
+#include <sstream>
+#include <random> // For M1 demo, spawning 2.5k GOs
 
 class GameObjectFactory
 {
