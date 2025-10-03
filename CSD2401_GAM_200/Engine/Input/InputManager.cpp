@@ -173,7 +173,8 @@ void InputManager::Update(float dt)
         */
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
-        InputManager::KeyStateImgui = true;
+        InputManager::KeyStateImgui= (!InputManager::KeyStateImgui) ? true : false;
+        std::cout << InputManager::KeyStateImgui << std::endl;
 
     }
     // Jump
