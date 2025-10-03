@@ -106,7 +106,7 @@ public:
 			return false;
 		}
 
-		glm::vec4 color = render->GetColor();
+		vec4 color = render->GetColor();
 
 		// Hard coding output directory for now... (shameful, dishonorable even)
 		std::ofstream outFile("../Logs/GameObjectData.txt", std::ios::app);
@@ -118,10 +118,10 @@ public:
 
 		// Print in specified format
 		outFile << "GO Name: " << GO.GetName() << " | Shape: " << render->GetShapeTypeName()
-				<< " | Position (x,y): (" << transform->posX << "," << transform->posY << ")"
-				<< " | Size (w,h): (" << transform->scaleX << "," << transform->scaleY << ")"
-				<< " | Colour: (" << color.r << "," << color.g << "," << color.b << "," << color.a << ")"
-				<< std::endl;
+			<< " | Position (x,y): (" << transform->posX << "," << transform->posY << ")"
+			<< " | Size (w,h): (" << transform->scaleX << "," << transform->scaleY << ")"
+			<< " | Colour: (" << color.x << "," << color.y << "," << color.z << "," << color.w << ")"
+			<< std::endl;
 
 		outFile.close(); // Close stream and return true. Operation successful!
 		std::cout << "Successfully wrote GameObject data to file!\n";
@@ -252,12 +252,12 @@ void CreatePrefab(GameObject &GO)
 		return;
 	}
 
-	auto *transform = GO.GetComponent<TransformComponent>(); // Temp components
-	auto *render = GO.GetComponent<RenderComponent>();
-	glm::vec4 color = render->GetColor();
+	auto* transform = GO.GetComponent<TransformComponent>();
+	auto* render = GO.GetComponent<RenderComponent>();
+	vec4 color = render->GetColor();
 
-	// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA. Whitespace separated, this stores pure data.
-	ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " " << transform->scaleX << " " << transform->scaleY << " " << color.r << " " << color.g << " " << color.b << " " << color.a << std::endl;
+	// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA
+	ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " "  << transform->scaleX << " " << transform->scaleY << " " << color.x << " " << color.y << " " << color.z << " " << color.w << std::endl;
 
 	std::cout << "Prefab created successfully!";
 	ofs.clear();

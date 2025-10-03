@@ -96,6 +96,8 @@ public:
 
     // Static quit flag triggered when Escape is pressed.
     static bool KeyStateQuit;
+    // Static Imgui flag triggered when Escape is pressed.
+    static bool KeyStateImgui;
 
 private:
     // Window info

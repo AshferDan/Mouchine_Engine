@@ -40,7 +40,7 @@ GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 
 */
 
-GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer)
+GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 color, CollisionLayer)
 {
     GameObject *player = CreateGameObject(name);
 
@@ -94,7 +94,7 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
 
 */
 
-GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color, CollisionLayer layer)
+GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color, CollisionLayer layer)
 {
     GameObject *obj = CreateGameObject(name);
 
@@ -104,11 +104,11 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
 
     if (shape == RenderComponent::ShapeType::Line)
     {
-        render->SetLine(glm::vec2(x, y), glm::vec2(w, h));
+        render->SetLine(vec2(x, y), vec2(w, h));
     }
     else if (shape == RenderComponent::ShapeType::Point)
     {
-        render->SetPoint(glm::vec2(x, y), w);
+        render->SetPoint(vec2(x, y), w);
     }
     else
     {
@@ -134,7 +134,7 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     return obj;
 }
 
-GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color)
+GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color)
 {
     GameObject *obj = CreateGameObject(name);
 
@@ -144,11 +144,11 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
 
     if (shape == RenderComponent::ShapeType::Line)
     {
-        render->SetLine(glm::vec2(x, y), glm::vec2(w, h));
+        render->SetLine(vec2(x, y), vec2(w, h));
     }
     else if (shape == RenderComponent::ShapeType::Point)
     {
-        render->SetPoint(glm::vec2(x, y), w);
+        render->SetPoint(vec2(x, y), w);
     }
     else
     {
@@ -174,11 +174,11 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
 
     if (shape == RenderComponent::ShapeType::Line)
     {
-        render->SetLine(glm::vec2(x, y), glm::vec2(w, h));
+        render->SetLine(vec2(x, y), vec2(w, h));
     }
     else if (shape == RenderComponent::ShapeType::Point)
     {
-        render->SetPoint(glm::vec2(x, y), w);
+        render->SetPoint(vec2(x, y), w);
     }
     else
     {
@@ -537,7 +537,7 @@ void DemoM1_SpawnGameObjects()
     for (size_t i = 0; i < 2500; i++)
     {
         int intX{distributionX(gen)}, intY{distributionY(gen)};
-        GameObject *newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+        GameObject *newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, vec4(1.f, 0.f, 0.f, 1.f));
         vecGOs.push_back(newGO);
     }
 }

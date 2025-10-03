@@ -27,7 +27,9 @@ Spritesheet::Spritesheet(GameObject *owner, const char *textureFile, int numRows
 	  currentFrameTime(0.0f),
 	  startFrame(0),
 	  endFrame(0),
-	  textureID(GraphicsSystem::LoadTexture(textureFile))
+	  textureID(GraphicsSystem::LoadTexture(textureFile)),
+	  SpriteFile(0),
+	  alpha(0)
 {
 }
 
@@ -46,7 +48,9 @@ Spritesheet::Spritesheet(Spritesheet const &rhs, GameObject *NewClone)
 	  currentFrameTime(rhs.currentFrameTime),
 	  startFrame(rhs.startFrame),
 	  endFrame(rhs.endFrame),
-	  textureID(rhs.textureID)
+	  textureID(rhs.textureID),
+	  SpriteFile(0),
+	  alpha(0)
 {
 }
 
@@ -87,17 +91,17 @@ void Spritesheet::Update(float dt)
 /**
  * @brief Get UV scale of 'mesh'. For drawing texture on
  */
-glm::vec2 Spritesheet::GetUVScale() const
+vec2 Spritesheet::GetUVScale() const
 {
-	return glm::vec2(uv_width, uv_height);
+	return vec2(uv_width, uv_height);
 }
 
 /**
  * @brief Padding for spritesheets
  */
-glm::vec2 Spritesheet::GetUVOffset() const
+vec2 Spritesheet::GetUVOffset() const
 {
-	return glm::vec2(uv_width * currCol, uv_height * currRow);
+	return vec2(uv_width * currCol, uv_height * currRow);
 }
 
 /**

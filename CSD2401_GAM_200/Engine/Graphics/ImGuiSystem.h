@@ -21,6 +21,7 @@ Technology is prohibited.
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
 #include <map>
+#include "InputManager.h"
 
 using SystemTimingsMap = std::map<std::string, double>;
 

@@ -12,12 +12,13 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 #pragma once
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+//#include <glm/glm.hpp>
+//#include <glm/gtc/matrix_transform.hpp>
+//#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include "System.h"
 #include "GraphicsSystem.h"
+#include "MathLib.h"
 
 /**
  * @class DebugSystem
@@ -61,7 +62,7 @@ public:
      * @param end Ending point of the line.
      * @param color Color of the line (RGBA).
      */
-    void DrawLine(const glm::vec2& start, const glm::vec2& end, const glm::vec4& color);
+    void DrawLine(const vec2& start, const vec2& end, const vec4& color);
 
     /**
      * @brief Draw a rectangle for debugging.
@@ -69,7 +70,7 @@ public:
      * @param size Width (x) and height (y) of the rectangle.
      * @param color Color of the rectangle outline (RGBA).
      */
-    void DrawRect(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& color);
+    void DrawRect(const vec2& pos, const vec2& size, const vec4& color);
 
     /**
      * @brief Draw a circle for debugging.
@@ -78,14 +79,14 @@ public:
      * @param color Color of the circle outline (RGBA).
      * @param segments Number of line segments used to approximate the circle (default = 36).
      */
-    void DrawCircle(const glm::vec2& center, float radius, const glm::vec4& color, int segments = 36);
+    void DrawCircle(const vec2& center, float radius, const vec4& color, int segments = 36);
 
     /**
      * @brief Draw a point for debugging.
      * @param ppos Position of the point.
      * @param color Color of the point (RGBA).
      */
-    void DrawPoint(const glm::vec2& ppos, glm::vec4 color);
+    void DrawPoint(const vec2& ppos, vec4 color);
 
     /**
      * @brief Clears all debug shapes stored in the system.
@@ -103,10 +104,10 @@ public:
          */
         enum Type { LINE, RECT, CIRCLE, POINT } type;
 
-        glm::vec2 p1;     ///< First position (meaning depends on shape type).
-        glm::vec2 p2;     ///< Second position (used for lines/rectangles).
+        vec2 p1;     ///< First position (meaning depends on shape type).
+        vec2 p2;     ///< Second position (used for lines/rectangles).
         float radius;     ///< Radius (used for circles).
-        glm::vec4 color;  ///< Color (RGBA).
+        vec4 color;  ///< Color (RGBA).
         int segments;     ///< Segments (used for circle approximation).
     };
 

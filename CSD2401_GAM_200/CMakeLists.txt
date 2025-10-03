@@ -51,7 +51,7 @@ set(Core_DIR          ./Engine/Core)
 set(Resource_DIR      ./Engine/ResourceManager)
 
 # External dependencies
-set(Extern_DIR        ./Extern)
+set(Extern_DIR        ./Engine/Extern)
 
 # ======================= File Globbing ============================
 # Game files (Main.cpp and Main.h only)
@@ -293,6 +293,20 @@ add_custom_command(TARGET Game POST_BUILD
         "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
         "$<TARGET_FILE_DIR:Game>/Assets"
     COMMENT "Copying Assets folder to configuration directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern/Mathlib.h"
+        "$<TARGET_FILE_DIR:Game>"
+    COMMENT "Copying Mathlib.h folder to configuration directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern/Mathlib.cpp"
+        "$<TARGET_FILE_DIR:Game>"
+    COMMENT "Copying Mathlib.cpp folder to configuration directory"
 )
 
 

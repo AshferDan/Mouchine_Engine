@@ -64,7 +64,7 @@ public:
      * @param color The color of the shape.
      * @return A pointer to the newly created player GameObject.
      */
-    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color);
+    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 color);
 
     /**
      * @brief Creates a player GameObject with a sprite texture.
@@ -90,7 +90,7 @@ public:
      * @param color The color of the shape.
      * @return A pointer to the newly created shape GameObject.
      */
-    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color);
+    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color);
 
     /**
      * @brief Creates a generic shaped GameObject with a texture.
@@ -149,7 +149,7 @@ public:
      * @param layer The collision layer for the object.
      * @return A pointer to the newly created player GameObject.
      */
-    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer layer);
+    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 color, CollisionLayer layer);
 
     /**
      * @brief Creates a player GameObject with a sprite texture and collision layer.
@@ -177,7 +177,7 @@ public:
      * @param layer The collision layer for the object.
      * @return A pointer to the newly created shape GameObject.
      */
-    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color, CollisionLayer layer);
+    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color, CollisionLayer layer);
 
     /**
      * @brief Creates an animated image GameObject with a collision layer.

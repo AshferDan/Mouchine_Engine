@@ -82,8 +82,8 @@ public:
 	/**
 	 * @brief Graphics related, how the spritesheet frame should stick to a 'mesh' (how to 'cut' the image from a spritesheet)
 	 */
-	glm::vec2 GetUVScale() const;
-	glm::vec2 GetUVOffset() const;
+	vec2 GetUVScale() const;
+	vec2 GetUVOffset() const;
 
 	/**
 	 * @brief Getters/ Setters for Rows and Cols
