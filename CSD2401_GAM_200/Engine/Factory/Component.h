@@ -28,7 +28,7 @@ public:
     // Component lifecycle
     // all of the virtual down here is where all the functions each object should have when called 
     virtual void Initialize() {}
-    virtual void Update(float deltaTime) {}
+    virtual void Update(float) {}
     virtual void Destroy() {}
 
     // Component info

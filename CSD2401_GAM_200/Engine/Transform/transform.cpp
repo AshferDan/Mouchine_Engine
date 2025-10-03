@@ -7,7 +7,7 @@
      : IComponent(owner), posX(x), posY(y), rotation(0), scaleX(1), scaleY(1) {
  }
 
- void TransformComponent::Update(float deltaTime) {
+ void TransformComponent::Update(float) {
      // Debug output for transform changes
      static float lastPosX = posX, lastPosY = posY;
 

@@ -21,13 +21,13 @@ GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
     return ptr;
 }
 
-GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer layer)
+GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer)
 {
     GameObject *player = CreateGameObject(name);
 
     auto *transform = player->AddComponent<TransformComponent>(x, y);
     auto *physics = player->AddComponent<PhysicsComponent>(1.0f, false);
-    auto render = player->AddComponent<RenderComponent>(shape, color);
+    player->AddComponent<RenderComponent>(shape, color);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);
     physics->SetGravity(false);
@@ -44,7 +44,7 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(0, 0);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     // resource manager - check it out and return texture id
-    auto render = player->AddComponent<RenderComponent>(texID);
+    player->AddComponent<RenderComponent>(texID);
     physics->SetGravity(true); // Enable/Disable gravity
     physics->SetStatic(false);
     transform->SetScale(w, h);
@@ -157,11 +157,11 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
         transform->SetScale(w, h);
     }
     // testing TO BE REMOVED
-    std::cout << "Created "
-              << (shape == RenderComponent::ShapeType::Circle ? "Circle" : shape == RenderComponent::ShapeType::Square ? "Square"
-                                                                       : shape == RenderComponent::ShapeType::Line     ? "Line"
-                                                                                                                       : "Point")
-              << ": " << name << " at (" << x << "," << y << ")\n";
+    //std::cout << "Created "
+    //          << (shape == RenderComponent::ShapeType::Circle ? "Circle" : shape == RenderComponent::ShapeType::Square ? "Square"
+    //                                                                   : shape == RenderComponent::ShapeType::Line     ? "Line"
+    //                                                                                                                   : "Point")
+    //          << ": " << name << " at (" << x << "," << y << ")\n";
 
     return obj;
 }
@@ -197,13 +197,13 @@ GameObject *GameObjectFactory::CloneGameObject(EntityID id, const std::string &n
     return nullptr;
 }
 
-GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, char const *filename)
+GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType, float x, float y, float w, float h, char const *filename)
 {
     GameObject *obj = CreateGameObject(name);
 
     auto *transform = obj->AddComponent<TransformComponent>(x, y);
     GLint texID = GraphicsSystem::LoadTexture(filename);
-    auto render = obj->AddComponent<RenderComponent>(texID);
+    obj->AddComponent<RenderComponent>(texID);
     transform->SetScale(w, h);
     return obj;
 }
@@ -241,7 +241,7 @@ GameObject* GameObjectFactory::CreateAnimatedImage(const std::string& name, floa
     auto* transform = obj->AddComponent<TransformComponent>(x, y);
     auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
-    auto render = obj->AddComponent<RenderComponent>(texID);
+    obj->AddComponent<RenderComponent>(texID);
     physics->SetGravity(true); // Enable/Disable gravity
     physics->SetStatic(false);
     transform->SetScale(w, h);

@@ -272,6 +272,68 @@ set_target_properties(Game PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Build/Release"
 )
 
+# ======================= Copy Runtime Assets to Build Directory =============
+
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+        "$<TARGET_FILE_DIR:Game>/Assets"
+    COMMENT "Copying Assets folder to configuration directory"
+)
+
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
+        "$<TARGET_FILE_DIR:Game>/Shaders"
+    COMMENT "Copying Shaders folder to configuration directory"
+)
+
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Game>/Logs"
+    COMMENT "Creating Logs folder in configuration directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/config.txt"
+        "$<TARGET_FILE_DIR:Game>/Logs/config.txt"
+    COMMENT "Copying config.txt to Logs folder in configuration directory"
+)
+
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Assets"
+    COMMENT "Copying Assets folder to top-level Build directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Shaders"
+    COMMENT "Copying Shaders folder to top-level Build directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs"
+    COMMENT "Creating Logs folder in top-level Build directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/config.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs/config.txt"
+    COMMENT "Copying config.txt to Logs folder in top-level Build directory"
+)
+
+message(STATUS "Asset copy commands configured successfully for all build locations.")
+
 # ======================= Copy FMOD DLLs to Build Directory =================
 if(TARGET fmod)
     set(FMOD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/FMOD")

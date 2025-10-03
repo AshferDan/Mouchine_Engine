@@ -5,7 +5,7 @@ class TransformComponent : public IComponent {
 public:
     TransformComponent(GameObject* owner, float x = 0, float y = 0);
 
-    void Update(float deltaTime) override;
+    void Update(float) override;
     std::string GetName() const override { return "TransformComponent"; }
     std::unique_ptr<IComponent>Clone(GameObject* NewClone) const override;
     // Position
