@@ -147,20 +147,18 @@ public:
     /**
      * @brief Return the shape's name as a c string
      */
-    const char *GetShapeTypeName()
+    const char* GetShapeTypeName()
     {
-        switch (static_cast<int>(GetShapeType())) // Return corresponding name depending on object's shape enum
+        switch (static_cast<int>(GetShapeType()))               // Return corresponding name depending on object's shape enum
         {
-        case ShapeType::Square:
+        case static_cast<int>(ShapeType::Square):
             return "Square";
-        case ShapeType::Circle:
+        case static_cast<int>(ShapeType::Circle):
             return "Circle";
-        case ShapeType::Line:
+        case static_cast<int>(ShapeType::Line):
             return "Line";
-        case ShapeType::Point:
+        case static_cast<int>(ShapeType::Point):
             return "Point";
-        default:
-            return "Unknown"; // handle unexpected values
         }
     }
 

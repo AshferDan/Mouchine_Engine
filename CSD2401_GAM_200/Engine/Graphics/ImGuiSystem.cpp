@@ -336,7 +336,6 @@ void ImGuiSystem::Update(float dt)
 	static std::map<std::string, float> smoothedMs;
 	static std::map<std::string, float> smoothedPercent;
 
-	const float lerpSpeed = 0.05; // smaller = smoother
 
 	const float lerpSpeed = static_cast<float>(0.05); // smaller = smoother
 
