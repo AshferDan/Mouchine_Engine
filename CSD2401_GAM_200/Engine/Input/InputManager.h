@@ -44,7 +44,7 @@ public:
      * @param window Pointer to the GLFW window.
      * @param audio Optional pointer to the AudioEngine for sound control.
      */
-    InputManager(GLFWwindow* window, AudioEngine* audio = nullptr);
+    InputManager(GLFWwindow *window, AudioEngine *audio = nullptr);
 
     /**
      * @brief Destructor for InputManager.
@@ -83,15 +83,15 @@ public:
     double GetMouseY() const { return mouseY; }
 
     /**
-    * @brief Gets the scroll X offset.
-    * @return Horizontal scroll offset.
-    */
+     * @brief Gets the scroll X offset.
+     * @return Horizontal scroll offset.
+     */
     double GetScrollX() const { return scrollX; }
 
     /**
-    * @brief Gets the scroll Y offset.
-    * @return Vertical scroll offset.
-    */
+     * @brief Gets the scroll Y offset.
+     * @return Vertical scroll offset.
+     */
     double GetScrollY() const { return scrollY; }
 
     // Static quit flag triggered when Escape is pressed.
@@ -101,7 +101,7 @@ private:
     // Window info
     GLFWwindow *window;
     int width, height;
-    AudioEngine* audioEngine;
+    AudioEngine *audioEngine;
 
     // Mouse position / scroll
     double mouseX, mouseY;

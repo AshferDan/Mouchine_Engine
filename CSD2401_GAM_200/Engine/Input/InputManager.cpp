@@ -22,14 +22,16 @@ Technology is prohibited.
  * @param window Pointer to the GLFW window.
  * @param audio Optional pointer to the AudioEngine.
  */
-InputManager::InputManager(GLFWwindow *window, AudioEngine* audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
+InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
 {
     glfwSetWindowUserPointer(window, this);
 
-    if (audioEngine) {
+    if (audioEngine)
+    {
         std::cout << "InputManager: AudioEngine successfully linked" << std::endl;
     }
-    else {
+    else
+    {
         std::cout << "InputManager: WARNING - AudioEngine is NULL!" << std::endl;
     }
 }
@@ -70,9 +72,12 @@ void InputManager::Update(float dt)
     // handle M key for pausing and resuming background music
     static bool bgmPaused = false;
 
-    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS) {
-        if (!singleTriggerKeys[GLFW_KEY_M]) {
-            if (audioEngine) {
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
+    {
+        if (!singleTriggerKeys[GLFW_KEY_M])
+        {
+            if (audioEngine)
+            {
                 bgmPaused = !bgmPaused;
                 audioEngine->pauseSound("bgm_channel", bgmPaused);
                 std::cout << "bgm paused" << std::endl;
@@ -125,10 +130,9 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    {
-        DemoM1_SpawnGameObjects();
-    }
+    /**
+     * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
+     */
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         DemoM1_DestroyGameObjects();
@@ -136,29 +140,30 @@ void InputManager::Update(float dt)
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
-    float moveSpeed = 200.0f; // Movement speed
+    float moveSpeed = 200.0f;    // Movement speed
     float moveDirectionX = 0.0f; // Track intended direction (1=Right, -1=Left)
-    bool is_jumping= false;
-   
+    bool is_jumping = false;
+
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
         vx = -moveSpeed;
-     
+
         moveDirectionX = -1.0f;
     }
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         vx = moveSpeed;
-       
+
         moveDirectionX = 1.0f;
     }
     else
     {
-   
+
         vx = 0.0f;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
@@ -170,50 +175,49 @@ void InputManager::Update(float dt)
         if (physics->IsGrounded())
         {
             is_jumping = false;
-            physics->Jump(400.0f); // Jump force
+            physics->Jump(400.0f);        // Jump force
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
-            if (audioEngine) {
+            if (audioEngine)
+            {
                 audioEngine->playSound("jump_sfx", "jump_channel");
             }
         }
     }
 
-    auto* anim = player->GetComponent<Spritesheet>();
+    auto *anim = player->GetComponent<Spritesheet>();
 
-    if (transform && anim) {
+    if (transform && anim)
+    {
 
-        // --- A. HORIZONTAL FLIP LOGIC ---
-        // ... (Your flip logic is fine here) ...
-        if (std::abs(moveDirectionX) > 0.0f) {
+        if (std::abs(moveDirectionX) > 0.0f)
+        {
             float baseWidth = std::abs(transform->scaleX);
             float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        // --- B. ANIMATION SWITCHING LOGIC (Idling vs Running) ---
-
-        // **Animation Constants - CORRECTED END FRAME INDEX (0 and 1 for 2 columns)**
-        const char* IDLE_SS = "../Assets/Mouch_Idle.png";
+        const char *IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
-        const int FRAME_END = 1; 
+        const int FRAME_END = 1;
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char* RUN_SS = "../Assets/Mouch_Running.png";
-        const char* JUMP_SS = "../Assets/Mouch_jump.png";
+        const char *RUN_SS = "./Assets/Mouch_Running.png";
+        const char *JUMP_SS = "./Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;
-        const char* newSpritesheet;
+        const char *newSpritesheet;
 
         if (std::abs(vx) > 0.0f) // Player is running/moving
         {
             newFPS = RUN_FPS;
             newSpritesheet = RUN_SS;
         }
-        else if (is_jumping) {
+        else if (is_jumping)
+        {
             _COLS = 1;
             newFPS = 0;
             newSpritesheet = JUMP_SS;
@@ -226,18 +230,15 @@ void InputManager::Update(float dt)
 
         float desiredTimePerFrame = 1.0f / newFPS;
 
-        
         if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
         {
-            // 1. Load the new texture (This is the crucial step that was being skipped)
+
             anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
 
-            // 2. Set the new animation speed and range
             anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
         }
     }
 
-    // Apply the horizontal velocity (vertical is handled by gravity/jump)
     physics->SetVelocity(vx, vy);
 
     // Mouse
@@ -254,8 +255,6 @@ void InputManager::Update(float dt)
     glfwGetCursorPos(window, &xpos, &ypos);
     mouseX = xpos;
     mouseY = ypos;
-
-    // scroll not added
 }
 
 /**

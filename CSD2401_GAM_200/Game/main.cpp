@@ -44,7 +44,7 @@ int main()
     CoreEngine engine;
     AudioEngine audio;
     engine.SetAudioEngine(&audio);
-    double g_totalLoopTime = 0.0;
+    //double g_totalLoopTime = 0.0;
     std::map<std::string, double> g_systemTimings; // ms per system
 
     std::cout << "\n--- Initializing Engine ---" << std::endl;
@@ -67,11 +67,11 @@ int main()
      resourceMgr.SetAudioEngine(&audio);
 
      // load textures
-     resourceMgr.LoadTexture("player_sprite", "../Assets/protosprite.png");
+     resourceMgr.LoadTexture("player_sprite", "./Assets/protosprite.png");
 
      // load audio files
-     resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true); // looping
-     resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false); // when jumping only
+     resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true); // looping
+     resourceMgr.LoadAudio("jump_sfx", "./Assets/audio/jump.wav", false); // when jumping only
      // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
 
      // print loaded resources
@@ -85,13 +85,13 @@ int main()
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
 
-    GameObject *Background = factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "../Assets/wallpaper_transparent.png");
+    factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "./Assets/wallpaper_transparent.png");
     
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                        // name
         0.0f, 0.0f,                    // x, y position
         150.0f, 150.0f,                // width, height (scale)
-        "../Assets/Mouch_idle.png",    // filename
+        "./Assets/Mouch_idle.png",    // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame
         2.0f,                          // 12 frames per second
@@ -101,21 +101,21 @@ int main()
     playerPhysics->SetGravity(true);
     playerPhysics->SetStatic(false);
 
-    GameObject* animatedMouchidle = factory.CreateAnimatedImage(
+    factory.CreateAnimatedImage(
         "AniImage",                      // name
         -700.0f, 100.0f,                 // x, y position
         300.0f, 300.0f,                  // width, height (scale)
-        "../Assets/Mouch_idle.png",      // filename
+        "./Assets/Mouch_idle.png",      // filename
         1, 2,                            //row,columns
         0, 7,                            // start frame , end frame
         2.0f                             // 12 frames per second
     );
 
-    GameObject* animatedMouchRun = factory.CreateAnimatedImage(
+    factory.CreateAnimatedImage(
         "AniImage",                    // name
         700.0f, 100.0f,                // x, y position
         300.0f, 300.0f,                // width, height (scale)
-        "../Assets/Mouch_Running.png", // filename
+        "./Assets/Mouch_Running.png", // filename
         1, 2,                          //row,columns
         0, 7,                          // start frame , end frame
         2.0f                           // 12 frames per second
@@ -148,7 +148,7 @@ int main()
     physics2->SetVelocity(250.0f, 0.0f); 
     physics2->SetGravity(true);         
     
-    GameObject* EvilButton = factory.CreateGameObject("Evil Button");
+    factory.CreateGameObject("Evil Button");
 
     std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
     engine.GameLoop();
