@@ -21,13 +21,13 @@ TextureResource::~TextureResource() {
     Unload();
 }
 
-bool TextureResource::Load(const std::string& filepath) {
+bool TextureResource::Load(const std::string& path) {
     if (loaded) {
-        std::cout << "Texture already loaded: " << filepath << std::endl;
+        std::cout << "Texture already loaded: " << path << std::endl;
         return true;
     }
 
-    this->filepath = filepath;
+    this->filepath = path;
 
     textureID = GraphicsSystem::LoadTexture(filepath.c_str());
 
@@ -56,9 +56,9 @@ AudioResource::~AudioResource() {
     Unload();
 }
 
-bool AudioResource::Load(const std::string& filepath) {
+bool AudioResource::Load(const std::string& path) {
     if (loaded) {
-        std::cout << "Audio already loaded: " << filepath << std::endl;
+        std::cout << "Audio already loaded: " << path << std::endl;
         return true;
     }
 
@@ -67,7 +67,7 @@ bool AudioResource::Load(const std::string& filepath) {
         return false;
     }
 
-    this->filepath = filepath;
+    this->filepath = path;
 
     // use audio engine load sound
     bool success = audioEngine->loadSound(name, filepath, loop);

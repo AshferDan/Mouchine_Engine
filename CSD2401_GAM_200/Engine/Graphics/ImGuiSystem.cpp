@@ -44,7 +44,7 @@ void ImGuiSystem::Initialize() {
 	ShowCreateGOMenu = false;
 }
 
-void ImGuiSystem::Update(float dt) {
+void ImGuiSystem::Update(float) {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -186,7 +186,7 @@ void ImGuiSystem::Update(float dt) {
 
 				// very ugly colour code bc that uses a different vec 4 AAAA
 				GameObject* TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{current_shape}, 20.f, 0.f, 5.f, 5.f,
-					glm::vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f));
+					glm::vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
 
 				TempGO->AddComponent<TransformComponent>(0, 0);
 				auto* transform = TempGO->GetComponent<TransformComponent>();
@@ -231,7 +231,7 @@ void ImGuiSystem::Update(float dt) {
 
 				// very ugly colour code bc that uses a different vec 4 AAAA
 				GameObject* TempGO = factory.CreateShape(static_cast<std::string>(tempPrefab.name), RenderComponent::ShapeType{ shapeEnum }, tempPrefab.pos[0], tempPrefab.pos[1],
-					tempPrefab.scale[0], tempPrefab.scale[1], glm::vec4(tempPrefab.color.x, tempPrefab.color.y, tempPrefab.color.z, tempPrefab.color.w));
+					tempPrefab.scale[0], tempPrefab.scale[1], glm::vec4(tempPrefab.color.x, tempPrefab.color.y, tempPrefab.color.z, tempPrefab.color.w), CollisionLayer::Default);
 
 				TempGO->AddComponent<TransformComponent>(0, 0);
 				auto* transform = TempGO->GetComponent<TransformComponent>();
@@ -251,7 +251,7 @@ void ImGuiSystem::Update(float dt) {
 	static std::map<std::string, float> smoothedMs;
 	static std::map<std::string, float> smoothedPercent;
 
-	const float lerpSpeed = 0.05; // smaller = smoother
+	const float lerpSpeed = static_cast<float>(0.05); // smaller = smoother
 
 	std::map<std::string, double>::iterator it;
 	for (it = g_systemTimings.begin(); it != g_systemTimings.end(); ++it) {

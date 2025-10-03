@@ -155,7 +155,7 @@ void Spritesheet::SetCols(int val)
 // endFrameIdx	 - index of last frame of spritesheet
 // duration		 - length of entire anim (start frame to end frame)
 //eg: ~player_sprite.Loop(0, 7, .8f);~ means go from frame 0 to 7 within 0.8s
-void Spritesheet::LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float duration)
+void Spritesheet::LoopSpriteSheetAnim(int, int, float)
 {
 }
 

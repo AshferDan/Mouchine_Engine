@@ -27,23 +27,22 @@ must haves like the component must haves
 #include <string>
 #include <memory>
 
-
 class GameObject;
 
 // Base Component class - contains both data and behavior
-class IComponent {
+class IComponent
+{
 public:
     /**
      * @brief Constructs the base component.
      * @param owner GameObject that owns this component.
      */
-    IComponent(GameObject* owner) : owner(owner), enabled(true) {}
+    IComponent(GameObject *owner) : owner(owner), enabled(true) {}
 
     /**
      * @brief Default virtual destructor for proper cleanup of derived component classes.
      */
     virtual ~IComponent() = default;
-
 
     /**
      * @brief Initializes the component's state. Called once upon component creation.
@@ -59,6 +58,7 @@ public:
     /**
      * @brief Cleans up the component's resources. Called once before component deletion.
      */
+    virtual void Update(float) {}
     virtual void Destroy() {}
 
     // Component info
@@ -68,13 +68,13 @@ public:
      */
     virtual std::string GetName() const = 0;
 
-    //cloning virtual
+    // cloning virtual
     /**
      * @brief Creates a deep copy of the component for a new GameObject clone.
      * @param NewClone The GameObject that will own the new component.
      * @return A unique pointer to the cloned component.
      */
-    virtual std::unique_ptr<IComponent>Clone(GameObject* NewClone) const = 0;
+    virtual std::unique_ptr<IComponent> Clone(GameObject *NewClone) const = 0;
 
     // Enable/disable component
     /**
@@ -90,6 +90,6 @@ public:
     bool IsEnabled() const { return enabled; }
 
 protected:
-    GameObject* owner;
+    GameObject *owner;
     bool enabled;
 };
