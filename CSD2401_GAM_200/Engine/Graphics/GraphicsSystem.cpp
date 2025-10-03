@@ -16,9 +16,10 @@ Technology is prohibited.
 #include "Animator.hpp"
 
 const char *configFile = "./Logs/config.txt";
+const double two_pi = 6.28318530717958647692528676655900576;
 
 GraphicsSystem::GraphicsSystem()
-    : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(0)
+    : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp()
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -67,7 +68,7 @@ GraphicsSystem::GraphicsSystem()
     Wheight = fbHeight;
 }
 
-GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(0)
+GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp()
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -150,8 +151,8 @@ void GraphicsSystem::Initialize()
     // Define vertex structure for a textured quad.
     struct Vertex
     {
-        glm::vec3 pos;  // Position (x, y, z)
-        glm::vec2 tex;  // Texture coordinates (u, v)
+        vec3 pos;  // Position (x, y, z)
+        vec2 tex;  // Texture coordinates (u, v)
     };
 
     // Quad geometry (two triangles forming a square).
@@ -203,10 +204,10 @@ void GraphicsSystem::Update(float)
     shader.Use();
 
     // Orthographic projection: origin at bottom-left, size = window width/height
-    glm::mat4 projection = glm::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+    mat4 projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
 
     // Default camera at (0,0)
-    glm::vec3 camPos(0.0f);
+    vec3 camPos(0.0f);
 
     // Center camera on the "Hero" object if it exists
     GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
@@ -223,7 +224,7 @@ void GraphicsSystem::Update(float)
     }
 
     // Camera transform: translate world relative to camPos
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), -camPos);
+    mat4 view = mat4::translate(-camPos);
     vp = projection * view; // Final View-Projection matrix
 
     // === Render All Active GameObjects ===
@@ -277,13 +278,13 @@ void GraphicsSystem::Update(float)
 
                 // === Pass uniforms to shader ===
                 shader.SetUniform("uIsLine", 0);  // Sprite, not line
-                shader.SetUniform("uColor", glm::vec4(rend->GetColor())); // Tint color
-                shader.SetUniform("uTiling", glm::vec2(1.0f));            // Default tiling
+                shader.SetUniform("uColor", vec4(rend->GetColor())); // Tint color
+                shader.SetUniform("uTiling", vec2(1.0f));            // Default tiling
                 shader.SetUniform("uIsCircle",
                     rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
 
-                glm::vec2 uvScale = glm::vec2(1.0f);
-                glm::vec2 uvOffset = glm::vec2(0.0f);
+                vec2 uvScale = vec2(1.0f);
+                vec2 uvOffset = vec2(0.0f);
 
                 // Check if object has an animator (spritesheet)
                 if (auto* animator = obj->GetComponent<Spritesheet>())
@@ -310,9 +311,9 @@ void GraphicsSystem::Update(float)
                 };
 
                 // === Model transform (position, rotation, scale) ===
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
-                model = glm::rotate(model, rot, glm::vec3(0, 0, 1));
-                model = glm::scale(model, glm::vec3(sx, sy, 1.0f));
+                mat4 model = mat4::translate(vec3(x, y, 0.0f));
+                model = model * mat4::rotate(rot,vec3(0, 0, 1));
+                model = model * mat4::scale(vec3(sx, sy, 1.0f));
 
                 // Send final MVP matrix to shader
                 shader.SetUniform("uMVP", vp * model);
@@ -351,8 +352,8 @@ void GraphicsSystem::Update(float)
 }
 
 // Draw a line between two points in world space
-void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
-    const glm::vec4& color, const glm::mat4& viewProjection)
+void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
+    const vec4& color, const mat4& viewProjection)
 {
     // Tell shader this is a line draw
     shader.SetUniform("uIsLine", 1);
@@ -361,7 +362,7 @@ void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
     shader.SetUniform("uIsCircle", 0);
 
     // Define 2 vertices for the line
-    glm::vec3 verts[2] = {
+    vec3 verts[2] = {
         {start.x, start.y, 0.0f},
         {end.x,   end.y,   0.0f} };
 
@@ -376,7 +377,7 @@ void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
 
     // Attribute 0 = vertex position (vec3 in shader)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 
     // Send MVP matrix
     shader.SetUniform("uMVP", viewProjection);
@@ -390,8 +391,8 @@ void GraphicsSystem::DrawLine(const glm::vec2& start, const glm::vec2& end,
 }
 
 // Draw a single point in world space
-void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
-    const glm::vec4& color, const glm::mat4& viewProjection)
+void GraphicsSystem::DrawPoint(const vec2& ppos,
+    const vec4& color, const mat4& viewProjection)
 {
     // Tell shader this is NOT a line
     shader.SetUniform("uIsLine", 0);
@@ -400,7 +401,7 @@ void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
     shader.SetUniform("uHasTexture", 0);
 
     // Position of the point (use vec3 to match shader input = vec3)
-    glm::vec3 pos = { ppos.x, ppos.y, 0.0f };
+    vec3 pos = { ppos.x, ppos.y, 0.0f };
 
     // Create temporary VAO/VBO for this point
     GLuint tempVBO, tempVAO;
@@ -413,7 +414,7 @@ void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
 
     // Attribute 0 = vertex position (vec3 in shader)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 
     // Send MVP matrix
     shader.SetUniform("uMVP", viewProjection);
@@ -433,17 +434,17 @@ void GraphicsSystem::DrawPoint(const glm::vec2& ppos,
 // Draw an axis-aligned rectangle outline centered at (x, y)
 // w = width, h = height
 void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
-    const glm::vec4& color, const glm::mat4& viewProjection)
+    const vec4& color, const mat4& viewProjection)
 {
     // Half extents (distance from center to edge)
     float halfW = w / 2;
     float halfH = h / 2;
 
     // Compute 4 corner points of the rectangle
-    glm::vec2 p1(x - halfW, y - halfH); // bottom-left
-    glm::vec2 p2(x + halfW, y - halfH); // bottom-right
-    glm::vec2 p3(x + halfW, y + halfH); // top-right
-    glm::vec2 p4(x - halfW, y + halfH); // top-left
+    vec2 p1(x - halfW, y - halfH); // bottom-left
+    vec2 p2(x + halfW, y - halfH); // bottom-right
+    vec2 p3(x + halfW, y + halfH); // top-right
+    vec2 p4(x - halfW, y + halfH); // top-left
 
     // Connect corners with lines (in order)
     DrawLine(p1, p2, color, viewProjection);
@@ -455,14 +456,14 @@ void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
 // Draw a circle outline centered at (cx, cy)
 // r = radius, segments = how many line segments to approximate the circle
 void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments,
-    const glm::vec4& color, const glm::mat4& viewProjection)
+    const vec4& color, const mat4& viewProjection)
 {
     // Clamp to a minimum number of segments (otherwise circle looks too blocky)
     if (segments < 8)
         segments = 8;
 
     // Angle step per segment (full 360� / segments)
-    float step = glm::two_pi<float>() / segments;
+    float step = static_cast<float>(two_pi) / segments;
 
     // Generate connected line segments around the circle
     for (int i = 0; i < segments; i++)
@@ -471,8 +472,8 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
         float theta2 = step * (i + 1);
 
         // Two consecutive points on the circle�s circumference
-        glm::vec2 p1 = { cx + r * cos(theta1), cy + r * sin(theta1) };
-        glm::vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
+        vec2 p1 = { cx + r * cos(theta1), cy + r * sin(theta1) };
+        vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
 
         // Draw line between them
         DrawLine(p1, p2, color, viewProjection);
@@ -545,7 +546,7 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     else
     {
         // Use the constructor for shape/color:
-        // RenderComponent(owner, ShapeType type, const glm::vec4& color)
+        // RenderComponent(owner, ShapeType type, const vec4& color)
         clonedComponent = std::make_unique<RenderComponent>(NewClone, this->shape, this->color);
     }
 

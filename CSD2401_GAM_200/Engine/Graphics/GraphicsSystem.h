@@ -28,7 +28,7 @@ Technology is prohibited.
 #include <iostream>
 #include <RenderComponent.h>
 #include <fstream>
-#include "MathLib.h"
+#include "../Engine/Extern/MathLib.h"
 
 
 /**
@@ -80,8 +80,8 @@ public:
 	 * Example:
 	 *   gfx.DrawLine({0,0}, {1,1}, {1,0,0,1}, cameraVP);
 	 */
-	void DrawLine(const glm::vec2& start, const glm::vec2& end,
-		const glm::vec4& color, const glm::mat4& viewProjection);
+	void DrawLine(const vec2& start, const vec2& end,
+		const vec4& color, const mat4& viewProjection);
 
 	/**
 	 * @brief Draws a debug point at a position.
@@ -89,8 +89,8 @@ public:
 	 * @param color RGBA color of the point.
 	 * @param vp View-projection matrix.
 	 */
-	void DrawPoint(const glm::vec2& pos,
-		const glm::vec4& color, const glm::mat4& viewProjection);
+	void DrawPoint(const vec2& pos,
+		const vec4& color, const mat4& viewProjection);
 
 	/**
 	 * @brief Draws the outline of a rectangle.
@@ -102,7 +102,7 @@ public:
 	 * @param vp View-projection matrix.
 	 */
 	void DrawRectOutline(float x, float y, float w, float h,
-		const glm::vec4& color, const glm::mat4& viewProjection);
+		const vec4& color, const mat4& viewProjection);
 
 	/**
 	 * @brief Draws a circle outline using line segments.
@@ -117,7 +117,7 @@ public:
 	 *   gfx.DrawCircleOutline(0, 0, 1.0f, 32, {0,1,0,1}, cameraVP);
 	 */
 	void DrawCircleOutline(float cx, float cy, float r, int segments,
-		const glm::vec4& color, const glm::mat4& viewProjection);
+		const vec4& color, const mat4& viewProjection);
 
 	// Returns whether debug mode is enabled.
 	bool isDebugModeOn() const { return debugMode; }
@@ -126,10 +126,10 @@ public:
 	void toggleDebugMode() { debugMode = !debugMode; }
 
 	// Returns the current view-projection matrix.
-	const glm::mat4& getVp() const { return vp; }
+	const mat4& getVp() const { return vp; }
 
 private:
-	glm::mat4 vp;               // Current view-projection matrix.
+	mat4 vp;               // Current view-projection matrix.
 	bool debugMode = false;     // Debug mode flag for showing shapes.
 	GLFWwindow* window;         // GLFW window handle.
 	GLSLShader shader;          // Shader used for debug rendering.

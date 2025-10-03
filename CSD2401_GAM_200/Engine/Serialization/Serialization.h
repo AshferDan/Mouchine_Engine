@@ -62,7 +62,7 @@ public:
 			return false;
 		}
 
-		glm::vec4 color = render->GetColor();
+		vec4 color = render->GetColor();
 
 		std::ofstream outFile("../Logs/GameObjectData.txt", std::ios::app);
 		if (!outFile.is_open()) {
@@ -73,7 +73,7 @@ public:
 		outFile << "GO Name: " << GO.GetName() << " | Shape: " << render->GetShapeTypeName()
 			<< " | Position (x,y): (" << transform->posX << "," << transform->posY << ")"
 			<< " | Size (w,h): (" << transform->scaleX << "," << transform->scaleY << ")"
-			<< " | Colour: (" << color.r << "," << color.g << "," << color.b << "," << color.a << ")"
+			<< " | Colour: (" << color.x << "," << color.y << "," << color.z << "," << color.w << ")"
 			<< std::endl;
 
 		outFile.close();
@@ -169,11 +169,11 @@ void CreatePrefab(GameObject& GO)
 
 	auto* transform = GO.GetComponent<TransformComponent>();
 	auto* render = GO.GetComponent<RenderComponent>();
-	glm::vec4 color = render->GetColor();
+	vec4 color = render->GetColor();
 
 	// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA
 	ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " "  << 
-		transform->scaleX << " " << transform->scaleY << " " << color.r << " " << color.g << " " << color.b << " " << color.a << std::endl;
+		transform->scaleX << " " << transform->scaleY << " " << color.x << " " << color.y << " " << color.z << " " << color.w << std::endl;
 
 	std::cout << "Prefab created successfully!";
 	ofs.clear();

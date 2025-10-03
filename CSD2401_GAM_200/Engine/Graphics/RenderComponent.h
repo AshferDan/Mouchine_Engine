@@ -2,7 +2,7 @@
 /*!
 \file       GraphicsSystem.h
 \author     Guan Shao Jun [50%]
-\co-author 
+\co-author
 \par        shaojun.g@digipen.edu,
 \date       October 02 2025
 
@@ -15,6 +15,7 @@ Technology is prohibited.
 #pragma once
 #include "Component.h"
 #include <GL/glew.h>
+#include "../Engine/Extern/MathLib.h"
 
 
 /*! @class RenderComponent
@@ -37,18 +38,18 @@ public:
         @brief Data structure for a line (start/end points and color).
     */
     struct LineData {
-        glm::vec2 start; /*!< Start position of the line */
-        glm::vec2 end;   /*!< End position of the line */
-        glm::vec4 color; /*!< Line color */
+        vec2 start; /*!< Start position of the line */
+        vec2 end;   /*!< End position of the line */
+        vec4 color; /*!< Line color */
     };
 
     /*! @struct PointData
         @brief Data structure for a point (position, color, size).
     */
     struct PointData {
-        glm::vec2 pos;   /*!< Position of the point */
-        glm::vec4 color; /*!< Point color */
-        float size;      /*!< Point size */
+        vec2 pos;   /*!< Position of the point */
+        vec4 color; /*!< Point color */
+        float size=0; /*!< Point size */
     };
 
     /*! @brief Constructor for a textured object
@@ -65,7 +66,7 @@ public:
         @param type Shape type
         @param color Shape color
     */
-    RenderComponent(GameObject* owner, ShapeType type, const glm::vec4& color)
+    RenderComponent(GameObject* owner, ShapeType type, const vec4& color)
         : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
     };
 
@@ -105,31 +106,31 @@ public:
     ShapeType GetShapeType() const { return shape; }
 
     /*! @brief Get the current color
-        @return Color as glm::vec4
+        @return Color as vec4
     */
-    glm::vec4 GetColor() const { return color; }
+    vec4 GetColor() const { return color; }
 
     /*! @brief Set the color of the shape
         @param newColor New color
     */
-    void SetColor(glm::vec4 newColor) { color = newColor; }
+    void SetColor(vec4 newColor) { color = newColor; }
 
     /*! @brief Set alpha (transparency) of the shape
         @param newAlpha New alpha value
     */
-    void setAlpha(float newAlpha) { color.a = newAlpha; }
+    void setAlpha(float newAlpha) { color.w = newAlpha; } // renamed from a -> w
 
     /*! @brief Set line data
         @param start Start position
         @param end End position
     */
-    void SetLine(const glm::vec2& start, const glm::vec2& end) { line = { start, end, color }; }
+    void SetLine(const vec2& start, const vec2& end) { line = { start, end, color }; }
 
     /*! @brief Set point data
         @param pos Position of the point
         @param size Point size
     */
-    void SetPoint(const glm::vec2& pos, float size) { point = { pos, color, size }; }
+    void SetPoint(const vec2& pos, float size) { point = { pos, color, size }; }
 
     /*! @brief Get line data
         @return LineData structure
@@ -166,12 +167,10 @@ public:
         }
     }
 
-
-
 private:
     ShapeType shape; /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
-    glm::vec4 color; /*!< Color of the shape */
+    vec4 color; /*!< Color of the shape */
 
     LineData line; /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */

@@ -22,22 +22,22 @@ void DebugSystem::Update(float) {
 	// Update the DebugSystem each frame (currently empty)
 }
 
-void DebugSystem::DrawLine(const glm::vec2& start, const glm::vec2& end, const glm::vec4& color) {
+void DebugSystem::DrawLine(const vec2& start, const vec2& end, const vec4& color) {
 	// Add a line shape to the debug draw list
 	shapes.push_back({ DebugShape::LINE, start, end, 0.0f, color, 0 });
 }
 
-void DebugSystem::DrawRect(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& color) {
+void DebugSystem::DrawRect(const vec2& pos, const vec2& size, const vec4& color) {
 	// Add a rectangle shape to the debug draw list
 	shapes.push_back({ DebugShape::RECT, pos, size, 0.0f, color, 0 });
 }
 
-void DebugSystem::DrawCircle(const glm::vec2& center, float radius, const glm::vec4& color, int segments) {
+void DebugSystem::DrawCircle(const vec2& center, float radius, const vec4& color, int segments) {
 	// Add a circle shape to the debug draw list
 	shapes.push_back({ DebugShape::CIRCLE, center, {}, radius, color, segments });
 }
 
-void DebugSystem::DrawPoint(const glm::vec2& ppos, glm::vec4 color) {
+void DebugSystem::DrawPoint(const vec2& ppos, vec4 color) {
 	// Add a point shape to the debug draw list
 	shapes.push_back({ DebugShape::POINT, ppos, {}, 0.0f, color, 0 });
 }

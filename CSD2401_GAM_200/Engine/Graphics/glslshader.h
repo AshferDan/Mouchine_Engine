@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include "../Engine/Extern/MathLib.h"
 
 
 /*  _________________________________________________________________________ */
@@ -122,11 +123,14 @@ public:
   void SetUniform(GLchar const* name, GLfloat x, GLfloat y, GLfloat z);
   void SetUniform(GLchar const* name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
   void SetUniform(GLchar const* name, glm::vec2 const& val);
+  void SetUniform(GLchar const* name, vec2 const& val);
   void SetUniform(GLchar const* name, glm::vec3 const& val);
   void SetUniform(GLchar const* name, glm::vec4 const& val);
+  void SetUniform(GLchar const* name, vec4 const& val);
   void SetUniform(GLchar const* name, glm::mat2 const& val);
   void SetUniform(GLchar const* name, glm::mat3 const& val);
   void SetUniform(GLchar const* name, glm::mat4 const& val);
+  void SetUniform(GLchar const* name, mat4 const& val);
   void SetUniformVec2(GLchar const* name, glm::vec2 const& v);
   void SetUniform2f(GLchar const* name, glm::vec2 const& v);
 

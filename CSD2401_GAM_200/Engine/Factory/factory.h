@@ -22,10 +22,10 @@ public:
     GameObject *CreateGameObject(const std::string &name = "GameObject");
 
     // Create predefined 2D types
-    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color);
-    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *sprite);
+    //GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 color);
+    //GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *sprite);
 
-    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color);
+    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color);
     GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *filename);
 
 
@@ -34,9 +34,9 @@ public:
                                     char const *filename, int numRows, int numCols,
                                     int startFrame, int endFrame, float fps);
 
-    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 color, CollisionLayer layer);
+    GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 color, CollisionLayer layer);
     GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *sprite, CollisionLayer layer);
-    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const glm::vec4 &color, CollisionLayer layer);
+    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color, CollisionLayer layer);
     GameObject* CreateAnimatedImage(const std::string& name, float x, float y, float w, float h,
         char const* filename, int numRows, int numCols,
         int startFrame, int endFrame, float fps,CollisionLayer layer);
@@ -65,4 +65,4 @@ private:
 
 void DemoM1_SpawnGameObjects();
 void DemoM1_DestroyGameObjects();
-void DemoM1_SpawnGameObjectsTest(int val = 0);
+//void DemoM1_SpawnGameObjectsTest(int val = 0);

@@ -24,8 +24,8 @@ public:
 	void SetAnimation(int startFrameIdx, int endFrameIdx, float fps);
 	void Unload();
 
-	glm::vec2 GetUVScale() const;
-	glm::vec2 GetUVOffset() const;
+	vec2 GetUVScale() const;
+	vec2 GetUVOffset() const;
 
 
 	int GetRows();

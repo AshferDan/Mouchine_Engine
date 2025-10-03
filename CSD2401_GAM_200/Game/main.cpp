@@ -98,31 +98,31 @@ int main()
     );
 
     // Create ground at the bottom of the screen (black rectangle)
-    GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
+    GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
     // Make ground static so it doesn't fall
     auto *groundPhysics = ground->AddComponent<PhysicsComponent>(1.0f, true);
     groundPhysics->SetGravity(false);
 
     // Create ground at the bottom of the screen (black rectangle)
-    GameObject *wall = factory.CreateShape("Wall", RenderComponent::ShapeType::Square, 1500, -500, 1000, 3000, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
+    GameObject *wall = factory.CreateShape("Wall", RenderComponent::ShapeType::Square, 1500, -500, 1000, 3000, vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
     auto* wallPhysics = wall->AddComponent<PhysicsComponent>(1.0f, true);
     wallPhysics->SetGravity(false);
 
-    GameObject* wall2 = factory.CreateShape("Wall2", RenderComponent::ShapeType::Square, -1500, -500, 1000, 3000, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
+    GameObject* wall2 = factory.CreateShape("Wall2", RenderComponent::ShapeType::Square, -1500, -500, 1000, 3000, vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
 
     // Make ground static so it doesn't fall
     auto *wall2Physics = wall2->AddComponent<PhysicsComponent>(1.0f, true);
     wall2Physics->SetGravity(false);
 
 
-    GameObject *CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
+    GameObject *CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 150, 300, 100, 100, vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics1 = CircleShape->AddComponent<PhysicsComponent>(1.0f, false);
     physics1->SetVelocity(-250.0f, 0.0f);
     physics1->SetGravity(true);           
 
     
  
-    GameObject *CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, -150, 300, 100, 100, glm::vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
+    GameObject *CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, -150, 300, 100, 100, vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
     auto *physics2 = CircleShape2->AddComponent<PhysicsComponent>(1.0f, false);
     physics2->SetVelocity(250.0f, 0.0f); 
     physics2->SetGravity(true);         

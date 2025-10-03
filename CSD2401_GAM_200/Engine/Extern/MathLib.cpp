@@ -92,9 +92,9 @@ mat3 mat3::operator*(mat3 const& o) const {
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             r.m[i * 3 + j] = m[0 * 3 + j] * o.m[i * 3 + 0] + m[1 * 3 + j] * o.m[i * 3 + 1] + m[2 * 3 + j] * o.m[i * 3 + 2];
-            return r;
         }
     }
+    return r;
 }
 
 //----------------- mat4 -----------------//
@@ -143,11 +143,17 @@ mat4 mat4::rotateZ(float rad) {
     return r; 
 }
 
+// Column-major matrix multiplication
 mat4 mat4::operator*(mat4 const& o) const {
     mat4 r;
-    for (int c = 0; c < 4; ++c)
-        for (int rI = 0; rI < 4; ++rI)
-            r.m[c * 4 + rI] = m[0 * 4 + rI] * o.m[c * 4 + 0] + m[1 * 4 + rI] * o.m[c * 4 + 1] + m[2 * 4 + rI] * o.m[c * 4 + 2] + m[3 * 4 + rI] * o.m[c * 4 + 3];
+    for (int col = 0; col < 4; ++col) {
+        for (int row = 0; row < 4; ++row) {
+            r.m[col * 4 + row] = 0.0f;
+            for (int k = 0; k < 4; ++k) {
+                r.m[col * 4 + row] += m[k * 4 + row] * o.m[col * 4 + k];
+            }
+        }
+    }
     return r;
 }
 
