@@ -4,7 +4,7 @@
 \author     Leck Xin Yee [53% - 48 lines]
 \co-author	Lee Hwee Min [47% - 43 lines]
 \par        xinyee.leck@digipen.edu, l.hweemin@digipen.edu
-\date       October 02 2025
+\date       October, 3, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

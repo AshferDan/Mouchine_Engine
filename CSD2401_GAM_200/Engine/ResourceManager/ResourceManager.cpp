@@ -3,7 +3,7 @@
 \file       ResourceManager.cpp
 \author     Leck Xin Yee [100% - 156 lines]
 \par        xinyee.leck@digipen.edu
-\date       October 02 2025
+\date       October, 2, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
