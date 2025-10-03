@@ -21,7 +21,6 @@ double CoreEngine::delta_time = 0.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 
-
 /* brief
    Constuctor
 
@@ -44,7 +43,7 @@ CoreEngine::~CoreEngine()
 }
 
 /* brief
-   function loads the config.txt file from the folder  directory and loads the 
+   function loads the config.txt file from the folder  directory and loads the
    window width and height to the graphics system
 
    */
