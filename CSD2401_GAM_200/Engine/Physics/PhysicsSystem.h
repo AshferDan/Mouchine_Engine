@@ -107,13 +107,6 @@ private:
      */
     void ApplyGravity(PhysicsComponent* physics, float deltaTime);
 
-    /**
-     * @brief Integrates velocity into position
-     * @param physics Physics component with velocity
-     * @param transform Transform to update
-     * @param deltaTime Frame time
-     */
-    void IntegrateVelocity(PhysicsComponent* physics, TransformComponent* transform, float deltaTime);
 
     // Store collisions reported this frame for batch resolution
     std::vector<CollisionData> pendingCollisions;

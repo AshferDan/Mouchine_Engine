@@ -71,6 +71,7 @@ void CoreEngine::InitSystems()
 {
     CoreEngine::ConfigFile("./Logs/config.txt");
     std::cout << "Initializing default systems..." << std::endl;
+
     // 1. Graphics first (needed for window)
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth, WindHeight);
 
@@ -84,8 +85,12 @@ void CoreEngine::InitSystems()
     // 4. GameObject System
     gameObjectSystem = AddSystem<GameObjectSystem>();
 
+    //Transform System 
+    transformSystem = AddSystem<TransformSystem>();
+
     // 5. Collision System - detects collisions
     collisionSystem = AddSystem<CollisionSystem>();
+
 
     // 6. Physics System - processes collisions and applies physics
     physicsSystem = AddSystem<PhysicsSystem>();

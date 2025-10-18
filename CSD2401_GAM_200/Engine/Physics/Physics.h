@@ -14,7 +14,7 @@ Technology is prohibited.
 #pragma once
 #include "Component.h"
 #include <memory>
-#include "Transform.h"
+#include "transform.h"
 #include "GameObject.h"
 #include <iostream>
 #include <cmath>
@@ -151,13 +151,13 @@ private:
      * @brief Applies gravity to velocity
      * @param deltaTime Frame time
      */
-    void ApplyGravity(float deltaTime);
+    //void ApplyGravity(float deltaTime);
 
     /**
      * @brief Updates object position based on velocity
      * @param deltaTime Frame time
      */
-    void UpdatePosition(float deltaTime);
+   // void UpdatePosition(float deltaTime);
 
 public:
     // Linear motion

@@ -27,24 +27,6 @@ TransformComponent::TransformComponent(GameObject *owner, float x, float y)
 }
 
 /**
- * @brief Updates the transform and tracks position changes for debugging
- */
-void TransformComponent::Update(float deltaTime)
-{
-    // Debug output for transform changes
-    static float lastPosX = posX, lastPosY = posY;
-
-    if (posX != lastPosX || posY != lastPosY)
-    {
-        // std::cout << owner->GetName() << " Transform Update - Position changed to ("
-        //  << posX << ", " << posY << ")" << std::endl;
-        lastPosX = posX;
-        lastPosY = posY;
-    }
-    // throw std::runtime_error("Test crash: runtime error");
-}
-
-/**
  * @brief Creates a deep copy of this TransformComponent for a new GameObject
  */
 std::unique_ptr<IComponent> TransformComponent::Clone(GameObject *NewClone) const
