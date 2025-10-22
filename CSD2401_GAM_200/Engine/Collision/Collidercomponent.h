@@ -81,12 +81,6 @@ public:
     std::unique_ptr<IComponent> Clone(GameObject* newOwner) const override;
 
     /**
-     * @brief Updates the component (empty for colliders)
-     * @param deltaTime Time elapsed since last update
-     */
-    void Update(float deltaTime) override;
-
-    /**
      * @brief Gets the collider shape type
      * @return Type enum (Square or Circle)
      */

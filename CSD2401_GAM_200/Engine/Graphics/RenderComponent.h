@@ -74,8 +74,6 @@ public:
     /*! @brief Lifecycle override: initialize component */
     void Initialize() override {}
 
-    /*! @brief Lifecycle override: update component */
-    void Update(float) override {}
 
     /*! @brief Lifecycle override: destroy component */
     void Destroy() override {}

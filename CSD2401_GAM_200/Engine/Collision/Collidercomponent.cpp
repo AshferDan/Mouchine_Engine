@@ -59,12 +59,3 @@ std::unique_ptr<IComponent> ColliderComponent::Clone(GameObject* newOwner) const
     cloned->SetEnabled(this->IsEnabled());
     return cloned;
 }
-
-/**
- * @brief Update function (empty as colliders are queried, not updated)
- */
-void ColliderComponent::Update(float deltaTime) {
-    // Colliders typically don't need per-frame updates
-    // They're queried by the collision system
-    // Leave empty or add any specific update logic you need
-}
