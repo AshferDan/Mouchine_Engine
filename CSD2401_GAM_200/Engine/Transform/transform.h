@@ -30,11 +30,6 @@ public:
      */
     TransformComponent(GameObject *owner, float x = 0, float y = 0);
 
-    /**
-     * @brief Updates the transform component each frame
-     * @param deltaTime Time elapsed since last frame
-     */
-    void Update(float deltaTime) override;
 
     /**
      * @brief Gets the name of this component type

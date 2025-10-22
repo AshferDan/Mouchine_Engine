@@ -120,23 +120,23 @@ std::unique_ptr<IComponent> PhysicsComponent::Clone(GameObject *NewClone) const
         velocityY = std::sin(angle) * speed;
     }
 
-    /**
-     * @brief Applies gravity acceleration to velocity
-     */
-    void PhysicsComponent::ApplyGravity(float deltaTime)
-    {
-        velocityX += gravityX * deltaTime;
-        velocityY += gravityY * deltaTime;
-    }
+    //**
+    // * @brief Applies gravity acceleration to velocity
+    // */
+    //void PhysicsComponent::ApplyGravity(float deltaTime)
+    //{
+    //    velocityX += gravityX * deltaTime;
+    //    velocityY += gravityY * deltaTime;
+    //}
 
-    /**
-     * @brief Updates the transform position based on velocity
-     */
-    void PhysicsComponent::UpdatePosition(float deltaTime)
-    {
-        auto *transform = owner->GetComponent<TransformComponent>();
-        if (transform)
-        {
-            transform->Move(velocityX * deltaTime, velocityY * deltaTime);
-        }
-    }
+    //**
+    // * @brief Updates the transform position based on velocity
+    // */
+    //void PhysicsComponent::UpdatePosition(float deltaTime)
+    //{
+    //    auto *transform = owner->GetComponent<TransformComponent>();
+    //    if (transform)
+    //    {
+    //        transform->Move(velocityX * deltaTime, velocityY * deltaTime);
+    //    }
+    //}
