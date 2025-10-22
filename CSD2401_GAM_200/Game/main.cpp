@@ -68,6 +68,7 @@ int main()
 
      // load textures
      resourceMgr.LoadTexture("player_sprite", "./Assets/protosprite.png");
+     resourceMgr.LoadTexture("wallpaper", "./Assets/wallpaper_transparent.png");
 
      // load audio files
      resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true); // looping
@@ -85,7 +86,7 @@ int main()
     std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
     auto &factory = GameObjectFactory::Instance();
 
-    factory.CreateImage("bgImage", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "./Assets/wallpaper_transparent.png");
+    factory.CreateImage("wallpaper", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "./Assets/wallpaper_transparent.png");
     
     GameObject* animatedMouch = factory.CreateAnimatedImage(
         "Hero",                        // name
