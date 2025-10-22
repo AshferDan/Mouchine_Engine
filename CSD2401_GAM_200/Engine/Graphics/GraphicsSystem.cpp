@@ -187,6 +187,44 @@ void GraphicsSystem::Initialize()
     glEnableVertexArrayAttrib(vao, 1); // enable attribute location 1
     glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
     glVertexArrayAttribBinding(vao, 1, 0); // bind attribute 1 to binding point 0
+
+    // Initialise batch rendering buffers
+    glCreateVertexArrays(1, &batchVAO);
+    glCreateBuffers(1, &batchVBO);
+    glCreateBuffers(1, &batchEBO);
+
+    // Allocate large buffers for batch rendering
+    glNamedBufferStorage(batchVBO, MAX_BATCH_VERTICES * sizeof(BatchVertex), nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(batchEBO, MAX_BATCH_INDICES * sizeof(GLuint), nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+    //bind buffers to VAO
+    glVertexArrayVertexBuffer(batchVAO, 0, batchVBO, 0, sizeof(BatchVertex));
+    glVertexArrayElementBuffer(batchVAO, batchEBO);
+
+    // Attribute 0: Position (vec3)
+    glEnableVertexArrayAttrib(batchVAO, 0);
+    glVertexArrayAttribFormat(batchVAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, pos));
+    glVertexArrayAttribBinding(batchVAO, 0, 0);
+
+    // Attribute 1: Texture Coords (vec2)
+    glEnableVertexArrayAttrib(batchVAO, 1);
+    glVertexArrayAttribFormat(batchVAO, 1, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, tex));
+    glVertexArrayAttribBinding(batchVAO, 1, 0);
+
+    // Attribute 2: Color (vec4)
+    glEnableVertexArrayAttrib(batchVAO, 2);
+    glVertexArrayAttribFormat(batchVAO, 2, 4, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, color));
+    glVertexArrayAttribBinding(batchVAO, 2, 0);
+
+    //Attribute 3: UV Scale (vec2)
+    glEnableVertexArrayAttrib(batchVAO, 3);
+    glVertexArrayAttribFormat(batchVAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, uvScale));
+    glVertexArrayAttribBinding(batchVAO, 3, 0);
+
+    // Attribute 4: UV Offset (vec2)
+    glEnableVertexArrayAttrib(batchVAO, 4);
+    glVertexArrayAttribFormat(batchVAO, 4, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, uvOffset));
+    glVertexArrayAttribBinding(batchVAO, 4, 0);
 }
 
 void GraphicsSystem::Update(float)

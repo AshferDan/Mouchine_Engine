@@ -128,6 +128,8 @@ public:
 	// Returns the current view-projection matrix.
 	const mat4& getVp() const { return vp; }
 
+	void DrawBatches();
+
 private:
 	mat4 vp;               // Current view-projection matrix.
 	bool debugMode = false;     // Debug mode flag for showing shapes.
@@ -135,6 +137,28 @@ private:
 	GLSLShader shader;          // Shader used for debug rendering.
 	GLuint vao = 0, vbo = 0, tex = 0; // OpenGL buffers and texture.
 	GLint Wwidth, Wheight;      // Window dimensions.
+
+	struct BatchVertex {
+		vec3 pos;
+		vec2 tex;
+		vec4 color;
+		vec2 uvScale;
+		vec2 uvOffset;
+	};
+
+	struct RenderBatch {
+		GLuint textureID;
+		bool isCircle;
+		std::vector<BatchVertex> vertices;
+		std::vector<GLuint> indices;
+
+		RenderBatch(GLuint texID, bool circle) : textureID(texID), isCircle(circle) {}
+	};
+
+	std::vector<RenderBatch> batches;
+	GLuint batchVAO, batchVBO, batchEBO;
+	const size_t MAX_BATCH_VERTICES = 10000; // 2500 quads * 4 vertices
+	const size_t MAX_BATCH_INDICES = 15000; // 2500 quads * 6 indices
 };
 
 
