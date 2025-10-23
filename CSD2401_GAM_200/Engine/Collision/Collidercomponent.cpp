@@ -14,6 +14,10 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "GameObject.h"
 
+ColliderComponent::ColliderComponent(GameObject* own)
+    : IComponent(own), type(Type::Square), width(0), height(0), radius(0), layer(CollisionLayer::Default)
+{
+}
 /**
  * @brief Constructs a ColliderComponent with specified parameters
  */

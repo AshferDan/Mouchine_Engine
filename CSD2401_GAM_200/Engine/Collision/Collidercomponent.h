@@ -32,6 +32,7 @@ class ColliderComponent : public IComponent {
 public:
     enum class Type { Square, Circle };
 
+    ColliderComponent(GameObject* own);
      /**
      * @brief Constructs a ColliderComponent
      * @param owner GameObject that owns this component
@@ -73,6 +74,8 @@ public:
      */
     void SetLayer(CollisionLayer newLayer) { layer = newLayer; }
 
+
+    void setColliShape(ColliderComponent::Type newShape) { type = newShape; }
     /**
      * @brief Creates a deep copy of this component
      * @param newOwner GameObject that will own the clone

@@ -108,7 +108,7 @@ int main()
     }
 
     // Start the game loop when ready
-    API::StartGameLoop(engine);
+    API::StartEngineLoop(engine);
 
     return 0;
 }

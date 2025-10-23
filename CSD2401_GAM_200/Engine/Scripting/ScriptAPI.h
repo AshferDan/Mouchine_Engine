@@ -2,9 +2,8 @@
 #include <iostream>
 #include <cmath>
 #include <string>
-
-#include "Core.h"
-#include "Factory.h"
+#include "core.h"
+#include "factory.h"
 #include "GameObjectSystem.h"
 #include "GraphicsSystem.h"
 #include "ImGuiSystem.h"
@@ -20,14 +19,20 @@
 #include "InputManager.h"
 #include "gameObject.h"
 
+enum Shape {
+    SQUARE,
+    CIRCLE,
+    POINT,
+    LINE
+};
 
 namespace API {
 #pragma region Engine
     void Init_Engine(CoreEngine& engine, AudioEngine& audio);
-    void StartGameLoop(CoreEngine& engine);
+    void StartEngineLoop(CoreEngine& engine);
 #pragma endregion
 
-#pragma region Graphics
+#pragma region Creations
     void CreateShape(const std::string& name,
         RenderComponent::ShapeType type,
         float x, float y,
@@ -58,30 +63,79 @@ namespace API {
 
 #pragma endregion
 
+#pragma region Graphics
+    void SetShapeType(const std::string& objectName, RenderComponent::ShapeType);
+    void SetTexture(const std::string& objectName, const char* filename);
+    void setColor(const std::string& objectName, vec4 color);
+    void SetAlpha(const std::string& objectName,float);
+#pragma endregion
+
 #pragma region Physics
     void GetVelocity(const std::string&);
-    void SetVelocity(const std::string& objectName, float vx, float vy);
+    void SetVelocity(const std::string&, float, float);
 
-    void IsStatic(const std::string&);
+    
+    void SetStatic(const std::string&,bool);
     void SetJumpVal(const std::string&, float);
-    void SetGravBool(const std::string&); //set whether it have a Gravity
+    void SetGravBool(const std::string&,bool); //set whether it have a Gravity
     void SetGravVal(const std::string&, float, float);//Setting the gravity amount
+
 #pragma endregion
 
 #pragma region Transform
-    void SetPos(const std::string&,float,float);
-    void SetRot(const std::string&,float,float);
-    void SetScale(const std::string&,float,float);
+    void SetPos(const std::string&, float, float);
+
+    void SetScale(const std::string&, float);
+    void SetScale(const std::string&, float, float);
+
+    void SetRot(const std::string&, float);
+    void AddRot(const std::string&, float);
 
     void GetRot(const std::string&);
     void GetPos(const std::string&);
     void GetScale(const std::string&);
+
 #pragma endregion
 
-
+#pragma region Components
     
-        
+    void AddTransformComponent(const std::string&);
 
-
+    void AddRenderComponent(const std::string&);
     
+    void AddCollisionComponent(const std::string&);
+    
+    void AddPhysicComponent(const std::string&);
+
+#pragma endregion
+
+#pragma region Collision
+    void SetColisionShape(const std::string&, ColliderComponent::Type newShape);
+    void SetCollisionLayer(const std::string&, CollisionLayer newlayer);
+#pragma endregion
+
+    //#pragma region InputSystem
+    //    void GetMousePos();
+    //    void GetKeyPressed();
+    //    void GetKeyHold();
+    //    void GetKeyRelease();
+    //#pragma endregion
+    //
+    //#pragma region Audio
+    //    void Init_AudioEngine();
+    //    void PlaySound();
+    //    void StopSound();
+    //    void PauseSound();
+    //    void SetBGM();
+    //#pragma endregion
+
+
+
+
+
+
+
+
+
+
 }
