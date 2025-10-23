@@ -63,13 +63,6 @@ void InputManager::Update(float dt)
         {GLFW_KEY_M, false}, // toggle pause (for now)
     };
 
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (io.WantCaptureKeyboard)
-    {
-        return;
-    }
-
     // handle M key for pausing and resuming background music
     static bool bgmPaused = false;
 

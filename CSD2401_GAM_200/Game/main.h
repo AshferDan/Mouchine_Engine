@@ -30,7 +30,7 @@ Technology is prohibited.
 #include "ResourceManager.h"
 #include "audio.h"
 #include "InputManager.h"
-
+#include "ScriptAPI.h"
 /**
  * @brief Initializes all main systems and resources for the game.
  */

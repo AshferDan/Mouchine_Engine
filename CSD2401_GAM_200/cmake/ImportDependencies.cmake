@@ -74,7 +74,7 @@ macro(import_imgui)
         FetchContent_Declare(
             imgui
             GIT_REPOSITORY https://github.com/ocornut/imgui.git
-            GIT_TAG v1.90.4
+            GIT_TAG v1.92.4-docking
         )
         if(NOT imgui_POPULATED)
             FetchContent_Populate(imgui)

@@ -40,120 +40,75 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
 int main()
 {
     EnableMemoryLeakChecking();
-    std::cout << "=== 2D Component System Test ===" << std::endl;
     CoreEngine engine;
     AudioEngine audio;
-    engine.SetAudioEngine(&audio);
-    //double g_totalLoopTime = 0.0;
-    std::map<std::string, double> g_systemTimings; // ms per system
 
-    std::cout << "\n--- Initializing Engine ---" << std::endl;
-    engine.Init();
+    API::Init_Engine(engine, audio);
 
-     // Initialise Audio System
-     std::cout << "\n--- Initialising Audio System ---" << std::endl;
-     if (!audio.initialiseAudio())
-     {
-         std::cout << "Audio system failed to initialise, continuing without audio" << std::endl;
-     }
-     else
-     {
-         std::cout << "Audio system initialised successfully" << std::endl;
-     }
+    // Create objects whenever you want, in any order
+    std::cout << "\n--- Creating Background ---" << std::endl;
+    API::CreateImage("bgImage", RenderComponent::ShapeType::Square,
+        0.f, 0.f, 2400.f, 1380.f,
+        "./Assets/wallpaper_transparent.png");
 
-     // Initialise ResourceManager
-     std::cout << "\n--- Initialising Resource Manager ---" << std::endl;
-     auto& resourceMgr = ResourceManager::Instance();
-     resourceMgr.SetAudioEngine(&audio);
+    std::cout << "\n--- Creating Hero ---" << std::endl;
+    API::CreateAnimatedImage("Hero", 0.0f, 0.0f, 150.0f, 150.0f,
+        "./Assets/Mouch_idle.png",
+        1, 2, 0, 7, 2.0f,
+        CollisionLayer::Player,
+        true, false, true);
 
-     // load textures
-     resourceMgr.LoadTexture("player_sprite", "./Assets/protosprite.png");
-     resourceMgr.LoadTexture("wallpaper", "./Assets/wallpaper_transparent.png");
+    // Maybe some logic here...
+    std::cout << "\n--- Creating Other Sprites ---" << std::endl;
+    API::CreateAnimatedImage("AniImage", -700.0f, 100.0f, 300.0f, 300.0f,
+        "./Assets/Mouch_idle.png",
+        1, 2, 0, 7, 2.0f, CollisionLayer::Ground, true, true, false);
 
-     // load audio files
-     resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true); // looping
-     resourceMgr.LoadAudio("jump_sfx", "./Assets/audio/jump.wav", false); // when jumping only
-     // resourceMgr.LoadAudio("wind", "../Assets/Audio/wind1.wav", false); // one-shot
+    // Create ground
+    std::cout << "\n--- Creating Environment ---" << std::endl;
+    API::CreateShape("Ground", RenderComponent::ShapeType::Square,
+        0, -500, 3000, 500,
+        vec4(0.0f, 0.0f, 0.0f, 1.0f),
+        CollisionLayer::Ground,
+        true, true, false);
 
-     // print loaded resources
-     resourceMgr.PrintLoadedResources();
+    API::CreateShape("Wall", RenderComponent::ShapeType::Square,
+        1500, -500, 1000, 3000,
+        vec4(0.0f, 0.0f, 0.0f, 1.0f),
+        CollisionLayer::Ground,
+        true, true, false);
 
-     // register the sound with audio engine
-     std::cout << "\n--- Starting Background Music ---" << std::endl;
-     audio.playSound("bgm", "bgm_channel"); 
-     audio.setVolume("bgm_channel", 0.5f);
+    API::CreateShape("Wall2", RenderComponent::ShapeType::Square,
+        -1500, -500, 1000, 3000,
+        vec4(0.0f, 0.0f, 0.0f, 1.0f),
+        CollisionLayer::Ground,
+        true, true, false);
 
-    std::cout << "\n--- Creating 2D GameObjects ---" << std::endl;
-    auto &factory = GameObjectFactory::Instance();
+    // Create enemies
+    std::cout << "\n--- Creating Enemies ---" << std::endl;
+    API::CreateShape("Circle", RenderComponent::ShapeType::Circle,
+        150, 300, 100, 100,
+        vec4(1.f, 0.f, 0.f, 1.f),
+        CollisionLayer::Enemy,
+        true, false, true);
+    API::SetVelocity("Circle", -250.0f, 0.0f);
 
-    factory.CreateImage("wallpaper", RenderComponent::ShapeType::Square, 0.f, 0.f, 2400.f, 1380.f, "./Assets/wallpaper_transparent.png");
-    
-    GameObject* animatedMouch = factory.CreateAnimatedImage(
-        "Hero",                        // name
-        0.0f, 0.0f,                    // x, y position
-        150.0f, 150.0f,                // width, height (scale)
-        "./Assets/Mouch_idle.png",    // filename
-        1, 2,                          //row,columns
-        0, 7,                          // start frame , end frame
-        2.0f,                          // 12 frames per second
-        CollisionLayer::Player                           
-    );
-    auto* playerPhysics = animatedMouch->AddComponent<PhysicsComponent>(1.0f, true);
-    playerPhysics->SetGravity(true);
-    playerPhysics->SetStatic(false);
+    API::CreateShape("Circle2", RenderComponent::ShapeType::Circle,
+        -150, 300, 100, 100,
+        vec4(1.f, 0.f, 0.f, 1.f),
+        CollisionLayer::Enemy,
+        true, false, true);
+    API::SetVelocity("Circle2", 250.0f, 0.0f);
 
-    factory.CreateAnimatedImage(
-        "AniImage",                      // name
-        -700.0f, 100.0f,                 // x, y position
-        300.0f, 300.0f,                  // width, height (scale)
-        "./Assets/Mouch_idle.png",      // filename
-        1, 2,                            //row,columns
-        0, 7,                            // start frame , end frame
-        2.0f                             // 12 frames per second
-    );
+    // You can even add conditional creation
+    bool createButton = true;
+    if (createButton)
+    {
+        //API::CreateGameObject("Evil Button");
+    }
 
-    factory.CreateAnimatedImage(
-        "AniImage",                    // name
-        700.0f, 100.0f,                // x, y position
-        300.0f, 300.0f,                // width, height (scale)
-        "./Assets/Mouch_Running.png", // filename
-        1, 2,                          //row,columns
-        0, 7,                          // start frame , end frame
-        2.0f                           // 12 frames per second
-    );
-
-    // Create ground at the bottom of the screen (black rectangle)
-    GameObject *ground = factory.CreateShape("Ground", RenderComponent::ShapeType::Square, 0, -500, 3000, 500, vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
-    // Make ground static so it doesn't fall
-    auto *groundPhysics = ground->AddComponent<PhysicsComponent>(1.0f, true);
-    groundPhysics->SetGravity(false);
-
-    // Create ground at the bottom of the screen (black rectangle)
-    GameObject *wall = factory.CreateShape("Wall", RenderComponent::ShapeType::Square, 1500, -500, 1000, 3000, vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
-    auto* wallPhysics = wall->AddComponent<PhysicsComponent>(1.0f, true);
-    wallPhysics->SetGravity(false);
-
-    GameObject* wall2 = factory.CreateShape("Wall2", RenderComponent::ShapeType::Square, -1500, -500, 1000, 3000, vec4(0.0f, 0.0f, 0.0f, 1.0f), CollisionLayer::Ground);
-
-    // Make ground static so it doesn't fall
-    auto *wall2Physics = wall2->AddComponent<PhysicsComponent>(1.0f, true);
-    wall2Physics->SetGravity(false);
-
-
-    GameObject *CircleShape = factory.CreateShape("Circle", RenderComponent::ShapeType::Circle, 150, 300, 100, 100, vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
-    auto *physics1 = CircleShape->AddComponent<PhysicsComponent>(1.0f, false);
-    physics1->SetVelocity(-250.0f, 0.0f);
-    physics1->SetGravity(true);            
- 
-    GameObject *CircleShape2 = factory.CreateShape("Circle2", RenderComponent::ShapeType::Circle, -150, 300, 100, 100, vec4(1.f, 0.f, 0.f, 1.f), CollisionLayer::Enemy);
-    auto *physics2 = CircleShape2->AddComponent<PhysicsComponent>(1.0f, false);
-    physics2->SetVelocity(250.0f, 0.0f); 
-    physics2->SetGravity(true);         
-    
-    factory.CreateGameObject("Evil Button");
-
-    std::cout << "\n--- Starting Engine Gameloop ---" << std::endl;
-    engine.GameLoop();
+    // Start the game loop when ready
+    API::StartEngineLoop(engine);
 
     return 0;
 }
