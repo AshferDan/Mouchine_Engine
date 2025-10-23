@@ -193,12 +193,28 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
      This is the blueprint for the normal image gameobject, wer would this function to be images that we wanna like the background
 */
 
-GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType, float x, float y, float w, float h, char const *filename)
+GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderComponent::ShapeType, float x, float y, float w, float h, char const* filename)
 {
-    GameObject *obj = CreateGameObject(name);
+    GameObject* obj = CreateGameObject(name);
 
-    auto *transform = obj->AddComponent<TransformComponent>(x, y);
-    GLint texID = GraphicsSystem::LoadTexture(filename);
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    //GLint texID = GraphicsSystem::LoadTexture(filename);
+    TextureResource* texResource = ResourceManager::Instance().GetTexture(name);
+    GLuint texID = 0;
+
+    if (texResource && texResource->IsLoaded())
+    {
+        // Use existing texture from ResourceManager
+        texID = texResource->GetTextureID();
+        std::cout << "Using texture from ResourceManager: " << name << std::endl;
+    }
+    else
+    {
+        // Fallback: load directly if not in ResourceManager
+        texID = GraphicsSystem::LoadTexture(filename);
+        std::cout << "Warning: Texture not in ResourceManager, loading directly: " << filename << std::endl;
+    }
+
     obj->AddComponent<RenderComponent>(texID);
     transform->SetScale(w, h);
     return obj;

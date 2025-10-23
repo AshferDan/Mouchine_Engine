@@ -1,4 +1,5 @@
 @echo off
+setlocal
 REM ===============================================
 REM Windows Build and Run Script
 REM ===============================================

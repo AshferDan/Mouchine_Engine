@@ -14,7 +14,7 @@ Technology is prohibited.
 #pragma once
 #include "Component.h"
 #include <memory>
-#include "Transform.h"
+#include "transform.h"
 #include "GameObject.h"
 #include <iostream>
 #include <cmath>
@@ -126,19 +126,26 @@ public:
      * @param useGrav Whether to apply gravity
      */
     void SetGravity(bool useGrav) { useGravity = useGrav; }
-
+    /**
+ * @brief sets a constant gravity to x or y to the object
+ * @param float values of x and y
+ */
+    void SetGravityVal(float x, float y) {
+        gravityX = x;
+        gravityY = y;
+    }
     // 2D specific helpers
     /**
      * @brief Calculates the speed (magnitude of velocity)
      * @return Current speed
      */
     float GetSpeed() const;
+
     /**
      * @brief Gets direction of movement
      * @return Direction in radians
      */
     float GetDirection() const;
-
     /**
      * @brief Sets velocity from angle and speed
      * @param angle Direction in radians
@@ -151,13 +158,13 @@ private:
      * @brief Applies gravity to velocity
      * @param deltaTime Frame time
      */
-    void ApplyGravity(float deltaTime);
+    //void ApplyGravity(float deltaTime);
 
     /**
      * @brief Updates object position based on velocity
      * @param deltaTime Frame time
      */
-    void UpdatePosition(float deltaTime);
+   // void UpdatePosition(float deltaTime);
 
 public:
     // Linear motion

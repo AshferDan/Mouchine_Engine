@@ -49,6 +49,8 @@ set(Input_DIR         ./Engine/Input)
 set(Factory_DIR       ./Engine/Factory)
 set(Core_DIR          ./Engine/Core)
 set(Resource_DIR      ./Engine/ResourceManager)
+set(Scripting_DIR     ./Engine/Scripting)
+
 
 # External dependencies
 set(Extern_DIR        ./Engine/Extern)
@@ -101,6 +103,9 @@ file(GLOB_RECURSE Core_HEAD        "${Core_DIR}/*.h" "${Core_DIR}/*.hpp")
 file(GLOB_RECURSE Resource_SRC  "${Resource_DIR}/*.cpp")
 file(GLOB_RECURSE Resource_HEAD "${Resource_DIR}/*.h" "${Resource_DIR}/*.hpp")
 
+file(GLOB_RECURSE Scripting_SRC    "${Scripting_DIR}/*.cpp")
+file(GLOB_RECURSE Scripting_HEAD    "${Scripting_DIR}/*.h" "${Scripting_DIR}/*.hpp")
+
 
 # External files (if any cpp/h files exist in Extern)
 file(GLOB_RECURSE Extern_SRC       "${Extern_DIR}/*.cpp")
@@ -124,6 +129,7 @@ set(ENGINE_SOURCES
     ${Core_SRC}
     ${Extern_SRC}
     ${Resource_SRC}
+    ${Scripting_SRC}
 )
 
 set(ENGINE_HEADERS
@@ -142,6 +148,7 @@ set(ENGINE_HEADERS
     ${Core_HEAD}
     ${Extern_HEAD}
     ${Resource_HEAD}
+    ${Scripting_HEAD}
 )
 
 # ======================= Create Engine Static Library ===============
@@ -197,6 +204,9 @@ source_group("Core\\Header Files" FILES ${Core_HEAD})
 source_group("ResourceManager\\Source Files" FILES ${Resource_SRC})
 source_group("ResourceManager\\Header Files" FILES ${Resource_HEAD})
 
+source_group("Scripting\\Source Files" FILES ${Scripting_SRC})
+source_group("Scripting\\Header Files" FILES ${Scripting_HEAD})
+
 source_group("Extern\\Source Files" FILES ${Extern_SRC})
 source_group("Extern\\Header Files" FILES ${Extern_HEAD})
 
@@ -217,6 +227,7 @@ target_include_directories(Engine PUBLIC
     ${Factory_DIR}
     ${Extern_DIR}
     ${Resource_DIR}
+    ${Scripting_DIR}
 )
 
 # ======================= Link Libraries to Engine ===================
@@ -228,6 +239,7 @@ target_link_libraries(Engine PUBLIC
     imgui
     freetype
     stb_image
+    #mono
 )
 
 # Link FMOD to Engine if available
@@ -326,7 +338,7 @@ add_custom_command(TARGET Game POST_BUILD
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/config.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Logs/config.txt"
         "$<TARGET_FILE_DIR:Game>/Logs/config.txt"
     COMMENT "Copying config.txt to Logs folder in configuration directory"
 )
@@ -344,19 +356,6 @@ add_custom_command(TARGET Game POST_BUILD
         "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
         "${CMAKE_CURRENT_SOURCE_DIR}/Build/Shaders"
     COMMENT "Copying Shaders folder to top-level Build directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs"
-    COMMENT "Creating Logs folder in top-level Build directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/config.txt"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs/config.txt"
-    COMMENT "Copying config.txt to Logs folder in top-level Build directory"
 )
 
 message(STATUS "Asset copy commands configured successfully for all build locations.")

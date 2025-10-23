@@ -15,7 +15,7 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "Factory.h"
 #include "Physics.h"
-#include "Transform.h"
+#include "transform.h"
 #include "Collision.h"
 #include <iostream>
 #include <cmath>
@@ -68,8 +68,6 @@ void PhysicsSystem::Update(float deltaTime) {
                 }
             }
 
-            // Integrate velocity into position
-            IntegrateVelocity(physics, transform, deltaTime);
         }
     }
 
@@ -118,13 +116,6 @@ void PhysicsSystem::ReportCollision(GameObject* obj1, GameObject* obj2,
 void PhysicsSystem::ApplyGravity(PhysicsComponent* physics, float deltaTime) {
     physics->velocityX += physics->gravityX * deltaTime;
     physics->velocityY += physics->gravityY * deltaTime;
-}
-
-/**
- * @brief Updates position based on velocity
- */
-void PhysicsSystem::IntegrateVelocity(PhysicsComponent* physics, TransformComponent* transform, float deltaTime) {
-    transform->Move(physics->velocityX * deltaTime, physics->velocityY * deltaTime);
 }
 
 /**

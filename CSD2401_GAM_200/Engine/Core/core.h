@@ -28,6 +28,7 @@ Technology is prohibited.
 #include <Physics.h>
 #include "ImGuiSystem.h"
 #include "InputManager.h"
+#include "transformSystem.h"
 #include "CollisionSystem.h"
 #include "PhysicsSystem.h"
 #include "DebugSystem.h"
@@ -42,6 +43,7 @@ class InputManager;
 class CollisionSystem;
 class PhysicsSystem;
 class DebugSystem;
+class TransformSystem;
 class CoreEngine
 {
 public:
@@ -65,10 +67,6 @@ public:
      */
     void DestroySystems();
 
-    /**
-     * @brief Signals the game to exit the GameLoop.
-     */
-    void exit();
 
     /**
      * @brief Initializes the CoreEngine and its systems.
@@ -154,6 +152,10 @@ public:
         return debugSystem;
     }
 
+    TransformSystem* GetTransformSystem() const {
+
+        return transformSystem;
+    }
     /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
@@ -201,6 +203,7 @@ private:
     PhysicsSystem* physicsSystem = nullptr;
     DebugSystem* debugSystem = nullptr;
     AudioEngine* audioEngine = nullptr;
+    TransformSystem* transformSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;
