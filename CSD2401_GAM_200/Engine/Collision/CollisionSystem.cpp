@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       CollisionSystem.cpp
+\author     Khalil Belabadia [100% - 115 lines]
+\par        khalil.b@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "CollisionSystem.h"
 #include "PhysicsSystem.h"
 #include "GameObject.h"
@@ -7,16 +20,35 @@
 #include <iostream>
 #include <algorithm>
 
+/**
+ * @brief Constructs collision system with null physics reference
+ */
 CollisionSystem::CollisionSystem() : physicsSystem(nullptr) {
 }
 
+/**
+ * @brief Destructor
+ */
 CollisionSystem::~CollisionSystem() {
 }
 
+/**
+ * @brief Initializes the collision system
+ */
 void CollisionSystem::Initialize() {
     std::cout << "Initializing system: CollisionSystem" << std::endl;
 }
 
+/**
+ * @brief Determines if two collision layers should interact based on layer rules
+ * Layer interaction matrix:
+ * - Default collides with everything
+ * - Player collides with Ground, Wall, Enemy, Platform
+ * - Enemy collides with Player, Ground, Wall, Platform, other Enemies
+ * - Ground doesn't collide with other Ground or Walls
+ * - Walls don't collide with other Walls or Ground
+ * - Platforms only collide with Player and Enemy
+ */
 bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2) {
     if (layer1 == CollisionLayer::Default || layer2 == CollisionLayer::Default) {
         return true;
@@ -60,6 +92,11 @@ bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2
     return true;
 }
 
+/**
+ * @brief Main update loop - detects collisions and reports them to physics system
+ * Performs broad-phase collision detection for all game objects with colliders,
+ * then narrow-phase testing based on shape types
+ */
 void CollisionSystem::Update(float deltaTime) {
     auto& factory = GameObjectFactory::Instance();
     const auto& gameObjects = factory.GetAllGameObjects();

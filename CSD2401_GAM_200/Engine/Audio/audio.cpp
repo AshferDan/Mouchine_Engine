@@ -1,9 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
 \file       audio.cpp
-\author     Leck Xin Yee [100%]
+\author     Leck Xin Yee [100% - 183 lines]
 \par        xinyee.leck@digipen.edu
-\date       October 02 2025
+\date       October, 2, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -18,6 +18,9 @@ AudioEngine::AudioEngine() : sounds(), channels(), system(nullptr) {}
 AudioEngine::~AudioEngine() { stopAudio(); }
 
 /*  Core Functionalities  */
+/**
+ * @brief Initializes the FMOD audio system with 32 max concurrent sounds
+ */
 bool AudioEngine::initialiseAudio() {
 	FMOD_RESULT result;
 
@@ -38,6 +41,9 @@ bool AudioEngine::initialiseAudio() {
 	return true;
 }
 
+/**
+ * @brief Updates the FMOD audio system (must be called every frame)
+ */
 void AudioEngine::updateAudio() {
 	// must be called every frame in game loop
 	if (system) {
@@ -45,6 +51,9 @@ void AudioEngine::updateAudio() {
 	}
 }
 
+/**
+ * @brief Stops all audio, unloads all sounds, and shuts down the system
+ */
 void AudioEngine::stopAudio() {
 	stopAllSound();
 	unloadAllSound();
@@ -59,6 +68,9 @@ void AudioEngine::stopAudio() {
 }
 
 /*   Sound loading  */
+/**
+ * @brief Registers a pre-existing FMOD sound with a name identifier
+ */
 bool AudioEngine::registerSound(const std::string& name, FMOD::Sound* sound) {
 	if (!system) {
 		std::cout << "Audio system not initialised" << std::endl;
@@ -76,9 +88,12 @@ bool AudioEngine::registerSound(const std::string& name, FMOD::Sound* sound) {
 	return true;
 }
 
+/**
+ * @brief Loads a sound file from disk with optional looping
+ */
 bool AudioEngine::loadSound(const std::string& name, const std::string& filepath, bool loop) {
 	if (!system) {
-		std::cout << "o man its not initialised" << std::endl;
+		std::cout << "It's not initialised" << std::endl;
 		return false;
 	}
 	// check sound exist
@@ -106,6 +121,9 @@ bool AudioEngine::loadSound(const std::string& name, const std::string& filepath
 	return true;
 }
 
+/**
+ * @brief Unloads a specific sound and removes it from the sound map
+ */
 void AudioEngine::unloadSound(const std::string& name) {
 	auto it = sounds.find(name);
 	if (it != sounds.end()) {
@@ -115,6 +133,9 @@ void AudioEngine::unloadSound(const std::string& name) {
 	}
 }
 
+/**
+ * @brief Unloads all sounds and clears the sound and channel maps
+ */
 void AudioEngine::unloadAllSound() {
 	for (auto& pair : sounds) {
 		pair.second->release();
@@ -125,6 +146,9 @@ void AudioEngine::unloadAllSound() {
 }
 
 /*  Playback controls  */
+/**
+ * @brief Plays a loaded sound on a named or unnamed channel
+ */
 bool AudioEngine::playSound(const std::string& name, const std::string& channelName) {
 	if (!system) {
 		std::cout << "Audio system not initialised..." << std::endl;
@@ -152,6 +176,9 @@ bool AudioEngine::playSound(const std::string& name, const std::string& channelN
 	return true;
 }
 
+/**
+ * @brief Stops playback on a specific channel and removes it from the channel map
+ */
 void AudioEngine::stopSound(const std::string& channelName) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -166,6 +193,9 @@ void AudioEngine::stopSound(const std::string& channelName) {
 	}
 }
 
+/**
+ * @brief Stops playback on all active channels and clears the channel map
+ */
 void AudioEngine::stopAllSound() {
 	for (auto& pair : channels) {
 		if (pair.second) {
@@ -180,6 +210,9 @@ void AudioEngine::stopAllSound() {
 	std::cout << "Stopped all sound" << std::endl;
 }
 
+/**
+ * @brief Pauses or resumes playback on a specific channel
+ */
 void AudioEngine::pauseSound(const std::string& channelName, bool pause) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -195,7 +228,10 @@ bool AudioEngine::eventPlaying(const std::string& eventName) {
 }
 */
 
-/*  Volume and effects controls  */
+// Volume and effects controls
+/**
+ * @brief Sets the volume for a specific channel (clamped between 0.0 and 1.0)
+ */
 void AudioEngine::setVolume(const std::string& channelName, float volume) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -204,6 +240,9 @@ void AudioEngine::setVolume(const std::string& channelName, float volume) {
 	}
 }
 
+/**
+ * @brief Sets the master volume for all audio (clamped between 0.0 and 1.0)
+ */
 void AudioEngine::masterVolume(float volume) {
 	if (system) {
 		FMOD::ChannelGroup* masterGroup = nullptr;
@@ -216,6 +255,9 @@ void AudioEngine::masterVolume(float volume) {
 	}
 }
 
+/**
+ * @brief Checks if a specific channel is currently playing
+ */
 bool AudioEngine::isPlaying(const std::string& channelName) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -226,6 +268,9 @@ bool AudioEngine::isPlaying(const std::string& channelName) {
 	return false;
 }
 
+/**
+ * @brief Toggles the mute status for a specific channel
+ */
 void AudioEngine::muteSound(const std::string& channelName) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
@@ -237,6 +282,9 @@ void AudioEngine::muteSound(const std::string& channelName) {
 }
 
 /*  Error Handling  */
+/**
+ * @brief Checks FMOD result and logs error message if operation failed
+ */
 void AudioEngine::checkError(FMOD_RESULT result, const std::string& operation) {
 	if (result != FMOD_OK) {
 		std::cout << "fmod error in " << operation << ": " << FMOD_ErrorString(result) << result << std::endl;

@@ -1,35 +1,31 @@
+/* Start Header ************************************************************************/
+/*!
+\file        Collision.h
+\author     Khalil Belabadia [100% - 31 lines]
+\par        khalil.b@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
+#include "MathLib.h"
 #include <string>
 #include <cmath>
-
-// --------------------
-// Basic 2D Math Types
-// --------------------
-struct Vec2 {
-    float x{ 0 };
-    float y{ 0 };
-};
-
-//inline Vec2 operator-(const Vec2& a, const Vec2& b) {
-//    return { a.x - b.x, a.y - b.y };
-//}
-//inline Vec2 operator+(const Vec2& a, const Vec2& b) {
-//    return { a.x + b.x, a.y + b.y };
-//}
-//inline Vec2 operator*(const Vec2& v, float s) {
-//    return { v.x * s, v.y * s };
-//}
 
 // --------------------
 // Collider Types
 // --------------------
 struct AABB {
-    Vec2 min; // bottom-left
-    Vec2 max; // top-right
+    vec2 min; // bottom-left
+    vec2 max; // top-right
 };
 
 struct Circle {
-    Vec2 center;
+    vec2 center;
     float radius;
 };
 
@@ -37,45 +33,76 @@ struct Circle {
 // Static Intersection Tests
 // --------------------
 
-// AABB vs AABB
+/**
+ * @brief Tests if two AABBs are intersecting
+ * @param aabb1 First axis-aligned bounding box
+ * @param aabb2 Second axis-aligned bounding box
+ * @return True if the AABBs overlap
+ */
 bool CollisionIntersection_RectRect_Static(const AABB& aabb1, const AABB& aabb2);
 
-// Circle vs Circle
+/**
+ * @brief Tests if two circles are intersecting
+ * @param c1 First circle
+ * @param c2 Second circle
+ * @return True if the circles overlap
+ */
 bool CollisionIntersection_CircleCircle_Static(const Circle& c1, const Circle& c2);
 
-// AABB vs Circle
+/**
+ * @brief Tests if an AABB and circle are intersecting
+ * @param rect Axis-aligned bounding box
+ * @param circle Circle to test against
+ * @return True if the shapes overlap
+ */
 bool CollisionIntersection_RectCircle_Static(const AABB& rect, const Circle& circle);
 
 // --------------------
-// Dynamic (swept) Intersection Tests
+// Dynamic Intersection Tests
 // --------------------
 
-// Moving AABB vs AABB
+/**
+ * @brief Tests if two moving AABBs will collide within the frame
+ * @param aabb1 First axis-aligned bounding box
+ * @param vel1 Velocity of first AABB
+ * @param aabb2 Second axis-aligned bounding box
+ * @param vel2 Velocity of second AABB
+ * @param firstTimeOfCollision Output parameter for normalized collision time [0,1]
+ * @return True if the AABBs will collide
+ */
 bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1,
-    const Vec2& vel1,
+    const vec2& vel1,
     const AABB& aabb2,
-    const Vec2& vel2,
+    const vec2& vel2,
     float& firstTimeOfCollision);
 
-// (Optional: Circle vs Circle dynamic can be added later)
+// (Circle vs Circle dynamic can be added later)
 
 // --------------------
 // Unified Helpers
 // --------------------
 
-// AABB collision with velocities
+/**
+ * @brief Combined static and dynamic AABB collision test
+ * @param aabb1 First axis-aligned bounding box
+ * @param vel1 Velocity of first AABB
+ * @param aabb2 Second axis-aligned bounding box
+ * @param vel2 Velocity of second AABB
+ * @param firstTimeOfCollision Output parameter for normalized collision time
+ * @return True if AABBs are colliding or will collide
+ */
 inline bool CollisionIntersection_RectRect(const AABB& aabb1,
-    const Vec2& vel1,
+    const vec2& vel1,
     const AABB& aabb2,
-    const Vec2& vel2,
+    const vec2& vel2,
     float& firstTimeOfCollision)
 {
-    // Step 1: Static check (already overlapping?)
+    // Step 1: Static check
     if (CollisionIntersection_RectRect_Static(aabb1, aabb2)) {
         firstTimeOfCollision = 0.0f;
         return true;
     }
 
-    // Step 2: Swept test
+    // Step 2: Dynamic test
     return CollisionIntersection_RectRect_Dynamic(aabb1, vel1, aabb2, vel2, firstTimeOfCollision);
 }

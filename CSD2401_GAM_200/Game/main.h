@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       main.h
+\author     Lee Hwee Min [100% - 23 lines]
+\par        l.hweemin@digipen.edu
+\date       October, 2, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once 
 
 #include "Core.h"
@@ -18,8 +31,27 @@
 #include "audio.h"
 #include "InputManager.h"
 
+/**
+ * @brief Initializes all main systems and resources for the game.
+ */
 void Main_init();
+
+/**
+ * @brief Updates all systems and processes logic each frame.
+ */
 void Main_Update();
+
+/**
+ * @brief Renders all game objects and systems each frame.
+ */
 void Main_Draw();
+
+/**
+ * @brief Frees all allocated resources when shutting down the game.
+ */
 void Main_Free();
+
+/**
+ * @brief Unloads resources (textures, audio, etc.) from memory.
+ */
 void Main_Unload();

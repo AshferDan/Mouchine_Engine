@@ -1,4 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Core.cpp
+\author     Jonathan Fam Qian Wei [71% - 103 lines]
+\co-author  Lee Hwee Min [29% - 41 lines]
+\par        Fam.q@digipen.edu , l.hweemin@digipen.edu
+\date       October, 2, 2025
 
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "core.h"
 bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
@@ -8,7 +21,11 @@ double CoreEngine::delta_time = 0.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 
-CoreEngine::CoreEngine()
+/* brief
+   Constuctor
+
+   */
+CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0)
 {
     LastTime = 0;
     GameActive = true;
@@ -16,13 +33,20 @@ CoreEngine::CoreEngine()
 
     std::cout << "CoreEngine constructed" << std::endl;
 }
-
+/* brief
+   deonstuctor
+   */
 CoreEngine::~CoreEngine()
 {
     DestroySystems();
     std::cout << "CoreEngine destroyed" << std::endl;
 }
 
+/* brief
+   function loads the config.txt file from the folder  directory and loads the
+   window width and height to the graphics system
+
+   */
 void CoreEngine::ConfigFile(const char *configF)
 {
     std::ifstream fp{configF};
@@ -39,10 +63,15 @@ void CoreEngine::ConfigFile(const char *configF)
     setWindsize(WindWid, WindHei);
 }
 
+/* brief
+   This function init the systems and add the systems into the enigne
+
+   */
 void CoreEngine::InitSystems()
 {
-    CoreEngine::ConfigFile("../Logs/config.txt");
+    CoreEngine::ConfigFile("./Logs/config.txt");
     std::cout << "Initializing default systems..." << std::endl;
+
     // 1. Graphics first (needed for window)
     graphicsSystem = AddSystem<GraphicsSystem>(WindWidth, WindHeight);
 
@@ -56,8 +85,12 @@ void CoreEngine::InitSystems()
     // 4. GameObject System
     gameObjectSystem = AddSystem<GameObjectSystem>();
 
+    //Transform System 
+    transformSystem = AddSystem<TransformSystem>();
+
     // 5. Collision System - detects collisions
     collisionSystem = AddSystem<CollisionSystem>();
+
 
     // 6. Physics System - processes collisions and applies physics
     physicsSystem = AddSystem<PhysicsSystem>();
@@ -67,6 +100,10 @@ void CoreEngine::InitSystems()
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
+/* brief
+   This function init the engine and add the systems into the enigne and as well as initialze the added systems.
+
+   */
 
 void CoreEngine::Init()
 {
@@ -82,6 +119,11 @@ void CoreEngine::Init()
     std::cout << "CoreEngine initialization complete" << std::endl;
 }
 
+/* brief
+   This function starts the core engine loop to start the game engine process
+   there is the a exeception error checker too to get error thrown too
+
+   */
 void CoreEngine::GameLoop()
 {
     double fps_interval = 1.0;
@@ -102,7 +144,7 @@ void CoreEngine::GameLoop()
                     continue;
 
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                Systems[i]->Update(CoreEngine::GetDeltaTime());
+                Systems[i]->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
 
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
@@ -115,7 +157,7 @@ void CoreEngine::GameLoop()
             {
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
 
-                imguiSystem->Update(CoreEngine::GetDeltaTime());
+                imguiSystem->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
 
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
 
@@ -128,7 +170,7 @@ void CoreEngine::GameLoop()
     catch (const std::exception &e)
     {
         // Log standard exceptions to debuglog.txt
-        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        std::ofstream log("./Logs/CrashLog.txt", std::ios::app);
         log << "[EXCEPTION] " << e.what() << std::endl;
         log.close();
 
@@ -137,7 +179,7 @@ void CoreEngine::GameLoop()
     catch (...)
     {
         // Log unknown exceptions
-        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        std::ofstream log("./Logs/CrashLog.txt", std::ios::app);
         log << "[UNKNOWN EXCEPTION]" << std::endl;
         log.close();
 
@@ -147,12 +189,15 @@ void CoreEngine::GameLoop()
     glfwTerminate();
 }
 
+/* brief
+   This function deletes the engines and stops the engine processes and clears all systems
+
+   */
 void CoreEngine::DestroySystems()
 {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
 }
-
 
 void CoreEngine::update_time(double fps_calc_interval)
 {
