@@ -18,6 +18,8 @@ Technology is prohibited.
 #include <cmath>
 #include <cstdint>
 
+struct vec3;
+struct vec4;
 //----------------- vec2 -----------------//
 struct vec2
 {
@@ -50,6 +52,8 @@ struct vec3
 	vec3();
 	vec3(float px, float py, float pz);
 	vec3(float s) : x(s), y(s), z(s) {};
+	vec3(vec4 const& v);
+
 
 	vec3 operator+(vec3 const &v) const noexcept;
 	vec3 operator-(vec3 const &v) const noexcept;
@@ -79,6 +83,7 @@ struct vec4
 	vec4();
 	vec4(float px, float py, float pz, float pw);
 	vec4(float s) : x(s), y(s), z(s), w(s) {};
+	vec4(vec3 const& v, float pw);
 
 	vec4 operator+(vec4 const &v) const noexcept;
 	vec4 operator-(vec4 const &v) const noexcept;
@@ -112,6 +117,7 @@ struct mat4
 	static mat4 rotateZ(float radians);
 
 	mat4 operator*(mat4 const &o) const;
+
 
 	static mat4 ortho(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f)
 	{
@@ -159,5 +165,10 @@ struct mat4
 		return result;
 	}
 };
+
+vec4 operator*(mat4 const& m, vec4 const& v);
+
+inline vec3::vec3(vec4 const& v) : x(v.x), y(v.y), z(v.z) {}
+inline vec4::vec4(vec3 const& v, float pw) : x(v.x), y(v.y), z(v.z), w(pw) {}
 
 #endif // MATH_LIB

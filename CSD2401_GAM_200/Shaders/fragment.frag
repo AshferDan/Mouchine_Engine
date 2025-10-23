@@ -26,9 +26,9 @@ void main() {
         return;
     }
 
-   if(uHasTexture == 1) {
-      vec2 finalTexCoord = TexCoord * uTiling + offset; 
-        
+    if(uHasTexture == 1) {
+        vec2 finalTexCoord = TexCoord * ((uUseBatching == 1) ? UVScale : uTiling)
+                             + ((uUseBatching == 1) ? UVOffset : uTexOffset);
         vec4 tex = texture(uTexture, finalTexCoord);
         baseColor *= tex;
     }

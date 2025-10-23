@@ -265,128 +265,192 @@ void GraphicsSystem::Update(float)
     mat4 view = mat4::translate(-camPos);
     vp = projection * view; // Final View-Projection matrix
 
-    // === Render All Active GameObjects ===
+    //Accumulate all geometry into batches
+    batches.clear();
+
     auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
-    //int count = 0;
-    for (auto& obj : gameObjects)
-    {
-        if (!obj->IsActive())
+    for (auto& obj : gameObjects) {
+        if (!obj->IsActive()) {
             continue;
+        }
 
         auto* transform = obj->GetComponent<TransformComponent>();
-        if (!transform)
+        if (!transform) {
             continue;
+        }
 
-        if (auto* rend = obj->GetComponent<RenderComponent>())
-        {
-            switch (rend->GetShapeType())
-            {
-                // === Draw Sprite / Shape (Square or Circle) ===
-            case RenderComponent::ShapeType::Square:
-            case RenderComponent::ShapeType::Circle:
-            {
-                float x, y, sx, sy;
-                transform->GetPosition(x, y);
-                transform->GetScale(sx, sy);
-                float rot = transform->GetRotation();
+        auto* rend = obj->GetComponent<RenderComponent>();
 
-                // Debug mode: overlay custom debug shapes
-                // Draw dubug mode shapes
-                if (debugMode)
-                {
-                    auto& debugShapes = CORE->GetDebugSystem()->GetShapes();
-                    for (auto& shape : debugShapes)
-                    {
-                        switch (shape.type)
-                        {
-                        case DebugSystem::DebugShape::LINE:
-                            DrawLine(shape.p1, shape.p2, shape.color, vp);
-                            break;
-                        case DebugSystem::DebugShape::RECT:
-                            DrawRectOutline(shape.p1.x, shape.p1.y, shape.p2.x, shape.p2.y, shape.color, vp);
-                            break;
-                        case DebugSystem::DebugShape::CIRCLE:
-                            DrawCircleOutline(shape.p1.x, shape.p1.y, shape.radius, shape.segments, shape.color, vp);
-                            break;
-                        case DebugSystem::DebugShape::POINT:
-                            DrawPoint(shape.p1, shape.color, vp);
-                        }
-                    }
-                }
+        if (!rend) {
+            continue;
+        }
+        //Only batch Square and Circle for now
+        if (rend->GetShapeType() != RenderComponent::ShapeType::Circle && rend->GetShapeType() != RenderComponent::ShapeType::Square) {
+            continue;
+        }
 
-                // === Pass uniforms to shader ===
-                shader.SetUniform("uIsLine", 0);  // Sprite, not line
-                shader.SetUniform("uColor", vec4(rend->GetColor())); // Tint color
-                shader.SetUniform("uTiling", vec2(1.0f));            // Default tiling
-                shader.SetUniform("uIsCircle",
-                    rend->GetShapeType() == RenderComponent::ShapeType::Circle ? 1 : 0);
+        //transform data
+        float x, y, sx, sy;
+        transform->GetPosition(x, y);
+        transform->GetScale(sx, sy);
+        float rot = transform->GetRotation();
 
-                vec2 uvScale = vec2(1.0f);
-                vec2 uvOffset = vec2(0.0f);
+        //Render data
+        GLuint texID = rend->GetTextureID();
+        vec4 color = vec4(rend->GetColor());
+        bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
+        int layer = rend->GetLayer();
 
-                // Check if object has an animator (spritesheet)
-                if (auto* animator = obj->GetComponent<Spritesheet>())
-                {
-                    uvScale = animator->GetUVScale();   // Scale (1/Cols, 1/Rows)
-                    uvOffset = animator->GetUVOffset(); // Offset for current frame
-                }
+        //UV data
+        vec2 uvScale = vec2(1.0f);
+        vec2 uvOffset = vec2(1.0f);
+        if (auto* animator = obj->GetComponent<Spritesheet>()) {
+            uvScale = animator->GetUVScale();
+            uvOffset = animator->GetUVOffset();
+        }
 
-                shader.SetUniform("uTiling", uvScale);
-                shader.SetUniform("uTexOffset", uvOffset);
-
-                // === Bind texture if available ===
-                if (rend->GetTextureID() > 0)
-                {
-                    shader.SetUniform("uHasTexture", 1);
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, rend->GetTextureID());
-                    shader.SetUniform("uTexture", 0);
-                }
-                else
-                {
-                    shader.SetUniform("uHasTexture", 0);
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                };
-
-                // === Model transform (position, rotation, scale) ===
-                mat4 model = mat4::translate(vec3(x, y, 0.0f));
-                model = model * mat4::rotate(rot,vec3(0, 0, 1));
-                model = model * mat4::scale(vec3(sx, sy, 1.0f));
-
-                // Send final MVP matrix to shader
-                shader.SetUniform("uMVP", vp * model);
-
-                    glBindVertexArray(vao);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-                    if (debugMode) {
-                        if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
-                            DrawCircleOutline(x, y, static_cast<float>(sx*0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
-                        }
-                        else {
-                            DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
-                        }
-                    }
+        RenderBatch* targetBatch = nullptr;
+        for (auto& batch : batches) {
+            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer) {
+                targetBatch = &batch;
                 break;
             }
+        }
 
-            // === Draw Line ===
+            if (!targetBatch) {
+                batches.emplace_back(texID, isCircle, layer);
+                targetBatch = &batches.back();
+            }
+
+            mat4 model = mat4::translate(vec3(x, y, 0.0f));
+            model = model * mat4::rotate(rot, vec3(0, 0, 1));
+            model = model * mat4::scale(vec3(sx, sy, 1.0f));
+
+            vec3 localVerts[4] = {
+                {-0.5f, -0.5f, 0.f},
+                {0.5f, -0.5f, 0.f},
+                {-0.5f, 0.5f, 0.f},
+                {0.5f, 0.5f, 0.f}
+            };
+
+            vec2 texCoords[4] = {
+                {0.f, 0.f},
+                {1.f, 0.f},
+                {0.f, 1.f},
+                {1.f, 1.f}
+            };
+
+            GLuint baseIndex = (GLuint)targetBatch->vertices.size();
+
+            //add 4 vertices to batch
+            for (int i = 0; i < 4; ++i) {
+                vec3 worldPos = model * vec4(localVerts[i], 1.0f);
+
+                BatchVertex vert;
+                vert.pos = worldPos;
+                vert.tex = texCoords[i];
+                vert.color = color;
+                vert.uvScale = uvScale;
+                vert.uvOffset = uvOffset;
+
+                targetBatch->vertices.push_back(vert);
+            }
+
+            //add 6 indices for 2 triangles (quad)
+            targetBatch->indices.push_back(baseIndex + 0);
+            targetBatch->indices.push_back(baseIndex + 1);
+            targetBatch->indices.push_back(baseIndex + 2);
+            targetBatch->indices.push_back(baseIndex + 2);
+            targetBatch->indices.push_back(baseIndex + 1);
+            targetBatch->indices.push_back(baseIndex + 3);
+
+        std::sort(batches.begin(), batches.end(), [](const RenderBatch& a, const RenderBatch& b) {return a.layer < b.layer; });
+
+        //Draw all batches
+        DrawBatches();
+
+        //Draw Non-batched shapes
+        for (auto& obj : gameObjects) {
+            if (!obj->IsActive()) {
+                continue;
+            }
+
+            auto* rend = obj->GetComponent<RenderComponent>();
+
+            if (!rend) {
+                continue;
+            }
+
+            switch (rend->GetShapeType()) {
             case RenderComponent::ShapeType::Line:
             {
                 auto line = rend->GetLine();
                 DrawLine(line.start, line.end, line.color, vp);
                 break;
             }
-
-            // === Draw Point ===
             case RenderComponent::ShapeType::Point:
             {
                 auto point = rend->GetPoint();
                 DrawPoint(point.pos, point.color, vp);
                 break;
             }
+            default:
+                break;
             }
         }
+
+        if (debugMode) {
+            auto& debugShapes = CORE->GetDebugSystem()->GetShapes();
+            for (auto& shape : debugShapes) {
+                switch (shape.type) {
+                case DebugSystem::DebugShape::LINE :
+                {
+                    DrawLine(shape.p1, shape.p2, shape.color, vp);
+                    break;
+                }
+                case DebugSystem::DebugShape::POINT:
+                {
+                    DrawPoint(shape.p1, shape.color, vp);
+                    break;
+                }
+                case DebugSystem::DebugShape::RECT:
+                {
+                    DrawRectOutline(shape.p1.x, shape.p1.y, shape.p2.x, shape.p2.y, shape.color, vp);
+                    break;
+                }
+                case DebugSystem::DebugShape::CIRCLE:
+                {
+                    DrawCircleOutline(shape.p1.x, shape.p1.y, shape.radius, shape.segments, shape.color, vp);
+                    break;
+                }
+                }
+            }
+
+            for (auto& obj : gameObjects) {
+                if (!obj->IsActive()) {
+                    continue;
+                }
+
+                auto* transform = obj->GetComponent<TransformComponent>();
+                auto* rend = obj->GetComponent<RenderComponent>();
+                if (!transform || !rend) {
+                    continue;
+                }
+
+                float x, y, sx, sy;
+                transform->GetPosition(x, y);
+                transform->GetScale(sx, sy);
+                if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
+                    DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
+                }
+                else if (rend->GetShapeType() == RenderComponent::ShapeType::Square) {
+                    DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
+                }
+            }
+
+        }
     }
+
 }
 
 // Draw a line between two points in world space
@@ -518,6 +582,48 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
     }
 }
 
+void GraphicsSystem::DrawBatches() {
+    if (batches.empty()) {
+        return;
+    }
+
+    shader.Use();
+    shader.SetUniform("uUseBatching", 1);
+    shader.SetUniform("uIsLine", 0);
+
+    glBindVertexArray(batchVAO);
+
+    for (auto& batch : batches) {
+        if (batch.vertices.empty()) {
+            continue;
+        }
+
+        //Upload vertex data
+        glNamedBufferSubData(batchVBO, 0, batch.vertices.size() * sizeof(BatchVertex), batch.vertices.data());
+
+        //Upload index data
+        glNamedBufferSubData(batchEBO, 0, batch.indices.size() * sizeof(GLuint), batch.indices.data());
+
+        //Set Uniform
+        shader.SetUniform("uMVP", vp);
+        shader.SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
+    
+        //Bind Texture
+        if (batch.textureID > 0) {
+            shader.SetUniform("uHasTexture", 1);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, batch.textureID);
+            shader.SetUniform("uTexture", 0);
+        }
+        else {
+            shader.SetUniform("uHasTexture", 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+
+        glDrawElements(GL_TRIANGLES, (GLsizei)batch.indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    shader.SetUniform("uUseBatching", 0);
+}
 
 std::string GraphicsSystem::GetName()
 {
@@ -602,6 +708,8 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
 
     // 3. Clone the enabled state.
     clonedComponent->SetEnabled(this->IsEnabled());
+
+    clonedComponent->SetLayer(this->layer);
 
     return clonedComponent;
 }

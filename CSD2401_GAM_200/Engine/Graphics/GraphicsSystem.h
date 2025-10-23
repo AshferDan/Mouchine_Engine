@@ -29,6 +29,7 @@ Technology is prohibited.
 #include <RenderComponent.h>
 #include <fstream>
 #include "MathLib.h"
+#include <algorithm>
 
 
 /**
@@ -151,8 +152,9 @@ private:
 		bool isCircle;
 		std::vector<BatchVertex> vertices;
 		std::vector<GLuint> indices;
+		int layer;
 
-		RenderBatch(GLuint texID, bool circle) : textureID(texID), isCircle(circle) {}
+		RenderBatch(GLuint texID, bool circle, int l) : textureID(texID), isCircle(circle), layer(l) {}
 	};
 
 	std::vector<RenderBatch> batches;

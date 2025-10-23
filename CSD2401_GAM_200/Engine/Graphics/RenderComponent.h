@@ -57,8 +57,8 @@ public:
         @param owner The GameObject this component belongs to
         @param texID OpenGL texture ID
     */
-    RenderComponent(GameObject *owner, GLuint texID)
-        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point()
+    RenderComponent(GameObject* owner, GLuint texID)
+        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point(), layer(0)
     {
     }
 
@@ -68,7 +68,7 @@ public:
         @param color Shape color
     */
     RenderComponent(GameObject* owner, ShapeType type, const vec4& color)
-        : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
+        : IComponent(owner), shape(type), textureID(0), color(color), line(), point(), layer(0) {
           };
 
     /*! @brief Lifecycle override: initialize component */
@@ -161,10 +161,14 @@ public:
         }
     }
 
+    int GetLayer() const { return layer; };
+    void SetLayer(int l) { layer = l; };
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
     vec4 color; /*!< Color of the shape */
+    int layer;
 
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
