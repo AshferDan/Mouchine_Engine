@@ -298,6 +298,7 @@ set_target_properties(Game PROPERTIES
 
 # ======================= Copy Runtime Assets to Build Directory =============
 
+# --- Copy Assets, Shaders, etc. to Configuration Directory (e.g., Build/Debug) ---
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -320,7 +321,6 @@ add_custom_command(TARGET Game POST_BUILD
     COMMENT "Copying Mathlib.cpp folder to configuration directory"
 )
 
-
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
@@ -328,6 +328,7 @@ add_custom_command(TARGET Game POST_BUILD
     COMMENT "Copying Shaders folder to configuration directory"
 )
 
+# --- Copy Logs to Configuration Directory (e.g., Build/Debug) ---
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory
@@ -342,6 +343,20 @@ add_custom_command(TARGET Game POST_BUILD
     COMMENT "Copying config.txt to Logs folder in configuration directory"
 )
 
+# --- Copy Assets, Shaders, and Logs to Top-Level Build Directory (Build/) ---
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs"
+    COMMENT "Creating Logs folder in top-level Build directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Logs/config.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs/config.txt"
+    COMMENT "Copying config.txt to Logs folder in top-level Build directory"
+)
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
