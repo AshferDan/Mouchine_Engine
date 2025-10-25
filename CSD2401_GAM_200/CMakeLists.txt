@@ -12,8 +12,8 @@
 
 
 # ======================= Project Configuration =========================
-cmake_minimum_required(VERSION 3.13)
-cmake_policy(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
+#cmake_policy(VERSION 2.7...3.5)
 
 # Set policy for imported targets
 if(POLICY CMP0111)
@@ -27,7 +27,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(ImportDependencies)
 importDependencies()
 
-add_definitions(-DGLEW_STATIC)
 add_definitions(-DUSE_CSD3151_AUTOMATION=0)
 
 # ======================= Directories =============================
