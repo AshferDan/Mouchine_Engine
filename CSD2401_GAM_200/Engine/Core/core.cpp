@@ -52,7 +52,7 @@ void CoreEngine::ConfigFile(const char *configF)
     std::ifstream fp{configF};
     if (!fp)
     {
-        std::cout << "Cannot find file";
+        std::cout << "Cannot find file"<< std::endl;
         glfwTerminate();
     }
 

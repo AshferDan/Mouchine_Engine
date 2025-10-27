@@ -14,6 +14,10 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "GameObject.h"
 
+ColliderComponent::ColliderComponent(GameObject* own)
+    : IComponent(own), type(Type::Square), width(0), height(0), radius(0), layer(CollisionLayer::Default)
+{
+}
 /**
  * @brief Constructs a ColliderComponent with specified parameters
  */
@@ -58,13 +62,4 @@ std::unique_ptr<IComponent> ColliderComponent::Clone(GameObject* newOwner) const
     );
     cloned->SetEnabled(this->IsEnabled());
     return cloned;
-}
-
-/**
- * @brief Update function (empty as colliders are queried, not updated)
- */
-void ColliderComponent::Update(float deltaTime) {
-    // Colliders typically don't need per-frame updates
-    // They're queried by the collision system
-    // Leave empty or add any specific update logic you need
 }

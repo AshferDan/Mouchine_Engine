@@ -53,6 +53,9 @@ public:
         float size=0; /*!< Point size */
     };
 
+    RenderComponent(GameObject* owner)
+        : IComponent(owner), shape(ShapeType::Square), textureID(0), color(1.0f, 0.0f, 0.0f, 1.0f), line(), point() {
+    }
     /*! @brief Constructor for a textured object
         @param owner The GameObject this component belongs to
         @param texID OpenGL texture ID
@@ -69,13 +72,11 @@ public:
     */
     RenderComponent(GameObject* owner, ShapeType type, const vec4& color)
         : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
-          };
+          }
 
     /*! @brief Lifecycle override: initialize component */
     void Initialize() override {}
 
-    /*! @brief Lifecycle override: update component */
-    void Update(float) override {}
 
     /*! @brief Lifecycle override: destroy component */
     void Destroy() override {}
@@ -105,6 +106,8 @@ public:
         @return ShapeType of this component
     */
     ShapeType GetShapeType() const { return shape; }
+
+    void SetShapeType(ShapeType newShape) { shape = newShape; }
 
     /*! @brief Get the current color
         @return Color as vec4

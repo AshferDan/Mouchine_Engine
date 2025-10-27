@@ -82,6 +82,8 @@ void ImGuiSystem::Initialize()
 	ImGui::StyleColorsDark();					  // Set dark theme
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true); // Initialize GLFW backend
 	ImGui_ImplOpenGL3_Init("#version 450");		  // Initialize OpenGL backend
+	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;	// Enable docking
+
 
 	ShowCreateGOMenu = false; // Hide create menu initially
 }

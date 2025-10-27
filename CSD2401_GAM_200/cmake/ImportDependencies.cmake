@@ -42,7 +42,7 @@ macro(import_glew)
         FetchContent_Declare(
             glew
             GIT_REPOSITORY https://github.com/omniavinco/glew-cmake.git
-            GIT_TAG master  # Or use a specific commit or tag if preferred
+            GIT_TAG glew-cmake-release
         )
 
         # Disable shared builds if needed
@@ -74,7 +74,7 @@ macro(import_imgui)
         FetchContent_Declare(
             imgui
             GIT_REPOSITORY https://github.com/ocornut/imgui.git
-            GIT_TAG v1.90.4
+            GIT_TAG v1.92.4-docking
         )
         if(NOT imgui_POPULATED)
             FetchContent_Populate(imgui)

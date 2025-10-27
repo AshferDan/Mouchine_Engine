@@ -67,10 +67,6 @@ public:
      */
     void DestroySystems();
 
-    /**
-     * @brief Signals the game to exit the GameLoop.
-     */
-    void exit();
 
     /**
      * @brief Initializes the CoreEngine and its systems.

@@ -1,4 +1,5 @@
 @echo off
+setlocal
 REM ===============================================
 REM Windows Build and Run Script
 REM ===============================================
@@ -42,7 +43,7 @@ cd Build
 
 REM Configure with CMake
 echo [3/4] Configuring project with CMake...
-cmake .. -G "Visual Studio 17 2022" -A x64
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 if %errorlevel% neq 0 (
     echo ERROR: CMake configuration failed
     cd ..

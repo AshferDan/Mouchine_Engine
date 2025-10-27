@@ -126,19 +126,26 @@ public:
      * @param useGrav Whether to apply gravity
      */
     void SetGravity(bool useGrav) { useGravity = useGrav; }
-
+    /**
+ * @brief sets a constant gravity to x or y to the object
+ * @param float values of x and y
+ */
+    void SetGravityVal(float x, float y) {
+        gravityX = x;
+        gravityY = y;
+    }
     // 2D specific helpers
     /**
      * @brief Calculates the speed (magnitude of velocity)
      * @return Current speed
      */
     float GetSpeed() const;
+
     /**
      * @brief Gets direction of movement
      * @return Direction in radians
      */
     float GetDirection() const;
-
     /**
      * @brief Sets velocity from angle and speed
      * @param angle Direction in radians

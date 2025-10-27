@@ -33,6 +33,7 @@ bool TextureResource::Load(const std::string &filepath)
         return true;
     }
 
+
     this->filepath = filepath;
 
     textureID = GraphicsSystem::LoadTexture(filepath.c_str());
