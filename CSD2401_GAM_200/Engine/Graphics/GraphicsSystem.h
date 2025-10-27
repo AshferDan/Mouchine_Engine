@@ -159,8 +159,8 @@ private:
 
 	std::vector<RenderBatch> batches;
 	GLuint batchVAO, batchVBO, batchEBO;
-	const size_t MAX_BATCH_VERTICES = 10000; // 2500 quads * 4 vertices
-	const size_t MAX_BATCH_INDICES = 15000; // 2500 quads * 6 indices
+	const size_t MAX_BATCH_VERTICES = 20000; // 2500 quads * 4 vertices
+	const size_t MAX_BATCH_INDICES = 30000; // 2500 quads * 6 indices
 };
 
 

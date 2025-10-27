@@ -189,19 +189,16 @@ void ImGuiSystem::Update(float dt)
 					}
 				}
 
+
+				ImGui::TreePop();
+			}
+		}
 				// Evil button that spawns 2.5k Circle GOs
-				if (obj->GetName() == "Evil Button")
-				{
 					if (ImGui::Button("Spawn 2500 Entities"))
 					{
 						DemoM1_SpawnGameObjects();
 						std::cout << "Spawned 2500 Circle Entities!\n";
 					}
-				}
-
-				ImGui::TreePop();
-			}
-		}
 
 		ImGui::End();
 
