@@ -12,8 +12,8 @@
 
 
 # ======================= Project Configuration =========================
-cmake_minimum_required(VERSION 3.13)
-cmake_policy(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
+#cmake_policy(VERSION 2.7...3.5)
 
 # Set policy for imported targets
 if(POLICY CMP0111)
@@ -27,7 +27,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(ImportDependencies)
 importDependencies()
 
-add_definitions(-DGLEW_STATIC)
 add_definitions(-DUSE_CSD3151_AUTOMATION=0)
 
 # ======================= Directories =============================
@@ -299,6 +298,7 @@ set_target_properties(Game PROPERTIES
 
 # ======================= Copy Runtime Assets to Build Directory =============
 
+# --- Copy Assets, Shaders, etc. to Configuration Directory (e.g., Build/Debug) ---
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -321,7 +321,6 @@ add_custom_command(TARGET Game POST_BUILD
     COMMENT "Copying Mathlib.cpp folder to configuration directory"
 )
 
-
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
@@ -329,6 +328,7 @@ add_custom_command(TARGET Game POST_BUILD
     COMMENT "Copying Shaders folder to configuration directory"
 )
 
+# --- Copy Logs to Configuration Directory (e.g., Build/Debug) ---
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory
@@ -343,6 +343,20 @@ add_custom_command(TARGET Game POST_BUILD
     COMMENT "Copying config.txt to Logs folder in configuration directory"
 )
 
+# --- Copy Assets, Shaders, and Logs to Top-Level Build Directory (Build/) ---
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs"
+    COMMENT "Creating Logs folder in top-level Build directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Logs/config.txt"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs/config.txt"
+    COMMENT "Copying config.txt to Logs folder in top-level Build directory"
+)
 
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory

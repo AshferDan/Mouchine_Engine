@@ -303,7 +303,7 @@ void GraphicsSystem::Update(float)
 
         //UV data
         vec2 uvScale = vec2(1.0f);
-        vec2 uvOffset = vec2(1.0f);
+        vec2 uvOffset = vec2(0.0f);
         if (auto* animator = obj->GetComponent<Spritesheet>()) {
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
@@ -317,55 +317,64 @@ void GraphicsSystem::Update(float)
             }
         }
 
-            if (!targetBatch) {
-                batches.emplace_back(texID, isCircle, layer);
-                targetBatch = &batches.back();
-            }
+        if (!targetBatch) {
+            batches.emplace_back(texID, isCircle, layer);
+            targetBatch = &batches.back();
+            //std::cout << "Created batch - TexID: " << texID
+            //    << ", Layer: " << layer
+            //    << ", IsCircle: " << isCircle << std::endl;
+        }
 
-            mat4 model = mat4::translate(vec3(x, y, 0.0f));
-            model = model * mat4::rotate(rot, vec3(0, 0, 1));
-            model = model * mat4::scale(vec3(sx, sy, 1.0f));
+        mat4 model = mat4::translate(vec3(x, y, 0.0f));
+        model = model * mat4::rotate(rot, vec3(0, 0, 1));
+        model = model * mat4::scale(vec3(sx, sy, 1.0f));
 
-            vec3 localVerts[4] = {
-                {-0.5f, -0.5f, 0.f},
-                {0.5f, -0.5f, 0.f},
-                {-0.5f, 0.5f, 0.f},
-                {0.5f, 0.5f, 0.f}
-            };
+        vec3 localVerts[4] = {
+            {-0.5f, -0.5f, 0.f},
+            {0.5f, -0.5f, 0.f},
+            {-0.5f, 0.5f, 0.f},
+            {0.5f, 0.5f, 0.f}
+        };
 
-            vec2 texCoords[4] = {
-                {0.f, 0.f},
-                {1.f, 0.f},
-                {0.f, 1.f},
-                {1.f, 1.f}
-            };
+        vec2 texCoords[4] = {
+            {0.f, 0.f},
+            {1.f, 0.f},
+            {0.f, 1.f},
+            {1.f, 1.f}
+        };
 
-            GLuint baseIndex = (GLuint)targetBatch->vertices.size();
+        GLuint baseIndex = (GLuint)targetBatch->vertices.size();
 
-            //add 4 vertices to batch
-            for (int i = 0; i < 4; ++i) {
-                vec3 worldPos = model * vec4(localVerts[i], 1.0f);
+        //add 4 vertices to batch
+        for (int i = 0; i < 4; ++i) {
+            vec3 worldPos = model * vec4(localVerts[i], 1.0f);
 
-                BatchVertex vert;
-                vert.pos = worldPos;
-                vert.tex = texCoords[i];
-                vert.color = color;
-                vert.uvScale = uvScale;
-                vert.uvOffset = uvOffset;
+            BatchVertex vert;
+            vert.pos = worldPos;
+            vert.tex = texCoords[i];
+            vert.color = color;
+            vert.uvScale = uvScale;
+            vert.uvOffset = uvOffset;
 
-                targetBatch->vertices.push_back(vert);
-            }
+            targetBatch->vertices.push_back(vert);
+        }
 
-            //add 6 indices for 2 triangles (quad)
-            targetBatch->indices.push_back(baseIndex + 0);
-            targetBatch->indices.push_back(baseIndex + 1);
-            targetBatch->indices.push_back(baseIndex + 2);
-            targetBatch->indices.push_back(baseIndex + 2);
-            targetBatch->indices.push_back(baseIndex + 1);
-            targetBatch->indices.push_back(baseIndex + 3);
-
+        //add 6 indices for 2 triangles (quad)
+        targetBatch->indices.push_back(baseIndex + 0);
+        targetBatch->indices.push_back(baseIndex + 1);
+        targetBatch->indices.push_back(baseIndex + 2);
+        targetBatch->indices.push_back(baseIndex + 2);
+        targetBatch->indices.push_back(baseIndex + 1);
+        targetBatch->indices.push_back(baseIndex + 3);
+    }
         std::sort(batches.begin(), batches.end(), [](const RenderBatch& a, const RenderBatch& b) {return a.layer < b.layer; });
 
+        //std::cout << "\n=== Batch Order After Sorting ===" << std::endl;
+        //for (size_t i = 0; i < batches.size(); ++i) {
+        //    std::cout << "Batch " << i << ": Layer " << batches[i].layer
+        //        << ", TexID " << batches[i].textureID
+        //        << ", Vertices " << batches[i].vertices.size() << std::endl;
+        //}
         //Draw all batches
         DrawBatches();
 
@@ -449,8 +458,6 @@ void GraphicsSystem::Update(float)
             }
 
         }
-    }
-
 }
 
 // Draw a line between two points in world space

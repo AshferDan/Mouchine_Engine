@@ -54,7 +54,7 @@ public:
     };
 
     RenderComponent(GameObject* owner)
-        : IComponent(owner), shape(ShapeType::Square), textureID(0), color(1.0f, 0.0f, 0.0f, 1.0f), line(), point() {
+        : IComponent(owner), shape(ShapeType::Square), textureID(0), color(1.0f, 0.0f, 0.0f, 1.0f), line(), point(), layer(0) {
     }
     /*! @brief Constructor for a textured object
         @param owner The GameObject this component belongs to
@@ -71,7 +71,7 @@ public:
         @param color Shape color
     */
     RenderComponent(GameObject* owner, ShapeType type, const vec4& color)
-        : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
+        : IComponent(owner), shape(type), textureID(0), color(color), line(), point(), layer(0) {
           }
 
     /*! @brief Lifecycle override: initialize component */

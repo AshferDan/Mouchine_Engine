@@ -100,6 +100,11 @@ int main()
         true, false, true);
     API::SetVelocity("Circle2", 250.0f, 0.0f);
 
+    //auto* bg = GameObjectFactory::Instance().FindGameObject("bgImage");
+    //if (bg && bg->GetComponent<RenderComponent>()) {
+    //    bg->GetComponent<RenderComponent>()->SetLayer(-10);
+    //}
+
     // You can even add conditional creation
     bool createButton = true;
     if (createButton)
