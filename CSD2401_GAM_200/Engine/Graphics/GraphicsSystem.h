@@ -139,6 +139,17 @@ private:
 	GLuint vao = 0, vbo = 0, tex = 0; // OpenGL buffers and texture.
 	GLint Wwidth, Wheight;      // Window dimensions.
 
+	//struct BatchVertex {
+	//	vec3 pos;       // LOCAL position (-0.5 to 0.5)
+	//	vec2 tex;       // base texture coord (0-1)
+	//	vec4 color;     // tint color
+	//	vec2 uvScale;   // for animation
+	//	vec2 uvOffset;  // for animation
+	//	vec3 worldPos;  // NEW: world position (x, y, 0)
+	//	vec2 scale;     // NEW: scale (sx, sy)
+	//	float rotation; // NEW: rotation in radians
+	//};
+
 	struct BatchVertex {
 		vec3 pos;
 		vec2 tex;

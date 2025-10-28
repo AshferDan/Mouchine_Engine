@@ -33,12 +33,9 @@ void main() {
         baseColor *= tex;
     }
 
-    if(uIsCircle == 1) {
-        float dist = dot(CircleCoord, CircleCoord); // distance squared from center
-        float edge = 0.01; // width of the edge fade
-        float alpha = 1.0 - smoothstep(1.0 - edge, 1.0, dist);
-        baseColor.a *= alpha;
-        if(alpha <= 0.0) discard;
+    if (uIsCircle == 1) {
+        float distSq = dot(CircleCoord, CircleCoord);
+        if (distSq > 1.0) discard;  // Hard edge, no smoothstep!
     }
 
     FragColor = baseColor;

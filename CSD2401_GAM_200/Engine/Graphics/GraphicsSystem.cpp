@@ -225,6 +225,12 @@ void GraphicsSystem::Initialize()
     glEnableVertexArrayAttrib(batchVAO, 4);
     glVertexArrayAttribFormat(batchVAO, 4, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, uvOffset));
     glVertexArrayAttribBinding(batchVAO, 4, 0);
+
+    //Attribute 5: World Position (vec3)
+
+    //Attribute 6: Scale (vec2)
+
+    //Attribute 7: Rotation (float)
 }
 
 void GraphicsSystem::Update(float)
@@ -265,7 +271,7 @@ void GraphicsSystem::Update(float)
     mat4 view = mat4::translate(-camPos);
     vp = projection * view; // Final View-Projection matrix
 
-    auto start = std::chrono::high_resolution_clock::now();
+    //auto start = std::chrono::high_resolution_clock::now();
 
     //Accumulate all geometry into batches
     batches.clear();
@@ -374,10 +380,10 @@ void GraphicsSystem::Update(float)
         targetBatch->indices.push_back(baseIndex + 3);
     }
 
-    auto afterAccumulate = std::chrono::high_resolution_clock::now();
+   // auto afterAccumulate = std::chrono::high_resolution_clock::now();
 
         std::sort(batches.begin(), batches.end(), [](const RenderBatch& a, const RenderBatch& b) {return a.layer < b.layer; });
-        auto afterSort = std::chrono::high_resolution_clock::now();
+        //auto afterSort = std::chrono::high_resolution_clock::now();
 
         //std::cout << "\n=== Batch Order After Sorting ===" << std::endl;
         //for (size_t i = 0; i < batches.size(); ++i) {
@@ -387,19 +393,19 @@ void GraphicsSystem::Update(float)
         //}
         //Draw all batches
         DrawBatches();
-        auto afterDraw = std::chrono::high_resolution_clock::now();
+        //auto afterDraw = std::chrono::high_resolution_clock::now();
 
         // Print timing (only occasionally, not every frame)
-        static int frameCount = 0;
-        if (++frameCount % 60 == 0) {
-            auto accumulateMs = std::chrono::duration<double, std::milli>(afterAccumulate - start).count();
-            auto sortMs = std::chrono::duration<double, std::milli>(afterSort - afterAccumulate).count();
-            auto drawMs = std::chrono::duration<double, std::milli>(afterDraw - afterSort).count();
+        //static int frameCount = 0;
+        //if (++frameCount % 60 == 0) {
+        //    auto accumulateMs = std::chrono::duration<double, std::milli>(afterAccumulate - start).count();
+        //    auto sortMs = std::chrono::duration<double, std::milli>(afterSort - afterAccumulate).count();
+        //    auto drawMs = std::chrono::duration<double, std::milli>(afterDraw - afterSort).count();
 
-            std::cout << "Accumulate: " << accumulateMs << "ms, "
-                << "Sort: " << sortMs << "ms, "
-                << "Draw: " << drawMs << "ms" << std::endl;
-        }
+        //    std::cout << "Accumulate: " << accumulateMs << "ms, "
+        //        << "Sort: " << sortMs << "ms, "
+        //        << "Draw: " << drawMs << "ms" << std::endl;
+        //}
 
         //Draw Non-batched shapes
         for (auto& obj : gameObjects) {
