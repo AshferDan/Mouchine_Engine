@@ -468,26 +468,26 @@ if(EXISTS "${MONO_ROOT_DIR}")
     
     # Find and copy Mono DLLs
     find_file(MONO_DLL
-        NAMES mono-2.0-sgen.dll mono-2.0-sgend.dll
+        NAMES mono-2.0-sgen.dll
         PATHS ${MONO_DLL_DIR}
         NO_DEFAULT_PATH
     )
-    
-    if(MONO_DLL)
-        add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${MONO_DLL}"
-                "$<TARGET_FILE_DIR:Game>"
-            COMMENT "Copying Mono DLL to build directory"
-        )
-        message(STATUS "Will copy Mono DLL: ${MONO_DLL}")
-    endif()
     
     find_file(MONO_POSIX_HELPER_DLL
         NAMES MonoPosixHelper.dll
         PATHS ${MONO_DLL_DIR}
         NO_DEFAULT_PATH
     )
+    
+    # Copy DLLs to build output
+    if(MONO_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying Mono DLL"
+        )
+    endif()
     
     if(MONO_POSIX_HELPER_DLL)
         add_custom_command(TARGET Game POST_BUILD
@@ -496,46 +496,99 @@ if(EXISTS "${MONO_ROOT_DIR}")
                 "$<TARGET_FILE_DIR:Game>"
             COMMENT "Copying MonoPosixHelper.dll"
         )
-        message(STATUS "Will copy MonoPosixHelper.dll: ${MONO_POSIX_HELPER_DLL}")
     endif()
     
-    # Copy Mono lib directory (CRITICAL - contains mscorlib.dll)
-    if(EXISTS "${MONO_LIB_DIR}")
+    # ===== OPTIMIZED: Only copy essential .NET assemblies =====
+    # Instead of copying the entire lib directory (~150MB),
+    # only copy the core assemblies needed for .NET 4.5
+    
+    set(ESSENTIAL_ASSEMBLIES
+        # Core framework assemblies
+        mscorlib.dll
+        System.dll
+        System.Core.dll
+        
+        # Optional but commonly used:
+        # System.Xml.dll
+        # System.Numerics.dll
+    )
+    
+    # Copy only essential assemblies
+    foreach(ASSEMBLY ${ESSENTIAL_ASSEMBLIES})
         add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-                "${MONO_LIB_DIR}"
-                "$<TARGET_FILE_DIR:Game>/mono/lib"
-            COMMENT "Copying Mono lib directory (includes mscorlib.dll)"
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:Game>/mono/lib/mono/4.5"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_LIB_DIR}/mono/4.5/${ASSEMBLY}"
+                "$<TARGET_FILE_DIR:Game>/mono/lib/mono/4.5/${ASSEMBLY}"
+            COMMENT "Copying ${ASSEMBLY}"
         )
-        message(STATUS "Will copy Mono lib: ${MONO_LIB_DIR}")
-    else()
-        message(FATAL_ERROR "Mono lib directory not found at: ${MONO_LIB_DIR}")
-    endif()
+    endforeach()
     
-    # Copy Mono etc directory
-    if(EXISTS "${MONO_ETC_DIR}")
+    # Copy minimal Mono config (small files)
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_ETC_DIR}"
+            "$<TARGET_FILE_DIR:Game>/mono/etc"
+        COMMENT "Copying Mono config"
+    )
+    
+    # Copy to Build root
+    if(MONO_DLL)
         add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-                "${MONO_ETC_DIR}"
-                "$<TARGET_FILE_DIR:Game>/mono/etc"
-            COMMENT "Copying Mono etc directory"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_DLL}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/Build/"
         )
-        message(STATUS "Will copy Mono etc: ${MONO_ETC_DIR}")
-    else()
-        message(FATAL_ERROR "Mono etc directory not found at: ${MONO_ETC_DIR}")
     endif()
     
-    message(STATUS "✓ Mono runtime copy commands configured")
+    foreach(ASSEMBLY ${ESSENTIAL_ASSEMBLIES})
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/lib/mono/4.5"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_LIB_DIR}/mono/4.5/${ASSEMBLY}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/lib/mono/4.5/${ASSEMBLY}"
+        )
+    endforeach()
+    
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_ETC_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/etc"
+    )
+    
+    # Copy to project root
+    if(MONO_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_DLL}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/"
+        )
+    endif()
+    
+    foreach(ASSEMBLY ${ESSENTIAL_ASSEMBLIES})
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${CMAKE_CURRENT_SOURCE_DIR}/mono/lib/mono/4.5"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_LIB_DIR}/mono/4.5/${ASSEMBLY}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/mono/lib/mono/4.5/${ASSEMBLY}"
+        )
+    endforeach()
+    
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_ETC_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/mono/etc"
+    )
+    
+    message(STATUS "✓ Optimized Mono copy configured (only essential assemblies)")
 else()
     message(FATAL_ERROR "Mono not found at: ${MONO_ROOT_DIR}")
 endif()
 
-# ======================= Create Scripts Directory =================
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-        "$<TARGET_FILE_DIR:Game>/Scripts"
-    COMMENT "Creating Scripts folder"
-)
+
 # ======================= ALSO Copy Mono to Solution Root =================
 # This ensures Mono is available regardless of working directory
 
