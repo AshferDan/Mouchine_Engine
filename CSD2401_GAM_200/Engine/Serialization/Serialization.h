@@ -14,26 +14,42 @@ Technology is prohibited.
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
+#include "RenderComponent.h"
 
 class GameObject;
 using json = nlohmann::json;
 
+// --- Object Serialization ---
+json SerializeGameObject(GameObject* GO);
+void DeserializeGameObject(const json& j);
+
+// --- Game Object Creation ---
+GameObject* CreateObj(
+    const std::string& name,
+    RenderComponent::ShapeType shapeType,
+    const vec2& pos,
+    const vec2& scale,
+    const vec4& color,
+    float rotation = 0.f);
+
 /**
  * @brief Save all active GameObjects in the scene into a single JSON file.
  */
-void SaveSceneJSON(const std::string& filePath = "../Logs/Scene.json");
+void SaveScene(const std::string& filePath = "../Logs/Scene.json");
 
 /**
  * @brief Load all GameObjects from a JSON file into the current game scene.
  */
-void LoadSceneJSON(const std::string& filePath = "../Logs/Scene.json");
+void LoadScene(const std::string& filePath = "../Logs/Scene.json");
 
 /**
  * @brief Save one GameObject as a prefab JSON file.
  */
-void CreatePrefabJSON(GameObject& GO);
+void SavePrefab(GameObject& GO, const std::string& existingFile = "");
 
 /**
  * @brief Load one prefab JSON file into the current scene.
  */
-void LoadPrefabJSON(const std::string& filePath);
+void LoadPrefab(const std::string& filePath);
+
+std::vector<std::string> GetAllPrefabJSONFiles();
