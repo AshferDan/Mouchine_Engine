@@ -1,1 +1,1 @@
-GO Name: Circle | Shape: Circle | Position (x,y): (59.25,-186.199) | Size (w,h): (246.7,253.4) | Colour: (1,0,0,1)
+GO Name: test | Shape: Square | Position (x,y): (0,0) | Size (w,h): (124.4,116.1) | Colour: (0.245098,0.104527,0.104527,1)

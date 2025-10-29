@@ -173,52 +173,51 @@ private:
     PointData point; /*!< Point data if ShapeType::Point */
 };
 
-/**
- * @brief Takes in references to a string and a enum int, and depending on which value is null, it'll assign the null value the corresponding value of the shape id.
- *        Basically used to get the shape enum from shape string name, and vice versa.
- *        If no match for either, print to cout and return out.
- * @param shapeName Ref to string containing shape name
- * @param shapeEnum Ref to enum int containing value in shape enum
- */
-inline void ShapeEnumToString(std::string &shapeName, RenderComponent::ShapeType &shapeEnum)
+
+namespace RenderComponentTools
 {
-    if (!shapeName.empty()) // If theres a name in shapeName, find a match and assign the enum int the corresponding shape value
+    /**
+     * @brief Overloaded function that converts shape type enum to string and vice versa. Overloaded for std::string and ShapeType enum!
+     */
+
+    inline RenderComponent::ShapeType ShapeEnumToString(std::string shapeName)
     {
         if (shapeName == "Square")
         {
-            shapeEnum = RenderComponent::ShapeType::Square;
+            return RenderComponent::ShapeType::Square;
         }
         else if (shapeName == "Circle")
         {
-            shapeEnum = RenderComponent::ShapeType::Circle;
+            return RenderComponent::ShapeType::Circle;
         }
         else if (shapeName == "Line")
         {
-            shapeEnum = RenderComponent::ShapeType::Line;
+            return RenderComponent::ShapeType::Line;
         }
         else if (shapeName == "Point")
         {
-            shapeEnum = RenderComponent::ShapeType::Point;
+            return RenderComponent::ShapeType::Point;
         }
         else
             std::cout << "No matching shape name!\n";
-        return;
+        return RenderComponent::ShapeType::Point;   // Replace as runtime error!
     }
-    else // If string is empty, look to the enum int to assign the string the corresponding shape's name
+
+    inline std::string ShapeEnumToString(RenderComponent::ShapeType shapeEnum)
     {
         switch (shapeEnum)
         {
         case RenderComponent::ShapeType::Square:
-            shapeName = "Square";
+            return "Square";
             break;
         case RenderComponent::ShapeType::Circle:
-            shapeName = "Circle";
+            return "Circle";
             break;
         case RenderComponent::ShapeType::Line:
-            shapeName = "Line";
+            return "Line";
             break;
         case RenderComponent::ShapeType::Point:
-            shapeName = "Point";
+            return "Point";
             break;
 
         default:
@@ -227,3 +226,4 @@ inline void ShapeEnumToString(std::string &shapeName, RenderComponent::ShapeType
         }
     }
 }
+

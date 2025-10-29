@@ -26,6 +26,8 @@ using json = nlohmann::json;
 class RenderComponent;
 class TransformComponent;
 
+const std::string PrefabFilePath{ "../Assets/Prefabs/" };
+
 /**
  * @brief Serialising Writer Class!
  */
@@ -236,58 +238,112 @@ private:
 
 // NON MEMBER FUNCTIONS
 
-/**
+namespace PrefabTools
+{
+	/**
  * @brief Takes existing GO, and turns it into a prefab!!! As of right now, we are storing it in Logs! Will move to its own folder soon!
  * @param GO Reference to Game Object to read data of
  *			(Will require tweaking to read component data! But as of rn, basic data works!)
  */
-void CreatePrefab(GameObject &GO)
-{
-	std::string filePath{"../Logs/Prefab_" + GO.GetName() + ".txt"}; // Create a textfile in Logs folder with GOs name
-	std::ofstream ofs(filePath);									 // New ofs
-
-	if (!ofs.good()) // If stream bad, stop process immediately!
+	void CreatePrefab(GameObject& GO)
 	{
-		std::cerr << "File Stream: " << filePath << " is not good!\n";
-		return;
+		std::string filePath{ PrefabFilePath + GO.GetName() + ".txt" }; // Create a textfile in Logs folder with GOs name
+		std::ofstream ofs(filePath);									 // New ofs
+
+		if (!ofs.good()) // If stream bad, stop process immediately!
+		{
+			std::cerr << "File Stream: " << filePath << " is not good!\n";
+			return;
+		}
+
+		auto* transform = GO.GetComponent<TransformComponent>();
+		auto* render = GO.GetComponent<RenderComponent>();
+		vec4 color = render->GetColor();
+
+		// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA
+		ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " " << transform->scaleX << " " << transform->scaleY << " " << color.x << " " << color.y << " " << color.z << " " << color.w << std::endl;
+
+		std::cout << "Prefab created successfully!";
+		ofs.clear();
+		ofs.close();
 	}
 
-	auto* transform = GO.GetComponent<TransformComponent>();
-	auto* render = GO.GetComponent<RenderComponent>();
-	vec4 color = render->GetColor();
-
-	// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA
-	ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " "  << transform->scaleX << " " << transform->scaleY << " " << color.x << " " << color.y << " " << color.z << " " << color.w << std::endl;
-
-	std::cout << "Prefab created successfully!";
-	ofs.clear();
-	ofs.close();
-}
-
-/**
- * @brief Takes file path to read prefab data! Actual loading of prefab data is somewhere else, will shift into here soon for cleanliness!
- * @param destination c string for destination of where to read prefab data from
- */
-std::string ReadPrefabData(const char *destination)
-{
-	std::ifstream ifs(destination); // Create ifstream of destination, check if its valid (existing prefab)
-	if (!ifs.good())
+	/**
+	 * @brief Takes file path to read prefab data! Actual loading of prefab data is somewhere else, will shift into here soon for cleanliness!
+	 * @param destination c string for destination of where to read prefab data from
+	 */
+	std::string ReadPrefabData(const char* destination)
 	{
-		std::cerr << "File Stream: " << destination << " is not good!\n";
+		std::ifstream ifs(destination); // Create ifstream of destination, check if its valid (existing prefab)
+		if (!ifs.good())
+		{
+			std::cerr << "File Stream: " << destination << " is not good!\n";
+			ifs.clear();
+			ifs.close();
+			return ""; // Return EMPTY. No data has been read (can change to "missing data" or something)
+		}
+
+		std::string data{};
+		std::stringstream ss;
+
+		ss << ifs.rdbuf(); // Read data obtained and store into string
+		data = ss.str();
+
 		ifs.clear();
 		ifs.close();
-		return ""; // Return EMPTY. No data has been read (can change to "missing data" or something)
+		return data; // Return data obtained (white space separated)
 	}
 
-	std::string data{};
-	std::stringstream ss;
+	std::vector<std::string> LoadPrefabList()
+	{
+		std::vector<std::string> temp;
+		for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
+		{
+			if (prefab.path().extension() == ".txt")
+			{
+				std::string prefabName = prefab.path().stem().string();
+				temp.push_back(prefabName);
+			}
+		}
+		temp.shrink_to_fit();
+		return temp;
+	}
 
-	ss << ifs.rdbuf(); // Read data obtained and store into string
-	data = ss.str();
+	void RemovePrefab(std::string const& prefabName)
+	{
+		for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
+		{
+			if (prefab.path().stem().string() == prefabName)
+			{
+				std::filesystem::remove(prefab);
+			}
+			else
+			{
+				std::cout << "Error! No matching prefab found!\n";
+			}
+		}
+	}
 
-	ifs.clear();
-	ifs.close();
-	return data; // Return data obtained (white space separated)
+	void RenamePrefab(std::string const& oldName, std::string const& newName)
+	{
+		if (!std::filesystem::exists(PrefabFilePath + oldName + ".txt"))
+		{
+			std::cout << "File Path " + PrefabFilePath + oldName + ".txt\" cannot be found!\n";
+			return;
+		}
+
+		// this is pretty buggy, WIP!!!!
+		if (!std::filesystem::exists(PrefabFilePath + newName + ".txt"))
+		{
+			std::filesystem::rename(PrefabFilePath + oldName + ".txt", PrefabFilePath + newName + ".txt");
+		}
+		else
+		{
+			std::filesystem::rename(PrefabFilePath + oldName + ".txt", PrefabFilePath + newName + "(1).txt");
+		}
+		
+		std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
+	}
 }
 
 /**
