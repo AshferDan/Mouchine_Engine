@@ -180,24 +180,10 @@ void ImGuiSystem::Update(float dt)
 					}
 
 					// --- Save current GO as Prefab JSON ---
-					if (ImGui::Button("Create Prefab (JSON)"))
+					if (ImGui::Button("Create Prefab (Unable to use)"))
 					{
-						CreatePrefabJSON(*obj);
-						std::cout << "[ImGui] Prefab saved for: " << obj->GetName() << '\n';
-					}
-
-					// --- Quick-save current GO’s transform/physics to scene JSON ---
-					if (ImGui::Button("Save Scene"))
-					{
-						SaveSceneJSON("../Logs/Scene.json");
-						std::cout << "[ImGui] Scene saved to ../Logs/Scene.json\n";
-					}
-
-					// --- Quick-load scene (for testing reloading in real time) ---
-					if (ImGui::Button("Reload Scene"))
-					{
-						LoadSceneJSON("../Logs/Scene.json");
-						std::cout << "[ImGui] Scene reloaded from ../Logs/Scene.json\n";
+						//CreatePrefabJSON(*obj);
+						//std::cout << "[ImGui] Prefab saved for: " << obj->GetName() << '\n';
 					}
 				}
 
@@ -307,54 +293,57 @@ void ImGuiSystem::Update(float dt)
 				{
 				} // Slider for GO rot
 
+				// Prefab Option
+				static bool appendToExisting = false;
+				static int selectedPrefabIndex = -1;
+				static std::vector<std::string> prefabFiles = GetAllPrefabJSONFiles();
+				ImGui::Separator();
+				ImGui::Checkbox("Append to existing prefab", &appendToExisting);
+				std::string selectedPath;
+
+				if (appendToExisting)
+				{
+					ImGui::Text("Select existing prefab to add into:");
+					if (ImGui::BeginCombo("##PrefabSelect",
+						selectedPrefabIndex >= 0 ? prefabFiles[selectedPrefabIndex].c_str() : "Select prefab..."))
+					{
+						for (int i = 0; i < prefabFiles.size(); ++i)
+						{
+							bool is_selected = (selectedPrefabIndex == i);
+							if (ImGui::Selectable(prefabFiles[i].c_str(), is_selected))
+								selectedPrefabIndex = i;
+							if (is_selected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+
+					if (selectedPrefabIndex >= 0)
+						selectedPath = "../Logs/" + prefabFiles[selectedPrefabIndex];
+				}
+
 				// Generate Game Object
 				ImGui::Text("  ");
 				if (ImGui::Button("Generate"))
 				{
-					auto& factory = GameObjectFactory::Instance();
+					vec2 pos(tempGO.pos[0], tempGO.pos[1]);
+					vec2 scale(tempGO.scale[0], tempGO.scale[1]);
+					vec4 color(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
 
-					// Determine the shape enum
-					RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);
-
-					// Create GameObject through factory
-					GameObject* newGO = factory.CreateShape(
+					GameObject* newGO = CreateObj(
 						tempGO.name,
-						shapeType,
-						tempGO.pos[0], tempGO.pos[1],
-						tempGO.scale[0], tempGO.scale[1],
-						vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f),
-						CollisionLayer::Default
+						static_cast<RenderComponent::ShapeType>(current_shape),
+						pos, scale, color, tempGO.rot
 					);
 
-					// --- Transform ---
-					auto* transform = newGO->AddComponent<TransformComponent>(0, 0);
-					transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
-					transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
-					transform->SetRotation(tempGO.rot);
-
-					// --- Physics ---
-					auto* physics = newGO->AddComponent<PhysicsComponent>();
-					physics->useGravity = true;
-					physics->SetMass(1.0f);
-					physics->SetStatic(false);
-					physics->SetGrounded(false);
-
-					// --- Collider ---
-					ColliderComponent::Type colliderType =
-						(shapeType == RenderComponent::ShapeType::Circle)
-						? ColliderComponent::Type::Circle
-						: ColliderComponent::Type::Square;
-
-					float width = tempGO.scale[0];
-					float height = tempGO.scale[1];
-
-					auto* collider = newGO->AddComponent<ColliderComponent>(
-						colliderType, width, height, CollisionLayer::Default
-					);
-
-					std::cout << "[ImGui] Created new GameObject: " << tempGO.name
-						<< " with collider and physics.\n";
+					// Append or new prefab logic
+					if (appendToExisting && !selectedPath.empty())
+						SavePrefab(*newGO, selectedPath);
+					else
+						SavePrefab(*newGO);
 				}
+
+				prefabFiles = GetAllPrefabJSONFiles(); // auto-refresh
 				//ImGui::Text("  ");
 				//if (ImGui::Button("Generate")) // Button to create new GO
 				//{
@@ -438,7 +427,7 @@ void ImGuiSystem::Update(float dt)
 				if (selectedPrefab >= 0 && ImGui::Button("Load Selected Prefab"))
 				{
 					std::string selectedPath = prefabFolder + prefabFiles[selectedPrefab];
-					LoadPrefabJSON(selectedPath);
+					LoadPrefab(selectedPath);
 					std::cout << "[ImGui] Loaded prefab: " << selectedPath << '\n';
 				}
 			}

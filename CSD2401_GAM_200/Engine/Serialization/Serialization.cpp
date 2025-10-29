@@ -16,6 +16,9 @@ namespace fs = std::filesystem;
 
 // Utility helpers
 namespace {
+	std::unordered_map<GLuint, std::string> s_TexturePathByID;
+	std::unordered_map<std::string, GLuint> s_IDByTexturePath;
+
 	static std::string ColliderTypeToString(ColliderComponent::Type type)
 	{
 		switch (type)
@@ -82,8 +85,7 @@ json SerializeGameObject(GameObject* GO)
 	j["active"] = GO->IsActive();
 
 	// ---- Transform ----
-	if (const auto* t = GO->GetComponent<TransformComponent>())
-	{
+	if (const auto* t = GO->GetComponent<TransformComponent>()) {
 		j["TransformComponent"] = {
 			{"pos", {t->posX, t->posY}},
 			{"scale", {t->scaleX, t->scaleY}},
@@ -92,51 +94,47 @@ json SerializeGameObject(GameObject* GO)
 	}
 
 	// ---- Render ----
-	if (auto* r = GO->GetComponent<RenderComponent>())
-	{
-		auto color = r->GetColor();
-		j["RenderComponent"] = {
-			{"shapeType", r->GetShapeTypeName()},
-			{"color", {color.x, color.y, color.z, color.w}}
+	if (auto* r = GO->GetComponent<RenderComponent>()) {
+		j["RenderComponent"]["shapeType"] = r->GetShapeTypeName();
+
+		std::string texPath;
+		auto it = s_TexturePathByID.find(r->GetTextureID());
+		texPath = (it != s_TexturePathByID.end()) ? it->second : "";
+
+		j["RenderComponent"]["texturePath"] = texPath;
+
+		vec4 c = r->GetColor();
+		j["RenderComponent"]["color"] = { c.x, c.y, c.z, c.w };
+	}
+
+	// --- Spritesheet ---
+	if (auto* s = GO->GetComponent<Spritesheet>()) {
+		j["Spritesheet"] = {
+			{"rows", s->GetRows()},
+			{"cols", s->GetCols()},
+			{"startFrame", s->GetCurrentStartFrame()},
+			{"endFrame", s->GetCols() * s->GetRows() - 1},
+			{"fps", s->GetTimePerFrame()}
 		};
 	}
 
 	// --- Physics ---
-	if (auto* p = GO->GetComponent<PhysicsComponent>())
-	{
+	if (auto* p = GO->GetComponent<PhysicsComponent>()) {
 		j["PhysicsComponent"] = {
 			{"mass", p->GetMass()},
 			{"isStatic", p->IsStatic()},
 			{"useGravity", p->useGravity},
 			{"isGrounded", p->IsGrounded()},
-			{"isJumping", p->isJumping},
-			{"wasGrounded", p->wasGrounded},
 			{"velocity", {p->velocityX, p->velocityY}},
-			{"gravity",  {p->gravityX,  p->gravityY}}
 		};
 	}
 
 	// --- Collider ---
-	if (auto* c = GO->GetComponent<ColliderComponent>())
-	{
+	if (auto* c = GO->GetComponent<ColliderComponent>()) {
 		j["ColliderComponent"] = {
 			{"shape", ColliderTypeToString(c->GetType())},
 			{"layer", CollisionLayerToString(c->GetLayer())}
-		};
-
-		if (c->GetType() == ColliderComponent::Type::Square)
-		{
-			AABB box = c->GetAABB();
-			float width = box.max.x - box.min.x;
-			float height = box.max.y - box.min.y;
-			j["ColliderComponent"]["width"] = width;
-			j["ColliderComponent"]["height"] = height;
-		}
-		else if (c->GetType() == ColliderComponent::Type::Circle)
-		{
-			Circle circle = c->GetCircle();
-			j["ColliderComponent"]["radius"] = circle.radius;
-		}
+		};		
 	}
 
 	return j;
@@ -145,7 +143,9 @@ json SerializeGameObject(GameObject* GO)
 void DeserializeGameObject(const json& j)
 {
 	GameObjectFactory& factory = GameObjectFactory::Instance();
-	GameObject* GO = factory.CreateGameObject(j.value("name", "Unnamed"));
+	std::string name = j.value("name", "Unnamed");
+
+	GameObject* GO = factory.CreateGameObject(name);
 	GO->SetActive(j.value("active", true));
 
 	// ---- Transform ----
@@ -158,52 +158,100 @@ void DeserializeGameObject(const json& j)
 		tc->SetRotation(t["rotation"]);
 	}
 
-	// ---- Render ----
-	if (j.contains("RenderComponent"))
-	{
+	// ---- Render / Texture ----
+	if (j.contains("RenderComponent")) {
 		const auto& r = j["RenderComponent"];
-		auto* rc = GO->AddComponent<RenderComponent>();
+		std::string shapeType = r.value("shapeType", "Square");
+		std::string texPath = r.value("texturePath", "");
+		RenderComponent::ShapeType shape;
+		ShapeEnumToString(shapeType, shape);
 
-		std::string shape = r.value("shapeType", "Square");
-		vec4 color(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
+		auto* render = GO->AddComponent<RenderComponent>();
+		render->SetShapeType(shape);
 
-		RenderComponent::ShapeType shapeEnum{};
-		ShapeEnumToString(shape, shapeEnum);
-		rc->SetShapeType(shapeEnum);
-		rc->SetColor(color);
+		// === Textured object ===
+		if (!texPath.empty()) {
+			GLuint texID = GraphicsSystem::LoadTexture(texPath.c_str());
+			render->SetTextureID(texID);
+			render->SetColor({ 1, 1, 1, 1 });  // remove tint
+
+			// --- Clamp texture edges (avoid half-color issue) ---
+			glBindTexture(GL_TEXTURE_2D, texID);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		else {
+			// === Color-only object ===
+			if (r.contains("color")) {
+				vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
+				render->SetColor(c);
+			}
+			else {
+				render->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
+			}
+		}
+	}
+
+
+	// --- Spritesheet ---
+	if (j.contains("Spritesheet")) {
+		const auto& s = j["Spritesheet"];
+		std::string texPath = j["RenderComponent"].value("texturePath", "");
+
+		auto* spr = GO->AddComponent<Spritesheet>(
+			texPath.c_str(),
+			s.value("rows", 1),
+			s.value("cols", 1)
+		);
+		spr->LoadNewSpritesheet(texPath.c_str(),
+			s.value("rows", 1),
+			s.value("cols", 1));
+		spr->SetAnimation(
+			s.value("startFrame", 0),
+			s.value("endFrame", 0),
+			s.value("fps", 1.0f));
 	}
 
 	// --- Physics ---
-	if (j.contains("PhysicsComponent"))
-	{
+	if (j.contains("PhysicsComponent")) {
 		const auto& p = j["PhysicsComponent"];
 		auto* pc = GO->AddComponent<PhysicsComponent>();
-		pc->useGravity = p.value("useGravity", true);
-		pc->velocityX = p["velocity"][0];
-		pc->velocityY = p["velocity"][1];
-		pc->gravityX = p["gravity"][0];
-		pc->gravityY = p["gravity"][1];
-		pc->SetGrounded(p.value("isGrounded", false));
-		pc->isJumping = p.value("isJumping", false);
-		pc->wasGrounded = p.value("wasGrounded", false);
+		pc->SetStatic(p.value("isStatic", false));
+		pc->SetGravity(p.value("useGravity", true));
+		pc->SetMass(p.value("mass", 1.0f));
+
+		if (p.contains("velocity")) {
+			pc->SetVelocity(p["velocity"][0].get<float>(), p["velocity"][1].get<float>());
+
+			pc->SetGrounded(p.value("isGrounded", false));
+		}
 	}
 
-
 	// --- Collider ---
-	if (j.contains("ColliderComponent"))
-	{
+	if (j.contains("ColliderComponent")) {
 		const auto& c = j["ColliderComponent"];
 		ColliderComponent::Type type = StringToColliderType(c.value("shape", "Square"));
 		CollisionLayer layer = StringToCollisionLayer(c.value("layer", "Default"));
-
-		float w = c.value("width", 0.0f);
-		float h = c.value("height", 0.0f);
-
-		if (type == ColliderComponent::Type::Circle)
-			w = c.value("radius", 0.0f);
-
-		GO->AddComponent<ColliderComponent>(type, w, h, layer);
+		float width = j["TransformComponent"]["scale"][0].get<float>();
+		float height = j["TransformComponent"]["scale"][1].get<float>();
+		GO->AddComponent<ColliderComponent>(type, width, height, layer);
 	}
+
+	std::cout << "[Deserialize] " << name
+		<< " pos(" << j["TransformComponent"]["pos"][0]
+		<< "," << j["TransformComponent"]["pos"][1]
+		<< ") scale("
+		<< j["TransformComponent"]["scale"][0]
+		<< "," << j["TransformComponent"]["scale"][1]
+		<< ")\n";
+	if (auto* r = GO->GetComponent<RenderComponent>()) {
+		std::cout << "[Render] " << name
+			<< " TextureID: " << r->GetTextureID()
+			<< " Path: " << r->GetShapeTypeName()
+			<< "\n";
+	}
+	
 }
 
 GameObject* CreateObj(
@@ -265,90 +313,55 @@ GameObject* CreateObj(
 
 void SavePrefab(GameObject& go, const std::string& existingPath)
 {
-	json j = SerializeGameObject(&go);
-
 	std::string path = existingPath.empty()
 		? "../Logs/Prefab_" + go.GetName() + ".json"
 		: existingPath;
 
 	json root;
-
-	// If file exists and has content, load it first
-	if (fs::exists(path))
-	{
-		std::ifstream inFile(path);
-		if (inFile.is_open() && inFile.peek() != std::ifstream::traits_type::eof()) // not empty
-		{
-			try
-			{
-				inFile >> root;
-			}
-			catch (const std::exception& e)
-			{
-				std::cerr << "[SavePrefab] Warning: Invalid JSON detected, recreating file. (" << e.what() << ")\n";
-				root = json::object();
-			}
+	if (fs::exists(path)) {
+		std::ifstream in(path);
+		if (in.peek() != std::ifstream::traits_type::eof()) {
+			try { in >> root; }
+			catch (...) { root = json::object(); }
 		}
-		inFile.close();
 	}
 
-	if (!root.is_object())
-		root = json::object();
-
-	if (!root.contains("GameObjects") || !root["GameObjects"].is_array())
+	if (!root.contains("GameObjects"))
 		root["GameObjects"] = json::array();
 
-	root["GameObjects"].push_back(j);
+	root["GameObjects"].push_back(SerializeGameObject(&go));
 
-	std::ofstream outFile(path, std::ios::trunc); // trunc clears old contents
-	if (!outFile)
-	{
-		std::cerr << "[SavePrefab] Error: Cannot open file for writing: " << path << '\n';
-		return;
-	}
+	std::ofstream out(path, std::ios::trunc);
+	out << root.dump(4);
+	out.close();
 
-	outFile << root.dump(4);
-	outFile.close();   // ensure file is properly closed
-
-	std::cout << "[SavePrefab] Prefab saved or appended to: " << path << std::endl;
+	std::cout << "[SavePrefab] Saved prefab: " << path << "\n";
 }
 
-void LoadPrefab(const std::string& filePath)
+void LoadPrefab(const std::string& path)
 {
-	std::ifstream file(filePath);
-	if (!file)
-	{
-		std::cerr << "[Serialization] Cannot open prefab: " << filePath << '\n';
+	std::ifstream in(path);
+	if (!in.is_open()) {
+		std::cerr << "[LoadPrefab] Cannot open " << path << "\n";
 		return;
 	}
 
 	json j;
-	try { file >> j; }
-	catch (const std::exception& e)
-	{
-		std::cerr << "[Serialization] Parse error: " << e.what() << '\n';
+	try { in >> j; }
+	catch (const std::exception& e) {
+		std::cerr << "[LoadPrefab] Parse error: " << e.what() << "\n";
 		return;
 	}
 
-	if (j.contains("GameObjects") && j["GameObjects"].is_array())
-	{
+	if (j.contains("GameObjects")) {
 		for (const auto& obj : j["GameObjects"])
-		{
 			DeserializeGameObject(obj);
-		}
-		std::cout << "[Serialization] Loaded prefab file with "
-			<< j["GameObjects"].size() << " GameObjects.\n";
 	}
-	else if (j.contains("GameObject"))
-	{
-		DeserializeGameObject(j["GameObject"]);
-		std::cout << "[Serialization] Loaded single GameObject prefab.\n";
-	}
-	else
-	{
+	else {
 		DeserializeGameObject(j);
-		std::cout << "[Serialization] Loaded simple JSON prefab (no array key).\n";
 	}
+
+	std::cout << "[LoadPrefab] Loaded prefab: " << path << "\n";
 }
 
 // ========================= SCENE I/O =========================
