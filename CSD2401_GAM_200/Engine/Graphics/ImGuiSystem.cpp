@@ -39,12 +39,12 @@ extern double g_totalLoopTime;
  */
 struct TempGOData
 {
-	char name[128]{""};
+	char name[128]{ "" };
 	std::string shape;
-	float pos[2]{0.f, 0.f};
-	float scale[2]{50.f, 50.f};
-	float rot{0.f}; // = transform->GetRotation();
-	ImVec4 color{0.f, 0.f, 0.f, 1.f};
+	float pos[2]{ 0.f, 0.f };
+	float scale[2]{ 50.f, 50.f };
+	float rot{ 0.f }; // = transform->GetRotation();
+	ImVec4 color{ 0.f, 0.f, 0.f, 1.f };
 };
 
 // 2 Temp GO Structs - for Game Object Creator & Prefab Loader
@@ -60,7 +60,7 @@ bool ShowLoadPrefabMenu;
 /**
  * @brief Ctor - Inits window variable
  */
-ImGuiSystem::ImGuiSystem(GLFWwindow *window) : m_window(window) {};
+ImGuiSystem::ImGuiSystem(GLFWwindow* window) : m_window(window) {};
 
 /**
  * @brief Dtor - Calls Funct to terminate properly
@@ -77,7 +77,7 @@ void ImGuiSystem::Initialize()
 {
 	IMGUI_CHECKVERSION();	// Verify ImGui version
 	ImGui::CreateContext(); // Create ImGui context
-	ImGuiIO &io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	(void)io;									  // IO object (unused here)
 	ImGui::StyleColorsDark();					  // Set dark theme
 	ImGui_ImplGlfw_InitForOpenGL(m_window, true); // Initialize GLFW backend
@@ -100,7 +100,7 @@ void ImGuiSystem::Update(float dt)
 		ImGui::NewFrame();			  // Start ImGui frame
 
 		// Begin main GameObject Inspector window
-		ImGui::Begin("GameObject Inspector",&InputManager::KeyStateImgui);
+		ImGui::Begin("GameObject Inspector", &InputManager::KeyStateImgui);
 
 		// Toggle GameObject creation menu
 		if (ImGui::Button("Create New Game Object"))
@@ -155,39 +155,87 @@ void ImGuiSystem::Update(float dt)
 				// Altered for M1 demonstration of 2.5k GOs!
 				if (obj->GetName() != "Hero" && obj->GetName() != "Evil Button")
 				{
+					// --- Clone GameObject ---
 					if (ImGui::Button("Clone"))
 					{
 						GameObjectFactory& factory = GameObjectFactory::Instance();
-						GameObject* clonedObj = factory.CloneGameObject(obj->GetID());
+						GameObject* cloned = factory.CloneGameObject(obj->GetID());
 
-						// Save cloned object data
-						Serialize_Writer writer("../Logs/GameObjectData.txt");
-						if (writer.IsStreamGood())
+						if (cloned)
 						{
-							writer.WriteGameObjectData(*clonedObj, 0);
-							std::cout << "Cloned object data saved!\n";
+							// Offset position slightly so clones don’t overlap
+							if (auto* t = cloned->GetComponent<TransformComponent>())
+							{
+								float x, y;
+								t->GetPosition(x, y);
+								t->SetPosition(x + 20.f, y + 20.f);
+							}
+
+							std::cout << "[ImGui] Cloned GameObject: " << cloned->GetName() << '\n';
 						}
-
-						std::cout << "button clicked";
-					}
-
-					// Save GO Data - Serialisation!
-					if (ImGui::Button("Save Data"))
-					{
-						Serialize_Writer writer("../Logs/GameObjectData.txt"); // Create Writer class object with specified path
-						if (writer.IsStreamGood())
+						else
 						{
-							writer.WriteGameObjectData(*obj, 0); // If stream is valid, write objects data to file path
-							std::cout << "GameObject data saved!\n";
+							std::cerr << "[ImGui] Clone failed: invalid source object.\n";
 						}
 					}
 
-					// Create Prefab with GO Data
-					if (ImGui::Button("Create Prefab"))
+					// --- Save current GO as Prefab JSON ---
+					if (ImGui::Button("Create Prefab (JSON)"))
 					{
-						CreatePrefab(*obj);
+						CreatePrefabJSON(*obj);
+						std::cout << "[ImGui] Prefab saved for: " << obj->GetName() << '\n';
+					}
+
+					// --- Quick-save current GO’s transform/physics to scene JSON ---
+					if (ImGui::Button("Save Scene"))
+					{
+						SaveSceneJSON("../Logs/Scene.json");
+						std::cout << "[ImGui] Scene saved to ../Logs/Scene.json\n";
+					}
+
+					// --- Quick-load scene (for testing reloading in real time) ---
+					if (ImGui::Button("Reload Scene"))
+					{
+						LoadSceneJSON("../Logs/Scene.json");
+						std::cout << "[ImGui] Scene reloaded from ../Logs/Scene.json\n";
 					}
 				}
+
+				//if (obj->GetName() != "Hero" && obj->GetName() != "Evil Button")
+				//{
+				//	if (ImGui::Button("Clone"))
+				//	{
+				//		GameObjectFactory& factory = GameObjectFactory::Instance();
+				//		GameObject* clonedObj = factory.CloneGameObject(obj->GetID());
+
+				//		// Save cloned object data
+				//		Serialize_Writer writer("../Logs/GameObjectData.txt");
+				//		if (writer.IsStreamGood())
+				//		{
+				//			writer.WriteGameObjectData(*clonedObj, 0);
+				//			std::cout << "Cloned object data saved!\n";
+				//		}
+
+				//		std::cout << "button clicked";
+				//	}
+
+				//	// Save GO Data - Serialisation!
+				//	if (ImGui::Button("Save Data"))
+				//	{
+				//		Serialize_Writer writer("../Logs/GameObjectData.txt"); // Create Writer class object with specified path
+				//		if (writer.IsStreamGood())
+				//		{
+				//			writer.WriteGameObjectData(*obj, 0); // If stream is valid, write objects data to file path
+				//			std::cout << "GameObject data saved!\n";
+				//		}
+				//	}
+
+				//	// Create Prefab with GO Data
+				//	if (ImGui::Button("Create Prefab"))
+				//	{
+				//		CreatePrefab(*obj);
+				//	}
+				//}
 
 				// Evil button that spawns 2.5k Circle GOs
 				if (obj->GetName() == "Evil Button")
@@ -261,22 +309,69 @@ void ImGuiSystem::Update(float dt)
 
 				// Generate Game Object
 				ImGui::Text("  ");
-				if (ImGui::Button("Generate")) // Button to create new GO
+				if (ImGui::Button("Generate"))
 				{
-					auto& factory = GameObjectFactory::Instance(); // Factory
+					auto& factory = GameObjectFactory::Instance();
 
-					// very ugly colour code bc that uses a different vec 4 AAAA
-					GameObject* TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
-						vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+					// Determine the shape enum
+					RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);
 
-					// Add transform component to assign transform values
-					TempGO->AddComponent<TransformComponent>(0, 0);
-					auto* transform = TempGO->GetComponent<TransformComponent>();
+					// Create GameObject through factory
+					GameObject* newGO = factory.CreateShape(
+						tempGO.name,
+						shapeType,
+						tempGO.pos[0], tempGO.pos[1],
+						tempGO.scale[0], tempGO.scale[1],
+						vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f),
+						CollisionLayer::Default
+					);
 
+					// --- Transform ---
+					auto* transform = newGO->AddComponent<TransformComponent>(0, 0);
 					transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
 					transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
 					transform->SetRotation(tempGO.rot);
+
+					// --- Physics ---
+					auto* physics = newGO->AddComponent<PhysicsComponent>();
+					physics->useGravity = true;
+					physics->SetMass(1.0f);
+					physics->SetStatic(false);
+					physics->SetGrounded(false);
+
+					// --- Collider ---
+					ColliderComponent::Type colliderType =
+						(shapeType == RenderComponent::ShapeType::Circle)
+						? ColliderComponent::Type::Circle
+						: ColliderComponent::Type::Square;
+
+					float width = tempGO.scale[0];
+					float height = tempGO.scale[1];
+
+					auto* collider = newGO->AddComponent<ColliderComponent>(
+						colliderType, width, height, CollisionLayer::Default
+					);
+
+					std::cout << "[ImGui] Created new GameObject: " << tempGO.name
+						<< " with collider and physics.\n";
 				}
+				//ImGui::Text("  ");
+				//if (ImGui::Button("Generate")) // Button to create new GO
+				//{
+				//	auto& factory = GameObjectFactory::Instance(); // Factory
+
+				//	// very ugly colour code bc that uses a different vec 4 AAAA
+				//	GameObject* TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
+				//		vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+
+				//	// Add transform component to assign transform values
+				//	TempGO->AddComponent<TransformComponent>(0, 0);
+				//	auto* transform = TempGO->GetComponent<TransformComponent>();
+
+				//	transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
+				//	transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
+				//	transform->SetRotation(tempGO.rot);
+				//}
 			}
 			ImGui::End(); // End of GO Creation
 		}
@@ -284,53 +379,120 @@ void ImGuiSystem::Update(float dt)
 		/**
 		 * @brief Prefab Loader Menu IMGui Window
 		 */
-		if (ShowLoadPrefabMenu) // If flag to show Prefab Search Menu is true
+		if (ShowLoadPrefabMenu)
 		{
-			ImGui::Begin("Prefab Loader", &ShowLoadPrefabMenu); // Begin window
+			ImGui::Begin("Prefab Loader", &ShowLoadPrefabMenu);
 
 			ImGui::Text("Prefab Search");
-			if (ImGui::InputText("#", tempPrefab.name, sizeof(tempGO.name)))
-			{
-			} // Text box to search for prefab txt file (Will change to a list to select from)
 
-			if (ImGui::Button("Search"))
+			// ---------------- Search + list available prefabs ----------------
+			static std::vector<std::string> prefabFiles;
+			static int selectedPrefab = -1; // index of selection
+			const std::string prefabFolder = "../Logs/";
+
+			if (ImGui::Button("Search Prefabs"))
 			{
-				std::string filePath{ "../Logs/" + static_cast<std::string>(tempPrefab.name) + ".txt" }; // Checking for specific file path & file type
-				Serialize_Reader reader(filePath);
-				if (!reader.IsStreamGood())
-				{ // Check if is existing file
-					std::cout << "file stream bad!\n";
-				}
-				else // If matching file name found
+				prefabFiles.clear();
+				selectedPrefab = -1;
+
+				try
 				{
-					std::string PrefabData = ReadPrefabData(filePath.c_str()); // Get prefab data and store into stringstream to plug into temp prefab struct
-					std::stringstream ss(PrefabData);
-					std::cout << ss.str();
+					for (const auto& entry : std::filesystem::directory_iterator(prefabFolder))
+					{
+						if (entry.is_regular_file() &&
+							entry.path().extension() == ".json" &&
+							entry.path().filename().string().find("Prefab_") != std::string::npos)
+						{
+							prefabFiles.push_back(entry.path().filename().string());
+						}
+					}
 
-					ss >> tempPrefab.name >> tempPrefab.shape >> tempPrefab.pos[0] >> tempPrefab.pos[1] >> tempPrefab.scale[0] >> tempPrefab.scale[1] >>
-						tempPrefab.color.x >> tempPrefab.color.y >> tempPrefab.color.z >> tempPrefab.color.w;
-
-					RenderComponent::ShapeType shapeEnum{};
-					ShapeEnumToString(tempPrefab.shape, shapeEnum); // Function that takes in a string and a enum type, to convert shape str to its corresponding enum value (vice versa)
-
-					auto& factory = GameObjectFactory::Instance(); // Factory
-
-					// very ugly colour code bc that uses a different vec 4 AAAA
-					GameObject* TempGO = factory.CreateShape(static_cast<std::string>(tempPrefab.name), RenderComponent::ShapeType{ shapeEnum }, tempPrefab.pos[0], tempPrefab.pos[1],
-						tempPrefab.scale[0], tempPrefab.scale[1], vec4(tempPrefab.color.x, tempPrefab.color.y, tempPrefab.color.z, tempPrefab.color.w), CollisionLayer::Default);
-
-					// Add transform component to assign transform values
-					TempGO->AddComponent<TransformComponent>(0, 0);
-					auto* transform = TempGO->GetComponent<TransformComponent>();
-
-					transform->SetPosition(tempPrefab.pos[0], tempPrefab.pos[1]);
-					transform->SetScale(tempPrefab.scale[0], tempPrefab.scale[1]);
-					transform->SetRotation(tempPrefab.rot);
+					if (prefabFiles.empty())
+						std::cout << "[ImGui] No prefab JSONs found in " << prefabFolder << '\n';
+					else
+						std::cout << "[ImGui] Found " << prefabFiles.size() << " prefab files.\n";
+				}
+				catch (const std::exception& e)
+				{
+					std::cerr << "[ImGui] Error reading prefab folder: " << e.what() << '\n';
 				}
 			}
 
-			ImGui::End(); // End of Prefab Search Menu
+			// ---------------- Prefab dropdown ----------------
+			if (!prefabFiles.empty())
+			{
+				ImGui::Text("Select prefab to load:");
+				if (ImGui::BeginCombo("##PrefabList",
+					selectedPrefab >= 0 ? prefabFiles[selectedPrefab].c_str() : "Choose prefab"))
+				{
+					for (int i = 0; i < (int)prefabFiles.size(); ++i)
+					{
+						bool isSelected = (selectedPrefab == i);
+						if (ImGui::Selectable(prefabFiles[i].c_str(), isSelected))
+							selectedPrefab = i;
+						if (isSelected) ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+
+				if (selectedPrefab >= 0 && ImGui::Button("Load Selected Prefab"))
+				{
+					std::string selectedPath = prefabFolder + prefabFiles[selectedPrefab];
+					LoadPrefabJSON(selectedPath);
+					std::cout << "[ImGui] Loaded prefab: " << selectedPath << '\n';
+				}
+			}
+
+			ImGui::End();
 		}
+
+		//if (ShowLoadPrefabMenu) // If flag to show Prefab Search Menu is true
+		//{
+		//	ImGui::Begin("Prefab Loader", &ShowLoadPrefabMenu); // Begin window
+
+		//	ImGui::Text("Prefab Search");
+		//	if (ImGui::InputText("#", tempPrefab.name, sizeof(tempGO.name)))
+		//	{
+		//	} // Text box to search for prefab txt file (Will change to a list to select from)
+
+		//	if (ImGui::Button("Search"))
+		//	{
+		//		std::string filePath{ "../Logs/" + static_cast<std::string>(tempPrefab.name) + ".txt" }; // Checking for specific file path & file type
+		//		Serialize_Reader reader(filePath);
+		//		if (!reader.IsStreamGood())
+		//		{ // Check if is existing file
+		//			std::cout << "file stream bad!\n";
+		//		}
+		//		else // If matching file name found
+		//		{
+		//			//std::string PrefabData = ReadPrefabData(filePath.c_str()); // Get prefab data and store into stringstream to plug into temp prefab struct
+		//			std::stringstream ss(PrefabData);
+		//			std::cout << ss.str();
+
+		//			ss >> tempPrefab.name >> tempPrefab.shape >> tempPrefab.pos[0] >> tempPrefab.pos[1] >> tempPrefab.scale[0] >> tempPrefab.scale[1] >>
+		//				tempPrefab.color.x >> tempPrefab.color.y >> tempPrefab.color.z >> tempPrefab.color.w;
+
+		//			RenderComponent::ShapeType shapeEnum{};
+		//			ShapeEnumToString(tempPrefab.shape, shapeEnum); // Function that takes in a string and a enum type, to convert shape str to its corresponding enum value (vice versa)
+
+		//			auto& factory = GameObjectFactory::Instance(); // Factory
+
+		//			// very ugly colour code bc that uses a different vec 4 AAAA
+		//			GameObject* TempGO = factory.CreateShape(static_cast<std::string>(tempPrefab.name), RenderComponent::ShapeType{ shapeEnum }, tempPrefab.pos[0], tempPrefab.pos[1],
+		//				tempPrefab.scale[0], tempPrefab.scale[1], vec4(tempPrefab.color.x, tempPrefab.color.y, tempPrefab.color.z, tempPrefab.color.w), CollisionLayer::Default);
+
+		//			// Add transform component to assign transform values
+		//			TempGO->AddComponent<TransformComponent>(0, 0);
+		//			auto* transform = TempGO->GetComponent<TransformComponent>();
+
+		//			transform->SetPosition(tempPrefab.pos[0], tempPrefab.pos[1]);
+		//			transform->SetScale(tempPrefab.scale[0], tempPrefab.scale[1]);
+		//			transform->SetRotation(tempPrefab.rot);
+		//		}
+		//	}
+
+		//	ImGui::End(); // End of Prefab Search Menu
+		//}
 
 		/**
 		 * @brief Performance Profiler IMGui Window
