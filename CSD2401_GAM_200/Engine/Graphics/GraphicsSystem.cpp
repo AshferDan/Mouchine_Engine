@@ -231,6 +231,26 @@ void GraphicsSystem::Initialize()
     //Attribute 6: Scale (vec2)
 
     //Attribute 7: Rotation (float)
+
+    //Text Shader Initialize
+    textShader.CompileLinkValidate({
+        {GL_VERTEX_SHADER, "./Shaders/text.vert"},
+        {GL_FRAGMENT_SHADER, "./Shaders/text.frag"}
+        });
+
+    glGenVertexArrays(1, &textVAO);
+    glGenBuffers(1, &textVBO);
+
+    glBindVertexArray(textVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void GraphicsSystem::Update(float)
@@ -413,27 +433,53 @@ void GraphicsSystem::Update(float)
                 continue;
             }
 
-            auto* rend = obj->GetComponent<RenderComponent>();
+            if (auto* rend = obj->GetComponent<RenderComponent>()) {
+                if (!rend) {
+                    continue;
+                }
 
-            if (!rend) {
-                continue;
+                switch (rend->GetShapeType()) {
+                case RenderComponent::ShapeType::Line:
+                {
+                    auto line = rend->GetLine();
+                    DrawLine(line.start, line.end, line.color, vp);
+                    break;
+                }
+                case RenderComponent::ShapeType::Point:
+                {
+                    auto point = rend->GetPoint();
+                    DrawPoint(point.pos, point.color, vp);
+                    break;
+                }
+                default:
+                    break;
+                }
+
+                if (debugMode) {
+                    auto* transform = obj->GetComponent<TransformComponent>();
+                    if (transform) {
+                        float x, y, sx, sy;
+                        transform->GetPosition(x, y);
+                        transform->GetScale(sx, sy);
+                        if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
+                            DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
+                        }
+                        else if (rend->GetShapeType() == RenderComponent::ShapeType::Square) {
+                            DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
+                        }
+                    }
+                }
             }
 
-            switch (rend->GetShapeType()) {
-            case RenderComponent::ShapeType::Line:
-            {
-                auto line = rend->GetLine();
-                DrawLine(line.start, line.end, line.color, vp);
-                break;
-            }
-            case RenderComponent::ShapeType::Point:
-            {
-                auto point = rend->GetPoint();
-                DrawPoint(point.pos, point.color, vp);
-                break;
-            }
-            default:
-                break;
+            if (auto* textComp = obj->GetComponent<TextComponent>()) {
+                if (textComp->IsEnabled()) {
+                    if (auto* transform = obj->GetComponent<TransformComponent>()) {
+                        float x, y;
+                        transform->GetPosition(x, y);
+
+                        RenderText(textComp->GetCharacters(), textComp->GetText(), x, y, textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
+                    }
+                }
             }
         }
 
@@ -463,30 +509,12 @@ void GraphicsSystem::Update(float)
                 }
                 }
             }
-
-            for (auto& obj : gameObjects) {
-                if (!obj->IsActive()) {
-                    continue;
-                }
-
-                auto* transform = obj->GetComponent<TransformComponent>();
-                auto* rend = obj->GetComponent<RenderComponent>();
-                if (!transform || !rend) {
-                    continue;
-                }
-
-                float x, y, sx, sy;
-                transform->GetPosition(x, y);
-                transform->GetScale(sx, sy);
-                if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
-                    DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
-                }
-                else if (rend->GetShapeType() == RenderComponent::ShapeType::Square) {
-                    DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
-                }
-            }
-
         }
+
+
+
+
+
 }
 
 // Draw a line between two points in world space
@@ -673,6 +701,61 @@ void GraphicsSystem::DrawBatches() {
     }
     shader.SetUniform("uUseBatching", 0);
 }
+
+void GraphicsSystem::RenderText(const std::map<char, Character>& characters, const std::string& text, float x, float y, float scale, const vec4& color, bool screenSpace) {
+    textShader.Use();   
+    textShader.SetUniform("textColor", color);
+
+    mat4 projection;
+    if (screenSpace) {
+        projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+    }
+    else {
+        projection = vp;
+    }
+    textShader.SetUniform("projection", projection);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(textVAO);
+
+    for (char c : text) {
+        auto it = characters.find(c);
+        if (it == characters.end()) {
+            continue;
+        }
+
+        const Character& ch = it->second;
+
+        float xpos = x + ch.bearing.x * scale;
+        float ypos = y - (ch.size.y - ch.bearing.y) * scale;
+        float w = ch.size.x * scale;
+        float h = ch.size.y * scale;
+
+        float vertices[6][4] = {
+            {xpos,      ypos + h,     0.f, 0.f},
+            {xpos,      ypos,       0.f, 1.f},
+            {xpos + w,    ypos,       1.f, 1.f},
+
+            {xpos,      ypos + h,     0.f, 0.f},
+            {xpos + w,    ypos,       1.f, 1.f},
+            {xpos + w,    ypos + h,     1.f, 0.f}
+        };
+
+        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+
+        glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        x += (ch.advance >> 6) * scale;
+    }
+
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 
 std::string GraphicsSystem::GetName()
 {

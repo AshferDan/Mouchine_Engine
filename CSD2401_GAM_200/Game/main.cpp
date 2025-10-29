@@ -100,6 +100,20 @@ int main()
         true, false, true);
     API::SetVelocity("Circle2", 250.0f, 0.0f);
 
+    GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
+    textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen
+    auto* text = textObj->AddComponent<TextComponent>(
+        "./Assets/FrederickatheGreat-Regular.ttf",
+        48,  // Font size
+        "Score: 0",
+        vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        true
+    );
+    text->SetScale(1.0f);
+
+    // Later, update the text:
+    text->SetText("Score: 100");
+
     //auto* bg = GameObjectFactory::Instance().FindGameObject("bgImage");
     //if (bg && bg->GetComponent<RenderComponent>()) {
     //    bg->GetComponent<RenderComponent>()->SetLayer(-10);
