@@ -73,7 +73,7 @@ events:
       The output was:
       0
       MSBuild version 17.14.23+b0019275e for .NET Framework
-      Build started 25/10/2025 8:11:29 pm.
+      Build started 30/10/2025 2:12:12 am.
       
       Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\4.1.1\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -102,7 +102,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.35
+      Time Elapsed 00:00:00.55
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -667,7 +667,7 @@ events:
       The output was:
       0
       MSBuild version 17.14.23+b0019275e for .NET Framework
-      Build started 25/10/2025 8:11:29 pm.
+      Build started 30/10/2025 2:12:13 am.
       
       Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\4.1.1\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -696,7 +696,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.37
+      Time Elapsed 00:00:00.48
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -1046,8 +1046,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-r1r6sa"
-      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-r1r6sa"
+      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-65u8ev"
+      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-65u8ev"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
       CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1056,40 +1056,40 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-r1r6sa'
+        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-65u8ev'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_4aecf.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_b4622.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 25/10/2025 8:11:30 pm.
+        Build started 30/10/2025 2:12:14 am.
         
-        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-r1r6sa\\cmTC_4aecf.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-65u8ev\\cmTC_b4622.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_4aecf.dir\\Debug\\".
+          Creating directory "cmTC_b4622.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-r1r6sa\\Debug\\".
-          Creating directory "cmTC_4aecf.dir\\Debug\\cmTC_4aecf.tlog\\".
+          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-65u8ev\\Debug\\".
+          Creating directory "cmTC_b4622.dir\\Debug\\cmTC_b4622.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_4aecf.dir\\Debug\\cmTC_4aecf.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_4aecf.dir\\Debug\\cmTC_4aecf.tlog\\unsuccessfulbuild".
+          Creating "cmTC_b4622.dir\\Debug\\cmTC_b4622.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_b4622.dir\\Debug\\cmTC_b4622.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_4aecf.dir\\Debug\\\\" /Fd"cmTC_4aecf.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_b4622.dir\\Debug\\\\" /Fd"cmTC_b4622.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_4aecf.dir\\Debug\\\\" /Fd"cmTC_4aecf.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_b4622.dir\\Debug\\\\" /Fd"cmTC_b4622.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-r1r6sa\\Debug\\cmTC_4aecf.exe" /INCREMENTAL /ILK:"cmTC_4aecf.dir\\Debug\\cmTC_4aecf.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-r1r6sa/Debug/cmTC_4aecf.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-r1r6sa/Debug/cmTC_4aecf.lib" /MACHINE:X64  /machine:x64 cmTC_4aecf.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_4aecf.vcxproj -> C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-r1r6sa\\Debug\\cmTC_4aecf.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-65u8ev\\Debug\\cmTC_b4622.exe" /INCREMENTAL /ILK:"cmTC_b4622.dir\\Debug\\cmTC_b4622.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-65u8ev/Debug/cmTC_b4622.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-65u8ev/Debug/cmTC_b4622.lib" /MACHINE:X64  /machine:x64 cmTC_b4622.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_b4622.vcxproj -> C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-65u8ev\\Debug\\cmTC_b4622.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_4aecf.dir\\Debug\\cmTC_4aecf.tlog\\unsuccessfulbuild".
-          Touching "cmTC_4aecf.dir\\Debug\\cmTC_4aecf.tlog\\cmTC_4aecf.lastbuildstate".
-        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-r1r6sa\\cmTC_4aecf.vcxproj" (default targets).
+          Deleting file "cmTC_b4622.dir\\Debug\\cmTC_b4622.tlog\\unsuccessfulbuild".
+          Touching "cmTC_b4622.dir\\Debug\\cmTC_b4622.tlog\\cmTC_b4622.lastbuildstate".
+        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-65u8ev\\cmTC_b4622.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.34
+        Time Elapsed 00:00:00.54
         
       exitCode: 0
   -
@@ -1129,8 +1129,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-auew2h"
-      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-auew2h"
+      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-t7x7mh"
+      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-t7x7mh"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1140,40 +1140,40 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-auew2h'
+        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-t7x7mh'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_716f1.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_ef2d5.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 25/10/2025 8:11:31 pm.
+        Build started 30/10/2025 2:12:15 am.
         
-        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-auew2h\\cmTC_716f1.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-t7x7mh\\cmTC_ef2d5.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_716f1.dir\\Debug\\".
+          Creating directory "cmTC_ef2d5.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-auew2h\\Debug\\".
-          Creating directory "cmTC_716f1.dir\\Debug\\cmTC_716f1.tlog\\".
+          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-t7x7mh\\Debug\\".
+          Creating directory "cmTC_ef2d5.dir\\Debug\\cmTC_ef2d5.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_716f1.dir\\Debug\\cmTC_716f1.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_716f1.dir\\Debug\\cmTC_716f1.tlog\\unsuccessfulbuild".
+          Creating "cmTC_ef2d5.dir\\Debug\\cmTC_ef2d5.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_ef2d5.dir\\Debug\\cmTC_ef2d5.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /GR /Fo"cmTC_716f1.dir\\Debug\\\\" /Fd"cmTC_716f1.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /GR /Fo"cmTC_ef2d5.dir\\Debug\\\\" /Fd"cmTC_ef2d5.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /GR /Fo"cmTC_716f1.dir\\Debug\\\\" /Fd"cmTC_716f1.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /GR /Fo"cmTC_ef2d5.dir\\Debug\\\\" /Fd"cmTC_ef2d5.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.1\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-auew2h\\Debug\\cmTC_716f1.exe" /INCREMENTAL /ILK:"cmTC_716f1.dir\\Debug\\cmTC_716f1.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-auew2h/Debug/cmTC_716f1.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-auew2h/Debug/cmTC_716f1.lib" /MACHINE:X64  /machine:x64 cmTC_716f1.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_716f1.vcxproj -> C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-auew2h\\Debug\\cmTC_716f1.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-t7x7mh\\Debug\\cmTC_ef2d5.exe" /INCREMENTAL /ILK:"cmTC_ef2d5.dir\\Debug\\cmTC_ef2d5.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-t7x7mh/Debug/cmTC_ef2d5.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-t7x7mh/Debug/cmTC_ef2d5.lib" /MACHINE:X64  /machine:x64 cmTC_ef2d5.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_ef2d5.vcxproj -> C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-t7x7mh\\Debug\\cmTC_ef2d5.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_716f1.dir\\Debug\\cmTC_716f1.tlog\\unsuccessfulbuild".
-          Touching "cmTC_716f1.dir\\Debug\\cmTC_716f1.tlog\\cmTC_716f1.lastbuildstate".
-        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-auew2h\\cmTC_716f1.vcxproj" (default targets).
+          Deleting file "cmTC_ef2d5.dir\\Debug\\cmTC_ef2d5.tlog\\unsuccessfulbuild".
+          Touching "cmTC_ef2d5.dir\\Debug\\cmTC_ef2d5.tlog\\cmTC_ef2d5.lastbuildstate".
+        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-t7x7mh\\cmTC_ef2d5.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.45
+        Time Elapsed 00:00:00.35
         
       exitCode: 0
   -
@@ -1215,7 +1215,7 @@ events:
       - "C:/Program Files/CMake/share/cmake-4.1/Modules/FetchContent.cmake:1978:EVAL:1 (__FetchContent_Populate)"
       - "C:/Program Files/CMake/share/cmake-4.1/Modules/FetchContent.cmake:1978 (cmake_language)"
       - "cmake/ImportDependencies.cmake:15 (FetchContent_Populate)"
-      - "cmake/ImportDependencies.cmake:250 (import_glfw)"
+      - "cmake/ImportDependencies.cmake:297 (import_glfw)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "program"
     variable: "GIT_EXECUTABLE"
@@ -1446,8 +1446,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-oo89ar"
-      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-oo89ar"
+      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-36va20"
+      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-36va20"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
       CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1457,35 +1457,35 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-oo89ar'
+        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-36va20'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_a1e39.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_a8716.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 25/10/2025 8:11:36 pm.
+        Build started 30/10/2025 2:12:21 am.
         
-        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\cmTC_a1e39.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\cmTC_a8716.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_a1e39.dir\\Debug\\".
+          Creating directory "cmTC_a8716.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\Debug\\".
-          Creating directory "cmTC_a1e39.dir\\Debug\\cmTC_a1e39.tlog\\".
+          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\Debug\\".
+          Creating directory "cmTC_a8716.dir\\Debug\\cmTC_a8716.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_a1e39.dir\\Debug\\cmTC_a1e39.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_a1e39.dir\\Debug\\cmTC_a1e39.tlog\\unsuccessfulbuild".
+          Creating "cmTC_a8716.dir\\Debug\\cmTC_a8716.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_a8716.dir\\Debug\\cmTC_a8716.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_a1e39.dir\\Debug\\\\" /Fd"cmTC_a1e39.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\src.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_a8716.dir\\Debug\\\\" /Fd"cmTC_a8716.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\src.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_a1e39.dir\\Debug\\\\" /Fd"cmTC_a1e39.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\src.c"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_a8716.dir\\Debug\\\\" /Fd"cmTC_a8716.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\src.c"
           src.c
-        C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\cmTC_a1e39.vcxproj]
-        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\cmTC_a1e39.vcxproj" (default targets) -- FAILED.
+        C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\cmTC_a8716.vcxproj]
+        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\cmTC_a8716.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\cmTC_a1e39.vcxproj" (default target) (1) ->
+        "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\cmTC_a8716.vcxproj" (default target) (1) ->
         (ClCompile target) -> 
-          C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-oo89ar\\cmTC_a1e39.vcxproj]
+          C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-36va20\\cmTC_a8716.vcxproj]
         
             0 Warning(s)
             1 Error(s)
@@ -1503,8 +1503,8 @@ events:
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-rrsbbc"
-      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-rrsbbc"
+      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-9ni9p1"
+      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-9ni9p1"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
       CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1514,42 +1514,42 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-rrsbbc'
+        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-9ni9p1'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_9ece9.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_bdc6a.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 25/10/2025 8:11:36 pm.
+        Build started 30/10/2025 2:12:21 am.
         
-        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\cmTC_9ece9.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\cmTC_bdc6a.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_9ece9.dir\\Debug\\".
+          Creating directory "cmTC_bdc6a.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\Debug\\".
-          Creating directory "cmTC_9ece9.dir\\Debug\\cmTC_9ece9.tlog\\".
+          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\Debug\\".
+          Creating directory "cmTC_bdc6a.dir\\Debug\\cmTC_bdc6a.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_9ece9.dir\\Debug\\cmTC_9ece9.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_9ece9.dir\\Debug\\cmTC_9ece9.tlog\\unsuccessfulbuild".
+          Creating "cmTC_bdc6a.dir\\Debug\\cmTC_bdc6a.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_bdc6a.dir\\Debug\\cmTC_bdc6a.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_9ece9.dir\\Debug\\\\" /Fd"cmTC_9ece9.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\CheckFunctionExists.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_bdc6a.dir\\Debug\\\\" /Fd"cmTC_bdc6a.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\CheckFunctionExists.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_9ece9.dir\\Debug\\\\" /Fd"cmTC_9ece9.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\CheckFunctionExists.c"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_bdc6a.dir\\Debug\\\\" /Fd"cmTC_bdc6a.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\CheckFunctionExists.c"
           CheckFunctionExists.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\Debug\\cmTC_9ece9.exe" /INCREMENTAL /ILK:"cmTC_9ece9.dir\\Debug\\cmTC_9ece9.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-rrsbbc/Debug/cmTC_9ece9.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-rrsbbc/Debug/cmTC_9ece9.lib" /MACHINE:X64  /machine:x64 cmTC_9ece9.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\cmTC_9ece9.vcxproj]
-        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\cmTC_9ece9.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\Debug\\cmTC_bdc6a.exe" /INCREMENTAL /ILK:"cmTC_bdc6a.dir\\Debug\\cmTC_bdc6a.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-9ni9p1/Debug/cmTC_bdc6a.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-9ni9p1/Debug/cmTC_bdc6a.lib" /MACHINE:X64  /machine:x64 cmTC_bdc6a.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\cmTC_bdc6a.vcxproj]
+        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\cmTC_bdc6a.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\cmTC_9ece9.vcxproj" (default target) (1) ->
+        "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\cmTC_bdc6a.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-rrsbbc\\cmTC_9ece9.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-9ni9p1\\cmTC_bdc6a.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.28
+        Time Elapsed 00:00:00.27
         
       exitCode: 1
   -
@@ -1562,8 +1562,8 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-m19bfj"
-      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-m19bfj"
+      source: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-v7vf61"
+      binary: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-v7vf61"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
       CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
@@ -1573,42 +1573,42 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-m19bfj'
+        Change Dir: 'C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-v7vf61'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_00875.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_61f91.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.23+b0019275e for .NET Framework
-        Build started 25/10/2025 8:11:37 pm.
+        Build started 30/10/2025 2:12:22 am.
         
-        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\cmTC_00875.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\cmTC_61f91.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_00875.dir\\Debug\\".
+          Creating directory "cmTC_61f91.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\Debug\\".
-          Creating directory "cmTC_00875.dir\\Debug\\cmTC_00875.tlog\\".
+          Creating directory "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\Debug\\".
+          Creating directory "cmTC_61f91.dir\\Debug\\cmTC_61f91.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_00875.dir\\Debug\\cmTC_00875.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_00875.dir\\Debug\\cmTC_00875.tlog\\unsuccessfulbuild".
+          Creating "cmTC_61f91.dir\\Debug\\cmTC_61f91.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_61f91.dir\\Debug\\cmTC_61f91.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_00875.dir\\Debug\\\\" /Fd"cmTC_00875.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\CheckFunctionExists.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_61f91.dir\\Debug\\\\" /Fd"cmTC_61f91.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\CheckFunctionExists.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35219 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_00875.dir\\Debug\\\\" /Fd"cmTC_00875.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\CheckFunctionExists.c"
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Fo"cmTC_61f91.dir\\Debug\\\\" /Fd"cmTC_61f91.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\CheckFunctionExists.c"
           CheckFunctionExists.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\Debug\\cmTC_00875.exe" /INCREMENTAL /ILK:"cmTC_00875.dir\\Debug\\cmTC_00875.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-m19bfj/Debug/cmTC_00875.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-m19bfj/Debug/cmTC_00875.lib" /MACHINE:X64  /machine:x64 cmTC_00875.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\cmTC_00875.vcxproj]
-        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\cmTC_00875.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /OUT:"C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\Debug\\cmTC_61f91.exe" /INCREMENTAL /ILK:"cmTC_61f91.dir\\Debug\\cmTC_61f91.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-v7vf61/Debug/cmTC_61f91.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /IMPLIB:"C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/CMakeFiles/CMakeScratch/TryCompile-v7vf61/Debug/cmTC_61f91.lib" /MACHINE:X64  /machine:x64 cmTC_61f91.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\cmTC_61f91.vcxproj]
+        Done Building Project "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\cmTC_61f91.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\cmTC_00875.vcxproj" (default target) (1) ->
+        "C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\cmTC_61f91.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-m19bfj\\cmTC_00875.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\Users\\Jonathan\\Documents\\SIT\\csd2401f25_avidmoustacheenjoyers\\CSD2401_GAM_200\\Build\\CMakeFiles\\CMakeScratch\\TryCompile-v7vf61\\cmTC_61f91.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.28
+        Time Elapsed 00:00:00.35
         
       exitCode: 1
   -
@@ -4890,7 +4890,7 @@ events:
     kind: "find-v1"
     backtrace:
       - "cmake/ImportDependencies.cmake:158 (find_path)"
-      - "cmake/ImportDependencies.cmake:278 (import_fmod)"
+      - "cmake/ImportDependencies.cmake:325 (import_fmod)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "path"
     variable: "FMOD_INCLUDE_DIR"
@@ -4942,7 +4942,7 @@ events:
     kind: "find-v1"
     backtrace:
       - "cmake/ImportDependencies.cmake:174 (find_file)"
-      - "cmake/ImportDependencies.cmake:278 (import_fmod)"
+      - "cmake/ImportDependencies.cmake:325 (import_fmod)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "file"
     variable: "FMOD_RELEASE_LIBRARY_FILE"
@@ -4994,7 +4994,7 @@ events:
     kind: "find-v1"
     backtrace:
       - "cmake/ImportDependencies.cmake:181 (find_file)"
-      - "cmake/ImportDependencies.cmake:278 (import_fmod)"
+      - "cmake/ImportDependencies.cmake:325 (import_fmod)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "file"
     variable: "FMOD_DEBUG_LIBRARY_FILE"
@@ -5046,7 +5046,7 @@ events:
     kind: "find-v1"
     backtrace:
       - "cmake/ImportDependencies.cmake:204 (find_file)"
-      - "cmake/ImportDependencies.cmake:278 (import_fmod)"
+      - "cmake/ImportDependencies.cmake:325 (import_fmod)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "file"
     variable: "FMOD_STUDIO_RELEASE_LIBRARY_FILE"
@@ -5098,7 +5098,7 @@ events:
     kind: "find-v1"
     backtrace:
       - "cmake/ImportDependencies.cmake:211 (find_file)"
-      - "cmake/ImportDependencies.cmake:278 (import_fmod)"
+      - "cmake/ImportDependencies.cmake:325 (import_fmod)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "file"
     variable: "FMOD_STUDIO_DEBUG_LIBRARY_FILE"
@@ -5150,7 +5150,7 @@ events:
     kind: "find-v1"
     backtrace:
       - "cmake/ImportDependencies.cmake:218 (find_path)"
-      - "cmake/ImportDependencies.cmake:278 (import_fmod)"
+      - "cmake/ImportDependencies.cmake:325 (import_fmod)"
       - "CMakeLists.txt:28 (importDependencies)"
     mode: "path"
     variable: "FMOD_STUDIO_INCLUDE_DIR"
@@ -5168,6 +5168,110 @@ events:
     candidate_directories:
       - "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc/"
     found: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc/"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\TortoiseSVN\\bin"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Jonathan\\.dotnet\\tools"
+        - "C:\\Users\\Jonathan\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Jonathan\\Desktop\\Coding Projects\\Flutter\\flutter\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Muse Hub\\lib"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/GAM_200_AME"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/GAM_200_AME"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "cmake/ImportDependencies.cmake:256 (find_file)"
+      - "cmake/ImportDependencies.cmake:329 (import_mono)"
+      - "CMakeLists.txt:28 (importDependencies)"
+    mode: "file"
+    variable: "MONO_IMPORT_LIBRARY"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mono-2.0-sgen.lib"
+    candidate_directories:
+      - "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib/"
+    found: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib/mono-2.0-sgen.lib"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\TortoiseSVN\\bin"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Jonathan\\.dotnet\\tools"
+        - "C:\\Users\\Jonathan\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Jonathan\\Desktop\\Coding Projects\\Flutter\\flutter\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Muse Hub\\lib"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/GAM_200_AME"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/GAM_200_AME"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "cmake/ImportDependencies.cmake:263 (find_path)"
+      - "cmake/ImportDependencies.cmake:329 (import_mono)"
+      - "CMakeLists.txt:28 (importDependencies)"
+    mode: "path"
+    variable: "MONO_INCLUDE_DIR"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mono/jit/jit.h"
+    candidate_directories:
+      - "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/include/"
+    found: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/include/"
     search_context:
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"
@@ -5368,6 +5472,107 @@ events:
     candidate_directories:
       - "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/lib/x64/"
     found: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/lib/x64/fmodstudio.dll"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\TortoiseSVN\\bin"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Jonathan\\.dotnet\\tools"
+        - "C:\\Users\\Jonathan\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Jonathan\\Desktop\\Coding Projects\\Flutter\\flutter\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Muse Hub\\lib"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/GAM_200_AME"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/GAM_200_AME"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "CMakeLists.txt:470 (find_file)"
+    mode: "file"
+    variable: "MONO_DLL"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "mono-2.0-sgen.dll"
+      - "mono-2.0-sgend.dll"
+    candidate_directories:
+      - "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/"
+    found: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll"
+    search_context:
+      ENV{PATH}:
+        - "C:\\WINDOWS\\system32"
+        - "C:\\WINDOWS"
+        - "C:\\WINDOWS\\System32\\Wbem"
+        - "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\"
+        - "C:\\WINDOWS\\System32\\OpenSSH\\"
+        - "C:\\Program Files (x86)\\NVIDIA Corporation\\PhysX\\Common"
+        - "C:\\Program Files\\dotnet\\"
+        - "C:\\Program Files\\nodejs\\"
+        - "C:\\Program Files\\TortoiseSVN\\bin"
+        - "C:\\Program Files\\NVIDIA Corporation\\NVIDIA app\\NvDLISR"
+        - "C:\\Program Files\\Git\\cmd"
+        - "C:\\Program Files\\doxygen\\bin"
+        - "C:\\Program Files (x86)\\Windows Kits\\10\\Windows Performance Toolkit\\"
+        - "C:\\Program Files\\CMake\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Python\\Launcher\\"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Microsoft\\WindowsApps"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Programs\\Microsoft VS Code\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\GitHubDesktop\\bin"
+        - "C:\\Users\\Jonathan\\.dotnet\\tools"
+        - "C:\\Users\\Jonathan\\AppData\\Roaming\\npm"
+        - "C:\\Users\\Jonathan\\Desktop\\Coding Projects\\Flutter\\flutter\\bin"
+        - "C:\\Users\\Jonathan\\AppData\\Local\\Muse Hub\\lib"
+      CMAKE_INSTALL_PREFIX: "C:/Program Files/GAM_200_AME"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "C:/Program Files"
+        - "C:/Program Files (x86)"
+        - "C:/Program Files/CMake"
+        - "C:/Program Files/GAM_200_AME"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "CMakeLists.txt:486 (find_file)"
+    mode: "file"
+    variable: "MONO_POSIX_HELPER_DLL"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "MonoPosixHelper.dll"
+    candidate_directories:
+      - "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/"
+    found: "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll"
     search_context:
       ENV{PATH}:
         - "C:\\WINDOWS\\system32"

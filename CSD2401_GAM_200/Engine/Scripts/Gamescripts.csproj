@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>GameScripts</AssemblyName>
+    <RootNamespace>GameScripts</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    
+    <!-- Output path - adjust to match your C++ project structure -->
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    
+    <!-- Generate PDB for debugging -->
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Include all C# script files -->
+    <Compile Include="GameAPI.cs" />
+    <Compile Include="TwoSquaresSpawner.cs" />
+    <Compile Include="AnimatedSquares.cs" />
+    <Compile Include="GameScript.cs" />
+  </ItemGroup>
+
+</Project>

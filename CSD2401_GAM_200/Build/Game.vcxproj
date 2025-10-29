@@ -87,7 +87,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/include" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -113,10 +113,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;USE_CSD3151_AUTOMATION=0;GLEW_STATIC;WIN32_MEAN_AND_LEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;GLEW_NO_GLU;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -124,7 +124,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory</Message>
+      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory	Copying Mono DLL to build directory	Copying MonoPosixHelper.dll	Copying Mono lib directory (includes mscorlib.dll)	Copying Mono etc directory	Creating Scripts folder	Copying Mono lib to Build root	Copying Mono etc to Build root	Copying Mono DLL to Build root	Copying MonoPosixHelper to Build root	Copying Mono lib to project root	Copying Mono etc to project root	Copying Mono DLL to project root	Copying MonoPosixHelper to project root	Copying GameScripts.dll (if exists)	Creating Scripts in top-level Build directory	Copying GameScripts.dll to Build directory</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Assets C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug/Assets
 if %errorlevel% neq 0 goto :cmEnd
@@ -250,10 +250,154 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 :cmErrorLevel
 exit /b %1
 :cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Scripts/bin/Release/net48/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Debug/Scripts/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>Debug\Engine.lib;_deps\glm-build\glm\Debug\glm.lib;Debug\imgui.lib;Build\_deps\glfw-src\src\Debug\glfw3.lib;_deps\glew-build\lib\Debug\glewd.lib;opengl32.lib;_deps\freetype-build\Debug\freetyped.lib;Debug\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmodL_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudioL_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Debug\Engine.lib;_deps\glm-build\glm\Debug\glm.lib;Debug\imgui.lib;Build\_deps\glfw-src\src\Debug\glfw3.lib;_deps\glew-build\lib\Debug\glewd.lib;opengl32.lib;_deps\freetype-build\Debug\freetyped.lib;Debug\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\lib\mono-2.0-sgen.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmodL_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudioL_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -273,7 +417,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/include" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -300,10 +444,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_CSD3151_AUTOMATION=0;GLEW_STATIC;WIN32_MEAN_AND_LEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;GLEW_NO_GLU;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -311,7 +455,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory</Message>
+      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory	Copying Mono DLL to build directory	Copying MonoPosixHelper.dll	Copying Mono lib directory (includes mscorlib.dll)	Copying Mono etc directory	Creating Scripts folder	Copying Mono lib to Build root	Copying Mono etc to Build root	Copying Mono DLL to Build root	Copying MonoPosixHelper to Build root	Copying Mono lib to project root	Copying Mono etc to project root	Copying Mono DLL to project root	Copying MonoPosixHelper to project root	Copying GameScripts.dll (if exists)	Creating Scripts in top-level Build directory	Copying GameScripts.dll to Build directory</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Assets C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release/Assets
 if %errorlevel% neq 0 goto :cmEnd
@@ -437,10 +581,154 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 :cmErrorLevel
 exit /b %1
 :cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Scripts/bin/Release/net48/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Release/Scripts/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>Release\Engine.lib;_deps\glm-build\glm\Release\glm.lib;Release\imgui.lib;Build\_deps\glfw-src\src\Release\glfw3.lib;_deps\glew-build\lib\Release\glew.lib;opengl32.lib;_deps\freetype-build\Release\freetype.lib;Release\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmod_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudio_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Release\Engine.lib;_deps\glm-build\glm\Release\glm.lib;Release\imgui.lib;Build\_deps\glfw-src\src\Release\glfw3.lib;_deps\glew-build\lib\Release\glew.lib;opengl32.lib;_deps\freetype-build\Release\freetype.lib;Release\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\lib\mono-2.0-sgen.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmod_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudio_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -460,7 +748,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/include" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -487,10 +775,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_CSD3151_AUTOMATION=0;GLEW_STATIC;WIN32_MEAN_AND_LEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;GLEW_NO_GLU;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -498,7 +786,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory</Message>
+      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory	Copying Mono DLL to build directory	Copying MonoPosixHelper.dll	Copying Mono lib directory (includes mscorlib.dll)	Copying Mono etc directory	Creating Scripts folder	Copying Mono lib to Build root	Copying Mono etc to Build root	Copying Mono DLL to Build root	Copying MonoPosixHelper to Build root	Copying Mono lib to project root	Copying Mono etc to project root	Copying Mono DLL to project root	Copying MonoPosixHelper to project root	Copying GameScripts.dll (if exists)	Creating Scripts in top-level Build directory	Copying GameScripts.dll to Build directory</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Assets C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel/Assets
 if %errorlevel% neq 0 goto :cmEnd
@@ -624,10 +912,154 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 :cmErrorLevel
 exit /b %1
 :cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Scripts/bin/Release/net48/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/MinSizeRel/Scripts/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>MinSizeRel\Engine.lib;_deps\glm-build\glm\MinSizeRel\glm.lib;MinSizeRel\imgui.lib;Build\_deps\glfw-src\src\MinSizeRel\glfw3.lib;_deps\glew-build\lib\MinSizeRel\glew.lib;opengl32.lib;_deps\freetype-build\MinSizeRel\freetype.lib;MinSizeRel\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmod_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudio_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>MinSizeRel\Engine.lib;_deps\glm-build\glm\MinSizeRel\glm.lib;MinSizeRel\imgui.lib;Build\_deps\glfw-src\src\MinSizeRel\glfw3.lib;_deps\glew-build\lib\MinSizeRel\glew.lib;opengl32.lib;_deps\freetype-build\MinSizeRel\freetype.lib;MinSizeRel\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\lib\mono-2.0-sgen.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmod_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudio_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
@@ -647,7 +1079,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/include" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/core/inc" /external:I "C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/FMOD/api/studio/inc"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -673,10 +1105,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;USE_CSD3151_AUTOMATION=0;GLEW_STATIC;WIN32_MEAN_AND_LEAN;VC_EXTRALEAN;_CRT_SECURE_NO_WARNINGS;GLEW_NO_GLU;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glfw-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glm-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\glew-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Game;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Audio;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Camera;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Collision;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\GameManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Graphics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\LevelEditor;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Logic;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Physics;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Serialization;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Transform;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Input;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Core;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Factory;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Extern;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\ResourceManager;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\.\Engine\Scripting;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\json-src\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\imgui-src\backends;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\freetype-build\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\_deps\stb-src;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\include;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\inc;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -684,7 +1116,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory</Message>
+      <Message>Copying Assets folder to configuration directory	Copying Mathlib.h folder to configuration directory	Copying Mathlib.cpp folder to configuration directory	Copying Shaders folder to configuration directory	Creating Logs folder in configuration directory	Copying config.txt to Logs folder in configuration directory	Creating Logs folder in top-level Build directory	Copying config.txt to Logs folder in top-level Build directory	Copying Assets folder to top-level Build directory	Copying Shaders folder to top-level Build directory	Copying fmodL.dll to Debug build directory	Copying fmodstudioL.dll to Debug build directory	Copying fmod.dll to Release build directory	Copying fmodstudio.dll to Release build directory	Copying Mono DLL to build directory	Copying MonoPosixHelper.dll	Copying Mono lib directory (includes mscorlib.dll)	Copying Mono etc directory	Creating Scripts folder	Copying Mono lib to Build root	Copying Mono etc to Build root	Copying Mono DLL to Build root	Copying MonoPosixHelper to Build root	Copying Mono lib to project root	Copying Mono etc to project root	Copying Mono DLL to project root	Copying MonoPosixHelper to project root	Copying GameScripts.dll (if exists)	Creating Scripts in top-level Build directory	Copying GameScripts.dll to Build directory</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Assets C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo/Assets
 if %errorlevel% neq 0 goto :cmEnd
@@ -810,10 +1242,154 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 :cmErrorLevel
 exit /b %1
 :cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/lib C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/lib
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/etc C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/mono/etc
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/mono-2.0-sgen.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Extern/Mono/bin/MonoPosixHelper.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Scripts/bin/Release/net48/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/RelWithDebInfo/Scripts/GameScripts.dll C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Build/Scripts/GameScripts.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>RelWithDebInfo\Engine.lib;_deps\glm-build\glm\RelWithDebInfo\glm.lib;RelWithDebInfo\imgui.lib;Build\_deps\glfw-src\src\RelWithDebInfo\glfw3.lib;_deps\glew-build\lib\RelWithDebInfo\glew.lib;opengl32.lib;_deps\freetype-build\RelWithDebInfo\freetype.lib;RelWithDebInfo\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmod_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudio_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RelWithDebInfo\Engine.lib;_deps\glm-build\glm\RelWithDebInfo\glm.lib;RelWithDebInfo\imgui.lib;Build\_deps\glfw-src\src\RelWithDebInfo\glfw3.lib;_deps\glew-build\lib\RelWithDebInfo\glew.lib;opengl32.lib;_deps\freetype-build\RelWithDebInfo\freetype.lib;RelWithDebInfo\stb_image.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\Mono\lib\mono-2.0-sgen.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\core\lib\x64\fmod_vc.lib;C:\Users\Jonathan\Documents\SIT\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Extern\FMOD\api\studio\lib\x64\fmodstudio_vc.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>

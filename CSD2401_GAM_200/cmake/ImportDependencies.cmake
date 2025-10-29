@@ -242,6 +242,53 @@ macro(import_fmod)
     endif()
 endmacro()
 
+# Macro to import Mono
+macro(import_mono)
+    # Guard to prevent multiple inclusion
+    if(NOT TARGET mono)
+        
+        # --- Define Paths to local Extern/Mono folder ---
+        set(MONO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/Mono")
+        set(MONO_LIB_DIR "${MONO_ROOT_DIR}/lib")
+        set(MONO_INCLUDE_DIR_ROOT "${MONO_ROOT_DIR}/include")
+
+        # 1. Find the Import Library (mono-2.0-sgen.lib)
+        find_file(MONO_IMPORT_LIBRARY
+            NAMES mono-2.0-sgen.lib
+            PATHS ${MONO_LIB_DIR}
+            NO_DEFAULT_PATH
+        )
+
+        # 2. Find the Include Directory
+        find_path(MONO_INCLUDE_DIR
+            NAMES mono/jit/jit.h
+            PATHS ${MONO_INCLUDE_DIR_ROOT}
+            NO_DEFAULT_PATH
+        )
+
+        # 3. Check if we found everything
+        if(MONO_IMPORT_LIBRARY AND MONO_INCLUDE_DIR)
+            # Add as a SHARED IMPORTED library (for use with a DLL)
+            add_library(mono SHARED IMPORTED)
+            
+set_target_properties(mono PROPERTIES
+            # Set this import lib for all build types
+            IMPORTED_IMPLIB "${MONO_IMPORT_LIBRARY}"
+            # Set the include directory
+            INTERFACE_INCLUDE_DIRECTORIES "${MONO_INCLUDE_DIR}"
+        )
+            
+            message(STATUS "Mono (Shared) configured successfully from Extern/Mono")
+            message(STATUS "  > Found Library: ${MONO_IMPORT_LIBRARY}")
+            message(STATUS "  > Found Includes: ${MONO_INCLUDE_DIR}")
+        else()
+            message(WARNING "Mono import library or includes not found in Extern/Mono.")
+            message(STATUS "  > Searched for Lib (mono-2.0-sgen.lib) in: ${MONO_LIB_DIR}")
+            message(STATUS "  > Searched for Include (mono/jit/jit.h) in: ${MONO_INCLUDE_DIR_ROOT}")
+        endif()
+    endif()
+endmacro()
+
 # Macro to import all dependencies
 macro(importDependencies)
     message(STATUS "Starting to import dependencies...")
@@ -277,6 +324,10 @@ macro(importDependencies)
     message(STATUS "Importing FMOD...")
     import_fmod()
     message(STATUS "FMOD imported successfully.")
+
+        message(STATUS "Importing Mono...")
+    import_mono()
+    message(STATUS "Mono imported successfully.")
 
     message(STATUS "All dependencies have been imported successfully.")
 endmacro()

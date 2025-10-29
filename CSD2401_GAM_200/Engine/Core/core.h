@@ -32,6 +32,7 @@ Technology is prohibited.
 #include "CollisionSystem.h"
 #include "PhysicsSystem.h"
 #include "DebugSystem.h"
+#include "ScriptingSystem.h"
 #include <map>
 #include "MathLib.h"
 
@@ -44,6 +45,7 @@ class CollisionSystem;
 class PhysicsSystem;
 class DebugSystem;
 class TransformSystem;
+class ScriptSystem;
 class CoreEngine
 {
 public:
@@ -156,6 +158,10 @@ public:
 
         return transformSystem;
     }
+
+    ScriptSystem* GetScriptSystem() const {
+        return scriptSystem;
+    }
     /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
@@ -204,6 +210,7 @@ private:
     DebugSystem* debugSystem = nullptr;
     AudioEngine* audioEngine = nullptr;
     TransformSystem* transformSystem = nullptr;
+    ScriptSystem* scriptSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;

@@ -238,7 +238,7 @@ target_link_libraries(Engine PUBLIC
     imgui
     freetype
     stb_image
-    #mono
+    mono
 )
 
 # Link FMOD to Engine if available
@@ -457,10 +457,193 @@ if(TARGET fmod)
     
     message(STATUS "FMOD DLL copy commands configured successfully")
 endif()
+# ======================= Copy Mono Runtime Files =================
+set(MONO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/Mono")
+set(MONO_DLL_DIR "${MONO_ROOT_DIR}/bin")
+set(MONO_LIB_DIR "${MONO_ROOT_DIR}/lib")
+set(MONO_ETC_DIR "${MONO_ROOT_DIR}/etc")
 
-# ======================= Compiler Warnings for Game =================
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(Game PRIVATE -Wall ${DisableWarnings})
-elseif (MSVC)
+if(EXISTS "${MONO_ROOT_DIR}")
+    message(STATUS "Found Mono at: ${MONO_ROOT_DIR}")
+    
+    # Find and copy Mono DLLs
+    find_file(MONO_DLL
+        NAMES mono-2.0-sgen.dll mono-2.0-sgend.dll
+        PATHS ${MONO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    if(MONO_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying Mono DLL to build directory"
+        )
+        message(STATUS "Will copy Mono DLL: ${MONO_DLL}")
+    endif()
+    
+    find_file(MONO_POSIX_HELPER_DLL
+        NAMES MonoPosixHelper.dll
+        PATHS ${MONO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    if(MONO_POSIX_HELPER_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_POSIX_HELPER_DLL}"
+                "$<TARGET_FILE_DIR:Game>"
+            COMMENT "Copying MonoPosixHelper.dll"
+        )
+        message(STATUS "Will copy MonoPosixHelper.dll: ${MONO_POSIX_HELPER_DLL}")
+    endif()
+    
+    # Copy Mono lib directory (CRITICAL - contains mscorlib.dll)
+    if(EXISTS "${MONO_LIB_DIR}")
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${MONO_LIB_DIR}"
+                "$<TARGET_FILE_DIR:Game>/mono/lib"
+            COMMENT "Copying Mono lib directory (includes mscorlib.dll)"
+        )
+        message(STATUS "Will copy Mono lib: ${MONO_LIB_DIR}")
+    else()
+        message(FATAL_ERROR "Mono lib directory not found at: ${MONO_LIB_DIR}")
+    endif()
+    
+    # Copy Mono etc directory
+    if(EXISTS "${MONO_ETC_DIR}")
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                "${MONO_ETC_DIR}"
+                "$<TARGET_FILE_DIR:Game>/mono/etc"
+            COMMENT "Copying Mono etc directory"
+        )
+        message(STATUS "Will copy Mono etc: ${MONO_ETC_DIR}")
+    else()
+        message(FATAL_ERROR "Mono etc directory not found at: ${MONO_ETC_DIR}")
+    endif()
+    
+    message(STATUS "✓ Mono runtime copy commands configured")
+else()
+    message(FATAL_ERROR "Mono not found at: ${MONO_ROOT_DIR}")
+endif()
+
+# ======================= Create Scripts Directory =================
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Game>/Scripts"
+    COMMENT "Creating Scripts folder"
+)
+# ======================= ALSO Copy Mono to Solution Root =================
+# This ensures Mono is available regardless of working directory
+
+# Copy to top-level Build directory
+if(EXISTS "${MONO_ROOT_DIR}")
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_LIB_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/lib"
+        COMMENT "Copying Mono lib to Build root"
+    )
+    
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_ETC_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/etc"
+        COMMENT "Copying Mono etc to Build root"
+    )
+    
+    # Copy Mono DLL to Build root too
+    if(MONO_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_DLL}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/Build/"
+            COMMENT "Copying Mono DLL to Build root"
+        )
+    endif()
+    
+    if(MONO_POSIX_HELPER_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_POSIX_HELPER_DLL}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/Build/"
+            COMMENT "Copying MonoPosixHelper to Build root"
+        )
+    endif()
+    
+    message(STATUS "Will also copy Mono to Build root directory")
+endif()
+
+# ======================= Copy to Project Root (Solution Directory) =================
+# In case VS runs from project root
+if(EXISTS "${MONO_ROOT_DIR}")
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_LIB_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/mono/lib"
+        COMMENT "Copying Mono lib to project root"
+    )
+    
+    add_custom_command(TARGET Game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MONO_ETC_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/mono/etc"
+        COMMENT "Copying Mono etc to project root"
+    )
+    
+    if(MONO_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_DLL}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/"
+            COMMENT "Copying Mono DLL to project root"
+        )
+    endif()
+    
+    if(MONO_POSIX_HELPER_DLL)
+        add_custom_command(TARGET Game POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${MONO_POSIX_HELPER_DLL}"
+                "${CMAKE_CURRENT_SOURCE_DIR}/"
+            COMMENT "Copying MonoPosixHelper to project root"
+        )
+    endif()
+    
+    message(STATUS "Will also copy Mono to project root directory")
+endif()
+
+# ======================= Copy C# Scripts (Manual Build) =================
+# NOTE: Build Scripts/GameScripts.csproj manually in Visual Studio
+message(STATUS "C# scripts must be built manually - open Scripts/GameScripts.csproj in VS")
+
+# Copy pre-compiled GameScripts.dll if it exists
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/bin/Release/net48/GameScripts.dll"
+        "$<TARGET_FILE_DIR:Game>/Scripts/GameScripts.dll"
+    COMMENT "Copying GameScripts.dll (if exists)"
+)
+
+# ======================= Copy to Top-Level Build Directory =================
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Scripts"
+    COMMENT "Creating Scripts in top-level Build directory"
+)
+
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE_DIR:Game>/Scripts/GameScripts.dll"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Scripts/GameScripts.dll"
+    COMMENT "Copying GameScripts.dll to Build directory"
+)
+
+# ======================= Compiler Warnings =================
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(Game PRIVATE -Wall)
+elseif(MSVC)
     target_compile_options(Game PRIVATE /W4 /WX-)
 endif()

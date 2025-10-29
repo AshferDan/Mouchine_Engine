@@ -98,6 +98,8 @@ void CoreEngine::InitSystems()
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
+    scriptSystem = AddSystem<ScriptSystem>();
+
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
 /* brief
