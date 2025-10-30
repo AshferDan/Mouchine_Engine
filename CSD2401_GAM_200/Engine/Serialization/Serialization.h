@@ -14,7 +14,15 @@ Technology is prohibited.
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
+
+#include "serialization.h"
+#include "gameObject.h"
 #include "RenderComponent.h"
+#include "transform.h"
+#include "physics.h"
+#include "collidercomponent.h"
+#include "collision.h"
+#include "factory.h"
 
 class GameObject;
 using json = nlohmann::json;
@@ -31,16 +39,6 @@ GameObject* CreateObj(
     const vec2& scale,
     const vec4& color,
     float rotation = 0.f);
-
-/**
- * @brief Save all active GameObjects in the scene into a single JSON file.
- */
-void SaveScene(const std::string& filePath = "../Logs/Scene.json");
-
-/**
- * @brief Load all GameObjects from a JSON file into the current game scene.
- */
-void LoadScene(const std::string& filePath = "../Logs/Scene.json");
 
 /**
  * @brief Save one GameObject as a prefab JSON file.

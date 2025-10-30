@@ -344,23 +344,6 @@ void ImGuiSystem::Update(float dt)
 				}
 
 				prefabFiles = GetAllPrefabJSONFiles(); // auto-refresh
-				//ImGui::Text("  ");
-				//if (ImGui::Button("Generate")) // Button to create new GO
-				//{
-				//	auto& factory = GameObjectFactory::Instance(); // Factory
-
-				//	// very ugly colour code bc that uses a different vec 4 AAAA
-				//	GameObject* TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
-				//		vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
-
-				//	// Add transform component to assign transform values
-				//	TempGO->AddComponent<TransformComponent>(0, 0);
-				//	auto* transform = TempGO->GetComponent<TransformComponent>();
-
-				//	transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
-				//	transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
-				//	transform->SetRotation(tempGO.rot);
-				//}
 			}
 			ImGui::End(); // End of GO Creation
 		}

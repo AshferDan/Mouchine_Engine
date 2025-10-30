@@ -1,11 +1,4 @@
 #include "serialization.h"
-#include "gameObject.h"
-#include "RenderComponent.h"
-#include "transform.h"
-#include "physics.h"
-#include "collidercomponent.h"
-#include "collision.h"
-#include "factory.h"
 
 #include <fstream>
 #include <sstream>
@@ -13,6 +6,8 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
+std::string currentPrefabPath = "";
+std::string previousPrefabPath = "";
 
 // Utility helpers
 namespace {
@@ -76,6 +71,153 @@ std::vector<std::string> GetAllPrefabJSONFiles() {
 	return files;
 }
 
+// ------------------------------------------------------------
+// Serialization Helpers
+// ------------------------------------------------------------
+
+static void SerializeTransform(json& j, const TransformComponent* t) {
+	j["TransformComponent"] = {
+		{"pos",   {t->posX, t->posY}},
+		{"scale", {t->scaleX, t->scaleY}},
+		{"rotation", t->GetRotation()}
+	};
+}
+
+static void SerializeRender(json& j, RenderComponent* r) {
+	j["RenderComponent"]["shapeType"] = r->GetShapeTypeName();
+
+	std::string texPath;
+	auto it = s_TexturePathByID.find(r->GetTextureID());
+	texPath = (it != s_TexturePathByID.end()) ? it->second : "";
+
+	j["RenderComponent"]["texturePath"] = texPath;
+
+	vec4 c = r->GetColor();
+	j["RenderComponent"]["color"] = { c.x, c.y, c.z, c.w };
+}
+
+static void SerializeSpritesheet(json& j, Spritesheet* s) {
+	j["Spritesheet"] = {
+		{"rows", s->GetRows()},
+		{"cols", s->GetCols()},
+		{"startFrame", s->GetCurrentStartFrame()},
+		{"endFrame", s->GetCols() * s->GetRows() - 1},
+		{"fps", s->GetTimePerFrame()}
+	};
+}
+
+static void SerializePhysics(json& j, PhysicsComponent* p) {
+	j["PhysicsComponent"] = {
+		{"mass", p->GetMass()},
+		{"isStatic", p->IsStatic()},
+		{"useGravity", p->useGravity},
+		{"isGrounded", p->IsGrounded()},
+		{"velocity", {p->velocityX, p->velocityY}}
+	};
+}
+
+static void SerializeCollider(json& j, ColliderComponent* c) {
+	j["ColliderComponent"] = {
+		{"shape", ColliderTypeToString(c->GetType())},
+		{"layer", CollisionLayerToString(c->GetLayer())}
+	};
+}
+
+// ------------------------------------------------------------
+// Deserialization Helpers
+// ------------------------------------------------------------
+
+static void DeserializeTransform(const json& j, GameObject* go) {
+	if (!j.contains("TransformComponent")) return;
+	const auto& t = j["TransformComponent"];
+	auto* tc = go->AddComponent<TransformComponent>();
+	tc->SetPosition(t["pos"][0], t["pos"][1]);
+	tc->SetScale(t["scale"][0], t["scale"][1]);
+	tc->SetRotation(t["rotation"]);
+}
+
+static void DeserializeRender(const json& j, GameObject* go) {
+	if (!j.contains("RenderComponent")) return;
+	const auto& r = j["RenderComponent"];
+
+	std::string shapeType = r.value("shapeType", "Square");
+	std::string texPath = r.value("texturePath", "");
+
+	RenderComponent::ShapeType shape;
+	ShapeEnumToString(shapeType, shape);
+
+	auto* render = go->AddComponent<RenderComponent>();
+	render->SetShapeType(shape);
+
+	if (!texPath.empty()) {
+		GLuint texID = GraphicsSystem::LoadTexture(texPath.c_str());
+		render->SetTextureID(texID);
+		render->SetColor({ 1,1,1,1 });
+
+		glBindTexture(GL_TEXTURE_2D, texID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	else if (r.contains("color")) {
+		vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
+		render->SetColor(c);
+	}
+	else {
+		render->SetColor({ 1,1,1,1 });
+	}
+}
+
+static void DeserializeSpritesheet(const json& j, GameObject* go) {
+	if (!j.contains("Spritesheet")) return;
+	const auto& s = j["Spritesheet"];
+	std::string texPath = j["RenderComponent"].value("texturePath", "");
+
+	auto* spr = go->AddComponent<Spritesheet>(
+		texPath.c_str(),
+		s.value("rows", 1),
+		s.value("cols", 1)
+	);
+	spr->LoadNewSpritesheet(texPath.c_str(),
+		s.value("rows", 1),
+		s.value("cols", 1));
+	spr->SetAnimation(
+		s.value("startFrame", 0),
+		s.value("endFrame", 0),
+		s.value("fps", 1.0f));
+}
+
+static void DeserializePhysics(const json& j, GameObject* go) {
+	if (!j.contains("PhysicsComponent")) return;
+	const auto& p = j["PhysicsComponent"];
+
+	auto* pc = go->AddComponent<PhysicsComponent>();
+	pc->SetStatic(p.value("isStatic", false));
+	pc->SetGravity(p.value("useGravity", true));
+	pc->SetMass(p.value("mass", 1.0f));
+
+	if (p.contains("velocity"))
+		pc->SetVelocity(p["velocity"][0].get<float>(), p["velocity"][1].get<float>());
+
+	pc->SetGrounded(p.value("isGrounded", false));
+}
+
+static void DeserializeCollider(const json& j, GameObject* go) {
+	if (!j.contains("ColliderComponent")) return;
+	const auto& c = j["ColliderComponent"];
+
+	ColliderComponent::Type type = StringToColliderType(c.value("shape", "Square"));
+	CollisionLayer layer = StringToCollisionLayer(c.value("layer", "Default"));
+	float width = j["TransformComponent"]["scale"][0].get<float>();
+	float height = j["TransformComponent"]["scale"][1].get<float>();
+
+	go->AddComponent<ColliderComponent>(type, width, height, layer);
+}
+
+// ------------------------------------------------------------
+// GameObject Serialization / Deserialization
+// ------------------------------------------------------------
+
 json SerializeGameObject(GameObject* GO)
 {
 	json j;
@@ -84,58 +226,11 @@ json SerializeGameObject(GameObject* GO)
 	j["name"] = GO->GetName();
 	j["active"] = GO->IsActive();
 
-	// ---- Transform ----
-	if (const auto* t = GO->GetComponent<TransformComponent>()) {
-		j["TransformComponent"] = {
-			{"pos", {t->posX, t->posY}},
-			{"scale", {t->scaleX, t->scaleY}},
-			{"rotation", t->GetRotation()}
-		};
-	}
-
-	// ---- Render ----
-	if (auto* r = GO->GetComponent<RenderComponent>()) {
-		j["RenderComponent"]["shapeType"] = r->GetShapeTypeName();
-
-		std::string texPath;
-		auto it = s_TexturePathByID.find(r->GetTextureID());
-		texPath = (it != s_TexturePathByID.end()) ? it->second : "";
-
-		j["RenderComponent"]["texturePath"] = texPath;
-
-		vec4 c = r->GetColor();
-		j["RenderComponent"]["color"] = { c.x, c.y, c.z, c.w };
-	}
-
-	// --- Spritesheet ---
-	if (auto* s = GO->GetComponent<Spritesheet>()) {
-		j["Spritesheet"] = {
-			{"rows", s->GetRows()},
-			{"cols", s->GetCols()},
-			{"startFrame", s->GetCurrentStartFrame()},
-			{"endFrame", s->GetCols() * s->GetRows() - 1},
-			{"fps", s->GetTimePerFrame()}
-		};
-	}
-
-	// --- Physics ---
-	if (auto* p = GO->GetComponent<PhysicsComponent>()) {
-		j["PhysicsComponent"] = {
-			{"mass", p->GetMass()},
-			{"isStatic", p->IsStatic()},
-			{"useGravity", p->useGravity},
-			{"isGrounded", p->IsGrounded()},
-			{"velocity", {p->velocityX, p->velocityY}},
-		};
-	}
-
-	// --- Collider ---
-	if (auto* c = GO->GetComponent<ColliderComponent>()) {
-		j["ColliderComponent"] = {
-			{"shape", ColliderTypeToString(c->GetType())},
-			{"layer", CollisionLayerToString(c->GetLayer())}
-		};		
-	}
+	if (const auto* t = GO->GetComponent<TransformComponent>()) SerializeTransform(j, t);
+	if (auto* r = GO->GetComponent<RenderComponent>())    SerializeRender(j, r);
+	if (auto* s = GO->GetComponent<Spritesheet>())        SerializeSpritesheet(j, s);
+	if (auto* p = GO->GetComponent<PhysicsComponent>())   SerializePhysics(j, p);
+	if (auto* c = GO->GetComponent<ColliderComponent>())  SerializeCollider(j, c);
 
 	return j;
 }
@@ -144,116 +239,19 @@ void DeserializeGameObject(const json& j)
 {
 	GameObjectFactory& factory = GameObjectFactory::Instance();
 	std::string name = j.value("name", "Unnamed");
-
 	GameObject* GO = factory.CreateGameObject(name);
 	GO->SetActive(j.value("active", true));
 
-	// ---- Transform ----
-	if (j.contains("TransformComponent"))
-	{
-		const auto& t = j["TransformComponent"];
-		auto* tc = GO->AddComponent<TransformComponent>();
-		tc->SetPosition(t["pos"][0], t["pos"][1]);
-		tc->SetScale(t["scale"][0], t["scale"][1]);
-		tc->SetRotation(t["rotation"]);
-	}
-
-	// ---- Render / Texture ----
-	if (j.contains("RenderComponent")) {
-		const auto& r = j["RenderComponent"];
-		std::string shapeType = r.value("shapeType", "Square");
-		std::string texPath = r.value("texturePath", "");
-		RenderComponent::ShapeType shape;
-		ShapeEnumToString(shapeType, shape);
-
-		auto* render = GO->AddComponent<RenderComponent>();
-		render->SetShapeType(shape);
-
-		// === Textured object ===
-		if (!texPath.empty()) {
-			GLuint texID = GraphicsSystem::LoadTexture(texPath.c_str());
-			render->SetTextureID(texID);
-			render->SetColor({ 1, 1, 1, 1 });  // remove tint
-
-			// --- Clamp texture edges (avoid half-color issue) ---
-			glBindTexture(GL_TEXTURE_2D, texID);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		else {
-			// === Color-only object ===
-			if (r.contains("color")) {
-				vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
-				render->SetColor(c);
-			}
-			else {
-				render->SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
-			}
-		}
-	}
-
-
-	// --- Spritesheet ---
-	if (j.contains("Spritesheet")) {
-		const auto& s = j["Spritesheet"];
-		std::string texPath = j["RenderComponent"].value("texturePath", "");
-
-		auto* spr = GO->AddComponent<Spritesheet>(
-			texPath.c_str(),
-			s.value("rows", 1),
-			s.value("cols", 1)
-		);
-		spr->LoadNewSpritesheet(texPath.c_str(),
-			s.value("rows", 1),
-			s.value("cols", 1));
-		spr->SetAnimation(
-			s.value("startFrame", 0),
-			s.value("endFrame", 0),
-			s.value("fps", 1.0f));
-	}
-
-	// --- Physics ---
-	if (j.contains("PhysicsComponent")) {
-		const auto& p = j["PhysicsComponent"];
-		auto* pc = GO->AddComponent<PhysicsComponent>();
-		pc->SetStatic(p.value("isStatic", false));
-		pc->SetGravity(p.value("useGravity", true));
-		pc->SetMass(p.value("mass", 1.0f));
-
-		if (p.contains("velocity")) {
-			pc->SetVelocity(p["velocity"][0].get<float>(), p["velocity"][1].get<float>());
-
-			pc->SetGrounded(p.value("isGrounded", false));
-		}
-	}
-
-	// --- Collider ---
-	if (j.contains("ColliderComponent")) {
-		const auto& c = j["ColliderComponent"];
-		ColliderComponent::Type type = StringToColliderType(c.value("shape", "Square"));
-		CollisionLayer layer = StringToCollisionLayer(c.value("layer", "Default"));
-		float width = j["TransformComponent"]["scale"][0].get<float>();
-		float height = j["TransformComponent"]["scale"][1].get<float>();
-		GO->AddComponent<ColliderComponent>(type, width, height, layer);
-	}
-
-	std::cout << "[Deserialize] " << name
-		<< " pos(" << j["TransformComponent"]["pos"][0]
-		<< "," << j["TransformComponent"]["pos"][1]
-		<< ") scale("
-		<< j["TransformComponent"]["scale"][0]
-		<< "," << j["TransformComponent"]["scale"][1]
-		<< ")\n";
-	if (auto* r = GO->GetComponent<RenderComponent>()) {
-		std::cout << "[Render] " << name
-			<< " TextureID: " << r->GetTextureID()
-			<< " Path: " << r->GetShapeTypeName()
-			<< "\n";
-	}
-	
+	DeserializeTransform(j, GO);
+	DeserializeRender(j, GO);
+	DeserializeSpritesheet(j, GO);
+	DeserializePhysics(j, GO);
+	DeserializeCollider(j, GO);
 }
 
+// ------------------------------------------------------------
+// Create GameObject Serialization / Deserialization
+// ------------------------------------------------------------
 GameObject* CreateObj(
 	const std::string& name,
 	RenderComponent::ShapeType shapeType,
@@ -311,6 +309,9 @@ GameObject* CreateObj(
 	return go;
 }
 
+// ------------------------------------------------------------
+// Prefab Save / Load
+// ------------------------------------------------------------
 void SavePrefab(GameObject& go, const std::string& existingPath)
 {
 	std::string path = existingPath.empty()
@@ -340,6 +341,12 @@ void SavePrefab(GameObject& go, const std::string& existingPath)
 
 void LoadPrefab(const std::string& path)
 {
+	if (path == currentPrefabPath) {
+		GameObjectFactory::Instance().Clear();
+	}
+	else if (!currentPrefabPath.empty()) {
+		GameObjectFactory::Instance().Clear();
+	}
 	std::ifstream in(path);
 	if (!in.is_open()) {
 		std::cerr << "[LoadPrefab] Cannot open " << path << "\n";
@@ -361,60 +368,7 @@ void LoadPrefab(const std::string& path)
 		DeserializeGameObject(j);
 	}
 
+	previousPrefabPath = currentPrefabPath;
+	currentPrefabPath = path;
 	std::cout << "[LoadPrefab] Loaded prefab: " << path << "\n";
-}
-
-// ========================= SCENE I/O =========================
-void SaveScene(const std::string& filePath)
-{
-	json scene;
-	scene["GameObjects"] = json::array();
-
-	GameObjectFactory& factory = GameObjectFactory::Instance();
-	for (const std::unique_ptr<GameObject>& goPtr : factory.GetAllGameObjects())
-	{
-		GameObject* go = goPtr.get();
-		if (go && go->IsActive())
-			scene["GameObjects"].push_back(SerializeGameObject(go));
-	}
-
-
-	std::ofstream file(filePath);
-	if (!file)
-	{
-		std::cerr << "[Serialization] Cannot save scene: " << filePath << '\n';
-		return;
-	}
-
-	file << scene.dump(4);
-	std::cout << "[Serialization] Scene saved: " << filePath << '\n';
-}
-
-void LoadScene(const std::string& filePath)
-{
-	std::ifstream file(filePath);
-	if (!file)
-	{
-		std::cerr << "[Serialization] Cannot open scene JSON: " << filePath << '\n';
-		return;
-	}
-
-	json scene;
-	try { file >> scene; }
-	catch (const std::exception& e)
-	{
-		std::cerr << "[Serialization] Parse error: " << e.what() << '\n';
-		return;
-	}
-
-	if (!scene.contains("GameObjects"))
-	{
-		std::cerr << "[Serialization] Invalid scene JSON\n";
-		return;
-	}
-
-	for (const auto& obj : scene["GameObjects"])
-		DeserializeGameObject(obj);
-
-	std::cout << "[Serialization] Scene loaded: " << filePath << '\n';
 }
