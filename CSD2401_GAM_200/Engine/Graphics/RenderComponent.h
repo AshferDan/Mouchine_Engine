@@ -225,5 +225,54 @@ namespace RenderComponentTools
             break;
         }
     }
+
+    inline void ShapeEnumToString(std::string& shapeName, RenderComponent::ShapeType& shapeEnum)
+    {
+        if (!shapeName.empty()) // If theres a name in shapeName, find a match and assign the enum int the corresponding shape value
+        {
+            if (shapeName == "Square")
+            {
+                shapeEnum = RenderComponent::ShapeType::Square;
+            }
+            else if (shapeName == "Circle")
+            {
+                shapeEnum = RenderComponent::ShapeType::Circle;
+            }
+            else if (shapeName == "Line")
+            {
+                shapeEnum = RenderComponent::ShapeType::Line;
+            }
+            else if (shapeName == "Point")
+            {
+                shapeEnum = RenderComponent::ShapeType::Point;
+            }
+            else
+                std::cout << "No matching shape name!\n";
+            return;
+        }
+        else // If string is empty, look to the enum int to assign the string the corresponding shape's name
+        {
+            switch (shapeEnum)
+            {
+            case RenderComponent::ShapeType::Square:
+                shapeName = "Square";
+                break;
+            case RenderComponent::ShapeType::Circle:
+                shapeName = "Circle";
+                break;
+            case RenderComponent::ShapeType::Line:
+                shapeName = "Line";
+                break;
+            case RenderComponent::ShapeType::Point:
+                shapeName = "Point";
+                break;
+
+            default:
+                std::cout << "No matching shape enum!\n";
+                break;
+            }
+        }
+    }
+
 }
 

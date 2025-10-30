@@ -150,6 +150,7 @@ void InputManager::Update(float dt)
             CurrentSceneIndex = (CurrentSceneIndex + 1) % sceneList.size();
             NextScenePath = sceneList[CurrentSceneIndex];
             RequestChangeScene = true;
+            std::cout << "BUTTON PRESSED" << std::endl;
         }
     }
     else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
