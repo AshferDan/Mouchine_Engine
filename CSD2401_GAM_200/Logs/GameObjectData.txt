@@ -1,1 +1,1 @@
-GO Name: Circle | Shape: Circle | Position (x,y): (59.25,-186.199) | Size (w,h): (246.7,253.4) | Colour: (1,0,0,1)
+GO Name: swu | Shape: Square | Position (x,y): (0,-40) | Size (w,h): (200,50) | Colour: (1,0.421569,0.421569,1)

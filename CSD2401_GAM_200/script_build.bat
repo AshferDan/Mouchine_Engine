@@ -51,16 +51,14 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Build the project
-echo [4/4] Building project...
-cmake --build . --config Debug
+echo [4/4] Building project with parallel compilation...
+cmake --build . --config Debug --parallel
 if %errorlevel% neq 0 (
     echo ERROR: Build failed
     cd ..
     pause
     exit /b 1
 )
-
 echo.
 echo ===============================================
 echo   Build completed successfully!
