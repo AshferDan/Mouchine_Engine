@@ -22,10 +22,19 @@ public:
 	void SetPosition(const vec2& pos);
 	vec2 GetPosition() const { return position; }
 
+	void Move(float dx, float dy);
+
+	void SetZoom(float z);
+	float getZoom() const {return zoom;}
+
 	void SetFollowTarget(GameObject* target);
 	void SetFollowOffset(const vec2& offset);
+	GameObject* GetFollowTarget() const { return followTarget; }
 
-	void SetSmoothing(CameraMode m);
+	void SetMode(CameraMode m);
+	CameraMode GetMode() const { return mode; }
+
+	void SetSmoothing(bool enable, float speed);
 	bool IsSmoothingEnabled() const { return enableSmoothing; }
 
 	void SetBounds(float minX, float minY, float maxX, float maxY);

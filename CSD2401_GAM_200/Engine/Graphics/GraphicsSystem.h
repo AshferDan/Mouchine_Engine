@@ -28,6 +28,7 @@ Technology is prohibited.
 #include <iostream>
 #include <RenderComponent.h>
 #include <TextComponent.h>
+#include "CameraManager.h"
 #include <fstream>
 #include "MathLib.h"
 #include <algorithm>

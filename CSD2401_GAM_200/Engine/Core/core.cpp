@@ -95,6 +95,9 @@ void CoreEngine::InitSystems()
     // 6. Physics System - processes collisions and applies physics
     physicsSystem = AddSystem<PhysicsSystem>();
 
+    //7. Camera System - Controls the cameras
+    cameraSystem = AddSystem<CameraSystem>();
+
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 

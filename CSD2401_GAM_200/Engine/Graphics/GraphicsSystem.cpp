@@ -291,6 +291,9 @@ void GraphicsSystem::Update(float)
     mat4 view = mat4::translate(-camPos);
     vp = projection * view; // Final View-Projection matrix
 
+    //vp = CameraManager::Instance().GetViewProjectMatrix((float)Wwidth, (float)Wheight);
+
+
     //auto start = std::chrono::high_resolution_clock::now();
 
     //Accumulate all geometry into batches

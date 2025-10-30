@@ -114,6 +114,18 @@ int main()
     // Later, update the text:
     text->SetText("Score: 100");
 
+    GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+    auto* cam = mainCamera->AddComponent<CameraComponent>();
+
+    GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (player) {
+        cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+        cam->SetFollowTarget(player);
+        cam->SetFollowOffset(vec2(0.f, 0.f));
+        cam->SetSmoothing(true, 0.5f);
+    }
+    CameraManager::Instance().SetActiveCamera(mainCamera);
+
     //auto* bg = GameObjectFactory::Instance().FindGameObject("bgImage");
     //if (bg && bg->GetComponent<RenderComponent>()) {
     //    bg->GetComponent<RenderComponent>()->SetLayer(-10);
