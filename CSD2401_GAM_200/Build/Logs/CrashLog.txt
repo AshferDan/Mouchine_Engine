@@ -1,2 +1,0 @@
-[EXCEPTION] rename: The system cannot find the file specified.: "../Assets/Prefabs/Circle2(1).txt", "../Assets/Prefabs/Circle.txt"
-[EXCEPTION] rename: The system cannot find the file specified.: "../Assets/Prefabs/Circle2(1).txt", "../Assets/Prefabs/Circle.txt"
