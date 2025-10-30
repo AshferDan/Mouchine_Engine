@@ -14,7 +14,7 @@ namespace GameScripts
                 "RedSquare",                     // name
                 (int)ShapeType.Square,           // type: square
                 100, 300,                        // x, y position
-                100, 100,                        // width, height
+                200, 200,                        // width, height
                 1.0f, 0.0f, 0.0f, 1.0f,          // r, g, b, a (red color)
                 (int)CollisionLayer.Default,     // collision layer
                 false,                           // hasPhysics = false (no physics)
@@ -27,7 +27,7 @@ namespace GameScripts
                 "BlueSquare",                    // name
                 (int)ShapeType.Square,           // type: square
                 400, 300,                        // x, y position
-                100, 100,                        // width, height
+                300, 300,                        // width, height
                 0.0f, 0.0f, 1.0f, 1.0f,          // r, g, b, a (blue color)
                 (int)CollisionLayer.Default,     // collision layer
                 false,                           // hasPhysics = false (no physics)
