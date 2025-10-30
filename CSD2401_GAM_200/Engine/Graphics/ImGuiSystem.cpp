@@ -20,6 +20,7 @@ Technology is prohibited.
 #include <chrono>
 #include <map>
 #include <string>
+#include <filesystem>
 #include "core.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
@@ -48,11 +49,18 @@ struct TempGOData
 };
 
 // 2 Temp GO Structs - for Game Object Creator & Prefab Loader
-TempGOData tempGO;
+TempGOData tempGO{"Game Object"};
 TempGOData tempPrefab;
+
+std::vector<std::string> prefabList;
+char rename_str[128]{ "" };
 
 // Flags for IMGUI (current selection in drop down for GO Creator, and showing of some screens)
 static int current_shape = 0;
+static int current_prefab = 0;
+static int prefab_renameIndex = -1;
+static bool prefab_renameFocus = false;
+std::string prefab_oldname{};
 bool ShowCreateGOMenu;
 bool ShowLoadPrefabMenu;
 
@@ -84,6 +92,7 @@ void ImGuiSystem::Initialize()
 	ImGui_ImplOpenGL3_Init("#version 450");		  // Initialize OpenGL backend
 	ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;	// Enable docking
 
+	ReloadPrefabsList();
 
 	ShowCreateGOMenu = false; // Hide create menu initially
 }
@@ -94,6 +103,9 @@ void ImGuiSystem::Initialize()
  */
 void ImGuiSystem::Update(float dt)
 {
+	ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
+	ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
+	ImGui::NewFrame();			  // Start ImGui frame
 	if (InputManager::KeyStateImgui) {
 		//ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
 		//ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
@@ -207,7 +219,8 @@ void ImGuiSystem::Update(float dt)
 					// Create Prefab with GO Data
 					if (ImGui::Button("Create Prefab"))
 					{
-						CreatePrefab(*obj);
+						PrefabTools::CreatePrefab(*obj);
+						ReloadPrefabsList();
 					}
 				}
 
@@ -308,16 +321,103 @@ void ImGuiSystem::Update(float dt)
 		 */
 		if (ShowLoadPrefabMenu) // If flag to show Prefab Search Menu is true
 		{
-			ImGui::Begin("Prefab Loader", &ShowLoadPrefabMenu); // Begin window
+			ImGui::Begin("Prefab Loader", &ShowLoadPrefabMenu);
 
-			ImGui::Text("Prefab Search");
-			if (ImGui::InputText("#", tempPrefab.name, sizeof(tempGO.name)))
+			ImGui::Text("Prefab Menu");
+			ImGui::BeginGroup();
+			if (ImGui::BeginListBox("##", ImVec2(200, 150)))					// Draw selectable box for which prefabs are found
 			{
-			} // Text box to search for prefab txt file (Will change to a list to select from)
+				if (prefabList.empty())
+				{
+					ImGui::Text("No saved Prefabs found.");
+				}
+				else
+				{
+					// Draw list of prefabs
+					for (int i = 0; i < prefabList.size(); ++i)					// Loop for every prefab in list
+					{
+						if (prefab_renameIndex != i)
+						{
+							bool is_selected = (current_prefab == i);
+							if (ImGui::Selectable(prefabList[i].c_str(), &is_selected))
+							{
+								current_prefab = i;									// Selected item in list
+							}
+							else if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+							{
+								current_prefab = i; // optional: select on right-click too
+								ImGui::OpenPopup("Prefab_RightClickEvent");
+							}
+							if (i != prefabList.size() - 1) { ImGui::Separator(); }
+						}
+						else
+						{
+							ImGui::PushID(i);
+							if (prefab_renameFocus)
+							{
+								ImGui::SetKeyboardFocusHere();
+								prefab_renameFocus = false;
+							}
+							if (ImGui::InputText("##", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+							{
+								prefabList[i] = std::string(rename_str);
+								//ImGui::SetKeyboardFocusHere(-1);
+							}
+							//if (ImGui::IsKeyPressed(ImGuiKey_Escape))					//supposed to be escape but it closes the whole game LMAO
+							if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+							{
+								prefab_renameIndex = -1;
+								PrefabTools::RenamePrefab(prefab_oldname, rename_str);
+							}
 
-			if (ImGui::Button("Search"))
+							ImGui::PopID();
+						}
+						
+					}
+					/*char test[128]{ "" };
+					if (ImGui::InputText("Entity Name", test, ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+					{
+						
+					}*/
+				}
+
+				if (ImGui::BeginPopup("Prefab_RightClickEvent"))					// If an item in the prefab lists gets right clicked
+				{
+					if (ImGui::MenuItem("Rename")) 
+					{
+						prefab_renameIndex = current_prefab;
+						strncpy(rename_str, prefabList[current_prefab].c_str(), sizeof(rename_str));
+						prefab_renameFocus = true;
+						prefab_oldname = prefabList[current_prefab];
+					}
+					ImGui::Separator();
+					if (ImGui::MenuItem("Delete")) 
+					{
+						// TODO: DELETE
+						PrefabTools::RemovePrefab(prefabList[current_prefab]);
+						ReloadPrefabsList();
+					}
+					ImGui::EndPopup();
+				}
+
+				ImGui::EndListBox();
+			}
+			ImGui::EndGroup();
+
+			ImGui::SameLine();													// This so its on the right side of the selection box
+			// draw preview
+			ImGui::BeginGroup();
+			ImVec2 boxSize = ImVec2(256, 256);
+			ImGui::Text("Preview Render:");
+			ImGui::Dummy(boxSize);												// Reserves space for preview
+
+			ImDrawList* drawList = ImGui::GetWindowDrawList();					// Imgui rendering for box with white outline
+			drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
+			ImGui::EndGroup();
+
+			if (ImGui::Button("Spawn"))
 			{
-				std::string filePath{ "../Logs/" + static_cast<std::string>(tempPrefab.name) + ".txt" }; // Checking for specific file path & file type
+				std::string filePath{ "../Assets/Prefabs/" + prefabList[current_prefab] + ".txt" }; // Checking for specific file path & file type
 				Serialize_Reader reader(filePath);
 				if (!reader.IsStreamGood())
 				{ // Check if is existing file
@@ -325,15 +425,14 @@ void ImGuiSystem::Update(float dt)
 				}
 				else // If matching file name found
 				{
-					std::string PrefabData = ReadPrefabData(filePath.c_str()); // Get prefab data and store into stringstream to plug into temp prefab struct
+					std::string PrefabData = PrefabTools::ReadPrefabData(filePath.c_str()); // Get prefab data and store into stringstream to plug into temp prefab struct
 					std::stringstream ss(PrefabData);
 					std::cout << ss.str();
 
 					ss >> tempPrefab.name >> tempPrefab.shape >> tempPrefab.pos[0] >> tempPrefab.pos[1] >> tempPrefab.scale[0] >> tempPrefab.scale[1] >>
 						tempPrefab.color.x >> tempPrefab.color.y >> tempPrefab.color.z >> tempPrefab.color.w;
 
-					RenderComponent::ShapeType shapeEnum{};
-					ShapeEnumToString(tempPrefab.shape, shapeEnum); // Function that takes in a string and a enum type, to convert shape str to its corresponding enum value (vice versa)
+					RenderComponent::ShapeType shapeEnum = RenderComponentTools::ShapeEnumToString(tempPrefab.shape);
 
 					auto& factory = GameObjectFactory::Instance(); // Factory
 
@@ -403,6 +502,11 @@ void ImGuiSystem::Update(float dt)
 		//glfwSwapBuffers(m_window);								// Swap GLFW window buffers
 		//glfwPollEvents();// Poll input events
 	}
+	// Render ImGui frame
+	ImGui::Render();										// Finish ImGui frame
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Render draw data via OpenGL3 backend
+	glfwSwapBuffers(m_window);								// Swap GLFW window buffers
+	glfwPollEvents();// Poll input events
 }
 
 /**
@@ -421,4 +525,9 @@ void ImGuiSystem::Shutdown()
 std::string ImGuiSystem::GetName()
 {
 	return "ImGui_System"; // Return descriptive system name
+}
+
+void ReloadPrefabsList()
+{
+	prefabList = PrefabTools::LoadPrefabList();
 }
