@@ -22,7 +22,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{96741452-9A3D-337C-ABB1-52384D10EE82}</ProjectGuid>
+    <ProjectGuid>{017B47DD-E0F3-39FE-A559-15C082A687B8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -125,7 +125,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\7d1f0117965c307ffef559c0c648e9a5\INSTALL_force.rule">
+    <CustomBuild Include="C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\0049d658c09ef3233416cbe76e0d2395\INSTALL_force.rule">
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BuildInParallel>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'"> </Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
@@ -138,7 +138,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</BuildInParallel>
@@ -153,7 +153,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</BuildInParallel>
@@ -168,7 +168,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
       <BuildInParallel Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</BuildInParallel>
@@ -183,21 +183,21 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\CMakeFiles\INSTALL_force</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</VerifyInputsAndOutputsExist>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\ZERO_CHECK.vcxproj">
-      <Project>{4C25B1E5-ADDF-3DB4-888A-15B73EDD4224}</Project>
+    <ProjectReference Include="C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\ZERO_CHECK.vcxproj">
+      <Project>{31F5D2AA-9F0E-32FB-B449-303C0047D2C1}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="C:\Users\elxyn\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\ALL_BUILD.vcxproj">
-      <Project>{3795ECBD-FD8D-32FC-BBCD-E77D71862131}</Project>
+    <ProjectReference Include="C:\Users\danis\OneDrive\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Build\ALL_BUILD.vcxproj">
+      <Project>{38DB9A4A-7CC5-3127-94E2-C42E16EE287E}</Project>
       <Name>ALL_BUILD</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
