@@ -103,9 +103,6 @@ void ImGuiSystem::Initialize()
  */
 void ImGuiSystem::Update(float dt)
 {
-	ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
-	ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
-	ImGui::NewFrame();			  // Start ImGui frame
 	if (InputManager::KeyStateImgui) {
 		//ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
 		//ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
@@ -502,11 +499,6 @@ void ImGuiSystem::Update(float dt)
 		//glfwSwapBuffers(m_window);								// Swap GLFW window buffers
 		//glfwPollEvents();// Poll input events
 	}
-	// Render ImGui frame
-	ImGui::Render();										// Finish ImGui frame
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Render draw data via OpenGL3 backend
-	glfwSwapBuffers(m_window);								// Swap GLFW window buffers
-	glfwPollEvents();// Poll input events
 }
 
 /**

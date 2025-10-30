@@ -137,10 +137,10 @@ void CoreEngine::GameLoop()
 
             // 1. Clear previous frame timings and reset total time
             g_systemTimings.clear();
-            g_totalLoopTime = 0.0; // Reset total time for the new frame
+            g_totalLoopTime = 0.0;
 
-            // 2. Start ImGui frame first (so other systems can render ImGui UI)
-            if (InputManager::KeyStateImgui && imguiSystem)
+            // 2. Start ImGui frame ALWAYS (not conditionally)
+            if (imguiSystem)
             {
                 ImGui_ImplOpenGL3_NewFrame();
                 ImGui_ImplGlfw_NewFrame();
@@ -159,10 +159,9 @@ void CoreEngine::GameLoop()
 
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[Systems[i]->GetName()] = ms;
-                g_totalLoopTime += ms; // Accumulate total time
+                g_totalLoopTime += ms;
             }
 
-            // 4. Update ImGui System (Time it like any other system)
             if (imguiSystem)
             {
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -170,19 +169,21 @@ void CoreEngine::GameLoop()
                 imguiSystem->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
 
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[imguiSystem->GetName()] = ms;
-                g_totalLoopTime += ms; // Add ImGui time to total loop time
+                g_totalLoopTime += ms;
             }
-            // 5. End ImGui frame and render
-            if (InputManager::KeyStateImgui && imguiSystem)
+
+            // 5. End ImGui frame and render (ALWAYS)
+            if (imguiSystem)
             {
                 ImGui::Render();
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-                glfwSwapBuffers(graphicsSystem->getWindow());
-                glfwPollEvents();
             }
+
+            // 6. Swap buffers and poll events
+            glfwSwapBuffers(graphicsSystem->getWindow());
+            glfwPollEvents();
         }
     }
     catch (const std::exception &e)
