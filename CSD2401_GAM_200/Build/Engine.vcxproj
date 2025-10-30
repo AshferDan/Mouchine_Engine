@@ -328,8 +328,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Engine\Camera\CameraComponent.cpp" />
+    <ClCompile Include="..\Engine\Camera\CameraManager.cpp" />
+    <ClCompile Include="..\Engine\Camera\CameraSystem.cpp" />
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Audio\audio.cpp" />
-    <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Camera\Camera.cpp" />
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collidercomponent.cpp" />
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collision.cpp" />
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\CollisionSystem.cpp" />
@@ -357,8 +359,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\ResourceManager\ResourceManager.cpp" />
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Scripting\ScriptAPI.cpp" />
     <ClCompile Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Scripting\ScriptingSystem.cpp" />
+    <ClInclude Include="..\Engine\Camera\CameraComponent.h" />
+    <ClInclude Include="..\Engine\Camera\CameraManager.h" />
+    <ClInclude Include="..\Engine\Camera\CameraSystem.h" />
     <ClInclude Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Audio\audio.h" />
-    <ClInclude Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Camera\Camera.h" />
     <ClInclude Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collidercomponent.h" />
     <ClInclude Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\Collision.h" />
     <ClInclude Include="C:\Users\Shao Jun\Documents\GitHub\csd2401f25_avidmoustacheenjoyers\CSD2401_GAM_200\Engine\Collision\CollisionSystem.h" />
