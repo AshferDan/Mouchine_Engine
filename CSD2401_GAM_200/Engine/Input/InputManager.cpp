@@ -16,8 +16,18 @@ Technology is prohibited.
 #include <unordered_map>
 #include "Animator.hpp"
 #include "core.h"
+#include "Serialization.h"
 
+bool InputManager::RequestChangeScene = false;
+std::string InputManager::NextScenePath = "";
+int InputManager::CurrentSceneIndex = 0;
 bool InputManager::KeyStateImgui = true;
+
+static std::vector<std::string> sceneList = {
+    "../Logs/Prefab_TestScene.json",
+    "../Logs/Prefab_TestScene2.json",
+    "../Logs/Prefab_TestScene3.json"
+};
 /**
  * @brief Constructs an InputManager with specified parameters.
  * @param window Pointer to the GLFW window.
@@ -57,6 +67,8 @@ void InputManager::Initialize()
  */
 void InputManager::Update(float dt)
 {
+    static bool keyPressed = false;
+
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},
@@ -130,6 +142,18 @@ void InputManager::Update(float dt)
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         DemoM1_DestroyGameObjects();
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+        if (!keyPressed) {
+            keyPressed = true;
+            CurrentSceneIndex = (CurrentSceneIndex + 1) % sceneList.size();
+            NextScenePath = sceneList[CurrentSceneIndex];
+            RequestChangeScene = true;
+        }
+    }
+    else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
+        keyPressed = false;
     }
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//

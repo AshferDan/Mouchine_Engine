@@ -165,6 +165,12 @@ void CoreEngine::GameLoop()
                 g_systemTimings[imguiSystem->GetName()] = ms;
                 g_totalLoopTime += ms; // Add ImGui time to total loop time
             }
+
+            if (InputManager::RequestChangeScene) {
+                GameObjectFactory::Instance().Clear();
+                LoadPrefab(InputManager::NextScenePath);
+                InputManager::RequestChangeScene = false;
+            }
         }
     }
     catch (const std::exception &e)

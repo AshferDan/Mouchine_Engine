@@ -34,6 +34,7 @@ Technology is prohibited.
 #include "DebugSystem.h"
 #include <map>
 #include "MathLib.h"
+#include "Serialization.h"
 
 // Forward declarations
 class GameObjectSystem;
