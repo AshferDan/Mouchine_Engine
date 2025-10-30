@@ -34,6 +34,7 @@ Technology is prohibited.
 #include "DebugSystem.h"
 #include <map>
 #include "MathLib.h"
+#include "LevelEditor.h" 
 
 // Forward declarations
 class GameObjectSystem;
@@ -44,6 +45,7 @@ class CollisionSystem;
 class PhysicsSystem;
 class DebugSystem;
 class TransformSystem;
+class LevelEditor;
 class CoreEngine
 {
 public:
@@ -157,6 +159,15 @@ public:
         return transformSystem;
     }
     /**
+      * @brief Gets a pointer to the LevelEditor.
+      * @return A pointer to the LevelEditor.
+     */
+    LevelEditor* GetLevelEditor() const
+    {
+        return levelEditor;
+    }
+
+    /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
      */
@@ -204,6 +215,7 @@ private:
     DebugSystem* debugSystem = nullptr;
     AudioEngine* audioEngine = nullptr;
     TransformSystem* transformSystem = nullptr;
+    LevelEditor* levelEditor = nullptr;
 
     unsigned LastTime;
     bool GameActive;

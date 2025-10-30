@@ -91,9 +91,11 @@ void CoreEngine::InitSystems()
     // 5. Collision System - detects collisions
     collisionSystem = AddSystem<CollisionSystem>();
 
-
     // 6. Physics System - processes collisions and applies physics
     physicsSystem = AddSystem<PhysicsSystem>();
+
+    // 7. Level Editor - for editing levels
+    levelEditor = AddSystem<LevelEditor>();
 
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
@@ -137,7 +139,15 @@ void CoreEngine::GameLoop()
             g_systemTimings.clear();
             g_totalLoopTime = 0.0; // Reset total time for the new frame
 
-            // 2. Update all systems and collect timings
+            // 2. Start ImGui frame first (so other systems can render ImGui UI)
+            if (InputManager::KeyStateImgui && imguiSystem)
+            {
+                ImGui_ImplOpenGL3_NewFrame();
+                ImGui_ImplGlfw_NewFrame();
+                ImGui::NewFrame();
+            }
+
+            // 3. Update all systems and collect timings
             for (size_t i = 0; i < Systems.size(); ++i)
             {
                 if (Systems[i]->GetName() == "ImGui_System")
@@ -152,7 +162,7 @@ void CoreEngine::GameLoop()
                 g_totalLoopTime += ms; // Accumulate total time
             }
 
-            // 3. Update ImGui System (Time it like any other system)
+            // 4. Update ImGui System (Time it like any other system)
             if (imguiSystem)
             {
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -164,6 +174,14 @@ void CoreEngine::GameLoop()
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[imguiSystem->GetName()] = ms;
                 g_totalLoopTime += ms; // Add ImGui time to total loop time
+            }
+            // 5. End ImGui frame and render
+            if (InputManager::KeyStateImgui && imguiSystem)
+            {
+                ImGui::Render();
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+                glfwSwapBuffers(graphicsSystem->getWindow());
+                glfwPollEvents();
             }
         }
     }

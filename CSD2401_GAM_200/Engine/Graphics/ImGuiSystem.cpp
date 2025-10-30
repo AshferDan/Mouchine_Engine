@@ -95,9 +95,31 @@ void ImGuiSystem::Initialize()
 void ImGuiSystem::Update(float dt)
 {
 	if (InputManager::KeyStateImgui) {
-		ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
-		ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
-		ImGui::NewFrame();			  // Start ImGui frame
+		//ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
+		//ImGui_ImplGlfw_NewFrame();	  // Start new GLFW frame
+		//ImGui::NewFrame();			  // Start ImGui frame
+
+		// Full window docking
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->WorkPos);
+		ImGui::SetNextWindowSize(viewport->WorkSize);
+		ImGui::SetNextWindowViewport(viewport->ID);
+
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+		ImGui::Begin("Window Dock", nullptr, window_flags);
+		ImGui::PopStyleVar(3);
+
+		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::End();
 
 		// Begin main GameObject Inspector window
 		ImGui::Begin("GameObject Inspector",&InputManager::KeyStateImgui);
@@ -376,10 +398,10 @@ void ImGuiSystem::Update(float dt)
 		ImGui::End();
 
 		// Render ImGui frame
-		ImGui::Render();										// Finish ImGui frame
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Render draw data via OpenGL3 backend
-		glfwSwapBuffers(m_window);								// Swap GLFW window buffers
-		glfwPollEvents();// Poll input events
+		//ImGui::Render();										// Finish ImGui frame
+		//ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Render draw data via OpenGL3 backend
+		//glfwSwapBuffers(m_window);								// Swap GLFW window buffers
+		//glfwPollEvents();// Poll input events
 	}
 }
 
