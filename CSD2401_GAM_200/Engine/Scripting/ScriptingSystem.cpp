@@ -530,8 +530,6 @@ void ScriptSystem::ReloadScriptAssembly()
     mono_domain_set(rootDomain, false);
     mono_domain_unload(appDomain);
 
-    // --- END OF FIX ---
-
     // Create new domain
     char domainName[] = "GameScriptDomain";
     appDomain = mono_domain_create_appdomain(domainName, nullptr);

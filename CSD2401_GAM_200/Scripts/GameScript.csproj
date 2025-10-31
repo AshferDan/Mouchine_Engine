@@ -8,9 +8,10 @@
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     
+<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <!-- Output path - adjust to match your C++ project structure -->
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    
+        <OutputPath>..\Build\Scripts\</OutputPath>
+
     <!-- Generate PDB for debugging -->
     <DebugType>portable</DebugType>
   </PropertyGroup>

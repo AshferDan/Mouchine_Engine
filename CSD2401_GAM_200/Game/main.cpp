@@ -49,11 +49,11 @@ int main()
     std::cout << "\n--- Creating Background ---" << std::endl;
     API::CreateImage("bgImage", RenderComponent::ShapeType::Square,
         0.f, 0.f, 2400.f, 1380.f,
-        "./Assets/wallpaper_transparent.png");
+        "../Assets/wallpaper_transparent.png");
 
     std::cout << "\n--- Creating Hero ---" << std::endl;
     API::CreateAnimatedImage("Hero", 0.0f, 0.0f, 150.0f, 150.0f,
-        "./Assets/Mouch_idle.png",
+        "../Assets/Mouch_idle.png",
         1, 2, 0, 7, 2.0f,
         CollisionLayer::Player,
         true, false, true);
@@ -61,7 +61,7 @@ int main()
     // Maybe some logic here...
     std::cout << "\n--- Creating Other Sprites ---" << std::endl;
     API::CreateAnimatedImage("AniImage", -700.0f, 100.0f, 300.0f, 300.0f,
-        "./Assets/Mouch_idle.png",
+        "../Assets/Mouch_idle.png",
         1, 2, 0, 7, 2.0f, CollisionLayer::Ground, true, true, false);
 
     // Create ground

@@ -31,8 +31,8 @@ namespace API {
         resourceMgr.LoadTexture("player_sprite", "./Assets/protosprite.png");
 
         // load audio files
-        resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true); // looping
-        resourceMgr.LoadAudio("jump_sfx", "./Assets/audio/jump.wav", false); // when jumping only
+        resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true); // looping
+        resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false); // when jumping only
 
         // print loaded resources
         resourceMgr.PrintLoadedResources();

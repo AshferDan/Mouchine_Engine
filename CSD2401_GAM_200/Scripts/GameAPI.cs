@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace GameEngine
+namespace CSharpScript
 {
     /// <summary>
     /// Debug utilities for logging from C# to C++ console

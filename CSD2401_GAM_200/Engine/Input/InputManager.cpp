@@ -161,6 +161,56 @@ void InputManager::Update(float dt)
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+        // Use single trigger to prevent multiple reloads
+        static bool rKeyPressed = false;
+
+        if (!rKeyPressed)
+        {
+            std::cout << "\n=== HOT RELOAD TRIGGERED (R Key) ===" << std::endl;
+
+            // 1. Get the script system from CORE
+            auto scriptSystem = CORE->GetScriptSystem();
+
+            if (scriptSystem)
+            {
+                // 2. Reload the script assembly
+                scriptSystem->ReloadScriptAssembly();
+
+                // 3. Find and re-attach scripts to game objects
+                // Get your test object - adjust the name to match your actual GameObject
+                GameObject* testObj = GameObjectFactory::Instance().FindGameObject("TestObject");
+
+                // Or if you created it with a different name, use that:
+                // GameObject* testObj = GameObjectFactory::Instance().FindGameObject("RedSquare");
+
+                if (testObj)
+                {
+                    scriptSystem->AttachScript(testObj, "TestGameObject");
+                    scriptSystem->CallOnStart(testObj);
+                    std::cout << " Scripts reattached to TestObject" << std::endl;
+                }
+                else
+                {
+                    std::cout << " TestObject not found - create it first or check the name" << std::endl;
+                }
+
+                std::cout << "=== HOT RELOAD COMPLETE ===" << std::endl;
+            }
+            else
+            {
+                std::cout << " ScriptSystem not found in CORE!" << std::endl;
+            }
+
+            rKeyPressed = true;
+        }
+    }
+    else
+    {
+        static bool rKeyPressed = false;
+        rKeyPressed = false;
+    }
     /**
         * @brief Toggle on and off imgui
         */
@@ -200,15 +250,15 @@ void InputManager::Update(float dt)
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        const char *IDLE_SS = "./Assets/Mouch_Idle.png";
+        const char *IDLE_SS = "../Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1;
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char *RUN_SS = "./Assets/Mouch_Running.png";
-        const char *JUMP_SS = "./Assets/Mouch_jump.png";
+        const char *RUN_SS = "../Assets/Mouch_Running.png";
+        const char *JUMP_SS = "../Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;

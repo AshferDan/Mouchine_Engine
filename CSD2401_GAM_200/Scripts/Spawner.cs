@@ -1,4 +1,4 @@
-using GameEngine; // Import the API you just defined
+using CSharpScript; // Import the API you just defined
 
 // This namespace MUST be "GameScripts" for your C++ code to find it
 namespace GameScripts
