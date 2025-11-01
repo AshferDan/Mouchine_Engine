@@ -71,3 +71,5 @@ private:
 
     GLFWwindow* m_window; ///< Pointer to the GLFW window
 };
+
+void ReloadPrefabsList();

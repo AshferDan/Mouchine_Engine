@@ -99,6 +99,11 @@ public:
     // Static Imgui flag triggered when Escape is pressed.
     static bool KeyStateImgui;
 
+    // Change Scene
+    static bool RequestChangeScene;
+    static std::string NextScenePath;
+    static int CurrentSceneIndex;
+
 private:
     // Window info
     GLFWwindow *window;
