@@ -14,10 +14,11 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 #include "core.h"
 bool InputManager::KeyStateQuit = false;
-CoreEngine *CORE;
+CoreEngine* CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
+double CoreEngine::fixed_dt = 1.0 / 60.0;  // Default: 60 updates per second
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 
@@ -25,7 +26,7 @@ std::map<std::string, double> g_systemTimings;
    Constuctor
 
    */
-CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0)
+CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0)
 {
     LastTime = 0;
     GameActive = true;
@@ -47,9 +48,9 @@ CoreEngine::~CoreEngine()
    window width and height to the graphics system
 
    */
-void CoreEngine::ConfigFile(const char *configF)
+void CoreEngine::ConfigFile(const char* configF)
 {
-    std::ifstream fp{configF};
+    std::ifstream fp{ configF };
     if (!fp)
     {
         std::cout << "Cannot find file" << std::endl;
@@ -124,22 +125,39 @@ void CoreEngine::Init()
 /* brief
    This function starts the core engine loop to start the game engine process
    there is the a exeception error checker too to get error thrown too
+   Uses fixed timestep for physics and variable timestep for rendering
 
    */
 void CoreEngine::GameLoop()
 {
     double fps_interval = 1.0;
+    const double max_frame_time = 0.25; // Cap frame time to prevent spiral of death
+
     try
     {
         while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
         {
+            // Update variable delta_time and FPS
             update_time(fps_interval);
 
-            // 1. Clear previous frame timings and reset total time
+            // Cap delta_time to avoid spiral of death
+            double frame_time = (delta_time > max_frame_time) ? max_frame_time : delta_time;
+            accumulator += frame_time;
+
             g_systemTimings.clear();
             g_totalLoopTime = 0.0;
 
-            // 2. Start ImGui frame ALWAYS (not conditionally)
+            if (inputManager) g_systemTimings[inputManager->GetName()] = 0.0;
+            if (gameObjectSystem) g_systemTimings[gameObjectSystem->GetName()] = 0.0;
+            if (transformSystem) g_systemTimings[transformSystem->GetName()] = 0.0;
+            if (collisionSystem) g_systemTimings[collisionSystem->GetName()] = 0.0;
+            if (physicsSystem) g_systemTimings[physicsSystem->GetName()] = 0.0;
+            if (graphicsSystem) g_systemTimings[graphicsSystem->GetName()] = 0.0;
+            if (debugSystem) g_systemTimings[debugSystem->GetName()] = 0.0;
+            if (levelEditor) g_systemTimings[levelEditor->GetName()] = 0.0;
+            if (imguiSystem) g_systemTimings[imguiSystem->GetName()] = 0.0;
+
+            // Start ImGui frame
             if (imguiSystem)
             {
                 ImGui_ImplOpenGL3_NewFrame();
@@ -147,61 +165,129 @@ void CoreEngine::GameLoop()
                 ImGui::NewFrame();
             }
 
-            // 3. Update all systems and collect timings
-            for (size_t i = 0; i < Systems.size(); ++i)
+            // FIXED TIMESTEP LOOP - Run physics multiple times if needed
+            while (accumulator >= fixed_dt)
             {
-                if (Systems[i]->GetName() == "ImGui_System")
-                    continue;
+                // Update physics-dependent systems with FIXED timestep
+                if (inputManager)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    inputManager->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[inputManager->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
 
+                if (gameObjectSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    gameObjectSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[gameObjectSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                if (transformSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    transformSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[transformSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                if (collisionSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    collisionSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[collisionSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                if (physicsSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    physicsSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[physicsSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                // Subtract fixed_dt from accumulator
+                accumulator -= fixed_dt;
+            }
+
+            // VARIABLE TIMESTEP - Rendering and UI systems
+            if (graphicsSystem)
+            {
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                Systems[i]->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
+                graphicsSystem->Update(static_cast<float>(delta_time));
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[Systems[i]->GetName()] = ms;
+                g_systemTimings[graphicsSystem->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
+
+            if (debugSystem)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                debugSystem->Update(static_cast<float>(delta_time));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[debugSystem->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
+
+            if (levelEditor)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                levelEditor->Update(static_cast<float>(delta_time));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[levelEditor->GetName()] = ms;
                 g_totalLoopTime += ms;
             }
 
             if (imguiSystem)
             {
                 std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-
-                imguiSystem->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
-
+                imguiSystem->Update(static_cast<float>(delta_time));
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[imguiSystem->GetName()] = ms;
                 g_totalLoopTime += ms;
             }
 
-            // 5. End ImGui frame and render (ALWAYS)
+            // End ImGui frame and render
             if (imguiSystem)
             {
                 ImGui::Render();
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             }
 
-            // 6. Swap buffers and poll events
+            // Swap buffers and poll events
             glfwSwapBuffers(graphicsSystem->getWindow());
             glfwPollEvents();
         }
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
-        // Log standard exceptions to debuglog.txt
         std::ofstream log("./Logs/CrashLog.txt", std::ios::app);
         log << "[EXCEPTION] " << e.what() << std::endl;
         log.close();
-
         std::cerr << "Exception caught in CoreEngine::GameLoop(): " << e.what() << std::endl;
     }
     catch (...)
     {
-        // Log unknown exceptions
         std::ofstream log("./Logs/CrashLog.txt", std::ios::app);
         log << "[UNKNOWN EXCEPTION]" << std::endl;
         log.close();
-
         std::cerr << "Unknown exception caught in CoreEngine::GameLoop()" << std::endl;
     }
     CoreEngine::DestroySystems();
@@ -240,7 +326,7 @@ void CoreEngine::update_time(double fps_calc_interval)
     }
 
     std::stringstream iostream;
-    std::string tempfps, tempdt;
+    std::string tempfps, tempdt, tempfixeddt;
     std::string title_str;
 
     iostream << CoreEngine::fps;
@@ -252,9 +338,15 @@ void CoreEngine::update_time(double fps_calc_interval)
     iostream << CoreEngine::delta_time;
     tempdt = iostream.str();
 
-    title_str = "Game Engine | FPS:" + tempfps + "|DT : " + tempdt;
+    iostream.str("");
+    iostream.clear();
 
-    GLFWwindow *Wind = CORE->GetGraphicsSystem()->getWindow();
+    iostream << CoreEngine::fixed_dt;
+    tempfixeddt = iostream.str();
+
+    title_str = "Game Engine | FPS:" + tempfps + " | DT: " + tempdt + " | Fixed DT: " + tempfixeddt;
+
+    GLFWwindow* Wind = CORE->GetGraphicsSystem()->getWindow();
     if (Wind)
     {
         glfwSetWindowTitle(Wind, title_str.c_str());
