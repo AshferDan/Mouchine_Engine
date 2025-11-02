@@ -466,7 +466,6 @@ namespace PrefabTools
 			return;
 		}
 
-		// this is pretty buggy, WIP!!!!
 		if (!std::filesystem::exists(PrefabFilePath + newName + ".txt"))
 		{
 			std::filesystem::rename(PrefabFilePath + oldName + ".txt", PrefabFilePath + newName + ".txt");

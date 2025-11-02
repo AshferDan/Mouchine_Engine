@@ -150,8 +150,8 @@ void CollisionSystem::Update(float deltaTime) {
                 }
 
                 if (!wasActive) {
-                    std::cout << "Collision: " << gameObjects[i]->GetName() << " <-> "
-                        << gameObjects[j]->GetName() << std::endl;
+                    //std::cout << "Collision: " << gameObjects[i]->GetName() << " <-> "
+                    //    << gameObjects[j]->GetName() << std::endl;
                     activeCollisions.push_back({ gameObjects[i].get(), gameObjects[j].get() });
                 }
 
