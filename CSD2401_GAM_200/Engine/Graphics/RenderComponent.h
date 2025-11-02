@@ -32,7 +32,8 @@ public:
         Square, /*!< Square shape */
         Circle, /*!< Circle shape */
         Line,   /*!< Line shape */
-        Point   /*!< Point shape */
+        Point,   /*!< Point shape */
+        Empty
     };
 
     /*! @struct LineData

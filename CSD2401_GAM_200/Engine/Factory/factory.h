@@ -166,6 +166,16 @@ public:
     GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *sprite, CollisionLayer layer);
 
     /**
+     * @brief Creates an empty GameObject that just has no shape, only Physics and transform.
+     * @param name The desired name for the new GameObject.=
+     * @param x The initial x-coordinate.
+     * @param y The initial y-coordinate.
+     * @param w The width.
+     * @param h The height.
+     */
+    GameObject* CreateEmptyGO(const std::string& name, float x, float y, float w, float h);
+
+    /**
      * @brief Creates a generic shaped GameObject with a color and collision layer.
      * @param name The desired name for the new GameObject.
      * @param shape The shape type for rendering.

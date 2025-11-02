@@ -81,7 +81,7 @@ std::string prefab_oldname{};
 
 
 // DRAG & DROP VARIABLES
-//static bool isDragging = false;
+static bool greyOutGOSettings = false;
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton
@@ -248,8 +248,8 @@ void ImGuiSystem::Update(float dt)
                         Serialize_Writer writer("../Logs/GameObjectData.txt");
                         if (writer.IsStreamGood())
                         {
-                            writer.WriteGameObjectData(*clonedObj, 0);
-                            std::cout << "Cloned object data saved!\n";
+                            if (writer.WriteGameObjectData(*clonedObj, 0))
+                                std::cout << "Cloned object data saved!\n";
                         }
 
                         std::cout << "button clicked";
@@ -261,8 +261,9 @@ void ImGuiSystem::Update(float dt)
                         Serialize_Writer writer("../Logs/GameObjectData.txt"); // Create Writer class object with specified path
                         if (writer.IsStreamGood())
                         {
-                            writer.WriteGameObjectData(*obj, 0); // If stream is valid, write objects data to file path
-                            std::cout << "GameObject data saved!\n";
+                            // If stream is valid, write objects data to file path
+                            if(writer.WriteGameObjectData(*obj, 0))
+                                std::cout << "GameObject data saved!\n";
                         }
                     }
 
@@ -397,11 +398,11 @@ void GOCreationMenu_Render()
         } // Text input field for GO Name
 
         // Very ugly sorry, future impl can include a check for empty GOs
-        const char* ShapeTypes[4] = { "Square", "Circle", "Line", "Point" }; // Type of shapes
+        const char* ShapeTypes[5] = { "Square", "Circle", "Line", "Point", "Empty"}; // Type of shapes
         ImGui::Text("Shape Type");
         if (ImGui::BeginCombo("##", ShapeTypes[current_shape]))
         { // Drop down menu for each shape
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 bool is_selected = (current_shape == i);
                 if (ImGui::Selectable(ShapeTypes[i], is_selected))
@@ -409,15 +410,32 @@ void GOCreationMenu_Render()
 
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();
+
+                // If selected shape is empty, block out colour selection
+                greyOutGOSettings = (!strcmp(ShapeTypes[current_shape], "Empty")) ? true : false;
             }
             ImGui::EndCombo(); // End drop down menu
         }
 
+        if (greyOutGOSettings) 
+        {
+            ImGui::BeginDisabled(true); 
+        }
+
+        //----- will be disabled if shape selected is empty -----
+        
         // Shape Colour Picker
         ImGui::Text("Colour");
         if (ImGui::ColorEdit3(" ", (float*)&tempGO.color))
         {
         } // Colour picker to later store in Vec4
+
+        //----- will be disabled if shape selected is empty -----
+
+        if (greyOutGOSettings) 
+        {
+            ImGui::EndDisabled(); 
+        }
 
         // Game Object Position
         ImGui::Text("Position");
@@ -454,10 +472,19 @@ void GOCreationMenu_Render()
 void GOCreationMenu_Spawn()
 {
     auto& factory = GameObjectFactory::Instance(); // Factory
+    GameObject* TempGO = nullptr;
 
-    // very ugly colour code bc that uses a different vec 4 AAAA
-    GameObject* TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
-        vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+    if (RenderComponent::ShapeType{ current_shape } == RenderComponent::ShapeType::Empty)
+    {
+        TempGO = factory.CreateEmptyGO(tempGO.name, 20.f, 0.f, 5.f, 5.f);
+    }
+    else
+    {
+        // very ugly colour code bc that uses a different vec 4 AAAA
+        TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
+            vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+    }
+
 
     // Add transform component to assign transform values
     TempGO->AddComponent<TransformComponent>(0, 0);

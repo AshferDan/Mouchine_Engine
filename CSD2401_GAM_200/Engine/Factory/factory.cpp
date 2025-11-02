@@ -88,6 +88,20 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
 
 /*
     /brief
+     This is the blueprint for the creation of empty GOs that do not require shapes or textures. Will largely be used for parenting and organising.
+*/
+GameObject* GameObjectFactory::CreateEmptyGO(const std::string& name, float x, float y, float w, float h) 
+{
+    GameObject* obj = CreateGameObject(name);
+
+    auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
+
+    return obj;
+}
+
+/*
+    /brief
      This is the blueprint for the normal gameobject creation where
      it has 3 overloads with the sprite and the color and one more for the collsions,
      color overload is for the creating the shape and the sprite is for the texture and the last one is the collision layer.
