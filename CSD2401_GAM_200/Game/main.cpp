@@ -120,9 +120,11 @@ int main()
     GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
     if (player) {
         cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+        //WHEN CAMERA MODE IS FIXED
+        //cam->SetPosition(0.f, 0.f);
         cam->SetFollowTarget(player);
         cam->SetFollowOffset(vec2(0.f, 0.f));
-        //cam->SetSmoothing(true, 2.f);
+        cam->SetSmoothing(true, 2.f);
     }
     CameraManager::Instance().SetActiveCamera(mainCamera);
 

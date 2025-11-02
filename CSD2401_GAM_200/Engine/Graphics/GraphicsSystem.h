@@ -135,6 +135,17 @@ public:
 
 	void RenderText(const std::map<char, Character>& characters, const std::string& text, float x, float y, float scale, const vec4& color, bool screenSpace = true);
 
+	void RenderGameViewportImGui();
+	
+	bool IsEditorMode() const { return editorMode; };
+
+	void SetEditorMode(bool enable) { editorMode = enable; };
+
+	GLuint GetFrameBufferTexture() const { return frameBufferTexture; };
+
+	int GetWindowWidth() const { return Wwidth; };
+	int GetWindowHeight() const { return Wheight; };
+
 private:
 	mat4 vp;               // Current view-projection matrix.
 	bool debugMode = false;     // Debug mode flag for showing shapes.
@@ -180,6 +191,14 @@ private:
 	GLuint textVAO, textVBO;
 	const size_t MAX_BATCH_VERTICES = 20000; // 2500 quads * 4 vertices
 	const size_t MAX_BATCH_INDICES = 30000; // 2500 quads * 6 indices
+
+	GLuint frameBuffer, frameBufferTexture, depthRenderBuffer;
+	int frameBufferWidth, frameBufferHeight;
+	bool editorMode;
+
+	void CreateFrameBuffer(int width, int height);
+	void DeleteFrameBuffer();
+	void ResizeFrameBuffer(int width, int height);
 };
 
 

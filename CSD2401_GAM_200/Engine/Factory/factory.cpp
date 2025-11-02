@@ -285,6 +285,17 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
     return obj;
 }
 
+GameObject* GameObjectFactory::CreateEmptyGO(const std::string& name, float x, float y, float w, float h) {
+    GameObject* obj = CreateGameObject(name);
+
+    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+    auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
+
+    //============ PARENTING CODE HERE =================
+
+    return obj;
+}
+
 /*
     /brief
      This is the blueprint for cloning each type of gameobject we have 4 types so
@@ -550,7 +561,7 @@ void DemoM1_SpawnGameObjects()
     std::uniform_int_distribution<int> distributionY(-540, 540);
 
     // spawn 2.5k small circles
-    for (size_t i = 0; i < 2500; i++)
+    for (size_t i = 0; i < 1000; i++)
     {
         int intX{distributionX(gen)}, intY{distributionY(gen)};
         std::string uniqueName = "Demo Circle " + std::to_string(i);

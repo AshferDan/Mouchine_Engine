@@ -128,6 +128,14 @@ void ImGuiSystem::Update(float dt)
 
 		ImGuiID dockspace_id = ImGui::GetID("DockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+		if (CORE->GetGraphicsSystem()->IsEditorMode()) {
+			ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+
+			CORE->GetGraphicsSystem()->RenderGameViewportImGui();
+		}
+
 		ImGui::End();
 
 		// Begin main GameObject Inspector window

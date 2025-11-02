@@ -14,26 +14,33 @@ out vec2 UVScale;
 out vec2 UVOffset;                         
 
 uniform mat4 uMVP;
+uniform int uUseBatching;
 
 void main() {
-    float worldX = aTransform.x;
-    float worldY = aTransform.y;
-    float rotation = aTransform.z;
-    float scaleX = aScale.x;
-    float scaleY = aScale.y;
+    vec2 finalPos;
 
-    float cosR = cos(rotation);
-    float sinR = sin(rotation);
-    mat2 rotMatrix = mat2(
-        cosR, sinR,
-        -sinR, cosR
-    );
+    if(uUseBatching == 1) {
+        float worldX = aTransform.x;
+        float worldY = aTransform.y;
+        float rotation = aTransform.z;
+        float scaleX = aScale.x;
+        float scaleY = aScale.y;
 
-    vec2 scaledPos = aPos.xy * aScale;
-    vec2 rotatedPos = rotMatrix * scaledPos;
-    vec2 worldPos = rotatedPos + aTransform.xy;
+        float cosR = cos(rotation);
+        float sinR = sin(rotation);
+        mat2 rotMatrix = mat2(
+            cosR, sinR,
+            -sinR, cosR
+        );
 
-    gl_Position = uMVP * vec4(worldPos, 0.0, 1.0);
+        vec2 scaledPos = aPos.xy * aScale;
+        vec2 rotatedPos = rotMatrix * scaledPos;
+        finalPos = rotatedPos + aTransform.xy;
+    }else{
+        finalPos = aPos.xy;
+    }
+
+    gl_Position = uMVP * vec4(finalPos, 0.0, 1.0);
 
     TexCoord = aTex;
     CircleCoord = aTex * 2.0 - 1.0;

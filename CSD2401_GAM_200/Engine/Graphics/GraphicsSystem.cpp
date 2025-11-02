@@ -19,7 +19,9 @@ const char *configFile = "./Logs/config.txt";
 const double two_pi = 6.28318530717958647692528676655900576;
 
 GraphicsSystem::GraphicsSystem()
-    : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp()
+    : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
+    frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
+    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -68,7 +70,10 @@ GraphicsSystem::GraphicsSystem()
     Wheight = fbHeight;
 }
 
-GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp()
+GraphicsSystem::GraphicsSystem(GLint w, GLint h) 
+    : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
+    frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
+    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -119,6 +124,8 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h) : window(nullptr), vao(0), vbo(
 
 GraphicsSystem::~GraphicsSystem()
 {
+    DeleteFrameBuffer();
+
     // Clean up resources on destruction.
     if (window)
     {
@@ -255,16 +262,29 @@ void GraphicsSystem::Initialize()
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+    CreateFrameBuffer(800, 600);
 }
 
 void GraphicsSystem::Update(float)
 {
+    //std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
+
     if (!window)
         return; // Skip if no valid window.
 
+    if (editorMode) {
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        glViewport(0, 0, frameBufferWidth, frameBufferHeight);
+    }
+    else {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glViewport(0, 0, Wwidth, Wheight);
+    }
+
     // === Clear Screen ===
     glClearColor(0.6f, 0.5f, 0.45f, 0.0f); // Background color (RGBA)
-    glClear(GL_COLOR_BUFFER_BIT);          // Clear color buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);          // Clear color buffer
     glLineWidth(2.f);                      // Set line thickness
     glPointSize(50.f);                     // Set point size (for debug points)
 
@@ -295,9 +315,11 @@ void GraphicsSystem::Update(float)
     //mat4 view = mat4::translate(-camPos);
     //vp = projection * view; // Final View-Projection matrix
 
-    vp = CameraManager::Instance().GetViewProjectMatrix((float)Wwidth, (float)Wheight);
+    float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
+    float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+    vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
-    std::cout << "Camera Pos X: " << camPos.x << ", Y: " << camPos.y << std::endl;
+    //std::cout << "Camera Pos X: " << camPos.x << ", Y: " << camPos.y << std::endl;
 
     //auto start = std::chrono::high_resolution_clock::now();
 
@@ -445,51 +467,55 @@ void GraphicsSystem::Update(float)
                 continue;
             }
 
-            if (auto* rend = obj->GetComponent<RenderComponent>()) {
-                if (!rend) {
-                    continue;
-                }
+            auto* rend = obj->GetComponent<RenderComponent>();
+            if (!rend) {
+                continue;
+            }
 
-                switch (rend->GetShapeType()) {
-                case RenderComponent::ShapeType::Line:
-                {
-                    auto line = rend->GetLine();
-                    DrawLine(line.start, line.end, line.color, vp);
-                    break;
-                }
-                case RenderComponent::ShapeType::Point:
-                {
-                    auto point = rend->GetPoint();
-                    DrawPoint(point.pos, point.color, vp);
-                    break;
-                }
-                default:
-                    break;
-                }
+            // Draw Lines and Points (not batched)
+            switch (rend->GetShapeType()) {
+            case RenderComponent::ShapeType::Line:
+            {
+                auto line = rend->GetLine();
+                DrawLine(line.start, line.end, line.color, vp);
+                break;
+            }
+            case RenderComponent::ShapeType::Point:
+            {
+                auto point = rend->GetPoint();
+                DrawPoint(point.pos, point.color, vp);
+                break;
+            }
+            default:
+                break;
+            }
 
-                if (debugMode) {
-                    auto* transform = obj->GetComponent<TransformComponent>();
-                    if (transform) {
-                        float x, y, sx, sy;
-                        transform->GetPosition(x, y);
-                        transform->GetScale(sx, sy);
-                        if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
-                            DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0,1,0,1 }, vp);
-                        }
-                        else if (rend->GetShapeType() == RenderComponent::ShapeType::Square) {
-                            DrawRectOutline(x, y, sx, sy, { 0,1,0,1 }, vp);
-                        }
+            // Draw debug outlines for ALL shapes (moved outside switch)
+            if (debugMode) {
+                std::cout << "went here" << std::endl;
+                auto* transform = obj->GetComponent<TransformComponent>();
+                if (transform) {
+                    float x, y, sx, sy;
+                    transform->GetPosition(x, y);
+                    transform->GetScale(sx, sy);
+
+                    if (rend->GetShapeType() == RenderComponent::ShapeType::Circle) {
+                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
+                    }
+                    else if (rend->GetShapeType() == RenderComponent::ShapeType::Square) {
+                        DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
                     }
                 }
             }
 
+            // Text rendering
             if (auto* textComp = obj->GetComponent<TextComponent>()) {
                 if (textComp->IsEnabled()) {
                     if (auto* transform = obj->GetComponent<TransformComponent>()) {
                         float x, y;
                         transform->GetPosition(x, y);
-
-                        RenderText(textComp->GetCharacters(), textComp->GetText(), x, y, textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
+                        RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
+                            textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
                     }
                 }
             }
@@ -523,7 +549,9 @@ void GraphicsSystem::Update(float)
             }
         }
 
-
+        if (editorMode) {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
 
 
 
@@ -538,6 +566,7 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
     shader.SetUniform("uColor", color);
     shader.SetUniform("uHasTexture", 0);
     shader.SetUniform("uIsCircle", 0);
+    shader.SetUniform("uUseBatching", 0);
 
     // Define 2 vertices for the line
     vec3 verts[2] = {
@@ -768,6 +797,75 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void GraphicsSystem::CreateFrameBuffer(int width, int height) {
+    frameBufferWidth = width;
+    frameBufferHeight = height;
+
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+    glGenTextures(1, &frameBufferTexture);
+    glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
+
+    glGenRenderbuffers(1, &depthRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "ERROR: Framebuffer is not complete! \n";
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    std::cout << "framebuffer created " << width << "x" << height << std::endl;
+}
+
+void GraphicsSystem::DeleteFrameBuffer() {
+    if (frameBuffer) {
+        glDeleteFramebuffers(1, &frameBuffer);
+        glDeleteTextures(1, &frameBufferTexture);
+        glDeleteRenderbuffers(1, &depthRenderBuffer);
+        frameBuffer = 0;
+        frameBufferTexture = 0;
+        depthRenderBuffer = 0;
+    }
+}
+
+void GraphicsSystem::ResizeFrameBuffer(int width, int height) {
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+    DeleteFrameBuffer();
+    CreateFrameBuffer(width, height);
+}
+
+void GraphicsSystem::RenderGameViewportImGui() {
+    if (!editorMode) {
+        return;
+    }
+
+    ImGui::Begin("Game Viewport");
+
+    ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+    // ADD THIS: Use minimum size if viewport is too small
+    if (viewportSize.x < 100.0f) viewportSize.x = 800.0f;
+    if (viewportSize.y < 100.0f) viewportSize.y = 600.0f;
+
+    if ((int)viewportSize.x != frameBufferWidth || (int)viewportSize.y != frameBufferHeight) {
+        if (viewportSize.x > 0 && viewportSize.y > 0) {
+            ResizeFrameBuffer((int)viewportSize.x, (int)viewportSize.y);
+        }
+    }
+
+    ImGui::Image((void*)(intptr_t)frameBufferTexture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::End();
+}
 
 std::string GraphicsSystem::GetName()
 {
