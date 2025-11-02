@@ -26,7 +26,7 @@ std::map<std::string, double> g_systemTimings;
    Constuctor
 
    */
-CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0)
+CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0), stepMode(false), stepOnce(false)
 {
     LastTime = 0;
     GameActive = true;
@@ -168,7 +168,7 @@ void CoreEngine::GameLoop()
             // FIXED TIMESTEP LOOP - Run physics multiple times if needed
             while (accumulator >= fixed_dt)
             {
-                // Update physics-dependent systems with FIXED timestep
+                // InputManager ALWAYS updates (even in step mode) to detect F2/F3 keys
                 if (inputManager)
                 {
                     std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -179,47 +179,56 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
-                if (gameObjectSystem)
+                // Only run physics if NOT in step mode, OR if stepping once
+                if (!stepMode || stepOnce)
                 {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    gameObjectSystem->Update(static_cast<float>(fixed_dt));
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[gameObjectSystem->GetName()] += ms;
-                    g_totalLoopTime += ms;
+                    // Update physics-dependent systems with FIXED timestep
+                    if (gameObjectSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        gameObjectSystem->Update(static_cast<float>(fixed_dt));
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[gameObjectSystem->GetName()] += ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    if (transformSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        transformSystem->Update(static_cast<float>(fixed_dt));
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[transformSystem->GetName()] += ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    if (collisionSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        collisionSystem->Update(static_cast<float>(fixed_dt));
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[collisionSystem->GetName()] += ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    if (physicsSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        physicsSystem->Update(static_cast<float>(fixed_dt));
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[physicsSystem->GetName()] += ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    stepOnce = false; // Reset after processing one frame
                 }
 
-                if (transformSystem)
-                {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    transformSystem->Update(static_cast<float>(fixed_dt));
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[transformSystem->GetName()] += ms;
-                    g_totalLoopTime += ms;
-                }
+                // In step mode, only process ONE timestep then break
+                if (stepMode) break;
 
-                if (collisionSystem)
-                {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    collisionSystem->Update(static_cast<float>(fixed_dt));
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[collisionSystem->GetName()] += ms;
-                    g_totalLoopTime += ms;
-                }
-
-                if (physicsSystem)
-                {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    physicsSystem->Update(static_cast<float>(fixed_dt));
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[physicsSystem->GetName()] += ms;
-                    g_totalLoopTime += ms;
-                }
-
-                // Subtract fixed_dt from accumulator
                 accumulator -= fixed_dt;
             }
 

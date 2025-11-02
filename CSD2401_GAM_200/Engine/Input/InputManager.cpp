@@ -72,6 +72,8 @@ void InputManager::Update(float dt)
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},
+        {GLFW_KEY_F2, false},
+        {GLFW_KEY_F3, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
     };
 
@@ -105,6 +107,22 @@ void InputManager::Update(float dt)
                 {
                     CORE->GetGraphicsSystem()->toggleDebugMode();
                     std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
+                }
+                else if (key == GLFW_KEY_F2)
+                {
+                    CORE->stepMode = !CORE->stepMode;
+
+                    // Reset accumulator when exiting step mode to prevent catch-up
+                    if (!CORE->stepMode) {
+                        CORE->accumulator = 0.0;
+                    }
+
+                    std::cout << "\n[STEP MODE] " << (CORE->stepMode ? "ENABLED - Press F3 to advance frames" : "DISABLED - Normal play") << std::endl;
+                }
+                else if (key == GLFW_KEY_F3 && CORE->stepMode)
+                {
+                    CORE->stepOnce = true;
+                    std::cout << "[STEP MODE] Advancing 1 frame..." << std::endl;
                 }
             }
             wasPressed = true;
