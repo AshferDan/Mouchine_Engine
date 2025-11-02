@@ -13,13 +13,220 @@ Technology is prohibited.
 
 #pragma once
 #include "Component.h"
+#include "Forces.h"
 #include <memory>
+#include <vector>
+#include <string>
+#include <algorithm>
 #include "transform.h"
 #include "GameObject.h"
 #include <iostream>
 #include <cmath>
 
 class TransformComponent; // Forward declaration
+
+/**
+ * @brief Manages all forces acting on a physics object
+ */
+class ForcesManager {
+public:
+    ForcesManager() = default;
+
+    /**
+     * @brief Add a force by type (main interface)
+     * @param type The type of force to add
+     * @param mass The object's mass
+     */
+    void AddForce(ForceType type, float mass) {
+        switch (type) {
+        case ForceType::Jump:
+            // Only add if not already jumping
+            if (!HasForceType(ForceType::Jump)) {
+                forces.push_back(std::make_unique<LinearDirectionalForce>(
+                    0.0f, 1.0f,
+                    ForceConstants::JUMP_FORCE,
+                    ForceConstants::JUMP_DURATION,
+                    ForceType::Jump
+                ));
+            }
+            break;
+
+        case ForceType::MoveRight:
+            if (!HasForceType(ForceType::MoveRight)) {
+                forces.push_back(std::make_unique<LinearDirectionalForce>(
+                    1.0f, 0.0f,
+                    ForceConstants::MOVE_FORCE,
+                    -1.0f,
+                    ForceType::MoveRight
+                ));
+            }
+            break;
+
+        case ForceType::MoveLeft:
+            if (!HasForceType(ForceType::MoveLeft)) {
+                forces.push_back(std::make_unique<LinearDirectionalForce>(
+                    -1.0f, 0.0f,
+                    ForceConstants::MOVE_FORCE,
+                    -1.0f,
+                    ForceType::MoveLeft
+                ));
+            }
+            break;
+
+        case ForceType::Wind:
+        case ForceType::Boost:
+            // These require custom parameters, use AddCustomForce instead
+            break;
+        }
+    }
+
+    /**
+     * @brief Add drag force
+     */
+    void AddDrag() {
+        forces.push_back(std::make_unique<DragForce>(ForceConstants::DRAG_COEFFICIENT));
+    }
+
+    /**
+     * @brief Add a custom force (for advanced usage)
+     */
+    void AddCustomForce(std::unique_ptr<Force> force) {
+        forces.push_back(std::move(force));
+    }
+
+    /**
+     * @brief Remove a force by index
+     * @param index Index of force to remove
+     */
+    void RemoveForce(size_t index) {
+        if (index < forces.size()) {
+            forces.erase(forces.begin() + index);
+        }
+    }
+
+    /**
+     * @brief Activate or deactivate a force
+     * @param index Index of force
+     * @param active New active state
+     */
+    void ActivateForce(size_t index, bool active) {
+        if (index < forces.size()) {
+            forces[index]->isActive = active;
+        }
+    }
+
+    /**
+     * @brief Update force ages and remove expired forces
+     * @param deltaTime Time elapsed
+     */
+    void ValidateAge(float deltaTime) {
+        for (auto it = forces.begin(); it != forces.end();) {
+            (*it)->age += deltaTime;
+
+            // Remove if lifetime expired (lifetime >= 0 means it has a limit)
+            if ((*it)->lifetime >= 0.0f && (*it)->age >= (*it)->lifetime) {
+                it = forces.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+    }
+
+    /**
+     * @brief Set the lifetime of a force
+     * @param index Index of force
+     * @param lifetime New lifetime (-1 for infinite)
+     */
+    void SetLifeTime(size_t index, float lifetime) {
+        if (index < forces.size()) {
+            forces[index]->lifetime = lifetime;
+        }
+    }
+
+    /**
+     * @brief Calculate total acceleration from all active forces
+     * @param mass Object's mass
+     * @param velocityX Current velocity X
+     * @param velocityY Current velocity Y
+     * @return Pair of (accelX, accelY)
+     */
+    std::pair<float, float> CalculateTotalAcceleration(float mass, float velocityX, float velocityY) {
+        float totalAccelX = 0.0f;
+        float totalAccelY = 0.0f;
+
+        for (const auto& force : forces) {
+            float accelX, accelY;
+            force->CalculateAcceleration(mass, velocityX, velocityY, accelX, accelY);
+            totalAccelX += accelX;
+            totalAccelY += accelY;
+        }
+
+        return { totalAccelX, totalAccelY };
+    }
+
+    /**
+     * @brief Get number of forces
+     */
+    size_t GetForceCount() const { return forces.size(); }
+
+    /**
+     * @brief Clear all forces
+     */
+    void ClearForces() { forces.clear(); }
+
+    /**
+     * @brief Get force at index (for inspection/debugging)
+     */
+    Force* GetForce(size_t index) {
+        if (index < forces.size()) {
+            return forces[index].get();
+        }
+        return nullptr;
+    }
+
+    /**
+     * @brief Remove all forces of a specific type
+     * @param type The ForceType to remove
+     */
+    void RemoveForcesByType(ForceType type) {
+        forces.erase(
+            std::remove_if(forces.begin(), forces.end(),
+                [type](const std::unique_ptr<Force>& force) {
+                    auto* linearForce = dynamic_cast<LinearDirectionalForce*>(force.get());
+                    return linearForce && linearForce->type == type;
+                }),
+            forces.end()
+        );
+    }
+
+    /**
+     * @brief Find the index of the first force of a specific type
+     * @param type The ForceType to find
+     * @return Index of the force, or -1 if not found
+     */
+    int FindForceByType(ForceType type) const {
+        for (size_t i = 0; i < forces.size(); ++i) {
+            auto* linearForce = dynamic_cast<LinearDirectionalForce*>(forces[i].get());
+            if (linearForce && linearForce->type == type) {
+                return static_cast<int>(i);
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * @brief Check if a force of a specific type exists
+     * @param type The ForceType to check
+     * @return True if force type exists
+     */
+    bool HasForceType(ForceType type) const {
+        return FindForceByType(type) != -1;
+    }
+
+private:
+    std::vector<std::unique_ptr<Force>> forces;
+};
 
 class PhysicsComponent : public IComponent {
 public:
@@ -58,19 +265,6 @@ public:
      */
     void GetVelocity(float& x, float& y) const;
 
-    /**
-     * @brief Adds to the current velocity
-     * @param x Horizontal velocity to add
-     * @param y Vertical velocity to add
-     */
-    void AddVelocity(float x, float y);
-
-    // ===== Jump System =====
-    /**
-     * @brief Initiates a jump if the object is grounded
-     * @param jumpForce Upward force to apply
-     */
-    void Jump(float jumpForce);
 
     /**
      * @brief Sets the grounded state
@@ -126,14 +320,14 @@ public:
      * @param useGrav Whether to apply gravity
      */
     void SetGravity(bool useGrav) { useGravity = useGrav; }
+
+    // ===== Forces Manager Access =====
     /**
- * @brief sets a constant gravity to x or y to the object
- * @param float values of x and y
- */
-    void SetGravityVal(float x, float y) {
-        gravityX = x;
-        gravityY = y;
-    }
+     * @brief Get the forces manager
+     * @return Reference to forces manager
+     */
+    ForcesManager& GetForcesManager() { return forcesManager; }
+
     // 2D specific helpers
     /**
      * @brief Calculates the speed (magnitude of velocity)
@@ -146,6 +340,7 @@ public:
      * @return Direction in radians
      */
     float GetDirection() const;
+
     /**
      * @brief Sets velocity from angle and speed
      * @param angle Direction in radians
@@ -153,33 +348,27 @@ public:
      */
     void SetDirection(float angle, float speed);
 
-private:
     /**
-     * @brief Applies gravity to velocity
-     * @param deltaTime Frame time
+     * @brief Integrates forces into motion (velocity and position)
+     * @param dt Delta time
      */
-    //void ApplyGravity(float deltaTime);
-
-    /**
-     * @brief Updates object position based on velocity
-     * @param deltaTime Frame time
-     */
-   // void UpdatePosition(float deltaTime);
+    void Integrate(float dt);
 
 public:
     // Linear motion
     float velocityX, velocityY;
 
     // Properties
-    float mass;               
+    float mass;
     bool isStatic;
     bool useGravity;
 
-    // State Flages
+    // State Flags
     bool isGrounded;
     bool wasGrounded;
     bool isJumping;
 
-    // 2D gravity (can be changed for different effects)
-    float gravityX, gravityY;
+private:
+    // Forces manager
+    ForcesManager forcesManager;
 };

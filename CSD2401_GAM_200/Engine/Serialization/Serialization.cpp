@@ -107,10 +107,12 @@ static void SerializeSpritesheet(json& j, Spritesheet* s) {
 }
 
 static void SerializePhysics(json& j, PhysicsComponent* p) {
+	bool hasGravity = p->useGravity;
+
 	j["PhysicsComponent"] = {
 		{"mass", p->GetMass()},
 		{"isStatic", p->IsStatic()},
-		{"useGravity", p->useGravity},
+		{"hasGravity", hasGravity},
 		{"isGrounded", p->IsGrounded()},
 		{"velocity", {p->velocityX, p->velocityY}}
 	};
@@ -143,7 +145,7 @@ static void DeserializeRender(const json& j, GameObject* go) {
 	std::string shapeType = r.value("shapeType", "Square");
 	std::string texPath = r.value("texturePath", "");
 
-	
+
 
 	auto* render = go->AddComponent<RenderComponent>();
 	render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
@@ -190,10 +192,17 @@ static void DeserializePhysics(const json& j, GameObject* go) {
 	if (!j.contains("PhysicsComponent")) return;
 	const auto& p = j["PhysicsComponent"];
 
-	auto* pc = go->AddComponent<PhysicsComponent>();
-	pc->SetStatic(p.value("isStatic", false));
-	pc->SetGravity(p.value("useGravity", true));
-	pc->SetMass(p.value("mass", 1.0f));
+	float mass = p.value("mass", 1.0f);
+	bool isStatic = p.value("isStatic", false);
+
+	auto* pc = go->AddComponent<PhysicsComponent>(mass, isStatic);
+
+	// Add gravity if needed
+	bool hasGravity = p.value("hasGravity", p.value("useGravity", true)); // Support old 'useGravity' key
+	if (hasGravity)
+	{
+		pc->SetGravity(true);
+	}
 
 	if (p.contains("velocity"))
 		pc->SetVelocity(p["velocity"][0].get<float>(), p["velocity"][1].get<float>());
@@ -277,17 +286,16 @@ GameObject* CreateObj(
 	t->SetRotation(rotation);
 
 	// --- Physics ---
-	auto* physics = go->AddComponent<PhysicsComponent>();
-	physics->SetMass(1.0f);
-	physics->SetStatic(false);
-	physics->useGravity = true;
+	auto* physics = go->AddComponent<PhysicsComponent>(1.0f, false);
+
+	// Add gravity force
+	physics->SetGravity(true);
+
 	physics->SetGrounded(false);
 	physics->isJumping = false;
 	physics->wasGrounded = false;
 	physics->velocityX = 0.0f;
 	physics->velocityY = 0.0f;
-	physics->gravityX = 0.0f;
-	physics->gravityY = -9.8f;
 
 	// --- Collider ---
 	ColliderComponent::Type colliderType =

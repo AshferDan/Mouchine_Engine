@@ -12,7 +12,7 @@
  * @brief Constructor - initialise level editor
  */
 LevelEditor::LevelEditor()
-: factory(GameObjectFactory::Instance()),
+    : factory(GameObjectFactory::Instance()),
     selectedGameObjectID(0),
     showPropertyEditor(true),
     showSaveDialog(false),
@@ -54,7 +54,7 @@ void LevelEditor::Update(float dt)
 
     // render hierarchy panel
     RenderHierarchy();
-    
+
     // render property editor
     if (showPropertyEditor && selectedGameObjectID != 0)
     {
@@ -694,7 +694,11 @@ GameObject* LevelEditor::DeserializeGameObject(const GameObjectData& data)
     {
         auto* physics = obj->AddComponent<PhysicsComponent>(data.mass, data.isStatic);
         physics->SetVelocity(data.velocityX, data.velocityY);
-        physics->SetGravity(data.hasGravity);
+
+        if (data.hasGravity)
+        {
+            physics->SetGravity(true);
+        }
     }
 
     // add collider component

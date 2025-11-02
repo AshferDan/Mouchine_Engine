@@ -20,13 +20,13 @@ Technology is prohibited.
 /**
  * @brief Constructs physics component with initial settings
  */
-PhysicsComponent::PhysicsComponent(GameObject *owner, float m, bool static_)
+PhysicsComponent::PhysicsComponent(GameObject* owner, float m, bool static_)
     : IComponent(owner),
-      velocityX(0), velocityY(0),
-      mass(m), isStatic(static_), useGravity(true),
-      isGrounded(true), isJumping(false), wasGrounded(true),
-      gravityX(0), gravityY(-381.f)
+    velocityX(0), velocityY(0),
+    mass(m), isStatic(static_), useGravity(true),
+    isGrounded(true), isJumping(false), wasGrounded(true)
 {
+    // Gravity is now a constant acceleration in Integrate(), not a force
 }
 
 /**
@@ -41,102 +41,91 @@ void PhysicsComponent::SetVelocity(float x, float y)
 /**
  * @brief Creates a deep copy of this physics component
  */
-std::unique_ptr<IComponent> PhysicsComponent::Clone(GameObject *NewClone) const
+std::unique_ptr<IComponent> PhysicsComponent::Clone(GameObject* NewClone) const
 {
-
     auto clonedComponent = std::make_unique<PhysicsComponent>(
         NewClone,
-        this->mass,    // Get mass
-        this->isStatic // Get isStatic status
+        this->mass,
+        this->isStatic
     );
 
     clonedComponent->velocityX = this->velocityX;
     clonedComponent->velocityY = this->velocityY;
-    clonedComponent->useGravity = this->useGravity;
-    clonedComponent->gravityX = this->gravityX;
-    clonedComponent->gravityY = this->gravityY;
+
+    // Note: Forces are not deep-copied since they're time-dependent
+    // If needed, implement force cloning logic here
 
     clonedComponent->SetEnabled(this->IsEnabled());
 
     return clonedComponent;
 }
 
-    /**
-     * @brief Gets the current velocity values
-     */
-    void PhysicsComponent::GetVelocity(float &x, float &y) const
+/**
+ * @brief Gets the current velocity values
+ */
+void PhysicsComponent::GetVelocity(float& x, float& y) const
+{
+    x = velocityX;
+    y = velocityY;
+}
+
+/**
+ * @brief Calculates the speed magnitude from velocity components
+ */
+float PhysicsComponent::GetSpeed() const
+{
+    return std::sqrt(velocityX * velocityX + velocityY * velocityY);
+}
+
+/**
+ * @brief Calculates the direction angle from velocity components
+ */
+float PhysicsComponent::GetDirection() const
+{
+    return std::atan2(velocityY, velocityX);
+}
+
+/**
+ * @brief Sets velocity from polar coordinates
+ */
+void PhysicsComponent::SetDirection(float angle, float speed)
+{
+    velocityX = std::cos(angle) * speed;
+    velocityY = std::sin(angle) * speed;
+}
+
+/**
+ * @brief Integrates forces into motion (velocity and position)
+ */
+void PhysicsComponent::Integrate(float dt)
+{
+    if (isStatic) return; // Static objects don't move
+
+    // Validate and remove expired forces
+    forcesManager.ValidateAge(dt);
+
+    // Calculate total acceleration from all forces
+    auto [accelX, accelY] = forcesManager.CalculateTotalAcceleration(mass, velocityX, velocityY);
+
+    // Add constant gravity acceleration if enabled
+    if (useGravity)
     {
-        x = velocityX;
-        y = velocityY;
+        const float gravityY = -500.0f;
+        accelY += gravityY;
     }
 
-    /**
-     * @brief Adds to the current velocity
-     */
-    void PhysicsComponent::AddVelocity(float x, float y)
+    // Integrate velocity: v = v0 + a*dt
+    velocityX += accelX * dt;
+    velocityY += accelY * dt;
+
+    // Integrate position: p = p0 + v*dt
+    TransformComponent* transform = owner->GetComponent<TransformComponent>();
+    if (transform)
     {
-        velocityX += x;
-        velocityY += y;
+        transform->Move(velocityX * dt, velocityY * dt);
     }
 
-    /**
-     * @brief Initiates a jump if grounded, sets upward velocity
-     */
-    void PhysicsComponent::Jump(float jumpForce)
-    {
-        if (isGrounded)
-        {
-            velocityY = jumpForce;
-            isJumping = true;
-            isGrounded = false;
-
-            std::cout << owner->GetName() << " jumped with force " << jumpForce
-                      << "! New VelY: " << velocityY << std::endl;
-        }
-    }
-
-    /**
-     * @brief Calculates the speed magnitude from velocity components
-     */
-    float PhysicsComponent::GetSpeed() const
-    {
-        return std::sqrt(velocityX * velocityX + velocityY * velocityY);
-    }
-
-    /**
-     * @brief Calculates the direction angle from velocity components
-     */
-    float PhysicsComponent::GetDirection() const
-    {
-        return std::atan2(velocityY, velocityX);
-    }
-
-    /**
-     * @brief Sets velocity from polar coordinates
-     */
-    void PhysicsComponent::SetDirection(float angle, float speed)
-    {
-        velocityX = std::cos(angle) * speed;
-        velocityY = std::sin(angle) * speed;
-    }
-
-    //**
-    // * @brief Applies gravity acceleration to velocity
-    // */
-    //void PhysicsComponent::ApplyGravity(float deltaTime)
-    //{
-    //    velocityX += gravityX * deltaTime;
-    //    velocityY += gravityY * deltaTime;
-    //}
-
-    //**
-    // * @brief Updates the transform position based on velocity
-    // */
-    //void PhysicsComponent::UpdatePosition(float deltaTime)
-    //{
-    //    auto *transform = owner->GetComponent<TransformComponent>();
-    //    if (transform)
-    //    {
-    //        transform->Move(velocityX * deltaTime, velocityY * deltaTime);
-    //    }
-    //}
+    // Reset jump state if grounded
+    if (isGrounded)
+        isJumping = false;
+}

@@ -33,7 +33,7 @@ static std::vector<std::string> sceneList = {
  * @param window Pointer to the GLFW window.
  * @param audio Optional pointer to the AudioEngine.
  */
-InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
+InputManager::InputManager(GLFWwindow* window, AudioEngine* audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
 {
     glfwSetWindowUserPointer(window, this);
 
@@ -92,10 +92,10 @@ void InputManager::Update(float dt)
         }
     }
 
-    for (auto &kv : singleTriggerKeys)
+    for (auto& kv : singleTriggerKeys)
     {
         int key = kv.first;
-        bool &wasPressed = kv.second;
+        bool& wasPressed = kv.second;
 
         if (glfwGetKey(window, key) == GLFW_PRESS)
         {
@@ -115,22 +115,31 @@ void InputManager::Update(float dt)
         }
     }
 
-    auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
+    auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
     if (!player)
     {
         return;
     }
 
-    auto *physics = player->GetComponent<PhysicsComponent>();
+    auto* physics = player->GetComponent<PhysicsComponent>();
     if (!physics)
     {
         return;
     }
 
-    TransformComponent *transform = player->GetComponent<TransformComponent>();
+    TransformComponent* transform = player->GetComponent<TransformComponent>();
     if (!transform)
     {
         return;
+    }
+
+    // Ensure player has drag force for smooth stopping (add once)
+    static bool dragInitialized = false;
+    if (!dragInitialized && physics)
+    {
+        auto& forcesManager = physics->GetForcesManager();
+        forcesManager.AddDrag();
+        dragInitialized = true;
     }
 
     float vx, vy;
@@ -158,27 +167,36 @@ void InputManager::Update(float dt)
     }
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
-    // Horizontal movement
-    float moveSpeed = 200.0f;    // Movement speed
+    // Horizontal movement using forces
+    /*float moveForce = 800.0f;*/    // Force magnitude for movement
     float moveDirectionX = 0.0f; // Track intended direction (1=Right, -1=Left)
     bool is_jumping = false;
 
+    auto& forcesManager = physics->GetForcesManager();
+
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        vx = -moveSpeed;
-
         moveDirectionX = -1.0f;
+
+        // Add left movement force using helper
+        forcesManager.AddForce(ForceType::MoveLeft, physics->GetMass());
+        // Remove right movement if present
+        forcesManager.RemoveForcesByType(ForceType::MoveRight);
     }
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        vx = moveSpeed;
-
         moveDirectionX = 1.0f;
+
+        // Add right movement force using helper
+        forcesManager.AddForce(ForceType::MoveRight, physics->GetMass());
+        // Remove left movement if present
+        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
     }
     else
     {
-
-        vx = 0.0f;
+        // No movement keys pressed - remove all movement forces
+        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
+        forcesManager.RemoveForcesByType(ForceType::MoveRight);
     }
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -202,7 +220,7 @@ void InputManager::Update(float dt)
         if (physics->IsGrounded())
         {
             is_jumping = false;
-            physics->Jump(400.0f);        // Jump force
+            physics->GetForcesManager().AddForce(ForceType::Jump, physics->GetMass());
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
             if (audioEngine)
@@ -212,7 +230,7 @@ void InputManager::Update(float dt)
         }
     }
 
-    auto *anim = player->GetComponent<Spritesheet>();
+    auto* anim = player->GetComponent<Spritesheet>();
 
     if (transform && anim)
     {
@@ -224,19 +242,19 @@ void InputManager::Update(float dt)
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        const char *IDLE_SS = "./Assets/Mouch_Idle.png";
+        const char* IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1;
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char *RUN_SS = "./Assets/Mouch_Running.png";
-        const char *JUMP_SS = "./Assets/Mouch_jump.png";
+        const char* RUN_SS = "./Assets/Mouch_Running.png";
+        const char* JUMP_SS = "./Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;
-        const char *newSpritesheet;
+        const char* newSpritesheet;
 
         if (std::abs(vx) > 0.0f) // Player is running/moving
         {
@@ -266,7 +284,8 @@ void InputManager::Update(float dt)
         }
     }
 
-    physics->SetVelocity(vx, vy);
+    // Note: Don't call SetVelocity anymore - forces handle movement
+    // The Integrate() method will update velocity based on forces
 
     // Mouse
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
