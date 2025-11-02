@@ -161,6 +161,8 @@ private:
 		vec4 color;
 		vec2 uvScale;
 		vec2 uvOffset;
+		vec3 transform;
+		vec2 scale;
 	};
 
 	struct RenderBatch {

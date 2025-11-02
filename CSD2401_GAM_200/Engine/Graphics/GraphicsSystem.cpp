@@ -226,11 +226,15 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribFormat(batchVAO, 4, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, uvOffset));
     glVertexArrayAttribBinding(batchVAO, 4, 0);
 
-    //Attribute 5: World Position (vec3)
+    //Attribute 5: Transform (vec3)
+    glEnableVertexArrayAttrib(batchVAO, 5);
+    glVertexArrayAttribFormat(batchVAO, 5, 3, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, transform));
+    glVertexArrayAttribBinding(batchVAO, 5, 0);
 
     //Attribute 6: Scale (vec2)
-
-    //Attribute 7: Rotation (float)
+    glEnableVertexArrayAttrib(batchVAO, 6);
+    glVertexArrayAttribFormat(batchVAO, 6, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, scale));
+    glVertexArrayAttribBinding(batchVAO, 6, 0);
 
     //Text Shader Initialize
     textShader.CompileLinkValidate({
@@ -267,32 +271,33 @@ void GraphicsSystem::Update(float)
     // Use main shader program
     shader.Use();
 
-    // Orthographic projection: origin at bottom-left, size = window width/height
-    mat4 projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+    //// Orthographic projection: origin at bottom-left, size = window width/height
+    //mat4 projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
 
-    // Default camera at (0,0)
-    vec3 camPos(0.0f);
+    //// Default camera at (0,0)
+    //vec3 camPos(0.0f);
 
-    // Center camera on the "Hero" object if it exists
-    GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
-    if (player)
-    {
-        auto* transform = player->GetComponent<TransformComponent>();
-        if (transform)
-        {
-            float px{ 0 }, py{ 0 };
-            transform->GetPosition(px, py);
-            camPos.x = px - Wwidth / 2.0f;  // shift camera so Hero is centered
-            camPos.y = py - Wheight / 2.0f;
-        }
-    }
+    //// Center camera on the "Hero" object if it exists
+    //GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
+    //if (player)
+    //{
+    //    auto* transform = player->GetComponent<TransformComponent>();
+    //    if (transform)
+    //    {
+    //        float px{ 0 }, py{ 0 };
+    //        transform->GetPosition(px, py);
+    //        camPos.x = px - Wwidth / 2.0f;  // shift camera so Hero is centered
+    //        camPos.y = py - Wheight / 2.0f;
+    //    }
+    //}
 
-    // Camera transform: translate world relative to camPos
-    mat4 view = mat4::translate(-camPos);
-    vp = projection * view; // Final View-Projection matrix
+    //// Camera transform: translate world relative to camPos
+    //mat4 view = mat4::translate(-camPos);
+    //vp = projection * view; // Final View-Projection matrix
 
-    //vp = CameraManager::Instance().GetViewProjectMatrix((float)Wwidth, (float)Wheight);
-
+    vp = CameraManager::Instance().GetViewProjectMatrix((float)Wwidth, (float)Wheight);
+    vec2 camPos = CameraManager::Instance().GetCameraPosition();
+    std::cout << "Camera Pos X: " << camPos.x << ", Y: " << camPos.y << std::endl;
 
     //auto start = std::chrono::high_resolution_clock::now();
 
@@ -360,9 +365,11 @@ void GraphicsSystem::Update(float)
             //    << ", IsCircle: " << isCircle << std::endl;
         }
 
-        mat4 model = mat4::translate(vec3(x, y, 0.0f));
-        model = model * mat4::rotate(rot, vec3(0, 0, 1));
-        model = model * mat4::scale(vec3(sx, sy, 1.0f));
+        //-------------------- TBR -------------------------------
+        //mat4 model = mat4::translate(vec3(x, y, 0.0f));
+        //model = model * mat4::rotate(rot, vec3(0, 0, 1));
+        //model = model * mat4::scale(vec3(sx, sy, 1.0f));
+        //--------------------------------------------------------
 
         vec3 localVerts[4] = {
             {-0.5f, -0.5f, 0.f},
@@ -382,14 +389,16 @@ void GraphicsSystem::Update(float)
 
         //add 4 vertices to batch
         for (int i = 0; i < 4; ++i) {
-            vec3 worldPos = model * vec4(localVerts[i], 1.0f);
+            //vec3 worldPos = model * vec4(localVerts[i], 1.0f);
 
             BatchVertex vert;
-            vert.pos = worldPos;
+            vert.pos = localVerts[i];
             vert.tex = texCoords[i];
             vert.color = color;
             vert.uvScale = uvScale;
             vert.uvOffset = uvOffset;
+            vert.transform = vec3(x, y, rot);
+            vert.scale = vec2(sx, sy);
 
             targetBatch->vertices.push_back(vert);
         }

@@ -122,7 +122,7 @@ int main()
         cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
         cam->SetFollowTarget(player);
         cam->SetFollowOffset(vec2(0.f, 0.f));
-        cam->SetSmoothing(true, 0.5f);
+        //cam->SetSmoothing(true, 2.f);
     }
     CameraManager::Instance().SetActiveCamera(mainCamera);
 

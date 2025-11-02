@@ -3,7 +3,7 @@
 #include <algorithm>
 
 CameraComponent::CameraComponent(GameObject* owner) 
-	: IComponent(owner), position(0.f, 0.f), zoom(0.f), mode(CameraMode::FIXED), followTarget(nullptr), followOffset(0.f, 0.f), enableSmoothing(false), smoothSpeed(5.f), useBounds(false), boundsMin(-10000.f, -10000.f), boundsMax(10000.f, 10000.f) {}
+	: IComponent(owner), position(0.f, 0.f), zoom(1.f), mode(CameraMode::FIXED), followTarget(nullptr), followOffset(0.f, 0.f), enableSmoothing(false), smoothSpeed(5.f), useBounds(false), boundsMin(-10000.f, -10000.f), boundsMax(10000.f, 10000.f) {}
 
 void CameraComponent::Update(float dt) {
 	if (!IsEnabled()) {
@@ -21,7 +21,7 @@ void CameraComponent::Update(float dt) {
 			if (enableSmoothing) {
 				float t = 1.f - pow(0.5f, smoothSpeed * dt);
 				position.x += (targetPos.x - position.x) * t;
-				position.y += (targetPos.y = position.y) * t;
+				position.y += (targetPos.y - position.y) * t;
 			}
 			else {
 				position = targetPos;
