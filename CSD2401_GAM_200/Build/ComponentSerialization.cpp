@@ -19,6 +19,9 @@ Technology is prohibited.
 *    the core serializer remains clean and extendable.
 */
 
+std::unordered_map<GLuint, std::string> s_TexturePathByID;
+std::unordered_map<std::string, GLuint> s_IDByTexturePath;
+
 // ------------------- Serialize -------------------
 void ComponentSerialization::SerializeTransform(json& j, const TransformComponent* t)
 {
@@ -29,16 +32,23 @@ void ComponentSerialization::SerializeTransform(json& j, const TransformComponen
     };
 }
 
-void ComponentSerialization::SerializeRender(json& j, const RenderComponent* r)
+void ComponentSerialization::SerializeRender(json& j, RenderComponent* r)
 {
+    std::string texPath = r->GetTexturePath();
+
+    if (texPath.empty()) {
+        auto it = s_TexturePathByID.find(r->GetTextureID());
+        texPath = (it != s_TexturePathByID.end()) ? it->second : "";
+    }
+
     j["RenderComponent"] = {
         {"shapeType", r->GetShapeTypeName()},
-        {"texturePath", r->GetTexturePath()},
+        {"texturePath", texPath},
         {"color", {r->GetColor().x, r->GetColor().y, r->GetColor().z, r->GetColor().w}}
     };
 }
 
-void ComponentSerialization::SerializePhysics(json& j, const PhysicsComponent* p)
+void ComponentSerialization::SerializePhysics(json& j, PhysicsComponent* p)
 {
     j["PhysicsComponent"] = {
         {"mass", p->GetMass()},
@@ -48,7 +58,7 @@ void ComponentSerialization::SerializePhysics(json& j, const PhysicsComponent* p
     };
 }
 
-void ComponentSerialization::SerializeCollider(json& j, const ColliderComponent* c)
+void ComponentSerialization::SerializeCollider(json& j, ColliderComponent* c)
 {
     j["ColliderComponent"] = {
         {"shape", EnumConverters::ToString(c->GetType())},
@@ -56,7 +66,7 @@ void ComponentSerialization::SerializeCollider(json& j, const ColliderComponent*
     };
 }
 
-void ComponentSerialization::SerializeSpritesheet(json& j, const Spritesheet* s)
+void ComponentSerialization::SerializeSpritesheet(json& j, Spritesheet* s)
 {
     j["Spritesheet"] = {
         {"rows", s->GetRows()},
@@ -78,13 +88,64 @@ void ComponentSerialization::DeserializeTransform(const json& j, GameObject* go)
     tc->SetRotation(t["rotation"]);
 }
 
-void ComponentSerialization::DeserializeRender(const json& j, GameObject* go)
-{
+void ComponentSerialization::DeserializeRender(const json& j, GameObject* go) {
     if (!j.contains("RenderComponent")) return;
     const auto& r = j["RenderComponent"];
+
+    std::string shapeType = r.value("shapeType", "Square");
+    std::string texPath = r.value("texturePath", "");
+
+
+
     auto* render = go->AddComponent<RenderComponent>();
-    render->SetShapeType(RenderComponentTools::ShapeEnumToString(r.value("shapeType", "Square")));
-    render->SetColor({ r["color"][0], r["color"][1], r["color"][2], r["color"][3] });
+    render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
+
+    if (!texPath.empty()) {
+        // try to get texture from resource manager
+        auto& resourceMgr = ResourceManager::Instance();
+        std::string goName = go->GetName();
+        TextureResource* texResource = resourceMgr.GetTexture(goName);
+        GLuint texID = 0;
+
+        if (texResource && texResource->IsLoaded()) {
+            // use existing texture from resource manager
+            texID = texResource->GetTextureID();
+            std::cout << "Serialization using texture from resource manager: " << goName << std::endl;
+        }
+        else {
+            // not in resource manager, load it and register it for future use
+            std::cout << "Serialization texture not in ResourceManager, loading and registering: "
+                << goName << " -> " << texPath << std::endl;
+
+            if (resourceMgr.LoadTexture(goName, texPath)) {
+                texResource = resourceMgr.GetTexture(goName);
+                if (texResource && texResource->IsLoaded()) {
+                    texID = texResource->GetTextureID();
+                }
+            }
+            else {
+                // load directly
+                std::cout << "Serialization warning: Failed to load via resource manager, directly loading" << std::endl;
+                texID = GraphicsSystem::LoadTexture(texPath.c_str());
+            }
+        }
+
+        render->SetTextureID(texID);
+        render->SetTexturePath(texPath);  // store the path for future serialization
+        render->SetColor({ 1,1,1,1 });
+
+        glBindTexture(GL_TEXTURE_2D, texID);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    else if (r.contains("color")) {
+        vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
+        render->SetColor(c);
+    }
+    else {
+        render->SetColor({ 1,1,1,1 });
+    }
 }
 
 void ComponentSerialization::DeserializePhysics(const json& j, GameObject* go)
@@ -121,10 +182,10 @@ void ComponentSerialization::DeserializeSpritesheet(const json& j, GameObject* g
 void ComponentSerialization::SerializeAllComponents(GameObject* go, json& j)
 {
     if (const auto* t = go->GetComponent<TransformComponent>()) SerializeTransform(j, t);
-    if (const auto* r = go->GetComponent<RenderComponent>())    SerializeRender(j, r);
-    if (const auto* p = go->GetComponent<PhysicsComponent>())   SerializePhysics(j, p);
-    if (const auto* c = go->GetComponent<ColliderComponent>())  SerializeCollider(j, c);
-    if (const auto* s = go->GetComponent<Spritesheet>())        SerializeSpritesheet(j, s);
+    if (auto* r = go->GetComponent<RenderComponent>())    SerializeRender(j, r);
+    if (auto* p = go->GetComponent<PhysicsComponent>())   SerializePhysics(j, p);
+    if (auto* c = go->GetComponent<ColliderComponent>())  SerializeCollider(j, c);
+    if (auto* s = go->GetComponent<Spritesheet>())        SerializeSpritesheet(j, s);
 }
 
 void ComponentSerialization::DeserializeAllComponents(GameObject* go, const json& j)

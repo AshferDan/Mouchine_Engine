@@ -31,10 +31,10 @@ namespace ComponentSerialization
 {
     // ----------- Serialize Individual Components -----------------
     void SerializeTransform(json& j, const TransformComponent* t);
-    void SerializeRender(json& j, const RenderComponent* r);
-    void SerializePhysics(json& j, const PhysicsComponent* p);
-    void SerializeCollider(json& j, const ColliderComponent* c);
-    void SerializeSpritesheet(json& j, const Spritesheet* s);
+    void SerializeRender(json& j, RenderComponent* r);
+    void SerializePhysics(json& j, PhysicsComponent* p);
+    void SerializeCollider(json& j, ColliderComponent* c);
+    void SerializeSpritesheet(json& j, Spritesheet* s);
 
     // ----------- Deserialize Individual Components ----------------
     void DeserializeTransform(const json& j, GameObject* go);
