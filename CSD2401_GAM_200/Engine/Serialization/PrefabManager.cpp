@@ -17,7 +17,7 @@ Technology is prohibited.
 #include <iostream>
 
 namespace fs = std::filesystem;
-static const std::string PREFAB_DIR = "Assets/Prefabs/";
+static const std::string PREFAB_DIR = "../Assets/Prefabs/";
 
 /**
  * @brief Returns full path for a prefab filename.

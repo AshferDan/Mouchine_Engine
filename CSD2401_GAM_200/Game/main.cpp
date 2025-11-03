@@ -55,6 +55,37 @@ int main()
         API::Init_Engine(engine, audio);
 
         PrefabManager::LoadPrefab("Prefab_TestScene.json");
+
+        GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
+        textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen
+        auto* text = textObj->AddComponent<TextComponent>(
+            "./Assets/FrederickatheGreat-Regular.ttf",
+            48,  // Font size
+            "Score: 0",
+            vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            true
+        );
+        text->SetScale(1.0f);
+
+        // Later, update the text:
+        text->SetText("Score: 100");
+
+        GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+        auto* cam = mainCamera->AddComponent<CameraComponent>();
+
+        GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (player) {
+            cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+            //WHEN CAMERA MODE IS FIXED
+            //cam->SetPosition(0.f, 0.f);
+            cam->SetFollowTarget(player);
+            cam->SetFollowOffset(vec2(0.f, 0.f));
+            cam->SetSmoothing(true, 2.f);
+        }
+        CameraManager::Instance().SetActiveCamera(mainCamera);
+
+    
+        API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
     {
@@ -65,9 +96,11 @@ int main()
     {
         CrashHandler::LogCrash("UNKNOWN EXCEPTION");
     }
-
     return 0;
+
 }
+
+
 
 namespace CrashHandler
 {
@@ -119,5 +152,4 @@ namespace CrashHandler
         log << GetStackTrace() << "\n";
         log.close();
     }
-
 } // namespace CrashHandler
