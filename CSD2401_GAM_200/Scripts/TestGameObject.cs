@@ -39,6 +39,7 @@ namespace GameScripts
                 false,                           // isStatic
                 false                            // hasGravity = false (no gravity)
             );
+            
 
             Debug.Log("TestGameObject: Two squares created successfully!");
         }

@@ -270,42 +270,42 @@ void ScriptSystem::Shutdown()
 void ScriptSystem::RegisterInternalCalls()
 {
     // === Debug ===
-    mono_add_internal_call("GameEngine.Debug::Log", (void *)Internal_Log);
+    mono_add_internal_call("CSharpScript.Debug::Log", (void *)Internal_Log);
 
     // === GameObject Creation ===
-    mono_add_internal_call("GameEngine.GameObject::CreateShape", (void *)Internal_CreateShape);
-    mono_add_internal_call("GameEngine.GameObject::CreateImage", (void *)Internal_CreateImage);
-    mono_add_internal_call("GameEngine.GameObject::CreateAnimatedImage", (void *)Internal_CreateAnimatedImage);
+    mono_add_internal_call("CSharpScript.GameObject::CreateShape", (void *)Internal_CreateShape);
+    mono_add_internal_call("CSharpScript.GameObject::CreateImage", (void *)Internal_CreateImage);
+    mono_add_internal_call("CSharpScript.GameObject::CreateAnimatedImage", (void *)Internal_CreateAnimatedImage);
 
     // === Transform ===
-    mono_add_internal_call("GameEngine.Transform::SetPosition", (void *)Internal_SetPosition);
-    mono_add_internal_call("GameEngine.Transform::SetRotation", (void *)Internal_SetRotation);
-    mono_add_internal_call("GameEngine.Transform::AddRotation", (void *)Internal_AddRotation);
-    mono_add_internal_call("GameEngine.Transform::SetScale_Single", (void *)Internal_SetScale_Single);
-    mono_add_internal_call("GameEngine.Transform::SetScale_XY", (void *)Internal_SetScale_XY);
+    mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);
+    mono_add_internal_call("CSharpScript.Transform::SetRotation", (void *)Internal_SetRotation);
+    mono_add_internal_call("CSharpScript.Transform::AddRotation", (void *)Internal_AddRotation);
+    mono_add_internal_call("CSharpScript.Transform::SetScale_Single", (void *)Internal_SetScale_Single);
+    mono_add_internal_call("CSharpScript.Transform::SetScale_XY", (void *)Internal_SetScale_XY);
 
     // === Graphics ===
-    mono_add_internal_call("GameEngine.Graphics::SetShapeType", (void *)Internal_SetShapeType);
-    mono_add_internal_call("GameEngine.Graphics::SetTexture", (void *)Internal_SetTexture);
-    mono_add_internal_call("GameEngine.Graphics::SetColor", (void *)Internal_SetColor);
-    mono_add_internal_call("GameEngine.Graphics::SetAlpha", (void *)Internal_SetAlpha);
+    mono_add_internal_call("CSharpScript.Graphics::SetShapeType", (void *)Internal_SetShapeType);
+    mono_add_internal_call("CSharpScript.Graphics::SetTexture", (void *)Internal_SetTexture);
+    mono_add_internal_call("CSharpScript.Graphics::SetColor", (void *)Internal_SetColor);
+    mono_add_internal_call("CSharpScript.Graphics::SetAlpha", (void *)Internal_SetAlpha);
 
     // === Physics ===
-    mono_add_internal_call("GameEngine.Physics::SetVelocity", (void *)Internal_SetVelocity);
-    mono_add_internal_call("GameEngine.Physics::SetJumpValue", (void *)Internal_SetJumpValue);
-    mono_add_internal_call("GameEngine.Physics::SetGravity", (void *)Internal_SetGravity);
-    mono_add_internal_call("GameEngine.Physics::SetGravityValue", (void *)Internal_SetGravityValue);
-    mono_add_internal_call("GameEngine.Physics::SetStatic", (void *)Internal_SetStatic);
+    mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);
+    mono_add_internal_call("CSharpScript.Physics::SetJumpValue", (void *)Internal_SetJumpValue);
+    mono_add_internal_call("CSharpScript.Physics::SetGravity", (void *)Internal_SetGravity);
+    mono_add_internal_call("CSharpScript.Physics::SetGravityValue", (void *)Internal_SetGravityValue);
+    mono_add_internal_call("CSharpScript.Physics::SetStatic", (void *)Internal_SetStatic);
 
     // === Collision ===
-    mono_add_internal_call("GameEngine.Collision::SetCollisionShape", (void *)Internal_SetCollisionShape);
-    mono_add_internal_call("GameEngine.Collision::SetCollisionLayer", (void *)Internal_SetCollisionLayer);
+    mono_add_internal_call("CSharpScript.Collision::SetCollisionShape", (void *)Internal_SetCollisionShape);
+    mono_add_internal_call("CSharpScript.Collision::SetCollisionLayer", (void *)Internal_SetCollisionLayer);
 
     // === Components ===
-    mono_add_internal_call("GameEngine.Components::AddTransformComponent", (void *)Internal_AddTransformComponent);
-    mono_add_internal_call("GameEngine.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
-    mono_add_internal_call("GameEngine.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
-    mono_add_internal_call("GameEngine.Components::AddPhysicsComponent", (void *)Internal_AddPhysicsComponent);
+    mono_add_internal_call("CSharpScript.Components::AddTransformComponent", (void *)Internal_AddTransformComponent);
+    mono_add_internal_call("CSharpScript.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
+    mono_add_internal_call("CSharpScript.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
+    mono_add_internal_call("CSharpScript.Components::AddPhysicsComponent", (void *)Internal_AddPhysicsComponent);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)
