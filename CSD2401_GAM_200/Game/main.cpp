@@ -47,7 +47,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        LoadPrefab("../Logs/Prefab_TestScene.json");
+        PrefabManager::LoadPrefab("Prefab_TestScene.json");
 
         // Start the game loop when ready
         API::StartEngineLoop(engine);
