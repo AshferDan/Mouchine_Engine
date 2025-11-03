@@ -78,7 +78,7 @@ void Serialization::DeserializeGameObject(const json& j)
 void Serialization::SavePrefab(GameObject& go, const std::string& existingPath, bool append)
 {
 	std::string path = existingPath.empty()
-		? "../Assets/Prefabs/Prefab_" + go.GetName() + ".json"
+		? "Assets/Prefabs/Prefab_" + go.GetName() + ".json"
 		: existingPath;
 
 	json root;
