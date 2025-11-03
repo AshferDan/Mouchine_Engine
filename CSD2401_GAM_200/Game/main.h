@@ -31,7 +31,9 @@ Technology is prohibited.
 #include "audio.h"
 #include "InputManager.h"
 #include "ScriptAPI.h"
-#include <Serialization.h>
+#include "Serialization.h"
+#include "PrefabManager.h"
+
 /**
  * @brief Initializes all main systems and resources for the game.
  */

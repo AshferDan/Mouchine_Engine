@@ -32,6 +32,9 @@ public:
 	 */
 	Spritesheet(GameObject *owner, const char *textureFile, int numRows, int numCols);
 
+	// ============ TO BE ADDED =========================
+	Spritesheet(GameObject* owner, GLuint existingTextureID, int numRows, int numCols);
+
 	/**
 	 * @brief Ctor, with GO ptr, and parameters specifying spritesheet details.
 	 * @param rhs		  reference to spritesheet
@@ -130,4 +133,5 @@ private:
 	const char *SpriteFile; // File path for spritesheet
 	GLuint textureID;		// Personalised ID for the texture
 	float alpha;			// Transparency
+	bool ownsTexture;
 };

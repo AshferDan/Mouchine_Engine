@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Serialization.cpp
+\author     Lee Hwee Min [100% - ?? lines]
+\par        l.hweemin@digipen.edu
+\date       November, 3, 2025
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "serialization.h"
 
 #include <fstream>
@@ -6,64 +19,106 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-std::string currentPrefabPath = "";
-std::string previousPrefabPath = "";
 
-// Utility helpers
-namespace {
-	std::unordered_map<GLuint, std::string> s_TexturePathByID;
-	std::unordered_map<std::string, GLuint> s_IDByTexturePath;
+/**
+ * @brief Converts a GameObject and its components into a JSON object.
+ *
+ * Collects GameObject properties such as name and active state,
+ * then delegates the serialization of all attached components to
+ * ComponentSerialization.
+ *
+ * @param go Pointer to the GameObject to serialize.
+ * @return JSON object representing the serialized GameObject.
+ */
+json Serialization::SerializeGameObject(GameObject *go)
+{
+	json j;
+	if (!go)
+		return j;
 
-	static std::string ColliderTypeToString(ColliderComponent::Type type)
-	{
-		switch (type)
-		{
-		case ColliderComponent::Type::Square: return "Square";
-		case ColliderComponent::Type::Circle: return "Circle";
-		default: return "Unknown";
-		}
-	}
+	j["name"] = go->GetName();
+	j["active"] = go->IsActive();
 
-	static ColliderComponent::Type StringToColliderType(const std::string& str)
-	{
-		if (str == "Square") return ColliderComponent::Type::Square;
-		if (str == "Circle") return ColliderComponent::Type::Circle;
-		return ColliderComponent::Type::Square;
-	}
-
-	static std::string CollisionLayerToString(CollisionLayer layer)
-	{
-		switch (layer)
-		{
-		case CollisionLayer::Player:   return "Player";
-		case CollisionLayer::Ground:   return "Ground";
-		case CollisionLayer::Wall:     return "Wall";
-		case CollisionLayer::Enemy:    return "Enemy";
-		case CollisionLayer::Platform: return "Platform";
-		default:                       return "Default";
-		}
-	}
-
-	static CollisionLayer StringToCollisionLayer(const std::string& s)
-	{
-		if (s == "Player")   return CollisionLayer::Player;
-		if (s == "Ground")   return CollisionLayer::Ground;
-		if (s == "Wall")     return CollisionLayer::Wall;
-		if (s == "Enemy")    return CollisionLayer::Enemy;
-		if (s == "Platform") return CollisionLayer::Platform;
-		return CollisionLayer::Default;
-	}
+	ComponentSerialization::SerializeAllComponents(go, j);
+	return j;
 }
 
-std::vector<std::string> GetAllPrefabJSONFiles() {
-	std::vector<std::string> files;
-	const std::string dir = "../Logs/";
+/**
+ * @brief Creates a GameObject from JSON data and registers it with the factory.
+ *
+ * Reads GameObject attributes such as name and active state, and reconstructs
+ * all serialized components through ComponentSerialization.
+ *
+ * @param j JSON object describing the GameObject.
+ */
+void Serialization::DeserializeGameObject(const json &j)
+{
+	GameObjectFactory &factory = GameObjectFactory::Instance();
+	std::string name = j.value("name", "Unnamed");
 
-	for (const auto& entry : fs::directory_iterator(dir)) {
-		if (entry.is_regular_file()) {
-			std::string name = entry.path().filename().string();
-			if (name.find("Prefab_") != std::string::npos && name.ends_with(".json")) {
-				files.push_back(name);
+	GameObject *go = factory.CreateGameObject(name);
+	go->SetActive(j.value("active", true));
+
+	ComponentSerialization::DeserializeAllComponents(go, j);
+}
+
+/**
+ * @brief Saves one or more GameObjects to a prefab JSON file.
+ *
+ * Supports two modes:
+ * - **Append Mode:** Adds a single GameObject to an existing JSON prefab.
+ * - **Overwrite Mode:** Serializes all active GameObjects and replaces the file.
+ *
+ * @param go            Reference to the GameObject to save or append.
+ * @param existingPath  Optional file path to an existing prefab file.
+ * @param append        True to append, false to overwrite the entire prefab.
+ *
+ * @note When overwrite mode is used, all active GameObjects in the
+ *       GameObjectFactory are serialized together.
+ */
+void Serialization::SavePrefab(GameObject &go, const std::string &existingPath, bool append)
+{
+	std::string path = existingPath.empty()
+						   ? "Assets/Prefabs/Prefab_" + go.GetName() + ".json"
+						   : existingPath;
+
+	json root;
+
+	// Append � add new object to existing prefab file
+	if (append && fs::exists(path))
+	{
+		std::ifstream in(path);
+		if (in.peek() != std::ifstream::traits_type::eof())
+		{
+			try
+			{
+				in >> root;
+			}
+			catch (...)
+			{
+				root = json::object();
+			}
+		}
+		in.close();
+
+		if (!root.contains("GameObjects"))
+			root["GameObjects"] = json::array();
+
+		root["GameObjects"].push_back(Serialization::SerializeGameObject(&go));
+	}
+
+	// Overwrite � reserialize *all* current GameObjects
+	else
+	{
+		root = json::object();
+		root["GameObjects"] = json::array();
+
+		const auto &objs = GameObjectFactory::Instance().GetAllGameObjects();
+		for (const auto &objPtr : objs)
+		{
+			if (objPtr && objPtr->IsActive())
+			{
+				root["GameObjects"].push_back(Serialization::SerializeGameObject(objPtr.get()));
 			}
 		}
 	}
@@ -75,20 +130,22 @@ std::vector<std::string> GetAllPrefabJSONFiles() {
 // Serialization Helpers
 // ------------------------------------------------------------
 
-static void SerializeTransform(json& j, const TransformComponent* t) {
+static void SerializeTransform(json &j, const TransformComponent *t)
+{
 	j["TransformComponent"] = {
-		{"pos",   {t->posX, t->posY}},
+		{"pos", {t->posX, t->posY}},
 		{"scale", {t->scaleX, t->scaleY}},
-		{"rotation", t->GetRotation()}
-	};
+		{"rotation", t->GetRotation()}};
 }
 
-static void SerializeRender(json& j, RenderComponent* r)	{
+static void SerializeRender(json &j, RenderComponent *r)
+{
 	j["RenderComponent"]["shapeType"] = r->GetShapeTypeName();
 
 	std::string texPath = r->GetTexturePath();
 	// if no path stored in component, try the lookup map as fallback
-	if (texPath.empty()) {
+	if (texPath.empty())
+	{
 		auto it = s_TexturePathByID.find(r->GetTextureID());
 		texPath = (it != s_TexturePathByID.end()) ? it->second : "";
 	}
@@ -96,133 +153,146 @@ static void SerializeRender(json& j, RenderComponent* r)	{
 	j["RenderComponent"]["texturePath"] = texPath;
 
 	vec4 c = r->GetColor();
-	j["RenderComponent"]["color"] = { c.x, c.y, c.z, c.w };
+	j["RenderComponent"]["color"] = {c.x, c.y, c.z, c.w};
 }
 
-static void SerializeSpritesheet(json& j, Spritesheet* s) {
+static void SerializeSpritesheet(json &j, Spritesheet *s)
+{
 	j["Spritesheet"] = {
 		{"rows", s->GetRows()},
 		{"cols", s->GetCols()},
 		{"startFrame", s->GetCurrentStartFrame()},
 		{"endFrame", s->GetCols() * s->GetRows() - 1},
-		{"fps", s->GetTimePerFrame()}
-	};
+		{"fps", s->GetTimePerFrame()}};
 }
 
-static void SerializePhysics(json& j, PhysicsComponent* p) {
+static void SerializePhysics(json &j, PhysicsComponent *p)
+{
 	j["PhysicsComponent"] = {
 		{"mass", p->GetMass()},
 		{"isStatic", p->IsStatic()},
 		{"useGravity", p->useGravity},
 		{"isGrounded", p->IsGrounded()},
-		{"velocity", {p->velocityX, p->velocityY}}
-	};
+		{"velocity", {p->velocityX, p->velocityY}}};
 }
 
-static void SerializeCollider(json& j, ColliderComponent* c) {
+static void SerializeCollider(json &j, ColliderComponent *c)
+{
 	j["ColliderComponent"] = {
 		{"shape", ColliderTypeToString(c->GetType())},
-		{"layer", CollisionLayerToString(c->GetLayer())}
-	};
+		{"layer", CollisionLayerToString(c->GetLayer())}};
 }
 
 // ------------------------------------------------------------
 // Deserialization Helpers
 // ------------------------------------------------------------
 
-static void DeserializeTransform(const json& j, GameObject* go) {
-	if (!j.contains("TransformComponent")) return;
-	const auto& t = j["TransformComponent"];
-	auto* tc = go->AddComponent<TransformComponent>();
+static void DeserializeTransform(const json &j, GameObject *go)
+{
+	if (!j.contains("TransformComponent"))
+		return;
+	const auto &t = j["TransformComponent"];
+	auto *tc = go->AddComponent<TransformComponent>();
 	tc->SetPosition(t["pos"][0], t["pos"][1]);
 	tc->SetScale(t["scale"][0], t["scale"][1]);
 	tc->SetRotation(t["rotation"]);
 }
 
-	static void DeserializeRender(const json& j, GameObject* go) {
-		if (!j.contains("RenderComponent")) return;
-		const auto& r = j["RenderComponent"];
+static void DeserializeRender(const json &j, GameObject *go)
+{
+	if (!j.contains("RenderComponent"))
+		return;
+	const auto &r = j["RenderComponent"];
 
-		std::string shapeType = r.value("shapeType", "Square");
-		std::string texPath = r.value("texturePath", "");
+	std::string shapeType = r.value("shapeType", "Square");
+	std::string texPath = r.value("texturePath", "");
 
-	
+	auto *render = go->AddComponent<RenderComponent>();
+	render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
 
-		auto* render = go->AddComponent<RenderComponent>();
-		render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
+	if (!texPath.empty())
+	{
+		// try to get texture from resource manager
+		auto &resourceMgr = ResourceManager::Instance();
+		std::string goName = go->GetName();
+		TextureResource *texResource = resourceMgr.GetTexture(goName);
+		GLuint texID = 0;
 
-		if (!texPath.empty()) {
-			// try to get texture from resource manager
-			auto& resourceMgr = ResourceManager::Instance();
-			std::string goName = go->GetName();
-			TextureResource* texResource = resourceMgr.GetTexture(goName);
-			GLuint texID = 0;
+		if (texResource && texResource->IsLoaded())
+		{
+			// use existing texture from resource manager
+			texID = texResource->GetTextureID();
+			std::cout << "Serialization using texture from resource manager: " << goName << std::endl;
+		}
+		else
+		{
+			// not in resource manager, load it and register it for future use
+			std::cout << "Serialization texture not in ResourceManager, loading and registering: "
+					  << goName << " -> " << texPath << std::endl;
 
-			if (texResource && texResource->IsLoaded()) {
-				// use existing texture from resource manager
-				texID = texResource->GetTextureID();
-				std::cout << "Serialization using texture from resource manager: " << goName << std::endl;
-			}
-			else {
-				// not in resource manager, load it and register it for future use
-				std::cout << "Serialization texture not in ResourceManager, loading and registering: "
-					<< goName << " -> " << texPath << std::endl;
-
-				if (resourceMgr.LoadTexture(goName, texPath)) {
-					texResource = resourceMgr.GetTexture(goName);
-					if (texResource && texResource->IsLoaded()) {
-						texID = texResource->GetTextureID();
-					}
+			if (resourceMgr.LoadTexture(goName, texPath))
+			{
+				texResource = resourceMgr.GetTexture(goName);
+				if (texResource && texResource->IsLoaded())
+				{
+					texID = texResource->GetTextureID();
 				}
-				else {
-					// load directly
-					std::cout << "Serialization warning: Failed to load via resource manager, directly loading" << std::endl;
-					texID = GraphicsSystem::LoadTexture(texPath.c_str());
-				}
 			}
+			else
+			{
+				// load directly
+				std::cout << "Serialization warning: Failed to load via resource manager, directly loading" << std::endl;
+				texID = GraphicsSystem::LoadTexture(texPath.c_str());
+			}
+		}
 
-			render->SetTextureID(texID);
-			render->SetTexturePath(texPath);  // store the path for future serialization
-			render->SetColor({ 1,1,1,1 });
+		render->SetTextureID(texID);
+		render->SetTexturePath(texPath); // store the path for future serialization
+		render->SetColor({1, 1, 1, 1});
 
-			glBindTexture(GL_TEXTURE_2D, texID);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-		else if (r.contains("color")) {
-			vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
-			render->SetColor(c);
-		}
-		else {
-			render->SetColor({ 1,1,1,1 });
-		}
+		glBindTexture(GL_TEXTURE_2D, texID);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	else if (r.contains("color"))
+	{
+		vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
+		render->SetColor(c);
+	}
+	else
+	{
+		render->SetColor({1, 1, 1, 1});
+	}
+}
 
-static void DeserializeSpritesheet(const json& j, GameObject* go) {
-	if (!j.contains("Spritesheet")) return;
-	const auto& s = j["Spritesheet"];
+static void DeserializeSpritesheet(const json &j, GameObject *go)
+{
+	if (!j.contains("Spritesheet"))
+		return;
+	const auto &s = j["Spritesheet"];
 	std::string texPath = j["RenderComponent"].value("texturePath", "");
 
-	auto* spr = go->AddComponent<Spritesheet>(
+	auto *spr = go->AddComponent<Spritesheet>(
 		texPath.c_str(),
 		s.value("rows", 1),
-		s.value("cols", 1)
-	);
-	spr->LoadNewSpritesheet(texPath.c_str(),
-		s.value("rows", 1),
 		s.value("cols", 1));
+	spr->LoadNewSpritesheet(texPath.c_str(),
+							s.value("rows", 1),
+							s.value("cols", 1));
 	spr->SetAnimation(
 		s.value("startFrame", 0),
 		s.value("endFrame", 0),
 		s.value("fps", 1.0f));
 }
 
-static void DeserializePhysics(const json& j, GameObject* go) {
-	if (!j.contains("PhysicsComponent")) return;
-	const auto& p = j["PhysicsComponent"];
+static void DeserializePhysics(const json &j, GameObject *go)
+{
+	if (!j.contains("PhysicsComponent"))
+		return;
+	const auto &p = j["PhysicsComponent"];
 
-	auto* pc = go->AddComponent<PhysicsComponent>();
+	auto *pc = go->AddComponent<PhysicsComponent>();
 	pc->SetStatic(p.value("isStatic", false));
 	pc->SetGravity(p.value("useGravity", true));
 	pc->SetMass(p.value("mass", 1.0f));
@@ -233,9 +303,11 @@ static void DeserializePhysics(const json& j, GameObject* go) {
 	pc->SetGrounded(p.value("isGrounded", false));
 }
 
-static void DeserializeCollider(const json& j, GameObject* go) {
-	if (!j.contains("ColliderComponent")) return;
-	const auto& c = j["ColliderComponent"];
+static void DeserializeCollider(const json &j, GameObject *go)
+{
+	if (!j.contains("ColliderComponent"))
+		return;
+	const auto &c = j["ColliderComponent"];
 
 	ColliderComponent::Type type = StringToColliderType(c.value("shape", "Square"));
 	CollisionLayer layer = StringToCollisionLayer(c.value("layer", "Default"));
@@ -249,28 +321,34 @@ static void DeserializeCollider(const json& j, GameObject* go) {
 // GameObject Serialization / Deserialization
 // ------------------------------------------------------------
 
-json SerializeGameObject(GameObject* GO)
+json SerializeGameObject(GameObject *GO)
 {
 	json j;
-	if (!GO) return j;
+	if (!GO)
+		return j;
 
 	j["name"] = GO->GetName();
 	j["active"] = GO->IsActive();
 
-	if (const auto* t = GO->GetComponent<TransformComponent>()) SerializeTransform(j, t);
-	if (auto* r = GO->GetComponent<RenderComponent>())    SerializeRender(j, r);
-	if (auto* s = GO->GetComponent<Spritesheet>())        SerializeSpritesheet(j, s);
-	if (auto* p = GO->GetComponent<PhysicsComponent>())   SerializePhysics(j, p);
-	if (auto* c = GO->GetComponent<ColliderComponent>())  SerializeCollider(j, c);
+	if (const auto *t = GO->GetComponent<TransformComponent>())
+		SerializeTransform(j, t);
+	if (auto *r = GO->GetComponent<RenderComponent>())
+		SerializeRender(j, r);
+	if (auto *s = GO->GetComponent<Spritesheet>())
+		SerializeSpritesheet(j, s);
+	if (auto *p = GO->GetComponent<PhysicsComponent>())
+		SerializePhysics(j, p);
+	if (auto *c = GO->GetComponent<ColliderComponent>())
+		SerializeCollider(j, c);
 
 	return j;
 }
 
-void DeserializeGameObject(const json& j)
+void DeserializeGameObject(const json &j)
 {
-	GameObjectFactory& factory = GameObjectFactory::Instance();
+	GameObjectFactory &factory = GameObjectFactory::Instance();
 	std::string name = j.value("name", "Unnamed");
-	GameObject* GO = factory.CreateGameObject(name);
+	GameObject *GO = factory.CreateGameObject(name);
 	GO->SetActive(j.value("active", true));
 
 	DeserializeTransform(j, GO);
@@ -283,33 +361,32 @@ void DeserializeGameObject(const json& j)
 // ------------------------------------------------------------
 // Create GameObject Serialization / Deserialization
 // ------------------------------------------------------------
-GameObject* CreateObj(
-	const std::string& name,
+GameObject *CreateObj(
+	const std::string &name,
 	RenderComponent::ShapeType shapeType,
-	const vec2& pos,
-	const vec2& scale,
-	const vec4& color,
+	const vec2 &pos,
+	const vec2 &scale,
+	const vec4 &color,
 	float rotation)
 {
-	auto& factory = GameObjectFactory::Instance();
+	auto &factory = GameObjectFactory::Instance();
 
 	// --- Create GameObject ---
-	GameObject* go = factory.CreateShape(
+	GameObject *go = factory.CreateShape(
 		name, shapeType,
 		pos.x, pos.y,
 		scale.x, scale.y,
 		color,
-		CollisionLayer::Default
-	);
+		CollisionLayer::Default);
 
 	// --- Transform ---
-	auto* t = go->AddComponent<TransformComponent>(0, 0);
+	auto *t = go->AddComponent<TransformComponent>(0, 0);
 	t->SetPosition(pos.x, pos.y);
 	t->SetScale(scale.x, scale.y);
 	t->SetRotation(rotation);
 
 	// --- Physics ---
-	auto* physics = go->AddComponent<PhysicsComponent>();
+	auto *physics = go->AddComponent<PhysicsComponent>();
 	physics->SetMass(1.0f);
 	physics->SetStatic(false);
 	physics->useGravity = true;
@@ -324,8 +401,8 @@ GameObject* CreateObj(
 	// --- Collider ---
 	ColliderComponent::Type colliderType =
 		(shapeType == RenderComponent::ShapeType::Circle)
-		? ColliderComponent::Type::Circle
-		: ColliderComponent::Type::Square;
+			? ColliderComponent::Type::Circle
+			: ColliderComponent::Type::Square;
 
 	float width = scale.x;
 	float height = scale.y;
@@ -335,7 +412,7 @@ GameObject* CreateObj(
 	go->AddComponent<ColliderComponent>(colliderType, width, height, layer);
 
 	std::cout << "[CreateObj] Created full GameObject '" << name
-		<< "' with Transform, Render, Physics, and Collider.\n";
+			  << "' with Transform, Render, Physics, and Collider.\n";
 
 	return go;
 }
@@ -343,18 +420,26 @@ GameObject* CreateObj(
 // ------------------------------------------------------------
 // Prefab Save / Load
 // ------------------------------------------------------------
-void SavePrefab(GameObject& go, const std::string& existingPath)
+void SavePrefab(GameObject &go, const std::string &existingPath)
 {
 	std::string path = existingPath.empty()
-		? "../Logs/Prefab_" + go.GetName() + ".json"
-		: existingPath;
+						   ? "../Logs/Prefab_" + go.GetName() + ".json"
+						   : existingPath;
 
 	json root;
-	if (fs::exists(path)) {
+	if (fs::exists(path))
+	{
 		std::ifstream in(path);
-		if (in.peek() != std::ifstream::traits_type::eof()) {
-			try { in >> root; }
-			catch (...) { root = json::object(); }
+		if (in.peek() != std::ifstream::traits_type::eof())
+		{
+			try
+			{
+				in >> root;
+			}
+			catch (...)
+			{
+				root = json::object();
+			}
 		}
 	}
 
@@ -364,150 +449,62 @@ void SavePrefab(GameObject& go, const std::string& existingPath)
 	root["GameObjects"].push_back(SerializeGameObject(&go));
 
 	std::ofstream out(path, std::ios::trunc);
-	out << root.dump(4);
-	out.close();
+	if (out.is_open())
+	{
+		out << root.dump(4);
+		out.close();
+	}
 
-	std::cout << "[SavePrefab] Saved prefab: " << path << "\n";
+	std::cout << "[SavePrefab] "
+			  << (append ? "Appended to" : "Overwrote with updated scene: ")
+			  << path << "\n";
 }
 
-void LoadPrefab(const std::string& path)
+/**
+ * @brief Loads and reconstructs GameObjects from a prefab JSON file.
+ *
+ * Reads the prefab file from disk, parses its JSON data, and recreates
+ * all GameObjects within the scene using the GameObjectFactory.
+ *
+ * @param path Full file path to the prefab JSON file.
+ */
+void Serialization::LoadPrefab(const std::string &path)
 {
-	if (path == currentPrefabPath) {
-		GameObjectFactory::Instance().Clear();
+	if (!fs::exists(path))
+	{
+		std::cerr << "[Serialization] Prefab not found: " << path << "\n";
+		return;
 	}
-	else if (!currentPrefabPath.empty()) {
-		GameObjectFactory::Instance().Clear();
-	}
+
 	std::ifstream in(path);
-	if (!in.is_open()) {
-		std::cerr << "[LoadPrefab] Cannot open " << path << "\n";
+	if (!in.is_open())
+	{
+		std::cerr << "[Serialization] Cannot open prefab: " << path << "\n";
 		return;
 	}
 
 	json j;
-	try { in >> j; }
-	catch (const std::exception& e) {
-		std::cerr << "[LoadPrefab] Parse error: " << e.what() << "\n";
+	try
+	{
+		in >> j;
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << "[Serialization] Parse error: " << e.what() << "\n";
 		return;
 	}
 
-	if (j.contains("GameObjects")) {
-		for (const auto& obj : j["GameObjects"])
+	GameObjectFactory::Instance().Clear();
+
+	if (j.contains("GameObjects"))
+	{
+		for (const auto &obj : j["GameObjects"])
 			DeserializeGameObject(obj);
 	}
-	else {
+	else
+	{
 		DeserializeGameObject(j);
 	}
 
-	previousPrefabPath = currentPrefabPath;
-	currentPrefabPath = path;
-	std::cout << "[LoadPrefab] Loaded prefab: " << path << "\n";
-}
-
-
-
-namespace PrefabTools
-{
-	/**
-   * @brief Takes existing GO, and turns it into a prefab!!! As of right now, we are storing it in Logs! Will move to its own folder soon!
-   * @param GO Reference to Game Object to read data of
-   *      (Will require tweaking to read component data! But as of rn, basic data works!)
-   */
-	void CreatePrefab(GameObject& GO)
-	{
-		std::string filePath{ PrefabFilePath + GO.GetName() + ".txt" }; // Create a textfile in Logs folder with GOs name
-		std::ofstream ofs(filePath);                   // New ofs
-
-		if (!ofs.good()) // If stream bad, stop process immediately!
-		{
-			std::cerr << "File Stream: " << filePath << " is not good!\n";
-			return;
-		}
-
-		auto* transform = GO.GetComponent<TransformComponent>();
-		auto* render = GO.GetComponent<RenderComponent>();
-		vec4 color = render->GetColor();
-
-		// format: Name, Shape Type, PosX, PosY, ScaleX, ScaleY, Colour RGBA
-		ofs << GO.GetName() << " " << render->GetShapeTypeName() << " " << transform->posX << " " << transform->posY << " " << transform->scaleX << " " << transform->scaleY << " " << color.x << " " << color.y << " " << color.z << " " << color.w << std::endl;
-
-		std::cout << "Prefab created successfully!";
-		ofs.clear();
-		ofs.close();
-	}/**
-   * @brief Takes file path to read prefab data! Actual loading of prefab data is somewhere else, will shift into here soon for cleanliness!
-   * @param destination c string for destination of where to read prefab data from
-   */
-	std::string ReadPrefabData(const char* destination)
-	{
-		std::ifstream ifs(destination); // Create ifstream of destination, check if its valid (existing prefab)
-		if (!ifs.good())
-		{
-			std::cerr << "File Stream: " << destination << " is not good!\n";
-			ifs.clear();
-			ifs.close();
-			return ""; // Return EMPTY. No data has been read (can change to "missing data" or something)
-		}
-
-		std::string data{};
-		std::stringstream ss;
-
-		ss << ifs.rdbuf(); // Read data obtained and store into string
-		data = ss.str();
-
-		ifs.clear();
-		ifs.close();
-		return data; // Return data obtained (white space separated)
-	}
-
-	std::vector<std::string> LoadPrefabList()
-	{
-		std::vector<std::string> temp;
-		for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
-		{
-			if (prefab.path().extension() == ".txt")
-			{
-				std::string prefabName = prefab.path().stem().string();
-				temp.push_back(prefabName);
-			}
-		}
-		temp.shrink_to_fit();
-		return temp;
-	}
-
-	void RemovePrefab(std::string const& prefabName)
-	{
-		for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
-		{
-			if (prefab.path().stem().string() == prefabName)
-			{
-				std::filesystem::remove(prefab);
-			}
-			else
-			{
-				std::cout << "Error! No matching prefab found!\n";
-			}
-		}
-	}
-
-	void RenamePrefab(std::string const& oldName, std::string const& newName)
-	{
-		if (!std::filesystem::exists(PrefabFilePath + oldName + ".txt"))
-		{
-			std::cout << "File Path " + PrefabFilePath + oldName + ".txt\" cannot be found!\n";
-			return;
-		}
-
-		// this is pretty buggy, WIP!!!!
-		if (!std::filesystem::exists(PrefabFilePath + newName + ".txt"))
-		{
-			std::filesystem::rename(PrefabFilePath + oldName + ".txt", PrefabFilePath + newName + ".txt");
-		}
-		else
-		{
-			std::filesystem::rename(PrefabFilePath + oldName + ".txt", PrefabFilePath + newName + "(1).txt");
-		}
-
-		std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
-	}
+	std::cout << "[Serialization] Loaded prefab: " << path << "\n";
 }

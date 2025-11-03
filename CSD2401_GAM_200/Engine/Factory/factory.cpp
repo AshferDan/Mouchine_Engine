@@ -285,6 +285,17 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
     return obj;
 }
 
+GameObject* GameObjectFactory::CreateEmptyGO(const std::string& name, float x, float y, float w, float h) {
+    GameObject* obj = CreateGameObject(name);
+
+    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+    auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
+
+    //============ PARENTING CODE HERE =================
+
+    return obj;
+}
+
 /*
     /brief
      This is the blueprint for cloning each type of gameobject we have 4 types so
@@ -586,11 +597,40 @@ void DemoM1_SpawnGameObjects()
     std::uniform_int_distribution<int> distributionX(-960, 960);
     std::uniform_int_distribution<int> distributionY(-540, 540);
 
+    GLuint sharedTextureID = GraphicsSystem::LoadTexture("./Assets/Mouch_idle.png");
+
     // spawn 2.5k small circles
-    for (size_t i = 0; i < 2500; i++)
+    for (size_t i = 0; i < 1000; i++)
     {
         int intX{distributionX(gen)}, intY{distributionY(gen)};
-        GameObject *newGO = factory.CreateShape("Demo Circles", RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, vec4(1.f, 0.f, 0.f, 1.f));
+        std::string uniqueName = "Demo Circle " + std::to_string(i);
+        //GameObject *newGO = factory.CreateShape(uniqueName, RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, vec4(1.f, 0.f, 0.f, 1.f));
+        //GameObject* newGO = factory.CreateAnimatedImage(uniqueName, static_cast<float>(intX), static_cast<float>(intY), 40.0, 40.0, "./Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Ground);
+        
+        GameObject* newGO = factory.CreateGameObject(uniqueName);
+
+        newGO->AddComponent<TransformComponent>(
+            static_cast<float>(intX),
+            static_cast<float>(intY)
+        );
+        auto* transform = newGO->GetComponent<TransformComponent>();
+        auto* physics = newGO->AddComponent<PhysicsComponent>(0, 0);
+        physics->SetGravity(true); // Enable/Disable gravity
+        physics->SetStatic(false);
+        transform->SetScale(40.f, 40.f);
+        physics->SetVelocity(0, 0);
+        newGO->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, 5.f, 5.f, CollisionLayer::Ground);
+
+
+        auto* render = newGO->AddComponent<RenderComponent>(sharedTextureID);
+        render->SetLayer(0);
+        
+        auto* animator = newGO->AddComponent<Spritesheet>(
+            sharedTextureID,
+            1,
+            2
+            );
+        animator->SetAnimation(0, 7, 2.f);
         vecGOs.push_back(newGO);
     }
 }
