@@ -180,6 +180,7 @@ void InputManager::Update(float dt)
     {
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+        
     }
     /**
         * @brief Toggle on and off imgui
