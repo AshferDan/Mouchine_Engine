@@ -13,6 +13,12 @@ Technology is prohibited.
 
 #include "main.h"
 
+namespace CrashHandler
+{
+    std::string GetStackTrace();
+    void LogCrash(const char *type, const std::exception *e = nullptr);
+}
+
 /**
  * @brief Enables memory leak checking in debug mode.
  * @param breakAlloc, Allocation number to break on for debugging.
@@ -39,109 +45,79 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
  */
 int main()
 {
-    EnableMemoryLeakChecking();
-    CoreEngine engine;
-    AudioEngine audio;
-
-    API::Init_Engine(engine, audio);
-
-    // Create objects whenever you want, in any order
-    std::cout << "\n--- Creating Background ---" << std::endl;
-    API::CreateImage("bgImage", RenderComponent::ShapeType::Square,
-        0.f, 0.f, 2400.f, 1380.f,
-        "./Assets/wallpaper_transparent.png");
-
-    std::cout << "\n--- Creating Hero ---" << std::endl;
-    API::CreateAnimatedImage("Hero", 0.0f, 0.0f, 150.0f, 150.0f,
-        "./Assets/Mouch_idle.png",
-        1, 2, 0, 7, 2.0f,
-        CollisionLayer::Player,
-        true, false, true);
-
-    // Maybe some logic here...
-    std::cout << "\n--- Creating Other Sprites ---" << std::endl;
-    API::CreateAnimatedImage("AniImage", -700.0f, 100.0f, 300.0f, 300.0f,
-        "./Assets/Mouch_idle.png",
-        1, 2, 0, 7, 2.0f, CollisionLayer::Ground, true, true, false);
-
-    // Create ground
-    std::cout << "\n--- Creating Environment ---" << std::endl;
-    API::CreateShape("Ground", RenderComponent::ShapeType::Square,
-        0, -500, 3000, 500,
-        vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        CollisionLayer::Ground,
-        true, true, false);
-
-    API::CreateShape("Wall", RenderComponent::ShapeType::Square,
-        1500, -500, 1000, 3000,
-        vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        CollisionLayer::Ground,
-        true, true, false);
-
-    API::CreateShape("Wall2", RenderComponent::ShapeType::Square,
-        -1500, -500, 1000, 3000,
-        vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        CollisionLayer::Ground,
-        true, true, false);
-
-    // Create enemies
-    std::cout << "\n--- Creating Enemies ---" << std::endl;
-    API::CreateShape("Circle", RenderComponent::ShapeType::Circle,
-        150, 300, 100, 100,
-        vec4(1.f, 0.f, 0.f, 1.f),
-        CollisionLayer::Enemy,
-        true, false, true);
-    API::SetVelocity("Circle", -250.0f, 0.0f);
-
-    API::CreateShape("Circle2", RenderComponent::ShapeType::Circle,
-        -150, 300, 100, 100,
-        vec4(1.f, 0.f, 0.f, 1.f),
-        CollisionLayer::Enemy,
-        true, false, true);
-    API::SetVelocity("Circle2", 250.0f, 0.0f);
-
-    GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
-    textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen
-    auto* text = textObj->AddComponent<TextComponent>(
-        "./Assets/FrederickatheGreat-Regular.ttf",
-        48,  // Font size
-        "Score: 0",
-        vec4(1.0f, 1.0f, 1.0f, 1.0f),
-        true
-    );
-    text->SetScale(1.0f);
-
-    // Later, update the text:
-    text->SetText("Score: 100");
-
-    GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
-    auto* cam = mainCamera->AddComponent<CameraComponent>();
-
-    GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
-    if (player) {
-        cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
-        //WHEN CAMERA MODE IS FIXED
-        //cam->SetPosition(0.f, 0.f);
-        cam->SetFollowTarget(player);
-        cam->SetFollowOffset(vec2(0.f, 0.f));
-        cam->SetSmoothing(true, 2.f);
-    }
-    CameraManager::Instance().SetActiveCamera(mainCamera);
-
-    //auto* bg = GameObjectFactory::Instance().FindGameObject("bgImage");
-    //if (bg && bg->GetComponent<RenderComponent>()) {
-    //    bg->GetComponent<RenderComponent>()->SetLayer(-10);
-    //}
-
-    // You can even add conditional creation
-    bool createButton = true;
-    if (createButton)
+    try
     {
-        //API::CreateGameObject("Evil Button");
-    }
 
-    // Start the game loop when ready
-    API::StartEngineLoop(engine);
+        EnableMemoryLeakChecking();
+        CoreEngine engine;
+        AudioEngine audio;
+
+        API::Init_Engine(engine, audio);
+
+        PrefabManager::LoadPrefab("Prefab_TestScene.json");
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "[TEST] Exception caught: " << e.what() << "\n";
+        CrashHandler::LogCrash("EXCEPTION", &e);
+    }
+    catch (...)
+    {
+        CrashHandler::LogCrash("UNKNOWN EXCEPTION");
+    }
 
     return 0;
 }
+
+namespace CrashHandler
+{
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <dbghelp.h>
+#pragma comment(lib, "dbghelp.lib")
+#endif
+
+    std::string GetStackTrace()
+    {
+#if defined(_WIN32)
+        void *stack[62];
+        HANDLE process = GetCurrentProcess();
+        SymInitialize(process, NULL, TRUE);
+        WORD frames = CaptureStackBackTrace(0, 62, stack, NULL);
+
+        std::ostringstream oss;
+        for (WORD i = 0; i < frames; ++i)
+        {
+            DWORD64 address = (DWORD64)(stack[i]);
+            char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+            PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
+            symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+            symbol->MaxNameLen = MAX_SYM_NAME;
+
+            DWORD64 displacement = 0;
+            if (SymFromAddr(process, address, &displacement, symbol))
+            {
+                oss << "[" << i << "] " << symbol->Name
+                    << " - 0x" << std::hex << symbol->Address << std::dec << "\n";
+            }
+        }
+        return oss.str();
+#else
+        return "Stacktrace not supported on this platform.";
+#endif
+    }
+
+    void LogCrash(const char *type, const std::exception *e)
+    {
+        std::filesystem::create_directories("../Logs");
+        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        log << "\n[" << type << "] " << std::put_time(std::localtime(&now), "%F %T") << "\n";
+        if (e)
+            log << e->what() << "\n";
+        log << GetStackTrace() << "\n";
+        log.close();
+    }
+
+} // namespace CrashHandler

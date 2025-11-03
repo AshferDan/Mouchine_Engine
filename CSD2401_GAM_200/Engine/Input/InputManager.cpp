@@ -16,8 +16,10 @@ Technology is prohibited.
 #include <unordered_map>
 #include "Animator.hpp"
 #include "core.h"
+#include "Serialization.h"
 
 bool InputManager::KeyStateImgui = true;
+
 /**
  * @brief Constructs an InputManager with specified parameters.
  * @param window Pointer to the GLFW window.
@@ -57,6 +59,8 @@ void InputManager::Initialize()
  */
 void InputManager::Update(float dt)
 {
+    static bool keyPressed = false;
+
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},
@@ -189,7 +193,15 @@ void InputManager::Update(float dt)
             if (audioEngine)
             {
                 audioEngine->playSound("jump_sfx", "jump_channel");
+           
             }
+            /*if (audioEngine) {
+                Message msg;
+                msg.type = "PlaySound";
+                msg.sender = this;
+                msg.data = (void*)"jump_sfx";
+                CORE->GetMessageBus().Broadcast(msg);
+            }*/
         }
     }
 

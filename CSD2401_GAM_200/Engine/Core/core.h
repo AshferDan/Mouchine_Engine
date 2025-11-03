@@ -35,7 +35,8 @@ Technology is prohibited.
 #include "CameraSystem.h"
 #include <map>
 #include "MathLib.h"
-#include "LevelEditor.h" 
+#include "Serialization.h"
+#include "LevelEditor.h"
 
 // Forward declarations
 class GameObjectSystem;
@@ -69,7 +70,6 @@ public:
      * @brief Cleans up and destroys all active systems.
      */
     void DestroySystems();
-
 
     /**
      * @brief Initializes the CoreEngine and its systems.
@@ -155,7 +155,8 @@ public:
         return debugSystem;
     }
 
-    TransformSystem* GetTransformSystem() const {
+    TransformSystem* GetTransformSystem() const
+    {
 
         return transformSystem;
     }
@@ -166,8 +167,8 @@ public:
     }
 
     /**
-      * @brief Gets a pointer to the LevelEditor.
-      * @return A pointer to the LevelEditor.
+     * @brief Gets a pointer to the LevelEditor.
+     * @return A pointer to the LevelEditor.
      */
     LevelEditor* GetLevelEditor() const
     {
@@ -209,6 +210,18 @@ public:
      */
     static double GetDeltaTime() { return delta_time; }
 
+    /**
+     * @brief Gets the fixed delta time used for physics updates.
+     * @return The fixed delta time as a double.
+     */
+    static double GetFixedDeltaTime() { return fixed_dt; }
+
+    /**
+     * @brief Sets the fixed delta time (e.g., 1/60 for 60 updates per second).
+     * @param dt The desired fixed delta time.
+     */
+    static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
+
 private:
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
@@ -228,7 +241,9 @@ private:
     unsigned LastTime;
     bool GameActive;
     static double fps;
-    static double delta_time;
+    static double delta_time;      // Variable delta time
+    static double fixed_dt;         // Fixed delta time for physics
+    double accumulator;             // Accumulator for fixed timestep
     int WindWidth;
     int WindHeight;
 
