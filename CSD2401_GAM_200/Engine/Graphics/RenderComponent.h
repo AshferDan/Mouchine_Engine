@@ -164,6 +164,9 @@ public:
         }
     }
 
+    void SetTexturePath(const std::string& path) { texturePath = path; }
+    std::string GetTexturePath() const { return texturePath; }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
@@ -171,6 +174,8 @@ private:
 
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
+
+    std::string texturePath;
 };
 
 

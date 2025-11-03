@@ -18,16 +18,8 @@ Technology is prohibited.
 #include "core.h"
 #include "Serialization.h"
 
-bool InputManager::RequestChangeScene = false;
-std::string InputManager::NextScenePath = "";
-int InputManager::CurrentSceneIndex = 0;
 bool InputManager::KeyStateImgui = true;
 
-static std::vector<std::string> sceneList = {
-    "../Logs/Prefab_TestScene.json",
-    "../Logs/Prefab_TestScene2.json",
-    "../Logs/Prefab_TestScene3.json"
-};
 /**
  * @brief Constructs an InputManager with specified parameters.
  * @param window Pointer to the GLFW window.
@@ -144,19 +136,6 @@ void InputManager::Update(float dt)
         DemoM1_DestroyGameObjects();
     }
 
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
-        if (!keyPressed) {
-            keyPressed = true;
-            CurrentSceneIndex = (CurrentSceneIndex + 1) % sceneList.size();
-            NextScenePath = sceneList[CurrentSceneIndex];
-            RequestChangeScene = true;
-            std::cout << "BUTTON PRESSED" << std::endl;
-        }
-    }
-    else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
-        keyPressed = false;
-    }
-
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
     // Horizontal movement
     float moveSpeed = 200.0f;    // Movement speed
@@ -205,9 +184,17 @@ void InputManager::Update(float dt)
             physics->Jump(400.0f);        // Jump force
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
-            if (audioEngine)
-            {
-                audioEngine->playSound("jump_sfx", "jump_channel");
+           // if (audioEngine)
+           // {
+           //     audioEngine->playSound("jump_sfx", "jump_channel");
+           // 
+           //}
+            if (audioEngine) {
+                Message msg;
+                msg.type = "PlaySound";
+                msg.sender = this;
+                msg.data = (void*)"jump_sfx";
+                CORE->GetMessageBus().Broadcast(msg);
             }
         }
     }
