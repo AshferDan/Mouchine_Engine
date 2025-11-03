@@ -83,8 +83,7 @@ GameObject* PrefabManager::CreatePrefabObject(
     physics->wasGrounded = false;
     physics->velocityX = 0.0f;
     physics->velocityY = 0.0f;
-    physics->gravityX = 0.0f;
-    physics->gravityY = -9.8f;
+   
 
     // --- Collider ---
     ColliderComponent::Type colliderType =

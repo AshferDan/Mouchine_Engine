@@ -51,6 +51,15 @@ void InputManager::Initialize()
 {
     glfwGetWindowSize(window, &width, &height);
 }
+/**
+ * @brief Gets the system name.
+ * @return The string "Input System".
+ */
+
+std::string InputManager::GetName()
+{
+    return "InputSystem";
+}
 
 /**
  * @brief Updates input handling, including key presses, mouse events,
@@ -60,7 +69,7 @@ void InputManager::Initialize()
 void InputManager::Update(float dt)
 {
     static bool keyPressed = false;
-    LevelEditor *levelEditor = CORE->GetLevelEditor();
+    LevelEditor* levelEditor = CORE->GetLevelEditor();
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
     {
         // still allow escape key, but ignore player movement inputs
@@ -97,10 +106,10 @@ void InputManager::Update(float dt)
         }
     }
 
-    for (auto &kv : singleTriggerKeys)
+    for (auto& kv : singleTriggerKeys)
     {
         int key = kv.first;
-        bool &wasPressed = kv.second;
+        bool& wasPressed = kv.second;
 
         if (glfwGetKey(window, key) == GLFW_PRESS)
         {
@@ -142,19 +151,19 @@ void InputManager::Update(float dt)
             }
         }
 
-        auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
+        auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
         if (!player)
         {
             return;
         }
 
-        auto *physics = player->GetComponent<PhysicsComponent>();
+        auto* physics = player->GetComponent<PhysicsComponent>();
         if (!physics)
         {
             return;
         }
 
-        TransformComponent *transform = player->GetComponent<TransformComponent>();
+        TransformComponent* transform = player->GetComponent<TransformComponent>();
         if (!transform)
         {
             return;
@@ -164,7 +173,7 @@ void InputManager::Update(float dt)
         static bool dragInitialized = false;
         if (!dragInitialized && physics)
         {
-            auto &forcesManager = physics->GetForcesManager();
+            auto& forcesManager = physics->GetForcesManager();
             forcesManager.AddDrag();
             dragInitialized = true;
         }
@@ -186,7 +195,7 @@ void InputManager::Update(float dt)
         float moveDirectionX = 0.0f;  // Track intended direction (1=Right, -1=Left)
         bool is_jumping = false;
 
-        auto &forcesManager = physics->GetForcesManager();
+        auto& forcesManager = physics->GetForcesManager();
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
@@ -250,7 +259,7 @@ void InputManager::Update(float dt)
             }
         }
 
-        auto *anim = player->GetComponent<Spritesheet>();
+        auto* anim = player->GetComponent<Spritesheet>();
 
         if (transform && anim)
         {
@@ -262,19 +271,19 @@ void InputManager::Update(float dt)
                 transform->SetScale(newScaleX, transform->scaleY);
             }
 
-            const char *IDLE_SS = "./Assets/Mouch_Idle.png";
+            const char* IDLE_SS = "./Assets/Mouch_Idle.png";
             int _ROWS = 1;
             int _COLS = 2;
             const int FRAME_START = 0;
             const int FRAME_END = 1;
             const float IDLE_FPS = 2.0f;
             const float RUN_FPS = 7.0f;
-            const char *RUN_SS = "./Assets/Mouch_Running.png";
-            const char *JUMP_SS = "./Assets/Mouch_jump.png";
+            const char* RUN_SS = "./Assets/Mouch_Running.png";
+            const char* JUMP_SS = "./Assets/Mouch_jump.png";
             // --------------------------------------------------------
 
             float newFPS;
-            const char *newSpritesheet;
+            const char* newSpritesheet;
 
             if (std::abs(vx) > 0.0f) // Player is running/moving
             {
@@ -323,11 +332,4 @@ void InputManager::Update(float dt)
         mouseY = ypos;
     }
 
-    /**
-     * @brief Gets the system name.
-     * @return The string "Input System".
-     */
-    std::string InputManager::GetName()
-    {
-        return "Input System";
-    }
+}

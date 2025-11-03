@@ -15,7 +15,7 @@ public:
 
 	void Update(float dt) override;
 
-	std::string GetName() override { return "TransformSystems"; } ;
+	std::string GetName() override { return "TransformSystem"; } ;
 
 	~TransformSystem() override;
 
