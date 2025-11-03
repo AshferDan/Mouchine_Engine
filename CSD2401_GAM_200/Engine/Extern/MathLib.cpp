@@ -116,6 +116,7 @@ vec4 vec4::operator-(vec4 const &v) const noexcept { return vec4(x - v.x, y - v.
 vec4 vec4::operator*(float s) const noexcept { return vec4(x * s, y * s, z * s, w * s); }
 vec4 vec4::operator/(float s) const noexcept { return vec4(x / s, y / s, z / s, w / s); }
 
+
 //----------------- mat3 -----------------//
 mat3::mat3()
 {
@@ -243,3 +244,14 @@ mat4 mat4::operator*(mat4 const &o) const
     }
     return r;
 }
+
+vec4 operator*(mat4 const& m, vec4 const& v)
+{
+    vec4 r;
+    r.x = m.m[0] * v.x + m.m[4] * v.y + m.m[8] * v.z + m.m[12] * v.w;
+    r.y = m.m[1] * v.x + m.m[5] * v.y + m.m[9] * v.z + m.m[13] * v.w;
+    r.z = m.m[2] * v.x + m.m[6] * v.y + m.m[10] * v.z + m.m[14] * v.w;
+    r.w = m.m[3] * v.x + m.m[7] * v.y + m.m[11] * v.z + m.m[15] * v.w;
+    return r;
+}
+
