@@ -206,26 +206,38 @@ void GraphicsSystem::Update(float)
     // Orthographic projection: origin at bottom-left, size = window width/height
     mat4 projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
 
-    // Default camera at (0,0)
-    vec3 camPos(0.0f);
-
-    // Center camera on the "Hero" object if it exists
-    GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
-    if (player)
+    // Use editor camera for level editing, otherwise use default game camera
+    if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop))
     {
-        auto* transform = player->GetComponent<TransformComponent>();
-        if (transform)
-        {
-            float px{ 0 }, py{ 0 };
-            transform->GetPosition(px, py);
-            camPos.x = px - Wwidth / 2.0f;  // shift camera so Hero is centered
-            camPos.y = py - Wheight / 2.0f;
-        }
+        // EDITOR MODE: Use free editor camera for level editing
+        // This allows designers to navigate and edit the level
+        vp = levelEditor->GetEditorViewProjection((float)Wwidth, (float)Wheight);
     }
+    else
+    {
+        // Use normal game camera
+        mat4 projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+        // Default camera at (0,0)
+        vec3 camPos(0.0f);
 
-    // Camera transform: translate world relative to camPos
-    mat4 view = mat4::translate(-camPos);
-    vp = projection * view; // Final View-Projection matrix
+        // Center camera on the "Hero" object if it exists
+        GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (player)
+        {
+            auto* transform = player->GetComponent<TransformComponent>();
+            if (transform)
+            {
+                float px{ 0 }, py{ 0 };
+                transform->GetPosition(px, py);
+                camPos.x = px - Wwidth / 2.0f;  // shift camera so Hero is centered
+                camPos.y = py - Wheight / 2.0f;
+            }
+        }
+
+        // Camera transform: translate world relative to camPos
+        mat4 view = mat4::translate(-camPos);
+        vp = projection * view; // Final View-Projection matrix
+    }
 
     // === Render All Active GameObjects ===
     auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();

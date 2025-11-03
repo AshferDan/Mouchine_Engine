@@ -68,6 +68,16 @@ void InputManager::Initialize()
 void InputManager::Update(float dt)
 {
     static bool keyPressed = false;
+    LevelEditor* levelEditor = CORE->GetLevelEditor();
+    if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
+    {
+        // still allow escape key, but ignore player movement inputs
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        mouseX = xpos;
+        mouseY = ypos;
+        return;
+    }
 
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},

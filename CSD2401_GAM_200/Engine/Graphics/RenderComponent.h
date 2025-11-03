@@ -164,9 +164,13 @@ public:
         }
     }
 
+    void SetTexturePath(const std::string& path) { texturePath = path; }
+    std::string GetTexturePath() const { return texturePath; }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
+    std::string texturePath;
     vec4 color; /*!< Color of the shape */
 
     LineData line;   /*!< Line data if ShapeType::Line */

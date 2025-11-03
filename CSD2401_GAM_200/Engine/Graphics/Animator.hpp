@@ -98,6 +98,20 @@ public:
 	 */
 	int GetCurrentStartFrame() const { return startFrame; }
 	float GetTimePerFrame() const { return timePerFrame; }
+	int GetCurrentEndFrame() const { return endFrame; }
+	int GetCurrentRow() const { return currRow; }
+	int GetCurrentCol() const { return currCol; } 
+	const char* GetSpriteFile() const { return SpriteFile; }
+
+	void SetCurrentFrame(int row, int col)
+	{
+		if (row >= 0 && row < rows && col >= 0 && col < cols)
+		{
+			currRow = row;
+			currCol = col;
+		}
+	}
+
 
 	// function to loop anim if reach last frame
 	void LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float time);

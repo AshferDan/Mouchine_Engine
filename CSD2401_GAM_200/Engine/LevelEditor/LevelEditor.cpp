@@ -2,24 +2,41 @@
 #include "LevelEditor.h"
 #include "physics.h"
 #include "ResourceManager.h"
+#include "Serialization.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+namespace fs = std::filesystem;
 
 /**
  * @brief Constructor - initialise level editor
  */
 LevelEditor::LevelEditor()
-: factory(GameObjectFactory::Instance()),
+    : factory(GameObjectFactory::Instance()),
     selectedGameObjectID(0),
     showPropertyEditor(true),
     showSaveDialog(false),
-    showLoadDialog(false)
+    showLoadDialog(false),
+    currentFilename(""),
+    editorMode(EditorMode::Stop),
+    hasUnsavedChanges(false),
+    cameraX(0.0f),  
+    cameraY(0.0f),
+    cameraZoom(1.0f),
+    isPanning(false),
+    lastMouseX(0.0f),
+    lastMouseY(0.0f),
+    panSpeed(1.0f),
+    zoomSpeed(0.1f),    //zoom to be implemented
+    minZoom(0.1f),
+    maxZoom(5.0f)
 {
-    strcpy(saveFilepath, "../Engine/LevelEditor/Levels/level.txt");
-    strcpy(loadFilepath, "../Engine/LevelEditor/Levels/level.txt");
+    strcpy(saveFilepath, "");
+    strcpy(loadFilepath, "../Logs/Prefab_TestScene.json");
 }
 
 /**
@@ -34,11 +51,10 @@ LevelEditor::~LevelEditor()
  */
 void LevelEditor::Initialize()
 {
-    std::cout << "LevelEditor initialised" << std::endl;
+    std::cout << "Level editor initialised" << std::endl;
 
-    // create default level
-    currentLevel.levelName = "Untitled Level";
-    currentLevel.levelDescription = "Beninging";
+    currentFilename = "start level";
+    editorMode = EditorMode::Stop;
 }
 
 /**
@@ -47,63 +63,42 @@ void LevelEditor::Initialize()
 void LevelEditor::Update(float dt)
 {
     if (!InputManager::KeyStateImgui)
-        return;
-
-    // render menu bar
-    RenderMenuBar();
-
-    // render hierarchy panel
-    RenderHierarchy();
-    
-    // render property editor
-    if (showPropertyEditor && selectedGameObjectID != 0)
     {
-        RenderPropertyEditor();
+        return;
     }
 
-    // save dialog
-    if (showSaveDialog)
+    UpdateCameraControls();
+    RenderPlayControls();
+
+    // show editor UI only when not in live Play
+    if (editorMode != EditorMode::Play)
     {
-        ImGui::OpenPopup("Save Level");
-        if (ImGui::BeginPopupModal("Save Level", &showSaveDialog, ImGuiWindowFlags_AlwaysAutoResize))
+        RenderMenuBar();
+        RenderHierarchy();
+        
+        // only show camera controls in edit mode
+        if (editorMode == EditorMode::Stop)
         {
-            ImGui::Text("Save level to file:");
-            ImGui::InputText("Filepath", saveFilepath, sizeof(saveFilepath));
+            RenderCameraControls();
+        }
 
-            if (ImGui::Button("Save", ImVec2(120, 0)))
-            {
-                if (SaveLevel(saveFilepath))
-                {
-                    std::cout << "Level saved successfully to: " << saveFilepath << std::endl;
-                    showSaveDialog = false;
-                }
-                else
-                {
-                    std::cerr << "Failed to save level!" << std::endl;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel", ImVec2(120, 0)))
-            {
-                showSaveDialog = false;
-            }
-
-            ImGui::EndPopup();
+        if (showPropertyEditor && selectedGameObjectID != 0)
+        {
+            RenderPropertyEditor();
         }
     }
 
-    // load dialog
     if (showLoadDialog)
     {
-        ImGui::OpenPopup("Load Level");
-        if (ImGui::BeginPopupModal("Load Level", &showLoadDialog, ImGuiWindowFlags_AlwaysAutoResize))
+        ImGui::OpenPopup("Load Level##LevelEditor");
+        if (ImGui::BeginPopupModal("Load Level##LevelEditor", &showLoadDialog, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Load level from file:");
             ImGui::InputText("Filepath", loadFilepath, sizeof(loadFilepath));
 
             if (ImGui::Button("Load", ImVec2(120, 0)))
             {
-                if (LoadLevel(loadFilepath))
+                if (LoadLevelJSON(loadFilepath))
                 {
                     std::cout << "Level loaded successfully from: " << loadFilepath << std::endl;
                     showLoadDialog = false;
@@ -124,79 +119,228 @@ void LevelEditor::Update(float dt)
     }
 }
 
-/**
- * @brief Render the main menu bar
- */
-void LevelEditor::RenderMenuBar()
+void LevelEditor::RenderPlayControls()
 {
-    if (ImGui::BeginMainMenuBar())
+    ImGui::Begin("Editor Controls");
+
+    const bool isRunning = (editorMode == EditorMode::Play || editorMode == EditorMode::Pause);
+    const char* mainLabel = isRunning ? "Stop" : "Play";
+    if (ImGui::Button(mainLabel)) {
+        TogglePlayStop();
+    }
+
+    // pause / resume — always visible
+    ImGui::SameLine();
+    const bool canPause = isRunning;
+    const char* pauseLabel = (editorMode == EditorMode::Pause) ? "Resume" : "Pause";
+    ImGui::BeginDisabled(!canPause);
+    if (ImGui::Button(pauseLabel)) {
+        TogglePause();
+    }
+    ImGui::EndDisabled();
+
+    // status text
+    ImGui::SameLine();
+    ImGui::TextDisabled("Mode: %s",
+        editorMode == EditorMode::Play ? "Play" :
+        editorMode == EditorMode::Pause ? "Pause" :
+        "Stop");
+
+    if (!isRunning) {
+        ImGui::TextDisabled("Editing scene (camera active).");
+    }
+    else {
+        ImGui::TextDisabled("Game running – use Pause/Stop.");
+    }
+    ImGui::End();
+}
+
+// play state
+void LevelEditor::EnterPlayMode()
+{
+    if (editorMode == EditorMode::Play) return;
+    SaveSceneState();               // save the current scene as a JSON snapshot
+    editorMode = EditorMode::Play;
+    std::cout << "[LevelEditor] Entered Play Mode.\n";
+}
+
+// stop state
+void LevelEditor::StopPlayMode()
+{
+    if (editorMode == EditorMode::Stop) return;
+
+    RestoreSceneState();            // restore saved scene
+    editorMode = EditorMode::Stop;  // static camera
+    selectedGameObjectID = 0;       // clear selection
+    std::cout << "[LevelEditor] Returned to Edit Mode.\n";
+}
+
+// pause state
+void LevelEditor::TogglePause()
+{
+    if (editorMode == EditorMode::Play)
     {
-        if (ImGui::BeginMenu("File"))
-        {
-            if (ImGui::MenuItem("New Level", "Ctrl+N"))
-            {
-                NewLevel();
-            }
-
-            if (ImGui::MenuItem("Save Level", "Ctrl+S"))
-            {
-                showSaveDialog = true;
-            }
-
-            if (ImGui::MenuItem("Load Level", "Ctrl+O"))
-            {
-                showLoadDialog = true;
-            }
-
-            ImGui::Separator();
-
-            // recent levels submenu
-            if (ImGui::BeginMenu("Recent Levels"))
-            {
-                if (recentLevels.empty())
-                {
-                    ImGui::MenuItem("(No recent levels)", nullptr, false, false);
-                }
-                else
-                {
-                    for (const auto& path : recentLevels)
-                    {
-                        if (ImGui::MenuItem(path.c_str()))
-                        {
-                            LoadLevel(path);
-                        }
-                    }
-                }
-                ImGui::EndMenu();
-            }
-
-            ImGui::EndMenu();
-        }
-
-        if (ImGui::BeginMenu("View"))
-        {
-            ImGui::MenuItem("Properties", nullptr, &showPropertyEditor);
-
-            ImGui::EndMenu();
-        }
-
-        ImGui::EndMainMenuBar();
+        editorMode = EditorMode::Pause;
+        std::cout << "[LevelEditor] Game paused." << std::endl;
+    }
+    else if (editorMode == EditorMode::Pause)
+    {
+        editorMode = EditorMode::Play;
+        std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
 
-/**
- * @brief Render hierarchy panel listing all game objects
- */
-void LevelEditor::RenderHierarchy()
+void LevelEditor::TogglePlayStop()
 {
-    ImGui::Begin("Hierarchy");
+    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
+    {
+        // currently playing, stop & restore
+        StopPlayMode();
+    }
+    else
+    {
+        // currently stopped, save & enter play
+        EnterPlayMode();
+    }
+}
 
-    ImGui::Text("Level: %s", currentLevel.levelName.c_str());
+// save current scene state
+void LevelEditor::SaveSceneState()
+{
+    savedSceneState.gameObjects.clear();
+
+    // serialise all current GameObjects
+    auto& factory = GameObjectFactory::Instance();
+    for (auto& goPtr : factory.GetAllGameObjects())
+    {
+        GameObject* go = goPtr.get();
+        savedSceneState.gameObjects.push_back(SerialiseGameObject(go));
+    }
+
+    // store the current entity counter
+    savedEntityIDCounter = factory.GetNextEntityID();
+
+    std::cout << "[LevelEditor] Scene state saved with "
+        << savedSceneState.gameObjects.size() << " objects.\n";
+}
+
+// restore scene state from saved data
+void LevelEditor::RestoreSceneState()
+{
+    auto& factory = GameObjectFactory::Instance();
+    factory.DestroyAllGameObjects();
+
+    for (auto& data : savedSceneState.gameObjects)
+    {
+        DeserialiseGameObject(data);
+    }
+
+    factory.SetNextEntityID(savedEntityIDCounter);
+
+    std::cout << "[LevelEditor] Scene state restored.\n";
+}
+
+/**
+ * @brief Render the editor menu windows
+ */
+void LevelEditor::RenderMenuBar()
+{
+    ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 350), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Editor Menu##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    // new lvl
+    if (ImGui::Button("New Level", ImVec2(200, 0)))
+    {
+        NewLevel();
+    }
+
     ImGui::Separator();
 
-    // display count
+    // save lvl
+    ImGui::Text("Save Level:");
+    ImGui::InputText("Filename", saveFilepath, sizeof(saveFilepath));
+    ImGui::TextDisabled("Will save to: ../logs/%s.json", saveFilepath);
+
+    if (ImGui::Button("Save", ImVec2(200, 0)))
+    {
+        std::string filepath = saveFilepath;
+
+        if (filepath.find("../logs/") != 0)
+        {
+            filepath = "../logs/" + filepath;
+        }
+
+        if (filepath.length() < 5 || filepath.substr(filepath.length() - 5) != ".json")
+        {
+            filepath += ".json";
+        }
+
+        if (SaveLevelJSON(filepath))
+        {
+            std::cout << "Level saved successfully to: " << filepath << std::endl;
+        }
+        else
+        {
+            std::cerr << "Failed to save level!" << std::endl;
+        }
+    }
+
+    ImGui::Separator();
+
+    ImGui::Text("Load Scene:");
+    std::vector<std::string> sceneFiles = GetAllSceneFiles();
+    if (sceneFiles.empty())
+    {
+        ImGui::TextDisabled("(No scene files found)");
+    }
+    else
+    {
+        int sceneIndex = 0;
+        for (const auto& file : sceneFiles)
+        {
+            ImGui::PushID(("scene_" + std::to_string(sceneIndex)).c_str());
+            if (ImGui::Button(file.c_str(), ImVec2(200, 0)))
+            {
+                std::string fullPath = "../Logs/" + file;
+                LoadLevelJSON(fullPath);
+            }
+            ImGui::PopID();
+            sceneIndex++;
+        }
+    }
+
+    ImGui::End();
+}
+
+// todo: move to imguisystem!!
+void LevelEditor::RenderHierarchy()
+{
+    ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 600), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Hierarchy##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    // display current file name
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
+    ImGui::Text("Scene: %s", currentFilename.c_str());
+    ImGui::PopStyleColor();
+    ImGui::Separator();
+
+    // display object count
     auto& allObjects = factory.GetAllGameObjects();
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
     ImGui::Text("Game Objects: %zu", allObjects.size());
+    ImGui::PopStyleColor();
     ImGui::Separator();
 
     // list all game objects
@@ -215,7 +359,6 @@ void LevelEditor::RenderHierarchy()
             flags |= ImGuiTreeNodeFlags_Selected;
         }
 
-        // display as selectable tree node
         bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)",
             obj->GetName().c_str(), id);
 
@@ -232,6 +375,10 @@ void LevelEditor::RenderHierarchy()
             {
                 SetSelectedGameObject(id);
             }
+            if (ImGui::MenuItem("Save as Prefab"))
+            {
+                SavePrefab(*obj);
+            }
             if (ImGui::MenuItem("Clone"))
             {
                 factory.CloneGameObject(id);
@@ -245,20 +392,27 @@ void LevelEditor::RenderHierarchy()
             ImGui::EndPopup();
         }
     }
-
     ImGui::End();
 }
 
-/**
- * @brief Render property editor for selected game object
- */
+// todo: move to imguisystem!!s
 void LevelEditor::RenderPropertyEditor()
 {
     GameObject* obj = GetSelectedGameObject();
     if (!obj)
+    {
+        showPropertyEditor = false;
         return;
+    }
 
-    ImGui::Begin("Level Editor Properties", &showPropertyEditor);
+    ImGui::SetNextWindowPos(ImVec2(1400, 10), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(500, 900), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Properties##LevelEditor", &showPropertyEditor, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
 
     ImGui::Text("GameObject: %s", obj->GetName().c_str());
     ImGui::Text("ID: %u", obj->GetID());
@@ -306,7 +460,6 @@ void LevelEditor::RenderPropertyEditor()
         {
             ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
 
-            // colour editor if no texture (check if textureID is 0)
             if (render->GetTextureID() == 0)
             {
                 vec4 color = render->GetColor();
@@ -376,71 +529,143 @@ void LevelEditor::RenderPropertyEditor()
             ImGui::Text("Layer: %s", GetCollisionLayerName((int)collider->GetLayer()));
         }
     }
-
-    ImGui::Spacing();
-    ImGui::Separator();
-
-    // component management
-    if (ImGui::Button("Add Component"))
-    {
-        ImGui::OpenPopup("AddComponentPopup");
-    }
-
-    if (ImGui::BeginPopup("AddComponentPopup"))
-    {
-        if (!obj->HasComponent<TransformComponent>() && ImGui::MenuItem("Transform"))
-        {
-            obj->AddComponent<TransformComponent>(0.0f, 0.0f);
-        }
-        if (!obj->HasComponent<RenderComponent>() && ImGui::MenuItem("Render"))
-        {
-            obj->AddComponent<RenderComponent>(RenderComponent::ShapeType::Square, vec4(1, 1, 1, 1));
-        }
-        if (!obj->HasComponent<PhysicsComponent>() && ImGui::MenuItem("Physics"))
-        {
-            obj->AddComponent<PhysicsComponent>(1.0f, false);
-        }
-        if (!obj->HasComponent<ColliderComponent>() && ImGui::MenuItem("Collider"))
-        {
-            obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, 50.0f, 50.0f, CollisionLayer::Default);
-        }
-        ImGui::EndPopup();
-    }
-
-    ImGui::Spacing();
-    ImGui::Separator();
-    ImGui::Spacing();
-
-    // game object actions
-    ImGui::Text("GameObject Actions:");
-
-    // clone button
-    if (ImGui::Button("Clone GameObject", ImVec2(-1, 30)))
-    {
-        GameObject* clone = factory.CloneGameObject(selectedGameObjectID);
-        if (clone)
-        {
-            std::cout << "Cloned object: " << clone->GetName() << std::endl;
-            SetSelectedGameObject(clone->GetID()); // select the clone
-        }
-    }
-
-    // delete button (red color)
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
-
-    if (ImGui::Button("Delete GameObject", ImVec2(-1, 30)))
-    {
-        RemoveGameObject(selectedGameObjectID);
-        selectedGameObjectID = 0; // dselect after deletion
-        ImGui::PopStyleColor(3);
-        ImGui::End();
-        return;
-    }
-
-    ImGui::PopStyleColor(3);
     ImGui::End();
+}
+
+bool LevelEditor::SaveLevelJSON(const std::string& filepath)
+{
+    try
+    {
+        // filename from path without logs or .jsn
+        size_t lastSlash = filepath.find_last_of("/\\");
+        size_t lastDot = filepath.find_last_of(".");
+        std::string filenameOnly = filepath;
+
+        if (lastSlash != std::string::npos)
+            filenameOnly = filepath.substr(lastSlash + 1);
+
+        if (lastDot != std::string::npos && lastDot > lastSlash)
+            filenameOnly = filenameOnly.substr(0, lastDot - (lastSlash + 1));
+
+        currentFilename = filenameOnly;
+
+        json root;
+        root["GameObjects"] = json::array();
+
+        // serialise all active game objects
+        auto& allObjects = factory.GetAllGameObjects();
+        for (const auto& objPtr : allObjects)
+        {
+            if (objPtr && objPtr->IsActive())
+            {
+                json objData = ::SerializeGameObject(objPtr.get());
+                root["GameObjects"].push_back(objData);
+            }
+        }
+
+        // write to file
+        std::ofstream outFile(filepath);
+        if (!outFile.is_open())
+        {
+            std::cerr << "Failed to open file for writing: " << filepath << std::endl;
+            return false;
+        }
+
+        outFile << root.dump(2);
+        outFile.close();
+
+        std::cout << "Level saved to: " << filepath << std::endl;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error saving level: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool LevelEditor::LoadLevelJSON(const std::string& filepath)
+{
+    try
+    {
+        std::ifstream inFile(filepath);
+        if (!inFile.is_open())
+        {
+            std::cerr << "Failed to open file for reading: " << filepath << std::endl;
+            return false;
+        }
+
+        json root;
+        inFile >> root;
+        inFile.close();
+
+        // clear current level
+        factory.Clear();
+        selectedGameObjectID = 0;
+
+        size_t lastSlash = filepath.find_last_of("/\\");
+        size_t lastDot = filepath.find_last_of(".");
+        std::string filenameOnly = filepath;
+
+        if (lastSlash != std::string::npos)
+            filenameOnly = filepath.substr(lastSlash + 1);
+
+        if (lastDot != std::string::npos && lastDot > lastSlash)
+            filenameOnly = filenameOnly.substr(0, lastDot - (lastSlash + 1));
+
+        currentFilename = filenameOnly;
+
+        // load all game objects
+        if (root.contains("GameObjects") && root["GameObjects"].is_array())
+        {
+            for (const auto& objData : root["GameObjects"])
+            {
+                ::DeserializeGameObject(objData);
+            }
+        }
+
+        std::cout << "Level loaded from: " << filepath << std::endl;
+        std::cout << "Loaded " << factory.GetAllGameObjects().size() << " game objects" << std::endl;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error loading level: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+/**
+ * @brief Get all scene files from the prefabs directory
+ */
+std::vector<std::string> LevelEditor::GetAllSceneFiles()
+{
+    std::vector<std::string> files;
+    std::string prefabDir = "../Logs/";
+
+    try
+    {
+        if (fs::exists(prefabDir) && fs::is_directory(prefabDir))
+        {
+            for (const auto& entry : fs::directory_iterator(prefabDir))
+            {
+                if (entry.is_regular_file())
+                {
+                    std::string filename = entry.path().filename().string();
+                    if (filename.ends_with(".json"))
+                    {
+                        files.push_back(filename);
+                    }
+                }
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error reading scene directory: " << e.what() << std::endl;
+    }
+
+    return files;
 }
 
 /**
@@ -448,22 +673,13 @@ void LevelEditor::RenderPropertyEditor()
  */
 void LevelEditor::NewLevel()
 {
-    // confirm if there are unsaved changes
-    auto& allObjects = factory.GetAllGameObjects();
-    if (!allObjects.empty())
-    {
-        std::cout << "Warning: Creating new level will clear all existing objects!" << std::endl;
-    }
-
-    // clear all game objects
-    factory.Clear();
-
-    // reset level data
     currentLevel = LevelData();
-    currentLevel.levelName = "New Level";
+    currentFilename = "Untitled";
+
+    factory.Clear();
     selectedGameObjectID = 0;
 
-    std::cout << "Created new level" << std::endl;
+    std::cout << "New level created" << std::endl;
 }
 
 /**
@@ -471,37 +687,7 @@ void LevelEditor::NewLevel()
  */
 bool LevelEditor::SaveLevel(const std::string& filepath)
 {
-    // serialise all active game objects
-    currentLevel.gameObjects.clear();
-
-    for (const auto& objPtr : factory.GetAllGameObjects())
-    {
-        if (objPtr->IsActive())
-        {
-            GameObjectData data = SerializeGameObject(objPtr.get());
-            currentLevel.gameObjects.push_back(data);
-        }
-    }
-
-    // save to file
-    bool success = SaveLevelToFile(currentLevel, filepath);
-
-    if (success)
-    {
-        // add to recent levels
-        auto it = std::find(recentLevels.begin(), recentLevels.end(), filepath);
-        if (it != recentLevels.end())
-        {
-            recentLevels.erase(it);
-        }
-        recentLevels.insert(recentLevels.begin(), filepath);
-        if (recentLevels.size() > MAX_RECENT_LEVELS)
-        {
-            recentLevels.pop_back();
-        }
-    }
-
-    return success;
+    return SaveLevelJSON(filepath);  // redirect to JSON version
 }
 
 /**
@@ -509,41 +695,31 @@ bool LevelEditor::SaveLevel(const std::string& filepath)
  */
 bool LevelEditor::LoadLevel(const std::string& filepath)
 {
-    LevelData loadedLevel;
-    if (!LoadLevelFromFile(filepath, loadedLevel))
+    // check if it's a JSON file
+    if (filepath.ends_with(".json"))
     {
-        return false;
+        return LoadLevelJSON(filepath);
     }
 
-    // clear existing level
-    factory.Clear();
-    selectedGameObjectID = 0;
-
-    // load new level
-    currentLevel = loadedLevel;
-
-    // instantiate all game objects
-    for (const auto& objData : currentLevel.gameObjects)
+    LevelData data;
+    if (LoadLevelFromFile(filepath, data))
     {
-        DeserializeGameObject(objData);
+        // convert to current level
+        currentLevel = data;
+
+        // clear and recreate game objects
+        factory.Clear();
+        selectedGameObjectID = 0;
+
+        for (const auto& objData : data.gameObjects)
+        {
+            DeserialiseGameObject(objData);
+        }
+
+        return true;
     }
 
-    // ad to recent levels
-    auto it = std::find(recentLevels.begin(), recentLevels.end(), filepath);
-    if (it != recentLevels.end())
-    {
-        recentLevels.erase(it);
-    }
-    recentLevels.insert(recentLevels.begin(), filepath);
-    if (recentLevels.size() > MAX_RECENT_LEVELS)
-    {
-        recentLevels.pop_back();
-    }
-
-    std::cout << "Loaded level: " << currentLevel.levelName << " with "
-        << currentLevel.gameObjects.size() << " objects" << std::endl;
-
-    return true;
+    return false;
 }
 
 /**
@@ -551,7 +727,7 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
  */
 GameObject* LevelEditor::AddGameObject(const GameObjectData& data)
 {
-    return DeserializeGameObject(data);
+    return DeserialiseGameObject(data);
 }
 
 /**
@@ -560,7 +736,6 @@ GameObject* LevelEditor::AddGameObject(const GameObjectData& data)
 void LevelEditor::RemoveGameObject(EntityID id)
 {
     factory.DestroyGameObject(id);
-    std::cout << "Removed GameObject ID: " << id << std::endl;
 }
 
 /**
@@ -568,8 +743,6 @@ void LevelEditor::RemoveGameObject(EntityID id)
  */
 GameObject* LevelEditor::GetSelectedGameObject() const
 {
-    if (selectedGameObjectID == 0)
-        return nullptr;
     return factory.GetGameObject(selectedGameObjectID);
 }
 
@@ -584,9 +757,14 @@ void LevelEditor::SetSelectedGameObject(EntityID id)
 /**
  * @brief Serialise a game object to data structure
  */
-GameObjectData LevelEditor::SerializeGameObject(GameObject* obj)
+GameObjectData LevelEditor::SerialiseGameObject(GameObject* obj)
 {
     GameObjectData data;
+
+    if (!obj) {
+        return data;
+    }
+
     data.name = obj->GetName();
     data.originalID = obj->GetID();
     data.isActive = obj->IsActive();
@@ -595,8 +773,10 @@ GameObjectData LevelEditor::SerializeGameObject(GameObject* obj)
     if (auto* transform = obj->GetComponent<TransformComponent>())
     {
         data.hasTransform = true;
-        transform->GetPosition(data.posX, data.posY);
-        transform->GetScale(data.scaleX, data.scaleY);
+        data.posX = transform->posX;
+        data.posY = transform->posY;
+        data.scaleX = transform->scaleX;
+        data.scaleY = transform->scaleY;
         data.rotation = transform->GetRotation();
     }
 
@@ -605,16 +785,33 @@ GameObjectData LevelEditor::SerializeGameObject(GameObject* obj)
     {
         data.hasRender = true;
         data.shapeType = (int)render->GetShapeType();
-        data.hasTexture = (render->GetTextureID() != 0);
 
-        if (!data.hasTexture)
+        std::string texPath = render->GetTexturePath();
+        if (!texPath.empty())
         {
-            vec4 color = render->GetColor();
-            data.colorR = color.x;
-            data.colorG = color.y;
-            data.colorB = color.z;
-            data.colorA = color.w;
+            data.hasTexture = true;
+            data.texturePath = texPath;
         }
+        else
+        {
+            // fallback: infer from texture ID
+            if (render->GetTextureID() != 0)
+            {
+                data.hasTexture = true;
+                data.texturePath = texPath;
+            }
+            else
+            {
+                data.hasTexture = false;
+                data.texturePath = "";
+            }
+        }
+
+        vec4 color = render->GetColor();
+        data.colorR = color.x;
+        data.colorG = color.y;
+        data.colorB = color.z;
+        data.colorA = color.w;
     }
 
     // serialise physics
@@ -622,7 +819,8 @@ GameObjectData LevelEditor::SerializeGameObject(GameObject* obj)
     {
         data.hasPhysics = true;
         data.mass = physics->GetMass();
-        physics->GetVelocity(data.velocityX, data.velocityY);
+        data.velocityX = physics->velocityX;
+        data.velocityY = physics->velocityY;
         data.isStatic = physics->IsStatic();
         data.hasGravity = physics->useGravity;
     }
@@ -633,20 +831,54 @@ GameObjectData LevelEditor::SerializeGameObject(GameObject* obj)
         data.hasCollider = true;
         data.colliderType = (int)collider->GetType();
 
-        if (collider->GetType() == ColliderComponent::Type::Circle)
+        if (auto* transform = obj->GetComponent<TransformComponent>())
         {
-            Circle circle = collider->GetCircle();
-            data.colliderWidth = circle.radius * 2.0f; // diameter
-            data.colliderHeight = circle.radius * 2.0f;
-        }
-        else
-        {
-            AABB aabb = collider->GetAABB();
-            data.colliderWidth = aabb.max.x - aabb.min.x;
-            data.colliderHeight = aabb.max.y - aabb.min.y;
+            data.colliderWidth = transform->scaleX;
+            data.colliderHeight = transform->scaleY;
         }
 
         data.collisionLayer = (int)collider->GetLayer();
+    }
+
+    // add animation / spritesheet component
+    if (auto* spritesheet = obj->GetComponent<Spritesheet>())
+    {
+        data.hasAnimation = true;
+        data.numRows = spritesheet->GetRows();
+        data.numCols = spritesheet->GetCols();
+        data.startFrame = spritesheet->GetCurrentStartFrame();
+        data.endFrame = spritesheet->GetCurrentEndFrame();
+        data.fps = (spritesheet->GetTimePerFrame() > 0.0f) ? (1.0f / spritesheet->GetTimePerFrame()) : 1.0f;
+
+        const char* spritePath = spritesheet->GetSpriteFile();
+        if (spritePath != nullptr)
+        {
+            data.spritesheetPath = spritePath;
+        }
+
+        if (auto* render = obj->GetComponent<RenderComponent>())
+        {
+            std::string rcPath = render->GetTexturePath();
+            if (!rcPath.empty())
+            {
+                data.spritesheetPath = rcPath;
+            }
+        }
+
+        if (!data.spritesheetPath.empty())
+        {
+            data.hasTexture = true;
+            data.texturePath = data.spritesheetPath;
+        }
+
+        std::cout << "[LevelEditor] Serialized animation for "
+            << data.name << ": " << data.spritesheetPath
+            << " (" << data.numRows << "x" << data.numCols << ")"
+            << std::endl;
+    }
+    else
+    {
+        data.hasAnimation = false;
     }
 
     return data;
@@ -655,13 +887,16 @@ GameObjectData LevelEditor::SerializeGameObject(GameObject* obj)
 /**
  * @brief Deserialise game object data and create instance
  */
-GameObject* LevelEditor::DeserializeGameObject(const GameObjectData& data)
+GameObject* LevelEditor::DeserialiseGameObject(const GameObjectData& data)
 {
-    // create base game object
-    GameObject* obj = factory.CreateGameObject(data.name);
-
+    // create base game object with same id so selection etc. still works
+    GameObject* obj = factory.CreateGameObjectWithID(data.originalID, data.name);
     if (!obj)
+    {
         return nullptr;
+    }
+
+    bool willHaveAnimation = data.hasAnimation && !data.spritesheetPath.empty();
 
     // add transform component
     if (data.hasTransform)
@@ -674,14 +909,62 @@ GameObject* LevelEditor::DeserializeGameObject(const GameObjectData& data)
     // add render component
     if (data.hasRender)
     {
-        RenderComponent::ShapeType shape = (RenderComponent::ShapeType)data.shapeType;
+        RenderComponent::ShapeType shape =
+            (RenderComponent::ShapeType)data.shapeType;
 
-        if (data.hasTexture && !data.texturePath.empty())
+        // animated
+        if (willHaveAnimation)
         {
-            // load texture (would need GraphicsSystem access)
-            // GLuint texID = GraphicsSystem::LoadTexture(data.texturePath.c_str());
-            // obj->AddComponent<RenderComponent>(texID);
+            std::cout << "[LevelEditor] Creating RenderComponent for animated object: "
+                << data.name << std::endl;
+
+            auto* render = obj->AddComponent<RenderComponent>(
+                shape,
+                vec4(data.colorR, data.colorG, data.colorB, data.colorA)
+            );
+
+            // store path so future serialisation can recover it
+            render->SetTexturePath(data.spritesheetPath);
         }
+        // static texture
+        else if (data.hasTexture && !data.texturePath.empty())
+        {
+            // We'll try to get or load the texture through ResourceManager
+            auto& rm = ResourceManager::Instance();
+            GLuint texID = 0;
+
+            TextureResource* texRes = rm.GetTexture(data.name);
+            if (texRes && texRes->IsLoaded())
+            {
+                texID = texRes->GetTextureID();
+            }
+            else
+            {
+                // not loaded yet, try to load now using saved path
+                if (rm.LoadTexture(data.name, data.texturePath))
+                {
+                    texRes = rm.GetTexture(data.name);
+                    if (texRes && texRes->IsLoaded())
+                    {
+                        texID = texRes->GetTextureID();
+                    }
+                }
+                else
+                {
+                    texID = GraphicsSystem::LoadTexture(data.texturePath.c_str());
+                }
+            }
+
+            auto* render = obj->AddComponent<RenderComponent>(texID);
+            render->SetTexturePath(data.texturePath);
+            render->SetColor(vec4(data.colorR, data.colorG, data.colorB, data.colorA));
+
+            glBindTexture(GL_TEXTURE_2D, texID);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+        // square, circle etc
         else
         {
             vec4 color(data.colorR, data.colorG, data.colorB, data.colorA);
@@ -702,87 +985,55 @@ GameObject* LevelEditor::DeserializeGameObject(const GameObjectData& data)
     {
         ColliderComponent::Type colliderType = (ColliderComponent::Type)data.colliderType;
         CollisionLayer layer = (CollisionLayer)data.collisionLayer;
-        obj->AddComponent<ColliderComponent>(colliderType, data.colliderWidth, data.colliderHeight, layer);
+        obj->AddComponent<ColliderComponent>(
+            colliderType,
+            data.colliderWidth,
+            data.colliderHeight,
+            layer
+        );
     }
 
-    // set active state
+    // --- Animation / Spritesheet ---
+    if (willHaveAnimation)
+    {
+        std::cout << "[LevelEditor] Restoring animation for " << data.name << std::endl;
+
+        auto* spritesheet = obj->AddComponent<Spritesheet>(
+            data.spritesheetPath.c_str(),
+            data.numRows,
+            data.numCols
+        );
+
+        if (spritesheet)
+        {
+            spritesheet->SetAnimation(
+                data.startFrame,
+                data.endFrame,
+                data.fps
+            );
+
+            // now sync the render component with the spritesheet texture
+            auto* render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                GLuint texID = spritesheet->GetTextureID();
+                render->SetTextureID(texID);
+                render->SetTexturePath(data.spritesheetPath);
+
+                // animated sprites should usually render with white tint
+                render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+                glBindTexture(GL_TEXTURE_2D, texID);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+        }
+    }
+
     obj->SetActive(data.isActive);
 
     return obj;
-}
-
-/**
- * @brief Save level data to file (simple text format)
- */
-bool LevelEditor::SaveLevelToFile(const LevelData& data, const std::string& filepath)
-{
-    std::ofstream file(filepath);
-    if (!file.is_open())
-    {
-        std::cerr << "Failed to open file for writing: " << filepath << std::endl;
-        return false;
-    }
-
-    // write level metadata
-    file << "LEVEL_BEGIN\n";
-    file << "Name: " << data.levelName << "\n";
-    file << "Description: " << data.levelDescription << "\n";
-    file << "ObjectCount: " << data.gameObjects.size() << "\n";
-    file << "\n";
-
-    // write each game object
-    for (const auto& obj : data.gameObjects)
-    {
-        file << "GAMEOBJECT_BEGIN\n";
-        file << "Name: " << obj.name << "\n";
-        file << "Active: " << obj.isActive << "\n";
-
-        // transform
-        if (obj.hasTransform)
-        {
-            file << "Transform: " << obj.posX << " " << obj.posY << " "
-                << obj.scaleX << " " << obj.scaleY << " " << obj.rotation << "\n";
-        }
-
-        // render
-        if (obj.hasRender)
-        {
-            file << "Render: " << obj.shapeType << " " << obj.hasTexture << " "
-                << obj.colorR << " " << obj.colorG << " " << obj.colorB << " " << obj.colorA << "\n";
-            if (obj.hasTexture)
-            {
-                file << "Texture: " << obj.texturePath << "\n";
-            }
-        }
-
-        // physics
-        if (obj.hasPhysics)
-        {
-            file << "Physics: " << obj.mass << " " << obj.velocityX << " " << obj.velocityY << " "
-                << obj.isStatic << " " << obj.hasGravity << "\n";
-        }
-
-        // collider
-        if (obj.hasCollider)
-        {
-            file << "Collider: " << obj.colliderType << " " << obj.colliderWidth << " "
-                << obj.colliderHeight << " " << obj.collisionLayer << "\n";
-        }
-
-        // animation
-        if (obj.hasAnimation)
-        {
-            file << "Animation: " << obj.spritesheetPath << " " << obj.numRows << " " << obj.numCols << " "
-                << obj.startFrame << " " << obj.endFrame << " " << obj.fps << "\n";
-        }
-
-        file << "GAMEOBJECT_END\n\n";
-    }
-
-    file << "LEVEL_END\n";
-    file.close();
-
-    return true;
 }
 
 /**
@@ -800,20 +1051,12 @@ bool LevelEditor::LoadLevelFromFile(const std::string& filepath, LevelData& outD
     std::string line;
     outData = LevelData(); // reset
 
-    // read level metadata
+    // read level
     while (std::getline(file, line))
     {
         if (line == "LEVEL_BEGIN")
         {
             continue;
-        }
-        else if (line.find("Name: ") == 0)
-        {
-            outData.levelName = line.substr(6);
-        }
-        else if (line.find("Description: ") == 0)
-        {
-            outData.levelDescription = line.substr(13);
         }
         else if (line == "GAMEOBJECT_BEGIN")
         {
@@ -873,13 +1116,6 @@ bool LevelEditor::LoadLevelFromFile(const std::string& filepath, LevelData& outD
             iss >> currentObj.colliderType >> currentObj.colliderWidth >> currentObj.colliderHeight >> currentObj.collisionLayer;
             currentObj.hasCollider = true;
         }
-        else if (line.find("Animation: ") == 0)
-        {
-            std::istringstream iss(line.substr(11));
-            iss >> currentObj.spritesheetPath >> currentObj.numRows >> currentObj.numCols
-                >> currentObj.startFrame >> currentObj.endFrame >> currentObj.fps;
-            currentObj.hasAnimation = true;
-        }
         else if (line == "GAMEOBJECT_END")
         {
             outData.gameObjects.push_back(currentObj);
@@ -926,4 +1162,153 @@ const char* LevelEditor::GetCollisionLayerName(int layer)
     case 5: return "Default";
     default: return "Unknown";
     }
+}
+
+// camera control
+/**
+ * @brief Render camera control panel
+ */
+void LevelEditor::RenderCameraControls()
+{
+    ImGui::SetNextWindowPos(ImVec2(10, 400), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Camera Controls##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Level Editor Camera");
+    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "For navigation & editing");
+    ImGui::Separator();
+
+    // display current camera info
+    ImGui::Text("Position: (%.1f, %.1f)", cameraX, cameraY);
+    ImGui::Separator();
+
+    // camera position sliders
+    if (ImGui::DragFloat("Camera X", &cameraX, 1.0f, -10000.0f, 10000.0f)) {}
+    if (ImGui::DragFloat("Camera Y", &cameraY, 1.0f, -10000.0f, 10000.0f)) {}
+    ImGui::Separator();
+
+    // camera settings
+    ImGui::DragFloat("Pan Speed", &panSpeed, 0.1f, 0.1f, 10.0f);
+    ImGui::Separator();
+
+    // reset button
+    if (ImGui::Button("Reset Camera", ImVec2(-1, 0)))
+    {
+        ResetCamera();
+    }
+
+    ImGui::Separator();
+    ImGui::TextWrapped("Controls:\n"
+        "- Middle Mouse: Pan camera\n"
+        "- WASD: Pan camera (alternative)");
+
+    ImGui::Separator();
+    ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Editor Mode");
+    ImGui::End();
+}
+
+/**
+ * @brief Update camera controls (handle input for panning and zooming in the future)
+ */
+void LevelEditor::UpdateCameraControls()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // camera moves when not hovering over imgui windows and if its in editor mode
+    if (editorMode != EditorMode::Stop || io.WantCaptureMouse)
+    {
+        isPanning = false;
+        return;
+    }
+
+    // middle mouse button
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+    {
+        isPanning = true;
+        lastMouseX = io.MousePos.x;
+        lastMouseY = io.MousePos.y;
+    }
+    else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
+    {
+        isPanning = false;
+    }
+
+    if (isPanning && ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+    {
+        float deltaX = io.MousePos.x - lastMouseX;
+        float deltaY = io.MousePos.y - lastMouseY;
+
+        // pan camera
+        cameraX -= (deltaX * panSpeed) / cameraZoom;
+        cameraY += (deltaY * panSpeed) / cameraZoom;
+
+        lastMouseX = io.MousePos.x;
+        lastMouseY = io.MousePos.y;
+    }
+
+    // keyboard panning
+    if (!io.WantCaptureKeyboard)
+    {
+        float keyPanSpeed = panSpeed * 5.0f / cameraZoom;
+
+        if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
+        {
+            cameraY -= keyPanSpeed;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_UpArrow))
+        {
+            cameraY += keyPanSpeed;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_RightArrow))
+        {
+            cameraX += keyPanSpeed;
+        }
+        if (ImGui::IsKeyDown(ImGuiKey_LeftArrow))
+        {
+            cameraX -= keyPanSpeed;
+        }
+    }
+}
+
+/**
+ * @brief Reset camera to default position and zoom
+ */
+void LevelEditor::ResetCamera()
+{
+    cameraX = 0.0f;
+    cameraY = 0.0f;
+    cameraZoom = 1.0f;
+    isPanning = false;
+    std::cout << "[LevelEditor] Camera reset to default." << std::endl;
+}
+
+/**
+ * @brief Apply camera transformations to the rendering system
+ */
+void LevelEditor::ApplyCameraTransform() {}
+
+/**
+ * @brief Get the editor camera's view-projection matrix
+ */
+mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight) const
+{
+    // same as your graphics system
+    mat4 projection = mat4::ortho(0.0f, windowWidth, 0.0f, windowHeight);
+
+    // create view matrix with editor camera position
+    vec3 editorCamPos(cameraX - windowWidth / 2.0f, cameraY - windowHeight / 2.0f, 0.0f);
+    mat4 view = mat4::translate(-editorCamPos);
+
+    // apply zoom by scaling the projection
+    mat4 zoomMatrix = mat4::translate(vec3(windowWidth / 2.0f, windowHeight / 2.0f, 0.0f));
+    zoomMatrix = zoomMatrix * mat4::scale(vec3(cameraZoom, cameraZoom, 1.0f));
+    zoomMatrix = zoomMatrix * mat4::translate(vec3(-windowWidth / 2.0f, -windowHeight / 2.0f, 0.0f));
+
+    // projection * zoom * view
+    return zoomMatrix * projection * view;
 }

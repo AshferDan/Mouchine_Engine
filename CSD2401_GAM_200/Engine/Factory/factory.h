@@ -274,8 +274,19 @@ public:
 
     /**
      * @brief Destroys all currently managed GameObjects.
+     * This method clears all GameObjects but does NOT reset the EntityID counter.
+     * Use this for level editor play/stop functionality to avoid ID conflicts.
+     */
+    void DestroyAllGameObjects();
+
+    /**
+     * @brief Destroys all currently managed GameObjects.
      */
     void Clear();
+
+    GameObject* CreateGameObjectWithID(EntityID id, const std::string& name);
+    void SetNextEntityID(EntityID id);
+    EntityID GetNextEntityID() const;
 
 private:
     GameObjectFactory() : nextEntityID(1), cloneCounter(0) {}

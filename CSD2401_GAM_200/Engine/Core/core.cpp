@@ -13,6 +13,8 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 #include "core.h"
+#include "LevelEditor.h"
+
 bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
 
@@ -100,6 +102,9 @@ void CoreEngine::InitSystems()
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
+    // Connect GraphicsSystem to LevelEditor for editor camera
+    graphicsSystem->SetLevelEditor(levelEditor);
+
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
 /* brief
@@ -147,46 +152,72 @@ void CoreEngine::GameLoop()
                 ImGui::NewFrame();
             }
 
-            // 3. Update all systems and collect timings
+            // 3. Get editor mode (if level editor exists)
+            LevelEditor* levelEditor = nullptr;
+            for (auto& uptr : Systems)                   // unique_ptr iteration
+            {
+                ISystem* sys = uptr.get();               // convert to raw
+                if (sys && sys->GetName() == "LevelEditor")
+                {
+                    levelEditor = static_cast<LevelEditor*>(sys);
+                    break;
+                }
+            }
+
+            EditorMode currentMode = EditorMode::Stop;
+            if (levelEditor) currentMode = levelEditor->GetEditorMode();
+
+            // 4. Update all systems based on editor mode
             for (size_t i = 0; i < Systems.size(); ++i)
             {
                 if (Systems[i]->GetName() == "ImGui_System")
                     continue;
 
-                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                Systems[i]->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
-                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                // freeze time while paused
+                float sysDt = (currentMode == EditorMode::Pause)
+                    ? 0.0f
+                    : static_cast<float>(CoreEngine::GetDeltaTime());
+
+                auto sysStart = std::chrono::high_resolution_clock::now();
+                Systems[i]->Update(sysDt);
+                auto sysEnd = std::chrono::high_resolution_clock::now();
 
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[Systems[i]->GetName()] = ms;
                 g_totalLoopTime += ms;
             }
 
+            // 5. Always update ImGui system
             if (imguiSystem)
             {
-                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-
+                auto sysStart = std::chrono::high_resolution_clock::now();
                 imguiSystem->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
+                auto sysEnd = std::chrono::high_resolution_clock::now();
 
-                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[imguiSystem->GetName()] = ms;
                 g_totalLoopTime += ms;
             }
 
-            // 5. End ImGui frame and render (ALWAYS)
+            //if (InputManager::RequestChangeScene) {
+            //    GameObjectFactory::Instance().Clear();
+            //    LoadPrefab(InputManager::NextScenePath);
+            //    InputManager::RequestChangeScene = false;
+            //}
+
+            // 6. End ImGui frame and render (ALWAYS)
             if (imguiSystem)
             {
                 ImGui::Render();
                 ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             }
 
-            // 6. Swap buffers and poll events
+            // 7. Swap buffers and poll events
             glfwSwapBuffers(graphicsSystem->getWindow());
             glfwPollEvents();
         }
     }
-    catch (const std::exception &e)
+    catch (const std::exception& e)
     {
         // Log standard exceptions to debuglog.txt
         std::ofstream log("./Logs/CrashLog.txt", std::ios::app);

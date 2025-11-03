@@ -83,12 +83,15 @@ static void SerializeTransform(json& j, const TransformComponent* t) {
 	};
 }
 
-static void SerializeRender(json& j, RenderComponent* r) {
+static void SerializeRender(json& j, RenderComponent* r)	{
 	j["RenderComponent"]["shapeType"] = r->GetShapeTypeName();
 
-	std::string texPath;
-	auto it = s_TexturePathByID.find(r->GetTextureID());
-	texPath = (it != s_TexturePathByID.end()) ? it->second : "";
+	std::string texPath = r->GetTexturePath();
+	// if no path stored in component, try the lookup map as fallback
+	if (texPath.empty()) {
+		auto it = s_TexturePathByID.find(r->GetTextureID());
+		texPath = (it != s_TexturePathByID.end()) ? it->second : "";
+	}
 
 	j["RenderComponent"]["texturePath"] = texPath;
 
@@ -136,36 +139,65 @@ static void DeserializeTransform(const json& j, GameObject* go) {
 	tc->SetRotation(t["rotation"]);
 }
 
-static void DeserializeRender(const json& j, GameObject* go) {
-	if (!j.contains("RenderComponent")) return;
-	const auto& r = j["RenderComponent"];
+	static void DeserializeRender(const json& j, GameObject* go) {
+		if (!j.contains("RenderComponent")) return;
+		const auto& r = j["RenderComponent"];
 
-	std::string shapeType = r.value("shapeType", "Square");
-	std::string texPath = r.value("texturePath", "");
+		std::string shapeType = r.value("shapeType", "Square");
+		std::string texPath = r.value("texturePath", "");
 
 	
 
-	auto* render = go->AddComponent<RenderComponent>();
-	render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
+		auto* render = go->AddComponent<RenderComponent>();
+		render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
 
-	if (!texPath.empty()) {
-		GLuint texID = GraphicsSystem::LoadTexture(texPath.c_str());
-		render->SetTextureID(texID);
-		render->SetColor({ 1,1,1,1 });
+		if (!texPath.empty()) {
+			// try to get texture from resource manager
+			auto& resourceMgr = ResourceManager::Instance();
+			std::string goName = go->GetName();
+			TextureResource* texResource = resourceMgr.GetTexture(goName);
+			GLuint texID = 0;
 
-		glBindTexture(GL_TEXTURE_2D, texID);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glBindTexture(GL_TEXTURE_2D, 0);
+			if (texResource && texResource->IsLoaded()) {
+				// use existing texture from resource manager
+				texID = texResource->GetTextureID();
+				std::cout << "Serialization using texture from resource manager: " << goName << std::endl;
+			}
+			else {
+				// not in resource manager, load it and register it for future use
+				std::cout << "Serialization texture not in ResourceManager, loading and registering: "
+					<< goName << " -> " << texPath << std::endl;
+
+				if (resourceMgr.LoadTexture(goName, texPath)) {
+					texResource = resourceMgr.GetTexture(goName);
+					if (texResource && texResource->IsLoaded()) {
+						texID = texResource->GetTextureID();
+					}
+				}
+				else {
+					// load directly
+					std::cout << "Serialization warning: Failed to load via resource manager, directly loading" << std::endl;
+					texID = GraphicsSystem::LoadTexture(texPath.c_str());
+				}
+			}
+
+			render->SetTextureID(texID);
+			render->SetTexturePath(texPath);  // store the path for future serialization
+			render->SetColor({ 1,1,1,1 });
+
+			glBindTexture(GL_TEXTURE_2D, texID);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		else if (r.contains("color")) {
+			vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
+			render->SetColor(c);
+		}
+		else {
+			render->SetColor({ 1,1,1,1 });
+		}
 	}
-	else if (r.contains("color")) {
-		vec4 c(r["color"][0], r["color"][1], r["color"][2], r["color"][3]);
-		render->SetColor(c);
-	}
-	else {
-		render->SetColor({ 1,1,1,1 });
-	}
-}
 
 static void DeserializeSpritesheet(const json& j, GameObject* go) {
 	if (!j.contains("Spritesheet")) return;

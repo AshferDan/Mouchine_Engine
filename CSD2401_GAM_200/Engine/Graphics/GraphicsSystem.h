@@ -128,6 +128,8 @@ public:
 	// Returns the current view-projection matrix.
 	const mat4& getVp() const { return vp; }
 
+	void SetLevelEditor(class LevelEditor* editor) { levelEditor = editor; }
+
 private:
 	mat4 vp;               // Current view-projection matrix.
 	bool debugMode = false;     // Debug mode flag for showing shapes.
@@ -135,6 +137,8 @@ private:
 	GLSLShader shader;          // Shader used for debug rendering.
 	GLuint vao = 0, vbo = 0, tex = 0; // OpenGL buffers and texture.
 	GLint Wwidth, Wheight;      // Window dimensions.
+	class LevelEditor* levelEditor = nullptr; // Level editor for camera control
+
 };
 
 

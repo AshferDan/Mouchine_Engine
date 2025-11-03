@@ -524,11 +524,48 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
     }
 }
 
+// destroys all gameobjects without resetting the EntityID counter - used by level editor 
+void GameObjectFactory::DestroyAllGameObjects()
+{
+    std::cout << "Factory: Destroying all " << gameObjects.size() << " GameObjects..." << std::endl;
+
+    gameObjects.clear();
+    entityToIndex.clear();
+
+    std::cout << "Factory: All game objects destroyed. Next ID will be: " << nextEntityID << std::endl;
+}
+
 void GameObjectFactory::Clear()
 {
     gameObjects.clear();
     entityToIndex.clear();
     nextEntityID = 1;
+}
+
+GameObject* GameObjectFactory::CreateGameObjectWithID(EntityID id, const std::string& name)
+{
+    auto gameObject = std::make_unique<GameObject>(id, name);
+    GameObject* ptr = gameObject.get();
+
+    entityToIndex[id] = gameObjects.size();
+    gameObjects.push_back(std::move(gameObject));
+
+    if (id >= nextEntityID)
+    {
+        nextEntityID = id + 1;
+    }
+
+    return ptr;
+}
+
+void GameObjectFactory::SetNextEntityID(EntityID id)
+{
+    nextEntityID = id;
+}
+
+EntityID GameObjectFactory::GetNextEntityID() const 
+{
+    return nextEntityID;
 }
 
 #pragma region M1 Showcase - 2500 GOs Test

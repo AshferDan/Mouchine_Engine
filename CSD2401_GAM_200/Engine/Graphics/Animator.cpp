@@ -28,7 +28,7 @@ Spritesheet::Spritesheet(GameObject *owner, const char *textureFile, int numRows
 	  startFrame(0),
 	  endFrame(0),
 	  textureID(GraphicsSystem::LoadTexture(textureFile)),
-	  SpriteFile(0),
+	  SpriteFile(textureFile),
 	  alpha(0)
 {
 }
