@@ -22,6 +22,7 @@ Technology is prohibited.
 #include <GLFW/glfw3.h>
 #include <map>
 #include "InputManager.h"
+#include <filesystem>
 
 using SystemTimingsMap = std::map<std::string, double>;
 
@@ -73,3 +74,34 @@ private:
 };
 
 void ReloadPrefabsList();
+
+class DirectoryNavigator
+{
+public:
+    DirectoryNavigator();
+    void RenderImGui(); 
+private:
+    std::filesystem::path currentDir;
+};
+
+void Profiler_Render();
+
+void GOCreationMenu_Render();
+
+void GOCreationMenu_Spawn();
+
+void PrefabMenu_Render();
+
+void PrefabMenu_Spawn();
+
+/**
+  * @brief 1/2 functions for drag and drop operations within asset browser. This one is for sending. Sends a payload with data + leaves a trailing text for users to see what file is being moved.
+  * @param PayloadID        ID that the Receiving end will check against, can be any string!
+  * @param filePath         string containing filepath/ data to send over
+  * @param displayText      string that shows near cursor while holding left click + dragging.
+  */
+template <typename DataType>
+void SendDragAndDrop(std::string const& PayloadID, DataType const& dataToSend, std::string const& displayText);
+void SendDragAndDrop(std::string const& PayloadID, std::string const& dataToSend, std::string const& displayText);
+
+void ReceiveDragAndDrop(std::string const& PayloadID, std::string& dataToReceive);

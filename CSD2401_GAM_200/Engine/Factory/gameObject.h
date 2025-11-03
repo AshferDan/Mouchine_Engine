@@ -247,9 +247,17 @@ public:
      */
     bool IsActive() const { return isActive; }
 
+    void AddChild(GameObject* ChildGO);
+
+    void RemoveChild(GameObject* ChildGO);
+
+    void SetParent(GameObject* ParentGO);
+
 private:
     EntityID entityID;
     std::string name;
     bool isActive;
+    GameObject* parent;
+    std::vector<GameObject*> children;                  
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;
 };

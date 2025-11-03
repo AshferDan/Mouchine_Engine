@@ -32,6 +32,9 @@ public:
 	 */
 	Spritesheet(GameObject *owner, const char *textureFile, int numRows, int numCols);
 
+	// ============ TO BE ADDED =========================
+	Spritesheet(GameObject* owner, GLuint existingTextureID, int numRows, int numCols);
+
 	/**
 	 * @brief Ctor, with GO ptr, and parameters specifying spritesheet details.
 	 * @param rhs		  reference to spritesheet
@@ -98,6 +101,20 @@ public:
 	 */
 	int GetCurrentStartFrame() const { return startFrame; }
 	float GetTimePerFrame() const { return timePerFrame; }
+	int GetCurrentEndFrame() const { return endFrame; }
+	int GetCurrentRow() const { return currRow; }
+	int GetCurrentCol() const { return currCol; } 
+	const char* GetSpriteFile() const { return SpriteFile; }
+
+	void SetCurrentFrame(int row, int col)
+	{
+		if (row >= 0 && row < rows && col >= 0 && col < cols)
+		{
+			currRow = row;
+			currCol = col;
+		}
+	}
+
 
 	// function to loop anim if reach last frame
 	void LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float time);
@@ -116,4 +133,5 @@ private:
 	const char *SpriteFile; // File path for spritesheet
 	GLuint textureID;		// Personalised ID for the texture
 	float alpha;			// Transparency
+	bool ownsTexture;
 };

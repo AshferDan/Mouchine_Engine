@@ -166,6 +166,16 @@ public:
     GameObject *CreatePlayer(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const char *sprite, CollisionLayer layer);
 
     /**
+     * @brief Creates an empty GameObject that just has no shape, only Physics and transform.
+     * @param name The desired name for the new GameObject.=
+     * @param x The initial x-coordinate.
+     * @param y The initial y-coordinate.
+     * @param w The width.
+     * @param h The height.
+     */
+    GameObject* CreateEmptyGO(const std::string& name, float x, float y, float w, float h);
+
+    /**
      * @brief Creates a generic shaped GameObject with a color and collision layer.
      * @param name The desired name for the new GameObject.
      * @param shape The shape type for rendering.
@@ -198,6 +208,7 @@ public:
     GameObject *CreateAnimatedImage(const std::string &name, float x, float y, float w, float h,
                                     char const *filename, int numRows, int numCols,
                                     int startFrame, int endFrame, float fps, CollisionLayer layer);
+
 
     /**
      * @brief Creates a clone of an existing GameObject by its EntityID.
@@ -274,8 +285,19 @@ public:
 
     /**
      * @brief Destroys all currently managed GameObjects.
+     * This method clears all GameObjects but does NOT reset the EntityID counter.
+     * Use this for level editor play/stop functionality to avoid ID conflicts.
+     */
+    void DestroyAllGameObjects();
+
+    /**
+     * @brief Destroys all currently managed GameObjects.
      */
     void Clear();
+
+    GameObject* CreateGameObjectWithID(EntityID id, const std::string& name);
+    void SetNextEntityID(EntityID id);
+    EntityID GetNextEntityID() const;
 
 private:
     GameObjectFactory() : nextEntityID(1), cloneCounter(0) {}

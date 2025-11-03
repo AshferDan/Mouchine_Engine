@@ -13,285 +13,49 @@ Technology is prohibited.
 
 #pragma once
 #include <string>
+#include <vector>
 #include <nlohmann/json.hpp>
-
-#include "serialization.h"
-#include "gameObject.h"
+#include "GameObject.h"
 #include "RenderComponent.h"
-#include "transform.h"
-#include "physics.h"
-#include "collidercomponent.h"
-#include "collision.h"
 #include "factory.h"
-class RenderComponent;
-class TransformComponent;
-class GameObject;
+#include "ComponentSerialization.h"
+
 using json = nlohmann::json;
+const std::string PrefabFilePath { "../Assets/Prefabs/" };
+const std::string SceneFilePath{ "../Assets/Scenes/" };
 
-// --- Object Serialization ---
-json SerializeGameObject(GameObject *GO);
-void DeserializeGameObject(const json &j);
-
-// --- Game Object Creation ---
-GameObject *CreateObj(
-	const std::string &name,
-	RenderComponent::ShapeType shapeType,
-	const vec2 &pos,
-	const vec2 &scale,
-	const vec4 &color,
-	float rotation = 0.f);
-
-const std::string PrefabFilePath{"../Assets/Prefabs/"};
-
-/**
- * @brief Save one GameObject as a prefab JSON file.
- */
-void SavePrefab(GameObject &GO, const std::string &existingFile = "");
-
-/**
- * @brief Load one prefab JSON file into the current scene.
- */
-void LoadPrefab(const std::string &filePath);
-
-std::vector<std::string> GetAllPrefabJSONFiles();
-
-/**
-  * @brief The only Ctor we allow. Sets ofs to be either write in txt or binary.
-  * @param filePathReference string containing file path to write to
-  * @param isBinaryStream     flag for if file will write in binary
-  */
-class Serialize_Writer
+namespace Serialization
 {
-public:
-    // Delete these, we want properly defined filestreams
-    Serialize_Writer() = delete;
-    Serialize_Writer& operator=(Serialize_Writer const&) = delete;
-    Serialize_Writer& operator=(Serialize_Writer&&) = delete;
-
-Serialize_Writer(std::string const& filePathReference, bool isBinaryStream = false) : filePath{ filePathReference }
-{
-    if (isBinaryStream)
-    {
-        ofs.open(filePath, std::ios::binary);
-    }
-    else
-        ofs.open(filePath);
-}
-
-/**
- * @brief Dtor. Clears streams and closes file stream
- */
-~Serialize_Writer()
-{
-    ofs.clear();
-    ofs.close();
-}
-
-/**
- * @brief Returns if stream is valid
- */
-bool IsStreamGood() const
-{
-    return ofs.good();
-}
-
-/**
-* @brief Templated to write data to ofs
-      (Might require tweaking!!)
-* @param data Reference to data to write
-* @param size Size of data we are writing
-* @return bool! Depending if operation was successful
-*/
-template <typename T>
-bool WriteSimpleData(T const& data, size_t size)
-{
-    if (!IsStreamGood()) // If bad file path, return out
-    {
-        std::cerr << "File Stream: " << filePath << " is not good!\n";
-        return false;
-    }
-    ofs.write(reinterpret_cast<const char*>(&data), size); // Write data to ofs
-    return true;
-}
-
-/**
- * @brief Writes data of entire game objects! As of right now, writes in a specified format for readability. Prefabs however, will take in raw data
- *     (Definitely requires tweaking for component data! But general GO data works fine!)
- * @param GO Reference to Game Object to write data of
- * @param size Size of data we are writing
- * @return bool! Depending if operation was successful
- */
-bool WriteGameObjectData(GameObject& GO, size_t size)
-{
-    // Create temp components to get GO's data
-    auto* transform = GO.GetComponent<TransformComponent>();
-    auto* render = GO.GetComponent<RenderComponent>();
-    if (!transform || !render)
-    {
-        std::cerr << "Missing required components on GameObject\n";
-        return false;
-    }
-
-    vec4 color = render->GetColor();
-
-    // Hard coding output directory for now... (shameful, dishonorable even)
-    std::ofstream outFile("../Logs/GameObjectData.txt", std::ios::app);
-    if (!outFile.is_open())
-    { // Check if ofs valid
-        std::cerr << "Failed to open file! Make sure ./Logs/ directory exists\n";
-        return false;
-    }
-
-    // Print in specified format
-    outFile << "GO Name: " << GO.GetName() << " | Shape: " << render->GetShapeTypeName()
-        << " | Position (x,y): (" << transform->posX << "," << transform->posY << ")"
-        << " | Size (w,h): (" << transform->scaleX << "," << transform->scaleY << ")"
-        << " | Colour: (" << color.x << "," << color.y << "," << color.z << "," << color.w << ")"
-        << std::endl;
-
-    outFile.close(); // Close stream and return true. Operation successful!
-    std::cout << "Successfully wrote GameObject data to file!\n";
-    return true;
-}
-/**
- * @brief Private members to hold File path and output stream!
- */
-private:
-    std::string filePath;
-    std::ofstream ofs;
-};
-
-/**
- * @brief Serialising Reader Class!
- */
-class Serialize_Reader
-{
-public:
-    // Delete these, we want properly defined filestreams
-    Serialize_Reader() = delete;
-    Serialize_Reader& operator=(Serialize_Reader const&) = delete;
-    Serialize_Reader& operator=(Serialize_Reader&&) = delete;
     /**
-       * @brief The only Ctor we allow. Sets ifs to be either read in txt or binary.
-       * @param filePathReference string containing file path to read from
-       * @param isBinaryStream     flag for if file will be read in binary
-       */
-    Serialize_Reader(std::string const& filePathReference, bool isBinaryStream = false) : filePath{ filePathReference }
-    {
-        if (isBinaryStream)
-        {
-            ifs.open(filePath, std::ios::binary);
-        }
-        else
-            ifs.open(filePath);
-    }
-
-    /**
-     * @brief Dtor. Clears streams and closes file stream
+     * @brief Serializes a GameObject and all its components into JSON format.
+     * @param go Pointer to GameObject.
+     * @return JSON object representing the serialized GameObject.
      */
-    ~Serialize_Reader()
-    {
-        ifs.clear();
-        ifs.close();
-    }
+    json SerializeGameObject(GameObject* go);
 
     /**
-     * @brief Returns if stream is valid
+     * @brief Creates a GameObject from JSON data and adds it to the factory.
+     * @param j JSON object describing the GameObject.
      */
-    bool IsStreamGood() const
-    {
-        return ifs.good();
-    }
+    void DeserializeGameObject(const json& j);
 
     /**
-     * @brief The reader version of WriteSimple Data. Basically just reads the entire textfile, and stores data into a stringstream ref!
-     * @param destination Reference to data to read
-     * @param size     Size of data we are reading
-     * @param ss       Reference to stringsStream where data is sent to
-     * @return bool! Depending if operation was successful
+     * @brief Saves (creates or updates) a prefab to disk as a JSON file.
+     * @param go GameObject reference to serialize.
+     * @param existingPath Optional path to an existing prefab to overwrite.
      */
-    bool ReadSimpleData(char* destination, size_t size, std::stringstream& ss)
-    {
-        if (!IsStreamGood()) // If file bad, return out
-        {
-            std::cerr << "File Stream: " << filePath << " is not good!\n";
-            return false;
-        }
-        ifs.clear(); // Else Read the data from file!
-        ifs.read(destination, size);
-
-        while (ifs.peek() != EOF)
-        {
-            ss << ifs.rdbuf(); // Stores data into stringstream, to be retrieved outside of this function. Return true, success!
-        }
-        return true;
-    }
+    void SavePrefab(GameObject& go);
 
     /**
-     * @brief [WIP] Reads data of entire game objects! As of right now, reads everything, including the formatted string.
-     *     (Definitely requires tweaking for component data! But general GO data works fine!)
-     *     (Ideally, would be able to read data of entire gameobject and do something with the data)
-     * @param GO Reference to Game Object to write data of
-     * @param size Size of data we are writing
-     * @return bool! Depending if operation was successful
+     * @brief Loads a prefab JSON file and recreates its GameObjects.
+     * @param path Path to the prefab file to load.
      */
-    bool ReadGameObjectData(GameObject const& GO, size_t size, std::stringstream& ss)
-    {
-        if (!IsStreamGood())
-        {
-            std::cerr << "File Stream: " << filePath << " is not good!\n";
-            return false;
-        }
+    void LoadPrefab(const std::string& path);
+    void LoadPrefab(const GameObject* GO);
 
-        // As of rn, it just reads data and stores it into stringstream, same as above really... WIP!!
-        std::string line;
-        while (std::getline(ifs, line))
-        {
-            ss << line << "\n";
-        }
-        return true;
-    }
-    /**
-     * @brief Private members to hold File path and input file stream!
-     */
-private:
-    std::string filePath;
-    std::ifstream ifs;
-};
-
-namespace PrefabTools
-{
-    /**
-   * @brief Takes existing GO, and turns it into a prefab!!! As of right now, we are storing it in Logs! Will move to its own folder soon!
-   * @param GO Reference to Game Object to read data of
-   *      (Will require tweaking to read component data! But as of rn, basic data works!)
-   */
-    void CreatePrefab(GameObject& GO);
-    /**
-   * @brief Takes file path to read prefab data! Actual loading of prefab data is somewhere else, will shift into here soon for cleanliness!
-   * @param destination c string for destination of where to read prefab data from
-   */
-    std::string ReadPrefabData(const char* destination);
-
-    std::vector<std::string> LoadPrefabList();
+    void SaveScene(GameObject& go, const std::string& existingPath, bool append);
+    void LoadScene(const std::string& path);
 
     void RemovePrefab(std::string const& prefabName);
-
     void RenamePrefab(std::string const& oldName, std::string const& newName);
-    
 }
-
-/**
- * @brief [WIP] Original serialising class. Might scrap?
- */
-class Serializable
-{
-public:
-    virtual ~Serializable() = default;
-
-    virtual json Serialize() const = 0;
-
-    virtual void Deserialize(json const& j) = 0;
-
-    virtual std::string GetTypeName() const = 0;
-};

@@ -32,13 +32,15 @@ public:
         Square, /*!< Square shape */
         Circle, /*!< Circle shape */
         Line,   /*!< Line shape */
-        Point   /*!< Point shape */
+        Point,   /*!< Point shape */
+        Empty
     };
 
     /*! @struct LineData
         @brief Data structure for a line (start/end points and color).
     */
-    struct LineData {
+    struct LineData
+    {
         vec2 start; /*!< Start position of the line */
         vec2 end;   /*!< End position of the line */
         vec4 color; /*!< Line color */
@@ -47,21 +49,23 @@ public:
     /*! @struct PointData
         @brief Data structure for a point (position, color, size).
     */
-    struct PointData {
-        vec2 pos;   /*!< Position of the point */
-        vec4 color; /*!< Point color */
-        float size=0; /*!< Point size */
+    struct PointData
+    {
+        vec2 pos;       /*!< Position of the point */
+        vec4 color;     /*!< Point color */
+        float size = 0; /*!< Point size */
     };
 
-    RenderComponent(GameObject* owner)
-        : IComponent(owner), shape(ShapeType::Square), textureID(0), color(1.0f, 0.0f, 0.0f, 1.0f), line(), point() {
+    RenderComponent(GameObject *owner)
+        : IComponent(owner), shape(ShapeType::Square), textureID(0), color(1.0f, 0.0f, 0.0f, 1.0f), line(), point(), layer(0)
+    {
     }
     /*! @brief Constructor for a textured object
         @param owner The GameObject this component belongs to
         @param texID OpenGL texture ID
     */
     RenderComponent(GameObject *owner, GLuint texID)
-        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point()
+        : IComponent(owner), shape(ShapeType::Square), textureID(texID), color(1.0f), line(), point(), layer(0)
     {
     }
 
@@ -70,13 +74,13 @@ public:
         @param type Shape type
         @param color Shape color
     */
-    RenderComponent(GameObject* owner, ShapeType type, const vec4& color)
-        : IComponent(owner), shape(type), textureID(0), color(color), line(), point() {
-          }
+    RenderComponent(GameObject *owner, ShapeType type, const vec4 &color)
+        : IComponent(owner), shape(type), textureID(0), color(color), line(), point(), layer(0)
+    {
+    }
 
     /*! @brief Lifecycle override: initialize component */
     void Initialize() override {}
-
 
     /*! @brief Lifecycle override: destroy component */
     void Destroy() override {}
@@ -128,13 +132,13 @@ public:
         @param start Start position
         @param end End position
     */
-    void SetLine(const vec2& start, const vec2& end) { line = { start, end, color }; }
+    void SetLine(const vec2 &start, const vec2 &end) { line = {start, end, color}; }
 
     /*! @brief Set point data
         @param pos Position of the point
         @param size Point size
     */
-    void SetPoint(const vec2& pos, float size) { point = { pos, color, size }; }
+    void SetPoint(const vec2 &pos, float size) { point = {pos, color, size}; }
 
     /*! @brief Get line data
         @return LineData structure
@@ -149,9 +153,9 @@ public:
     /**
      * @brief Return the shape's name as a c string
      */
-    const char* GetShapeTypeName()
+    const char *GetShapeTypeName()
     {
-        switch (static_cast<int>(GetShapeType()))               // Return corresponding name depending on object's shape enum
+        switch (static_cast<int>(GetShapeType())) // Return corresponding name depending on object's shape enum
         {
         case static_cast<int>(ShapeType::Square):
             return "Square";
@@ -164,15 +168,21 @@ public:
         }
     }
 
+    int GetLayer() const { return layer; };
+    void SetLayer(int l) { layer = l; };
+    void SetTexturePath(const std::string &path) { texturePath = path; }
+    std::string GetTexturePath() const { return texturePath; }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
     vec4 color; /*!< Color of the shape */
+    int layer;
+    std::string texturePath;
 
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
 };
-
 
 namespace RenderComponentTools
 {
@@ -200,7 +210,7 @@ namespace RenderComponentTools
         }
         else
             std::cout << "No matching shape name!\n";
-        return RenderComponent::ShapeType::Point;   // Replace as runtime error!
+        return RenderComponent::ShapeType::Point; // Replace as runtime error!
     }
 
     inline std::string ShapeEnumToString(RenderComponent::ShapeType shapeEnum)
@@ -226,7 +236,7 @@ namespace RenderComponentTools
         }
     }
 
-    inline void ShapeEnumToString(std::string& shapeName, RenderComponent::ShapeType& shapeEnum)
+    inline void ShapeEnumToString(std::string &shapeName, RenderComponent::ShapeType &shapeEnum)
     {
         if (!shapeName.empty()) // If theres a name in shapeName, find a match and assign the enum int the corresponding shape value
         {
@@ -275,4 +285,3 @@ namespace RenderComponentTools
     }
 
 }
-

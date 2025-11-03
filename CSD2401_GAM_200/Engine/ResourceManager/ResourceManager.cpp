@@ -155,6 +155,21 @@ TextureResource *ResourceManager::GetTexture(const std::string &name)
 }
 
 /**
+ * @brief Gets the filepath of a texture by its OpenGL texture ID
+ */
+std::string ResourceManager::GetTextureFilePath(unsigned int textureID)
+{
+    for (const auto& pair : textures)
+    {
+        if (pair.second->GetTextureID() == textureID)
+        {
+            return pair.second->GetFilePath();
+        }
+    }
+    return ""; // return empty string if not found
+}
+
+/**
  * @brief Unloads a specific texture resource from the manager
  */
 void ResourceManager::UnloadTexture(const std::string &name)

@@ -32,6 +32,7 @@ Technology is prohibited.
 #include "CollisionSystem.h"
 #include "PhysicsSystem.h"
 #include "DebugSystem.h"
+#include "CameraSystem.h"
 #include <map>
 #include "MathLib.h"
 #include "Serialization.h"
@@ -159,6 +160,12 @@ public:
 
         return transformSystem;
     }
+
+    CameraSystem* GetCameraSystem() const {
+
+        return cameraSystem;
+    }
+
     /**
      * @brief Gets a pointer to the LevelEditor.
      * @return A pointer to the LevelEditor.
@@ -233,6 +240,7 @@ private:
     DebugSystem* debugSystem = nullptr;
     AudioEngine* audioEngine = nullptr;
     TransformSystem* transformSystem = nullptr;
+    CameraSystem* cameraSystem = nullptr;
     LevelEditor* levelEditor = nullptr;
 
     unsigned LastTime;

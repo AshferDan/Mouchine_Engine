@@ -38,6 +38,13 @@ PhysicsSystem::~PhysicsSystem() {
  */
 void PhysicsSystem::Initialize() {
     std::cout << "Initializing system: PhysicsSystem" << std::endl;
+
+    //CORE->GetMessageBus().Subscribe("CollisionEnter", [this](const Message& msg)
+    //    {
+    //        GameObject* obj = static_cast<GameObject*>(msg.data);
+    //        if (obj)
+    //            std::cout << "[PhysicsSystem] Collision ENTER with: " << obj->GetName() << std::endl;
+    //    });
 }
 
 /**

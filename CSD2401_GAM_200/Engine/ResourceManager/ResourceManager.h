@@ -210,6 +210,13 @@ public:
     TextureResource* GetTexture(const std::string& name);
 
     /**
+     * @brief Gets the filepath of a texture by its OpenGL texture ID
+     * @param textureID The OpenGL texture ID
+     * @return The filepath if found, empty string otherwise
+     */
+    std::string GetTextureFilePath(unsigned int textureID);
+
+    /**
      * @brief Unloads a specific texture resource
      * @param name Identifier of the texture to unload
      */
