@@ -184,18 +184,18 @@ void InputManager::Update(float dt)
             physics->Jump(400.0f);        // Jump force
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
-           // if (audioEngine)
-           // {
-           //     audioEngine->playSound("jump_sfx", "jump_channel");
-           // 
-           //}
-            if (audioEngine) {
+            if (audioEngine)
+            {
+                audioEngine->playSound("jump_sfx", "jump_channel");
+           
+            }
+            /*if (audioEngine) {
                 Message msg;
                 msg.type = "PlaySound";
                 msg.sender = this;
                 msg.data = (void*)"jump_sfx";
                 CORE->GetMessageBus().Broadcast(msg);
-            }
+            }*/
         }
     }
 

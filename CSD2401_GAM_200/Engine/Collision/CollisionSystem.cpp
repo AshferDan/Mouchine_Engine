@@ -20,6 +20,9 @@ Technology is prohibited.
 #include <iostream>
 #include <algorithm>
 
+#include "core.h"
+#include "Message.h"
+
 /**
  * @brief Constructs collision system with null physics reference
  */
@@ -153,6 +156,15 @@ void CollisionSystem::Update(float deltaTime) {
                     std::cout << "Collision: " << gameObjects[i]->GetName() << " <-> "
                         << gameObjects[j]->GetName() << std::endl;
                     activeCollisions.push_back({ gameObjects[i].get(), gameObjects[j].get() });
+
+
+                    //Message msgEnter;
+                    //msgEnter.type = "CollisionEnter";     // New message type
+                    //msgEnter.sender = this;
+
+                    //// You can pack both objects in a small struct if needed
+                    //msgEnter.data = (void*)gameObjects[i].get();
+                    //CORE->GetMessageBus().Broadcast(msgEnter);
                 }
 
                 // Report collision to PhysicsSystem for resolution

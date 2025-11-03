@@ -13,6 +13,11 @@ Technology is prohibited.
 
 #include "main.h"
 
+namespace CrashHandler {
+    std::string GetStackTrace();
+    void LogCrash(const char* type, const std::exception* e = nullptr);
+}
+
 /**
  * @brief Enables memory leak checking in debug mode.
  * @param breakAlloc, Allocation number to break on for debugging.
@@ -53,8 +58,12 @@ int main()
         API::StartEngineLoop(engine);
     }
     catch (const std::exception& e) {
+        std::cerr << "[TEST] Exception caught: " << e.what() << "\n";
+        CrashHandler::LogCrash("EXCEPTION", &e);
     }
-    catch(...) {}
+    catch(...) {
+        CrashHandler::LogCrash("UNKNOWN EXCEPTION");
+    }
 
     //EnableMemoryLeakChecking();
     //CoreEngine engine;
@@ -131,3 +140,55 @@ int main()
 
     return 0;
 }
+
+namespace CrashHandler {
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <dbghelp.h>
+#pragma comment(lib, "dbghelp.lib")
+#endif
+
+std::string GetStackTrace()
+{
+#if defined(_WIN32)
+    void* stack[62];
+    HANDLE process = GetCurrentProcess();
+    SymInitialize(process, NULL, TRUE);
+    WORD frames = CaptureStackBackTrace(0, 62, stack, NULL);
+
+    std::ostringstream oss;
+    for (WORD i = 0; i < frames; ++i)
+    {
+        DWORD64 address = (DWORD64)(stack[i]);
+        char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+        PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
+        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+        symbol->MaxNameLen = MAX_SYM_NAME;
+
+        DWORD64 displacement = 0;
+        if (SymFromAddr(process, address, &displacement, symbol))
+        {
+            oss << "[" << i << "] " << symbol->Name
+                << " - 0x" << std::hex << symbol->Address << std::dec << "\n";
+        }
+    }
+    return oss.str();
+#else
+    return "Stacktrace not supported on this platform.";
+#endif
+}
+
+void LogCrash(const char* type, const std::exception* e)
+{
+    std::filesystem::create_directories("../Logs");
+    std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    log << "\n[" << type << "] " << std::put_time(std::localtime(&now), "%F %T") << "\n";
+    if (e)
+        log << e->what() << "\n";
+    log << GetStackTrace() << "\n";
+    log.close();
+}
+
+} // namespace CrashHandler
