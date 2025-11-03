@@ -167,7 +167,6 @@ public:
         }
     }
 
-    void SetTexturePath(const std::string &path) { texturePath = path; }
     int GetLayer() const { return layer; };
     void SetLayer(int l) { layer = l; };
     void SetTexturePath(const std::string &path) { texturePath = path; }
@@ -176,14 +175,12 @@ public:
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
-    std::string texturePath;
     vec4 color; /*!< Color of the shape */
     int layer;
+    std::string texturePath;
 
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
-
-    std::string texturePath;
 };
 
 namespace RenderComponentTools

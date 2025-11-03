@@ -296,7 +296,6 @@ void GraphicsSystem::Update(float)
     }
     else
     {
-
         float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
         float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);

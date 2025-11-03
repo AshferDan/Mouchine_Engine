@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 #include "Serialization.h"
 
+
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -377,7 +378,7 @@ void LevelEditor::RenderHierarchy()
             }
             if (ImGui::MenuItem("Save as Prefab"))
             {
-                SavePrefab(*obj);
+                PrefabManager::SavePrefab(obj);
             }
             if (ImGui::MenuItem("Clone"))
             {
@@ -426,7 +427,7 @@ void LevelEditor::RenderPropertyEditor()
 
     ImGui::Spacing();
 
-    // transform component
+    // transform 
     if (auto* transform = obj->GetComponent<TransformComponent>())
     {
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
@@ -558,7 +559,7 @@ bool LevelEditor::SaveLevelJSON(const std::string& filepath)
         {
             if (objPtr && objPtr->IsActive())
             {
-                json objData = ::SerializeGameObject(objPtr.get());
+                json objData = Serialization::SerializeGameObject(objPtr.get());
                 root["GameObjects"].push_back(objData);
             }
         }
@@ -620,7 +621,7 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
         {
             for (const auto& objData : root["GameObjects"])
             {
-                ::DeserializeGameObject(objData);
+                Serialization::DeserializeGameObject(objData);
             }
         }
 

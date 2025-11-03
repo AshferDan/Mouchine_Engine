@@ -369,9 +369,6 @@ void CoreEngine::GameLoop()
     glfwPollEvents();
 }
 
-CoreEngine::DestroySystems();
-glfwTerminate();
-}
 
 /* brief
    This function deletes the engines and stops the engine processes and clears all systems

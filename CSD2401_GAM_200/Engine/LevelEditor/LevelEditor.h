@@ -6,6 +6,7 @@
 #include "RenderComponent.h"
 #include "System.h"
 #include "transform.h"
+#include "PrefabManager.h"
 
 #include <imgui.h>
 #include <memory>
