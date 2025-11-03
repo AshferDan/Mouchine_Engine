@@ -22,6 +22,7 @@ Technology is prohibited.
 #include <string>
 #include <filesystem>
 #include "core.h"
+#include "LevelEditor.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -62,6 +63,9 @@ static bool prefab_renameFocus = false;
 std::string prefab_oldname{};
 bool ShowCreateGOMenu;
 bool ShowLoadPrefabMenu;
+
+// selected game object for editing
+static EntityID selectedGameObjectID = 0;
 
 /**
  * @brief Ctor - Inits window variable
