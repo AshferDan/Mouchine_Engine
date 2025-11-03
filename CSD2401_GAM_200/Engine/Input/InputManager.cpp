@@ -60,6 +60,7 @@ void InputManager::Update(float dt)
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},
+        {GLFW_KEY_F2, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
     };
 
@@ -93,6 +94,11 @@ void InputManager::Update(float dt)
                 {
                     CORE->GetGraphicsSystem()->toggleDebugMode();
                     std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
+                }
+
+                if (key == GLFW_KEY_F2) {
+                    CORE->GetGraphicsSystem()->SetEditorMode();
+                    std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
                 }
             }
             wasPressed = true;

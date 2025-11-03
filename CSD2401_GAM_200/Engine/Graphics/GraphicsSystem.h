@@ -139,7 +139,7 @@ public:
 	
 	bool IsEditorMode() const { return editorMode; };
 
-	void SetEditorMode(bool enable) { editorMode = enable; };
+	void SetEditorMode() { editorMode = !editorMode; };
 
 	GLuint GetFrameBufferTexture() const { return frameBufferTexture; };
 

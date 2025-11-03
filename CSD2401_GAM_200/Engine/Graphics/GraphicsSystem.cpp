@@ -21,7 +21,7 @@ const double two_pi = 6.28318530717958647692528676655900576;
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
     frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+    frameBufferWidth(800), frameBufferHeight(600), editorMode(false)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -73,7 +73,7 @@ GraphicsSystem::GraphicsSystem()
 GraphicsSystem::GraphicsSystem(GLint w, GLint h) 
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
     frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+    frameBufferWidth(800), frameBufferHeight(600), editorMode(false)
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -492,7 +492,7 @@ void GraphicsSystem::Update(float)
 
             // Draw debug outlines for ALL shapes (moved outside switch)
             if (debugMode) {
-                std::cout << "went here" << std::endl;
+                //std::cout << "went here" << std::endl;
                 auto* transform = obj->GetComponent<TransformComponent>();
                 if (transform) {
                     float x, y, sx, sy;

@@ -29,7 +29,28 @@ Spritesheet::Spritesheet(GameObject *owner, const char *textureFile, int numRows
 	  endFrame(0),
 	  textureID(GraphicsSystem::LoadTexture(textureFile)),
 	  SpriteFile(0),
-	  alpha(0)
+	  alpha(0),
+	  ownsTexture(true)
+{
+}
+
+
+Spritesheet::Spritesheet(GameObject* owner, GLuint existingTextureID, int numRows, int numCols)
+	: IComponent(owner),
+	rows(numRows),
+	cols(numCols),
+	currRow(0),
+	currCol(0),
+	uv_width(1.0f / (float)numCols),	// Calculate 1/Cols
+	uv_height(1.0f / (float)numRows), // Calculate 1/Rows
+	timePerFrame(0.0f),
+	currentFrameTime(0.0f),
+	startFrame(0),
+	endFrame(0),
+	textureID(existingTextureID),
+	SpriteFile(0),
+	alpha(0),
+	ownsTexture(false)
 {
 }
 
@@ -50,7 +71,8 @@ Spritesheet::Spritesheet(Spritesheet const &rhs, GameObject *NewClone)
 	  endFrame(rhs.endFrame),
 	  textureID(rhs.textureID),
 	  SpriteFile(0),
-	  alpha(0)
+	  alpha(0),
+	  ownsTexture(false)
 {
 }
 
@@ -152,7 +174,10 @@ void Spritesheet::SetAnimation(int startFrameIdx, int endFrameIdx, float fps)
  */
 Spritesheet::~Spritesheet()
 {
-	Unload();
+	if (ownsTexture)
+	{
+		Unload();
+	}
 }
 
 /**
