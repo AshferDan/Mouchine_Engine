@@ -53,6 +53,9 @@ namespace PrefabManager
         const vec4& color,
         float rotation);
 
+    void SaveScene(GameObject* go, const std::string& existingPath = "", bool append = false);
+    void LoadScene(const std::string& filename);
+
     /**
      * @brief Saves or updates a prefab file on disk.
      *
@@ -63,7 +66,7 @@ namespace PrefabManager
      * @param existingPath  Optional path to an existing prefab file to overwrite.
      * @param append        Whether to append to the existing prefab file.
      */
-    void SavePrefab(GameObject* go, const std::string& existingPath = "", bool append = false);
+    void SavePrefab(GameObject& go);
 
     /**
      * @brief Loads and instantiates a prefab from disk.
@@ -85,7 +88,7 @@ namespace PrefabManager
      * @param newName New prefab file name.
      * @return True if renamed successfully, false otherwise.
      */
-    bool RenamePrefab(const std::string& oldName, const std::string& newName);
+    void RenamePrefab(std::string const& oldName, std::string const& newName);
 
     /**
      * @brief Deletes a prefab JSON file from disk.
@@ -96,7 +99,7 @@ namespace PrefabManager
      * @param filename Name of the prefab file to delete.
      * @return True if deleted successfully, false otherwise.
      */
-    bool DeletePrefab(const std::string& filename);
+    void RemovePrefab(std::string const& prefabName);
 
     /**
      * @brief Constructs the full filesystem path for a prefab file.

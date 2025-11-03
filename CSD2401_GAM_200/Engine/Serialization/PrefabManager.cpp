@@ -17,14 +17,14 @@ Technology is prohibited.
 #include <iostream>
 
 namespace fs = std::filesystem;
-static const std::string PREFAB_DIR = "../Assets/Prefabs/";
+static const std::string PREFAB_DIR = PrefabFilePath;
 
 /**
  * @brief Returns full path for a prefab filename.
  */
 std::string PrefabManager::GetFullPath(const std::string& filename)
 {
-    return PREFAB_DIR + filename;
+    return PREFAB_DIR + filename + ".json";
 }
 
 /**
@@ -32,19 +32,17 @@ std::string PrefabManager::GetFullPath(const std::string& filename)
  */
 std::vector<std::string> PrefabManager::GetAllPrefabs()
 {
-    std::vector<std::string> files;
-    if (!fs::exists(PREFAB_DIR)) return files;
-
-    for (const auto& entry : fs::directory_iterator(PREFAB_DIR))
+    std::vector<std::string> temp;
+    for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
     {
-        if (entry.is_regular_file())
+        if (prefab.path().extension() == ".json")
         {
-            std::string name = entry.path().filename().string();
-            if (name.find("Prefab_") != std::string::npos && name.ends_with(".json"))
-                files.push_back(name);
+            std::string prefabName = prefab.path().stem().string();
+            temp.push_back(prefabName);
         }
     }
-    return files;
+    temp.shrink_to_fit();
+    return temp;
 }
 
 /**
@@ -110,14 +108,14 @@ GameObject* PrefabManager::CreatePrefabObject(
 /**
  * @brief Saves a prefab to disk (append or overwrite mode).
  */
-void PrefabManager::SavePrefab(GameObject* go, const std::string& existingPath, bool append)
+void PrefabManager::SaveScene(GameObject* go, const std::string& existingPath, bool append)
 {
     // --- Resolve target path ---
     std::string path;
     if (!existingPath.empty())
         path = existingPath;
     else if (go)
-        path = GetFullPath("Prefab_" + go->GetName() + ".json");
+        path = GetFullPath(go->GetName() + ".json");
     else
         path = GetFullPath("Prefab_DefaultScene.json");
 
@@ -130,7 +128,7 @@ void PrefabManager::SavePrefab(GameObject* go, const std::string& existingPath, 
             return;
         }
 
-        Serialization::SavePrefab(*go, path, true);
+        Serialization::SaveScene(*go, path, true);
         std::cout << "[PrefabManager] Appended '" << go->GetName()
             << "' to prefab file: " << path << "\n";
     }
@@ -145,16 +143,42 @@ void PrefabManager::SavePrefab(GameObject* go, const std::string& existingPath, 
             return;
         }
 
-        // Even though we pass one GameObject, Serialization::SavePrefab(false)
+        // Even though we pass one GameObject, Serialization::SaveScene(false)
         // automatically iterates all active objects to rewrite the scene.
-        Serialization::SavePrefab(*objs.front().get(), path, false);
+        Serialization::SaveScene(*objs.front().get(), path, false);
 
         std::cout << "[PrefabManager] Overwrote prefab with full scene: " << path << "\n";
     }
 }
 
+void PrefabManager::SavePrefab(GameObject& go)
+{
+    // Create prefab path based on GameObject name
+    std::string path = "..Assets/Prefabs/" + go.GetName() + ".json";
+
+    // Create a new JSON object
+    json root;
+    root["GameObjects"] = json::array();
+
+    // Serialize only this one GameObject
+    root["GameObjects"].push_back(Serialization::SerializeGameObject(&go));
+
+    // Write the JSON file to disk
+    std::ofstream out(path, std::ios::trunc);
+    if (out.is_open())
+    {
+        out << root.dump(4);
+        out.close();
+        std::cout << "[SaveSinglePrefab] Saved single prefab: " << path << "\n";
+    }
+    else
+    {
+        std::cerr << "[SaveSinglePrefab] Failed to open file for writing: " << path << "\n";
+    }
+}
+
 /**
- * @brief Loads prefab file and recreates GameObjects.
+ * @brief Loads a single prefab GO
  */
 void PrefabManager::LoadPrefab(const std::string& filename)
 {
@@ -169,51 +193,51 @@ void PrefabManager::LoadPrefab(const std::string& filename)
 }
 
 /**
- * @brief Renames an existing prefab JSON file.
+ * @brief Loads prefab file and recreates GameObjects.
  */
-
-bool PrefabManager::RenamePrefab(const std::string& oldName, const std::string& newName)
+void PrefabManager::LoadScene(const std::string& filename)
 {
-    std::string oldPath = GetFullPath(oldName);
-    std::string newPath = GetFullPath(newName);
-
-    if (!fs::exists(oldPath))
+    std::string fullPath = GetFullPath(filename);
+    if (!fs::exists(fullPath))
     {
-        std::cerr << "[PrefabManager] Cannot rename, file not found: " << oldPath << "\n";
-        return false;
+        std::cerr << "[PrefabManager] Scene not found: " << fullPath << "\n";
+        return;
     }
-
-    try
-    {
-        fs::rename(oldPath, newPath);
-        std::cout << "[PrefabManager] Renamed " << oldName << " -> " << newName << "\n";
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "[PrefabManager] Rename failed: " << e.what() << "\n";
-        return false;
-    }
+    Serialization::LoadScene(fullPath);
+    std::cout << "[PrefabManager] Loaded scene: " << fullPath << "\n";
 }
 
-/**
- * @brief Deletes a prefab JSON file from disk.
- */
-bool PrefabManager::DeletePrefab(const std::string& filename)
+void PrefabManager::RemovePrefab(std::string const& prefabName)
 {
-    std::string path = GetFullPath(filename);
-    if (!fs::exists(path))
-        return false;
+ 	for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
+ 	{
+ 		if (prefab.path().stem().string() == prefabName)
+ 		{
+ 			std::filesystem::remove(prefab);
+ 		}
+ 		else
+ 		{
+ 			std::cout << "Error! No matching prefab found!\n";
+ 		}
+ 	}
+}
 
-    try
-    {
-        fs::remove(path);
-        std::cout << "[PrefabManager] Deleted prefab: " << filename << "\n";
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "[PrefabManager] Delete failed: " << e.what() << "\n";
-        return false;
-    }
+void PrefabManager::RenamePrefab(std::string const& oldName, std::string const& newName)
+{
+ 	if (!std::filesystem::exists(PrefabFilePath + oldName + ".json"))
+ 	{
+ 		std::cout << "File Path " + PrefabFilePath + oldName + ".json\" cannot be found!\n";
+ 		return;
+ 	}
+
+ 	if (!std::filesystem::exists(PrefabFilePath + newName + ".json"))
+ 	{
+ 		std::filesystem::rename(PrefabFilePath + oldName + ".json", PrefabFilePath + newName + ".json");
+ 	}
+ 	else
+ 	{
+ 		std::filesystem::rename(PrefabFilePath + oldName + ".json", PrefabFilePath + newName + "(1).json");
+ 	}
+
+ 	std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
 }

@@ -378,7 +378,7 @@ void LevelEditor::RenderHierarchy()
             }
             if (ImGui::MenuItem("Save as Prefab"))
             {
-                PrefabManager::SavePrefab(obj);
+                Serialization::SavePrefab(*obj);
             }
             if (ImGui::MenuItem("Clone"))
             {

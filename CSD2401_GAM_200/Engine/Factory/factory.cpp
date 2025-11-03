@@ -299,17 +299,6 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
     return obj;
 }
 
-GameObject* GameObjectFactory::CreateEmptyGO(const std::string& name, float x, float y, float w, float h) {
-    GameObject* obj = CreateGameObject(name);
-
-    auto *transform = obj->AddComponent<TransformComponent>(x, y);
-    auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
-
-    //============ PARENTING CODE HERE =================
-
-    return obj;
-}
-
 /*
     /brief
      This is the blueprint for cloning each type of gameobject we have 4 types so

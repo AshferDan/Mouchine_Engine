@@ -21,6 +21,8 @@ Technology is prohibited.
 #include "ComponentSerialization.h"
 
 using json = nlohmann::json;
+const std::string PrefabFilePath { "../Assets/Prefabs/" };
+const std::string SceneFilePath{ "../Assets/Scenes/" };
 
 namespace Serialization
 {
@@ -42,11 +44,18 @@ namespace Serialization
      * @param go GameObject reference to serialize.
      * @param existingPath Optional path to an existing prefab to overwrite.
      */
-    void SavePrefab(GameObject& go, const std::string& existingPath, bool append);
+    void SavePrefab(GameObject& go);
 
     /**
      * @brief Loads a prefab JSON file and recreates its GameObjects.
      * @param path Path to the prefab file to load.
      */
     void LoadPrefab(const std::string& path);
+    void LoadPrefab(const GameObject* GO);
+
+    void SaveScene(GameObject& go, const std::string& existingPath, bool append);
+    void LoadScene(const std::string& path);
+
+    void RemovePrefab(std::string const& prefabName);
+    void RenamePrefab(std::string const& oldName, std::string const& newName);
 }

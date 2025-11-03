@@ -209,7 +209,6 @@ public:
                                     char const *filename, int numRows, int numCols,
                                     int startFrame, int endFrame, float fps, CollisionLayer layer);
 
-    GameObject* CreateEmptyGO(const std::string& name, float x, float y, float w, float h);
 
     /**
      * @brief Creates a clone of an existing GameObject by its EntityID.
