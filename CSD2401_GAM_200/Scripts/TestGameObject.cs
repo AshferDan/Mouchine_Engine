@@ -12,7 +12,7 @@ namespace GameScripts
 
         public void OnStart()
         {
-            Debug.Log("TestGameObject: Creating two squares...");
+
 
             // Create first square - Red, on the left
             GameObject.CreateShape(
@@ -39,9 +39,16 @@ namespace GameScripts
                 false,                           // isStatic
                 false                            // hasGravity = false (no gravity)
             );
-            
+           
 
-            Debug.Log("TestGameObject: Two squares created successfully!");
+            GameObject.CreateAnimatedImage("C#_AniImage",0,200,
+                300, 300,
+                "../Assets/spritesheet_R.png",
+                11,8,
+                24,29,
+                16,(int)CollisionLayer.Default,
+                false,false,
+                false);
         }
 
         public void OnUpdate(float deltaTime)

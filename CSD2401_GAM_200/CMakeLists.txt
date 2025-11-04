@@ -465,32 +465,38 @@ add_custom_command(TARGET Game POST_BUILD
     VERBATIM
 )
 
-# ======================= Copy C# Scripts (POST_BUILD for hot-reload) =================
-set(CSHARP_DLL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Scripts/bin/Debug/net48/GameScripts.dll")
+# ======================= C# Project Configuration ===========================
+set(CSHARP_PROJECT_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
+set(CSHARP_PROJECT_FILE "${CSHARP_PROJECT_DIR}/GameScript.csproj")
+set(CSHARP_DLL_SOURCE   "${CSHARP_PROJECT_DIR}/bin/Debug/net48/GameScripts.dll")
 
-# Ensure Build/Scripts directory exists
+# ======================= Add C# Project to Solution ========================
+message(STATUS "Adding C# project to solution: ${CSHARP_PROJECT_FILE}")
+
+include_external_msproject(CSharpSrcipts ${CSHARP_PROJECT_FILE})
+
+add_dependencies(Game CSharpSrcipts)
+
+# ======================= Copy C# Scripts (POST_BUILD) =====================
+
+# 3. Create the 'Scripts' folder in the output directory
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Scripts"
-    COMMENT "Creating Scripts in Build directory"
+        "$<TARGET_FILE_DIR:Game>/Scripts"
+    COMMENT "Creating Scripts folder"
     VERBATIM
 )
 
-# Copy GameScripts.dll on every build (for C# hot-reload)
+# 4. Copy the newly built DLL to the 'Scripts' folder
 if(EXISTS "${CSHARP_DLL_SOURCE}")
-    message(STATUS "GameScripts.dll found - will copy on every build for hot-reload")
+    message(STATUS "GameScripts.dll found, configuring copy for hot-reload")
     
     copy_runtime_dependency_postbuild(Game 
         "${CSHARP_DLL_SOURCE}"
         "$<TARGET_FILE_DIR:Game>/Scripts"
     )
-    
-    copy_runtime_dependency_postbuild(Game
-        "${CSHARP_DLL_SOURCE}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Scripts"
-    )
 else()
-    message(STATUS "GameScripts.dll not found - build Scripts/GameScript.csproj manually")
+    message(WARNING "GameScripts.dll not found after build. Check C# project.")
 endif()
 
 # ======================= Compiler Warnings =================

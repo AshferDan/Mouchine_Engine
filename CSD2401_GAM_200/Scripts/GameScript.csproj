@@ -14,5 +14,6 @@
 
     <!-- Generate PDB for debugging -->
     <DebugType>portable</DebugType>
+    <Platforms>AnyCPU;ARM64</Platforms>
   </PropertyGroup>
 </Project>

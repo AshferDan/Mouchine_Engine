@@ -86,6 +86,59 @@ int main()
         }
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
+        // =======================================================
+// C# SCRIPTING - TWO SQUARES SPAWNER
+// =======================================================
+        std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+
+        ScriptSystem* scriptSys = engine.GetScriptSystem();
+
+        // ===== ORIGINAL: Spawner script attached to Hero =====
+        GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (scriptSys && hero)
+        {
+            scriptSys->AttachScript(hero, "Spawner");
+            std::cout << "Attached 'Spawner' script to Hero" << std::endl;
+        }
+        else
+        {
+            if (!scriptSys)
+                std::cerr << "ERROR: Could not find ScriptingSystem!" << std::endl;
+            if (!hero)
+                std::cerr << "ERROR: Could not find 'Hero' GameObject!" << std::endl;
+        }
+
+        // ===== NEW: TestGameObject - Creates 2 static squares =====
+        // Use the factory to create the GameObject properly
+        GameObject* squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        if (scriptSys && squareSpawner)
+        {
+            // Attach the TestGameObject script (creates red and blue squares)
+            bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
+            if (attached)
+            {
+                std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
+
+                // Call OnStart to actually create the squares
+                scriptSys->CallOnStart(squareSpawner);
+                std::cout << "Called OnStart - Two squares should be created!" << std::endl;
+            }
+            else
+            {
+                std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
+                std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
+                std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
+            }
+        }
+        else
+        {
+            if (!scriptSys)
+                std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
+            if (!squareSpawner)
+                std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
+        }
+
+
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
@@ -152,54 +205,3 @@ namespace CrashHandler
     }
 } // namespace CrashHandler
 
-// =======================================================
-// C# SCRIPTING - TWO SQUARES SPAWNER
-// =======================================================
-std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
-
-ScriptSystem *scriptSys = engine.GetScriptSystem();
-
-// ===== ORIGINAL: Spawner script attached to Hero =====
-GameObject *hero = GameObjectFactory::Instance().FindGameObject("Hero");
-if (scriptSys && hero)
-{
-    scriptSys->AttachScript(hero, "Spawner");
-    std::cout << "Attached 'Spawner' script to Hero" << std::endl;
-}
-else
-{
-    if (!scriptSys)
-        std::cerr << "ERROR: Could not find ScriptingSystem!" << std::endl;
-    if (!hero)
-        std::cerr << "ERROR: Could not find 'Hero' GameObject!" << std::endl;
-}
-
-// ===== NEW: TestGameObject - Creates 2 static squares =====
-// Use the factory to create the GameObject properly
-GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
-if (scriptSys && squareSpawner)
-{
-    // Attach the TestGameObject script (creates red and blue squares)
-    bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
-    if (attached)
-    {
-        std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
-
-        // Call OnStart to actually create the squares
-        scriptSys->CallOnStart(squareSpawner);
-        std::cout << "Called OnStart - Two squares should be created!" << std::endl;
-    }
-    else
-    {
-        std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
-        std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
-        std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
-    }
-}
-else
-{
-    if (!scriptSys)
-        std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
-    if (!squareSpawner)
-        std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
-}
