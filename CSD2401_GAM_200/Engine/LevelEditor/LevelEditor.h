@@ -250,6 +250,9 @@ public:
     // camera zoom
     float GetCameraZoom() const { return cameraZoom; }
 
+    bool HasPendingSceneReload() const { return pendingSceneReload; }
+    void PerformSceneReload();
+
 private:
     // GUI rendering functions
     /**
@@ -343,6 +346,8 @@ private:
     EntityID savedEntityIDCounter;
     std::vector<GameObjectData> savedSceneData;
     bool hasValidSaveState;               // track if we have a valid saved state to restore
+    bool pendingSceneReload = false;
+    std::string pendingScenePath;         // path to reload
 
     // Editor camera state
     float cameraX;                        // camera position X

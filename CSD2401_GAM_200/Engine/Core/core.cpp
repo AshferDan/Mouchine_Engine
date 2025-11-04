@@ -208,6 +208,11 @@ void CoreEngine::GameLoop()
             if (levelEditor)
                 currentMode = levelEditor->GetEditorMode();
 
+            if (levelEditor && levelEditor->HasPendingSceneReload())
+            {
+                levelEditor->PerformSceneReload();
+            }
+
             // 4. Update all systems based on editor mode
             for (size_t i = 0; i < Systems.size(); ++i)
             {
