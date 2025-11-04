@@ -1,4 +1,3 @@
-
 /* Start Header ************************************************************************/
 /*!
 \file       factory.cpp
@@ -49,7 +48,8 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     player->AddComponent<RenderComponent>(shape, color);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);
-    physics->SetGravity(false);
+
+    // No gravity for this player variant
 
     std::cout << "Created Player: " << name << " at (" << x << ", " << y << ")" << std::endl;
 
@@ -60,14 +60,15 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
 {
     GameObject *player = CreateGameObject(name);
     auto *transform = player->AddComponent<TransformComponent>(x, y);
-    auto *physics = player->AddComponent<PhysicsComponent>(0, 0);
+    auto *physics = player->AddComponent<PhysicsComponent>(1.0f, false);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     ResourceManager::Instance().PrintLoadedResources();
     auto render = player->AddComponent<RenderComponent>(texID);
-    physics->SetGravity(true); // Enable/Disable gravity
     physics->SetStatic(false);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);
+
+    // Enable gravity
     physics->SetGravity(true);
 
     if (shape == RenderComponent::ShapeType::Circle)
@@ -90,12 +91,12 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     /brief
      This is the blueprint for the creation of empty GOs that do not require shapes or textures. Will largely be used for parenting and organising.
 */
-GameObject* GameObjectFactory::CreateEmptyGO(const std::string& name, float x, float y, float w, float h) 
+GameObject *GameObjectFactory::CreateEmptyGO(const std::string &name, float x, float y, float w, float h)
 {
-    GameObject* obj = CreateGameObject(name);
+    GameObject *obj = CreateGameObject(name);
 
-    auto* transform = obj->AddComponent<TransformComponent>(x, y);
-    auto* physics = obj->AddComponent<PhysicsComponent>(0, 0);
+    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+    auto *physics = obj->AddComponent<PhysicsComponent>(0, 0);
 
     return obj;
 }
@@ -207,13 +208,13 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
      This is the blueprint for the normal image gameobject, wer would this function to be images that we wanna like the background
 */
 
-GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderComponent::ShapeType, float x, float y, float w, float h, char const* filename)
+GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderComponent::ShapeType, float x, float y, float w, float h, char const *filename)
 {
-    GameObject* obj = CreateGameObject(name);
+    GameObject *obj = CreateGameObject(name);
 
-    auto* transform = obj->AddComponent<TransformComponent>(x, y);
-    //GLint texID = GraphicsSystem::LoadTexture(filename);
-    TextureResource* texResource = ResourceManager::Instance().GetTexture(name);
+    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+    // GLint texID = GraphicsSystem::LoadTexture(filename);
+    TextureResource *texResource = ResourceManager::Instance().GetTexture(name);
     GLuint texID = 0;
 
     if (texResource && texResource->IsLoaded())
@@ -236,7 +237,7 @@ GameObject* GameObjectFactory::CreateImage(const std::string& name, RenderCompon
 
 GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, float x, float y, float w, float h,
                                                    char const *filename, int numRows, int numCols,
-                                                   int startFrame, int endFrame, float fps)
+                                                   int startFrame, int endFrame, float fps, CollisionLayer layer)
 {
     GameObject *obj = CreateGameObject(name);
 
@@ -263,48 +264,9 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
 
 /*
     /brief
-     This is the blueprint for the CreateAnimatedImage gameobject, this is where the we create the sprite animation gameobject if we need to
-     this might removed in the future once we set up the player gamoboject better.
+     This is the blueprint for the Cloning of the gameobjects where we take in the id and newname for the game Object the we clone if we need to.
 */
 
-GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, float x, float y, float w, float h, char const *filename, int numRows, int numCols, int startFrame, int endFrame, float fps, CollisionLayer layer)
-{
-    GameObject *obj = CreateGameObject(name);
-
-    auto *transform = obj->AddComponent<TransformComponent>(x, y);
-    auto *physics = obj->AddComponent<PhysicsComponent>(0, 0);
-    GLuint texID = GraphicsSystem::LoadTexture(filename);
-    obj->AddComponent<RenderComponent>(texID);
-    physics->SetGravity(true); // Enable/Disable gravity
-    physics->SetStatic(false);
-    transform->SetScale(w, h);
-    physics->SetVelocity(0, 0);
-    physics->SetGravity(true);
-    obj->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, w, h, layer);
-    auto spritesheetComp = std::make_unique<Spritesheet>(
-        obj,
-        filename,
-        numRows,
-        numCols);
-
-    GLuint textureID = spritesheetComp->GetTextureID();
-
-    obj->AddComponent<RenderComponent>(textureID);
-
-    Spritesheet *anim = spritesheetComp.get();
-    obj->AddComponent(std::move(spritesheetComp));
-
-    anim->SetAnimation(startFrame, endFrame, fps);
-
-    return obj;
-}
-
-/*
-    /brief
-     This is the blueprint for cloning each type of gameobject we have 4 types so
-     4 different function for GameObject,Player,Image and Animted Image
-
-*/
 GameObject *GameObjectFactory::CloneGameObject(EntityID id, const std::string &newName)
 {
     GameObject *original = GetGameObject(id);
@@ -336,6 +298,11 @@ GameObject *GameObjectFactory::CloneGameObject(EntityID id, const std::string &n
     }
     return nullptr;
 }
+
+/*
+    /brief
+     This is the blueprint for the Cloning of the gameobjects where we take in the id and newname for the game Object the we clone if we need to.
+*/
 
 GameObject *GameObjectFactory::ClonePlayer(EntityID id, const std::string &newName)
 {
@@ -538,7 +505,7 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
     }
 }
 
-// destroys all gameobjects without resetting the EntityID counter - used by level editor 
+// destroys all gameobjects without resetting the EntityID counter - used by level editor
 void GameObjectFactory::DestroyAllGameObjects()
 {
     std::cout << "Factory: Destroying all " << gameObjects.size() << " GameObjects..." << std::endl;
@@ -556,10 +523,10 @@ void GameObjectFactory::Clear()
     nextEntityID = 1;
 }
 
-GameObject* GameObjectFactory::CreateGameObjectWithID(EntityID id, const std::string& name)
+GameObject *GameObjectFactory::CreateGameObjectWithID(EntityID id, const std::string &name)
 {
     auto gameObject = std::make_unique<GameObject>(id, name);
-    GameObject* ptr = gameObject.get();
+    GameObject *ptr = gameObject.get();
 
     entityToIndex[id] = gameObjects.size();
     gameObjects.push_back(std::move(gameObject));
@@ -577,7 +544,7 @@ void GameObjectFactory::SetNextEntityID(EntityID id)
     nextEntityID = id;
 }
 
-EntityID GameObjectFactory::GetNextEntityID() const 
+EntityID GameObjectFactory::GetNextEntityID() const
 {
     return nextEntityID;
 }
@@ -607,32 +574,29 @@ void DemoM1_SpawnGameObjects()
     {
         int intX{distributionX(gen)}, intY{distributionY(gen)};
         std::string uniqueName = "Demo Circle " + std::to_string(i);
-        //GameObject *newGO = factory.CreateShape(uniqueName, RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, vec4(1.f, 0.f, 0.f, 1.f));
-        //GameObject* newGO = factory.CreateAnimatedImage(uniqueName, static_cast<float>(intX), static_cast<float>(intY), 40.0, 40.0, "./Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Ground);
-        
-        GameObject* newGO = factory.CreateGameObject(uniqueName);
+        // GameObject *newGO = factory.CreateShape(uniqueName, RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, vec4(1.f, 0.f, 0.f, 1.f));
+        // GameObject* newGO = factory.CreateAnimatedImage(uniqueName, static_cast<float>(intX), static_cast<float>(intY), 40.0, 40.0, "./Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Ground);
+
+        GameObject *newGO = factory.CreateGameObject(uniqueName);
 
         newGO->AddComponent<TransformComponent>(
             static_cast<float>(intX),
-            static_cast<float>(intY)
-        );
-        auto* transform = newGO->GetComponent<TransformComponent>();
-        auto* physics = newGO->AddComponent<PhysicsComponent>(0, 0);
+            static_cast<float>(intY));
+        auto *transform = newGO->GetComponent<TransformComponent>();
+        auto *physics = newGO->AddComponent<PhysicsComponent>(0, 0);
         physics->SetGravity(true); // Enable/Disable gravity
         physics->SetStatic(false);
         transform->SetScale(40.f, 40.f);
         physics->SetVelocity(0, 0);
         newGO->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, 5.f, 5.f, CollisionLayer::Ground);
 
-
-        auto* render = newGO->AddComponent<RenderComponent>(sharedTextureID);
+        auto *render = newGO->AddComponent<RenderComponent>(sharedTextureID);
         render->SetLayer(0);
-        
-        auto* animator = newGO->AddComponent<Spritesheet>(
+
+        auto *animator = newGO->AddComponent<Spritesheet>(
             sharedTextureID,
             1,
-            2
-            );
+            2);
         animator->SetAnimation(0, 7, 2.f);
         vecGOs.push_back(newGO);
     }

@@ -229,6 +229,11 @@ public:
      */
     static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
 
+    // Step-by-step physics debugging
+    bool stepMode;
+    bool stepOnce;
+    double accumulator; // Accumulator for fixed timestep
+
 private:
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;

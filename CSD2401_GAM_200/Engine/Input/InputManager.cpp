@@ -51,6 +51,15 @@ void InputManager::Initialize()
 {
     glfwGetWindowSize(window, &width, &height);
 }
+/**
+ * @brief Gets the system name.
+ * @return The string "Input System".
+ */
+
+std::string InputManager::GetName()
+{
+    return "InputSystem";
+}
 
 /**
  * @brief Updates input handling, including key presses, mouse events,
@@ -60,7 +69,7 @@ void InputManager::Initialize()
 void InputManager::Update(float dt)
 {
     static bool keyPressed = false;
-    LevelEditor* levelEditor = CORE->GetLevelEditor();
+    LevelEditor *levelEditor = CORE->GetLevelEditor();
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
     {
         // still allow escape key, but ignore player movement inputs
@@ -75,6 +84,8 @@ void InputManager::Update(float dt)
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},
         {GLFW_KEY_F2, false},
+        {GLFW_KEY_F3, false},
+        {GLFW_KEY_F4, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
     };
 
@@ -109,8 +120,24 @@ void InputManager::Update(float dt)
                     CORE->GetGraphicsSystem()->toggleDebugMode();
                     std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
                 }
+                else if (key == GLFW_KEY_F2)
+                {
+                    CORE->stepMode = !CORE->stepMode;
 
-                if (key == GLFW_KEY_F2) {
+                    if (!CORE->stepMode)
+                    {
+                        CORE->accumulator = 0.0;
+                    }
+
+                    std::cout << "\n[STEP MODE] " << (CORE->stepMode ? "ENABLED - Press F3 to advance frames" : "DISABLED - Normal play") << std::endl;
+                }
+                else if (key == GLFW_KEY_F3 && CORE->stepMode)
+                {
+                    CORE->stepOnce = true;
+                    std::cout << "[STEP MODE] Advancing 1 frame..." << std::endl;
+                }
+                else if (key == GLFW_KEY_F4)
+                {
                     CORE->GetGraphicsSystem()->SetEditorMode();
                     std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
                 }
@@ -141,6 +168,15 @@ void InputManager::Update(float dt)
         return;
     }
 
+    //// Ensure player has drag force for smooth stopping (add once)
+    // static bool dragInitialized = false;
+    // if (!dragInitialized && physics)
+    //{
+    //     auto& forcesManager = physics->GetForcesManager();
+    //     forcesManager.AddDrag();
+    //     dragInitialized = true;
+    // }
+
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
@@ -153,92 +189,49 @@ void InputManager::Update(float dt)
     }
 
     //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
-    // Horizontal movement
-    float moveSpeed = 200.0f;    // Movement speed
-    float moveDirectionX = 0.0f; // Track intended direction (1=Right, -1=Left)
+    // Horizontal movement using forces
+    /*float moveForce = 800.0f;*/ // Force magnitude for movement
+    float moveDirectionX = 0.0f;  // Track intended direction (1=Right, -1=Left)
     bool is_jumping = false;
+
+    auto &forcesManager = physics->GetForcesManager();
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        vx = -moveSpeed;
-
         moveDirectionX = -1.0f;
+
+        // Add left movement force using helper
+        forcesManager.AddForce(ForceType::MoveLeft, physics->GetMass());
+        // Remove right movement if present
+        forcesManager.RemoveForcesByType(ForceType::MoveRight);
     }
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        vx = moveSpeed;
-
         moveDirectionX = 1.0f;
+
+        // Add right movement force using helper
+        forcesManager.AddForce(ForceType::MoveRight, physics->GetMass());
+        // Remove left movement if present
+        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
     }
     else
     {
-
-        vx = 0.0f;
+        // No movement keys pressed - remove all movement forces
+        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
+        forcesManager.RemoveForcesByType(ForceType::MoveRight);
     }
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
-        
-    }
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-    {
-        // Use single trigger to prevent multiple reloads
-        static bool rKeyPressed = false;
-
-        if (!rKeyPressed)
-        {
-            std::cout << "\n=== HOT RELOAD TRIGGERED (R Key) ===" << std::endl;
-
-            // 1. Get the script system from CORE
-            auto scriptSystem = CORE->GetScriptSystem();
-
-            if (scriptSystem)
-            {
-                // 2. Reload the script assembly
-                scriptSystem->ReloadScriptAssembly();
-
-                // 3. Find and re-attach scripts to game objects
-                // Get your test object - adjust the name to match your actual GameObject
-                GameObject* testObj = GameObjectFactory::Instance().FindGameObject("TestObject");
-
-                // Or if you created it with a different name, use that:
-                // GameObject* testObj = GameObjectFactory::Instance().FindGameObject("RedSquare");
-
-                if (testObj)
-                {
-                    scriptSystem->AttachScript(testObj, "TestGameObject");
-                    scriptSystem->CallOnStart(testObj);
-                    std::cout << " Scripts reattached to TestObject" << std::endl;
-                }
-                else
-                {
-                    std::cout << " TestObject not found - create it first or check the name" << std::endl;
-                }
-
-                std::cout << "=== HOT RELOAD COMPLETE ===" << std::endl;
-            }
-            else
-            {
-                std::cout << " ScriptSystem not found in CORE!" << std::endl;
-            }
-
-            rKeyPressed = true;
-        }
-    }
-    else
-    {
-        static bool rKeyPressed = false;
-        rKeyPressed = false;
     }
     /**
-        * @brief Toggle on and off imgui
-        */
+     * @brief Toggle on and off imgui
+     */
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
         InputManager::KeyStateImgui = true;
-
     }
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
@@ -248,13 +241,12 @@ void InputManager::Update(float dt)
         if (physics->IsGrounded())
         {
             is_jumping = false;
-            physics->Jump(400.0f);        // Jump force
+            physics->GetForcesManager().AddForce(ForceType::Jump, physics->GetMass());
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
             if (audioEngine)
             {
                 audioEngine->playSound("jump_sfx", "jump_channel");
-           
             }
             /*if (audioEngine) {
                 Message msg;
@@ -278,15 +270,15 @@ void InputManager::Update(float dt)
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        const char *IDLE_SS = "../Assets/Mouch_Idle.png";
+        const char *IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1;
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char *RUN_SS = "../Assets/Mouch_Running.png";
-        const char *JUMP_SS = "../Assets/Mouch_jump.png";
+        const char *RUN_SS = "./Assets/Mouch_Running.png";
+        const char *JUMP_SS = "./Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;
@@ -320,7 +312,8 @@ void InputManager::Update(float dt)
         }
     }
 
-    physics->SetVelocity(vx, vy);
+    // Note: Don't call SetVelocity anymore - forces handle movement
+    // The Integrate() method will update velocity based on forces
 
     // Mouse
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
@@ -336,13 +329,4 @@ void InputManager::Update(float dt)
     glfwGetCursorPos(window, &xpos, &ypos);
     mouseX = xpos;
     mouseY = ypos;
-}
-
-/**
- * @brief Gets the system name.
- * @return The string "Input System".
- */
-std::string InputManager::GetName()
-{
-    return "Input System";
 }

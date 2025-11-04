@@ -21,7 +21,7 @@ Technology is prohibited.
 namespace fs = std::filesystem;
 static const std::string PREFAB_DIR = PrefabFilePath;
 
-std::string Serialization::GetFullPath(const std::string& filename)
+std::string Serialization::GetFullPath(const std::string &filename)
 {
 	return PREFAB_DIR + filename + ".json";
 }
@@ -32,7 +32,7 @@ std::string Serialization::GetFullPath(const std::string& filename)
 std::vector<std::string> Serialization::GetAllPrefabs()
 {
 	std::vector<std::string> temp;
-	for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
+	for (auto const &prefab : std::filesystem::directory_iterator(PrefabFilePath))
 	{
 		if (prefab.path().extension() == ".json")
 		{
@@ -81,19 +81,19 @@ void Serialization::DeserializeGameObject(const json &j)
 	std::string name = j.value("name", "Unnamed");
 
 	std::cout << "[Deserialize] Creating: " << name << std::endl;
-	GameObject* go = factory.CreateGameObject(name);
+	GameObject *go = factory.CreateGameObject(name);
 	std::cout << "[Deserialize] Created GO at " << go << " (ID " << go->GetID() << ")\n";
-
 
 	go->SetActive(j.value("active", true));
 
 	ComponentSerialization::DeserializeAllComponents(go, j);
 }
 
-void Serialization::SavePrefab(GameObject& go)
+void Serialization::SavePrefab(GameObject &go)
 {
 	// Make sure the prefab directory exists
-	if (!fs::exists(PrefabFilePath)) fs::create_directories(PrefabFilePath);
+	if (!fs::exists(PrefabFilePath))
+		fs::create_directories(PrefabFilePath);
 
 	// Construct full prefab path
 	std::string path = PrefabFilePath + go.GetName() + ".json";
@@ -103,20 +103,21 @@ void Serialization::SavePrefab(GameObject& go)
 	j["GameObjects"] = json::array();
 
 	// Serialize only this single GameObject
-	j["GameObjects"].push_back(Serialization::SerializeGameObject(&go)); 
+	j["GameObjects"].push_back(Serialization::SerializeGameObject(&go));
 
 	// Write to disk
 	std::ofstream out(path, std::ios::trunc);
-	if (out.is_open()) {
+	if (out.is_open())
+	{
 		out << j.dump(4);
 		out.close();
 		std::cout << "[SavePrefab] Prefab saved successfully: " << path << "\n";
 	}
-	else {
+	else
+	{
 		std::cerr << "[SavePrefab] Failed to write prefab: " << path << "\n";
 	}
 }
-
 
 void Serialization::LoadPrefab(const std::string &prefabName)
 {
@@ -150,26 +151,28 @@ void Serialization::LoadPrefab(const std::string &prefabName)
 		return;
 	}
 
-	if (j.contains("GameObjects")) {
-		for (const auto& obj : j["GameObjects"])
+	if (j.contains("GameObjects"))
+	{
+		for (const auto &obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
-
 
 		std::cout << "[LoadPrefab] Prefab instantiated successfully.\n";
 	}
 }
 
-void Serialization::SaveScene(const std::string& scenePath)
+void Serialization::SaveScene(const std::string &scenePath)
 {
 	std::string path = SceneFilePath + scenePath + ".json";
 	json j;
 	j["GameObjects"] = json::array();
 
 	// Get all GameObjects currently managed by factory
-	const auto& objects = GameObjectFactory::Instance().GetAllGameObjects();
+	const auto &objects = GameObjectFactory::Instance().GetAllGameObjects();
 
-	for (const auto& obj : objects) {
-		if (obj && obj->IsActive()) {
+	for (const auto &obj : objects)
+	{
+		if (obj && obj->IsActive())
+		{
 			// Serialize and add to JSON array
 			j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
 		}
@@ -177,19 +180,20 @@ void Serialization::SaveScene(const std::string& scenePath)
 
 	// Write scene JSON to disk
 	std::ofstream out(path, std::ios::trunc);
-	if (out.is_open()) {
+	if (out.is_open())
+	{
 		out << j.dump(4);
 		out.close();
 		std::cout << "[SaveScene] Scene saved successfully :" << path << "\n";
-
 	}
 
-	else {
+	else
+	{
 		std::cerr << "[SaveScene] Failed to open file for writing (saving): " << path << "\n";
 	}
 }
 
-void Serialization::LoadScene(const std::string& scenePath)
+void Serialization::LoadScene(const std::string &scenePath)
 {
 	std::string path = SceneFilePath + scenePath + ".json";
 	if (!fs::exists(path))
@@ -210,7 +214,7 @@ void Serialization::LoadScene(const std::string& scenePath)
 	{
 		in >> j;
 	}
-	catch (const std::exception& e)
+	catch (const std::exception &e)
 	{
 		std::cerr << "[LoadScene] Parse error: " << e.what() << "\n";
 		return;
@@ -218,16 +222,16 @@ void Serialization::LoadScene(const std::string& scenePath)
 
 	if (j.contains("GameObjects"))
 	{
-		for (const auto& obj : j["GameObjects"]) 
+		for (const auto &obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
 		std::cout << "[LoadScene] Scene loaded successfully: " << path << "\n";
 	}
 }
 
-void Serialization::RemovePrefab(std::string const& prefabName)
+void Serialization::RemovePrefab(std::string const &prefabName)
 {
-	for (auto const& prefab : std::filesystem::directory_iterator(PrefabFilePath))
+	for (auto const &prefab : std::filesystem::directory_iterator(PrefabFilePath))
 	{
 		if (prefab.path().stem().string() == prefabName)
 		{
@@ -240,7 +244,7 @@ void Serialization::RemovePrefab(std::string const& prefabName)
 	}
 }
 
-void Serialization::RenamePrefab(std::string const& oldName, std::string const& newName)
+void Serialization::RenamePrefab(std::string const &oldName, std::string const &newName)
 {
 	if (!std::filesystem::exists(PrefabFilePath + oldName + ".json"))
 	{

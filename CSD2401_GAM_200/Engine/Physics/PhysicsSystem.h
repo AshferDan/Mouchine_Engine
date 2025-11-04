@@ -100,16 +100,6 @@ private:
     void ResolveMixed(GameObject* obj1, GameObject* obj2,
         ColliderComponent* col1, ColliderComponent* col2);
 
-    /**
-     * @brief Applies gravity acceleration to a physics component
-     * @param physics Physics component to update
-     * @param deltaTime Frame time
-     */
-    void ApplyGravity(PhysicsComponent* physics, float deltaTime);
-
-
     // Store collisions reported this frame for batch resolution
     std::vector<CollisionData> pendingCollisions;
-
-
 };
