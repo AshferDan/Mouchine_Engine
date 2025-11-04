@@ -32,7 +32,7 @@ LevelEditor::LevelEditor()
     maxZoom(5.0f)
 {
     strcpy(saveFilepath, "");
-    strcpy(loadFilepath, "../Assets/Scenes//Prefab_TestScene.json");
+    strcpy(loadFilepath, "../Assets/Scenes/Prefab_TestScene.json");
 }
 
 /**
@@ -102,8 +102,8 @@ void LevelEditor::Update(float /*dt*/)
     // show editor UI only when not in live Play
     if (editorMode != EditorMode::Play)
     {
-        RenderMenuBar();
-        RenderHierarchy();
+        //RenderMenuBar();
+        //RenderHierarchy();
 
         // only show camera controls in edit mode
         if (editorMode == EditorMode::Stop)
