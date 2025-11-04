@@ -28,7 +28,8 @@ namespace API {
         resourceMgr.SetAudioEngine(&audio);
 
         // load textures
-        resourceMgr.LoadTexture("player_sprite", "./Assets/protosprite.png");
+        resourceMgr.LoadTexture("Hero", "./Assets/Mouch_idle.png");
+        resourceMgr.LoadTexture("bgImage", "./Assets/wallpaper_transparent.png");
 
         // load audio files
         resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true); // looping

@@ -172,7 +172,7 @@ bool AudioEngine::playSound(const std::string& name, const std::string& channelN
 		channels[channelName] = channel;
 	}
 
-	std::cout << "Sound playing: " << name << std::endl;
+	std::cout << "Sound playing: " << name << "\n" << std::endl;
 	return true;
 }
 

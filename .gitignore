@@ -25,3 +25,5 @@ Release
 *.html
 _deps
 CmakeCache.txt
+build/
+Build/

@@ -22,7 +22,7 @@ Technology is prohibited.
 
     */
 GameObject::GameObject(EntityID id, const std::string& name)
-    : entityID(id), name(name), isActive(true) {
+    : entityID(id), name(name), isActive(true), parent(nullptr) {
 }
 
 /* brief
@@ -94,4 +94,27 @@ void GameObject::Destroy() {
         component->Destroy();
     }
     components.clear();
+}
+
+void GameObject::AddChild(GameObject* ChildGO)
+{
+    ChildGO->parent = this;
+    children.push_back(ChildGO);
+    std::cout << "oh my beautiful children: \n";
+    for (auto const& child : children)
+    {
+        std::cout << '\t' << ChildGO->GetName() << std::endl;
+    }
+}
+
+void GameObject::RemoveChild(GameObject* ChildGO)
+{
+    std::cout << ChildGO->GetName() << " is gone\n";
+    children.erase(std::remove(children.begin(), children.end(), ChildGO), children.end());
+    ChildGO->parent = nullptr;
+}
+
+void GameObject::SetParent(GameObject* ParentGO)
+{
+    ParentGO->AddChild(this);
 }

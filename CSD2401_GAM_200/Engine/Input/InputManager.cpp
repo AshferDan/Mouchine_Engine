@@ -16,8 +16,10 @@ Technology is prohibited.
 #include <unordered_map>
 #include "Animator.hpp"
 #include "core.h"
+#include "Serialization.h"
 
 bool InputManager::KeyStateImgui = true;
+
 /**
  * @brief Constructs an InputManager with specified parameters.
  * @param window Pointer to the GLFW window.
@@ -57,9 +59,22 @@ void InputManager::Initialize()
  */
 void InputManager::Update(float dt)
 {
+    static bool keyPressed = false;
+    LevelEditor* levelEditor = CORE->GetLevelEditor();
+    if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
+    {
+        // still allow escape key, but ignore player movement inputs
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        mouseX = xpos;
+        mouseY = ypos;
+        return;
+    }
+
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},
+        {GLFW_KEY_F2, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
     };
 
@@ -93,6 +108,11 @@ void InputManager::Update(float dt)
                 {
                     CORE->GetGraphicsSystem()->toggleDebugMode();
                     std::cout << "Dubug mode toggled" << CORE->GetGraphicsSystem()->isDebugModeOn() << std::endl;
+                }
+
+                if (key == GLFW_KEY_F2) {
+                    CORE->GetGraphicsSystem()->SetEditorMode();
+                    std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
                 }
             }
             wasPressed = true;
@@ -160,6 +180,7 @@ void InputManager::Update(float dt)
     {
         KeyStateQuit = true;
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+        
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
     {
@@ -216,8 +237,7 @@ void InputManager::Update(float dt)
         */
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
-        InputManager::KeyStateImgui= (!InputManager::KeyStateImgui) ? true : false;
-        std::cout << InputManager::KeyStateImgui << std::endl;
+        InputManager::KeyStateImgui = true;
 
     }
     // Jump
@@ -234,7 +254,15 @@ void InputManager::Update(float dt)
             if (audioEngine)
             {
                 audioEngine->playSound("jump_sfx", "jump_channel");
+           
             }
+            /*if (audioEngine) {
+                Message msg;
+                msg.type = "PlaySound";
+                msg.sender = this;
+                msg.data = (void*)"jump_sfx";
+                CORE->GetMessageBus().Broadcast(msg);
+            }*/
         }
     }
 

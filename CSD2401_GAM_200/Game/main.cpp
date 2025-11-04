@@ -13,6 +13,12 @@ Technology is prohibited.
 
 #include "main.h"
 
+namespace CrashHandler
+{
+    std::string GetStackTrace();
+    void LogCrash(const char *type, const std::exception *e = nullptr);
+}
+
 /**
  * @brief Enables memory leak checking in debug mode.
  * @param breakAlloc, Allocation number to break on for debugging.
@@ -39,146 +45,161 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
  */
 int main()
 {
-    EnableMemoryLeakChecking();
-    CoreEngine engine;
-    AudioEngine audio;
-
-    API::Init_Engine(engine, audio);
-
-    // Create objects whenever you want, in any order
-    std::cout << "\n--- Creating Background ---" << std::endl;
-    API::CreateImage("bgImage", RenderComponent::ShapeType::Square,
-        0.f, 0.f, 2400.f, 1380.f,
-        "../Assets/wallpaper_transparent.png");
-
-    std::cout << "\n--- Creating Hero ---" << std::endl;
-    API::CreateAnimatedImage("Hero", 0.0f, 0.0f, 150.0f, 150.0f,
-        "../Assets/Mouch_idle.png",
-        1, 2, 0, 7, 2.0f,
-        CollisionLayer::Player,
-        true, false, true);
-
-    // Maybe some logic here...
-    std::cout << "\n--- Creating Other Sprites ---" << std::endl;
-    API::CreateAnimatedImage("AniImage", -700.0f, 100.0f, 300.0f, 300.0f,
-        "../Assets/Mouch_idle.png",
-        1, 2, 0, 7, 2.0f, CollisionLayer::Ground, true, true, false);
-
-    // Create ground
-    std::cout << "\n--- Creating Environment ---" << std::endl;
-    API::CreateShape("Ground", RenderComponent::ShapeType::Square,
-        0, -500, 3000, 500,
-        vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        CollisionLayer::Ground,
-        true, true, false);
-
-    API::CreateShape("Wall", RenderComponent::ShapeType::Square,
-        1500, -500, 1000, 3000,
-        vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        CollisionLayer::Ground,
-        true, true, false);
-
-    API::CreateShape("Wall2", RenderComponent::ShapeType::Square,
-        -1500, -500, 1000, 3000,
-        vec4(0.0f, 0.0f, 0.0f, 1.0f),
-        CollisionLayer::Ground,
-        true, true, false);
-
-    // Create enemies
-    std::cout << "\n--- Creating Enemies ---" << std::endl;
-    API::CreateShape("Circle", RenderComponent::ShapeType::Circle,
-        150, 300, 100, 100,
-        vec4(1.f, 0.f, 0.f, 1.f),
-        CollisionLayer::Enemy,
-        true, false, true);
-    API::SetVelocity("Circle", -250.0f, 0.0f);
-
-    API::CreateShape("Circle2", RenderComponent::ShapeType::Circle,
-        -150, 300, 100, 100,
-        vec4(1.f, 0.f, 0.f, 1.f),
-        CollisionLayer::Enemy,
-        true, false, true);
-    API::SetVelocity("Circle2", 250.0f, 0.0f);
-
-    // You can even add conditional creation
-    bool createButton = true;
-    if (createButton)
+    try
     {
-        //API::CreateGameObject("Evil Button");
-    }
 
-    // =======================================================
-    // C# SCRIPTING - TWO SQUARES SPAWNER
-    // =======================================================
-    std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+        EnableMemoryLeakChecking();
+        CoreEngine engine;
+        AudioEngine audio;
 
-    ScriptSystem* scriptSys = engine.GetScriptSystem();
+        API::Init_Engine(engine, audio);
 
-    // ===== ORIGINAL: Spawner script attached to Hero =====
-    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
-    if (scriptSys && hero)
-    {
-        scriptSys->AttachScript(hero, "Spawner");
-        std::cout << "Attached 'Spawner' script to Hero" << std::endl;
-    }
-    else
-    {
-        if (!scriptSys)
-            std::cerr << "ERROR: Could not find ScriptingSystem!" << std::endl;
-        if (!hero)
-            std::cerr << "ERROR: Could not find 'Hero' GameObject!" << std::endl;
-    }
+        // Serialization::LoadScene("Prefab_TestScene.json");
+        Serialization::LoadScene("../Assets/Scenes/Prefab_TestScene.json");
+        /*LevelEditor::LoadLevel("../Assets/Prefabs/Prefab_TestScene.json");*/
 
-    // ===== NEW: TestGameObject - Creates 2 static squares =====
-    // Use the factory to create the GameObject properly
-    GameObject* squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
-    if (scriptSys && squareSpawner)
-    {
-        // Attach the TestGameObject script (creates red and blue squares)
-        bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
-        if (attached)
+        GameObject *textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
+        textObj->AddComponent<TransformComponent>(100.0f, 100.0f); // Position on screen
+        auto *text = textObj->AddComponent<TextComponent>(
+            "./Assets/FrederickatheGreat-Regular.ttf",
+            48, // Font size
+            "Score: 0",
+            vec4(1.0f, 1.0f, 1.0f, 1.0f),
+            true);
+        text->SetScale(1.0f);
+
+        // Later, update the text:
+        text->SetText("Score: 100");
+
+        GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+        auto *cam = mainCamera->AddComponent<CameraComponent>();
+
+        GameObject *player = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (player)
         {
-            std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
+            cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+            // WHEN CAMERA MODE IS FIXED
+            // cam->SetPosition(0.f, 0.f);
+            cam->SetFollowTarget(player);
+            cam->SetFollowOffset(vec2(0.f, 0.f));
+            cam->SetSmoothing(true, 2.f);
+        }
+        CameraManager::Instance().SetActiveCamera(mainCamera);
 
-            // Call OnStart to actually create the squares
-            scriptSys->CallOnStart(squareSpawner);
-            std::cout << "Called OnStart - Two squares should be created!" << std::endl;
-        }
-        else
-        {
-            std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
-            std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
-            std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
-        }
+        API::StartEngineLoop(engine);
     }
-    else
+    catch (const std::exception &e)
     {
-        if (!scriptSys)
-            std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
-        if (!squareSpawner)
-            std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
+        std::cerr << "[TEST] Exception caught: " << e.what() << "\n";
+        CrashHandler::LogCrash("EXCEPTION", &e);
     }
-
-    // ===== OPTIONAL: AnimatedSquares - Creates 2 animated squares =====
-    // Uncomment this section to also spawn animated squares
-    /*
-    GameObject* animatedSpawner = new GameObject("AnimatedSpawner");
-    if (scriptSys && animatedSpawner)
+    catch (...)
     {
-        bool attached = scriptSys->AttachScript(animatedSpawner, "AnimatedSquares");
-        if (attached)
-        {
-            std::cout << "Attached 'AnimatedSquares' script to AnimatedSpawner" << std::endl;
-            scriptSys->CallOnStart(animatedSpawner);
-            std::cout << "Called OnStart - Two animated squares should be created!" << std::endl;
-        }
+        CrashHandler::LogCrash("UNKNOWN EXCEPTION");
     }
-    */
-
-    // =======================================================
-
-    // Start the game loop when ready
-    API::StartEngineLoop(engine);
-
     return 0;
+}
+
+namespace CrashHandler
+{
+
+#if defined(_WIN32)
+#include <windows.h>
+#include <dbghelp.h>
+#pragma comment(lib, "dbghelp.lib")
+#endif
+
+    std::string GetStackTrace()
+    {
+#if defined(_WIN32)
+        void *stack[62];
+        HANDLE process = GetCurrentProcess();
+        SymInitialize(process, NULL, TRUE);
+        WORD frames = CaptureStackBackTrace(0, 62, stack, NULL);
+
+        std::ostringstream oss;
+        for (WORD i = 0; i < frames; ++i)
+        {
+            DWORD64 address = (DWORD64)(stack[i]);
+            char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+            PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
+            symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+            symbol->MaxNameLen = MAX_SYM_NAME;
+
+            DWORD64 displacement = 0;
+            if (SymFromAddr(process, address, &displacement, symbol))
+            {
+                oss << "[" << i << "] " << symbol->Name
+                    << " - 0x" << std::hex << symbol->Address << std::dec << "\n";
+            }
+        }
+        return oss.str();
+#else
+        return "Stacktrace not supported on this platform.";
+#endif
+    }
+
+    void LogCrash(const char *type, const std::exception *e)
+    {
+        std::filesystem::create_directories("../Logs");
+        std::ofstream log("../Logs/CrashLog.txt", std::ios::app);
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        log << "\n[" << type << "] " << std::put_time(std::localtime(&now), "%F %T") << "\n";
+        if (e)
+            log << e->what() << "\n";
+        log << GetStackTrace() << "\n";
+        log.close();
+    }
+} // namespace CrashHandler
+
+// =======================================================
+// C# SCRIPTING - TWO SQUARES SPAWNER
+// =======================================================
+std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+
+ScriptSystem *scriptSys = engine.GetScriptSystem();
+
+// ===== ORIGINAL: Spawner script attached to Hero =====
+GameObject *hero = GameObjectFactory::Instance().FindGameObject("Hero");
+if (scriptSys && hero)
+{
+    scriptSys->AttachScript(hero, "Spawner");
+    std::cout << "Attached 'Spawner' script to Hero" << std::endl;
+}
+else
+{
+    if (!scriptSys)
+        std::cerr << "ERROR: Could not find ScriptingSystem!" << std::endl;
+    if (!hero)
+        std::cerr << "ERROR: Could not find 'Hero' GameObject!" << std::endl;
+}
+
+// ===== NEW: TestGameObject - Creates 2 static squares =====
+// Use the factory to create the GameObject properly
+GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+if (scriptSys && squareSpawner)
+{
+    // Attach the TestGameObject script (creates red and blue squares)
+    bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
+    if (attached)
+    {
+        std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
+
+        // Call OnStart to actually create the squares
+        scriptSys->CallOnStart(squareSpawner);
+        std::cout << "Called OnStart - Two squares should be created!" << std::endl;
+    }
+    else
+    {
+        std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
+        std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
+        std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
+    }
+}
+else
+{
+    if (!scriptSys)
+        std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
+    if (!squareSpawner)
+        std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
 }
