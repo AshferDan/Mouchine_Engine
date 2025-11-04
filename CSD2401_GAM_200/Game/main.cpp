@@ -54,9 +54,7 @@ int main()
 
         API::Init_Engine(engine, audio);
         
-        //Serialization::LoadScene("Prefab_TestScene.json");
-        Serialization::LoadScene("../Assets/Scenes/Prefab_TestScene.json");
-        /*LevelEditor::LoadLevel("../Assets/Prefabs/Prefab_TestScene.json");*/
+        Serialization::LoadScene("Prefab_TestScene");
 
         GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
         textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen

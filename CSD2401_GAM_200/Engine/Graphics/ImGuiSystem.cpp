@@ -98,7 +98,7 @@ static EntityID selectedGameObjectID = 0;
 // Helper
 void ReloadPrefabsList()
 {
-    prefabList = PrefabManager::GetAllPrefabs();
+    prefabList = Serialization::GetAllPrefabs();
 }
 
 /**
@@ -256,62 +256,39 @@ void ImGuiSystem::Update(float dt)
                 if (ImGui::Button("Save As Prefab"))
                 {
                     Serialization::SavePrefab(*obj);
-
-                    // Refresh prefab list in PrefabUI if present
                     ReloadPrefabsList();
                 }
 
-                // ---- Reload prefab button ----
-                ImGui::SameLine();
-                if (ImGui::Button("Reload Prefab"))
-                {
-                    std::string path = PrefabFilePath + obj->GetName() + ".json";
-                    if (std::filesystem::exists(path))
-                    {
-                        // GameObjectFactory& factory = GameObjectFactory::Instance();
-                        // GameObject* clonedObj = factory.CloneGameObject(obj->GetID());
-
-                        // // Save cloned object data
-                        // Serialize_Writer writer("../Logs/GameObjectData.txt");
-                        // if (writer.IsStreamGood())
-                        // {
-                        //     if (writer.WriteGameObjectData(*clonedObj, 0))
-                        //         std::cout << "Cloned object data saved!\n";
-                        // }
-
-                        // std::cout << "button clicked";
-                        GameObjectFactory::Instance().Clear();
-                        PrefabManager::LoadPrefab(path);
-                        std::cout << "[ImGui] Reloaded prefab from " << path << "\n";
-                    }
-                    else
-                    {
-                        //     Serialize_Writer writer("../Logs/GameObjectData.txt"); // Create Writer class object with specified path
-                        //     if (writer.IsStreamGood())
-                        //     {
-                        //         // If stream is valid, write objects data to file path
-                        //         if(writer.WriteGameObjectData(*obj, 0))
-                        //             std::cout << "GameObject data saved!\n";
-                        //     }
-                        // }
-
-                        // // Create Prefab with GO Data
-                        // if (ImGui::Button("Save as Prefab"))
-                        // {
-                        //     PrefabTools::CreatePrefab(*obj);
-                        //     ReloadPrefabsList();
-                        std::cerr << "[ImGui] Prefab not found: " << path << "\n";
-                    }
-                }
-
                 // ---- Clone object ----
-                if (ImGui::Button("Clone Object"))
-                {
-                    auto &factory = GameObjectFactory::Instance();
-                    GameObject *clone = factory.CloneGameObject(obj->GetID());
-                    if (clone)
-                        std::cout << "[ImGui] Cloned GameObject: " << clone->GetName() << "\n";
+                if (obj->GetName() != "Hero" && obj->GetName() != "Evil Button") {
+                    if (ImGui::Button("Clone Object"))
+                    {
+                        auto& factory = GameObjectFactory::Instance();
+                        GameObject* clone = factory.CloneGameObject(obj->GetID());
+
+                        if (clone) {
+                            // Offset position slightly so clones do not overlap
+                            if (auto* t = clone->GetComponent<TransformComponent>())
+                            {
+                                float x, y;
+                                t->GetPosition(x, y);
+                                t->SetPosition(x + 20.f, y + 20.f);
+                            }
+                        }
+                    }
                 }
+
+                // Evil button that spawns 2.5k Circle GOs
+                if (obj && obj->GetName() == "Evil Button")
+                {
+                    if (ImGui::Button("Spawn 2500 Entities"))
+                    {
+                        DemoM1_SpawnGameObjects();
+                        std::cout << "Spawned 2500 Circle Entities!\n";
+                    }
+                }
+
+                ImGui::TreePop();
 
                 // Altered for M1 demonstration of 2.5k GOs!
                 // if (obj->GetName() != "Hero" && obj->GetName() != "Evil Button")
@@ -350,17 +327,6 @@ void ImGuiSystem::Update(float dt)
                 //        Serialization::GetAllPrefabJSONFiles();
                 //    }
                 //}
-
-                // Evil button that spawns 2.5k Circle GOs
-                if (obj->GetName() == "Evil Button")
-                {
-                    if (ImGui::Button("Spawn 2500 Entities"))
-                    {
-                        DemoM1_SpawnGameObjects();
-                        std::cout << "Spawned 2500 Circle Entities!\n";
-                    }
-                }
-                ImGui::TreePop();
             }
         }
 
@@ -635,7 +601,7 @@ void PrefabMenu_Render()
                     if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
                     {
                         prefab_renameIndex = -1;
-                        PrefabManager::RenamePrefab(prefab_oldname, rename_str);
+                        Serialization::RenamePrefab(prefab_oldname, rename_str);
                     }
 
                     ImGui::PopID();
@@ -656,7 +622,7 @@ void PrefabMenu_Render()
             if (ImGui::MenuItem("Delete"))
             {
                 // TODO: DELETE
-                PrefabManager::RemovePrefab(prefabList[current_prefab]);
+                Serialization::RemovePrefab(prefabList[current_prefab]);
                 ReloadPrefabsList();
             }
             ImGui::EndPopup();
@@ -693,7 +659,7 @@ void PrefabMenu_Render()
     }
     ImGui::EndGroup();
 
-    if (ImGui::Button("Spawn"))
+    if (ImGui::Button("Spawn -> Load Prefab"))
     {
         PrefabMenu_Spawn();
     }

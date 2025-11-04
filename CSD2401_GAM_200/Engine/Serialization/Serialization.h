@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Serialization.h
-\author     Muhammad Ashfer [100% - 168 lines]
+\author     Muhammad Ashfer [100% - ?? lines]
 \par        m.binafzalkhan@digipen.edu
 \date       October, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -26,6 +26,9 @@ const std::string SceneFilePath{ "../Assets/Scenes/" };
 
 namespace Serialization
 {
+    std::vector<std::string> GetAllPrefabs();
+    std::string GetFullPath(const std::string& filename);
+
     /**
      * @brief Serializes a GameObject and all its components into JSON format.
      * @param go Pointer to GameObject.
@@ -39,21 +42,10 @@ namespace Serialization
      */
     void DeserializeGameObject(const json& j);
 
-    /**
-     * @brief Saves (creates or updates) a prefab to disk as a JSON file.
-     * @param go GameObject reference to serialize.
-     * @param existingPath Optional path to an existing prefab to overwrite.
-     */
     void SavePrefab(GameObject& go);
-
-    /**
-     * @brief Loads a prefab JSON file and recreates its GameObjects.
-     * @param path Path to the prefab file to load.
-     */
     void LoadPrefab(const std::string& path);
-    void LoadPrefab(const GameObject* GO);
 
-    void SaveScene(GameObject& go, const std::string& existingPath, bool append);
+    void SaveScene(const std::string& existingPath);
     void LoadScene(const std::string& path);
 
     void RemovePrefab(std::string const& prefabName);
