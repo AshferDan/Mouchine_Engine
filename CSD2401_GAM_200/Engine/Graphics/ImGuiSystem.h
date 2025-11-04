@@ -105,3 +105,7 @@ void SendDragAndDrop(std::string const& PayloadID, DataType const& dataToSend, s
 void SendDragAndDrop(std::string const& PayloadID, std::string const& dataToSend, std::string const& displayText);
 
 void ReceiveDragAndDrop(std::string const& PayloadID, std::string& dataToReceive);
+
+void CompletedDragAndDrop();
+
+void TopMenuBar_Render();

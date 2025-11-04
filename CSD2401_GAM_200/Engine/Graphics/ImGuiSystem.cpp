@@ -95,6 +95,7 @@ DirectoryNavigator AssetBrowserWindow;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
+
 // Helper
 void ReloadPrefabsList()
 {
@@ -148,6 +149,8 @@ void ImGuiSystem::Initialize()
     paddingSize = 16.f;
     cellSize = icon_size.x + paddingSize;
     ShowCreateGOMenu = false; // Hide create menu initially
+
+    Serialization::Prefab_DragAndDropped = false;
 }
 
 /**
@@ -182,13 +185,32 @@ void ImGuiSystem::Update(float dt)
 
         ImGuiID dockspace_id = ImGui::GetID("DockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+        ImGui::End;
 
-        if (CORE->GetGraphicsSystem()->IsEditorMode())
+        TopMenuBar_Render();
+
+        // commented out bc editor mode isnt rly an editor mode, its more of a game view mode, dragndrop still works tho
+        //if (CORE->GetGraphicsSystem()->IsEditorMode())
         {
             ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
 
-            CORE->GetGraphicsSystem()->RenderGameViewportImGui();
+            ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+            CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
+            ImGui::Begin("Game Viewport");
+
+            ImGui::Image((void*)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+
+            std::string testdata{};
+            ReceiveDragAndDrop(PrefabPayloadID, testdata);
+            if (!testdata.empty())
+            {
+                std::cout << testdata << std::endl;
+                Serialization::LoadPrefab(testdata);
+                CompletedDragAndDrop();
+            }
+
+            ImGui::End();
         }
 
         ImGui::End();
@@ -653,9 +675,12 @@ void PrefabMenu_Render()
 
     std::string testdata{};
     ReceiveDragAndDrop(AssetPayloadID, testdata);
+    // Do something with DnD data
+    CompletedDragAndDrop();
     if (!testdata.empty())
     {
         std::cout << testdata << std::endl;
+        CompletedDragAndDrop();
     }
     ImGui::EndGroup();
 
@@ -749,11 +774,9 @@ void DirectoryNavigator::RenderImGui()
 template <typename DataType>
 void SendDragAndDrop(std::string const &PayloadID, DataType const &dataToSend, std::string const &displayText)
 {
-    static_assert(std::is_arithmetic_v<DataType>, "TEMPLATED FUNCTION ONLY TAKES ARITHMETIC TYPES!!!\n");
+    static_assert(std::is_arithmetic_v<DataType>, "FUNCTION ONLY TAKES STRINGS OR ARITHMETIC TYPES!!!\n");
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
     {
-        std::cout << "AAAAA+" << std::to_string(dataToSend) << std::endl;
-        // isDragging = true;
         if (std::string data = std::to_string(dataToSend))
         {
             ImGui::SetDragDropPayload(PayloadID.c_str(), data.c_str(), data.size() + 1, ImGuiCond_Once);
@@ -775,11 +798,12 @@ void SendDragAndDrop(std::string const &PayloadID, std::string const &dataToSend
 {
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
     {
-        // std::cout << "AAAAA+" << dataToSend << std::endl;
-        // isDragging = true;
+        // if dndcursor.x within viewport x and dndcursor.y within viewport y, then take as valid
+            // if not either cancel dnd or spawn prefab with no pos
         ImGui::SetDragDropPayload(PayloadID.c_str(), dataToSend.c_str(), dataToSend.size() + 1, ImGuiCond_Once);
         // for template ^ might need to take in (filePath.size() + 1) * sizeof(DataType)
         ImGui::Text(displayText.c_str());
+        //std::cout << "bool is: " << Serialization::Prefab_DragAndDropped << " | DND - successfully Sent\n";
         ImGui::EndDragDropSource();
         // can do like a check against which targets match the type, then change outline to show matchable slot
     }
@@ -795,12 +819,71 @@ void ReceiveDragAndDrop(std::string const &PayloadID, std::string &dataToReceive
     {
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PayloadID.c_str()))
         {
+            Serialization::Prefab_DragAndDropped = true;
             const char *droppedPath = (const char *)payload->Data; // can also change the lhs type and the rhs cast if need
             dataToReceive = droppedPath;
             // use droppedPath (load texture,model,etc)
             // droppedPath in this case is just the file path that we sent
+            std::cout << "DND successfully Received\n";
         }
         ImGui::EndDragDropTarget();
     }
 }
+
+void CompletedDragAndDrop()
+{
+    Serialization::Prefab_DragAndDropped = false;
+    std::cout << "DND - successfully Completed\n";
+}
 #pragma endregion
+
+void TopMenuBar_Render()
+{
+    if (ImGui::BeginMainMenuBar()) // Begin the top menu bar
+    {
+        // File menu
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("Open")) 
+            {
+            
+            }
+            if (ImGui::MenuItem("Save")) 
+            {
+
+            }
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Exit")) 
+            {
+
+            }
+
+            ImGui::EndMenu();
+        }
+
+        // Edit menu
+        if (ImGui::BeginMenu("Edit"))
+        {
+            if (ImGui::MenuItem("Preferences")) 
+            {
+            
+            }
+
+            ImGui::EndMenu();
+        }
+
+        // Help menu
+        if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("Naw")) 
+            {
+
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMainMenuBar();
+    }
+}

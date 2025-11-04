@@ -136,7 +136,7 @@ public:
 
 	void RenderText(const std::map<char, Character> &characters, const std::string &text, float x, float y, float scale, const vec4 &color, bool screenSpace = true);
 
-	void RenderGameViewportImGui();
+	void RenderGameViewportImGui(float& viewportSizeX, float& viewportSizeY);
 
 	bool IsEditorMode() const { return editorMode; };
 
