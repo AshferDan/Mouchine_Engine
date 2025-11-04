@@ -16,11 +16,6 @@ Technology is prohibited.
 
 std::unordered_map<GLuint, std::string> s_TexturePathByID;
 std::unordered_map<std::string, GLuint> s_IDByTexturePath;
-/*!
-* @brief Implements JSON serialization and deserialization logic for each
-*    component type. This file isolates per-component data handling so
-*    the core serializer remains clean and extendable.
-*/
 
 // ------------------- Serialize -------------------
 /**

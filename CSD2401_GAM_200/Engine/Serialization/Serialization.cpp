@@ -19,6 +19,30 @@ Technology is prohibited.
 #include <filesystem>
 
 namespace fs = std::filesystem;
+static const std::string PREFAB_DIR = PrefabFilePath;
+
+std::string Serialization::GetFullPath(const std::string &filename)
+{
+	return PREFAB_DIR + filename + ".json";
+}
+
+/**
+ * @brief Returns all prefab JSON filenames found in the prefab directory.
+ */
+std::vector<std::string> Serialization::GetAllPrefabs()
+{
+	std::vector<std::string> temp;
+	for (auto const &prefab : std::filesystem::directory_iterator(PrefabFilePath))
+	{
+		if (prefab.path().extension() == ".json")
+		{
+			std::string prefabName = prefab.path().stem().string();
+			temp.push_back(prefabName);
+		}
+	}
+	temp.shrink_to_fit();
+	return temp;
+}
 
 /**
  * @brief Converts a GameObject and its components into a JSON object.
@@ -55,130 +79,64 @@ void Serialization::DeserializeGameObject(const json &j)
 {
 	GameObjectFactory &factory = GameObjectFactory::Instance();
 	std::string name = j.value("name", "Unnamed");
-	std::cout << "name of deserial " << name << std::endl;
+
+	std::cout << "[Deserialize] Creating: " << name << std::endl;
 	GameObject *go = factory.CreateGameObject(name);
+	std::cout << "[Deserialize] Created GO at " << go << " (ID " << go->GetID() << ")\n";
+
 	go->SetActive(j.value("active", true));
 
 	ComponentSerialization::DeserializeAllComponents(go, j);
 }
 
-void Serialization::SaveScene(GameObject &go, const std::string &existingPath, bool append)
+void Serialization::SavePrefab(GameObject &go)
 {
-	std::string path = existingPath.empty()
-						   ? "Assets/Scenes/" + go.GetName() + ".json"
-						   : existingPath;
+	// Make sure the prefab directory exists
+	if (!fs::exists(PrefabFilePath))
+		fs::create_directories(PrefabFilePath);
 
-	json root;
+	// Construct full prefab path
+	std::string path = PrefabFilePath + go.GetName() + ".json";
 
-	// Append — add new object to existing prefab file
-	if (append && fs::exists(path))
-	{
-		std::ifstream in(path);
-		if (in.peek() != std::ifstream::traits_type::eof())
-		{
-			try
-			{
-				in >> root;
-			}
-			catch (...)
-			{
-				root = json::object();
-			}
-		}
-		in.close();
+	// JSON object
+	json j;
+	j["GameObjects"] = json::array();
 
-		if (!root.contains("GameObjects"))
-			root["GameObjects"] = json::array();
+	// Serialize only this single GameObject
+	j["GameObjects"].push_back(Serialization::SerializeGameObject(&go));
 
-		root["GameObjects"].push_back(Serialization::SerializeGameObject(&go));
-	}
-
-	// Overwrite — reserialize *all* current GameObjects
-	else
-	{
-		root = json::object();
-		root["GameObjects"] = json::array();
-
-		const auto &objs = GameObjectFactory::Instance().GetAllGameObjects();
-		for (const auto &objPtr : objs)
-		{
-			if (objPtr && objPtr->IsActive())
-			{
-				root["GameObjects"].push_back(Serialization::SerializeGameObject(objPtr.get()));
-			}
-		}
-	}
-
-	// Write final JSON to disk
+	// Write to disk
 	std::ofstream out(path, std::ios::trunc);
 	if (out.is_open())
 	{
-		out << root.dump(4);
+		out << j.dump(4);
 		out.close();
-	}
-
-	std::cout << "[SavePrefab] "
-			  << (append ? "Appended to" : "Overwrote with updated scene: ")
-			  << path << "\n";
-}
-
-/**
- * @brief Saves one or more GameObjects to a prefab JSON file.
- *
- * Supports two modes:
- * - **Append Mode:** Adds a single GameObject to an existing JSON prefab.
- * - **Overwrite Mode:** Serializes all active GameObjects and replaces the file.
- *
- * @param go            Reference to the GameObject to save or append.
- * @param existingPath  Optional file path to an existing prefab file.
- * @param append        True to append, false to overwrite the entire prefab.
- *
- * @note When overwrite mode is used, all active GameObjects in the
- *       GameObjectFactory are serialized together.
- */
-void Serialization::SavePrefab(GameObject &go)
-{
-	// Create prefab path based on GameObject name
-	std::cout << "go getname(): " << go.GetName() << std::endl;
-	std::string path = PrefabFilePath + go.GetName() + ".json";
-	std::cout << "complete path: " << path << std::endl;
-
-	// Create a new JSON object
-	json root;
-	root["GameObjects"] = json::array();
-
-	// Serialize only this one GameObject
-	root["GameObjects"].push_back(Serialization::SerializeGameObject(&go));
-
-	// Write the JSON file to disk
-	std::ofstream out(path);
-	if (out.good())
-	{
-		out << root.dump(4);
-		std::cout << "[SavePrefab] Saved prefab -> " << path << "\n";
+		std::cout << "[SavePrefab] Prefab saved successfully: " << path << "\n";
 	}
 	else
 	{
-		std::cerr << "[SavePrefab] Failed to open file for writing: " << path << "\n";
+		std::cerr << "[SavePrefab] Failed to write prefab: " << path << "\n";
 	}
-	out.clear();
-	out.close();
 }
 
-void Serialization::LoadPrefab(const std::string &path)
+void Serialization::LoadPrefab(const std::string &prefabName)
 {
-	std::string completePath = PrefabFilePath + path + ".json";
-	std::cout << "[Load Prefab] Path: " << completePath << '\n';
-	if (!fs::exists(completePath))
+	// Construct full prefab file path
+	std::string path = PrefabFilePath + prefabName + ".json";
+	std::cout << "[LoadPrefab] Loading prefab from: " << path << "\n";
+
+	// Verify the prefab exists
+	if (!fs::exists(path))
 	{
-		std::cerr << "[Serialization] Prefab not found: " << completePath << "\n";
+		std::cerr << "[LoadPrefab] Prefab not found: " << path << "\n";
 		return;
 	}
 
-	std::ifstream in(completePath);
+	// Read file
+	std::ifstream in(path);
 	if (!in.is_open())
 	{
-		std::cerr << "[Serialization] Cannot open prefab: " << completePath << "\n";
+		std::cerr << "[LoadPrefab] Cannot open prefab: " << path << "\n";
 		return;
 	}
 
@@ -186,41 +144,68 @@ void Serialization::LoadPrefab(const std::string &path)
 	try
 	{
 		in >> j;
-		// std::cout << "dump: " << j.dump(4) << std::endl;
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << "[Serialization] Parse error: " << e.what() << "\n";
+		std::cerr << "[LoadPrefab] JSON Parse error: " << e.what() << "\n";
 		return;
 	}
-
-	GameObjectFactory::Instance().Clear();
 
 	if (j.contains("GameObjects"))
 	{
 		for (const auto &obj : j["GameObjects"])
-			DeserializeGameObject(obj);
+			Serialization::DeserializeGameObject(obj);
+
+		std::cout << "[LoadPrefab] Prefab instantiated successfully.\n";
 	}
-	else
-	{
-		DeserializeGameObject(j);
-	}
-	// DeserializeGameObject(j);
 }
 
-void Serialization::LoadPrefab(const GameObject *GO)
+void Serialization::SaveScene(const std::string &scenePath)
 {
-	std::string path = PrefabFilePath + GO->GetName() + ".json";
+	std::string path = SceneFilePath + scenePath + ".json";
+	json j;
+	j["GameObjects"] = json::array();
+
+	// Get all GameObjects currently managed by factory
+	const auto &objects = GameObjectFactory::Instance().GetAllGameObjects();
+
+	for (const auto &obj : objects)
+	{
+		if (obj && obj->IsActive())
+		{
+			// Serialize and add to JSON array
+			j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
+		}
+	}
+
+	// Write scene JSON to disk
+	std::ofstream out(path, std::ios::trunc);
+	if (out.is_open())
+	{
+		out << j.dump(4);
+		out.close();
+		std::cout << "[SaveScene] Scene saved successfully :" << path << "\n";
+	}
+
+	else
+	{
+		std::cerr << "[SaveScene] Failed to open file for writing (saving): " << path << "\n";
+	}
+}
+
+void Serialization::LoadScene(const std::string &scenePath)
+{
+	std::string path = SceneFilePath + scenePath + ".json";
 	if (!fs::exists(path))
 	{
-		std::cerr << "[Serialization] Prefab not found: " << path << "\n";
+		std::cerr << "[LoadScene] Scene file not found: " << path << "\n";
 		return;
 	}
 
 	std::ifstream in(path);
 	if (!in.is_open())
 	{
-		std::cerr << "[Serialization] Cannot open prefab: " << path << "\n";
+		std::cerr << "[LoadScene] Cannot open scene file: " << path << "\n";
 		return;
 	}
 
@@ -231,64 +216,20 @@ void Serialization::LoadPrefab(const GameObject *GO)
 	}
 	catch (const std::exception &e)
 	{
-		std::cerr << "[Serialization] Parse error: " << e.what() << "\n";
+		std::cerr << "[LoadScene] Parse error: " << e.what() << "\n";
 		return;
 	}
-
-	GameObjectFactory::Instance().Clear();
-	DeserializeGameObject(j);
-}
-
-/**
- * @brief Loads and reconstructs GameObjects from a prefab JSON file.
- *
- * Reads the prefab file from disk, parses its JSON data, and recreates
- * all GameObjects within the scene using the GameObjectFactory.
- *
- * @param path Full file path to the prefab JSON file.
- */
-void Serialization::LoadScene(const std::string &path)
-{
-	if (!fs::exists(path))
-	{
-		std::cerr << "[Serialization] Prefab not found: " << path << "\n";
-		return;
-	}
-
-	std::ifstream in(path);
-	if (!in.is_open())
-	{
-		std::cerr << "[Serialization] Cannot open prefab: " << path << "\n";
-		return;
-	}
-
-	json j;
-	try
-	{
-		in >> j;
-	}
-	catch (const std::exception &e)
-	{
-		std::cerr << "[Serialization] Parse error: " << e.what() << "\n";
-		return;
-	}
-
-	GameObjectFactory::Instance().Clear();
 
 	if (j.contains("GameObjects"))
 	{
 		for (const auto &obj : j["GameObjects"])
-			DeserializeGameObject(obj);
-	}
-	else
-	{
-		DeserializeGameObject(j);
-	}
+			Serialization::DeserializeGameObject(obj);
 
-	std::cout << "[SavePrefab] Saved prefab: " << path << "\n";
+		std::cout << "[LoadScene] Scene loaded successfully: " << path << "\n";
+	}
 }
 
-void RemovePrefab(std::string const &prefabName)
+void Serialization::RemovePrefab(std::string const &prefabName)
 {
 	for (auto const &prefab : std::filesystem::directory_iterator(PrefabFilePath))
 	{
@@ -303,7 +244,7 @@ void RemovePrefab(std::string const &prefabName)
 	}
 }
 
-void RenamePrefab(std::string const &oldName, std::string const &newName)
+void Serialization::RenamePrefab(std::string const &oldName, std::string const &newName)
 {
 	if (!std::filesystem::exists(PrefabFilePath + oldName + ".json"))
 	{

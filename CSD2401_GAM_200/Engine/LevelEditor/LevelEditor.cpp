@@ -24,6 +24,7 @@ LevelEditor::LevelEditor()
       currentFilename(""),
       editorMode(EditorMode::Stop),
       hasUnsavedChanges(false),
+      hasValidSaveState(false),
       cameraX(0.0f),
       cameraY(0.0f),
       cameraZoom(1.0f),
@@ -36,7 +37,7 @@ LevelEditor::LevelEditor()
       maxZoom(5.0f)
 {
     strcpy(saveFilepath, "");
-    strcpy(loadFilepath, "../Logs/Prefab_TestScene.json");
+    strcpy(loadFilepath, "../Assets/Scenes//Prefab_TestScene.json");
 }
 
 /**
@@ -61,7 +62,7 @@ void LevelEditor::Initialize()
 /**
  * @brief Update - Render all editor GUI panels
  */
-void LevelEditor::Update(float dt)
+void LevelEditor::Update(float /*dt*/)
 {
     if (!InputManager::KeyStateImgui)
         return;
@@ -195,7 +196,16 @@ void LevelEditor::EnterPlayMode()
 {
     if (editorMode == EditorMode::Play)
         return;
-    SaveSceneState(); // save the current scene as a JSON snapshot
+    if (!hasValidSaveState)
+    {
+        SaveSceneState(); // save the current scene as a JSON snapshot
+        hasValidSaveState = true;
+        std::cout << "[LevelEditor] Saved original scene state.\n";
+    }
+    else
+    {
+        std::cout << "[LevelEditor] Using existing saved state (not overwriting).\n";
+    }
     editorMode = EditorMode::Play;
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
@@ -206,7 +216,8 @@ void LevelEditor::StopPlayMode()
     if (editorMode == EditorMode::Stop)
         return;
 
-    RestoreSceneState();           // restore saved scene
+    RestoreSceneState(); // restore saved scene
+    hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
@@ -247,15 +258,14 @@ void LevelEditor::SaveSceneState()
     savedSceneState.gameObjects.clear();
 
     // serialise all current GameObjects
-    auto &factory = GameObjectFactory::Instance();
-    for (auto &goPtr : factory.GetAllGameObjects())
-    {
+    for (auto &goPtr : this->factory.GetAllGameObjects())
+     {
         GameObject *go = goPtr.get();
         savedSceneState.gameObjects.push_back(SerialiseGameObject(go));
     }
 
     // store the current entity counter
-    savedEntityIDCounter = factory.GetNextEntityID();
+    savedEntityIDCounter = this->factory.GetNextEntityID();
 
     std::cout << "[LevelEditor] Scene state saved with "
               << savedSceneState.gameObjects.size() << " objects.\n";
@@ -264,17 +274,26 @@ void LevelEditor::SaveSceneState()
 // restore scene state from saved data
 void LevelEditor::RestoreSceneState()
 {
-    auto &factory = GameObjectFactory::Instance();
-    factory.DestroyAllGameObjects();
+    if (hasValidSaveState)
+    {
+        std::cout << "[LevelEditor] Warning: No valid save state to restore!\n";
+        return;
+    }
 
-    for (auto &data : savedSceneState.gameObjects)
+    std::vector<GameObjectData> sceneDataCopy = savedSceneState.gameObjects;
+    EntityID savedIDCopy = savedEntityIDCounter;
+    std::cout << "[LevelEditor] Restoring " << sceneDataCopy.size() << " objects...\n";
+
+    this->factory.DestroyAllGameObjects();
+
+    for (auto &data : sceneDataCopy)
     {
         DeserialiseGameObject(data);
     }
 
-    factory.SetNextEntityID(savedEntityIDCounter);
+    this->factory.SetNextEntityID(savedIDCopy);
 
-    std::cout << "[LevelEditor] Scene state restored.\n";
+    std::cout << "[LevelEditor] Scene state restored." << this->factory.GetAllGameObjects().size() << " objects.\n";
 }
 
 /**
@@ -302,15 +321,15 @@ void LevelEditor::RenderMenuBar()
     // save lvl
     ImGui::Text("Save Level:");
     ImGui::InputText("Filename", saveFilepath, sizeof(saveFilepath));
-    ImGui::TextDisabled("Will save to: ../logs/%s.json", saveFilepath);
+    ImGui::TextDisabled("Will save to: ../Assets/Scenes/%s.json", saveFilepath);
 
     if (ImGui::Button("Save", ImVec2(200, 0)))
     {
         std::string filepath = saveFilepath;
 
-        if (filepath.find("../logs/") != 0)
+        if (filepath.find("../Assets/Scenes/") != 0)
         {
-            filepath = "../logs/" + filepath;
+            filepath = "../Assets/Scenes/" + filepath;
         }
 
         if (filepath.length() < 5 || filepath.substr(filepath.length() - 5) != ".json")
@@ -344,7 +363,7 @@ void LevelEditor::RenderMenuBar()
             ImGui::PushID(("scene_" + std::to_string(sceneIndex)).c_str());
             if (ImGui::Button(file.c_str(), ImVec2(200, 0)))
             {
-                std::string fullPath = "../Logs/" + file;
+                std::string fullPath = "../Assets/Scenes/" + file;
                 LoadLevelJSON(fullPath);
             }
             ImGui::PopID();
@@ -355,7 +374,6 @@ void LevelEditor::RenderMenuBar()
     ImGui::End();
 }
 
-// todo: move to imguisystem!!
 void LevelEditor::RenderHierarchy()
 {
     ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
@@ -432,7 +450,6 @@ void LevelEditor::RenderHierarchy()
     ImGui::End();
 }
 
-// todo: move to imguisystem!!s
 void LevelEditor::RenderPropertyEditor()
 {
     GameObject *obj = GetSelectedGameObject();
@@ -573,7 +590,7 @@ bool LevelEditor::SaveLevelJSON(const std::string &filepath)
 {
     try
     {
-        // filename from path without logs or .jsn
+        // filename from path without scenes or .jsn
         size_t lastSlash = filepath.find_last_of("/\\");
         size_t lastDot = filepath.find_last_of(".");
         std::string filenameOnly = filepath;
@@ -663,6 +680,7 @@ bool LevelEditor::LoadLevelJSON(const std::string &filepath)
 
         std::cout << "Level loaded from: " << filepath << std::endl;
         std::cout << "Loaded " << factory.GetAllGameObjects().size() << " game objects" << std::endl;
+        hasValidSaveState = false;
         return true;
     }
     catch (const std::exception &e)
@@ -678,13 +696,12 @@ bool LevelEditor::LoadLevelJSON(const std::string &filepath)
 std::vector<std::string> LevelEditor::GetAllSceneFiles()
 {
     std::vector<std::string> files;
-    std::string prefabDir = "../Logs/";
 
     try
     {
-        if (fs::exists(prefabDir) && fs::is_directory(prefabDir))
+        if (fs::exists(SceneFilePath) && fs::is_directory(SceneFilePath))
         {
-            for (const auto &entry : fs::directory_iterator(prefabDir))
+            for (const auto &entry : fs::directory_iterator(SceneFilePath))
             {
                 if (entry.is_regular_file())
                 {
@@ -715,6 +732,7 @@ void LevelEditor::NewLevel()
 
     factory.Clear();
     selectedGameObjectID = 0;
+    hasValidSaveState = false;
 
     std::cout << "New level created" << std::endl;
 }

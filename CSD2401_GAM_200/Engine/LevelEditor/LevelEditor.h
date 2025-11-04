@@ -306,7 +306,7 @@ private:
      */
     bool LoadLevelFromFile(const std::string& filepath, LevelData& outData);
 
-    /**
+    /**v
      * @brief Get shape type name from enum
      * @param type Shape type enum value
      * @return String name of shape type
@@ -342,6 +342,7 @@ private:
     bool hasUnsavedChanges;               // track if there are unsaved changes
     EntityID savedEntityIDCounter;
     std::vector<GameObjectData> savedSceneData;
+    bool hasValidSaveState;               // track if we have a valid saved state to restore
 
     // Editor camera state
     float cameraX;                        // camera position X
