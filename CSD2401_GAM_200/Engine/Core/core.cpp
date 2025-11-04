@@ -280,6 +280,11 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
+        if (levelEditor && levelEditor->HasPendingSceneReload())
+        {
+            levelEditor->PerformSceneReload();
+        }
+
         if (imguiSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();

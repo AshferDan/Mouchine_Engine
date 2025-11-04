@@ -32,7 +32,7 @@ LevelEditor::LevelEditor()
     maxZoom(5.0f)
 {
     strcpy(saveFilepath, "");
-    strcpy(loadFilepath, "../Assets/Scenes//Prefab_TestScene.json");
+    strcpy(loadFilepath, "../Assets/Scenes/Prefab_TestScene.json");
 }
 
 /**
@@ -61,13 +61,6 @@ void LevelEditor::Update(float /*dt*/)
 {
     if (!InputManager::KeyStateImgui)
         return;
-
-
-    // render property editor
-    if (showPropertyEditor && selectedGameObjectID != 0)
-    {
-        return;
-    }
 
     // Full window docking
     ImGuiViewport *viewport = ImGui::GetMainViewport();
@@ -154,7 +147,7 @@ void LevelEditor::RenderPlayControls()
         TogglePlayStop();
     }
 
-    // pause / resume � always visible
+    // pause / resume
     ImGui::SameLine();
     const bool canPause = isRunning;
     const char *pauseLabel = (editorMode == EditorMode::Pause) ? "Resume" : "Pause";
@@ -168,8 +161,7 @@ void LevelEditor::RenderPlayControls()
     // status text
     ImGui::SameLine();
     ImGui::TextDisabled("Mode: %s",
-                        editorMode == EditorMode::Play ? "Play" : editorMode == EditorMode::Pause ? "Pause"
-                                                                                                  : "Stop");
+                        editorMode == EditorMode::Play ? "Play" : editorMode == EditorMode::Pause ? "Pause" : "Stop");
 
     if (!isRunning)
     {
@@ -177,7 +169,7 @@ void LevelEditor::RenderPlayControls()
     }
     else
     {
-        ImGui::TextDisabled("Game running � use Pause/Stop.");
+        ImGui::TextDisabled("Game running, use Pause/Stop.");
     }
     ImGui::End();
 }
@@ -204,7 +196,7 @@ void LevelEditor::EnterPlayMode()
         auto* camComponent = cameraObj->GetComponent<CameraComponent>();
         if (camComponent)
         {
-            // Set camera to follow the hero
+            // set camera to follow the hero
             GameObject* hero = factory.FindGameObject("Hero");
             if (hero)
             {
@@ -229,7 +221,7 @@ void LevelEditor::StopPlayMode()
     if (editorMode == EditorMode::Stop)
         return;
 
-    RestoreSceneState(); // restore saved scene
+    RestoreSceneState();           // restore saved scene
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
@@ -270,7 +262,7 @@ void LevelEditor::SaveSceneState()
 {
     savedSceneState.gameObjects.clear();
 
-    // serialise all current GameObjects
+    // serialise all current game objects
     for (auto &goPtr : this->factory.GetAllGameObjects())
      {
         GameObject *go = goPtr.get();
@@ -344,7 +336,7 @@ void LevelEditor::RestoreSceneState()
                 physics->SetVelocity(savedData->velocityX, savedData->velocityY);
                 physics->SetStatic(savedData->isStatic);
                 physics->SetGravity(savedData->hasGravity);
-                physics->SetGrounded(false); // Reset grounded state
+                physics->SetGrounded(false); // reset grounded state
             }
         }
 
@@ -360,7 +352,7 @@ void LevelEditor::RestoreSceneState()
             float heroX, heroY;
             transform->GetPosition(heroX, heroY);
 
-            // Snap camera back to restored hero position
+            // snap camera back to restored hero position
             cameraX = heroX;
             cameraY = heroY;
 
@@ -973,7 +965,7 @@ GameObjectData LevelEditor::SerialiseGameObject(GameObject *obj)
         data.collisionLayer = (int)collider->GetLayer();
     }
 
-    // add animation / spritesheet component
+    // serialise animation / spritesheet
     if (auto *spritesheet = obj->GetComponent<Spritesheet>())
     {
         data.hasAnimation = true;
@@ -1061,7 +1053,7 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
         // static texture
         else if (data.hasTexture && !data.texturePath.empty())
         {
-            // We'll try to get or load the texture through ResourceManager
+            // try to get or load the texture through resource manager
             auto &rm = ResourceManager::Instance();
             GLuint texID = 0;
 
@@ -1128,7 +1120,7 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
             layer);
     }
 
-    // --- Animation / Spritesheet ---
+    // add animation / spritesheet component
     if (willHaveAnimation)
     {
         std::cout << "[LevelEditor] Restoring animation for " << data.name << std::endl;
@@ -1367,7 +1359,7 @@ void LevelEditor::UpdateCameraControls()
 {
     ImGuiIO &io = ImGui::GetIO();
 
-    // In play/pause mode camera follows hero
+    // in play/pause mode camera follows hero
     if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
     {
         GameObject* hero = this->factory.FindGameObject("Hero");
@@ -1496,7 +1488,7 @@ void LevelEditor::PerformSceneReload()
     std::cout << "[LevelEditor] Performing deferred scene reload: "
         << pendingScenePath << "\n";
 
-    // Clear and reload safely at start of frame
+    // clear and reload safely at start of frame
     factory.Clear();
     selectedGameObjectID = 0;
 
