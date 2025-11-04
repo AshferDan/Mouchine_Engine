@@ -58,8 +58,8 @@ std::unique_ptr<IComponent> ColliderComponent::Clone(GameObject* newOwner) const
         this->type,
         this->width,
         this->height,
-        this->layer
-    );
+        this->layer);
+
     cloned->SetEnabled(this->IsEnabled());
     return cloned;
 }
