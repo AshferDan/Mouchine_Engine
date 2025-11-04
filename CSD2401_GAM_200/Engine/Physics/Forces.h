@@ -36,14 +36,14 @@ namespace ForceConstants {
     /*constexpr float GRAVITY_MAGNITUDE = 500.0f;*/
 
     // Jump
-    constexpr float JUMP_FORCE = 1500.0f;
-    constexpr float JUMP_DURATION = 0.5f;  // Very short impulse for realistic jump arc
+    constexpr float JUMP_FORCE = 1000.0f;
+    constexpr float JUMP_DURATION = 0.4f;  // Very short impulse for realistic jump arc
 
     // Movement
-    constexpr float MOVE_FORCE = 800.0f;
+    constexpr float MOVE_FORCE = 200.0f;
 
     // Drag
-    constexpr float DRAG_COEFFICIENT = 5.0f;
+    constexpr float DRAG_COEFFICIENT = 1000.0f;
 }
 
 /**

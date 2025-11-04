@@ -56,7 +56,7 @@ public:
                 forces.push_back(std::make_unique<LinearDirectionalForce>(
                     1.0f, 0.0f,
                     ForceConstants::MOVE_FORCE,
-                    -1.0f,
+                    0.1f,
                     ForceType::MoveRight
                 ));
             }
@@ -67,7 +67,7 @@ public:
                 forces.push_back(std::make_unique<LinearDirectionalForce>(
                     -1.0f, 0.0f,
                     ForceConstants::MOVE_FORCE,
-                    -1.0f,
+                    0.1f,
                     ForceType::MoveLeft
                 ));
             }

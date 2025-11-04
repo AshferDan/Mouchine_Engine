@@ -124,9 +124,7 @@ void InputManager::Update(float dt)
                 {
                     CORE->stepMode = !CORE->stepMode;
 
-                    // Reset accumulator when exiting step mode to prevent catch-up
-                    if (!CORE->stepMode)
-                    {
+                    if (!CORE->stepMode) {
                         CORE->accumulator = 0.0;
                     }
 
@@ -137,19 +135,19 @@ void InputManager::Update(float dt)
                     CORE->stepOnce = true;
                     std::cout << "[STEP MODE] Advancing 1 frame..." << std::endl;
                 }
-
-                if (key == GLFW_KEY_F4)
+                else if (key == GLFW_KEY_F4)
                 {
                     CORE->GetGraphicsSystem()->SetEditorMode();
                     std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
                 }
-                wasPressed = true;
             }
-            else
-            {
-                wasPressed = false;
-            }
+            wasPressed = true;
         }
+        else
+        {
+            wasPressed = false;
+        }
+    }
 
         auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
         if (!player)
@@ -169,14 +167,14 @@ void InputManager::Update(float dt)
             return;
         }
 
-        // Ensure player has drag force for smooth stopping (add once)
-        static bool dragInitialized = false;
-        if (!dragInitialized && physics)
-        {
-            auto& forcesManager = physics->GetForcesManager();
-            forcesManager.AddDrag();
-            dragInitialized = true;
-        }
+        //// Ensure player has drag force for smooth stopping (add once)
+        //static bool dragInitialized = false;
+        //if (!dragInitialized && physics)
+        //{
+        //    auto& forcesManager = physics->GetForcesManager();
+        //    forcesManager.AddDrag();
+        //    dragInitialized = true;
+        //}
 
         float vx, vy;
         physics->GetVelocity(vx, vy);
@@ -331,5 +329,3 @@ void InputManager::Update(float dt)
         mouseX = xpos;
         mouseY = ypos;
     }
-
-}
