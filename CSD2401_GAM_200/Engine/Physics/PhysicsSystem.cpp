@@ -49,37 +49,21 @@ void PhysicsSystem::Initialize() {
 
 /**
  * @brief Main physics update loop
- * Applies gravity, integrates velocity, clears grounded states, and resolves collisions
+ * Integrates physics for all objects, then resolves collisions
  */
 void PhysicsSystem::Update(float deltaTime) {
     auto& factory = GameObjectFactory::Instance();
     const auto& gameObjects = factory.GetAllGameObjects();
 
-    // Process all physics objects FIRST
+    // Integrate physics for all objects
     for (const auto& obj : gameObjects) {
         auto* physics = obj->GetComponent<PhysicsComponent>();
-        auto* transform = obj->GetComponent<TransformComponent>();
-
-        if (physics && transform && !physics->IsStatic()) {
-            // Save previous grounded state
-            physics->wasGrounded = physics->IsGrounded();
-
-            // Apply gravity only if not grounded
-            if (physics->useGravity) {
-                // Only stop gravity effect when grounded AND moving down
-                if (physics->IsGrounded() && physics->velocityY <= 0) {
-                    physics->velocityY = 0;  // Stop downward motion when on ground
-                }
-                else {
-                    ApplyGravity(physics, deltaTime);  // Always apply gravity when airborne
-                }
-            }
-
+        if (physics && physics->IsEnabled()) {
+            physics->Integrate(deltaTime);
         }
     }
 
     // Clear grounded state for ALL objects before resolving collisions
-    // This ensures fresh collision detection each frame
     for (const auto& obj : gameObjects) {
         auto* physics = obj->GetComponent<PhysicsComponent>();
         if (physics && !physics->IsStatic()) {
@@ -87,7 +71,7 @@ void PhysicsSystem::Update(float deltaTime) {
         }
     }
 
-    // Now resolve pending collisions - this will set grounded = true where needed
+    // Resolve pending collisions
     for (const auto& collision : pendingCollisions) {
         auto* col1 = collision.col1;
         auto* col2 = collision.col2;
@@ -105,7 +89,6 @@ void PhysicsSystem::Update(float deltaTime) {
         }
     }
 
-    // Clear pending collisions for next frame
     pendingCollisions.clear();
 }
 
@@ -115,14 +98,6 @@ void PhysicsSystem::Update(float deltaTime) {
 void PhysicsSystem::ReportCollision(GameObject* obj1, GameObject* obj2,
     ColliderComponent* col1, ColliderComponent* col2) {
     pendingCollisions.push_back({ obj1, obj2, col1, col2 });
-}
-
-/**
- * @brief Applies gravity force to physics object's velocity
- */
-void PhysicsSystem::ApplyGravity(PhysicsComponent* physics, float deltaTime) {
-    physics->velocityX += physics->gravityX * deltaTime;
-    physics->velocityY += physics->gravityY * deltaTime;
 }
 
 /**
@@ -247,9 +222,6 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
     float overlapX = std::min(aabb1.max.x - aabb2.min.x, aabb2.max.x - aabb1.min.x);
     float overlapY = std::min(aabb1.max.y - aabb2.min.y, aabb2.max.y - aabb1.min.y);
 
-    //std::cout << "ResolveSquareSquare: " << obj1->GetName() << " <-> " << obj2->GetName()
-        //<< " overlapX=" << overlapX << " overlapY=" << overlapY << std::endl;
-
     if (overlapX < overlapY) {
         // Resolve on X axis
         float direction = (aabb1.min.x + aabb1.max.x) < (aabb2.min.x + aabb2.max.x) ? -1.0f : 1.0f;
@@ -265,7 +237,6 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             transform2->Move(-direction * overlapX * 0.5f, 0);
             physics2->SetVelocity(0, physics2->velocityY);
         }
-        //std::cout << "  Resolved on X axis" << std::endl;
     }
     else {
         // Resolve on Y axis
@@ -274,15 +245,12 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
         auto* transform1 = obj1->GetComponent<TransformComponent>();
         auto* transform2 = obj2->GetComponent<TransformComponent>();
 
-        //std::cout << "  Resolving on Y axis, direction=" << direction << std::endl;
-
         if (!physics1->IsStatic() && transform1) {
             transform1->Move(0, direction * overlapY * 0.5f);
             physics1->SetVelocity(physics1->velocityX, 0);
             // obj1 is ABOVE obj2 when direction > 0, so it's landing on top
             if (direction > 0 && physics1->velocityY <= 0) {
                 physics1->SetGrounded(true);
-                //std::cout << "  " << obj1->GetName() << " IS NOW GROUNDED!" << std::endl;
             }
         }
         if (!physics2->IsStatic() && transform2) {
@@ -291,7 +259,6 @@ void PhysicsSystem::ResolveSquareSquare(GameObject* obj1, GameObject* obj2,
             // obj2 is ABOVE obj1 when direction < 0, so it's landing on top
             if (direction < 0 && physics2->velocityY <= 0) {
                 physics2->SetGrounded(true);
-                //std::cout << "  " << obj2->GetName() << " IS NOW GROUNDED!" << std::endl;
             }
         }
     }

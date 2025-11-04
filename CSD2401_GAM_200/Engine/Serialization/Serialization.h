@@ -50,4 +50,6 @@ namespace Serialization
 
     void RemovePrefab(std::string const& prefabName);
     void RenamePrefab(std::string const& oldName, std::string const& newName);
+
+    extern bool Prefab_DragAndDropped;
 }
