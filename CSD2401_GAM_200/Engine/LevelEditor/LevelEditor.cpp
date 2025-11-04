@@ -17,24 +17,19 @@ namespace fs = std::filesystem;
  */
 LevelEditor::LevelEditor()
     : factory(GameObjectFactory::Instance()),
-      selectedGameObjectID(0),
-      showPropertyEditor(true),
-      showSaveDialog(false),
-      showLoadDialog(false),
-      currentFilename(""),
-      editorMode(EditorMode::Stop),
-      hasUnsavedChanges(false),
-      hasValidSaveState(false),
-      cameraX(0.0f),
-      cameraY(0.0f),
-      cameraZoom(1.0f),
-      isPanning(false),
-      lastMouseX(0.0f),
-      lastMouseY(0.0f),
-      panSpeed(1.0f),
-      zoomSpeed(0.1f), // zoom to be implemented
-      minZoom(0.1f),
-      maxZoom(5.0f)
+    selectedGameObjectID(0),
+    showPropertyEditor(true),
+    showSaveDialog(false),
+    showLoadDialog(false),
+    currentFilename(""),
+    editorMode(EditorMode::Stop),
+    hasUnsavedChanges(false),
+    hasValidSaveState(false),
+    cameraX(0.0f),  cameraY(0.0f), cameraZoom(1.0f),
+    isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
+    zoomSpeed(0.1f),    //zoom to be implemented
+    minZoom(0.1f),
+    maxZoom(5.0f)
 {
     strcpy(saveFilepath, "");
     strcpy(loadFilepath, "../Assets/Scenes//Prefab_TestScene.json");
@@ -207,6 +202,28 @@ void LevelEditor::EnterPlayMode()
     {
         std::cout << "[LevelEditor] Using existing saved state (not overwriting).\n";
     }
+    // set up game camera to follow hero
+    GameObject* cameraObj = factory.FindGameObject("MainCamera");
+    if (cameraObj)
+    {
+        auto* camComponent = cameraObj->GetComponent<CameraComponent>();
+        if (camComponent)
+        {
+            // Set camera to follow the hero
+            GameObject* hero = factory.FindGameObject("Hero");
+            if (hero)
+            {
+                camComponent->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+                camComponent->SetFollowTarget(hero);
+                camComponent->SetSmoothing(true, 5.0f);
+                std::cout << "[LevelEditor] Camera set to follow hero.\n";
+            }
+
+            // set this as the active camera
+            CameraManager::Instance().SetActiveCamera(cameraObj);
+        }
+    }
+
     editorMode = EditorMode::Play;
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
@@ -219,8 +236,21 @@ void LevelEditor::StopPlayMode()
 
     RestoreSceneState(); // restore saved scene
     hasValidSaveState = false;
-    editorMode = EditorMode::Stop; // static camera
-    selectedGameObjectID = 0;      // clear selection
+
+    // reset camera to fixed mode
+    GameObject* cameraObj = factory.FindGameObject("MainCamera");
+    if (cameraObj)
+    {
+        auto* camComponent = cameraObj->GetComponent<CameraComponent>();
+        if (camComponent)
+        {
+            camComponent->SetMode(CameraComponent::CameraMode::FIXED);
+            std::cout << "[LevelEditor] Camera set to fixed mode.\n";
+        }
+    }
+
+    editorMode = EditorMode::Stop;  // static camera
+    selectedGameObjectID = 0;       // clear selection
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 
@@ -267,34 +297,96 @@ void LevelEditor::SaveSceneState()
 
     // store the current entity counter
     savedEntityIDCounter = this->factory.GetNextEntityID();
+    hasValidSaveState = true;
 
-    std::cout << "[LevelEditor] Scene state saved with "
-              << savedSceneState.gameObjects.size() << " objects.\n";
+    std::cout << "[LevelEditor] Restored camera position: (" << cameraX << ", " << cameraY << ")\n";
+    std::cout << "[LevelEditor] Scene state saved with " << savedSceneState.gameObjects.size() << " objects.\n";
 }
 
 // restore scene state from saved data
 void LevelEditor::RestoreSceneState()
 {
-    if (hasValidSaveState)
+    if (!hasValidSaveState)
     {
         std::cout << "[LevelEditor] Warning: No valid save state to restore!\n";
         return;
     }
 
-    std::vector<GameObjectData> sceneDataCopy = savedSceneState.gameObjects;
-    EntityID savedIDCopy = savedEntityIDCounter;
-    std::cout << "[LevelEditor] Restoring " << sceneDataCopy.size() << " objects...\n";
+    std::cout << "[LevelEditor] Restoring scene state    (transform & physics only)...\n";
 
-    this->factory.DestroyAllGameObjects();
 
-    for (auto &data : sceneDataCopy)
+    std::cout << "[LevelEditor] Saved objects: " << savedSceneState.gameObjects.size()
+        << ", Current objects: " << this->factory.GetAllGameObjects().size() << "\n";
+
+    // create a map of saved data by original ID for quick lookup
+    std::unordered_map<EntityID, const GameObjectData*> savedDataMap;
+    for (const auto& data : savedSceneState.gameObjects)
     {
-        DeserialiseGameObject(data);
+        savedDataMap[data.originalID] = &data;
     }
 
-    this->factory.SetNextEntityID(savedIDCopy);
+    // restore each object's state without destroying/recreating
+    for (const auto& objPtr : this->factory.GetAllGameObjects())
+    {
+        GameObject* obj = objPtr.get();
+        EntityID objID = obj->GetID();
 
-    std::cout << "[LevelEditor] Scene state restored." << this->factory.GetAllGameObjects().size() << " objects.\n";
+        // find saved data for this object
+        auto it = savedDataMap.find(objID);
+        if (it == savedDataMap.end())
+        {
+            std::cout << "[DEBUG] No saved data for object: " << obj->GetName()
+                << " (ID: " << objID << "), skipping\n";
+            continue;
+        }
+
+        const GameObjectData* savedData = it->second;
+
+        // restore transform
+        if (savedData->hasTransform)
+        {
+            if (auto* transform = obj->GetComponent<TransformComponent>())
+            {
+                transform->SetPosition(savedData->posX, savedData->posY);
+                transform->SetScale(savedData->scaleX, savedData->scaleY);
+                transform->SetRotation(savedData->rotation);
+            }
+        }
+
+        // restore physics (reset velocities to saved state)
+        if (savedData->hasPhysics)
+        {
+            if (auto* physics = obj->GetComponent<PhysicsComponent>())
+            {
+                physics->SetVelocity(savedData->velocityX, savedData->velocityY);
+                physics->SetStatic(savedData->isStatic);
+                physics->SetGravity(savedData->hasGravity);
+                physics->SetGrounded(false); // Reset grounded state
+            }
+        }
+
+        // restore active state
+        obj->SetActive(savedData->isActive);
+    }
+
+    GameObject* hero = factory.FindGameObject("Hero");
+    if (hero != nullptr)
+    {
+        if (auto* transform = hero->GetComponent<TransformComponent>())
+        {
+            float heroX, heroY;
+            transform->GetPosition(heroX, heroY);
+
+            // Snap camera back to restored hero position
+            cameraX = heroX;
+            cameraY = heroY;
+
+            std::cout << "[LevelEditor] Camera reset to hero position: ("
+                << heroX << ", " << heroY << ")\n";
+        }
+    }
+
+    std::cout << "[LevelEditor] Scene restored. Camera: (" << cameraX << ", " << cameraY << ")\n";
 }
 
 /**
@@ -364,8 +456,9 @@ void LevelEditor::RenderMenuBar()
             ImGui::PushID(("scene_" + std::to_string(sceneIndex)).c_str());
             if (ImGui::Button(file.c_str(), ImVec2(200, 0)))
             {
-                std::string fullPath = "../Assets/Scenes/" + file;
-                LoadLevelJSON(fullPath);
+                pendingSceneReload = true;
+                pendingScenePath = "../Assets/Scenes/" + file;
+                std::cout << "[LevelEditor] Scheduled scene reload: " << pendingScenePath << "\n";
             }
             ImGui::PopID();
             sceneIndex++;
@@ -771,7 +864,7 @@ bool LevelEditor::LoadLevel(const std::string &filepath)
         {
             DeserialiseGameObject(objData);
         }
-
+        hasValidSaveState = false;
         return true;
     }
 
@@ -1291,8 +1384,29 @@ void LevelEditor::UpdateCameraControls()
 {
     ImGuiIO &io = ImGui::GetIO();
 
+    // In play/pause mode camera follows hero
+    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
+    {
+        GameObject* hero = this->factory.FindGameObject("Hero");
+        if (hero != nullptr)
+        {
+            if (auto* transform = hero->GetComponent<TransformComponent>())
+            {
+                float heroX, heroY;
+                transform->GetPosition(heroX, heroY);
+
+                // center camera on hero
+                cameraX = heroX;
+                cameraY = heroY;
+            }
+        }
+
+        isPanning = false;
+        return;
+    }
+
     // camera moves when not hovering over imgui windows and if its in editor mode
-    if (editorMode != EditorMode::Stop || io.WantCaptureMouse)
+    if (io.WantCaptureMouse)
     {
         isPanning = false;
         return;
@@ -1369,10 +1483,17 @@ void LevelEditor::ApplyCameraTransform() {}
  */
 mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight) const
 {
-    // same as your graphics system
-    mat4 projection = mat4::ortho(0.0f, windowWidth, 0.0f, windowHeight);
+    // In play pause mode, use the game camera
+    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
+    {
+        if (CameraManager::Instance().HasActiveCamera())
+        {
+            return CameraManager::Instance().GetViewProjectMatrix(windowWidth, windowHeight);
+        }
+    }
 
-    // create view matrix with editor camera position
+    // in edit mode use editor camera
+    mat4 projection = mat4::ortho(0.0f, windowWidth, 0.0f, windowHeight);
     vec3 editorCamPos(cameraX - windowWidth / 2.0f, cameraY - windowHeight / 2.0f, 0.0f);
     mat4 view = mat4::translate(-editorCamPos);
 
@@ -1381,6 +1502,34 @@ mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight)
     zoomMatrix = zoomMatrix * mat4::scale(vec3(cameraZoom, cameraZoom, 1.0f));
     zoomMatrix = zoomMatrix * mat4::translate(vec3(-windowWidth / 2.0f, -windowHeight / 2.0f, 0.0f));
 
-    // projection * zoom * view
     return zoomMatrix * projection * view;
 }
+
+void LevelEditor::PerformSceneReload()
+{
+    if (!pendingSceneReload)
+        return;
+
+    std::cout << "[LevelEditor] Performing deferred scene reload: "
+        << pendingScenePath << "\n";
+
+    // Clear and reload safely at start of frame
+    factory.Clear();
+    selectedGameObjectID = 0;
+
+    if (LoadLevelJSON(pendingScenePath))
+    {
+        currentFilename = pendingScenePath;
+        std::cout << "[LevelEditor] Scene reloaded successfully.\n";
+    }
+    else
+    {
+        std::cerr << "[LevelEditor] Failed to reload scene: "
+            << pendingScenePath << "\n";
+    }
+
+    hasValidSaveState = false;
+    pendingSceneReload = false;
+    pendingScenePath.clear();
+}
+
