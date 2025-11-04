@@ -185,7 +185,8 @@ void ImGuiSystem::Update(float dt)
 
         ImGuiID dockspace_id = ImGui::GetID("DockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
-        ImGui::End;
+
+        ImGui::End();
 
         TopMenuBar_Render();
 
@@ -212,8 +213,6 @@ void ImGuiSystem::Update(float dt)
 
             ImGui::End();
         }
-
-        ImGui::End();
 
         // Begin main GameObject Inspector window
         ImGui::Begin("GameObject Inspector", &InputManager::KeyStateImgui);

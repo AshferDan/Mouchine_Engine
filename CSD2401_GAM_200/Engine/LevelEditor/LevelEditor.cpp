@@ -62,12 +62,6 @@ void LevelEditor::Update(float /*dt*/)
     if (!InputManager::KeyStateImgui)
         return;
 
-    // render menu bar
-    RenderMenuBar();
-
-    // render hierarchy panel
-    RenderHierarchy();
-
     // render property editor
     if (showPropertyEditor && selectedGameObjectID != 0)
     {
@@ -92,8 +86,8 @@ void LevelEditor::Update(float /*dt*/)
     ImGui::Begin("Editor Dock", nullptr, window_flags);
     ImGui::PopStyleVar(3);
 
-    //ImGuiID dockspace_id = ImGui::GetID("DockSpace");
-    //ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
     ImGui::End();
 
     UpdateCameraControls();
@@ -102,8 +96,8 @@ void LevelEditor::Update(float /*dt*/)
     // show editor UI only when not in live Play
     if (editorMode != EditorMode::Play)
     {
-        //RenderMenuBar();
-        //RenderHierarchy();
+        RenderMenuBar();
+        RenderHierarchy();
 
         // only show camera controls in edit mode
         if (editorMode == EditorMode::Stop)
