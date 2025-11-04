@@ -1,4 +1,3 @@
-
 #include "ScriptAPI.h"
 
 namespace API {
@@ -69,8 +68,12 @@ namespace API {
         if (hasPhysics && obj)
         {
             auto* physics = obj->AddComponent<PhysicsComponent>(1.0f, isStatic);
-            physics->SetGravity(hasGravity);
             physics->SetStatic(isStatic);
+
+            if (hasGravity)
+            {
+                physics->SetGravity(true);
+            }
         }
     }
 
@@ -103,8 +106,12 @@ namespace API {
         if (hasPhysics && obj)
         {
             auto* physics = obj->AddComponent<PhysicsComponent>(1.0f, isStatic);
-            physics->SetGravity(hasGravity);
             physics->SetStatic(isStatic);
+
+            if (hasGravity)
+            {
+                physics->SetGravity(true);
+            }
         }
     }
 
@@ -151,11 +158,11 @@ namespace API {
             auto* render = obj->GetComponent<RenderComponent>();
             if (render)
             {
-               render->SetColor(color);
+                render->SetColor(color);
             }
         }
     }
-    void SetAlpha(const std::string& objectName,float val) {
+    void SetAlpha(const std::string& objectName, float val) {
         auto& factory = GameObjectFactory::Instance();
 
         GameObject* obj = factory.FindGameObject(objectName);
@@ -201,7 +208,7 @@ namespace API {
             auto* physics = obj->GetComponent<PhysicsComponent>();
             if (physics)
             {
-                physics->Jump(val);
+                physics->GetForcesManager().AddForce(ForceType::Jump, physics->GetMass());
             }
         }
     }
@@ -222,21 +229,24 @@ namespace API {
         }
     }
 
-    void SetGravVal(const std::string& objectName, float x, float y)
-    {
-        auto& factory = GameObjectFactory::Instance();
+    //void SetGravVal(const std::string& objectName, float x, float y)
+    //{
+    //    auto& factory = GameObjectFactory::Instance();
 
-        GameObject* obj = factory.FindGameObject(objectName);
+    //    GameObject* obj = factory.FindGameObject(objectName);
 
-        if (obj)
-        {
-            auto* physics = obj->GetComponent<PhysicsComponent>();
-            if (physics)
-            {
-                physics->SetGravityVal(x, y);
-            }
-        }
-    }
+    //    if (obj)
+    //    {
+    //        auto* physics = obj->GetComponent<PhysicsComponent>();
+    //        if (physics)
+    //        {
+    //            // Remove existing gravity and add new one with custom direction
+    //            physics->GetForcesManager().RemoveForcesByType(ForceType::Gravity);
+
+    //            physics->GetForcesManager().AddForce(ForceType::Gravity, physics->GetMass());
+    //        }
+    //    }
+    //}
 
     void SetStatic(const std::string& objectName, bool val)
     {
@@ -330,7 +340,7 @@ namespace API {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.FindGameObject(objectName);
         if (obj) {
-            
+
             if (!(obj->GetComponent<TransformComponent>())) {
                 obj->AddComponent<TransformComponent>();
             }
@@ -341,7 +351,7 @@ namespace API {
         else {
             throw std::runtime_error("GameObject not found: " + objectName);
         }
-        
+
     }
 
     void AddRenderComponent(const std::string& objectName) {
@@ -358,66 +368,66 @@ namespace API {
         }
     }
 
-     void AddCollisionComponent(const std::string& objectName) {
-         auto& factory = GameObjectFactory::Instance();
-         GameObject* obj = factory.FindGameObject(objectName);
-         if (obj) {
+    void AddCollisionComponent(const std::string& objectName) {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj) {
 
-             if (!obj->GetComponent<ColliderComponent>() && obj->GetComponent<TransformComponent>()) {
-                 obj->AddComponent<ColliderComponent>();
-             }
-             else if (!obj->GetComponent<TransformComponent>()) {
-                 throw std::runtime_error("This GameObject " + objectName+" do not have a TransformComponent" );
-             }
-             else {
-                 throw std::runtime_error("Attempted to add duplicate ColliderComponent to GameObject: " + objectName);
-             }
-         }
-     }
+            if (!obj->GetComponent<ColliderComponent>() && obj->GetComponent<TransformComponent>()) {
+                obj->AddComponent<ColliderComponent>();
+            }
+            else if (!obj->GetComponent<TransformComponent>()) {
+                throw std::runtime_error("This GameObject " + objectName + " do not have a TransformComponent");
+            }
+            else {
+                throw std::runtime_error("Attempted to add duplicate ColliderComponent to GameObject: " + objectName);
+            }
+        }
+    }
 
-     void AddPhysicComponent(const std::string& objectName) {
-         auto& factory = GameObjectFactory::Instance();
-         GameObject* obj = factory.FindGameObject(objectName);
-         if (obj) {
+    void AddPhysicComponent(const std::string& objectName) {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj) {
 
-             if (!obj->GetComponent<PhysicsComponent>()) {
-                 obj->AddComponent<PhysicsComponent>();
-             }
-             else {
-                 throw std::runtime_error("Attempted to add duplicate PhysicsComponent to GameObject: " + objectName);
-             }
-         }
-     }
+            if (!obj->GetComponent<PhysicsComponent>()) {
+                obj->AddComponent<PhysicsComponent>();
+            }
+            else {
+                throw std::runtime_error("Attempted to add duplicate PhysicsComponent to GameObject: " + objectName);
+            }
+        }
+    }
 #pragma endregion
 
 #pragma region Collision
-     void SetColisionShape(const std::string& objectName, ColliderComponent::Type newShape) {
-         auto& factory = GameObjectFactory::Instance();
-         GameObject* obj = factory.FindGameObject(objectName);
+    void SetColisionShape(const std::string& objectName, ColliderComponent::Type newShape) {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
 
-         if (obj)
-         {
-             auto* colli = obj->GetComponent<ColliderComponent>();
-             if (colli)
-             {
-                 colli->setColliShape(newShape);
-             }
-         }
-     }
-     void SetCollisionLayer(const std::string& objectName, CollisionLayer newlayer) {
-         auto& factory = GameObjectFactory::Instance();
+        if (obj)
+        {
+            auto* colli = obj->GetComponent<ColliderComponent>();
+            if (colli)
+            {
+                colli->setColliShape(newShape);
+            }
+        }
+    }
+    void SetCollisionLayer(const std::string& objectName, CollisionLayer newlayer) {
+        auto& factory = GameObjectFactory::Instance();
 
-         GameObject* obj = factory.FindGameObject(objectName);
+        GameObject* obj = factory.FindGameObject(objectName);
 
-         if (obj)
-         {
-             auto* colli = obj->GetComponent<ColliderComponent>();
-             if (colli)
-             {
-                 colli->SetLayer(newlayer);
-             }
-         }
-     }
+        if (obj)
+        {
+            auto* colli = obj->GetComponent<ColliderComponent>();
+            if (colli)
+            {
+                colli->SetLayer(newlayer);
+            }
+        }
+    }
 #pragma endregion
 
 }
