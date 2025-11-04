@@ -664,13 +664,12 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
 std::vector<std::string> LevelEditor::GetAllSceneFiles()
 {
     std::vector<std::string> files;
-    std::string prefabDir = "../Logs/";
 
     try
     {
-        if (fs::exists(prefabDir) && fs::is_directory(prefabDir))
+        if (fs::exists(SceneFilePath) && fs::is_directory(SceneFilePath))
         {
-            for (const auto& entry : fs::directory_iterator(prefabDir))
+            for (const auto& entry : fs::directory_iterator(SceneFilePath))
             {
                 if (entry.is_regular_file())
                 {
