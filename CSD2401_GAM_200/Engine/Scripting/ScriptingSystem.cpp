@@ -141,12 +141,6 @@ static void Internal_SetGravity(MonoString *objectName, bool enabled)
     mono_free(name);
 }
 
-static void Internal_SetGravityValue(MonoString *objectName, float x, float y)
-{
-    char *name = mono_string_to_utf8(objectName);
-    API::SetGravVal(name, x, y);
-    mono_free(name);
-}
 
 static void Internal_SetStatic(MonoString *objectName, bool isStatic)
 {
@@ -294,7 +288,6 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);
     mono_add_internal_call("CSharpScript.Physics::SetJumpValue", (void *)Internal_SetJumpValue);
     mono_add_internal_call("CSharpScript.Physics::SetGravity", (void *)Internal_SetGravity);
-    mono_add_internal_call("CSharpScript.Physics::SetGravityValue", (void *)Internal_SetGravityValue);
     mono_add_internal_call("CSharpScript.Physics::SetStatic", (void *)Internal_SetStatic);
 
     // === Collision ===

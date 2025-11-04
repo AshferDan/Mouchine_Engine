@@ -46,7 +46,7 @@ namespace GameScripts
                 "../Assets/spritesheet_R.png",
                 11,8,
                 24,29,
-                16,(int)CollisionLayer.Default,
+                8,(int)CollisionLayer.Default,
                 false,false,
                 false);
         }

@@ -424,7 +424,7 @@ if(EXISTS "${MONO_ROOT_DIR}")
         copy_runtime_dependency_once("${MONO_POSIX_HELPER_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}")
     endif()
     
-    # Copy Mono lib directory (CRITICAL - contains mscorlib.dll)
+    # Copy Mono lib directory (mscorlib.dll)
     if(EXISTS "${MONO_LIB_DIR}")
         copy_directory_once("${MONO_LIB_DIR}" "${CMAKE_BINARY_DIR}/bin/Debug/mono/lib" 
             "Copied Mono lib to Debug")

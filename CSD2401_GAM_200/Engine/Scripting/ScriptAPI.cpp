@@ -176,6 +176,18 @@ namespace API {
             }
         }
     }
+    void SetBackGround(char const* filename)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* background = factory.FindGameObject("bgImage");
+
+        if (background) {
+            unsigned int newID = GraphicsSystem::LoadTexture(filename);
+            auto* render = background->GetComponent<RenderComponent>();
+            render->SetTextureID(newID);
+        }
+    }
+
 #pragma endregion
 
 #pragma region Physics

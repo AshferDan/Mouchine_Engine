@@ -256,7 +256,6 @@ private:
     static double fps;
     static double delta_time; // Variable delta time
     static double fixed_dt;   // Fixed delta time for physics
-    double accumulator;       // Accumulator for fixed timestep
     int WindWidth;
     int WindHeight;
 
