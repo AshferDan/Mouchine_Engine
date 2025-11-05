@@ -189,7 +189,7 @@ void LevelEditor::EnterPlayMode()
     {
         std::cout << "[LevelEditor] Using existing saved state (not overwriting).\n";
     }
-    // set up game camera to follow hero
+    // setting up game camera to follow hero
     GameObject* cameraObj = factory.FindGameObject("MainCamera");
     if (cameraObj)
     {
@@ -200,6 +200,20 @@ void LevelEditor::EnterPlayMode()
             GameObject* hero = factory.FindGameObject("Hero");
             if (hero)
             {
+                auto* heroTransform = hero->GetComponent<TransformComponent>();
+                if (heroTransform)
+                {
+                    float hx, hy;
+                    heroTransform->GetPosition(hx, hy);
+
+                    // set camera component's position directly
+                    camComponent->SetPosition(hx, hy);
+                    std::cout << "[LevelEditor] Camera position set to: (" << hx << ", " << hy << ")\n";
+                    std::cout << "[LevelEditor] Camera GetPosition returns: (" << camComponent->GetPosition().x << ", " << camComponent->GetPosition().y << ")\n";
+                    
+                }
+
+                // now set up follow mode
                 camComponent->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
                 camComponent->SetFollowTarget(hero);
                 camComponent->SetSmoothing(true, 5.0f);
@@ -208,6 +222,7 @@ void LevelEditor::EnterPlayMode()
 
             // set this as the active camera
             CameraManager::Instance().SetActiveCamera(cameraObj);
+            std::cout << "[LevelEditor] Active camera set.\n";
         }
     }
 
@@ -225,6 +240,7 @@ void LevelEditor::StopPlayMode()
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
+    CameraManager::Instance().ClearActiveCamera();
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 
@@ -266,7 +282,14 @@ void LevelEditor::SaveSceneState()
     for (auto &goPtr : this->factory.GetAllGameObjects())
      {
         GameObject *go = goPtr.get();
+        GameObjectData data = SerialiseGameObject(go);
         savedSceneState.gameObjects.push_back(SerialiseGameObject(go));
+
+        // debug check if Hero position is being saved
+        if (go->GetName() == "Hero" && data.hasTransform)
+        {
+            std::cout << "[DEBUG] Saving Hero - Position: (" << data.posX << ", " << data.posY << ")\n";
+        }
     }
 
     // store the current entity counter
@@ -352,12 +375,12 @@ void LevelEditor::RestoreSceneState()
             float heroX, heroY;
             transform->GetPosition(heroX, heroY);
 
-            // snap camera back to restored hero position
+            // debug check restored position
+            std::cout << "[DEBUG] Hero restored to: (" << heroX << ", " << heroY << ")\n";
+
             cameraX = heroX;
             cameraY = heroY;
-
-            std::cout << "[LevelEditor] Camera reset to hero position: ("
-                << heroX << ", " << heroY << ")\n";
+            std::cout << "[LevelEditor] Camera reset to hero position: (" << cameraX << ", " << cameraY << ")\n";
         }
     }
 
@@ -725,6 +748,7 @@ bool LevelEditor::LoadLevelJSON(const std::string &filepath)
         // clear current level
         factory.Clear();
         selectedGameObjectID = 0;
+        CameraManager::Instance().ClearActiveCamera();
 
         size_t lastSlash = filepath.find_last_of("/\\");
         size_t lastDot = filepath.find_last_of(".");
@@ -749,7 +773,22 @@ bool LevelEditor::LoadLevelJSON(const std::string &filepath)
 
         std::cout << "Level loaded from: " << filepath << std::endl;
         std::cout << "Loaded " << factory.GetAllGameObjects().size() << " game objects" << std::endl;
+
+        // after loading all objects, check if main camera exists
+        GameObject* mainCam = factory.FindGameObject("MainCamera");
+        if (!mainCam) {
+            std::cout << "[LevelEditor] No MainCamera found in scene, creating one...\n";
+
+            // create main camera
+            mainCam = factory.CreateGameObject("MainCamera");
+            mainCam->AddComponent<TransformComponent>();
+            auto* camComp = mainCam->AddComponent<CameraComponent>();
+            camComp->SetZoom(1.0f);
+            camComp->SetMode(CameraComponent::CameraMode::FIXED);
+        }
+
         hasValidSaveState = false;
+
         return true;
     }
     catch (const std::exception &e)
@@ -802,6 +841,7 @@ void LevelEditor::NewLevel()
     factory.Clear();
     selectedGameObjectID = 0;
     hasValidSaveState = false;
+    CameraManager::Instance().ClearActiveCamera();
 
     std::cout << "New level created" << std::endl;
 }
@@ -1362,20 +1402,6 @@ void LevelEditor::UpdateCameraControls()
     // in play/pause mode camera follows hero
     if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
     {
-        GameObject* hero = this->factory.FindGameObject("Hero");
-        if (hero != nullptr)
-        {
-            if (auto* transform = hero->GetComponent<TransformComponent>())
-            {
-                float heroX, heroY;
-                transform->GetPosition(heroX, heroY);
-
-                // center camera on hero
-                cameraX = heroX;
-                cameraY = heroY;
-            }
-        }
-
         isPanning = false;
         return;
     }
