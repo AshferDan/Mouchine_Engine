@@ -1,0 +1,16 @@
+
+[EXCEPTION] 2025-11-05 19:07:43
+invalid string position
+[0] CrashHandler::GetStackTrace - 0x7ff7722d07e0
+[1] CrashHandler::LogCrash - 0x7ff7722d0a90
+[2] main$catch$7 - 0x7ff7727290d9
+[3] _CxxFrameHandler4 - 0x7ffe54da6c40
+[5] RtlCaptureContext2 - 0x7ffe5ae40fc0
+[6] main - 0x7ff7722d0cf0
+[7] invoke_main - 0x7ff77271ea50
+[8] __scrt_common_main_seh - 0x7ff77271e840
+[9] __scrt_common_main - 0x7ff77271e820
+[10] mainCRTStartup - 0x7ff77271eb10
+[11] BaseThreadInitThunk - 0x7ffe59c8e8c0
+[12] RtlUserThreadStart - 0x7ffe5adac510
+

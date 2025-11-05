@@ -52,6 +52,8 @@ void LevelEditor::Initialize()
     currentFilename = "start level";
     editorMode = EditorMode::Stop;
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable docking
+
+    //icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
 }
 
 /**
@@ -63,10 +65,10 @@ void LevelEditor::Update(float /*dt*/)
         return;
 
     // render property editor
-    if (showPropertyEditor && selectedGameObjectID != 0)
-    {
-        return;
-    }
+    //if (showPropertyEditor && selectedGameObjectID != 0)
+    //{
+    //    return;
+    //}
 
     // Full window docking
     ImGuiViewport *viewport = ImGui::GetMainViewport();
@@ -97,7 +99,7 @@ void LevelEditor::Update(float /*dt*/)
     if (editorMode != EditorMode::Play)
     {
         RenderMenuBar();
-        RenderHierarchy();
+        //RenderHierarchy();
 
         // only show camera controls in edit mode
         if (editorMode == EditorMode::Stop)
@@ -473,6 +475,13 @@ void LevelEditor::RenderHierarchy()
         return;
     }
 
+    // Render top part to show adding of GOs
+    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+    {
+        // this is a file, not sure if we wanna do anything yet
+        //ShowCreateGOMenu = true;
+    }
+
     // display current file name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
     ImGui::Text("Scene: %s", currentFilename.c_str());
@@ -504,6 +513,34 @@ void LevelEditor::RenderHierarchy()
 
         bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)",
                                           obj->GetName().c_str(), id);
+
+        // enter drag and drop stuff here
+
+        {
+            // might wanna send id as data instead
+            if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+            {
+                SendDragAndDrop(HierarchyPayloadID, obj->GetName(), obj->GetName());
+            }
+        }
+
+        {
+            std::string testdata{};
+            ReceiveDragAndDrop(HierarchyPayloadID, testdata);
+            // Do something with DnD data
+            if (!testdata.empty())
+            {
+                if (testdata != obj->GetName())
+                {
+                    std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
+                }
+                else
+                {
+                    std::cout << "[Hierarchy] Invalid Drag and Drop source!\n";
+                }
+                //CompletedDragAndDrop();
+            }
+        }
 
         // select on click
         if (ImGui::IsItemClicked())

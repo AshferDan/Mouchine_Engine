@@ -22,7 +22,35 @@ Technology is prohibited.
 #include <GLFW/glfw3.h>
 #include <map>
 #include "InputManager.h"
+#include "GraphicsSystem.h"
 #include <filesystem>
+#include "Serialization.h"
+
+// FILE SYSTEM
+namespace fs = std::filesystem;
+
+const std::string AssetPayloadID{ "Asset_Filepath" };
+const std::string PrefabPayloadID{ "Prefab_Filepath" };
+const std::string HierarchyPayloadID{ "GameObject_Name" };
+const std::string ScenePayloadID{ "Scene_Name" };
+
+// ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
+// Vars for ImGui::ImageButton
+inline const char* icon_folder = "../Assets/Editor_Icons/Folder.png";
+inline const char* icon_file = "../Assets/Editor_Icons/File_Generic.png";
+inline const char* icon_plus = "../Assets/Editor_Icons/Plus.png";
+inline const char* icon_prefab = "../Assets/Editor_Icons/Cube.png";
+extern GLuint icon_folder_ui;
+extern GLuint icon_file_ui;
+extern GLuint icon_plus_ui;
+extern GLuint icon_prefab_ui;
+
+
+// CONST VARIABLES
+const ImVec2 icon_size(64, 64); // AssetManager icon sizes
+const ImVec2 icon_size_small(20, 20); // AssetManager icon sizes
+// Payload IDs (for different types of drag and drops)
+static const fs::path assetPath = "../Assets";
 
 using SystemTimingsMap = std::map<std::string, double>;
 
@@ -64,11 +92,44 @@ public:
      */
     std::string GetName() override;
 
+    void Hierarchy_Render();
+
+    void Hierarchy_GameObjectTree_Renderer(GameObject* obj, int depth, EntityID& selectedGameObjectID, GameObjectFactory& factory);
+
+    ///**
+    // * @brief Add a new game object through the editor
+    // * @param data GameObject data to instantiate
+    // * @return Pointer to created GameObject, or nullptr if failed
+    // */
+    //GameObject* AddGameObject(const GameObjectData& data);
+
+    /**
+     * @brief Remove a game object from the level
+     * @param id EntityID of the game object to remove
+     */
+    void RemoveGameObject(EntityID id);
+
+    ///**
+    // * @brief Get the currently selected game object
+    // * @return Pointer to selected GameObject, or nullptr if none selected
+    // */
+    //GameObject* GetSelectedGameObject() const;
+
+    /**
+     * @brief Set the currently selected game object
+     * @param id EntityID of the game object to select
+     */
+    void SetSelectedGameObject(EntityID id);
+
+
+
 private:
     /**
      * @brief Shutdown and cleanup ImGui resources.
      */
     void Shutdown();
+    GameObjectFactory& factory;
+    EntityID selectedGameObjectID;        // currently selected game object
 
     GLFWwindow* m_window; ///< Pointer to the GLFW window
 };
@@ -109,3 +170,16 @@ void ReceiveDragAndDrop(std::string const& PayloadID, std::string& dataToReceive
 void CompletedDragAndDrop();
 
 void TopMenuBar_Render();
+
+void EditorLayout_SaveScene(std::string const& fileName);
+
+void EditorLayout_LoadScene(std::string const& fileName);
+
+void EditorLayout_Refresh();
+
+void EditorLayout_SaveNamePopUp();
+
+void EditorLayout_LoadPopUp();
+
+
+void CreateHintText(std::string const& displayText);
