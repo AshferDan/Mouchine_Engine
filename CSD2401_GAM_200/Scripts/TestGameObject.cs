@@ -12,9 +12,6 @@ namespace GameScripts
 
         public void OnStart()
         {
-
-
-            // Create first square - Red, on the left
             GameObject.CreateShape(
                 "RedSquare",                     // name
                 (int)ShapeType.Square,           // type: square (fixed from Circle)
@@ -39,16 +36,18 @@ namespace GameScripts
                 false,                           // isStatic
                 false                            // hasGravity = false (no gravity)
             );
-           
 
             GameObject.CreateAnimatedImage("C#_AniImage",0,200,
                 300, 300,
                 "../Assets/spritesheet_R.png",
-                11,8,
-                24,29,
+                11,8,//size of the spritesheet
+                24,29,//start and end frames
                 8,(int)CollisionLayer.Default,
                 false,false,
                 false);
+
+            Debug.Log("Adding Physics BLUESQUARE");
+            Components.AddPhysicsComponent("BlueSquare");
         }
 
         public void OnUpdate(float deltaTime)
@@ -62,7 +61,9 @@ namespace GameScripts
             {
                 redSquareX = 500;
             }
-        }
+
+
+         }
 
         public void OnDestroy()
         {

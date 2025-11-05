@@ -172,6 +172,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[debugSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
+        if (scriptSystem) 
+            g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
 
@@ -259,6 +261,16 @@ void CoreEngine::GameLoop()
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[graphicsSystem->GetName()] = ms;
+            g_totalLoopTime += ms;
+        }
+
+        if (scriptSystem)
+        {
+            std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+            scriptSystem->Update(static_cast<float>(delta_time)); // Use variable delta_time
+            std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+            g_systemTimings[scriptSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
