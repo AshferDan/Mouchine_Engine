@@ -1451,6 +1451,11 @@ void EditorLayout_LoadPopUp()
         }
         ImGui::Columns(1);
 
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
         ImGui::EndPopup();
     }
 }
