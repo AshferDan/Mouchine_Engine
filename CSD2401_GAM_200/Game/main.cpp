@@ -60,7 +60,7 @@ int main()
         textObj->AddComponent<TransformComponent>(100.f, 100.f); // Position on screen
         textObj->AddComponent<RenderComponent>();
         auto *text = textObj->AddComponent<TextComponent>(
-            "./Assets/FrederickatheGreat-Regular.ttf",
+            "../Assets/FrederickatheGreat-Regular.ttf",
             48, // Font size
             "Score: 0",
             vec4(1.0f, 1.0f, 1.0f, 1.0f),
