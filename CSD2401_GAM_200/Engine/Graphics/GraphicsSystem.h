@@ -157,6 +157,7 @@ private:
 	GLFWwindow *window;		// GLFW window handle.
 	GLSLShader shader;		// Shader used for debug rendering.
 	GLSLShader textShader;
+	GLSLShader debugShader;
 	GLuint vao = 0, vbo = 0, tex = 0;		  // OpenGL buffers and texture.
 	GLint Wwidth, Wheight;					  // Window dimensions.
 	class LevelEditor *levelEditor = nullptr; // Level editor for camera control
