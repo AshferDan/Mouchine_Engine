@@ -14,6 +14,7 @@ Technology is prohibited.
 #pragma once
 #include "System.h"
 #include "ColliderComponent.h"
+#include "SpatialGrid.h"
 #include <vector>
 #include <utility>
 
@@ -70,4 +71,7 @@ private:
 
     // Reference to physics system for reporting collisions
     PhysicsSystem* physicsSystem;
+
+    // Spatial grid for broad-phase collision detection
+    SpatialGrid spatialGrid;
 };

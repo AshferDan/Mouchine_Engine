@@ -195,12 +195,15 @@ void InputManager::Update(float dt)
 
         auto& forcesManager = physics->GetForcesManager();
 
+
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
             moveDirectionX = -1.0f;
 
+            // Remove friction when actively moving
+            forcesManager.RemoveForcesByType(ForceType::Friction);
             // Add left movement force using helper
-            forcesManager.AddForce(ForceType::MoveLeft, physics->GetMass());
+            forcesManager.AddForce(ForceType::MoveLeft);
             // Remove right movement if present
             forcesManager.RemoveForcesByType(ForceType::MoveRight);
         }
@@ -208,8 +211,10 @@ void InputManager::Update(float dt)
         {
             moveDirectionX = 1.0f;
 
+            // Remove friction when actively moving
+            forcesManager.RemoveForcesByType(ForceType::Friction);
             // Add right movement force using helper
-            forcesManager.AddForce(ForceType::MoveRight, physics->GetMass());
+            forcesManager.AddForce(ForceType::MoveRight);
             // Remove left movement if present
             forcesManager.RemoveForcesByType(ForceType::MoveLeft);
         }
@@ -242,6 +247,18 @@ void InputManager::Update(float dt)
         {
             // Reset timer when not moving or in air
             footstepTimer = 0.0f;
+            // Add friction to slow down (only if not already present)
+            if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
+            {
+                forcesManager.AddFriction(&physics->isGrounded);
+            }
+        }
+
+
+        // After forces are applied, clamp velocity
+        if (std::abs(vx) > 200.f) {
+            float clampedVx = (vx > 0) ? 200.f : -200.f;
+            physics->SetVelocity(clampedVx, vy);
         }
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -264,7 +281,7 @@ void InputManager::Update(float dt)
             if (physics->IsGrounded())
             {
                 is_jumping = false;
-                physics->GetForcesManager().AddForce(ForceType::Jump, physics->GetMass());
+                physics->GetForcesManager().AddForce(ForceType::Jump);
                 physics->GetVelocity(vx, vy); // Get updated VY after jump
                 // Play jump sound effect
                 if (audioEngine)

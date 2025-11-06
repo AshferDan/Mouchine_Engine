@@ -20,13 +20,10 @@ Technology is prohibited.
 #include <iostream>
 #include <algorithm>
 
-#include "core.h"
-#include "Message.h"
-
 /**
  * @brief Constructs collision system with null physics reference
  */
-CollisionSystem::CollisionSystem() : physicsSystem(nullptr) {
+CollisionSystem::CollisionSystem() : physicsSystem(nullptr), spatialGrid() {
 }
 
 /**
@@ -101,21 +98,37 @@ bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2
  * then narrow-phase testing based on shape types
  */
 void CollisionSystem::Update(float deltaTime) {
+    (void)deltaTime;
     auto& factory = GameObjectFactory::Instance();
     const auto& gameObjects = factory.GetAllGameObjects();
 
-    // ONLY collision detection now - no resolution
-    for (size_t i = 0; i < gameObjects.size(); ++i) {
-        auto* col1 = gameObjects[i]->GetComponent<ColliderComponent>();
+    // Clear and rebuild spatial grid each frame
+    spatialGrid.Clear();
+
+    // Insert all objects with colliders into the grid
+    for (const auto& obj : gameObjects) {
+        auto* collider = obj->GetComponent<ColliderComponent>();
+        if (collider) {
+            spatialGrid.Insert(obj.get(), collider);
+        }
+    }
+
+    // Use spatial grid for broad-phase collision detection
+    for (const auto& obj1 : gameObjects) {
+        auto* col1 = obj1->GetComponent<ColliderComponent>();
         if (!col1) continue;
 
-        for (size_t j = i + 1; j < gameObjects.size(); ++j) {
-            auto* col2 = gameObjects[j]->GetComponent<ColliderComponent>();
+        // Query nearby objects from spatial grid (MUCH FASTER than checking all)
+        std::vector<GameObject*> nearbyObjects = spatialGrid.Query(obj1.get(), col1);
+
+        // Check collisions only with nearby objects
+        for (GameObject* obj2 : nearbyObjects) {
+            auto* col2 = obj2->GetComponent<ColliderComponent>();
             if (!col2) continue;
 
             bool isColliding = false;
 
-            // Detect collision based on shape types
+            // Narrow-phase: Detect collision based on shape types
             if (col1->GetType() == ColliderComponent::Type::Circle &&
                 col2->GetType() == ColliderComponent::Type::Circle) {
                 isColliding = CollisionIntersection_CircleCircle_Static(
@@ -145,31 +158,22 @@ void CollisionSystem::Update(float deltaTime) {
             if (isColliding) {
                 bool wasActive = false;
                 for (auto& pair : activeCollisions) {
-                    if ((pair.first == gameObjects[i].get() && pair.second == gameObjects[j].get()) ||
-                        (pair.first == gameObjects[j].get() && pair.second == gameObjects[i].get())) {
+                    if ((pair.first == obj1.get() && pair.second == obj2) ||
+                        (pair.first == obj2 && pair.second == obj1.get())) {
                         wasActive = true;
                         break;
                     }
                 }
 
                 if (!wasActive) {
-                    //std::cout << "Collision: " << gameObjects[i]->GetName() << " <-> "
-                    //    << gameObjects[j]->GetName() << std::endl;
-                    activeCollisions.push_back({ gameObjects[i].get(), gameObjects[j].get() });
-
-
-                    //Message msgEnter;
-                    //msgEnter.type = "CollisionEnter";     // New message type
-                    //msgEnter.sender = this;
-
-                    //// You can pack both objects in a small struct if needed
-                    //msgEnter.data = (void*)gameObjects[i].get();
-                    //CORE->GetMessageBus().Broadcast(msgEnter);
+                    std::cout << "Collision: " << obj1->GetName() << " <-> "
+                        << obj2->GetName() << std::endl;
+                    activeCollisions.push_back({ obj1.get(), obj2 });
                 }
 
                 // Report collision to PhysicsSystem for resolution
                 if (physicsSystem) {
-                    physicsSystem->ReportCollision(gameObjects[i].get(), gameObjects[j].get(), col1, col2);
+                    physicsSystem->ReportCollision(obj1.get(), obj2, col1, col2);
                 }
             }
             else {
@@ -177,8 +181,8 @@ void CollisionSystem::Update(float deltaTime) {
                 activeCollisions.erase(
                     std::remove_if(activeCollisions.begin(), activeCollisions.end(),
                         [&](const auto& pair) {
-                            return (pair.first == gameObjects[i].get() && pair.second == gameObjects[j].get()) ||
-                                (pair.first == gameObjects[j].get() && pair.second == gameObjects[i].get());
+                            return (pair.first == obj1.get() && pair.second == obj2) ||
+                                (pair.first == obj2 && pair.second == obj1.get());
                         }),
                     activeCollisions.end()
                 );

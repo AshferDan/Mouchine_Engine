@@ -216,7 +216,7 @@ namespace API {
             auto* physics = obj->GetComponent<PhysicsComponent>();
             if (physics)
             {
-                physics->GetForcesManager().AddForce(ForceType::Jump, physics->GetMass());
+                physics->GetForcesManager().AddForce(ForceType::Jump);
             }
         }
     }
