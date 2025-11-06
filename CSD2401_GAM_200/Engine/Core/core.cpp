@@ -14,6 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 #include "core.h"
 #include "LevelEditor.h"
+#include "Message.h"
+#include "IMessageHandler.h"
 
 bool InputManager::KeyStateQuit = false;
 CoreEngine* CORE;
@@ -33,6 +35,7 @@ CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0), stepMo
     LastTime = 0;
     GameActive = true;
     CORE = this;
+    std::cout << "[CoreEngine::CoreEngine] CORE set to " << this << std::endl;
 
     std::cout << "CoreEngine constructed" << std::endl;
 }
@@ -72,7 +75,7 @@ void CoreEngine::ConfigFile(const char* configF)
    */
 void CoreEngine::InitSystems()
 {
-    CoreEngine::ConfigFile("./Logs/config.txt");
+    CoreEngine::ConfigFile("../Logs/config.txt");
     std::cout << "Initializing default systems..." << std::endl;
 
     // 1. Graphics first (needed for window)
@@ -106,8 +109,15 @@ void CoreEngine::InitSystems()
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
+    scriptSystem = AddSystem<ScriptSystem>();
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
+
+    messageBus.Subscribe<PlaySoundMessage>(audioEngine);
+    messageBus.Subscribe<PauseSoundMessage>(audioEngine);
+    messageBus.Subscribe<CollisionMessage>(physicsSystem);
+    messageBus.Subscribe<CreateObjectMessage>(gameObjectSystem);
+
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
@@ -119,6 +129,7 @@ void CoreEngine::InitSystems()
 void CoreEngine::Init()
 {
     InitSystems();
+
     std::cout << "Initializing CoreEngine with " << Systems.size() << " systems" << std::endl;
 
     for (size_t i = 0; i < Systems.size(); ++i)
@@ -170,6 +181,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[debugSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
+        if (scriptSystem) 
+            g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
 
@@ -264,6 +277,16 @@ void CoreEngine::GameLoop()
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[graphicsSystem->GetName()] = ms;
+            g_totalLoopTime += ms;
+        }
+
+        if (scriptSystem)
+        {
+            std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+            scriptSystem->Update(static_cast<float>(delta_time)); // Use variable delta_time
+            std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+            g_systemTimings[scriptSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 

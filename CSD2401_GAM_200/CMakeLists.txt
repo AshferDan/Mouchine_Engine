@@ -1,6 +1,6 @@
 #/* Start Header ************************************************************************/
 #\file       CMakeLists.txt
-#\author     Jonathan Fam Qian Wei [100% - 309 lines]
+#\author     Jonathan Fam Qian Wei [100% - 309 lines] - Optimized Version
 #\par        Fam.q@digipen.edu
 #\date       October, 2, 2025
 
@@ -13,7 +13,6 @@
 
 # ======================= Project Configuration =========================
 cmake_minimum_required(VERSION 3.15)
-#cmake_policy(VERSION 2.7...3.5)
 
 # Set policy for imported targets
 if(POLICY CMP0111)
@@ -21,6 +20,12 @@ if(POLICY CMP0111)
 endif()
 
 project(GAM_200_AME)
+
+# Enable parallel builds for Visual Studio
+if(MSVC)
+    add_compile_options(/MP)
+    message(STATUS "Enabled Visual Studio parallel compilation (/MP)")
+endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -49,7 +54,6 @@ set(Factory_DIR       ./Engine/Factory)
 set(Core_DIR          ./Engine/Core)
 set(Resource_DIR      ./Engine/ResourceManager)
 set(Scripting_DIR     ./Engine/Scripting)
-
 
 # External dependencies
 set(Extern_DIR        ./Engine/Extern)
@@ -104,7 +108,6 @@ file(GLOB_RECURSE Resource_HEAD "${Resource_DIR}/*.h" "${Resource_DIR}/*.hpp")
 
 file(GLOB_RECURSE Scripting_SRC    "${Scripting_DIR}/*.cpp")
 file(GLOB_RECURSE Scripting_HEAD    "${Scripting_DIR}/*.h" "${Scripting_DIR}/*.hpp")
-
 
 # External files (if any cpp/h files exist in Extern)
 file(GLOB_RECURSE Extern_SRC       "${Extern_DIR}/*.cpp")
@@ -222,159 +225,107 @@ target_include_directories(Engine PUBLIC
     ${Serialization_DIR}
     ${Transform_DIR}
     ${Input_DIR}
-    ${Core_DIR}
     ${Factory_DIR}
-    ${Extern_DIR}
+    ${Core_DIR}
     ${Resource_DIR}
     ${Scripting_DIR}
+    ${Extern_DIR}
 )
 
-# ======================= Link Libraries to Engine ===================
+# ======================= Engine Library Linking ===================
 target_link_libraries(Engine PUBLIC
     glfw
-    libglew_static 
-    glm
+    libglew_static
+    glm::glm
     nlohmann_json::nlohmann_json
     imgui
     freetype
     stb_image
-    #mono
 )
 
-# Link FMOD to Engine if available
+# Link FMOD if available
 if(TARGET fmod)
     target_link_libraries(Engine PUBLIC fmod)
-    message(STATUS "FMOD will be linked to the Engine")
 endif()
 
 if(TARGET fmodstudio)
     target_link_libraries(Engine PUBLIC fmodstudio)
-    message(STATUS "FMOD Studio will be linked to the Engine")
 endif()
 
-# ======================= Compiler Warnings for Engine ===============
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(Engine PRIVATE -Wall ${DisableWarnings})
-elseif (MSVC)
-    target_compile_options(Engine PRIVATE /W4 /WX-)
+# Link Mono if available
+if(TARGET mono)
+    target_link_libraries(Engine PUBLIC mono)
 endif()
 
-# ======================= Create Game Executable ===================
+# ======================= Game Executable ===============
 add_executable(Game
     ${Game_SRC}
     ${Game_HEAD}
 )
 
+# Link Game with Engine
+target_link_libraries(Game PRIVATE Engine)
+
 # Set C++ standard for Game
 set_property(TARGET Game PROPERTY CXX_STANDARD 20)
 set_property(TARGET Game PROPERTY CXX_STANDARD_REQUIRED ON)
 
-# ======================= Source Groups for Game Project =============
-source_group("Source Files" FILES ${Game_SRC})
-source_group("Header Files" FILES ${Game_HEAD})
+# ======================= Game Include Directories ================
+target_include_directories(Game PRIVATE ${Game_DIR})
 
-# ======================= Game Dependencies ===========================
-target_include_directories(Game PRIVATE
-    ${Game_DIR}
-)
+# Set Game as startup project for Visual Studio
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game)
 
-# Link Game to Engine (this gives Game access to all Engine functionality)
-target_link_libraries(Game PRIVATE Engine)
-
-# ======================= Set Build Output Directory ================
-# Engine library output
-set_target_properties(Engine PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Build"
-    ARCHIVE_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/Build/Debug"
-    ARCHIVE_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Build/Release"
-)
-
-# Game executable output
+# ======================= Output Directories ========================
+# Set consistent output directories for all configurations (Debug and Release only)
 set_target_properties(Game PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Build"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_SOURCE_DIR}/Build/Debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_SOURCE_DIR}/Build/Release"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/Release"
 )
 
-# ======================= Copy Runtime Assets to Build Directory =============
+# ======================= Helper Functions for File Copying =================
+# One-time copy at configure time (for DLLs that don't change)
+function(copy_runtime_dependency_once source_file dest_dir)
+    get_filename_component(filename "${source_file}" NAME)
+    
+    # Ensure destination directory exists
+    file(MAKE_DIRECTORY "${dest_dir}")
+    
+    if(NOT EXISTS "${dest_dir}/${filename}" OR 
+       "${source_file}" IS_NEWER_THAN "${dest_dir}/${filename}")
+        file(COPY "${source_file}" DESTINATION "${dest_dir}")
+        message(STATUS "  Copied ${filename} to ${dest_dir}")
+    else()
+        message(STATUS "  Skipped ${filename} (up to date)")
+    endif()
+endfunction()
 
-# --- Copy Assets, Shaders, etc. to Configuration Directory (e.g., Build/Debug) ---
+# One-time directory copy at configure time
+function(copy_directory_once source_dir dest_dir comment_text)
+    if(NOT EXISTS "${dest_dir}")
+        file(MAKE_DIRECTORY "${dest_dir}")
+        file(COPY "${source_dir}/" DESTINATION "${dest_dir}")
+        message(STATUS "  ${comment_text}")
+    else()
+        message(STATUS "  ${comment_text} (already exists, skipped)")
+    endif()
+endfunction()
 
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
-        "$<TARGET_FILE_DIR:Game>/Assets"
-    COMMENT "Copying Assets folder to configuration directory"
-)
+# POST_BUILD copy for frequently changing files (C# DLLs)
+function(copy_runtime_dependency_postbuild target_name source_file dest_dir)
+    get_filename_component(filename "${source_file}" NAME)
+    
+    add_custom_command(TARGET ${target_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${source_file}"
+            "${dest_dir}/${filename}"
+        COMMENT "Copying ${filename} (only if changed)"
+        VERBATIM
+    )
+endfunction()
 
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern/Mathlib.h"
-        "$<TARGET_FILE_DIR:Game>"
-    COMMENT "Copying Mathlib.h folder to configuration directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/Engine/Extern/Mathlib.cpp"
-        "$<TARGET_FILE_DIR:Game>"
-    COMMENT "Copying Mathlib.cpp folder to configuration directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
-        "$<TARGET_FILE_DIR:Game>/Shaders"
-    COMMENT "Copying Shaders folder to configuration directory"
-)
-
-# --- Copy Logs to Configuration Directory (e.g., Build/Debug) ---
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-        "$<TARGET_FILE_DIR:Game>/Logs"
-    COMMENT "Creating Logs folder in configuration directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/Logs/config.txt"
-        "$<TARGET_FILE_DIR:Game>/Logs/config.txt"
-    COMMENT "Copying config.txt to Logs folder in configuration directory"
-)
-
-# --- Copy Assets, Shaders, and Logs to Top-Level Build Directory (Build/) ---
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs"
-    COMMENT "Creating Logs folder in top-level Build directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/Logs/config.txt"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Logs/config.txt"
-    COMMENT "Copying config.txt to Logs folder in top-level Build directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Assets"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Assets"
-    COMMENT "Copying Assets folder to top-level Build directory"
-)
-
-add_custom_command(TARGET Game POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/Shaders"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Build/Shaders"
-    COMMENT "Copying Shaders folder to top-level Build directory"
-)
-
-message(STATUS "Asset copy commands configured successfully for all build locations.")
-
-# ======================= Copy FMOD DLLs to Build Directory =================
+# ======================= Copy FMOD DLLs (One-time at configure) =================
 if(TARGET fmod)
     set(FMOD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/FMOD")
     
@@ -387,23 +338,23 @@ if(TARGET fmod)
         set(FMOD_STUDIO_DLL_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x86")
     endif()
     
-    # Find FMOD DLLs
+    # Find Debug DLLs
     find_file(FMOD_DEBUG_DLL
         NAMES fmodL.dll
         PATHS ${FMOD_DLL_DIR}
         NO_DEFAULT_PATH
     )
     
-    find_file(FMOD_RELEASE_DLL
-        NAMES fmod.dll
-        PATHS ${FMOD_DLL_DIR}
-        NO_DEFAULT_PATH
-    )
-    
-    # Find FMOD Studio DLLs
     find_file(FMOD_STUDIO_DEBUG_DLL
         NAMES fmodstudioL.dll
         PATHS ${FMOD_STUDIO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    # Find Release DLLs
+    find_file(FMOD_RELEASE_DLL
+        NAMES fmod.dll
+        PATHS ${FMOD_DLL_DIR}
         NO_DEFAULT_PATH
     )
     
@@ -413,54 +364,128 @@ if(TARGET fmod)
         NO_DEFAULT_PATH
     )
     
-    # Copy Debug DLLs
+    message(STATUS "Copying FMOD DLLs (one-time at configure)...")
+    
+    # Copy Debug DLLs to Debug
     if(FMOD_DEBUG_DLL)
-        add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${FMOD_DEBUG_DLL}"
-                "$<TARGET_FILE_DIR:Game>"
-            COMMENT "Copying fmodL.dll to Debug build directory"
-        )
-        message(STATUS "Will copy fmodL.dll: ${FMOD_DEBUG_DLL}")
+        copy_runtime_dependency_once("${FMOD_DEBUG_DLL}" "${CMAKE_BINARY_DIR}/bin/Debug")
     endif()
     
     if(FMOD_STUDIO_DEBUG_DLL)
-        add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${FMOD_STUDIO_DEBUG_DLL}"
-                "$<TARGET_FILE_DIR:Game>"
-            COMMENT "Copying fmodstudioL.dll to Debug build directory"
-        )
-        message(STATUS "Will copy fmodstudioL.dll: ${FMOD_STUDIO_DEBUG_DLL}")
+        copy_runtime_dependency_once("${FMOD_STUDIO_DEBUG_DLL}" "${CMAKE_BINARY_DIR}/bin/Debug")
     endif()
     
-    # Copy Release DLLs
+    # Copy Release DLLs to Release
     if(FMOD_RELEASE_DLL)
-        add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${FMOD_RELEASE_DLL}"
-                "$<TARGET_FILE_DIR:Game>"
-            COMMENT "Copying fmod.dll to Release build directory"
-        )
-        message(STATUS "Will copy fmod.dll: ${FMOD_RELEASE_DLL}")
+        copy_runtime_dependency_once("${FMOD_RELEASE_DLL}" "${CMAKE_BINARY_DIR}/bin/Release")
     endif()
     
     if(FMOD_STUDIO_RELEASE_DLL)
-        add_custom_command(TARGET Game POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${FMOD_STUDIO_RELEASE_DLL}"
-                "$<TARGET_FILE_DIR:Game>"
-            COMMENT "Copying fmodstudio.dll to Release build directory"
-        )
-        message(STATUS "Will copy fmodstudio.dll: ${FMOD_STUDIO_RELEASE_DLL}")
+        copy_runtime_dependency_once("${FMOD_STUDIO_RELEASE_DLL}" "${CMAKE_BINARY_DIR}/bin/Release")
     endif()
     
-    message(STATUS "FMOD DLL copy commands configured successfully")
+    message(STATUS "✓ FMOD DLLs copied successfully")
+endif()
+# ======================= Copy Mono Runtime Files (One-time at configure) =================
+set(MONO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/Mono")
+set(MONO_DLL_DIR "${MONO_ROOT_DIR}/bin")
+set(MONO_LIB_DIR "${MONO_ROOT_DIR}/lib")
+set(MONO_ETC_DIR "${MONO_ROOT_DIR}/etc")
+
+if(EXISTS "${MONO_ROOT_DIR}")
+    message(STATUS "Copying Mono runtime files (one-time at configure)...")
+    
+    # Find Mono DLLs
+    find_file(MONO_DLL
+        NAMES mono-2.0-sgen.dll mono-2.0-sgend.dll
+        PATHS ${MONO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+ 
+    find_file(MONO_POSIX_HELPER_DLL
+        NAMES MonoPosixHelper.dll
+        PATHS ${MONO_DLL_DIR}
+        NO_DEFAULT_PATH
+    )
+    
+    # Copy Mono DLLs to the /Build folder
+    if(MONO_DLL)
+        copy_runtime_dependency_once("${MONO_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}/Build")
+    endif()
+    
+ 
+    if(MONO_POSIX_HELPER_DLL)
+        copy_runtime_dependency_once("${MONO_POSIX_HELPER_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}/Build")
+    endif()
+    
+    # Copy Mono lib directory (mscorlib.dll)
+    if(EXISTS "${MONO_LIB_DIR}")
+        copy_directory_once("${MONO_LIB_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/lib"
+   
+             "Copied Mono lib to Build root")
+    else()
+        message(FATAL_ERROR "Mono lib directory not found at: ${MONO_LIB_DIR}")
+    endif()
+    
+    # Copy Mono etc directory
+    if(EXISTS "${MONO_ETC_DIR}")
+        copy_directory_once("${MONO_ETC_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/etc"
+            "Copied Mono etc to Build root")
+    else()
+        message(FATAL_ERROR "Mono etc directory not found at: ${MONO_ETC_DIR}")
+    endif()
+    
+    message(STATUS "✓ Mono runtime files copied successfully")
+else()
+    message(FATAL_ERROR "Mono not found at: ${MONO_ROOT_DIR}")
 endif()
 
-# ======================= Compiler Warnings for Game =================
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(Game PRIVATE -Wall ${DisableWarnings})
-elseif (MSVC)
+# ======================= Create Scripts Directory =================
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Game>/Scripts"
+    COMMENT "Creating Scripts folder"
+    VERBATIM
+)
+
+# ======================= C# Project Configuration ===========================
+set(CSHARP_PROJECT_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/Scripts")
+set(CSHARP_PROJECT_FILE "${CSHARP_PROJECT_DIR}/GameScript.csproj")
+set(CSHARP_DLL_SOURCE   "${CSHARP_PROJECT_DIR}/bin/Debug/net48/GameScripts.dll")
+
+# ======================= Add C# Project to Solution ========================
+message(STATUS "Adding C# project to solution: ${CSHARP_PROJECT_FILE}")
+
+include_external_msproject(CSharpSrcipts ${CSHARP_PROJECT_FILE})
+
+add_dependencies(Game CSharpSrcipts)
+
+# ======================= Copy C# Scripts (POST_BUILD) =====================
+
+# 3. Create the 'Scripts' folder in the output directory
+add_custom_command(TARGET Game POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+        "$<TARGET_FILE_DIR:Game>/Scripts"
+    COMMENT "Creating Scripts folder"
+    VERBATIM
+)
+
+# 4. Copy the newly built DLL to the 'Scripts' folder
+if(EXISTS "${CSHARP_DLL_SOURCE}")
+    message(STATUS "GameScripts.dll found, configuring copy for hot-reload")
+    
+    copy_runtime_dependency_postbuild(Game 
+        "${CSHARP_DLL_SOURCE}"
+        "$<TARGET_FILE_DIR:Game>/Scripts"
+    )
+else()
+    message(WARNING "GameScripts.dll not found after build. Check C# project.")
+endif()
+
+# ======================= Compiler Warnings =================
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(Game PRIVATE -Wall)
+elseif(MSVC)
     target_compile_options(Game PRIVATE /W4 /WX-)
 endif()

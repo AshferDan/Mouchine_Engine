@@ -54,7 +54,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        Serialization::LoadScene("Prefab_TestScene");
+        //Serialization::LoadScene("Prefab_TestScene");
 
         GameObject *textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
         textObj->AddComponent<TransformComponent>(100.f, 100.f); // Position on screen
@@ -85,6 +85,38 @@ int main()
             cam->SetSmoothing(true, 2.f);
         }
         CameraManager::Instance().SetActiveCamera(mainCamera);
+
+        std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+
+        ScriptSystem *scriptSys = engine.GetScriptSystem();
+
+        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        if (scriptSys && squareSpawner)
+        {
+            // Attach the TestGameObject script (creates red and blue squares)
+            bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
+            if (attached)
+            {
+                std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
+
+                // Call OnStart to actually create the squares
+                scriptSys->CallOnStart(squareSpawner);
+                std::cout << "Called OnStart - Two squares should be created!" << std::endl;
+            }
+            else
+            {
+                std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
+                std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
+                std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
+            }
+        }
+        else
+        {
+            if (!scriptSys)
+                std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
+            if (!squareSpawner)
+                std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
+        }
 
         API::StartEngineLoop(engine);
     }

@@ -1,87 +1,97 @@
+#/* Start Header ************************************************************************/
+#\file       ImportDependencies.cmake
+#\author     Optimized Version
+#\date       October 30, 2025
+#/* End Header **************************************************************************/
+
 include(FetchContent)
 
-# Macro to import GLFW
+# Performance optimizations
+set(FETCHCONTENT_QUIET OFF)
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
+
+# ======================= GLFW ==========================
 macro(import_glfw)
-    if(NOT TARGET glfw)  # Guard to prevent multiple inclusion
+    if(NOT TARGET glfw)
+        message(STATUS "Configuring GLFW...")
         FetchContent_Declare(
             glfw
             GIT_REPOSITORY https://github.com/glfw/glfw.git
-            GIT_TAG 3.3.8
+            GIT_TAG 3.4
+            GIT_SHALLOW TRUE
         )
-        if(NOT glfw_POPULATED)
-            set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-            set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-            set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-            FetchContent_Populate(glfw)
-        endif()
-
-        add_subdirectory(${glfw_SOURCE_DIR})
-        include_directories(${GLFW_SOURCE_DIR}/include)
+        set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+        set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+        FetchContent_MakeAvailable(glfw)
+        message(STATUS "✓ GLFW configured")
     endif()
 endmacro()
 
-# Macro to import glm
+# ======================= GLM ===========================
 macro(import_glm)
-    if(NOT TARGET glm)  # Guard to prevent multiple inclusion
+    if(NOT TARGET glm)
+        message(STATUS "Configuring GLM...")
         FetchContent_Declare(
             glm
             GIT_REPOSITORY https://github.com/g-truc/glm.git
-            GIT_TAG master
+            GIT_TAG 1.0.1
+            GIT_SHALLOW TRUE
         )
+        set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(glm)
-
-        include_directories(${glm_SOURCE_DIR})
+        message(STATUS "✓ GLM configured")
     endif()
 endmacro()
 
-# Macro to import glew
+# ======================= GLEW ==========================
 macro(import_glew)
-    if(NOT TARGET glew_s)  # Guard to prevent multiple inclusion
-        include(FetchContent)
-
+    if(NOT TARGET libglew_static)
+        message(STATUS "Configuring GLEW...")
         FetchContent_Declare(
             glew
-            GIT_REPOSITORY https://github.com/omniavinco/glew-cmake.git
-            GIT_TAG glew-cmake-release
+            GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
+            GIT_TAG glew-cmake-2.2.0
+            GIT_SHALLOW TRUE
         )
-
-        # Disable shared builds if needed
-        set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libs" FORCE)
+        set(glew-cmake_BUILD_SHARED OFF CACHE BOOL "" FORCE)
+        set(glew-cmake_BUILD_STATIC ON CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(glew)
-
-        # Optional: include directories 
-        # if needed manually (though target_link_libraries handles it)
-        include_directories(${glew_SOURCE_DIR}/include)
+        message(STATUS "✓ GLEW configured")
     endif()
 endmacro()
 
-# Macro to import nlohmann/json
+# ======================= nlohmann/json =================
 macro(import_json)
-    if(NOT TARGET nlohmann_json::nlohmann_json)  # Fixed target name and typo
-        include(FetchContent)
+    if(NOT TARGET nlohmann_json::nlohmann_json)
+        message(STATUS "Configuring nlohmann/json...")
         FetchContent_Declare(
             json
             GIT_REPOSITORY https://github.com/nlohmann/json.git
-            GIT_TAG v3.11.3  # Use a stable version instead of master
+            GIT_TAG v3.11.3
+            GIT_SHALLOW TRUE
         )
+        set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
+        set(JSON_Install OFF CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(json)
+        message(STATUS "✓ nlohmann/json configured")
     endif()
 endmacro()
 
-# Macro to import ImGui
+# ======================= ImGui =========================
 macro(import_imgui)
-    if(NOT TARGET imgui)  # Guard to prevent multiple inclusion
+    if(NOT TARGET imgui)
+        message(STATUS "Configuring ImGui...")
         FetchContent_Declare(
             imgui
             GIT_REPOSITORY https://github.com/ocornut/imgui.git
             GIT_TAG v1.92.4-docking
+            GIT_SHALLOW TRUE
         )
-        if(NOT imgui_POPULATED)
-            FetchContent_Populate(imgui)
-        endif()
-
-        # Create ImGui library manually since it doesn't have CMakeLists.txt
-        set(IMGUI_SOURCES
+        FetchContent_MakeAvailable(imgui)
+        
+        add_library(imgui STATIC
             ${imgui_SOURCE_DIR}/imgui.cpp
             ${imgui_SOURCE_DIR}/imgui_demo.cpp
             ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -90,193 +100,171 @@ macro(import_imgui)
             ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
             ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
         )
-
-        add_library(imgui STATIC ${IMGUI_SOURCES})
         target_include_directories(imgui PUBLIC 
             ${imgui_SOURCE_DIR}
             ${imgui_SOURCE_DIR}/backends
         )
         target_link_libraries(imgui PUBLIC glfw libglew_static)
-        
-        # Set C++ standard for ImGui (required for constexpr support)
         set_property(TARGET imgui PROPERTY CXX_STANDARD 11)
         set_property(TARGET imgui PROPERTY CXX_STANDARD_REQUIRED ON)
+        message(STATUS "✓ ImGui configured")
     endif()
 endmacro()
 
-
-# Macro to import FreeType
+# ======================= FreeType ======================
 macro(import_freetype)
-    if(NOT TARGET freetype)  # Guard to prevent multiple inclusion
+    if(NOT TARGET freetype)
+        message(STATUS "Configuring FreeType...")
         FetchContent_Declare(
             freetype
             GIT_REPOSITORY https://github.com/freetype/freetype.git
-            GIT_TAG master
+            GIT_TAG VER-2-13-2
+            GIT_SHALLOW TRUE
         )
+        set(FT_DISABLE_ZLIB ON CACHE BOOL "" FORCE)
+        set(FT_DISABLE_BZIP2 ON CACHE BOOL "" FORCE)
+        set(FT_DISABLE_PNG ON CACHE BOOL "" FORCE)
+        set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "" FORCE)
+        set(FT_DISABLE_BROTLI ON CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(freetype)
-        
-        # Include directories
-        include_directories(${freetype_SOURCE_DIR}/include)
+        message(STATUS "✓ FreeType configured")
     endif()
 endmacro()
 
-# Macro to import stb_image (Added from previous step)
-# This fetches the stb repository and compiles the implementation into a library.
+# ======================= stb_image =====================
 macro(import_stb_image)
     if(NOT TARGET stb_image)
+        message(STATUS "Configuring stb_image...")
         FetchContent_Declare(
             stb
             GIT_REPOSITORY https://github.com/nothings/stb.git
-            GIT_TAG master 
+            GIT_TAG master
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(stb)
-
-        # 1. Define the implementation file for stb_image in the binary directory.
-        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.c
-            "#define STB_IMAGE_IMPLEMENTATION\n#include \"${stb_SOURCE_DIR}/stb_image.h\"\n"
-        )
-
-        # 2. Create the static library target named 'stb_image'
-        add_library(stb_image STATIC ${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.c)
-
-        # 3. Set the public include directory so other targets can find "stb_image.h"
-        target_include_directories(stb_image PUBLIC
-            $<BUILD_INTERFACE:${stb_SOURCE_DIR}>
-        )
+        
+        set(STB_IMPL_FILE ${CMAKE_CURRENT_BINARY_DIR}/stb_image_impl.c)
+        if(NOT EXISTS ${STB_IMPL_FILE})
+            file(WRITE ${STB_IMPL_FILE}
+                "#define STB_IMAGE_IMPLEMENTATION\n"
+                "#include \"${stb_SOURCE_DIR}/stb_image.h\"\n"
+            )
+        endif()
+        
+        add_library(stb_image STATIC ${STB_IMPL_FILE})
+        target_include_directories(stb_image PUBLIC ${stb_SOURCE_DIR})
+        
+        if(MSVC)
+            target_compile_options(stb_image PRIVATE /W0)
+        else()
+            target_compile_options(stb_image PRIVATE -w)
+        endif()
+        message(STATUS "✓ stb_image configured")
     endif()
 endmacro()
 
+# ======================= FMOD ==========================
 macro(import_fmod)
     if(NOT TARGET fmod)
+        message(STATUS "Configuring FMOD...")
         set(FMOD_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/FMOD")
         
         if(NOT EXISTS "${FMOD_ROOT_DIR}")
-            message(STATUS "FMOD directory not found. Skipping FMOD integration.")
+            message(WARNING "FMOD not found at: ${FMOD_ROOT_DIR}")
             return()
         endif()
         
-        find_path(FMOD_INCLUDE_DIR 
-            NAMES fmod.h
-            PATHS ${FMOD_ROOT_DIR}/api/core/inc
-            NO_DEFAULT_PATH
-        )
-        
         if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-            set(FMOD_LIB_DIR "${FMOD_ROOT_DIR}/api/core/lib/x64")
-            set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x64")
+            set(FMOD_ARCH "x64")
         else()
-            set(FMOD_LIB_DIR "${FMOD_ROOT_DIR}/api/core/lib/x86")
-            set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT_DIR}/api/studio/lib/x86")
+            set(FMOD_ARCH "x86")
         endif()
         
-        # --- FMOD Core Library Setup (Configuration-Specific Linking) ---
-        # Find Release library (fmod_vc.lib)
-        find_file(FMOD_RELEASE_LIBRARY_FILE
-            NAMES fmod_vc.lib
-            PATHS ${FMOD_LIB_DIR}
-            NO_DEFAULT_PATH
-        )
+        find_path(FMOD_INCLUDE_DIR NAMES fmod.h
+            PATHS ${FMOD_ROOT_DIR}/api/core/inc NO_DEFAULT_PATH)
+        set(FMOD_LIB_DIR "${FMOD_ROOT_DIR}/api/core/lib/${FMOD_ARCH}")
+        find_file(FMOD_RELEASE_LIB NAMES fmod_vc.lib
+            PATHS ${FMOD_LIB_DIR} NO_DEFAULT_PATH)
+        find_file(FMOD_DEBUG_LIB NAMES fmodL_vc.lib
+            PATHS ${FMOD_LIB_DIR} NO_DEFAULT_PATH)
         
-        # Find Debug library (fmodL_vc.lib)
-        find_file(FMOD_DEBUG_LIBRARY_FILE
-            NAMES fmodL_vc.lib
-            PATHS ${FMOD_LIB_DIR}
-            NO_DEFAULT_PATH
-        )
-
-        # Check if both versions and includes were found
-        if(FMOD_INCLUDE_DIR AND FMOD_RELEASE_LIBRARY_FILE AND FMOD_DEBUG_LIBRARY_FILE)
-            add_library(fmod STATIC IMPORTED)
-            
+        if(FMOD_INCLUDE_DIR AND FMOD_RELEASE_LIB AND FMOD_DEBUG_LIB)
+            add_library(fmod STATIC IMPORTED GLOBAL)
             set_target_properties(fmod PROPERTIES
-                # Set all four standard MSVC configurations
-                IMPORTED_LOCATION_DEBUG "${FMOD_DEBUG_LIBRARY_FILE}"
-                IMPORTED_LOCATION_RELEASE "${FMOD_RELEASE_LIBRARY_FILE}"
-                IMPORTED_LOCATION_MINSIZEREL "${FMOD_RELEASE_LIBRARY_FILE}"  # Map to Release
-                IMPORTED_LOCATION_RELWITHDEBINFO "${FMOD_RELEASE_LIBRARY_FILE}" # Map to Release
+                IMPORTED_LOCATION_DEBUG "${FMOD_DEBUG_LIB}"
+                IMPORTED_LOCATION_RELEASE "${FMOD_RELEASE_LIB}"
+                IMPORTED_LOCATION_MINSIZEREL "${FMOD_RELEASE_LIB}"
+                IMPORTED_LOCATION_RELWITHDEBINFO "${FMOD_RELEASE_LIB}"
                 INTERFACE_INCLUDE_DIRECTORIES "${FMOD_INCLUDE_DIR}"
             )
+            message(STATUS "✓ FMOD Core configured (${FMOD_ARCH})")
             
-            message(STATUS "FMOD configured successfully")
+            # FMOD Studio
+            set(FMOD_STUDIO_LIB_DIR "${FMOD_ROOT_DIR}/api/studio/lib/${FMOD_ARCH}")
+            find_path(FMOD_STUDIO_INCLUDE_DIR NAMES fmod_studio.h
+                PATHS ${FMOD_ROOT_DIR}/api/studio/inc NO_DEFAULT_PATH)
+            find_file(FMOD_STUDIO_RELEASE_LIB NAMES fmodstudio_vc.lib
+                PATHS ${FMOD_STUDIO_LIB_DIR} NO_DEFAULT_PATH)
+            find_file(FMOD_STUDIO_DEBUG_LIB NAMES fmodstudioL_vc.lib
+                PATHS ${FMOD_STUDIO_LIB_DIR} NO_DEFAULT_PATH)
             
-            # --- FMOD Studio Library Setup (Configuration-Specific Linking) ---
-            # Find Release Studio library (fmodstudio_vc.lib)
-            find_file(FMOD_STUDIO_RELEASE_LIBRARY_FILE
-                NAMES fmodstudio_vc.lib
-                PATHS ${FMOD_STUDIO_LIB_DIR}
-                NO_DEFAULT_PATH
-            )
-            
-            # Find Debug Studio library (fmodstudioL_vc.lib)
-            find_file(FMOD_STUDIO_DEBUG_LIBRARY_FILE
-                NAMES fmodstudioL_vc.lib
-                PATHS ${FMOD_STUDIO_LIB_DIR}
-                NO_DEFAULT_PATH
-            )
-            
-            if(FMOD_STUDIO_RELEASE_LIBRARY_FILE AND FMOD_STUDIO_DEBUG_LIBRARY_FILE)
-                find_path(FMOD_STUDIO_INCLUDE_DIR 
-                    NAMES fmod_studio.h
-                    PATHS ${FMOD_ROOT_DIR}/api/studio/inc
-                    NO_DEFAULT_PATH
+            if(FMOD_STUDIO_INCLUDE_DIR AND FMOD_STUDIO_RELEASE_LIB AND FMOD_STUDIO_DEBUG_LIB)
+                add_library(fmodstudio STATIC IMPORTED GLOBAL)
+                set_target_properties(fmodstudio PROPERTIES
+                    IMPORTED_LOCATION_DEBUG "${FMOD_STUDIO_DEBUG_LIB}"
+                    IMPORTED_LOCATION_RELEASE "${FMOD_STUDIO_RELEASE_LIB}"
+                    IMPORTED_LOCATION_MINSIZEREL "${FMOD_STUDIO_RELEASE_LIB}"
+                    IMPORTED_LOCATION_RELWITHDEBINFO "${FMOD_STUDIO_RELEASE_LIB}"
+                    INTERFACE_INCLUDE_DIRECTORIES "${FMOD_STUDIO_INCLUDE_DIR}"
                 )
-                
-                if(FMOD_STUDIO_INCLUDE_DIR)
-                    add_library(fmodstudio STATIC IMPORTED)
-                    
-                    set_target_properties(fmodstudio PROPERTIES
-                        # Set all four standard MSVC configurations
-                        IMPORTED_LOCATION_DEBUG "${FMOD_STUDIO_DEBUG_LIBRARY_FILE}"
-                        IMPORTED_LOCATION_RELEASE "${FMOD_STUDIO_RELEASE_LIBRARY_FILE}"
-                        IMPORTED_LOCATION_MINSIZEREL "${FMOD_STUDIO_RELEASE_LIBRARY_FILE}" # Map to Release
-                        IMPORTED_LOCATION_RELWITHDEBINFO "${FMOD_STUDIO_RELEASE_LIBRARY_FILE}" # Map to Release
-                        INTERFACE_INCLUDE_DIRECTORIES "${FMOD_STUDIO_INCLUDE_DIR}"
-                    )
-                    
-                    message(STATUS "FMOD Studio configured successfully")
-                endif()
+                message(STATUS "✓ FMOD Studio configured (${FMOD_ARCH})")
             endif()
-        else()
-            message(STATUS "FMOD not found. Continuing without FMOD...")
         endif()
     endif()
 endmacro()
 
-# Macro to import all dependencies
+# ======================= Mono ==========================
+macro(import_mono)
+    if(NOT TARGET mono)
+        message(STATUS "Configuring Mono...")
+        set(MONO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/Mono")
+        
+        if(NOT EXISTS "${MONO_ROOT_DIR}")
+            message(WARNING "Mono not found at: ${MONO_ROOT_DIR}")
+            return()
+        endif()
+        
+        find_path(MONO_INCLUDE_DIR NAMES mono/jit/jit.h
+            PATHS ${MONO_ROOT_DIR}/include NO_DEFAULT_PATH)
+        find_file(MONO_IMPORT_LIB NAMES mono-2.0-sgen.lib
+            PATHS ${MONO_ROOT_DIR}/lib NO_DEFAULT_PATH)
+        
+        if(MONO_INCLUDE_DIR AND MONO_IMPORT_LIB)
+            add_library(mono SHARED IMPORTED GLOBAL)
+            set_target_properties(mono PROPERTIES
+                IMPORTED_IMPLIB "${MONO_IMPORT_LIB}"
+                INTERFACE_INCLUDE_DIRECTORIES "${MONO_INCLUDE_DIR}"
+            )
+            message(STATUS "✓ Mono configured")
+        else()
+            message(WARNING "Mono library or includes not found")
+        endif()
+    endif()
+endmacro()
+
+# ======================= Import All ====================
 macro(importDependencies)
-    message(STATUS "Starting to import dependencies...")
-
-    message(STATUS "Importing GLFW...")
+    message(STATUS "")
+    message(STATUS "========== Importing Dependencies ==========")
     import_glfw()
-    message(STATUS "GLFW imported successfully.")
-
-    message(STATUS "Importing GLM...")
-    import_glm()
-    message(STATUS "GLM imported successfully.")
-
-    message(STATUS "Importing GLEW...")
     import_glew()
-    message(STATUS "GLEW imported successfully.")
-
-    message(STATUS "Importing nlohmann/json...")
+    import_glm()
     import_json()
-    message(STATUS "nlohmann/json imported successfully.")
-
-    message(STATUS "Importing ImGui...")
     import_imgui()
-    message(STATUS "ImGui imported successfully.")
-
-    message(STATUS "Importing freetype...")
     import_freetype()
-    message(STATUS "freetype imported successfully.")
-
-    message(STATUS "Importing stb_image...")
     import_stb_image()
-    message(STATUS "stb_image imported successfully.")
-
-    message(STATUS "Importing FMOD...")
     import_fmod()
-    message(STATUS "FMOD imported successfully.")
-
-    message(STATUS "All dependencies have been imported successfully.")
+    import_mono()
+    message(STATUS "=========== Dependencies Complete ===========")
+    message(STATUS "")
 endmacro()

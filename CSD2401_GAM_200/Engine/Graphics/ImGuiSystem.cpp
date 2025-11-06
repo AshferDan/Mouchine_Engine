@@ -236,6 +236,114 @@ void ImGuiSystem::Update(float dt)
             ReloadPrefabsList();
             ShowLoadPrefabMenu = (!ShowLoadPrefabMenu) ? true : false;
         }
+
+        // Stress Test: Spawn 1000 GameObjects
+        static bool addCollidersLater = true;
+        static std::vector<GameObject*> stressObjects;
+        static int colliderIndex = 0;
+
+        const float spawnW = 16.f;
+        const float spawnH = 16.f;
+
+        if (ImGui::Button("Run Stress Test (1000 Objects)"))
+        {
+            auto& factory = GameObjectFactory::Instance();
+            auto& resourceMgr = ResourceManager::Instance();
+
+            stressObjects.clear();
+            colliderIndex = 0;
+
+            // Load the texture once, reuse for all obj
+            const std::string spritePath = "./Assets/protosprite.png";
+            const std::string textureKey = "stress_shared";
+
+            TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+            if (!texRes)
+            {
+                if (!resourceMgr.LoadTexture(textureKey, spritePath))
+                {
+                    std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
+                    return;
+                }
+                texRes = resourceMgr.GetTexture(textureKey);
+            }
+
+            if (!texRes || !texRes->IsLoaded())
+            {
+                std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
+                return;
+            }
+
+            GLuint sharedTexID = texRes->GetTextureID();
+
+            // --- Spawn 1000 objects ---
+            for (int i = 0; i < 1001; ++i)
+            {
+                std::string objName = "StressObj_" + std::to_string(i);
+                GameObject* go = factory.CreateGameObject(objName);
+                stressObjects.push_back(go);
+
+                // --- Transform: random position ---
+                if (auto* t = go->AddComponent<TransformComponent>())
+                {
+                    float x = static_cast<float>(rand() % 1280) - 640;
+                    float y = static_cast<float>(rand() % 720) - 360;                 
+                    t->SetPosition(x, y);
+                    t->SetScale(spawnW, spawnH);
+                }
+
+                // --- RenderComponent (visiblility) ---
+                if (auto* render = go->AddComponent<RenderComponent>())
+                {
+                    render->SetTextureID(sharedTexID);
+                    render->SetTexturePath(spritePath);
+                    render->SetShapeType(RenderComponent::ShapeType::Square);
+                    render->SetColor({ 1.f, 1.f, 1.f, 1.f });
+                }
+            }
+
+            std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
+            addCollidersLater = true;
+        }
+
+        // --- Collider ---
+        if (addCollidersLater)
+        {
+            int batchPerFrame = 50; // add 50 colliders per frame
+
+            for (int i = 0; i < batchPerFrame && colliderIndex < static_cast<int>(stressObjects.size()); ++i, ++colliderIndex)
+            {
+                GameObject* go = stressObjects[colliderIndex];
+                if (go && !go->GetComponent<ColliderComponent>())
+                {
+                    go->AddComponent<ColliderComponent>(
+                        ColliderComponent::Type::Square,
+                        spawnW, spawnH,
+                        CollisionLayer::Enemy
+                    );
+                }
+
+                // --- Physics: random velocity ---
+                if (auto* p = go->AddComponent<PhysicsComponent>())
+                {
+                    float vx = static_cast<float>((rand() % 200) - 100);
+                    float vy = static_cast<float>((rand() % 200) - 100);
+                    p->SetVelocity(vx, vy);
+                    p->SetMass(1.0f);
+                    p->SetGrounded(false);
+                    p->SetGravity(true);
+                }
+            }
+
+            if (colliderIndex >= static_cast<int>(stressObjects.size()))
+            {
+                addCollidersLater = false;
+                colliderIndex = 0;
+                stressObjects.clear(); // clear tracking list
+                std::cout << "[STRESS TEST] All stress-test colliders added.\n";
+            }
+        }
+
         // Render Asset Browser things here!
         AssetBrowserWindow.RenderImGui();
 
@@ -309,14 +417,14 @@ void ImGuiSystem::Update(float dt)
                 }
 
                 // Evil button that spawns 2.5k Circle GOs
-                if (obj && obj->GetName() == "Evil Button")
+            /*    if (obj && obj->GetName() == "Evil Button")
                 {
                     if (ImGui::Button("Spawn 2500 Entities"))
                     {
                         DemoM1_SpawnGameObjects();
                         std::cout << "Spawned 2500 Circle Entities!\n";
                     }
-                }
+                }*/
 
                 ImGui::TreePop();
 
@@ -891,27 +999,60 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
  */
 void GOCreationMenu_Spawn()
 {
-    auto &factory = GameObjectFactory::Instance(); // Factory
-    GameObject *TempGO = nullptr;
+    //auto& factory = GameObjectFactory::Instance(); // Factory
+    //GameObject* TempGO = nullptr;
 
-    if (RenderComponent::ShapeType{current_shape} == RenderComponent::ShapeType::Empty)
+    //if (RenderComponent::ShapeType{ current_shape } == RenderComponent::ShapeType::Empty)
+    //{
+    //    TempGO = factory.CreateEmptyGO(tempGO.name, 20.f, 0.f, 5.f, 5.f);
+    //}
+    //else
+    //{
+    //    // very ugly colour code bc that uses a different vec 4 AAAA
+    //    TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
+    //        vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+    //}
+
+    ////Add transform component to assign transform values
+    //TempGO->AddComponent<TransformComponent>(0, 0);
+    //auto* transform = TempGO->GetComponent<TransformComponent>();
+
+    //transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
+    //transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
+    //transform->SetRotation(tempGO.rot);
+
+    // Determine creation type based on shape
+    CreateObjectMessage::ObjectType objType;
+    RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);
+
+    if (shapeType == RenderComponent::ShapeType::Empty)
     {
-        TempGO = factory.CreateEmptyGO(tempGO.name, 20.f, 0.f, 5.f, 5.f);
+        objType = CreateObjectMessage::ObjectType::Empty;
     }
     else
     {
-        // very ugly colour code bc that uses a different vec 4 AAAA
-        TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{current_shape}, 20.f, 0.f, 5.f, 5.f,
-                                     vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+        objType = CreateObjectMessage::ObjectType::Basic;
     }
 
-    // Add transform component to assign transform values
-    TempGO->AddComponent<TransformComponent>(0, 0);
-    auto *transform = TempGO->GetComponent<TransformComponent>();
+    // Gather data from your temporary editor object
+    float pos[2] = { tempGO.pos[0], tempGO.pos[1] };
+    float scale[2] = { tempGO.scale[0], tempGO.scale[1] };
+    float rot = tempGO.rot;
+    vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f); // assuming ImVec4 in editor
+    std::string name = tempGO.name;
+    // Build and send message
+    CreateObjectMessage msg(
+        name,          // GameObject name
+        objType,              // Empty or Basic
+        shapeType,            // ShapeType
+        pos, scale, rot,
+        color
+    );
 
-    transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
-    transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
-    transform->SetRotation(tempGO.rot);
+    std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;
+    //msg.Dispatch(*CORE);
+    CORE->GetMessageBus().Publish(msg);
+
 }
 
 /**

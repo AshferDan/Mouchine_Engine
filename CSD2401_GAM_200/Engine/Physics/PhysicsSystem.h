@@ -16,6 +16,8 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include <vector>
 
+#include "IMessageHandler.h"
+
 class GameObject;
 class PhysicsComponent;
 class TransformComponent;
@@ -68,6 +70,8 @@ public:
      */
     void ReportCollision(GameObject* obj1, GameObject* obj2,
         ColliderComponent* col1, ColliderComponent* col2);
+
+    void HandleMessage(const CollisionMessage& msg) override;
 
 private:
     /**

@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "Animator.hpp"
 #include "core.h"
 #include "Serialization.h"
+#include "IMessageHandler.h"
 
 bool InputManager::KeyStateImgui = true;
 
@@ -69,7 +70,7 @@ std::string InputManager::GetName()
 void InputManager::Update(float dt)
 {
     static bool keyPressed = false;
-    LevelEditor* levelEditor = CORE->GetLevelEditor();
+    LevelEditor *levelEditor = CORE->GetLevelEditor();
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
     {
         // still allow escape key, but ignore player movement inputs
@@ -99,17 +100,21 @@ void InputManager::Update(float dt)
             if (audioEngine)
             {
                 bgmPaused = !bgmPaused;
-                audioEngine->pauseSound("bgm_channel", bgmPaused);
-                std::cout << "bgm paused" << std::endl;
+                /*audioEngine->pauseSound("bgm_channel", bgmPaused);
+                std::cout << "bgm paused" << std::endl;*/
+
+                PauseSoundMessage msg("bgm_channel", bgmPaused);
+                std::cout << "[InputManager] Sending PauseSoundMessage: " << bgmPaused << "\n";
+                CORE->GetMessageBus().Publish(msg);
             }
             singleTriggerKeys[GLFW_KEY_M] = true;
         }
     }
 
-    for (auto& kv : singleTriggerKeys)
+    for (auto &kv : singleTriggerKeys)
     {
         int key = kv.first;
-        bool& wasPressed = kv.second;
+        bool &wasPressed = kv.second;
 
         if (glfwGetKey(window, key) == GLFW_PRESS)
         {
@@ -124,7 +129,8 @@ void InputManager::Update(float dt)
                 {
                     CORE->stepMode = !CORE->stepMode;
 
-                    if (!CORE->stepMode) {
+                    if (!CORE->stepMode)
+                    {
                         CORE->accumulator = 0.0;
                     }
 
@@ -149,224 +155,227 @@ void InputManager::Update(float dt)
         }
     }
 
-        auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
-        if (!player)
+    auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (!player)
+    {
+        return;
+    }
+
+    auto *physics = player->GetComponent<PhysicsComponent>();
+    if (!physics)
+    {
+        return;
+    }
+
+    TransformComponent *transform = player->GetComponent<TransformComponent>();
+    if (!transform)
+    {
+        return;
+    }
+
+    //// Ensure player has drag force for smooth stopping (add once)
+    // static bool dragInitialized = false;
+    // if (!dragInitialized && physics)
+    //{
+    //     auto& forcesManager = physics->GetForcesManager();
+    //     forcesManager.AddDrag();
+    //     dragInitialized = true;
+    // }
+
+    float vx, vy;
+    physics->GetVelocity(vx, vy);
+
+    /**
+     * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
+     */
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    {
+        DemoM1_DestroyGameObjects();
+    }
+
+    //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
+    // Horizontal movement using forces
+    /*float moveForce = 800.0f;*/ // Force magnitude for movement
+    float moveDirectionX = 0.0f;  // Track intended direction (1=Right, -1=Left)
+    bool is_jumping = false;
+
+    auto &forcesManager = physics->GetForcesManager();
+
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        moveDirectionX = -1.0f;
+
+        // Remove friction when actively moving
+        forcesManager.RemoveForcesByType(ForceType::Friction);
+        // Add left movement force using helper
+        forcesManager.AddForce(ForceType::MoveLeft);
+        // Remove right movement if present
+        forcesManager.RemoveForcesByType(ForceType::MoveRight);
+    }
+    else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        moveDirectionX = 1.0f;
+
+        // Remove friction when actively moving
+        forcesManager.RemoveForcesByType(ForceType::Friction);
+        // Add right movement force using helper
+        forcesManager.AddForce(ForceType::MoveRight);
+        // Remove left movement if present
+        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
+    }
+    else
+    {
+        // No movement keys pressed - remove all movement forces
+        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
+        forcesManager.RemoveForcesByType(ForceType::MoveRight);
+
+        // Add friction to slow down (only if not already present)
+        if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
         {
-            return;
+            forcesManager.AddFriction(&physics->isGrounded);
         }
 
-        auto* physics = player->GetComponent<PhysicsComponent>();
-        if (!physics)
+        // Reset footstep timer when not moving
+        footstepTimer = 0.0f;
+    }
+
+    // Handle footstep sounds
+    // Play footsteps if: moving horizontally, grounded, and not jumping
+    bool isMoving = std::abs(vx) > 0.1f; // Small threshold to avoid playing when barely moving
+    if (isMoving && physics->IsGrounded() && audioEngine)
+    {
+        footstepTimer += dt;
+
+        // Play footstep sound at intervals
+        if (footstepTimer >= footstepInterval)
         {
-            return;
+            audioEngine->playSound("footstep_sfx", "footstep_channel");
+            audioEngine->setVolume("footstep_channel", 1.0f);
+            footstepTimer = 0.0f; // reset timer
         }
+    }
+    else
+    {
+        // Reset timer when not moving or in air
+        footstepTimer = 0.0f;
+    }
 
-        TransformComponent* transform = player->GetComponent<TransformComponent>();
-        if (!transform)
+    // After forces are applied, clamp velocity
+    if (std::abs(vx) > 200.f)
+    {
+        float clampedVx = (vx > 0) ? 200.f : -200.f;
+        physics->SetVelocity(clampedVx, vy);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        KeyStateQuit = true;
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    /**
+     * @brief Toggle on and off imgui
+     */
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+    {
+        InputManager::KeyStateImgui = true;
+    }
+    // Jump
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        // Only jump if grounded
+        is_jumping = true;
+        if (physics->IsGrounded())
         {
-            return;
-        }
-
-        //// Ensure player has drag force for smooth stopping (add once)
-        //static bool dragInitialized = false;
-        //if (!dragInitialized && physics)
-        //{
-        //    auto& forcesManager = physics->GetForcesManager();
-        //    forcesManager.AddDrag();
-        //    dragInitialized = true;
-        //}
-
-        float vx, vy;
-        physics->GetVelocity(vx, vy);
-
-        /**
-         * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
-         */
-        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
-        {
-            DemoM1_DestroyGameObjects();
-        }
-
-        //---------------NEW SYSTEM USING PHYSICS FOR MOVEMENT-------------------//
-        // Horizontal movement using forces
-        /*float moveForce = 800.0f;*/ // Force magnitude for movement
-        float moveDirectionX = 0.0f;  // Track intended direction (1=Right, -1=Left)
-        bool is_jumping = false;
-
-        auto& forcesManager = physics->GetForcesManager();
-
-
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        {
-            moveDirectionX = -1.0f;
-
-            // Remove friction when actively moving
-            forcesManager.RemoveForcesByType(ForceType::Friction);
-            // Add left movement force using helper
-            forcesManager.AddForce(ForceType::MoveLeft);
-            // Remove right movement if present
-            forcesManager.RemoveForcesByType(ForceType::MoveRight);
-        }
-        else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        {
-            moveDirectionX = 1.0f;
-
-            // Remove friction when actively moving
-            forcesManager.RemoveForcesByType(ForceType::Friction);
-            // Add right movement force using helper
-            forcesManager.AddForce(ForceType::MoveRight);
-            // Remove left movement if present
-            forcesManager.RemoveForcesByType(ForceType::MoveLeft);
-        }
-        else
-        {
-            // No movement keys pressed - remove all movement forces
-            forcesManager.RemoveForcesByType(ForceType::MoveLeft);
-            forcesManager.RemoveForcesByType(ForceType::MoveRight);
-
-            // Reset footstep timer when not moving
-            footstepTimer = 0.0f;
-        }
-
-        // Handle footstep sounds
-        // Play footsteps if: moving horizontally, grounded, and not jumping
-        bool isMoving = std::abs(vx) > 0.1f; // Small threshold to avoid playing when barely moving
-        if (isMoving && physics->IsGrounded() && audioEngine)
-        {
-            footstepTimer += dt;
-
-            // Play footstep sound at intervals
-            if (footstepTimer >= footstepInterval)
+            is_jumping = false;
+            physics->GetForcesManager().AddForce(ForceType::Jump);
+            physics->GetVelocity(vx, vy); // Get updated VY after jump
+            // Play jump sound effect
+            if (audioEngine)
             {
-                audioEngine->playSound("footstep_sfx", "footstep_channel");
-                audioEngine->setVolume("footstep_channel", 1.0f);
-                footstepTimer = 0.0f; // reset timer
+                std::cout << "[InputManager] SPACE pressed to sending PlaySoundMessage\n";
+                std::cout << "[InputManager] CORE pointer = " << CORE << std::endl;
+                PlaySoundMessage msg("jump_sfx");
+                CORE->GetMessageBus().Publish(msg);
+                // audioEngine->playSound("jump_sfx", "jump_channel");
             }
+            /*if (audioEngine) {
+                Message msg;
+                msg.type = "PlaySound";
+                msg.sender = this;
+                msg.data = (void*)"jump_sfx";
+                CORE->GetMessageBus().Broadcast(msg);
+            }*/
         }
-        else
+    }
+    auto* anim = player->GetComponent<Spritesheet>();
+
+    if (transform && anim)
+    {
+
+        if (std::abs(moveDirectionX) > 0.0f)
         {
-            // Reset timer when not moving or in air
-            footstepTimer = 0.0f;
-            // Add friction to slow down (only if not already present)
-            if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
-            {
-                forcesManager.AddFriction(&physics->isGrounded);
-            }
+            float baseWidth = std::abs(transform->scaleX);
+            float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
+            transform->SetScale(newScaleX, transform->scaleY);
         }
 
+        const char* IDLE_SS = "./Assets/Mouch_Idle.png";
+        int _ROWS = 1;
+        int _COLS = 2;
+        const int FRAME_START = 0;
+        const int FRAME_END = 1;
+        const float IDLE_FPS = 2.0f;
+        const float RUN_FPS = 7.0f;
+        const char* RUN_SS = "./Assets/Mouch_Running.png";
+        const char* JUMP_SS = "./Assets/Mouch_jump.png";
+        // --------------------------------------------------------
 
-        // After forces are applied, clamp velocity
-        if (std::abs(vx) > 200.f) {
-            float clampedVx = (vx > 0) ? 200.f : -200.f;
-            physics->SetVelocity(clampedVx, vy);
-        }
+        float newFPS;
+        const char* newSpritesheet;
 
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        if (std::abs(vx) > 0.0f) // Player is running/moving
         {
-            KeyStateQuit = true;
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            newFPS = RUN_FPS;
+            newSpritesheet = RUN_SS;
         }
-        /**
-         * @brief Toggle on and off imgui
-         */
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        else if (is_jumping)
         {
-            InputManager::KeyStateImgui = true;
+            _COLS = 1;
+            newFPS = 0;
+            newSpritesheet = JUMP_SS;
         }
-        // Jump
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        else // Player is stopped (vx is 0)
         {
-            // Only jump if grounded
-            is_jumping = true;
-            if (physics->IsGrounded())
-            {
-                is_jumping = false;
-                physics->GetForcesManager().AddForce(ForceType::Jump);
-                physics->GetVelocity(vx, vy); // Get updated VY after jump
-                // Play jump sound effect
-                if (audioEngine)
-                {
-                    audioEngine->playSound("jump_sfx", "jump_channel");
-                }
-                /*if (audioEngine) {
-                    Message msg;
-                    msg.type = "PlaySound";
-                    msg.sender = this;
-                    msg.data = (void*)"jump_sfx";
-                    CORE->GetMessageBus().Broadcast(msg);
-                }*/
-            }
+            newFPS = IDLE_FPS;
+            newSpritesheet = IDLE_SS;
         }
 
-        auto* anim = player->GetComponent<Spritesheet>();
+        float desiredTimePerFrame = 1.0f / newFPS;
 
-        if (transform && anim)
+        if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
         {
 
-            if (std::abs(moveDirectionX) > 0.0f)
-            {
-                float baseWidth = std::abs(transform->scaleX);
-                float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
-                transform->SetScale(newScaleX, transform->scaleY);
-            }
+            anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
 
-            const char* IDLE_SS = "./Assets/Mouch_Idle.png";
-            int _ROWS = 1;
-            int _COLS = 2;
-            const int FRAME_START = 0;
-            const int FRAME_END = 1;
-            const float IDLE_FPS = 2.0f;
-            const float RUN_FPS = 7.0f;
-            const char* RUN_SS = "./Assets/Mouch_Running.png";
-            const char* JUMP_SS = "./Assets/Mouch_jump.png";
-            // --------------------------------------------------------
-
-            float newFPS;
-            const char* newSpritesheet;
-
-            if (std::abs(vx) > 0.0f) // Player is running/moving
-            {
-                newFPS = RUN_FPS;
-                newSpritesheet = RUN_SS;
-            }
-            else if (is_jumping)
-            {
-                _COLS = 1;
-                newFPS = 0;
-                newSpritesheet = JUMP_SS;
-            }
-            else // Player is stopped (vx is 0)
-            {
-                newFPS = IDLE_FPS;
-                newSpritesheet = IDLE_SS;
-            }
-
-            float desiredTimePerFrame = 1.0f / newFPS;
-
-            if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
-            {
-
-                anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
-
-                anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
-            }
+            anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
         }
+    }
 
-        // Note: Don't call SetVelocity anymore - forces handle movement
-        // The Integrate() method will update velocity based on forces
+    // Note: Don't call SetVelocity anymore - forces handle movement
+    // The Integrate() method will update velocity based on forces
 
-        // Mouse
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        {
-            std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
-        }
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-        {
-            std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
-        }
+    // Mouse
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
+        std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    {
+        std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
+    }
 
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        mouseX = xpos;
-        mouseY = ypos;
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    mouseX = xpos;
+    mouseY = ypos;
     }

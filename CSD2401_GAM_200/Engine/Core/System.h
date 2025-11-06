@@ -13,8 +13,10 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 #pragma once
 #include <string>
+#include "Message.h"
+#include "IMessageHandler.h"
 
-class ISystem
+class ISystem: public IMessageHandler
 {
 public:
     //virtual void SendMessage(Message* message) { UNREFERENCED_PARAMETER(message); };
