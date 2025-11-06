@@ -20,39 +20,3 @@ public:
 	virtual void HandleMessage(const CreateObjectMessage& msg) { (void)msg; }
 
 };
-
-
-// -------------- Inline dispatch implementations --------------
-//inline void KeyMessage::Dispatch(IMessageHandler& handler) const {
-//	handler.HandleMessage(*this);
-//}
-//
-//inline void PlaySoundMessage::Dispatch(IMessageHandler& handler) const {
-//	std::cout << "[Message] Dispatching PlaySoundMessage...\n";
-//	handler.HandleMessage(*this);
-//	std::cout << "[Message] Finished dispatch\n";
-//}
-//
-//inline void PauseSoundMessage::Dispatch(IMessageHandler& handler) const {
-//	std::cout << "[Message] Dispatching PauseSoundMessage...\n";
-//	handler.HandleMessage(*this);
-//	std::cout << "[Message] Finished dispatch\n";
-//}
-//
-//inline void CollisionMessage::Dispatch(IMessageHandler& handler) const {
-//	std::cout << "[Message] Dispatching CollisionMessage...\n";
-//	handler.HandleMessage(*this);
-//	std::cout << "[Message] Finished dispatch\n";
-//}
-//
-//inline void CreateObjectMessage::Dispatch(IMessageHandler& handler) const {
-//	std::cout << "[Message] Dispatching CreateObjectMessage..." << std::endl;
-//	handler.HandleMessage(*this);
-//	std::cout << "[Message] Finished dispatch" << std::endl;
-//}
-//
-//inline void PlayAnimationMessage::Dispatch(IMessageHandler& handler) const {
-//	std::cout << "[Message] Dispatching PlayAnimationMessage..." << std::endl;
-//	handler.HandleMessage(*this);
-//	std::cout << "[Message] Finished dispatch" << std::endl;
-//}

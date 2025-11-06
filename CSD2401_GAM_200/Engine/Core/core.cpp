@@ -112,10 +112,6 @@ void CoreEngine::InitSystems()
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
-    //messageBus.Subscribe(Message::Id::PLAY_SOUND, audioEngine);
-    //messageBus.Subscribe(Message::Id::PAUSE_SOUND, audioEngine);
-    //messageBus.Subscribe(Message::Id::COLLISION, physicsSystem);
-    //messageBus.Subscribe(Message::Id::CREATE_OBJECT, gameObjectSystem);
     messageBus.Subscribe<PlaySoundMessage>(audioEngine);
     messageBus.Subscribe<PauseSoundMessage>(audioEngine);
     messageBus.Subscribe<CollisionMessage>(physicsSystem);
