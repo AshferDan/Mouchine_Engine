@@ -136,6 +136,9 @@ void LevelEditor::Update(float /*dt*/)
 void LevelEditor::RenderPlayControls()
 {
     ImGui::Begin("Editor Controls");
+    ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2.f);
+    ImGui::BeginGroup();
+    
 
     const bool isRunning = (editorMode == EditorMode::Play || editorMode == EditorMode::Pause);
     const char *mainLabel = isRunning ? "Stop" : "Play";
@@ -157,8 +160,8 @@ void LevelEditor::RenderPlayControls()
 
     // status text
     ImGui::SameLine();
-    ImGui::TextDisabled("Mode: %s",
-                        editorMode == EditorMode::Play ? "Play" : editorMode == EditorMode::Pause ? "Pause" : "Stop");
+    ImGui::TextDisabled(" [Mode: %s",
+                        editorMode == EditorMode::Play ? "Play" : editorMode == EditorMode::Pause ? "Pause]" : "Stop]");
 
     if (!isRunning)
     {
@@ -168,6 +171,8 @@ void LevelEditor::RenderPlayControls()
     {
         ImGui::TextDisabled("Game running, use Pause/Stop.");
     }
+
+    ImGui::EndGroup();
     ImGui::End();
 }
 
@@ -1461,7 +1466,9 @@ void LevelEditor::PerformSceneReload()
 
     if (LoadLevelJSON(pendingScenePath))
     {
-        currentFilename = pendingScenePath;
+        std::string filename = fs::path(currentFilename).filename().string();
+
+        currentFilename = filename;
         std::cout << "[LevelEditor] Scene reloaded successfully.\n";
     }
     else

@@ -125,6 +125,8 @@ public:
     // Property Manager
     void RenderPropertyEditor();
 
+    void Viewport_ClickToSelect();
+
 private:
     /**
      * @brief Shutdown and cleanup ImGui resources.
@@ -149,6 +151,8 @@ private:
     std::filesystem::path currentDir;
 };
 
+extern ImVec2 viewportCursorPos;
+
 void Profiler_Render();
 
 void GOCreationMenu_Render();
@@ -170,8 +174,6 @@ void SendDragAndDrop(std::string const& PayloadID, DataType const& dataToSend, s
 void SendDragAndDrop(std::string const& PayloadID, std::string const& dataToSend, std::string const& displayText);
 
 void ReceiveDragAndDrop(std::string const& PayloadID, std::string& dataToReceive);
-
-void CompletedDragAndDrop();
 
 void TopMenuBar_Render();
 

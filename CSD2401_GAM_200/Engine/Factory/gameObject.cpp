@@ -96,6 +96,21 @@ void GameObject::Destroy() {
     components.clear();
 }
 
+void GameObject::SetActive(bool active)
+{
+    isActive = active; 
+
+    std::vector<EntityID> familyTree{};
+    GetFamilyTree(this, familyTree);
+
+    for (auto& childID : familyTree)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* child = factory.GetGameObject(childID);
+        child->SetActive(active);
+    }
+}
+
 void GameObject::AddChild(GameObject* ChildGO)
 {
     ChildGO->parent = this;
