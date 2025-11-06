@@ -239,8 +239,8 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
     // Text Shader Initialize
-    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "./Shaders/text.vert"},
-                                    {GL_FRAGMENT_SHADER, "./Shaders/text.frag"}});
+    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/text.vert"},
+                                    {GL_FRAGMENT_SHADER, "../Shaders/text.frag"}});
 
     glGenVertexArrays(1, &textVAO);
     glGenBuffers(1, &textVBO);
