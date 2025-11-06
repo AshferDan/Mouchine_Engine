@@ -343,4 +343,8 @@ private:
     float zoomSpeed;                      // camera zoom sensitivity
     float minZoom;                        // minimum zoom level
     float maxZoom;                        // maximum zoom level
+
+    std::string currentBGMName = "";
+    std::string currentBGMChannel = "bgm_channel";
+    float currentBGMVolume = 0.5f;
 };

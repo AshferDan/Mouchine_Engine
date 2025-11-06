@@ -18,7 +18,7 @@ Technology is prohibited.
 #include "IMessageHandler.h"
 
 bool InputManager::KeyStateQuit = false;
-CoreEngine* CORE;
+CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
@@ -53,9 +53,9 @@ CoreEngine::~CoreEngine()
    window width and height to the graphics system
 
    */
-void CoreEngine::ConfigFile(const char* configF)
+void CoreEngine::ConfigFile(const char *configF)
 {
-    std::ifstream fp{ configF };
+    std::ifstream fp{configF};
     if (!fp)
     {
         std::cout << "Cannot find file" << std::endl;
@@ -113,7 +113,7 @@ void CoreEngine::InitSystems()
     scriptSystem = AddSystem<ScriptSystem>();
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
-    
+
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
@@ -121,7 +121,6 @@ void CoreEngine::InitSystems()
     messageBus.Subscribe<PauseSoundMessage>(audioEngine);
     messageBus.Subscribe<CollisionMessage>(physicsSystem);
     messageBus.Subscribe<CreateObjectMessage>(gameObjectSystem);
-
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
@@ -160,13 +159,15 @@ void CoreEngine::GameLoop()
     while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
     {
 
-        if (m_hasPendingLoad) {
-            LevelEditor* level = GetLevelEditor();
+        if (m_hasPendingLoad)
+        {
+            LevelEditor *level = GetLevelEditor();
             level->LoadLevelJSON(m_pendingScene);
-                m_pendingScene = "";
-                m_hasPendingLoad = false;
-            
-            if (inputManager) inputManager->ResetState();
+            m_pendingScene = "";
+            m_hasPendingLoad = false;
+
+            if (inputManager)
+                inputManager->ResetState();
             CameraManager::Instance().ResetState();
             accumulator = 0.0;
         }
@@ -197,7 +198,7 @@ void CoreEngine::GameLoop()
             g_systemTimings[debugSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
-        if (scriptSystem) 
+        if (scriptSystem)
             g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
@@ -317,9 +318,6 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
-
-
-
         if (debugSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -354,8 +352,6 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
-
-
 
         // End ImGui frame and render
         if (imguiSystem)
@@ -422,7 +418,7 @@ void CoreEngine::update_time(double fps_calc_interval)
 
     title_str = "Game Engine | FPS:" + tempfps + " | DT: " + tempdt + " | Fixed DT: " + tempfixeddt;
 
-    GLFWwindow* Wind = CORE->GetGraphicsSystem()->getWindow();
+    GLFWwindow *Wind = CORE->GetGraphicsSystem()->getWindow();
     if (Wind)
     {
         glfwSetWindowTitle(Wind, title_str.c_str());
