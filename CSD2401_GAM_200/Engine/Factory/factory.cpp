@@ -578,7 +578,7 @@ void DemoM1_SpawnGameObjects()
     std::uniform_int_distribution<int> distributionX(-960, 960);
     std::uniform_int_distribution<int> distributionY(-540, 540);
 
-    GLuint sharedTextureID = GraphicsSystem::LoadTexture("./Assets/Mouch_idle.png");
+    GLuint sharedTextureID = GraphicsSystem::LoadTexture("../Assets/Mouch_idle.png");
 
     // spawn 2.5k small circles
     for (size_t i = 0; i < 1000; i++)
@@ -586,7 +586,7 @@ void DemoM1_SpawnGameObjects()
         int intX{distributionX(gen)}, intY{distributionY(gen)};
         std::string uniqueName = "Demo Circle " + std::to_string(i);
         // GameObject *newGO = factory.CreateShape(uniqueName, RenderComponent::ShapeType::Circle, static_cast<float>(intX), static_cast<float>(intY), 40.f, 40.f, vec4(1.f, 0.f, 0.f, 1.f));
-        // GameObject* newGO = factory.CreateAnimatedImage(uniqueName, static_cast<float>(intX), static_cast<float>(intY), 40.0, 40.0, "./Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Ground);
+        // GameObject* newGO = factory.CreateAnimatedImage(uniqueName, static_cast<float>(intX), static_cast<float>(intY), 40.0, 40.0, "../Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Ground);
 
         GameObject *newGO = factory.CreateGameObject(uniqueName);
 
