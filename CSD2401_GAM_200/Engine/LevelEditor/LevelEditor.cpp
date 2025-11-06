@@ -3,6 +3,7 @@
 #include "physics.h"
 #include "ResourceManager.h"
 #include "Serialization.h"
+#include "audio.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -24,7 +25,7 @@ LevelEditor::LevelEditor()
     editorMode(EditorMode::Stop),
     hasUnsavedChanges(false),
     hasValidSaveState(false),
-    cameraX(0.0f),  cameraY(0.0f), cameraZoom(1.0f),
+    cameraX(0.0f), cameraY(0.0f), cameraZoom(1.0f),
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
     zoomSpeed(0.1f),    //zoom to be implemented
     minZoom(0.1f),
@@ -224,6 +225,15 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
+
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine)
+    {
+        std::cout << "[LevelEditor] Starting background music..." << std::endl;
+        audioEngine->playSound("bgm", "bgm_channel");
+        audioEngine->setVolume("bgm_channel", 0.2f);
+    }
+
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
 
@@ -232,6 +242,13 @@ void LevelEditor::StopPlayMode()
 {
     if (editorMode == EditorMode::Stop)
         return;
+
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine)
+    {
+        std::cout << "[LevelEditor] Stopping background music..." << std::endl;
+        audioEngine->stopSound("bgm_channel");
+    }
 
     RestoreSceneState();           // restore saved scene
     hasValidSaveState = false;
@@ -244,14 +261,40 @@ void LevelEditor::StopPlayMode()
 // pause state
 void LevelEditor::TogglePause()
 {
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+
     if (editorMode == EditorMode::Play)
     {
         editorMode = EditorMode::Pause;
+
+        // pause background music
+        if (audioEngine)
+        {
+            std::cout << "[LevelEditor] Attempting to pause music on channel 'bgm_channel'..." << std::endl;
+            audioEngine->pauseSound("bgm_channel", true);
+
+            // verify if it's actually playing
+            bool stillPlaying = audioEngine->isPlaying("bgm_channel");
+            std::cout << "[LevelEditor] After pause, isPlaying = " << (stillPlaying ? "true" : "false") << std::endl;
+        }
+        else
+        {
+            std::cout << "[LevelEditor] ERROR: AudioEngine is null!" << std::endl;
+        }
+
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
     else if (editorMode == EditorMode::Pause)
     {
         editorMode = EditorMode::Play;
+
+        // resume background music
+        if (audioEngine)
+        {
+            std::cout << "[LevelEditor] Attempting to resume music on channel 'bgm_channel'..." << std::endl;
+            audioEngine->pauseSound("bgm_channel", false);
+        }
+
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
@@ -462,127 +505,6 @@ void LevelEditor::RenderMenuBar()
 
     ImGui::End();
 }
-
-/*void LevelEditor::RenderHierarchy()
-{
-    ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 600), ImGuiCond_FirstUseEver);
-
-    if (!ImGui::Begin("Hierarchy##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
-    {
-        ImGui::End();
-        return;
-    }
-
-    // Render top part to show adding of GOs
-    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
-    {
-        // this is a file, not sure if we wanna do anything yet
-        //ShowCreateGOMenu = true;
-    }
-
-    // display current file name
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
-    ImGui::Text("Scene: %s", currentFilename.c_str());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-
-    // display object count
-    auto &allObjects = factory.GetAllGameObjects();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-    ImGui::Text("Game Objects: %zu", allObjects.size());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-
-    // list all game objects
-    for (const auto &objPtr : allObjects)
-    {
-        if (!objPtr->IsActive())
-            continue;
-
-        GameObject *obj = objPtr.get();
-        EntityID id = obj->GetID();
-
-        // highlight if selected
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        if (selectedGameObjectID == id)
-        {
-            flags |= ImGuiTreeNodeFlags_Selected;
-        }
-
-        bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)",
-                                          obj->GetName().c_str(), id);
-
-        // enter drag and drop stuff here
-
-        {
-            // might wanna send id as data instead
-            if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-            {
-                SendDragAndDrop(HierarchyPayloadID, obj->GetName(), obj->GetName());
-            }
-        }
-
-        {
-            std::string testdata{};
-            ReceiveDragAndDrop(HierarchyPayloadID, testdata);
-            // Do something with DnD data
-            if (!testdata.empty())
-            {
-                if (testdata != obj->GetName())
-                {
-                    std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
-                }
-                else
-                {
-                    std::cout << "[Hierarchy] Invalid Drag and Drop source!\n";
-                }
-                //CompletedDragAndDrop();
-            }
-        }
-
-        // select on click
-        if (ImGui::IsItemClicked())
-        {
-            SetSelectedGameObject(id);
-        }
-
-        // context menu
-        if (ImGui::BeginPopupContextItem())
-        {
-            if (ImGui::MenuItem("Select"))
-            {
-                SetSelectedGameObject(id);
-            }
-            if (ImGui::MenuItem("Save as Prefab"))
-            {
-                Serialization::SavePrefab(*obj);
-            }
-            if (ImGui::MenuItem("Clone"))
-            {
-                factory.CloneGameObject(id);
-            }
-            if (ImGui::MenuItem("Delete"))
-            {
-                RemoveGameObject(id);
-                if (selectedGameObjectID == id)
-                    selectedGameObjectID = 0;
-            }
-            ImGui::EndPopup();
-        }
-    }
-
-    // deselect when clicking on empty space in the hierarchy
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-    {
-        if (!ImGui::IsAnyItemHovered())
-        {
-            selectedGameObjectID = 0;
-        }
-    }
-    ImGui::End();
-}
-*/
 
 bool LevelEditor::SaveLevelJSON(const std::string &filepath)
 {
