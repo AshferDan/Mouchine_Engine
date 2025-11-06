@@ -185,8 +185,12 @@ void ImGuiSystem::Update(float dt)
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
 
-        TopMenuBar_Render();
-        Hierarchy_Render();
+        LevelEditor* levelEditor = CORE->GetLevelEditor();
+        if (!levelEditor || levelEditor->GetEditorMode() != EditorMode::Play)
+        {
+            TopMenuBar_Render();
+            Hierarchy_Render();
+        }
 
         // render property editor for selected game object
         if (showPropertyEditor)

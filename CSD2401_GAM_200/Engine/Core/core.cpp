@@ -259,6 +259,16 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
+                if (scriptSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    scriptSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[scriptSystem->GetName()] = ms;
+                    g_totalLoopTime += ms;
+                }
+
                 stepOnce = false; // Reset after processing one frame
             }
 
@@ -277,16 +287,6 @@ void CoreEngine::GameLoop()
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[graphicsSystem->GetName()] = ms;
-            g_totalLoopTime += ms;
-        }
-
-        if (scriptSystem)
-        {
-            std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            scriptSystem->Update(static_cast<float>(delta_time)); // Use variable delta_time
-            std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[scriptSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
