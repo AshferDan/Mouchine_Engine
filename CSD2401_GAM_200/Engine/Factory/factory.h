@@ -299,6 +299,8 @@ public:
     void SetNextEntityID(EntityID id);
     EntityID GetNextEntityID() const;
 
+    GameObject* FindByName(const std::string& name);
+
 private:
     GameObjectFactory() : nextEntityID(1), cloneCounter(0) {}
     EntityID nextEntityID;

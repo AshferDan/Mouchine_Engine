@@ -21,6 +21,9 @@ Technology is prohibited.
 #include <cmath>
 #include "MathLib.h"
 
+#include "Message.h"
+#include "IMessageHandler.h"
+
 /**
  * @brief Default constructor
  */
@@ -328,4 +331,21 @@ void PhysicsSystem::ResolveMixed(GameObject* obj1, GameObject* obj2,
             }
         }
     }
+}
+
+void PhysicsSystem::HandleMessage(const CollisionMessage& msg) {
+    // msg.objectA and msg.objectB are GameObject pointers
+    GameObject* objA = static_cast<GameObject*>(msg.objectA);
+    GameObject* objB = static_cast<GameObject*>(msg.objectB);
+
+    if (!objA || !objB)
+        return;
+
+    auto* colA = objA->GetComponent<ColliderComponent>();
+    auto* colB = objB->GetComponent<ColliderComponent>();
+    if (!colA || !colB)
+        return;
+
+    // Queue for resolution during physics update
+    pendingCollisions.push_back({ objA, objB, colA, colB });
 }

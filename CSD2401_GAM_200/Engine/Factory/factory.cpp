@@ -549,6 +549,17 @@ EntityID GameObjectFactory::GetNextEntityID() const
     return nextEntityID;
 }
 
+GameObject* GameObjectFactory::FindByName(const std::string& name)
+{
+    for (auto& go : gameObjects)
+    {
+        if (go && go->GetName() == name)
+            return go.get();
+    }
+    return nullptr;
+}
+
+
 #pragma region M1 Showcase - 2500 GOs Test
 
 // Vector to store all GOs made by test function

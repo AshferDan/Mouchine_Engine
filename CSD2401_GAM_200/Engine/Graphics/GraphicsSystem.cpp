@@ -15,7 +15,7 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
 
-const char *configFile = "./Logs/config.txt";
+const char *configFile = "../Logs/config.txt";
 const double two_pi = 6.28318530717958647692528676655900576;
 
 GraphicsSystem::GraphicsSystem()
@@ -147,8 +147,8 @@ void GraphicsSystem::Initialize()
 
     // Compile and link the default shader program for rendering.
     // Requires "vertices.vert" (vertex shader) and "fragment.frag" (fragment shader).
-    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "./Shaders/vertices.vert"},
-                                {GL_FRAGMENT_SHADER, "./Shaders/fragment.frag"}});
+    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/vertices.vert"},
+                                {GL_FRAGMENT_SHADER, "../Shaders/fragment.frag"}});
 
     // Define vertex structure for a textured quad.
     struct Vertex
@@ -239,8 +239,8 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
     // Text Shader Initialize
-    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "./Shaders/text.vert"},
-                                    {GL_FRAGMENT_SHADER, "./Shaders/text.frag"}});
+    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/text.vert"},
+                                    {GL_FRAGMENT_SHADER, "../Shaders/text.frag"}});
 
     glGenVertexArrays(1, &textVAO);
     glGenBuffers(1, &textVBO);
@@ -970,4 +970,17 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     clonedComponent->SetLayer(this->layer);
 
     return clonedComponent;
+}
+
+void GraphicsSystem::HandleMessage(const CreateObjectMessage& msg)
+{
+    GameObject* go = GameObjectFactory::Instance().FindByName(msg.name);
+    if (!go)
+        return;
+
+    RenderComponent* render = go->AddComponent<RenderComponent>();
+    render->SetShapeType(msg.shapeType);
+    render->SetColor({ msg.color.x, msg.color.y, msg.color.z, msg.color.w });
+
+    std::cout << "[GraphicsSystem] Added RenderComponent to: " << msg.name << "\n";
 }

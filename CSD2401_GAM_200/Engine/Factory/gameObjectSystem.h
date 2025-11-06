@@ -14,6 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 #pragma once
 #include "System.h"
+#include "IMessageHandler.h"
+#include "Message.h"
 
 class GameObjectFactory;
 
@@ -24,6 +26,7 @@ public:
     void Update(float timeslice) override;
     std::string GetName() override { return "GameObjectSystem"; }
     void Initialize() override;
+    void HandleMessage(const CreateObjectMessage& msg);
 
 private:
     GameObjectFactory& factory;

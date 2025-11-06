@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>GameScripts</AssemblyName>
+    <RootNamespace>GameScripts</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    
+<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- Output path - adjust to match your C++ project structure -->
+        <OutputPath>..\Build\Scripts\</OutputPath>
+
+    <!-- Generate PDB for debugging -->
+    <DebugType>portable</DebugType>
+    <Platforms>AnyCPU;ARM64</Platforms>
+  </PropertyGroup>
+</Project>

@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "Factory.h"
 #include <iostream>
+#include "Message.h"
  GameObjectSystem::GameObjectSystem() : factory(GameObjectFactory::Instance()) {}
 
 
@@ -49,3 +50,86 @@ Technology is prohibited.
          }
      }
  }
+
+ void GameObjectSystem::HandleMessage(const CreateObjectMessage& msg)
+ {
+     std::cout << "[GameObjectSystem] Received CreateObjectMessage for "
+         << msg.name << " (Type: " << static_cast<int>(msg.type) << ")\n";
+
+     GameObjectFactory& factory = GameObjectFactory::Instance();
+     GameObject* go = nullptr;
+
+     switch (msg.type)
+     {
+
+     case CreateObjectMessage::ObjectType::Empty:
+     {
+         std::cout << "[GameObjectSystem] Creating EMPTY GameObject: " << msg.name << "\n";
+
+         // Use your existing CreateEmptyGO() exactly as is
+         go = factory.CreateEmptyGO(
+             msg.name,
+             msg.pos[0],
+             msg.pos[1],
+             msg.scale[0],
+             msg.scale[1]
+         );
+
+         break;
+     }
+
+     case CreateObjectMessage::ObjectType::Basic:
+     {
+         std::cout << "[GameObjectSystem] Creating BASIC GameObject: " << msg.name << "\n";
+
+         // Use the normal CreateGameObject()
+         go = factory.CreateGameObject(msg.name);
+         if (!go) break;
+
+         // --- Transform (always required) ---
+         auto* transform = go->AddComponent<TransformComponent>();
+         if (transform)
+         {
+             transform->SetPosition(msg.pos[0], msg.pos[1]);
+             transform->SetScale(msg.scale[0], msg.scale[1]);
+             transform->SetRotation(msg.rotation);
+         }
+
+         // --- Render ---
+         auto* render = go->AddComponent<RenderComponent>();
+         if (render)
+         {
+             render->SetShapeType(msg.shapeType);
+             render->SetColor({ msg.color.x, msg.color.y, msg.color.z, msg.color.w });
+         }
+
+         // --- Physics ---
+         //go->AddComponent<PhysicsComponent>();
+
+         // --- Collider ---
+         go->AddComponent<ColliderComponent>();
+
+         break;
+     }
+
+     case CreateObjectMessage::ObjectType::Prefab:
+     {
+         std::cout << "[GameObjectSystem] Creating PREFAB GameObject: " << msg.name << "\n";
+         break;
+     }
+
+     default:
+         std::cerr << "[GameObjectSystem] Unknown CreateObjectMessage type!\n";
+         break;
+     }
+
+     if (go)
+     {
+         std::cout << "[GameObjectSystem] Created object ptr: " << go << " Name: " << go->GetName() << std::endl;
+         std::cout << "   Has Transform: " << (go->GetComponent<TransformComponent>() ? "Yes" : "No") << std::endl;
+         std::cout << "   Has Render:    " << (go->GetComponent<RenderComponent>() ? "Yes" : "No") << std::endl;
+         std::cout << "   Has Physics:   " << (go->GetComponent<PhysicsComponent>() ? "Yes" : "No") << std::endl;
+         std::cout << "   Has Collider:  " << (go->GetComponent<ColliderComponent>() ? "Yes" : "No") << std::endl;
+     }
+ }
+
