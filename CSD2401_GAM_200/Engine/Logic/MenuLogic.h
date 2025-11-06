@@ -21,7 +21,10 @@ public:
     std::string GetName() override { return "MenuLogicSystem"; }
 
     void Initialize() override {}
+ 
 
 private:
-    bool IsButtonClicked(GameObject* button, double mouseX, double mouseY);
+    std::string hoveredButtonName = "";
+    bool IsMouseOver(GameObject* button, double mouseX, double mouseY);
+    void SetButtonTexture(std::string buttonName, bool isHovered);
 };

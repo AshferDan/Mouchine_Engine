@@ -191,6 +191,7 @@ public:
         return menuLogicSystem;
     }
 
+    AudioEngine* GetAudioEngine() const { return audioEngine; }
     /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
@@ -238,6 +239,8 @@ public:
      */
     static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
 
+
+
     void RequestSceneLoad(const std::string& sceneName) {
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
@@ -268,7 +271,7 @@ private:
     CameraSystem *cameraSystem = nullptr;
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem* menuLogicSystem = nullptr;
-
+ 
 
     unsigned LastTime;
     bool GameActive;
