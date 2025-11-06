@@ -28,7 +28,7 @@ namespace GameScripts
             GameObject.CreateShape(
                 "BlueSquare",                    // name
                 (int)ShapeType.Square,           // type: square
-                500, 300,                        // x, y position
+                300, 300,                        // x, y position
                 300, 300,                        // width, height
                 0.0f, 0.0f, 1.0f, 1.0f,          // r, g, b, a (blue color)
                 (int)CollisionLayer.Default,     // collision layer
@@ -46,9 +46,25 @@ namespace GameScripts
                 false,false,
                 false);
 
+            // Create second square - Blue, on the right
+            GameObject.CreateShape(
+                "Ground",                    // name
+                (int)ShapeType.Square,           // type: square
+                0, -500,                        // x, y position
+                3000, 500,                        // width, height
+                0.0f, 0.0f, 0.0f, 1.0f,          // r, g, b, a (blue color)
+                (int)CollisionLayer.Ground,     // collision layer
+                true,                           // hasPhysics = false (no physics)
+                true,                           // isStatic
+                false                            // hasGravity = false (no gravity)
+            );
+
             Debug.Log("Adding Physics BLUESQUARE");
             Components.AddPhysicsComponent("BlueSquare");
+            
         }
+
+        
 
         public void OnUpdate(float deltaTime)
         {
