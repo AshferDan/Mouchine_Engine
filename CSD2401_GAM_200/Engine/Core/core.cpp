@@ -180,6 +180,11 @@ void CoreEngine::GameLoop()
         // Start ImGui frame
         if (imguiSystem)
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glViewport(0, 0, graphicsSystem->GetWindowWidth(), graphicsSystem->GetWindowHeight());
+            glClearColor(0.15f, 0.15f, 0.15f, 1.f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
@@ -199,8 +204,10 @@ void CoreEngine::GameLoop()
                 g_totalLoopTime += ms;
             }
 
-            // Only run physics if NOT in step mode, OR if stepping once
-            if (!stepMode || stepOnce)
+            bool isPaused = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause);
+
+            // Only run physics if NOT in step mode/paused, OR if stepping once
+            if ((!stepMode && !isPaused) || stepOnce)
             {
                 // Update physics-dependent systems with FIXED timestep
                 if (gameObjectSystem)
@@ -292,6 +299,11 @@ void CoreEngine::GameLoop()
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[levelEditor->GetName()] = ms;
             g_totalLoopTime += ms;
+        }
+
+        if (levelEditor && levelEditor->HasPendingSceneReload())
+        {
+            levelEditor->PerformSceneReload();
         }
 
         if (imguiSystem)

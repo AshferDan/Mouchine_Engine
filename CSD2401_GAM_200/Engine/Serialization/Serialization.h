@@ -23,6 +23,7 @@ Technology is prohibited.
 using json = nlohmann::json;
 const std::string PrefabFilePath { "../Assets/Prefabs/" };
 const std::string SceneFilePath{ "../Assets/Scenes/" };
+const std::string LayoutsFilePath{ "../Logs/EditorLayout/" };
 
 namespace Serialization
 {
@@ -50,4 +51,6 @@ namespace Serialization
 
     void RemovePrefab(std::string const& prefabName);
     void RenamePrefab(std::string const& oldName, std::string const& newName);
+
+    extern bool Prefab_DragAndDropped;
 }

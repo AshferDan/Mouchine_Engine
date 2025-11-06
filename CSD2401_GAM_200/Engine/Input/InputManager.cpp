@@ -200,8 +200,10 @@ void InputManager::Update(float dt)
     {
         moveDirectionX = -1.0f;
 
+        // Remove friction when actively moving
+        forcesManager.RemoveForcesByType(ForceType::Friction);
         // Add left movement force using helper
-        forcesManager.AddForce(ForceType::MoveLeft, physics->GetMass());
+        forcesManager.AddForce(ForceType::MoveLeft);
         // Remove right movement if present
         forcesManager.RemoveForcesByType(ForceType::MoveRight);
     }
@@ -209,8 +211,10 @@ void InputManager::Update(float dt)
     {
         moveDirectionX = 1.0f;
 
+        // Remove friction when actively moving
+        forcesManager.RemoveForcesByType(ForceType::Friction);
         // Add right movement force using helper
-        forcesManager.AddForce(ForceType::MoveRight, physics->GetMass());
+        forcesManager.AddForce(ForceType::MoveRight);
         // Remove left movement if present
         forcesManager.RemoveForcesByType(ForceType::MoveLeft);
     }
@@ -219,6 +223,43 @@ void InputManager::Update(float dt)
         // No movement keys pressed - remove all movement forces
         forcesManager.RemoveForcesByType(ForceType::MoveLeft);
         forcesManager.RemoveForcesByType(ForceType::MoveRight);
+
+        // Add friction to slow down (only if not already present)
+        if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
+        {
+            forcesManager.AddFriction(&physics->isGrounded);
+        }
+
+        // Reset footstep timer when not moving
+        footstepTimer = 0.0f;
+    }
+
+    // Handle footstep sounds
+    // Play footsteps if: moving horizontally, grounded, and not jumping
+    bool isMoving = std::abs(vx) > 0.1f; // Small threshold to avoid playing when barely moving
+    if (isMoving && physics->IsGrounded() && audioEngine)
+    {
+        footstepTimer += dt;
+
+        // Play footstep sound at intervals
+        if (footstepTimer >= footstepInterval)
+        {
+            audioEngine->playSound("footstep_sfx", "footstep_channel");
+            audioEngine->setVolume("footstep_channel", 1.0f);
+            footstepTimer = 0.0f; // reset timer
+        }
+    }
+    else
+    {
+        // Reset timer when not moving or in air
+        footstepTimer = 0.0f;
+    }
+
+    // After forces are applied, clamp velocity
+    if (std::abs(vx) > 200.f)
+    {
+        float clampedVx = (vx > 0) ? 200.f : -200.f;
+        physics->SetVelocity(clampedVx, vy);
     }
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -241,7 +282,7 @@ void InputManager::Update(float dt)
         if (physics->IsGrounded())
         {
             is_jumping = false;
-            physics->GetForcesManager().AddForce(ForceType::Jump, physics->GetMass());
+            physics->GetForcesManager().AddForce(ForceType::Jump);
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
             if (audioEngine)
@@ -270,15 +311,15 @@ void InputManager::Update(float dt)
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        const char *IDLE_SS = "../Assets/Mouch_Idle.png";
+        const char *IDLE_SS = "./Assets/Mouch_Idle.png";
         int _ROWS = 1;
         int _COLS = 2;
         const int FRAME_START = 0;
         const int FRAME_END = 1;
         const float IDLE_FPS = 2.0f;
         const float RUN_FPS = 7.0f;
-        const char *RUN_SS = "../Assets/Mouch_Running.png";
-        const char *JUMP_SS = "../Assets/Mouch_jump.png";
+        const char *RUN_SS = "./Assets/Mouch_Running.png";
+        const char *JUMP_SS = "./Assets/Mouch_jump.png";
         // --------------------------------------------------------
 
         float newFPS;

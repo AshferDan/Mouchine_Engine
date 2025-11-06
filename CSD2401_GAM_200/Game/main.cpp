@@ -53,17 +53,19 @@ int main()
         AudioEngine audio;
 
         API::Init_Engine(engine, audio);
-        
+
         Serialization::LoadScene("Prefab_TestScene");
 
         GameObject *textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
-        textObj->AddComponent<TransformComponent>(100.0f, 100.0f); // Position on screen
+        textObj->AddComponent<TransformComponent>(100.f, 100.f); // Position on screen
+        textObj->AddComponent<RenderComponent>();
         auto *text = textObj->AddComponent<TextComponent>(
             "./Assets/FrederickatheGreat-Regular.ttf",
             48, // Font size
             "Score: 0",
             vec4(1.0f, 1.0f, 1.0f, 1.0f),
             true);
+        text->SetScreenSpace(true);
         text->SetScale(1.0f);
 
         // Later, update the text:
@@ -86,9 +88,9 @@ int main()
 
         std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
-        ScriptSystem* scriptSys = engine.GetScriptSystem();
+        ScriptSystem *scriptSys = engine.GetScriptSystem();
 
-        GameObject* squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
         if (scriptSys && squareSpawner)
         {
             // Attach the TestGameObject script (creates red and blue squares)
@@ -115,7 +117,6 @@ int main()
             if (!squareSpawner)
                 std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
         }
-
 
         API::StartEngineLoop(engine);
     }
@@ -182,4 +183,3 @@ namespace CrashHandler
         log.close();
     }
 } // namespace CrashHandler
-

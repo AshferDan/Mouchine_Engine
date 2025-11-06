@@ -17,6 +17,8 @@ Technology is prohibited.
 std::unordered_map<GLuint, std::string> s_TexturePathByID;
 std::unordered_map<std::string, GLuint> s_IDByTexturePath;
 
+bool Serialization::Prefab_DragAndDropped;
+
 // ------------------- Serialize -------------------
 /**
  * @brief Serializes the TransformComponent into JSON.
@@ -111,7 +113,17 @@ void ComponentSerialization::DeserializeTransform(const json& j, GameObject* go)
     const auto& t = j["TransformComponent"];
     auto* tc = go->AddComponent<TransformComponent>();
 
-    tc->SetPosition(t["pos"][0], t["pos"][1]);
+    if (Serialization::Prefab_DragAndDropped)
+    {
+        std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
+        tc->SetPosition(ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
+    }
+    else
+    {
+        std::cout << "[DeserializeTransform] Prefab transform set to serialised pos\n";
+        tc->SetPosition(t["pos"][0], t["pos"][1]);
+    }
+
     tc->SetScale(t["scale"][0], t["scale"][1]);
     tc->SetRotation(t["rotation"]);
 }

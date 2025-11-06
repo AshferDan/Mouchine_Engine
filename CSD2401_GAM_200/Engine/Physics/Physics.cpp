@@ -110,7 +110,7 @@ void PhysicsComponent::Integrate(float dt)
     // Add constant gravity acceleration if enabled
     if (useGravity)
     {
-        const float gravityY = -387.0f;
+        const float gravityY = -381.0f;
         accelY += gravityY;
     }
 

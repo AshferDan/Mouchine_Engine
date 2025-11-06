@@ -15,6 +15,7 @@ Technology is prohibited.
 
 #include "transform.h"
 #include "GameObject.h"
+#include "factory.h"
 #include <iostream>
 #include <cmath>
 
@@ -45,8 +46,32 @@ std::unique_ptr<IComponent> TransformComponent::Clone(GameObject *NewClone) cons
  */
 void TransformComponent::SetPosition(float x, float y)
 {
+    float diffX{ posX - x }, diffY{ posY - y };
     posX = x;
     posY = y;
+    if (!owner->GetAllChildren().empty())
+    {
+        GameObjectFactory& factory = GameObjectFactory::Instance();
+        GameObject* GO = factory.GetGameObject(owner->GetID());
+        std::vector<EntityID> familyTree{};
+        GetFamilyTree(GO, familyTree);
+
+        std::cout << "GetFamilyTree() has: \n";
+        for (auto const& r : familyTree)
+        {
+            std::cout << r << std::endl;
+        }
+
+        // incredibly scuffed but it kinda works
+        // better to add a local (WRT parent) and global (scene space) vec2 for positions, then just adjust accordingly
+        for (auto& childID : familyTree)
+        {
+            GameObject* childGO = factory.GetGameObject(childID);
+            vec2 newPos{};
+            childGO->GetComponent<TransformComponent>()->GetPosition(newPos.x, newPos.y);
+            childGO->GetComponent<TransformComponent>()->SetPosition(newPos.x + diffX, newPos.y + diffY);
+        }
+    }
 }
 
 /**
