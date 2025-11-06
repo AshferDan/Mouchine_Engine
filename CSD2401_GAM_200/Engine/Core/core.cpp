@@ -195,8 +195,10 @@ void CoreEngine::GameLoop()
                 g_totalLoopTime += ms;
             }
 
-            // Only run physics if NOT in step mode, OR if stepping once
-            if (!stepMode || stepOnce)
+            bool isPaused = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause);
+
+            // Only run physics if NOT in step mode/paused, OR if stepping once
+            if ((!stepMode && !isPaused) || stepOnce)
             {
                 // Update physics-dependent systems with FIXED timestep
                 if (gameObjectSystem)
@@ -278,6 +280,11 @@ void CoreEngine::GameLoop()
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[levelEditor->GetName()] = ms;
             g_totalLoopTime += ms;
+        }
+
+        if (levelEditor && levelEditor->HasPendingSceneReload())
+        {
+            levelEditor->PerformSceneReload();
         }
 
         if (imguiSystem)

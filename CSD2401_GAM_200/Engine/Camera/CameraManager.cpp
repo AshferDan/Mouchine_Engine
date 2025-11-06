@@ -57,3 +57,8 @@ vec2 CameraManager::GetCameraPosition() {
 bool CameraManager::HasActiveCamera() const {
 	return activeCameraObject != nullptr && activeCameraObject->IsActive();
 }
+
+void CameraManager::ClearActiveCamera() {
+	activeCameraObject = nullptr;
+	std::cout << "[CameraManager] Active camera cleared\n";
+}
