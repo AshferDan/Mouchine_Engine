@@ -253,6 +253,10 @@ public:
 
     void SetParent(GameObject* ParentGO);
 
+    GameObject* GetParent() const;
+
+    std::vector<GameObject*> GetAllChildren() const;
+
 private:
     EntityID entityID;
     std::string name;
@@ -261,3 +265,5 @@ private:
     std::vector<GameObject*> children;                  
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;
 };
+
+void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree);

@@ -862,33 +862,26 @@ void GraphicsSystem::ResizeFrameBuffer(int width, int height)
     CreateFrameBuffer(width, height);
 }
 
-void GraphicsSystem::RenderGameViewportImGui()
+// apologies for messy code, used 2 float refs instead of ImVec2 because i didnt wanna include imgui.h here and slow compile time
+void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewportSizeY)
 {
-    if (!editorMode)
+    //if (!editorMode)
+    //{
+    //    return;
+    //}
+
+    if (viewportSizeX < 100.0f)
+        viewportSizeX = 800.0f;
+    if (viewportSizeY < 100.0f)
+        viewportSizeY = 600.0f;
+
+    if ((int)viewportSizeX != frameBufferWidth || (int)viewportSizeY != frameBufferHeight)
     {
-        return;
-    }
-
-    ImGui::Begin("Game Viewport");
-
-    ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-
-    // ADD THIS: Use minimum size if viewport is too small
-    if (viewportSize.x < 100.0f)
-        viewportSize.x = 800.0f;
-    if (viewportSize.y < 100.0f)
-        viewportSize.y = 600.0f;
-
-    if ((int)viewportSize.x != frameBufferWidth || (int)viewportSize.y != frameBufferHeight)
-    {
-        if (viewportSize.x > 0 && viewportSize.y > 0)
+        if (viewportSizeX > 0 && viewportSizeY > 0)
         {
-            ResizeFrameBuffer((int)viewportSize.x, (int)viewportSize.y);
+            ResizeFrameBuffer((int)viewportSizeX, (int)viewportSizeY);
         }
     }
-
-    ImGui::Image((void *)(intptr_t)frameBufferTexture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::End();
 }
 
 std::string GraphicsSystem::GetName()

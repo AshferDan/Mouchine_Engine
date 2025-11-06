@@ -26,13 +26,16 @@ namespace API {
         auto& resourceMgr = ResourceManager::Instance();
         resourceMgr.SetAudioEngine(&audio);
 
-        // load textures
-        resourceMgr.LoadTexture("Hero", "./Assets/Mouch_idle.png");
-        resourceMgr.LoadTexture("bgImage", "./Assets/wallpaper_transparent.png");
-
         // load audio files
         resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true); // looping
         resourceMgr.LoadAudio("jump_sfx", "./Assets/audio/jump.wav", false); // when jumping only
+        resourceMgr.LoadAudio("footstep_sfx", "./Assets/audio/footstep.wav", false); // footstep sound
+
+        // load common fonts
+        std::cout << "\n--- Loading Fonts ---" << std::endl;
+        resourceMgr.LoadFont("default_font", "./Assets/FrederickatheGreat-Regular.ttf", 48);
+        resourceMgr.LoadFont("small_font", "./Assets/FrederickatheGreat-Regular.ttf", 24);
+        resourceMgr.LoadFont("large_font", "./Assets/FrederickatheGreat-Regular.ttf", 64);
 
         // print loaded resources
         resourceMgr.PrintLoadedResources();
@@ -41,6 +44,11 @@ namespace API {
         std::cout << "\n--- Starting Background Music ---" << std::endl;
         audio.playSound("bgm", "bgm_channel");
         audio.setVolume("bgm_channel", 0.5f);
+
+        // register wind sound
+        std::cout << "--- Starting Wind Ambient Sound ---" << std::endl;
+        audio.playSound("wind", "wind_channel");
+        audio.setVolume("wind_channel", 0.5f); // Quieter than music for ambient effect
     }
 
     void StartEngineLoop(CoreEngine& engine)

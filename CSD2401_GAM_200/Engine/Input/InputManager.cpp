@@ -218,6 +218,30 @@ void InputManager::Update(float dt)
             // No movement keys pressed - remove all movement forces
             forcesManager.RemoveForcesByType(ForceType::MoveLeft);
             forcesManager.RemoveForcesByType(ForceType::MoveRight);
+
+            // Reset footstep timer when not moving
+            footstepTimer = 0.0f;
+        }
+
+        // Handle footstep sounds
+        // Play footsteps if: moving horizontally, grounded, and not jumping
+        bool isMoving = std::abs(vx) > 0.1f; // Small threshold to avoid playing when barely moving
+        if (isMoving && physics->IsGrounded() && audioEngine)
+        {
+            footstepTimer += dt;
+
+            // Play footstep sound at intervals
+            if (footstepTimer >= footstepInterval)
+            {
+                audioEngine->playSound("footstep_sfx", "footstep_channel");
+                audioEngine->setVolume("footstep_channel", 1.0f);
+                footstepTimer = 0.0f; // reset timer
+            }
+        }
+        else
+        {
+            // Reset timer when not moving or in air
+            footstepTimer = 0.0f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
