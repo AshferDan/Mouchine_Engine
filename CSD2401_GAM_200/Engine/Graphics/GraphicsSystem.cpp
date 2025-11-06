@@ -21,7 +21,7 @@ const double two_pi = 6.28318530717958647692528676655900576;
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
       frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(false)
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -72,7 +72,7 @@ GraphicsSystem::GraphicsSystem()
 GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
       frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(false)
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -288,16 +288,16 @@ void GraphicsSystem::Update(float)
 
     //// Orthographic projection: origin at bottom-left, size = window width/height
     //  Use editor camera for level editing, otherwise use default game camera
+        float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
+        float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
     if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop))
     {
         // EDITOR MODE: Use free editor camera for level editing
         // This allows designers to navigate and edit the level
-        vp = levelEditor->GetEditorViewProjection((float)Wwidth, (float)Wheight);
+        vp = levelEditor->GetEditorViewProjection((float)renderWidth, (float)renderHeight);
     }
     else
     {
-        float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
-        float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
@@ -755,9 +755,11 @@ void GraphicsSystem::RenderText(const std::map<char, Character> &characters, con
     textShader.SetUniform("textColor", color);
 
     mat4 projection;
+    float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
+    float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
     if (screenSpace)
     {
-        projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+        projection = mat4::ortho(0.0f, (float)renderWidth, 0.0f, (float)renderHeight);
     }
     else
     {

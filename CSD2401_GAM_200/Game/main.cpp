@@ -57,7 +57,8 @@ int main()
         Serialization::LoadScene("Prefab_TestScene");
 
         GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
-        textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen
+        textObj->AddComponent<TransformComponent>(100.f, 100.f);  // Position on screen
+        textObj->AddComponent<RenderComponent>();
         auto* text = textObj->AddComponent<TextComponent>(
             "./Assets/FrederickatheGreat-Regular.ttf",
             48,  // Font size
@@ -65,6 +66,7 @@ int main()
             vec4(1.0f, 1.0f, 1.0f, 1.0f),
             true
         );
+        text->SetScreenSpace(true);
         text->SetScale(1.0f);
 
         // Later, update the text:
