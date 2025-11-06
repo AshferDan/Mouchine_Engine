@@ -7,7 +7,8 @@
 #include "InputManager.h" //
 #include "transform.h"
 #include "MathLib.h"
-
+#include "GraphicsSystem.h"
+class GraphicsSystem;
 class MenuLogicSystem : public ISystem {
 public:
     MenuLogicSystem() = default;

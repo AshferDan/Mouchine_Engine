@@ -112,6 +112,7 @@ void CoreEngine::InitSystems()
     // 10. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
+    menuLogicSystem = AddSystem<MenuLogicSystem>();
     
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
