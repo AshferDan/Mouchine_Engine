@@ -32,6 +32,9 @@ Technology is prohibited.
 #include <fstream>
 #include "MathLib.h"
 #include <algorithm>
+#include "RenderComponent.h"
+#include "GameObjectSystem.h"
+#include "Message.h"
 
 /**
  * @class GraphicsSystem
@@ -147,6 +150,7 @@ public:
 	int GetWindowWidth() const { return Wwidth; };
 	int GetWindowHeight() const { return Wheight; };
 
+	void HandleMessage(const CreateObjectMessage& msg);
 private:
 	mat4 vp;				// Current view-projection matrix.
 	bool debugMode = false; // Debug mode flag for showing shapes.

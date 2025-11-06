@@ -259,7 +259,7 @@ void ImGuiSystem::Update(float dt)
                 if (auto* t = go->AddComponent<TransformComponent>())
                 {
                     float x = static_cast<float>(rand() % 1280) - 640;
-                    float y = static_cast<float>(rand() % 720) - 360;
+                    float y = static_cast<float>(rand() % 720) - 360;                 
                     t->SetPosition(x, y);
                     t->SetScale(spawnW, spawnH);
                 }
@@ -272,17 +272,6 @@ void ImGuiSystem::Update(float dt)
                     render->SetShapeType(RenderComponent::ShapeType::Square);
                     render->SetColor({ 1.f, 1.f, 1.f, 1.f });
                 }
-
-                //// --- Physics: random velocity ---
-                //if (auto* p = go->AddComponent<PhysicsComponent>())
-                //{
-                //    float vx = static_cast<float>((rand() % 200) - 100);
-                //    float vy = static_cast<float>((rand() % 200) - 100);
-                //    p->SetVelocity(vx, vy);
-                //    p->SetMass(1.0f);
-                //    p->SetGrounded(false);
-                //    p->SetGravity(true);
-                //}
             }
 
             std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
@@ -627,27 +616,60 @@ void GOCreationMenu_Render()
  */
 void GOCreationMenu_Spawn()
 {
-    auto &factory = GameObjectFactory::Instance(); // Factory
-    GameObject *TempGO = nullptr;
+    //auto& factory = GameObjectFactory::Instance(); // Factory
+    //GameObject* TempGO = nullptr;
 
-    if (RenderComponent::ShapeType{current_shape} == RenderComponent::ShapeType::Empty)
+    //if (RenderComponent::ShapeType{ current_shape } == RenderComponent::ShapeType::Empty)
+    //{
+    //    TempGO = factory.CreateEmptyGO(tempGO.name, 20.f, 0.f, 5.f, 5.f);
+    //}
+    //else
+    //{
+    //    // very ugly colour code bc that uses a different vec 4 AAAA
+    //    TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
+    //        vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+    //}
+
+    ////Add transform component to assign transform values
+    //TempGO->AddComponent<TransformComponent>(0, 0);
+    //auto* transform = TempGO->GetComponent<TransformComponent>();
+
+    //transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
+    //transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
+    //transform->SetRotation(tempGO.rot);
+
+    // Determine creation type based on shape
+    CreateObjectMessage::ObjectType objType;
+    RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);
+
+    if (shapeType == RenderComponent::ShapeType::Empty)
     {
-        TempGO = factory.CreateEmptyGO(tempGO.name, 20.f, 0.f, 5.f, 5.f);
+        objType = CreateObjectMessage::ObjectType::Empty;
     }
     else
     {
-        // very ugly colour code bc that uses a different vec 4 AAAA
-        TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{current_shape}, 20.f, 0.f, 5.f, 5.f,
-                                     vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
+        objType = CreateObjectMessage::ObjectType::Basic;
     }
 
-    // Add transform component to assign transform values
-    TempGO->AddComponent<TransformComponent>(0, 0);
-    auto *transform = TempGO->GetComponent<TransformComponent>();
+    // Gather data from your temporary editor object
+    float pos[2] = { tempGO.pos[0], tempGO.pos[1] };
+    float scale[2] = { tempGO.scale[0], tempGO.scale[1] };
+    float rot = tempGO.rot;
+    vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f); // assuming ImVec4 in editor
+    std::string name = tempGO.name;
+    // Build and send message
+    CreateObjectMessage msg(
+        name,          // GameObject name
+        objType,              // Empty or Basic
+        shapeType,            // ShapeType
+        pos, scale, rot,
+        color
+    );
 
-    transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
-    transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
-    transform->SetRotation(tempGO.rot);
+    std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;
+    //msg.Dispatch(*CORE);
+    CORE->GetMessageBus().Publish(msg);
+
 }
 #pragma endregion
 

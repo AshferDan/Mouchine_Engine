@@ -157,20 +157,14 @@ void CollisionSystem::Update(float deltaTime) {
                     //    << gameObjects[j]->GetName() << std::endl;
                     activeCollisions.push_back({ gameObjects[i].get(), gameObjects[j].get() });
 
-
-                    //Message msgEnter;
-                    //msgEnter.type = "CollisionEnter";     // New message type
-                    //msgEnter.sender = this;
-
-                    //// You can pack both objects in a small struct if needed
-                    //msgEnter.data = (void*)gameObjects[i].get();
-                    //CORE->GetMessageBus().Broadcast(msgEnter);
+                    CollisionMessage msg(gameObjects[i].get(), gameObjects[j].get());
+                    CORE->GetMessageBus().Publish(msg);
                 }
 
                 // Report collision to PhysicsSystem for resolution
                 if (physicsSystem) {
                     physicsSystem->ReportCollision(gameObjects[i].get(), gameObjects[j].get(), col1, col2);
-                }
+               }
             }
             else {
                 // Remove from active collisions

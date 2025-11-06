@@ -38,6 +38,9 @@ Technology is prohibited.
 #include "Serialization.h"
 #include "LevelEditor.h"
 
+#include "Message.h"
+#include "IMessageHandler.h"
+
 // Forward declarations
 class GameObjectSystem;
 class GraphicsSystem;
@@ -48,7 +51,7 @@ class PhysicsSystem;
 class DebugSystem;
 class TransformSystem;
 class LevelEditor;
-class CoreEngine
+class CoreEngine : public IMessageHandler
 {
 public:
     /**
@@ -227,6 +230,9 @@ public:
     bool stepOnce;
     double accumulator;             // Accumulator for fixed timestep
 
+    // Message Handling 
+    MessageBus& GetMessageBus() { return messageBus; }
+
 private:
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
@@ -250,6 +256,7 @@ private:
     static double fixed_dt;         // Fixed delta time for physics
     int WindWidth;
     int WindHeight;
+    MessageBus messageBus;
 
     /**
      * @brief Updates the FPS and Delta Time counters.

@@ -976,3 +976,16 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
 
     return clonedComponent;
 }
+
+void GraphicsSystem::HandleMessage(const CreateObjectMessage& msg)
+{
+    GameObject* go = GameObjectFactory::Instance().FindByName(msg.name);
+    if (!go)
+        return;
+
+    RenderComponent* render = go->AddComponent<RenderComponent>();
+    render->SetShapeType(msg.shapeType);
+    render->SetColor({ msg.color.x, msg.color.y, msg.color.z, msg.color.w });
+
+    std::cout << "[GraphicsSystem] Added RenderComponent to: " << msg.name << "\n";
+}

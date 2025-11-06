@@ -26,11 +26,14 @@ Technology is prohibited.
 #include <vector>
 #include <list>
 
+#include "Message.h"
+#include "IMessageHandler.h"
+
 /**
  * @class AudioEngine
  * @brief Manages audio playback using FMOD sound system
  */
-class AudioEngine {
+class AudioEngine : public IMessageHandler {
 private:
 	FMOD::System* system;
 	std::map<std::string, FMOD::Sound*> sounds;
@@ -161,7 +164,15 @@ public:
 	 */
 	FMOD::System* GetFMODSystem() const { return system; }
 
-};
+	void HandleMessage(const PlaySoundMessage& msg) override {
+		std::cout << "[AudioEngine] Playing sound: " << msg.soundName << std::endl;
+		playSound(msg.soundName);
+	}
 
+	void HandleMessage(const PauseSoundMessage& msg) override {
+		std::cout << "[AudioEngine] Pausing sound: " << msg.channelName << std::endl;
+		pauseSound(msg.channelName, msg.pause);
+	}
+};
 
 #endif // AUDIO_H

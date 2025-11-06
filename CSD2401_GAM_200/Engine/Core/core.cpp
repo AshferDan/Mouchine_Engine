@@ -14,6 +14,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 #include "core.h"
 #include "LevelEditor.h"
+#include "Message.h"
+#include "IMessageHandler.h"
 
 bool InputManager::KeyStateQuit = false;
 CoreEngine* CORE;
@@ -33,6 +35,7 @@ CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0), stepMo
     LastTime = 0;
     GameActive = true;
     CORE = this;
+    std::cout << "[CoreEngine::CoreEngine] CORE set to " << this << std::endl;
 
     std::cout << "CoreEngine constructed" << std::endl;
 }
@@ -108,6 +111,16 @@ void CoreEngine::InitSystems()
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
+
+    //messageBus.Subscribe(Message::Id::PLAY_SOUND, audioEngine);
+    //messageBus.Subscribe(Message::Id::PAUSE_SOUND, audioEngine);
+    //messageBus.Subscribe(Message::Id::COLLISION, physicsSystem);
+    //messageBus.Subscribe(Message::Id::CREATE_OBJECT, gameObjectSystem);
+    messageBus.Subscribe<PlaySoundMessage>(audioEngine);
+    messageBus.Subscribe<PauseSoundMessage>(audioEngine);
+    messageBus.Subscribe<CollisionMessage>(physicsSystem);
+    messageBus.Subscribe<CreateObjectMessage>(gameObjectSystem);
+
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
