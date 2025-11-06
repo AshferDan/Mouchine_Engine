@@ -94,10 +94,39 @@ public:
      */
     double GetScrollY() const { return scrollY; }
 
+    /**
+     * @brief Gets if the left mouse was clicked (pressed AND released).
+     * @return True if a click happened this frame, false otherwise.
+     */
+    static bool IsMouseLeftClicked() { return MouseLeftClicked; }
+
+    /**
+     * @brief Gets the mouse's X position in world coordinates.
+     * @return World X position.
+     */
+    static double GetMouseWorldX() { return MouseWorldX; }
+
+    /**
+     * @brief Gets the mouse's Y position in world coordinates.
+     * @return World Y position.
+     */
+    static double GetMouseWorldY() { return MouseWorldY; }
+
+
     // Static quit flag triggered when Escape is pressed.
     static bool KeyStateQuit;
+    
     // Static Imgui flag triggered when Escape is pressed.
     static bool KeyStateImgui;
+
+    // Will store the mouse position in world coordinates (0,0 at center)
+    static double MouseWorldX;
+    static double MouseWorldY;
+
+    // Stores if the mouse was clicked *this frame*
+    static bool MouseLeftClicked;
+
+
 
 private:
     // Window info

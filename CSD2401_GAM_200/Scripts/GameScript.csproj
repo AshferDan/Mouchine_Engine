@@ -8,12 +8,15 @@
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     
-<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <!-- Output path - adjust to match your C++ project structure -->
-        <OutputPath>..\Build\Scripts\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
 
-    <!-- Generate PDB for debugging -->
     <DebugType>portable</DebugType>
-    <Platforms>AnyCPU;ARM64</Platforms>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Message Text="Copying GameScripts.dll to Build folder..." Importance="high" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\Build\Scripts\" />
+  </Target>
+
 </Project>

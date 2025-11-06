@@ -109,7 +109,10 @@ void CoreEngine::InitSystems()
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
+    // 10. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
+
+    
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
@@ -185,6 +188,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
+        if (menuLogicSystem)
+            g_systemTimings[menuLogicSystem->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
@@ -269,6 +274,16 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
+                if (menuLogicSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    menuLogicSystem->Update(static_cast<float>(fixed_dt)); // Use variable delta_time
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[scriptSystem->GetName()] = ms;
+                    g_totalLoopTime += ms;
+                }
+                
                 stepOnce = false; // Reset after processing one frame
             }
 
@@ -326,6 +341,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
+
+
 
         // End ImGui frame and render
         if (imguiSystem)

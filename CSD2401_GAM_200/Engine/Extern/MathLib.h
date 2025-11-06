@@ -166,6 +166,7 @@ struct mat4
 	}
 };
 
+bool IsAreaClicked(float buttonX, float buttonY, float buttonWidth, float buttonHeight, float mouseX, float mouseY);
 vec4 operator*(mat4 const& m, vec4 const& v);
 
 inline vec3::vec3(vec4 const& v) : x(v.x), y(v.y), z(v.z) {}
