@@ -15,7 +15,7 @@ Technology is prohibited.
 #include <cmath>
 
 // Forward declaration
-class Force;
+struct Force;
 
 /**
  * @brief Types of forces available in the system
@@ -25,7 +25,8 @@ enum class ForceType {
     MoveRight,
     MoveLeft,
     Wind,
-    Boost
+    Boost,
+    Friction
 };
 
 /**
@@ -43,7 +44,10 @@ namespace ForceConstants {
     constexpr float MOVE_FORCE = 200.0f;
 
     // Drag
-    constexpr float DRAG_COEFFICIENT = 1000.0f;
+    constexpr float DRAG_COEFFICIENT = 30.0f;
+
+    // Friction (ground friction)
+    constexpr float FRICTION_COEFFICIENT = 5.0f;
 }
 
 /**
@@ -87,6 +91,8 @@ struct LinearDirectionalForce : public Force {
     void CalculateAcceleration(float mass, float velocityX, float velocityY,
         float& accelX, float& accelY) override {
         if (!isActive) {
+            (void)velocityX;  // Unused
+            (void)velocityY;  // Unused
             accelX = 0.0f;
             accelY = 0.0f;
             return;
@@ -125,3 +131,35 @@ struct DragForce : public Force {
         accelY = dragForceY / mass;
     }
 };
+/**
+ * @brief Friction force (only horizontal, only when grounded)
+ */
+struct FrictionForce : public Force {
+    float frictionCoefficient;
+    bool* isGrounded;  // Pointer to grounded state
+    ForceType type;    // Type identifier
+
+    FrictionForce(float friction, bool* groundedPtr)
+        : frictionCoefficient(friction), isGrounded(groundedPtr), type(ForceType::Friction) {
+        lifetime = -1.0f;  // Infinite
+    }
+
+    void CalculateAcceleration(float mass, float velocityX, float velocityY,
+        float& accelX, float& accelY) override {
+        if (!isActive || !isGrounded || !(*isGrounded)) {
+            (void)velocityY;
+            accelX = 0.0f;
+            accelY = 0.0f;
+            return;
+        }
+
+        // Friction only opposes horizontal motion when grounded
+        float frictionForceX = -frictionCoefficient * velocityX;
+
+        accelX = frictionForceX / mass;
+        accelY = 0.0f;  // No vertical friction
+    }
+};
+
+//In the future I should make one Drag struct that has a Friction type force!!! instead of
+//two different structs.

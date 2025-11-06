@@ -115,6 +115,10 @@ private:
     float jumpStartY = 0.0f;
     float jumpMaxHeight = 5.0f; // max height relative to start
     float jumpSpeed = 10.0f;    // units per second
+
+    // Footstep audio timing
+    float footstepTimer = 0.0f;
+    float footstepInterval = 0.4f; // time between footstep sounds
 };
 
 #endif

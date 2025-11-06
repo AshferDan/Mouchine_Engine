@@ -32,6 +32,7 @@ Technology is prohibited.
 #include "CollisionSystem.h"
 #include "PhysicsSystem.h"
 #include "DebugSystem.h"
+#include "ScriptingSystem.h"
 #include "CameraSystem.h"
 #include <map>
 #include "MathLib.h"
@@ -50,6 +51,7 @@ class CollisionSystem;
 class PhysicsSystem;
 class DebugSystem;
 class TransformSystem;
+class ScriptSystem;
 class LevelEditor;
 class CoreEngine : public IMessageHandler
 {
@@ -87,10 +89,10 @@ public:
      * @return A raw pointer to the newly created system.
      */
     template <typename T, typename... Args>
-    T* AddSystem(Args &&...args)
+    T *AddSystem(Args &&...args)
     {
         auto system = std::make_unique<T>(std::forward<Args>(args)...);
-        T* systemPtr = system.get();
+        T *systemPtr = system.get();
         Systems.push_back(std::move(system));
         return systemPtr;
     }
@@ -99,7 +101,7 @@ public:
      * @brief Gets a pointer to the GameObjectSystem.
      * @return A pointer to the GameObjectSystem.
      */
-    GameObjectSystem* GetGameObjectSystem() const
+    GameObjectSystem *GetGameObjectSystem() const
     {
         return gameObjectSystem;
     }
@@ -108,7 +110,7 @@ public:
      * @brief Gets a pointer to the GraphicsSystem.
      * @return A pointer to the GraphicsSystem.
      */
-    GraphicsSystem* GetGraphicsSystem() const
+    GraphicsSystem *GetGraphicsSystem() const
     {
         return graphicsSystem;
     }
@@ -117,7 +119,7 @@ public:
      * @brief Gets a pointer to the ImGuiSystem (for debugging/tools).
      * @return A pointer to the ImGuiSystem.
      */
-    ImGuiSystem* GetImguiSystem() const
+    ImGuiSystem *GetImguiSystem() const
     {
         return imguiSystem;
     }
@@ -126,7 +128,7 @@ public:
      * @brief Gets a pointer to the InputManager.
      * @return A pointer to the InputManager.
      */
-    InputManager* GetInputManager() const
+    InputManager *GetInputManager() const
     {
         return inputManager;
     }
@@ -135,7 +137,7 @@ public:
      * @brief Gets a pointer to the CollisionSystem.
      * @return A pointer to the CollisionSystem.
      */
-    CollisionSystem* GetCollisionSystem() const
+    CollisionSystem *GetCollisionSystem() const
     {
         return collisionSystem;
     }
@@ -144,7 +146,7 @@ public:
      * @brief Gets a pointer to the PhysicsSystem.
      * @return A pointer to the PhysicsSystem.
      */
-    PhysicsSystem* GetPhysicsSystem() const
+    PhysicsSystem *GetPhysicsSystem() const
     {
         return physicsSystem;
     }
@@ -153,18 +155,23 @@ public:
      * @brief Gets a pointer to the DebugSystem.
      * @return A pointer to the DebugSystem.
      */
-    DebugSystem* GetDebugSystem() const
+    DebugSystem *GetDebugSystem() const
     {
         return debugSystem;
     }
 
-    TransformSystem* GetTransformSystem() const
+    TransformSystem *GetTransformSystem() const
     {
 
         return transformSystem;
     }
 
-    CameraSystem* GetCameraSystem() const {
+    ScriptSystem *GetScriptSystem() const
+    {
+        return scriptSystem;
+    }
+    CameraSystem *GetCameraSystem() const
+    {
 
         return cameraSystem;
     }
@@ -173,7 +180,7 @@ public:
      * @brief Gets a pointer to the LevelEditor.
      * @return A pointer to the LevelEditor.
      */
-    LevelEditor* GetLevelEditor() const
+    LevelEditor *GetLevelEditor() const
     {
         return levelEditor;
     }
@@ -182,13 +189,13 @@ public:
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
      */
-    void SetAudioEngine(AudioEngine* audio) { audioEngine = audio; }
+    void SetAudioEngine(AudioEngine *audio) { audioEngine = audio; }
 
     /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
      */
-    void ConfigFile(const char* configF);
+    void ConfigFile(const char *configF);
 
     /**
      * @brief Sets the dimensions of the game window.
@@ -228,7 +235,7 @@ public:
     // Step-by-step physics debugging
     bool stepMode;
     bool stepOnce;
-    double accumulator;             // Accumulator for fixed timestep
+    double accumulator; // Accumulator for fixed timestep
 
     // Message Handling 
     MessageBus& GetMessageBus() { return messageBus; }
@@ -237,23 +244,24 @@ private:
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
 
-    GameObjectSystem* gameObjectSystem = nullptr;
-    GraphicsSystem* graphicsSystem = nullptr;
-    ImGuiSystem* imguiSystem = nullptr;
-    InputManager* inputManager = nullptr;
-    CollisionSystem* collisionSystem = nullptr;
-    PhysicsSystem* physicsSystem = nullptr;
-    DebugSystem* debugSystem = nullptr;
-    AudioEngine* audioEngine = nullptr;
-    TransformSystem* transformSystem = nullptr;
-    CameraSystem* cameraSystem = nullptr;
-    LevelEditor* levelEditor = nullptr;
+    GameObjectSystem *gameObjectSystem = nullptr;
+    GraphicsSystem *graphicsSystem = nullptr;
+    ImGuiSystem *imguiSystem = nullptr;
+    InputManager *inputManager = nullptr;
+    CollisionSystem *collisionSystem = nullptr;
+    PhysicsSystem *physicsSystem = nullptr;
+    DebugSystem *debugSystem = nullptr;
+    AudioEngine *audioEngine = nullptr;
+    TransformSystem *transformSystem = nullptr;
+    ScriptSystem *scriptSystem = nullptr;
+    CameraSystem *cameraSystem = nullptr;
+    LevelEditor *levelEditor = nullptr;
 
     unsigned LastTime;
     bool GameActive;
     static double fps;
-    static double delta_time;      // Variable delta time
-    static double fixed_dt;         // Fixed delta time for physics
+    static double delta_time; // Variable delta time
+    static double fixed_dt;   // Fixed delta time for physics
     int WindWidth;
     int WindHeight;
     MessageBus messageBus;
@@ -265,4 +273,4 @@ private:
     void update_time(double fps_calc_interval = 1.0);
 };
 
-extern CoreEngine* CORE;
+extern CoreEngine *CORE;

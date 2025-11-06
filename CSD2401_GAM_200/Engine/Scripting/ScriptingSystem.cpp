@@ -1,0 +1,538 @@
+#include "ScriptingSystem.h"
+#include "gameObject.h"
+#include "ScriptAPI.h"
+#include <iostream>
+#include <filesystem>
+
+// Internal call functions - these will be called from C#
+
+// === Debug ===
+static void Internal_Log(MonoString *message)
+{
+    char *str = mono_string_to_utf8(message);
+    std::cout << "[C# Script] " << str << std::endl;
+    mono_free(str);
+}
+
+// === GameObject Creation ===
+static void Internal_CreateShape(MonoString *name, int type, float x, float y,
+                                 float width, float height,
+                                 float r, float g, float b, float a,
+                                 int layer, bool hasPhysics, bool isStatic, bool hasGravity)
+{
+    char *objName = mono_string_to_utf8(name);
+    vec4 color = {r, g, b, a};
+    API::CreateShape(objName, (RenderComponent::ShapeType)type, x, y, width, height,
+                     color, (CollisionLayer)layer, hasPhysics, isStatic, hasGravity);
+    mono_free(objName);
+}
+
+static void Internal_CreateImage(MonoString *name, int type, float x, float y,
+                                 float width, float height, MonoString *texturePath)
+{
+    char *objName = mono_string_to_utf8(name);
+    char *texPath = mono_string_to_utf8(texturePath);
+    API::CreateImage(objName, (RenderComponent::ShapeType)type, x, y, width, height, texPath);
+    mono_free(objName);
+    mono_free(texPath);
+}
+
+static void Internal_CreateAnimatedImage(MonoString *name, float x, float y,
+                                         float width, float height, MonoString *texturePath,
+                                         int rows, int columns, int startFrame, int endFrame, float fps,
+                                         int layer, bool hasPhysics, bool isStatic, bool hasGravity)
+{
+    char *objName = mono_string_to_utf8(name);
+    char *texPath = mono_string_to_utf8(texturePath);
+    API::CreateAnimatedImage(objName, x, y, width, height, texPath,
+                             rows, columns, startFrame, endFrame, fps,
+                             (CollisionLayer)layer, hasPhysics, isStatic, hasGravity);
+    mono_free(objName);
+    mono_free(texPath);
+}
+
+// === Transform ===
+static void Internal_SetPosition(MonoString *objectName, float x, float y)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetPos(name, x, y);
+    mono_free(name);
+}
+
+static void Internal_SetRotation(MonoString *objectName, float rotation)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetRot(name, rotation);
+    mono_free(name);
+}
+
+static void Internal_AddRotation(MonoString *objectName, float rotation)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::AddRot(name, rotation);
+    mono_free(name);
+}
+
+static void Internal_SetScale_Single(MonoString *objectName, float scale)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetScale(name, scale);
+    mono_free(name);
+}
+
+static void Internal_SetScale_XY(MonoString *objectName, float x, float y)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetScale(name, x, y);
+    mono_free(name);
+}
+
+// === Graphics ===
+static void Internal_SetShapeType(MonoString *objectName, int shapeType)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetShapeType(name, (RenderComponent::ShapeType)shapeType);
+    mono_free(name);
+}
+
+static void Internal_SetTexture(MonoString *objectName, MonoString *filename)
+{
+    char *name = mono_string_to_utf8(objectName);
+    char *file = mono_string_to_utf8(filename);
+    API::SetTexture(name, file);
+    mono_free(name);
+    mono_free(file);
+}
+
+static void Internal_SetColor(MonoString *objectName, float r, float g, float b, float a)
+{
+    char *name = mono_string_to_utf8(objectName);
+    vec4 color = {r, g, b, a};
+    API::setColor(name, color);
+    mono_free(name);
+}
+
+static void Internal_SetAlpha(MonoString *objectName, float alpha)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetAlpha(name, alpha);
+    mono_free(name);
+}
+
+// === Physics ===
+static void Internal_SetVelocity(MonoString *objectName, float vx, float vy)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetVelocity(name, vx, vy);
+    mono_free(name);
+}
+
+static void Internal_SetJumpValue(MonoString *objectName, float jumpForce)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetJumpVal(name, jumpForce);
+    mono_free(name);
+}
+
+static void Internal_SetGravity(MonoString *objectName, bool enabled)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetGravBool(name, enabled);
+    mono_free(name);
+}
+
+
+static void Internal_SetStatic(MonoString *objectName, bool isStatic)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetStatic(name, isStatic);
+    mono_free(name);
+}
+
+// === Collision ===
+static void Internal_SetCollisionShape(MonoString *objectName, int shape)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetColisionShape(name, (ColliderComponent::Type)shape);
+    mono_free(name);
+}
+
+static void Internal_SetCollisionLayer(MonoString *objectName, int layer)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetCollisionLayer(name, (CollisionLayer)layer);
+    mono_free(name);
+}
+
+// === Components ===
+static void Internal_AddTransformComponent(MonoString *objectName)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::AddTransformComponent(name);
+    mono_free(name);
+}
+
+static void Internal_AddRenderComponent(MonoString *objectName)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::AddRenderComponent(name);
+    mono_free(name);
+}
+
+static void Internal_AddCollisionComponent(MonoString *objectName)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::AddCollisionComponent(name);
+    mono_free(name);
+}
+
+static void Internal_AddPhysicsComponent(MonoString *objectName)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::AddPhysicComponent(name);
+    mono_free(name);
+}
+
+ScriptSystem::~ScriptSystem()
+{
+    Shutdown();
+}
+
+void ScriptSystem::Initialize()
+{
+    std::cout << "\n--- Initializing Scripting System (Mono) ---" << std::endl;
+
+    // Set Mono directories
+    mono_set_dirs("mono/lib", "mono/etc");
+
+    // Initialize Mono
+    rootDomain = mono_jit_init("GameEngineRuntime");
+    if (!rootDomain)
+    {
+        std::cerr << "Failed to initialize Mono JIT!" << std::endl;
+        return;
+    }
+
+    // Create app domain for script reloading
+    char domainName[] = "GameScriptDomain";
+    appDomain = mono_domain_create_appdomain(domainName, nullptr);
+    mono_domain_set(appDomain, true);
+
+    // Register internal calls (C++ functions callable from C#)
+    RegisterInternalCalls();
+
+    // Load core assembly
+    if (!LoadScriptAssembly("./Scripts/GameScripts.dll"))
+    {
+        std::cerr << "Warning: Could not load GameScripts.dll" << std::endl;
+    }
+
+    std::cout << "Scripting System initialized successfully" << std::endl;
+}
+
+void ScriptSystem::Shutdown()
+{
+    // Clean up all script instances
+    for (auto &[gameObject, instances] : gameObjectScripts)
+    {
+        for (auto &instance : instances)
+        {
+            if (instance.gcHandle != 0)
+            {
+                mono_gchandle_free(instance.gcHandle);
+            }
+        }
+    }
+    gameObjectScripts.clear();
+    scriptClasses.clear();
+
+    // Shutdown Mono
+    if (appDomain)
+    {
+        mono_domain_set(mono_get_root_domain(), false);
+        mono_domain_unload(appDomain);
+        appDomain = nullptr;
+    }
+
+    if (rootDomain)
+    {
+        mono_jit_cleanup(rootDomain);
+        rootDomain = nullptr;
+    }
+}
+
+void ScriptSystem::RegisterInternalCalls()
+{
+    // === Debug ===
+    mono_add_internal_call("CSharpScript.Debug::Log", (void *)Internal_Log);
+
+    // === GameObject Creation ===
+    mono_add_internal_call("CSharpScript.GameObject::CreateShape", (void *)Internal_CreateShape);
+    mono_add_internal_call("CSharpScript.GameObject::CreateImage", (void *)Internal_CreateImage);
+    mono_add_internal_call("CSharpScript.GameObject::CreateAnimatedImage", (void *)Internal_CreateAnimatedImage);
+
+    // === Transform ===
+    mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);
+    mono_add_internal_call("CSharpScript.Transform::SetRotation", (void *)Internal_SetRotation);
+    mono_add_internal_call("CSharpScript.Transform::AddRotation", (void *)Internal_AddRotation);
+    mono_add_internal_call("CSharpScript.Transform::SetScale_Single", (void *)Internal_SetScale_Single);
+    mono_add_internal_call("CSharpScript.Transform::SetScale_XY", (void *)Internal_SetScale_XY);
+
+    // === Graphics ===
+    mono_add_internal_call("CSharpScript.Graphics::SetShapeType", (void *)Internal_SetShapeType);
+    mono_add_internal_call("CSharpScript.Graphics::SetTexture", (void *)Internal_SetTexture);
+    mono_add_internal_call("CSharpScript.Graphics::SetColor", (void *)Internal_SetColor);
+    mono_add_internal_call("CSharpScript.Graphics::SetAlpha", (void *)Internal_SetAlpha);
+
+    // === Physics ===
+    mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);
+    mono_add_internal_call("CSharpScript.Physics::SetJumpValue", (void *)Internal_SetJumpValue);
+    mono_add_internal_call("CSharpScript.Physics::SetGravity", (void *)Internal_SetGravity);
+    mono_add_internal_call("CSharpScript.Physics::SetStatic", (void *)Internal_SetStatic);
+
+    // === Collision ===
+    mono_add_internal_call("CSharpScript.Collision::SetCollisionShape", (void *)Internal_SetCollisionShape);
+    mono_add_internal_call("CSharpScript.Collision::SetCollisionLayer", (void *)Internal_SetCollisionLayer);
+
+    // === Components ===
+    mono_add_internal_call("CSharpScript.Components::AddTransformComponent", (void *)Internal_AddTransformComponent);
+    mono_add_internal_call("CSharpScript.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
+    mono_add_internal_call("CSharpScript.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
+    mono_add_internal_call("CSharpScript.Components::AddPhysicsComponent", (void *)Internal_AddPhysicsComponent);
+}
+
+MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)
+{
+    if (!std::filesystem::exists(filepath))
+    {
+        std::cerr << "Assembly file not found: " << filepath << std::endl;
+        return nullptr;
+    }
+
+    MonoAssembly *assembly = mono_domain_assembly_open(appDomain, filepath.c_str());
+    if (!assembly)
+    {
+        std::cerr << "Failed to load assembly: " << filepath << std::endl;
+        return nullptr;
+    }
+
+    return assembly;
+}
+
+MonoClass *ScriptSystem::GetClassInAssembly(MonoAssembly *assembly, const char *namespaceName, const char *className)
+{
+    MonoImage *image = mono_assembly_get_image(assembly);
+    MonoClass *monoClass = mono_class_from_name(image, namespaceName, className);
+
+    if (!monoClass)
+    {
+        std::cerr << "Failed to find class: " << namespaceName << "." << className << std::endl;
+    }
+
+    return monoClass;
+}
+
+MonoObject *ScriptSystem::InstantiateClass(MonoClass *monoClass)
+{
+    MonoObject *instance = mono_object_new(appDomain, monoClass);
+
+    if (!instance)
+    {
+        std::cerr << "Failed to instantiate class" << std::endl;
+        return nullptr;
+    }
+
+    // Call constructor
+    mono_runtime_object_init(instance);
+
+    return instance;
+}
+
+bool ScriptSystem::LoadScriptAssembly(const std::string &filepath)
+{
+    coreAssembly = LoadAssembly(filepath);
+    if (!coreAssembly)
+    {
+        return false;
+    }
+
+    coreImage = mono_assembly_get_image(coreAssembly);
+    std::cout << "Loaded script assembly: " << filepath << std::endl;
+
+    return true;
+}
+
+bool ScriptSystem::AttachScript(GameObject *gameObject, const std::string &scriptClassName)
+{
+    if (!gameObject || !coreAssembly)
+    {
+        return false;
+    }
+
+    // Check if class is already cached
+    if (scriptClasses.find(scriptClassName) == scriptClasses.end())
+    {
+        // Load the class
+        MonoClass *monoClass = GetClassInAssembly(coreAssembly, "GameScripts", scriptClassName.c_str());
+        if (!monoClass)
+        {
+            return false;
+        }
+
+        // Cache the class and its methods
+        ScriptClass scriptClass;
+        scriptClass.monoClass = monoClass;
+        scriptClass.constructor = mono_class_get_method_from_name(monoClass, ".ctor", 0);
+        scriptClass.onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
+        scriptClass.onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
+        scriptClass.onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
+
+        scriptClasses[scriptClassName] = scriptClass;
+    }
+
+    // Create instance
+    ScriptClass &scriptClass = scriptClasses[scriptClassName];
+    MonoObject *instance = InstantiateClass(scriptClass.monoClass);
+
+    if (!instance)
+    {
+        return false;
+    }
+
+    // Create script instance and add to GameObject
+    ScriptInstance scriptInstance;
+    scriptInstance.instance = instance;
+    scriptInstance.scriptClass = &scriptClass;
+    scriptInstance.gcHandle = mono_gchandle_new(instance, false);
+
+    gameObjectScripts[gameObject].push_back(scriptInstance);
+
+    std::cout << "Attached script " << scriptClassName << " to GameObject" << std::endl;
+
+    return true;
+}
+
+void ScriptSystem::RemoveScript(GameObject *gameObject, const std::string &scriptClassName)
+{
+    auto it = gameObjectScripts.find(gameObject);
+    if (it == gameObjectScripts.end())
+    {
+        return;
+    }
+
+    auto &instances = it->second;
+    for (auto instIt = instances.begin(); instIt != instances.end(); ++instIt)
+    {
+        MonoClass *monoClass = mono_object_get_class(instIt->instance);
+        const char *className = mono_class_get_name(monoClass);
+
+        if (scriptClassName == className)
+        {
+            if (instIt->gcHandle != 0)
+            {
+                mono_gchandle_free(instIt->gcHandle);
+            }
+            instances.erase(instIt);
+            break;
+        }
+    }
+}
+
+void ScriptSystem::CallOnStart(GameObject *gameObject)
+{
+    auto it = gameObjectScripts.find(gameObject);
+    if (it == gameObjectScripts.end())
+    {
+        return;
+    }
+
+    for (auto &scriptInstance : it->second)
+    {
+        if (scriptInstance.scriptClass->onStart)
+        {
+            mono_runtime_invoke(scriptInstance.scriptClass->onStart, scriptInstance.instance, nullptr, nullptr);
+        }
+    }
+}
+
+void ScriptSystem::CallOnUpdate(GameObject *gameObject, float deltaTime)
+{
+    auto it = gameObjectScripts.find(gameObject);
+    if (it == gameObjectScripts.end())
+    {
+        return;
+    }
+
+    void *args[1];
+    args[0] = &deltaTime;
+
+    for (auto &scriptInstance : it->second)
+    {
+        if (scriptInstance.scriptClass->onUpdate)
+        {
+            mono_runtime_invoke(scriptInstance.scriptClass->onUpdate, scriptInstance.instance, args, nullptr);
+        }
+    }
+}
+
+void ScriptSystem::CallOnDestroy(GameObject *gameObject)
+{
+    auto it = gameObjectScripts.find(gameObject);
+    if (it == gameObjectScripts.end())
+    {
+        return;
+    }
+
+    for (auto &scriptInstance : it->second)
+    {
+        if (scriptInstance.scriptClass->onDestroy)
+        {
+            mono_runtime_invoke(scriptInstance.scriptClass->onDestroy, scriptInstance.instance, nullptr, nullptr);
+        }
+    }
+}
+
+void ScriptSystem::Update(float deltaTime)
+{
+    // Update all scripts attached to game objects
+    for (auto &[gameObject, instances] : gameObjectScripts)
+    {
+        CallOnUpdate(gameObject, deltaTime);
+    }
+}
+
+void ScriptSystem::ReloadScriptAssembly()
+{
+    std::cout << "Reloading script assembly..." << std::endl;
+
+    for (auto &[gameObject, instances] : gameObjectScripts)
+    {
+        for (auto &instance : instances)
+        {
+            if (instance.gcHandle != 0)
+            {
+                mono_gchandle_free(instance.gcHandle);
+            }
+        }
+    }
+    // 2. Clear all cached data
+    gameObjectScripts.clear();
+    scriptClasses.clear();
+
+    // 3. Unload the old domain
+    mono_domain_set(rootDomain, false);
+    mono_domain_unload(appDomain);
+
+    // Create new domain
+    char domainName[] = "GameScriptDomain";
+    appDomain = mono_domain_create_appdomain(domainName, nullptr);
+    mono_domain_set(appDomain, true);
+
+    // Re-register all C++ functions for the new domain
+    RegisterInternalCalls();
+
+    // Reload the assembly
+    LoadScriptAssembly("./Scripts/GameScripts.dll");
+
+    std::cout << "Script assembly reloaded" << std::endl;
+}

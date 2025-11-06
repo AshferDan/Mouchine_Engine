@@ -14,6 +14,7 @@ public:
 	vec2 GetCameraPosition();
 
 	bool HasActiveCamera() const;
+	void ClearActiveCamera();
 
 private:
 	CameraManager() : activeCameraObject(nullptr) {};

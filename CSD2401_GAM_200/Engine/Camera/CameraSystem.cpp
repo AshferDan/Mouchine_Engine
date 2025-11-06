@@ -5,7 +5,7 @@ void CameraSystem::Update(float dt) {
 	auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
 
 	for (auto& obj : gameObjects) {
-		if (obj->IsActive()) {
+		if (!obj->IsActive()) {
 			continue;
 		}
 

@@ -15,13 +15,13 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
 
-const char *configFile = "./Logs/config.txt";
+const char *configFile = "../Logs/config.txt";
 const double two_pi = 6.28318530717958647692528676655900576;
 
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
       frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(false)
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -72,7 +72,7 @@ GraphicsSystem::GraphicsSystem()
 GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
       frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(false)
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -147,8 +147,8 @@ void GraphicsSystem::Initialize()
 
     // Compile and link the default shader program for rendering.
     // Requires "vertices.vert" (vertex shader) and "fragment.frag" (fragment shader).
-    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "./Shaders/vertices.vert"},
-                                {GL_FRAGMENT_SHADER, "./Shaders/fragment.frag"}});
+    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/vertices.vert"},
+                                {GL_FRAGMENT_SHADER, "../Shaders/fragment.frag"}});
 
     // Define vertex structure for a textured quad.
     struct Vertex
@@ -239,8 +239,8 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
     // Text Shader Initialize
-    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "./Shaders/text.vert"},
-                                    {GL_FRAGMENT_SHADER, "./Shaders/text.frag"}});
+    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/text.vert"},
+                                    {GL_FRAGMENT_SHADER, "../Shaders/text.frag"}});
 
     glGenVertexArrays(1, &textVAO);
     glGenBuffers(1, &textVBO);
@@ -288,16 +288,16 @@ void GraphicsSystem::Update(float)
 
     //// Orthographic projection: origin at bottom-left, size = window width/height
     //  Use editor camera for level editing, otherwise use default game camera
+        float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
+        float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
     if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop))
     {
         // EDITOR MODE: Use free editor camera for level editing
         // This allows designers to navigate and edit the level
-        vp = levelEditor->GetEditorViewProjection((float)Wwidth, (float)Wheight);
+        vp = levelEditor->GetEditorViewProjection((float)renderWidth, (float)renderHeight);
     }
     else
     {
-        float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
-        float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
@@ -755,9 +755,11 @@ void GraphicsSystem::RenderText(const std::map<char, Character> &characters, con
     textShader.SetUniform("textColor", color);
 
     mat4 projection;
+    float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
+    float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
     if (screenSpace)
     {
-        projection = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+        projection = mat4::ortho(0.0f, (float)renderWidth, 0.0f, (float)renderHeight);
     }
     else
     {
@@ -860,33 +862,26 @@ void GraphicsSystem::ResizeFrameBuffer(int width, int height)
     CreateFrameBuffer(width, height);
 }
 
-void GraphicsSystem::RenderGameViewportImGui()
+// apologies for messy code, used 2 float refs instead of ImVec2 because i didnt wanna include imgui.h here and slow compile time
+void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewportSizeY)
 {
-    if (!editorMode)
+    //if (!editorMode)
+    //{
+    //    return;
+    //}
+
+    if (viewportSizeX < 100.0f)
+        viewportSizeX = 800.0f;
+    if (viewportSizeY < 100.0f)
+        viewportSizeY = 600.0f;
+
+    if ((int)viewportSizeX != frameBufferWidth || (int)viewportSizeY != frameBufferHeight)
     {
-        return;
-    }
-
-    ImGui::Begin("Game Viewport");
-
-    ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-
-    // ADD THIS: Use minimum size if viewport is too small
-    if (viewportSize.x < 100.0f)
-        viewportSize.x = 800.0f;
-    if (viewportSize.y < 100.0f)
-        viewportSize.y = 600.0f;
-
-    if ((int)viewportSize.x != frameBufferWidth || (int)viewportSize.y != frameBufferHeight)
-    {
-        if (viewportSize.x > 0 && viewportSize.y > 0)
+        if (viewportSizeX > 0 && viewportSizeY > 0)
         {
-            ResizeFrameBuffer((int)viewportSize.x, (int)viewportSize.y);
+            ResizeFrameBuffer((int)viewportSizeX, (int)viewportSizeY);
         }
     }
-
-    ImGui::Image((void *)(intptr_t)frameBufferTexture, viewportSize, ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::End();
 }
 
 std::string GraphicsSystem::GetName()
