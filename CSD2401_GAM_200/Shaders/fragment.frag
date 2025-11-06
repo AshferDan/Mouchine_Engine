@@ -14,17 +14,11 @@ uniform int uUseBatching;
 
 uniform int uIsCircle;
 uniform int uHasTexture;
-uniform int uIsLine;
 
 void main() {
     vec4 baseColor = (uUseBatching == 1) ? VertColor : uColor;
     vec2 tiling = (uUseBatching == 1) ? UVScale : uTiling;
     vec2 offset = (uUseBatching == 1) ? UVOffset : uTexOffset;
-
-    if (uIsLine == 1) {
-        FragColor = uColor; // just draw solid color
-        return;
-    }
 
     if(uHasTexture == 1) {
         vec2 finalTexCoord = TexCoord * ((uUseBatching == 1) ? UVScale : uTiling)
