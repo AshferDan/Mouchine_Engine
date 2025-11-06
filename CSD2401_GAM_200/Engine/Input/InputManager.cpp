@@ -224,6 +224,12 @@ void InputManager::Update(float dt)
             forcesManager.RemoveForcesByType(ForceType::MoveLeft);
             forcesManager.RemoveForcesByType(ForceType::MoveRight);
 
+            // Add friction to slow down (only if not already present)
+            if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
+            {
+                forcesManager.AddFriction(&physics->isGrounded);
+            }
+
             // Reset footstep timer when not moving
             footstepTimer = 0.0f;
         }
@@ -247,13 +253,7 @@ void InputManager::Update(float dt)
         {
             // Reset timer when not moving or in air
             footstepTimer = 0.0f;
-            // Add friction to slow down (only if not already present)
-            if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
-            {
-                forcesManager.AddFriction(&physics->isGrounded);
-            }
         }
-
 
         // After forces are applied, clamp velocity
         if (std::abs(vx) > 200.f) {
