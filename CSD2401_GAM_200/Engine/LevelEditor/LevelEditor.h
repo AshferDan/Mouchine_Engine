@@ -23,15 +23,15 @@ using json = nlohmann::json;
  */
 enum class EditorMode
 {
-    Play,   // objects running but cant edit
-    Pause,  // game paused and objects frozen
-    Stop    // stopped, back to editor state
+    Play,   // game running, objects active
+    Pause,  // game paused, objects frozen
+    Stop    // stopped, back to editing
 };
 
 /**
  * @struct GameObjectData
  * @brief Serialisable data structure for saving/loading game object properties
- */
+ */ 
 struct GameObjectData
 {
     std::string name;

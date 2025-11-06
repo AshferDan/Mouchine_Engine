@@ -18,12 +18,23 @@ Technology is prohibited.
 #include <memory>
 #include <iostream>
 #include "System.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include <glm/glm.hpp>
+#include <GL/glew.h>
 
 class AudioEngine;
 
 namespace FMOD {
     class Sound;
 }
+
+struct Character {
+    GLuint TextureID;
+    glm::ivec2 size;
+    glm::ivec2 bearing;
+    GLuint advance;
+};
 
 /**
  * @class Resource
@@ -177,6 +188,48 @@ private:
 };
 
 /**
+ * @class FontResource
+ * @brief Manages font resource loading and character glyph caching
+ */
+class FontResource : public Resource {
+public:
+    // cnstructs font resource 
+    FontResource() : fontSize(0) {}
+
+    // destructs the font resource and unloads font data
+    ~FontResource() override;
+
+    // loads a font from a file using FreeType
+    bool Load(const std::string& filepath) override;
+
+    // loads a font with a specific size
+    bool Load(const std::string& filepath, GLuint size);
+
+    // unloads the font and deletes all character textures
+    void Unload() override;
+
+    // checks if the font is currently loaded
+    bool IsLoaded() const override { return loaded; }
+
+    // gets the map of loaded character glyphs
+    const std::map<char, Character>& GetCharacters() const { return characters; }
+
+    // gets the font size
+    GLuint GetFontSize() const { return fontSize; }
+
+    // sets the font size (requires reload to take effect)
+    void SetFontSize(GLuint size) { fontSize = size; }
+
+private:
+    std::map<char, Character> characters;
+    GLuint fontSize;
+
+    // loads all ASCII characters (0-127) from the font
+    void LoadCharacters(FT_Face face);
+};
+
+
+/**
  * @class ResourceManager
  * @brief Singleton manager for all game resources (textures, audio, etc.)
  */
@@ -256,6 +309,15 @@ public:
      */
     AudioEngine* GetAudioEngine() const { return audioEngine; }
 
+    // loads a font resource
+    FontResource* LoadFont(const std::string& name, const std::string& filepath, GLuint fontSize);
+
+    // retrieves a loaded font resource
+    FontResource* GetFont(const std::string& name);
+
+    // unloads a specific font resource
+    void UnloadFont(const std::string& name);
+
     /**
      * @brief Unloads all resources (textures and audio)
      */
@@ -271,6 +333,9 @@ public:
      */
     void UnloadAllAudio();
 
+    // unloads all font resources
+    void UnloadAllFonts();
+
     /**
      * @brief Gets the count of loaded textures
      * @return Number of loaded textures
@@ -283,13 +348,16 @@ public:
      */
     size_t GetAudioCount() const { return audioResources.size(); }
 
+    // gets the count of loaded fonts
+    size_t GetFontCount() const { return fonts.size(); }
+
     /**
      * @brief Prints information about all loaded resources
      */
     void PrintLoadedResources() const;
 
 private:
-    ResourceManager() {}
+    ResourceManager();
     ~ResourceManager() {
         UnloadAll();
         std::cout << "Resource manager destroyed" << std::endl;
@@ -297,8 +365,20 @@ private:
 
     std::map<std::string, std::unique_ptr<TextureResource>> textures;
     std::map<std::string, std::unique_ptr<AudioResource>> audioResources;
+    std::map<std::string, std::unique_ptr<FontResource>> fonts;
 
     AudioEngine* audioEngine = nullptr;
+    FT_Library ftLibrary = nullptr;
+    int ftRefCount = 0;
+
+    // initialises FreeType library if not already initialized
+    bool InitialiseFreeType();
+
+    // shuts down FreeType library if no fonts are using it
+    void ShutdownFreeType();
+
+    // gets the FreeType library instance
+    FT_Library GetFreeTypeLibrary() const { return ftLibrary; }
 
     /**
      * @brief Template helper to retrieve resources from maps
@@ -308,4 +388,6 @@ private:
      */
     template<typename Resource>
     Resource* GetResource(const std::string& name, std::map<std::string, std::unique_ptr<Resource>>& resourceMap);
+
+    friend class FontResource;  // allow font resource to access FreeType library
 };

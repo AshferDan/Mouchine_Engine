@@ -58,6 +58,7 @@ int main()
 
         GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
         textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen
+        textObj->AddComponent<RenderComponent>();
         auto* text = textObj->AddComponent<TextComponent>(
             "./Assets/FrederickatheGreat-Regular.ttf",
             48,  // Font size

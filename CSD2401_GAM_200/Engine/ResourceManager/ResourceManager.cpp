@@ -116,7 +116,119 @@ void AudioResource::Unload()
     }
 }
 
+// Font Resource Implementation
+FontResource::~FontResource()
+{
+    Unload();
+}
+
+// loads a font from file using default size (48)
+bool FontResource::Load(const std::string& filepath)
+{
+    return Load(filepath, 48);
+}
+
+// loads a font from file with specified size
+bool FontResource::Load(const std::string& filepath, GLuint size)
+{
+    if (loaded)
+    {
+        std::cout << "Font already loaded: " << filepath << std::endl;
+        return true;
+    }
+
+    // FreeType is initialized
+    if (!ResourceManager::Instance().InitialiseFreeType())
+    {
+        std::cerr << "Failed to initialize FreeType library" << std::endl;
+        return false;
+    }
+
+    this->filepath = filepath;
+    this->fontSize = size;
+
+    FT_Face face;
+    FT_Library ft = ResourceManager::Instance().GetFreeTypeLibrary();
+
+    if (FT_New_Face(ft, filepath.c_str(), 0, &face))
+    {
+        std::cerr << "ERROR::FREETYPE: Failed to load font: " << filepath << std::endl;
+        ResourceManager::Instance().ShutdownFreeType();
+        return false;
+    }
+
+    FT_Set_Pixel_Sizes(face, 0, fontSize);
+    LoadCharacters(face);
+    FT_Done_Face(face);
+
+    loaded = true;
+    std::cout << "Font loaded successfully: " << filepath << " (size: " << fontSize << ")" << std::endl;
+
+    return true;
+}
+
+// loads all ASCII characters from the font
+void FontResource::LoadCharacters(FT_Face face)
+{
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    for (unsigned char c = 0; c < 128; c++)
+    {
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+        {
+            std::cerr << "ERROR::FREETYPE: Failed to load Glyph for character: " << (int)c << std::endl;
+            continue;
+        }
+
+        GLuint texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RED,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
+            0, GL_RED, GL_UNSIGNED_BYTE,
+            face->glyph->bitmap.buffer
+        );
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        Character character = {
+            texture,
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            static_cast<GLuint>(face->glyph->advance.x)
+        };
+        characters.insert(std::pair<char, Character>(c, character));
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+}
+
+// unloads the font and deletes all character textures
+void FontResource::Unload()
+{
+    if (loaded)
+    {
+        for (auto& pair : characters)
+        {
+            glDeleteTextures(1, &pair.second.TextureID);
+        }
+        characters.clear();
+
+        ResourceManager::Instance().ShutdownFreeType();
+
+        loaded = false;
+        std::cout << "Font unloaded: " << filepath << std::endl;
+    }
+}
+
 // Resource Manager Implementation
+ResourceManager::ResourceManager()
+{}
+
 /**
  * @brief Loads a texture resource or returns existing one if already loaded
  */
@@ -237,6 +349,96 @@ void ResourceManager::UnloadAudio(const std::string &name)
     }
 }
 
+bool ResourceManager::InitialiseFreeType()
+{
+    if (ftRefCount == 0)
+    {
+        if (FT_Init_FreeType(&ftLibrary))
+        {
+            std::cerr << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+            return false;
+        }
+        std::cout << "FreeType library initialized" << std::endl;
+    }
+    ftRefCount++;
+    return true;
+}
+
+// shutdown FreeType library when no longer needed
+void ResourceManager::ShutdownFreeType()
+{
+    ftRefCount--;
+    if (ftRefCount == 0 && ftLibrary)
+    {
+        FT_Done_FreeType(ftLibrary);
+        ftLibrary = nullptr;
+        std::cout << "FreeType library shut down" << std::endl;
+    }
+}
+
+// load font resource
+FontResource* ResourceManager::LoadFont(const std::string& name, const std::string& filepath, GLuint fontSize)
+{
+    // create unique key with font name and size
+    std::string key = name + "_" + std::to_string(fontSize);
+
+    auto it = fonts.find(key);
+    if (it != fonts.end())
+    {
+        std::cout << "Font '" << name << "' (size: " << fontSize << ") already loaded, returning existing resource" << std::endl;
+        return it->second.get();
+    }
+
+    auto font = std::make_unique<FontResource>();
+    font->SetName(name);
+    font->SetFontSize(fontSize);
+
+    if (!font->Load(filepath, fontSize))
+    {
+        std::cerr << "Failed to load font: " << name << " from " << filepath << std::endl;
+        return nullptr;
+    }
+
+    FontResource* ptr = font.get();
+    fonts[key] = std::move(font);
+    return ptr;
+}
+
+// get font resource
+FontResource* ResourceManager::GetFont(const std::string& name)
+{
+    // try to find any font with this base name
+    for (auto& pair : fonts)
+    {
+        if (pair.second->GetName() == name)
+        {
+            return pair.second.get();
+        }
+    }
+
+    std::cerr << "Font not found: " << name << std::endl;
+    return nullptr;
+}
+
+//unload font
+void ResourceManager::UnloadFont(const std::string& name)
+{
+    // unload all fonts with this base name
+    auto it = fonts.begin();
+    while (it != fonts.end())
+    {
+        if (it->second->GetName() == name)
+        {
+            it = fonts.erase(it);
+            std::cout << "Font '" << name << "' unloaded from resource manager" << std::endl;
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
 /**
  * @brief Unloads all textures and audio resources
  */
@@ -245,6 +447,7 @@ void ResourceManager::UnloadAll()
     std::cout << "Unloading all resources..." << std::endl;
     UnloadAllTextures();
     UnloadAllAudio();
+    UnloadAllFonts();
 }
 
 /**
@@ -263,6 +466,13 @@ void ResourceManager::UnloadAllAudio()
 {
     std::cout << "Unloading " << audioResources.size() << " audio resources" << std::endl;
     audioResources.clear();
+}
+
+// unload all font resources
+void ResourceManager::UnloadAllFonts()
+{
+    std::cout << "Unloading " << fonts.size() << " fonts" << std::endl;
+    fonts.clear();
 }
 
 /**
@@ -284,6 +494,14 @@ void ResourceManager::PrintLoadedResources() const
     for (const auto &pair : audioResources)
     {
         std::cout << "  - " << pair.first << " -> " << pair.second->GetFilePath() << std::endl;
+    }
+
+    std::cout << "Fonts (" << fonts.size() << "):" << std::endl;
+    for (const auto& pair : fonts)
+    {
+        std::cout << "  - " << pair.second->GetName()
+            << " (Size: " << pair.second->GetFontSize() << ")"
+            << " -> " << pair.second->GetFilePath() << std::endl;
     }
 }
 
