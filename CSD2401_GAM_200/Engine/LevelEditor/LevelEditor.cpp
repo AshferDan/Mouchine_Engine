@@ -1415,3 +1415,34 @@ void LevelEditor::PerformSceneReload()
     pendingSceneReload = false;
     pendingScenePath.clear();
 }
+
+void LevelEditor::PlayLoadedBGM()
+{
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+
+    if (audioEngine && !currentBGMName.empty())
+    {
+        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
+            << " on channel: " << currentBGMChannel << std::endl;
+
+        // stop any existing sound on this channel first
+        audioEngine->stopSound(currentBGMChannel);
+
+        // play the BGM
+        audioEngine->playSound(currentBGMName, currentBGMChannel);
+        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+
+        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
+    }
+    else
+    {
+        if (!audioEngine)
+        {
+            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
+        }
+        else if (currentBGMName.empty())
+        {
+            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
+        }
+    }
+}

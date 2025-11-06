@@ -163,6 +163,8 @@ void CoreEngine::GameLoop()
         {
             LevelEditor *level = GetLevelEditor();
             level->LoadLevelJSON(m_pendingScene);
+            std::cout << "[CoreEngine] Scene loaded, playing BGM if available..." << std::endl;
+            level->PlayLoadedBGM();
             m_pendingScene = "";
             m_hasPendingLoad = false;
 

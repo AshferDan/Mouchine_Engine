@@ -255,7 +255,7 @@ public:
 
     bool HasPendingSceneReload() const { return pendingSceneReload; }
     void PerformSceneReload();
-
+    void PlayLoadedBGM();
 private:
     // GUI rendering functions
     /**
