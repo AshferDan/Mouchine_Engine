@@ -16,7 +16,7 @@ Technology is prohibited.
 #include "LevelEditor.h"
 
 bool InputManager::KeyStateQuit = false;
-CoreEngine *CORE;
+CoreEngine* CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
@@ -28,7 +28,7 @@ std::map<std::string, double> g_systemTimings;
    Constuctor
 
    */
-CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0)
+CoreEngine::CoreEngine() : WindWidth(0), WindHeight(0), accumulator(0.0), stepMode(false), stepOnce(false)
 {
     LastTime = 0;
     GameActive = true;
@@ -50,9 +50,9 @@ CoreEngine::~CoreEngine()
    window width and height to the graphics system
 
    */
-void CoreEngine::ConfigFile(const char *configF)
+void CoreEngine::ConfigFile(const char* configF)
 {
-    std::ifstream fp{configF};
+    std::ifstream fp{ configF };
     if (!fp)
     {
         std::cout << "Cannot find file" << std::endl;
@@ -140,6 +140,7 @@ void CoreEngine::GameLoop()
 {
     double fps_interval = 1.0;
     const double max_frame_time = 0.25; // Cap frame time to prevent spiral of death
+    accumulator = 0.0;
 
     while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
     {
@@ -175,200 +176,132 @@ void CoreEngine::GameLoop()
         // Start ImGui frame
         if (imguiSystem)
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glViewport(0, 0, graphicsSystem->GetWindowWidth(), graphicsSystem->GetWindowHeight());
-            glClearColor(0.15f, 0.15f, 0.15f, 1.f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+        }
 
-            // 1. Clear previous frame timings and reset total time
-            g_systemTimings.clear();
-            g_totalLoopTime = 0.0;
-
-            // 2. Start ImGui frame ALWAYS (not conditionally)
-            if (imguiSystem)
+        // FIXED TIMESTEP LOOP - Run physics multiple times if needed
+        while (accumulator >= fixed_dt)
+        {
+            // InputManager ALWAYS updates (even in step mode) to detect F2/F3 keys
+            if (inputManager)
             {
-                ImGui_ImplOpenGL3_NewFrame();
-                ImGui_ImplGlfw_NewFrame();
-                ImGui::NewFrame();
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                inputManager->Update(static_cast<float>(fixed_dt));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[inputManager->GetName()] += ms;
+                g_totalLoopTime += ms;
             }
 
-            // 3. Get editor mode (if level editor exists)
-            LevelEditor *levelEditor = nullptr;
-            for (auto &uptr : Systems) // unique_ptr iteration
+            // Only run physics if NOT in step mode, OR if stepping once
+            if (!stepMode || stepOnce)
             {
-                ISystem *sys = uptr.get(); // convert to raw
-                if (sys && sys->GetName() == "LevelEditor")
+                // Update physics-dependent systems with FIXED timestep
+                if (gameObjectSystem)
                 {
-                    levelEditor = static_cast<LevelEditor *>(sys);
-                    break;
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    gameObjectSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[gameObjectSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
                 }
+
+                if (transformSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    transformSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[transformSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                if (collisionSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    collisionSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[collisionSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                if (physicsSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    physicsSystem->Update(static_cast<float>(fixed_dt));
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[physicsSystem->GetName()] += ms;
+                    g_totalLoopTime += ms;
+                }
+
+                stepOnce = false; // Reset after processing one frame
             }
 
-            EditorMode currentMode = EditorMode::Stop;
-            if (levelEditor)
-                currentMode = levelEditor->GetEditorMode();
+            // In step mode, only process ONE timestep then break
+            if (stepMode)
+                break;
 
-            // 4. Update all systems based on editor mode
-            for (size_t i = 0; i < Systems.size(); ++i)
-            {
-                if (Systems[i]->GetName() == "ImGui_System")
-                    continue;
-
-                // freeze time while paused
-                float sysDt = (currentMode == EditorMode::Pause)
-                                  ? 0.0f
-                                  : static_cast<float>(CoreEngine::GetDeltaTime());
-
-                auto sysStart = std::chrono::high_resolution_clock::now();
-                Systems[i]->Update(sysDt);
-                auto sysEnd = std::chrono::high_resolution_clock::now();
-
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[Systems[i]->GetName()] = ms;
-                g_totalLoopTime += ms;
-            }
-
-            // 5. Always update ImGui system
-            if (imguiSystem)
-            {
-                auto sysStart = std::chrono::high_resolution_clock::now();
-                imguiSystem->Update(static_cast<float>(CoreEngine::GetDeltaTime()));
-                auto sysEnd = std::chrono::high_resolution_clock::now();
-
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[imguiSystem->GetName()] = ms;
-                g_totalLoopTime += ms;
-            }
-
-            // if (InputManager::RequestChangeScene) {
-            //     GameObjectFactory::Instance().Clear();
-            //     LoadPrefab(InputManager::NextScenePath);
-            //     InputManager::RequestChangeScene = false;
-            // }
-
-            // 6. End ImGui frame and render (ALWAYS)
-            if (imguiSystem)
-            {
-                ImGui::Render();
-                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-            }
-
-            // 7. Swap buffers and poll events
-            glfwSwapBuffers(graphicsSystem->getWindow());
-            glfwPollEvents();
+            accumulator -= fixed_dt;
         }
-    }
-    // FIXED TIMESTEP LOOP - Run physics multiple times if needed
-    while (accumulator >= fixed_dt)
-    {
-        // Update physics-dependent systems with FIXED timestep
-        if (inputManager)
+
+        // VARIABLE TIMESTEP - Rendering and UI systems
+        if (graphicsSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            inputManager->Update(static_cast<float>(fixed_dt));
+            graphicsSystem->Update(static_cast<float>(delta_time));
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[inputManager->GetName()] += ms;
+            g_systemTimings[graphicsSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
-        if (gameObjectSystem)
+        if (debugSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            gameObjectSystem->Update(static_cast<float>(fixed_dt));
+            debugSystem->Update(static_cast<float>(delta_time));
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[gameObjectSystem->GetName()] += ms;
+            g_systemTimings[debugSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
-        if (transformSystem)
+        if (levelEditor)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            transformSystem->Update(static_cast<float>(fixed_dt));
+            levelEditor->Update(static_cast<float>(delta_time));
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[transformSystem->GetName()] += ms;
+            g_systemTimings[levelEditor->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
-        if (collisionSystem)
+        if (imguiSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            collisionSystem->Update(static_cast<float>(fixed_dt));
+            imguiSystem->Update(static_cast<float>(delta_time));
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[collisionSystem->GetName()] += ms;
+            g_systemTimings[imguiSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
-        if (physicsSystem)
+        // End ImGui frame and render
+        if (imguiSystem)
         {
-            std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            physicsSystem->Update(static_cast<float>(fixed_dt));
-            std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[physicsSystem->GetName()] += ms;
-            g_totalLoopTime += ms;
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
 
-        // Subtract fixed_dt from accumulator
-        accumulator -= fixed_dt;
+        // Swap buffers and poll events
+        glfwSwapBuffers(graphicsSystem->getWindow());
+        glfwPollEvents();
     }
-
-    // VARIABLE TIMESTEP - Rendering and UI systems
-    if (graphicsSystem)
-    {
-        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-        graphicsSystem->Update(static_cast<float>(delta_time));
-        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-        g_systemTimings[graphicsSystem->GetName()] = ms;
-        g_totalLoopTime += ms;
-    }
-
-    if (debugSystem)
-    {
-        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-        debugSystem->Update(static_cast<float>(delta_time));
-        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-        g_systemTimings[debugSystem->GetName()] = ms;
-        g_totalLoopTime += ms;
-    }
-
-    if (levelEditor)
-    {
-        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-        levelEditor->Update(static_cast<float>(delta_time));
-        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-        g_systemTimings[levelEditor->GetName()] = ms;
-        g_totalLoopTime += ms;
-    }
-
-    if (imguiSystem)
-    {
-        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-        imguiSystem->Update(static_cast<float>(delta_time));
-        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-        g_systemTimings[imguiSystem->GetName()] = ms;
-        g_totalLoopTime += ms;
-    }
-
-    // End ImGui frame and render
-    if (imguiSystem)
-    {
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
-
-    // Swap buffers and poll events
-    glfwSwapBuffers(graphicsSystem->getWindow());
-    glfwPollEvents();
 }
-
 
 /* brief
    This function deletes the engines and stops the engine processes and clears all systems
@@ -422,7 +355,7 @@ void CoreEngine::update_time(double fps_calc_interval)
 
     title_str = "Game Engine | FPS:" + tempfps + " | DT: " + tempdt + " | Fixed DT: " + tempfixeddt;
 
-    GLFWwindow *Wind = CORE->GetGraphicsSystem()->getWindow();
+    GLFWwindow* Wind = CORE->GetGraphicsSystem()->getWindow();
     if (Wind)
     {
         glfwSetWindowTitle(Wind, title_str.c_str());

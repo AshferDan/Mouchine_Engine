@@ -2,10 +2,6 @@
 
 float dt = CoreEngine::GetDeltaTime();
 float fps = CoreEngine::GetFPS();
-void Update(float dt) {
-
-}
-
 TransformSystem::TransformSystem() {
 
 }
