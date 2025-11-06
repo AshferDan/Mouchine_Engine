@@ -17,7 +17,8 @@ void MenuLogicSystem::Update(float dt)
         if (IsButtonClicked(factory.FindGameObject("PlayButton"), mouseX, mouseY))
         {
             std::cout << "PlayButton Clicked!" << std::endl;
-            CORE->RequestSceneLoad("Prefab_TestScene");
+            
+            CORE->RequestSceneLoad("..\\Assets\\Scenes\\Prefab_TestScene.json");
             return;
         }
 
@@ -25,7 +26,7 @@ void MenuLogicSystem::Update(float dt)
         if (IsButtonClicked(factory.FindGameObject("SettingsButton"), mouseX, mouseY))
         {
             std::cout << "SettingsButton Clicked!" << std::endl;
-            CORE->RequestSceneLoad("Prefab_TestScene2");
+            CORE->RequestSceneLoad("..\\Assets\\Scenes\\Prefab_TestScene2.json");
             return;
         }
 
@@ -33,7 +34,7 @@ void MenuLogicSystem::Update(float dt)
         if (IsButtonClicked(factory.FindGameObject("QuitButton"), mouseX, mouseY))
         {
             std::cout << "QuitButton Clicked!" << std::endl;
-            CORE->RequestSceneLoad("Prefab_TestScene3");
+            CORE->RequestSceneLoad("..\\Assets\\Scenes\\Prefab_TestScene3.json");
             return;
         }
     }

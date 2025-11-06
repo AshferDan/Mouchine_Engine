@@ -95,15 +95,15 @@ void CameraManager::ResetState() {
         camComp->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
         camComp->SetFollowTarget(hero);
         camComp->SetFollowOffset({ 0.f, 0.f });
-        camComp->SetSmoothing(true, 5.f); // Increased smoothing speed a bit
+        camComp->SetSmoothing(true, 5.f); 
 
-        // Snap instantly to hero position
+       
         if (auto* heroTx = hero->GetComponent<TransformComponent>()) {
             camComp->SetPosition({ heroTx->posX, heroTx->posY });
         }
     }
     else if (camComp) {
-        // Fallback if no hero: just center camera
+        
         camComp->SetMode(CameraComponent::CameraMode::FIXED);
         camComp->SetPosition(0.f, 0.f);
     }

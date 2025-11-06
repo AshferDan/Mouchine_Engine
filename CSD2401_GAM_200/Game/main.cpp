@@ -54,12 +54,12 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        //Serialization::LoadScene("Prefab_TestScene");
+        //CORE->RequestSceneLoad("Prefab_TestScene");
+       
+        GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+        auto* cam = mainCamera->AddComponent<CameraComponent>();
 
-        GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
-        auto *cam = mainCamera->AddComponent<CameraComponent>();
-
-        GameObject *player = GameObjectFactory::Instance().FindGameObject("Hero");
+        GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
         if (player)
         {
             cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);

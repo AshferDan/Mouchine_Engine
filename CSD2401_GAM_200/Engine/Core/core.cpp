@@ -161,9 +161,11 @@ void CoreEngine::GameLoop()
     {
 
         if (m_hasPendingLoad) {
-            Serialization::LoadScene(m_pendingScene);
-            m_pendingScene = "";
-            m_hasPendingLoad = false;
+            LevelEditor* level = GetLevelEditor();
+            level->LoadLevelJSON(m_pendingScene);
+                m_pendingScene = "";
+                m_hasPendingLoad = false;
+            
             if (inputManager) inputManager->ResetState();
             CameraManager::Instance().ResetState();
             accumulator = 0.0;
