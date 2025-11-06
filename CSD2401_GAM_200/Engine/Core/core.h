@@ -38,6 +38,7 @@ Technology is prohibited.
 #include "MathLib.h"
 #include "Serialization.h"
 #include "LevelEditor.h"
+#include "MenuLogic.h"
 
 #include "Message.h"
 #include "IMessageHandler.h"
@@ -53,6 +54,7 @@ class DebugSystem;
 class TransformSystem;
 class ScriptSystem;
 class LevelEditor;
+class MenuLogicSystem;
 class CoreEngine : public IMessageHandler
 {
 public:
@@ -185,6 +187,10 @@ public:
         return levelEditor;
     }
 
+    MenuLogicSystem* GetMenuLogic() const {
+        return menuLogicSystem;
+    }
+
     /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
@@ -256,6 +262,8 @@ private:
     ScriptSystem *scriptSystem = nullptr;
     CameraSystem *cameraSystem = nullptr;
     LevelEditor *levelEditor = nullptr;
+    MenuLogicSystem* menuLogicSystem = nullptr;
+
 
     unsigned LastTime;
     bool GameActive;
