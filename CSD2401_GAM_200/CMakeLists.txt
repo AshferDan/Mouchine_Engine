@@ -386,7 +386,6 @@ if(TARGET fmod)
     
     message(STATUS "✓ FMOD DLLs copied successfully")
 endif()
-
 # ======================= Copy Mono Runtime Files (One-time at configure) =================
 set(MONO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Extern/Mono")
 set(MONO_DLL_DIR "${MONO_ROOT_DIR}/bin")
@@ -403,51 +402,36 @@ if(EXISTS "${MONO_ROOT_DIR}")
         NO_DEFAULT_PATH
     )
     
+ 
     find_file(MONO_POSIX_HELPER_DLL
         NAMES MonoPosixHelper.dll
         PATHS ${MONO_DLL_DIR}
         NO_DEFAULT_PATH
     )
     
-    # Copy Mono DLLs to all build configurations (Debug and Release)
+    # Copy Mono DLLs to the /Build folder
     if(MONO_DLL)
-        copy_runtime_dependency_once("${MONO_DLL}" "${CMAKE_BINARY_DIR}/bin/Debug")
-        copy_runtime_dependency_once("${MONO_DLL}" "${CMAKE_BINARY_DIR}/bin/Release")
         copy_runtime_dependency_once("${MONO_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}/Build")
-        copy_runtime_dependency_once("${MONO_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}")
     endif()
     
+ 
     if(MONO_POSIX_HELPER_DLL)
-        copy_runtime_dependency_once("${MONO_POSIX_HELPER_DLL}" "${CMAKE_BINARY_DIR}/bin/Debug")
-        copy_runtime_dependency_once("${MONO_POSIX_HELPER_DLL}" "${CMAKE_BINARY_DIR}/bin/Release")
         copy_runtime_dependency_once("${MONO_POSIX_HELPER_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}/Build")
-        copy_runtime_dependency_once("${MONO_POSIX_HELPER_DLL}" "${CMAKE_CURRENT_SOURCE_DIR}")
     endif()
     
     # Copy Mono lib directory (mscorlib.dll)
     if(EXISTS "${MONO_LIB_DIR}")
-        copy_directory_once("${MONO_LIB_DIR}" "${CMAKE_BINARY_DIR}/bin/Debug/mono/lib" 
-            "Copied Mono lib to Debug")
-        copy_directory_once("${MONO_LIB_DIR}" "${CMAKE_BINARY_DIR}/bin/Release/mono/lib" 
-            "Copied Mono lib to Release")
         copy_directory_once("${MONO_LIB_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/lib"
-            "Copied Mono lib to Build root")
-        copy_directory_once("${MONO_LIB_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/mono/lib"
-            "Copied Mono lib to project root")
+   
+             "Copied Mono lib to Build root")
     else()
         message(FATAL_ERROR "Mono lib directory not found at: ${MONO_LIB_DIR}")
     endif()
     
     # Copy Mono etc directory
     if(EXISTS "${MONO_ETC_DIR}")
-        copy_directory_once("${MONO_ETC_DIR}" "${CMAKE_BINARY_DIR}/bin/Debug/mono/etc"
-            "Copied Mono etc to Debug")
-        copy_directory_once("${MONO_ETC_DIR}" "${CMAKE_BINARY_DIR}/bin/Release/mono/etc"
-            "Copied Mono etc to Release")
         copy_directory_once("${MONO_ETC_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/Build/mono/etc"
             "Copied Mono etc to Build root")
-        copy_directory_once("${MONO_ETC_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/mono/etc"
-            "Copied Mono etc to project root")
     else()
         message(FATAL_ERROR "Mono etc directory not found at: ${MONO_ETC_DIR}")
     endif()
