@@ -1,22 +1,12 @@
 #pragma once
 #include "Component.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
 #include <map>
 #include <string>
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include "gameObject.h"
 #include "MathLib.h"
-
-
-
-struct Character {
-	GLuint TextureID;
-	glm::ivec2 size;
-	glm::ivec2 bearing;
-	GLuint advance;
-};
+#include "ResourceManager.h"
 
 class TextComponent : public IComponent {
 public:
@@ -32,7 +22,7 @@ public:
 	void SetScale(float newScale) { scale = newScale; }
 	float GetScale() const { return scale; }
 
-	const std::map<char, Character>& GetCharacters() const { return characters; }
+	const std::map<char, Character>& GetCharacters() const;
 
 	void SetScreenSpace(bool isScreenSpace) { screenSpace = isScreenSpace; }
 	bool isScreenSpace() const { return screenSpace; }
@@ -48,8 +38,8 @@ private:
 	bool screenSpace;
 	std::string fontPath;
 	GLuint fontSize;
-
-	std::map<char, Character> characters;
+	std::string fontResourceName; // unique identifier for the font in resource manager
+	FontResource* fontResource; // pointer to the shared font resource
 
 	void LoadFont(const char* fontPath, GLuint fontSize);
 };

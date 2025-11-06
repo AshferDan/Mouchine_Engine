@@ -31,6 +31,7 @@ Technology is prohibited.
 #include "audio.h"
 #include "InputManager.h"
 #include "ScriptAPI.h"
+#include "ScriptingSystem.h"
 #include "Serialization.h"
 #include "PrefabManager.h"
 #include "LevelEditor.h"

@@ -75,7 +75,7 @@ void CoreEngine::ConfigFile(const char* configF)
    */
 void CoreEngine::InitSystems()
 {
-    CoreEngine::ConfigFile("./Logs/config.txt");
+    CoreEngine::ConfigFile("../Logs/config.txt");
     std::cout << "Initializing default systems..." << std::endl;
 
     // 1. Graphics first (needed for window)
@@ -109,6 +109,7 @@ void CoreEngine::InitSystems()
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
+    scriptSystem = AddSystem<ScriptSystem>();
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
@@ -128,6 +129,7 @@ void CoreEngine::InitSystems()
 void CoreEngine::Init()
 {
     InitSystems();
+
     std::cout << "Initializing CoreEngine with " << Systems.size() << " systems" << std::endl;
 
     for (size_t i = 0; i < Systems.size(); ++i)
@@ -179,12 +181,19 @@ void CoreEngine::GameLoop()
             g_systemTimings[debugSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
+        if (scriptSystem) 
+            g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glViewport(0, 0, graphicsSystem->GetWindowWidth(), graphicsSystem->GetWindowHeight());
+            glClearColor(0.15f, 0.15f, 0.15f, 1.f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
@@ -204,8 +213,10 @@ void CoreEngine::GameLoop()
                 g_totalLoopTime += ms;
             }
 
-            // Only run physics if NOT in step mode, OR if stepping once
-            if (!stepMode || stepOnce)
+            bool isPaused = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause);
+
+            // Only run physics if NOT in step mode/paused, OR if stepping once
+            if ((!stepMode && !isPaused) || stepOnce)
             {
                 // Update physics-dependent systems with FIXED timestep
                 if (gameObjectSystem)
@@ -269,6 +280,16 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
+        if (scriptSystem)
+        {
+            std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+            scriptSystem->Update(static_cast<float>(delta_time)); // Use variable delta_time
+            std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+            g_systemTimings[scriptSystem->GetName()] = ms;
+            g_totalLoopTime += ms;
+        }
+
         if (debugSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -287,6 +308,11 @@ void CoreEngine::GameLoop()
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[levelEditor->GetName()] = ms;
             g_totalLoopTime += ms;
+        }
+
+        if (levelEditor && levelEditor->HasPendingSceneReload())
+        {
+            levelEditor->PerformSceneReload();
         }
 
         if (imguiSystem)

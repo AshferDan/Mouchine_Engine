@@ -27,3 +27,4 @@ _deps
 CmakeCache.txt
 build/
 Build/
+*.csproj.filters

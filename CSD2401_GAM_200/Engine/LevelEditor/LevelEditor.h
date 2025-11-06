@@ -23,15 +23,15 @@ using json = nlohmann::json;
  */
 enum class EditorMode
 {
-    Play,   // objects running but cant edit
-    Pause,  // game paused and objects frozen
-    Stop    // stopped, back to editor state
+    Play,   // game running, objects active
+    Pause,  // game paused, objects frozen
+    Stop    // stopped, back to editing
 };
 
 /**
  * @struct GameObjectData
  * @brief Serialisable data structure for saving/loading game object properties
- */
+ */ 
 struct GameObjectData
 {
     std::string name;
@@ -250,6 +250,9 @@ public:
     // camera zoom
     float GetCameraZoom() const { return cameraZoom; }
 
+    bool HasPendingSceneReload() const { return pendingSceneReload; }
+    void PerformSceneReload();
+
 private:
     // GUI rendering functions
     /**
@@ -343,6 +346,8 @@ private:
     EntityID savedEntityIDCounter;
     std::vector<GameObjectData> savedSceneData;
     bool hasValidSaveState;               // track if we have a valid saved state to restore
+    bool pendingSceneReload = false;
+    std::string pendingScenePath;         // path to reload
 
     // Editor camera state
     float cameraX;                        // camera position X

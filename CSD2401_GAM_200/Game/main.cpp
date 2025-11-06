@@ -53,38 +53,71 @@ int main()
         AudioEngine audio;
 
         API::Init_Engine(engine, audio);
-        
-        Serialization::LoadScene("Prefab_TestScene");
 
-        GameObject* textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
-        textObj->AddComponent<TransformComponent>(100.0f, 100.0f);  // Position on screen
-        auto* text = textObj->AddComponent<TextComponent>(
+        //Serialization::LoadScene("Prefab_TestScene");
+
+        GameObject *textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
+        textObj->AddComponent<TransformComponent>(100.f, 100.f); // Position on screen
+        textObj->AddComponent<RenderComponent>();
+        auto *text = textObj->AddComponent<TextComponent>(
             "./Assets/FrederickatheGreat-Regular.ttf",
-            48,  // Font size
+            48, // Font size
             "Score: 0",
             vec4(1.0f, 1.0f, 1.0f, 1.0f),
-            true
-        );
+            true);
+        text->SetScreenSpace(true);
         text->SetScale(1.0f);
 
         // Later, update the text:
         text->SetText("Score: 100");
 
-        GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
-        auto* cam = mainCamera->AddComponent<CameraComponent>();
+        GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+        auto *cam = mainCamera->AddComponent<CameraComponent>();
 
-        GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
-        if (player) {
+        GameObject *player = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (player)
+        {
             cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
-            //WHEN CAMERA MODE IS FIXED
-            //cam->SetPosition(0.f, 0.f);
+            // WHEN CAMERA MODE IS FIXED
+            // cam->SetPosition(0.f, 0.f);
             cam->SetFollowTarget(player);
             cam->SetFollowOffset(vec2(0.f, 0.f));
             cam->SetSmoothing(true, 2.f);
         }
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
-    
+        std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+
+        ScriptSystem *scriptSys = engine.GetScriptSystem();
+
+        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        if (scriptSys && squareSpawner)
+        {
+            // Attach the TestGameObject script (creates red and blue squares)
+            bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
+            if (attached)
+            {
+                std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
+
+                // Call OnStart to actually create the squares
+                scriptSys->CallOnStart(squareSpawner);
+                std::cout << "Called OnStart - Two squares should be created!" << std::endl;
+            }
+            else
+            {
+                std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
+                std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
+                std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
+            }
+        }
+        else
+        {
+            if (!scriptSys)
+                std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
+            if (!squareSpawner)
+                std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
+        }
+
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
@@ -97,10 +130,7 @@ int main()
         CrashHandler::LogCrash("UNKNOWN EXCEPTION");
     }
     return 0;
-
 }
-
-
 
 namespace CrashHandler
 {

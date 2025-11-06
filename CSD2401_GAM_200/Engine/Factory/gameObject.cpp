@@ -116,5 +116,27 @@ void GameObject::RemoveChild(GameObject* ChildGO)
 
 void GameObject::SetParent(GameObject* ParentGO)
 {
+    if (GetParent())
+    {
+        GetParent()->RemoveChild(this);
+    }
     ParentGO->AddChild(this);
+}
+
+GameObject* GameObject::GetParent() const
+{
+    return parent;
+}
+
+std::vector<GameObject*> GameObject::GetAllChildren() const
+{
+    return children;
+}
+
+void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree)
+{
+    for (auto& child : parent->GetAllChildren()) {
+        familyTree.push_back(child->GetID());
+        GetFamilyTree(child, familyTree); // Recursively get grandchildren
+    }
 }

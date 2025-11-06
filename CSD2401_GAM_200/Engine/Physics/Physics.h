@@ -37,7 +37,7 @@ public:
      * @param type The type of force to add
      * @param mass The object's mass
      */
-    void AddForce(ForceType type, float mass) {
+    void AddForce(ForceType type) {
         switch (type) {
         case ForceType::Jump:
             // Only add if not already jumping
@@ -56,7 +56,7 @@ public:
                 forces.push_back(std::make_unique<LinearDirectionalForce>(
                     1.0f, 0.0f,
                     ForceConstants::MOVE_FORCE,
-                    0.1f,
+                    -1.0f,
                     ForceType::MoveRight
                 ));
             }
@@ -67,7 +67,7 @@ public:
                 forces.push_back(std::make_unique<LinearDirectionalForce>(
                     -1.0f, 0.0f,
                     ForceConstants::MOVE_FORCE,
-                    0.1f,
+                    -1.0f,
                     ForceType::MoveLeft
                 ));
             }
@@ -85,6 +85,15 @@ public:
      */
     void AddDrag() {
         forces.push_back(std::make_unique<DragForce>(ForceConstants::DRAG_COEFFICIENT));
+    }
+
+    /**
+     * @brief Add friction force (ground friction)
+     * @param groundedPtr Pointer to grounded state
+     */
+    void AddFriction(bool* groundedPtr) {
+        forces.push_back(std::make_unique<FrictionForce>(
+            ForceConstants::FRICTION_COEFFICIENT, groundedPtr));
     }
 
     /**
@@ -194,7 +203,12 @@ public:
             std::remove_if(forces.begin(), forces.end(),
                 [type](const std::unique_ptr<Force>& force) {
                     auto* linearForce = dynamic_cast<LinearDirectionalForce*>(force.get());
-                    return linearForce && linearForce->type == type;
+                    if (linearForce && linearForce->type == type) return true;
+
+                    auto* frictionForce = dynamic_cast<FrictionForce*>(force.get());
+                    if (frictionForce && frictionForce->type == type) return true;
+
+                    return false;
                 }),
             forces.end()
         );
@@ -208,9 +222,10 @@ public:
     int FindForceByType(ForceType type) const {
         for (size_t i = 0; i < forces.size(); ++i) {
             auto* linearForce = dynamic_cast<LinearDirectionalForce*>(forces[i].get());
-            if (linearForce && linearForce->type == type) {
-                return static_cast<int>(i);
-            }
+            if (linearForce && linearForce->type == type) return static_cast<int>(i);
+
+            auto* frictionForce = dynamic_cast<FrictionForce*>(forces[i].get());
+            if (frictionForce && frictionForce->type == type) return static_cast<int>(i);
         }
         return -1;
     }
