@@ -227,13 +227,14 @@ void LevelEditor::EnterPlayMode()
     editorMode = EditorMode::Play;
 
     AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-    if (audioEngine)
+    if (audioEngine && !currentBGMName.empty())
     {
-        std::cout << "[LevelEditor] Starting background music..." << std::endl;
-        audioEngine->playSound("bgm", "bgm_channel");
-        audioEngine->setVolume("bgm_channel", 0.2f);
+        std::cout << "[LevelEditor] Starting background music: " << currentBGMName << std::endl;
+        // Ensure it's stopped before starting to avoid doubling up if spamming play/stop
+        audioEngine->stopSound(currentBGMChannel);
+        audioEngine->playSound(currentBGMName, currentBGMChannel);
+        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
     }
-
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
 
@@ -244,10 +245,10 @@ void LevelEditor::StopPlayMode()
         return;
 
     AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-    if (audioEngine)
+    if (audioEngine && !currentBGMChannel.empty())
     {
-        std::cout << "[LevelEditor] Stopping background music..." << std::endl;
-        audioEngine->stopSound("bgm_channel");
+        std::cout << "[LevelEditor] Stopping background music on " << currentBGMChannel << std::endl;
+        audioEngine->stopSound(currentBGMChannel);
     }
 
     RestoreSceneState();           // restore saved scene
@@ -267,34 +268,24 @@ void LevelEditor::TogglePause()
     {
         editorMode = EditorMode::Pause;
 
-        // pause background music
-        if (audioEngine)
+        if (audioEngine && !currentBGMChannel.empty())
         {
-            std::cout << "[LevelEditor] Attempting to pause music on channel 'bgm_channel'..." << std::endl;
-            audioEngine->pauseSound("bgm_channel", true);
-
-            // verify if it's actually playing
-            bool stillPlaying = audioEngine->isPlaying("bgm_channel");
-            std::cout << "[LevelEditor] After pause, isPlaying = " << (stillPlaying ? "true" : "false") << std::endl;
+            std::cout << "[LevelEditor] Pausing music on channel " << currentBGMChannel << std::endl;
+            // CHANGED: Use currentBGMChannel instead of hardcoded string
+            audioEngine->pauseSound(currentBGMChannel, true);
         }
-        else
-        {
-            std::cout << "[LevelEditor] ERROR: AudioEngine is null!" << std::endl;
-        }
-
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
     else if (editorMode == EditorMode::Pause)
     {
         editorMode = EditorMode::Play;
 
-        // resume background music
-        if (audioEngine)
+        if (audioEngine && !currentBGMChannel.empty())
         {
-            std::cout << "[LevelEditor] Attempting to resume music on channel 'bgm_channel'..." << std::endl;
-            audioEngine->pauseSound("bgm_channel", false);
+            std::cout << "[LevelEditor] Resuming music on channel " << currentBGMChannel << std::endl;
+            // CHANGED: Use currentBGMChannel instead of hardcoded string
+            audioEngine->pauseSound(currentBGMChannel, false);
         }
-
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
@@ -619,25 +610,24 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
             if (settings.contains("backgroundMusic") && audio)
             {
                 const auto& bgm = settings["backgroundMusic"];
-                std::string name = bgm.value("name", "bgm");
+                // Store settings in member variables instead of local variables
+                currentBGMName = bgm.value("name", "");
                 std::string path = bgm.value("path", "");
-                bool        loop = bgm.value("looping", true);
-                float       vol = bgm.value("volume", 0.8f);
-                std::string chan = bgm.value("channel", "bgm");
+                bool loop = bgm.value("looping", true);
+                currentBGMVolume = bgm.value("volume", 0.5f);
+                currentBGMChannel = bgm.value("channel", "bgm_channel");
 
-                if (!path.empty())
+                if (!path.empty() && !currentBGMName.empty())
                 {
-                    std::cout << "[LoadLevel] Loading BGM: " << name << " from " << path << "\n";
-                    if (resourceMgr.LoadAudio(name, path, loop))
+                    std::cout << "[LoadLevel] Loading BGM: " << currentBGMName << " from " << path << "\n";
+                    if (resourceMgr.LoadAudio(currentBGMName, path, loop))
                     {
-                        std::cout << "[LoadLevel] Playing BGM on channel: " << chan << "\n";
-                        audio->playSound(name, chan);
-                        audio->setVolume(chan, vol);
-                        std::cout << "[LoadLevel] BGM started successfully\n";
+                        std::cout << "[LoadLevel] BGM loaded successfully (ready for Play Mode)\n";
                     }
                     else
                     {
                         std::cerr << "[LoadLevel] Failed to load BGM: " << path << "\n";
+                        currentBGMName = ""; // Clear if failed to load
                     }
                 }
             }
