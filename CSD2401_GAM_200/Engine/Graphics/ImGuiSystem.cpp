@@ -208,6 +208,82 @@ void ImGuiSystem::Update(float dt)
             ReloadPrefabsList();
             ShowLoadPrefabMenu = (!ShowLoadPrefabMenu) ? true : false;
         }
+
+        // Stress Test: Spawn 1000 GameObjects
+        if (ImGui::Button("Run Stress Test (1000 Objects)"))
+        {
+            auto& factory = GameObjectFactory::Instance();
+            auto& resourceMgr = ResourceManager::Instance();
+
+            // Load the texture once
+            const std::string spritePath = "./Assets/protosprite.png";
+            const std::string textureKey = "stress_shared";
+
+            TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+            if (!texRes)
+            {
+                if (!resourceMgr.LoadTexture(textureKey, spritePath))
+                {
+                    std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
+                    return;
+                }
+                texRes = resourceMgr.GetTexture(textureKey);
+            }
+
+            if (!texRes || !texRes->IsLoaded())
+            {
+                std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
+                return;
+            }
+
+            GLuint sharedTexID = texRes->GetTextureID();
+
+            // --- Spawn 1000 objects ---
+            for (int i = 0; i < 1000; ++i)
+            {
+                //GameObject* go = factory.CreateGameObject("StressObj_" + std::to_string(i));
+                std::string goName = "StressObj_" + std::to_string(i);
+
+                GameObject* go = factory.CreateShape(
+                    goName,
+                    RenderComponent::ShapeType::Square,     // or Circle if you prefer
+                    20.f, 0.f, 5.f, 5.f,                    // depth/rotation/etc.
+                    vec4(1.f, 1.f, 1.f, 1.f),               // white tint
+                    CollisionLayer::Default
+                );
+
+
+                // --- Transform: random position ---
+                if (auto* t = go->AddComponent<TransformComponent>())
+                {
+                    float x = static_cast<float>(rand() % 1280);
+                    float y = static_cast<float>(rand() % 720);
+                    t->SetPosition(x, y);
+                    t->SetScale(32.f, 32.f);
+                }
+
+                // --- Physics: random velocity ---
+                if (auto* p = go->AddComponent<PhysicsComponent>())
+                {
+                    float vx = static_cast<float>((rand() % 200) - 100);
+                    float vy = static_cast<float>((rand() % 200) - 100);
+                    p->SetVelocity(vx, vy);
+                    p->SetMass(1.0f);
+                }
+
+                // --- RenderComponent (visible) ---
+                if (auto* render = go->AddComponent<RenderComponent>())
+                {
+                    render->SetTextureID(sharedTexID);
+                    render->SetTexturePath(spritePath);
+                    render->SetShapeType(RenderComponent::ShapeType::Square);
+                    render->SetColor({ 1.f, 1.f, 1.f, 1.f });
+                }
+            }
+
+            std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
+        }
+
         // Render Asset Browser things here!
         AssetBrowserWindow.RenderImGui();
 
