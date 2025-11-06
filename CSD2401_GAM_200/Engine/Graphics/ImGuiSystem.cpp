@@ -192,9 +192,9 @@ void ImGuiSystem::Update(float dt)
             ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
 
+            ImGui::Begin("Game Viewport");
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();
             CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
-            ImGui::Begin("Game Viewport");
 
             ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
