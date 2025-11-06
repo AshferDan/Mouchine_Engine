@@ -1302,14 +1302,19 @@ void LevelEditor::RenderCameraControls()
 
     // display current camera info
     ImGui::Text("Position: (%.1f, %.1f)", cameraX, cameraY);
+    ImGui::Text("Zoom: %.2fx", cameraZoom);
     ImGui::Separator();
 
     // camera position sliders
     if (ImGui::DragFloat("Camera X", &cameraX, 1.0f, -10000.0f, 10000.0f))
-    {
-    }
+    {}
     if (ImGui::DragFloat("Camera Y", &cameraY, 1.0f, -10000.0f, 10000.0f))
+    {}
+    if (ImGui::SliderFloat("Zoom", &cameraZoom, minZoom, maxZoom, "%.2f"))
     {
+        // clamp zoom to min/max
+        if (cameraZoom < minZoom) cameraZoom = minZoom;
+        if (cameraZoom > maxZoom) cameraZoom = maxZoom;
     }
     ImGui::Separator();
 
@@ -1347,12 +1352,23 @@ void LevelEditor::UpdateCameraControls()
         return;
     }
 
-    // camera moves when not hovering over imgui windows and if its in editor mode
-    if (io.WantCaptureMouse)
-    {
-        isPanning = false;
-        return;
-    }
+    //ImGuiWindow* hoveredWindow = ImGui::GetCurrentContext()->HoveredWindow;
+    //const char* hoveredWindowName = hoveredWindow ? hoveredWindow->Name : "";
+
+    //bool blockControls = false;
+    //if (hoveredWindow)
+    //{
+    //    // Add any UI panel names that should NOT allow camera control
+    //    // The viewport is NOT in this list, so it will allow controls
+    //    if (strstr(hoveredWindowName, "Hierarchy") != nullptr ||
+    //        strstr(hoveredWindowName, "Inspector") != nullptr ||
+    //        strstr(hoveredWindowName, "Property") != nullptr ||
+    //        strstr(hoveredWindowName, "Asset") != nullptr ||
+    //        strstr(hoveredWindowName, "Console") != nullptr)
+    //    {
+    //        blockControls = true;
+    //    }
+    //}
 
     // middle mouse button
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
@@ -1379,10 +1395,13 @@ void LevelEditor::UpdateCameraControls()
         lastMouseY = io.MousePos.y;
     }
 
-    // keyboard panning
-    if (!io.WantCaptureKeyboard)
+    // only allow keyboard panning if not typing in an ImGui text field, keyboard panning
+    bool keyboardOverImGuiWindow = io.WantCaptureKeyboard && ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+
+    if (!keyboardOverImGuiWindow)
     {
         float keyPanSpeed = panSpeed * 5.0f / cameraZoom;
+        float dt = static_cast<float>(CoreEngine::GetDeltaTime());
 
         if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
         {
@@ -1400,6 +1419,15 @@ void LevelEditor::UpdateCameraControls()
         {
             cameraX -= keyPanSpeed;
         }
+    }
+    if (io.MouseWheel != 0.0f)
+    {
+        float zoomDelta = io.MouseWheel * zoomSpeed;
+        cameraZoom += zoomDelta;
+
+        // clamp zoom to min/max
+        if (cameraZoom < minZoom) cameraZoom = minZoom;
+        if (cameraZoom > maxZoom) cameraZoom = maxZoom;
     }
 }
 
@@ -1435,16 +1463,17 @@ mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight)
     }
 
     // in edit mode use editor camera
-    mat4 projection = mat4::ortho(0.0f, windowWidth, 0.0f, windowHeight);
-    vec3 editorCamPos(cameraX - windowWidth / 2.0f, cameraY - windowHeight / 2.0f, 0.0f);
-    mat4 view = mat4::translate(-editorCamPos);
+    float halfWidth = (windowWidth / 2.0f) / cameraZoom;
+    float halfHeight = (windowHeight / 2.0f) / cameraZoom;
 
-    // apply zoom by scaling the projection
-    mat4 zoomMatrix = mat4::translate(vec3(windowWidth / 2.0f, windowHeight / 2.0f, 0.0f));
-    zoomMatrix = zoomMatrix * mat4::scale(vec3(cameraZoom, cameraZoom, 1.0f));
-    zoomMatrix = zoomMatrix * mat4::translate(vec3(-windowWidth / 2.0f, -windowHeight / 2.0f, 0.0f));
+    float left = cameraX - halfWidth;
+    float right = cameraX + halfWidth;
+    float bottom = cameraY - halfHeight;
+    float top = cameraY + halfHeight;
 
-    return zoomMatrix * projection * view;
+    mat4 projection = mat4::ortho(left, right, bottom, top);
+
+    return projection;
 }
 
 void LevelEditor::PerformSceneReload()

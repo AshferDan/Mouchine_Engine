@@ -186,20 +186,9 @@ void ImGuiSystem::Update(float dt)
         ImGui::End();
 
         LevelEditor* levelEditor = CORE->GetLevelEditor();
-        if (!levelEditor || levelEditor->GetEditorMode() != EditorMode::Play)
-        {
-            TopMenuBar_Render();
-            Hierarchy_Render();
-        }
+        bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
-        // render property editor for selected game object
-        if (showPropertyEditor)
-        {
-            RenderPropertyEditor();
-        }
-
-        // commented out bc editor mode isnt rly an editor mode, its more of a game view mode, dragndrop still works tho
-        // if (CORE->GetGraphicsSystem()->IsEditorMode())
+        // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
         {
             ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
@@ -208,7 +197,7 @@ void ImGuiSystem::Update(float dt)
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();
             CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
-            ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((void*)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
 
             std::string testdata{};
             // dont rly wanna accept generic assets yet, because should accept those in specific scenarios like properties tab
@@ -225,6 +214,21 @@ void ImGuiSystem::Update(float dt)
             ImGui::End();
         }
 
+        // Only show editor UI when not in play mode
+        if (!isPlaying)
+        {
+            TopMenuBar_Render();
+            Hierarchy_Render();
+
+            // render property editor for selected game object
+            if (showPropertyEditor)
+            {
+                RenderPropertyEditor();
+            }
+            // Render profiler! Make it toggleable?
+            Profiler_Render();
+        }
+/*
         // Begin main GameObject Inspector window
         ImGui::Begin("OLD HIERARCHY", &InputManager::KeyStateImgui);
 
@@ -421,14 +425,14 @@ void ImGuiSystem::Update(float dt)
                 }
 
                 // Evil button that spawns 2.5k Circle GOs
-            /*    if (obj && obj->GetName() == "Evil Button")
-                {
-                    if (ImGui::Button("Spawn 2500 Entities"))
-                    {
-                        DemoM1_SpawnGameObjects();
-                        std::cout << "Spawned 2500 Circle Entities!\n";
-                    }
-                }*/
+            //    if (obj && obj->GetName() == "Evil Button")
+                //{
+                //    if (ImGui::Button("Spawn 2500 Entities"))
+                //    {
+                //        DemoM1_SpawnGameObjects();
+                //        std::cout << "Spawned 2500 Circle Entities!\n";
+                //    }
+                //}
 
                 ImGui::TreePop();
 
@@ -473,6 +477,7 @@ void ImGuiSystem::Update(float dt)
         }
 
         ImGui::End();
+        */
 
         /**
          * @brief Game Object Creator Menu IMGui Window
@@ -489,9 +494,6 @@ void ImGuiSystem::Update(float dt)
         {
             PrefabMenu_Render();
         }
-
-        // Render profiler! Make it toggleable?
-        Profiler_Render();
     }
 }
 
