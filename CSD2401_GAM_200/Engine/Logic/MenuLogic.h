@@ -17,8 +17,11 @@ public:
     // The main update loop for our menu logic
     void Update(float dt) override;
 
+
     std::string GetName() override { return "MenuLogicSystem"; }
+
     void Initialize() override {}
 
 private:
+    bool IsButtonClicked(GameObject* button, double mouseX, double mouseY);
 };

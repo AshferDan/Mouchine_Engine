@@ -159,6 +159,16 @@ void CoreEngine::GameLoop()
 
     while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
     {
+
+        if (m_hasPendingLoad) {
+            Serialization::LoadScene(m_pendingScene);
+            m_pendingScene = "";
+            m_hasPendingLoad = false;
+            if (inputManager) inputManager->ResetState();
+            CameraManager::Instance().ResetState();
+            accumulator = 0.0;
+        }
+
         // Update variable delta_time and FPS
         update_time(fps_interval);
 
@@ -284,7 +294,6 @@ void CoreEngine::GameLoop()
                     g_systemTimings[scriptSystem->GetName()] = ms;
                     g_totalLoopTime += ms;
                 }
-                
                 stepOnce = false; // Reset after processing one frame
             }
 
@@ -306,7 +315,8 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
-        
+
+
 
         if (debugSystem)
         {

@@ -62,3 +62,49 @@ void CameraManager::ClearActiveCamera() {
 	activeCameraObject = nullptr;
 	std::cout << "[CameraManager] Active camera cleared\n";
 }
+void CameraManager::ResetState() {
+    auto& factory = GameObjectFactory::Instance();
+    ClearActiveCamera();
+
+    // 1. Try to find an existing camera from the loaded scene
+    GameObject* activeCamObj = nullptr;
+    for (auto& obj : factory.GetAllGameObjects()) {
+        if (obj->GetComponent<CameraComponent>()) {
+            activeCamObj = obj.get();
+            if (obj->GetName() == "MainCamera") break;
+        }
+    }
+
+    // 2. If NO camera found, CREATE one (Fallback)
+    if (!activeCamObj) {
+        std::cout << "[CameraManager] No camera found. Creating default 'MainCamera'.\n";
+        activeCamObj = factory.CreateGameObject("MainCamera");
+        activeCamObj->AddComponent<CameraComponent>();
+        // Optional: Add Transform if your system requires it for all objects
+        activeCamObj->AddComponent<TransformComponent>();
+    }
+
+    // 3. Set as active and configure it
+    SetActiveCamera(activeCamObj);
+    CameraComponent* camComp = GetActiveCamera();
+
+    // 4. Find Hero and set to follow
+    GameObject* hero = factory.FindGameObject("Hero");
+    if (hero && camComp) {
+        std::cout << "[CameraManager] Setting camera to follow 'Hero'.\n";
+        camComp->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+        camComp->SetFollowTarget(hero);
+        camComp->SetFollowOffset({ 0.f, 0.f });
+        camComp->SetSmoothing(true, 5.f); // Increased smoothing speed a bit
+
+        // Snap instantly to hero position
+        if (auto* heroTx = hero->GetComponent<TransformComponent>()) {
+            camComp->SetPosition({ heroTx->posX, heroTx->posY });
+        }
+    }
+    else if (camComp) {
+        // Fallback if no hero: just center camera
+        camComp->SetMode(CameraComponent::CameraMode::FIXED);
+        camComp->SetPosition(0.f, 0.f);
+    }
+}

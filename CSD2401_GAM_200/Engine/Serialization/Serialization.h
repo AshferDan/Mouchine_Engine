@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "RenderComponent.h"
 #include "factory.h"
+#include "CameraComponent.h"
 #include "ComponentSerialization.h"
 
 using json = nlohmann::json;

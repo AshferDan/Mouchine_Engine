@@ -238,6 +238,11 @@ public:
      */
     static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
 
+    void RequestSceneLoad(const std::string& sceneName) {
+        m_pendingScene = sceneName;
+        m_hasPendingLoad = true;
+    }
+
     // Step-by-step physics debugging
     bool stepMode;
     bool stepOnce;
@@ -273,6 +278,8 @@ private:
     int WindWidth;
     int WindHeight;
     MessageBus messageBus;
+    std::string m_pendingScene = "";
+    bool m_hasPendingLoad = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.

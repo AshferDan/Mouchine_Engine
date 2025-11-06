@@ -1,6 +1,7 @@
 #pragma once
 #include "CameraComponent.h"
 #include "gameObject.h"
+#include "factory.h"
 
 class CameraManager {
 public:
@@ -12,6 +13,7 @@ public:
 
 	mat4 GetViewProjectMatrix(float screenWidth, float screenHeight);
 	vec2 GetCameraPosition();
+	void ResetState();
 
 	bool HasActiveCamera() const;
 	void ClearActiveCamera();
