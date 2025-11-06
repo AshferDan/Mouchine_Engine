@@ -188,6 +188,9 @@ void ImGuiSystem::Update(float dt)
         LevelEditor* levelEditor = CORE->GetLevelEditor();
         bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
+        if (!isPlaying)
+        {
+
         // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
         {
             ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
@@ -215,8 +218,7 @@ void ImGuiSystem::Update(float dt)
         }
 
         // Only show editor UI when not in play mode
-        if (!isPlaying)
-        {
+
             TopMenuBar_Render();
             Hierarchy_Render();
 
