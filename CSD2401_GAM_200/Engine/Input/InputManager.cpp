@@ -72,6 +72,7 @@ std::string InputManager::GetName()
  */
 void InputManager::Update(float dt)
 {
+    glfwGetWindowSize(window, &width, &height);
     static bool wasLeftMousePressed = false;
     bool isLeftMousePressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
 
@@ -388,7 +389,6 @@ void InputManager::Update(float dt)
     glfwGetCursorPos(window, &xpos, &ypos);
     mouseX = xpos;
     mouseY = ypos;
-
     MouseWorldX = mouseX - (width / 2.0);
     MouseWorldY = (height / 2.0) - mouseY;
     }

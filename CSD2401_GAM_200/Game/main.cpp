@@ -54,22 +54,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        //Serialization::LoadScene("Prefab_TestScene");
-
-        GameObject *textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
-        textObj->AddComponent<TransformComponent>(100.f, 100.f); // Position on screen
-        textObj->AddComponent<RenderComponent>();
-        auto *text = textObj->AddComponent<TextComponent>(
-            "./Assets/FrederickatheGreat-Regular.ttf",
-            48, // Font size
-            "Score: 0",
-            vec4(1.0f, 1.0f, 1.0f, 1.0f),
-            true);
-        text->SetScreenSpace(true);
-        text->SetScale(1.0f);
-
-        // Later, update the text:
-        text->SetText("Score: 100");
+        //Serialization::LoadScene("MainMenu");
 
         GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto *cam = mainCamera->AddComponent<CameraComponent>();
@@ -91,33 +76,31 @@ int main()
         ScriptSystem *scriptSys = engine.GetScriptSystem();
 
         GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+ 
         if (scriptSys && squareSpawner)
         {
-            // Attach the TestGameObject script (creates red and blue squares)
-            bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
-            if (attached)
+            // 1. Attach the first script (Red Square, Ground, Animation)
+            if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
             {
-                std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
-
-                // Call OnStart to actually create the squares
-                scriptSys->CallOnStart(squareSpawner);
-                std::cout << "Called OnStart - Two squares should be created!" << std::endl;
+                std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
             }
             else
             {
-                std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
-                std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
-                std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
+                std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
             }
-        }
-        else
-        {
-            if (!scriptSys)
-                std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
-            if (!squareSpawner)
-                std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
-        }
 
+            // 2. Attach the second script (Blue Square, Green Rotating Square)
+            if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
+            {
+                std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
+            }
+            else
+            {
+                std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
+            }
+            std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
+            scriptSys->CallOnStart(squareSpawner);
+        }
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)

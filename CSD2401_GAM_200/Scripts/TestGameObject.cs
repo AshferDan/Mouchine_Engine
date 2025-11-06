@@ -24,20 +24,7 @@ namespace GameScripts
                 false                            // hasGravity = false (no gravity)
             );  
 
-            // Create second square - Blue, on the right
-            GameObject.CreateShape(
-                "BlueSquare",                    // name
-                (int)ShapeType.Square,           // type: square
-                300, 300,                        // x, y position
-                300, 300,                        // width, height
-                0.0f, 0.0f, 1.0f, 1.0f,          // r, g, b, a (blue color)
-                (int)CollisionLayer.Default,     // collision layer
-                false,                           // hasPhysics = false (no physics)
-                false,                           // isStatic
-                false                            // hasGravity = false (no gravity)
-            );
-
-            GameObject.CreateAnimatedImage("C#_AniImage",0,200,
+            GameObject.CreateAnimatedImage("C#_AniImage",0,0,
                 300, 300,
                 "../Assets/spritesheet_R.png",
                 11,8,//size of the spritesheet
@@ -59,8 +46,6 @@ namespace GameScripts
                 false                            // hasGravity = false (no gravity)
             );
 
-            Debug.Log("Adding Physics BLUESQUARE");
-            Components.AddPhysicsComponent("BlueSquare");
             
         }
 
