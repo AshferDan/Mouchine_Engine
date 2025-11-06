@@ -194,7 +194,7 @@ void CollisionSystem::Update(float deltaTime)
 
                 if (!wasActive)
                 {
-                    CollisionMessage msg(gameObjects[i].get(), gameObjects[j].get());
+                    CollisionMessage msg(obj1.get(), obj2);
                     CORE->GetMessageBus().Publish(msg);
                     std::cout << "Collision: " << obj1->GetName() << " <-> "
                               << obj2->GetName() << std::endl;
