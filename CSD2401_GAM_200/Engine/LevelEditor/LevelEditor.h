@@ -250,6 +250,9 @@ public:
     // camera zoom
     float GetCameraZoom() const { return cameraZoom; }
 
+    // get current scene filename
+    const std::string& GetCurrentFilename() const { return currentFilename; }
+
     bool HasPendingSceneReload() const { return pendingSceneReload; }
     void PerformSceneReload();
 
@@ -269,11 +272,6 @@ private:
      * @brief Render the hierarchy panel listing all game objects
      */
     void RenderHierarchy();
-
-    /**
-     * @brief Render the property editor for selected game object
-     */
-    void RenderPropertyEditor();
 
     // Play mode functions
     /**
@@ -309,25 +307,10 @@ private:
      */
     bool LoadLevelFromFile(const std::string& filepath, LevelData& outData);
 
-    /**v
-     * @brief Get shape type name from enum
-     * @param type Shape type enum value
-     * @return String name of shape type
-     */
-    const char* GetShapeTypeName(int type);
-
-    /**
-     * @brief Get collision layer name from enum
-     * @param layer Collision layer enum value
-     * @return String name of collision layer
-     */
-    const char* GetCollisionLayerName(int layer);
-
 private:
     GameObjectFactory& factory;           // reference to game object factory
     LevelData currentLevel;               // current level being edited
     EntityID selectedGameObjectID;        // currently selected game object
-    bool showPropertyEditor;              // show property editor panel
     std::string currentFilename;          // show current filename
 
     // file dialog states

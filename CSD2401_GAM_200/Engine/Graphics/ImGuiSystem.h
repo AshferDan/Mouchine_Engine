@@ -25,6 +25,7 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include <filesystem>
 #include "Serialization.h"
+#include "LevelEditor.h"
 
 // FILE SYSTEM
 namespace fs = std::filesystem;
@@ -109,11 +110,11 @@ public:
      */
     void RemoveGameObject(EntityID id);
 
-    ///**
-    // * @brief Get the currently selected game object
-    // * @return Pointer to selected GameObject, or nullptr if none selected
-    // */
-    //GameObject* GetSelectedGameObject() const;
+    /**
+     * @brief Get the currently selected game object
+     * @return Pointer to selected GameObject, or nullptr if none selected
+     */
+    GameObject* GetSelectedGameObject() const;
 
     /**
      * @brief Set the currently selected game object
@@ -121,7 +122,8 @@ public:
      */
     void SetSelectedGameObject(EntityID id);
 
-
+    // Property Manager
+    void RenderPropertyEditor();
 
 private:
     /**
@@ -130,7 +132,9 @@ private:
     void Shutdown();
     GameObjectFactory& factory;
     EntityID selectedGameObjectID;        // currently selected game object
-
+    bool showPropertyEditor;              // show property editor panel
+    const char* GetShapeTypeName(int type);         // get shape type name
+    const char* GetCollisionLayerName(int layer);   // get collision layer name
     GLFWwindow* m_window; ///< Pointer to the GLFW window
 };
 

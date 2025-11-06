@@ -200,10 +200,10 @@ void CoreEngine::GameLoop()
                 g_totalLoopTime += ms;
             }
 
-            bool isPaused = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause);
+            bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
             // Only run physics if NOT in step mode/paused, OR if stepping once
-            if ((!stepMode && !isPaused) || stepOnce)
+            if ((isPlaying && !stepMode) || stepOnce)
             {
                 // Update physics-dependent systems with FIXED timestep
                 if (gameObjectSystem)
