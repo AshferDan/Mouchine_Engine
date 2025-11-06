@@ -29,12 +29,15 @@ public:
 
 	void SetFollowTarget(GameObject* target);
 	void SetFollowOffset(const vec2& offset);
+	vec2 GetFollowOffset() { return followOffset; }
 	GameObject* GetFollowTarget() const { return followTarget; }
+	std::string GetFollowTargetName() const { return followTarget? followTarget->GetName() : ""; }
 
 	void SetMode(CameraMode m);
 	CameraMode GetMode() const { return mode; }
 
 	void SetSmoothing(bool enable, float speed);
+	float GetSmoothingSpeed() { return smoothSpeed; }
 	bool IsSmoothingEnabled() const { return enableSmoothing; }
 
 	void SetBounds(float minX, float minY, float maxX, float maxY);

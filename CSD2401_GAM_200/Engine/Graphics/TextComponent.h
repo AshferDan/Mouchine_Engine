@@ -27,6 +27,9 @@ public:
 	void SetScreenSpace(bool isScreenSpace) { screenSpace = isScreenSpace; }
 	bool isScreenSpace() const { return screenSpace; }
 
+	std::string GetFontPath() { return fontPath; }
+	GLuint GetFontSize() { return fontSize; }
+
 	std::string GetName() const override { return "TextComponent";}
 	virtual std::unique_ptr<IComponent> Clone(GameObject* newOwner) const override;
 	virtual void Update(float) override {}
