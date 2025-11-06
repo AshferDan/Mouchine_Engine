@@ -307,8 +307,7 @@ void InputManager::Update(float dt)
             }*/
         }
     }
-
-    auto *anim = player->GetComponent<Spritesheet>();
+    auto* anim = player->GetComponent<Spritesheet>();
 
     if (transform && anim)
     {
@@ -319,65 +318,64 @@ void InputManager::Update(float dt)
             float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
             transform->SetScale(newScaleX, transform->scaleY);
         }
+
+        const char* IDLE_SS = "./Assets/Mouch_Idle.png";
+        int _ROWS = 1;
+        int _COLS = 2;
+        const int FRAME_START = 0;
+        const int FRAME_END = 1;
+        const float IDLE_FPS = 2.0f;
+        const float RUN_FPS = 7.0f;
+        const char* RUN_SS = "./Assets/Mouch_Running.png";
+        const char* JUMP_SS = "./Assets/Mouch_jump.png";
+        // --------------------------------------------------------
+
+        float newFPS;
+        const char* newSpritesheet;
+
+        if (std::abs(vx) > 0.0f) // Player is running/moving
+        {
+            newFPS = RUN_FPS;
+            newSpritesheet = RUN_SS;
+        }
+        else if (is_jumping)
+        {
+            _COLS = 1;
+            newFPS = 0;
+            newSpritesheet = JUMP_SS;
+        }
+        else // Player is stopped (vx is 0)
+        {
+            newFPS = IDLE_FPS;
+            newSpritesheet = IDLE_SS;
+        }
+
+        float desiredTimePerFrame = 1.0f / newFPS;
+
+        if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
+        {
+
+            anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
+
+            anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
+        }
     }
 
-    const char *IDLE_SS = "./Assets/Mouch_Idle.png";
-    int _ROWS = 1;
-    int _COLS = 2;
-    const int FRAME_START = 0;
-    const int FRAME_END = 1;
-    const float IDLE_FPS = 2.0f;
-    const float RUN_FPS = 7.0f;
-    const char *RUN_SS = "./Assets/Mouch_Running.png";
-    const char *JUMP_SS = "./Assets/Mouch_jump.png";
-    // --------------------------------------------------------
+    // Note: Don't call SetVelocity anymore - forces handle movement
+    // The Integrate() method will update velocity based on forces
 
-    float newFPS;
-    const char *newSpritesheet;
-
-    if (std::abs(vx) > 0.0f) // Player is running/moving
+    // Mouse
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
     {
-        newFPS = RUN_FPS;
-        newSpritesheet = RUN_SS;
+        std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
     }
-    else if (is_jumping)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     {
-        _COLS = 1;
-        newFPS = 0;
-        newSpritesheet = JUMP_SS;
-    }
-    else // Player is stopped (vx is 0)
-    {
-        newFPS = IDLE_FPS;
-        newSpritesheet = IDLE_SS;
+        std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
     }
 
-    float desiredTimePerFrame = 1.0f / newFPS;
-
-    if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
-    {
-
-        anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
-
-        anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    mouseX = xpos;
+    mouseY = ypos;
     }
-}
-
-// Note: Don't call SetVelocity anymore - forces handle movement
-// The Integrate() method will update velocity based on forces
-
-// Mouse
-if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-{
-    std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
-}
-if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-{
-    std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
-}
-
-double xpos, ypos;
-glfwGetCursorPos(window, &xpos, &ypos);
-mouseX = xpos;
-mouseY = ypos;
-}
