@@ -1,0 +1,154 @@
+[Window][Window Dock]
+Pos=0,19
+Size=1920,1061
+Collapsed=0
+
+[Window][=== Performance Profiler ===]
+Pos=1166,812
+Size=375,268
+Collapsed=0
+DockId=0x00000009,0
+
+[Window][Debug##Default]
+Pos=630,160
+Size=400,400
+Collapsed=0
+
+[Window][Hierarchy]
+Pos=271,18
+Size=237,263
+Collapsed=0
+
+[Window][GameObject Inspector]
+Pos=1217,61
+Size=293,954
+Collapsed=0
+
+[Window][Directory Navigator]
+Pos=274,852
+Size=1339,228
+Collapsed=0
+DockId=0x00000004,0
+
+[Window][Game Object Creator]
+Pos=325,89
+Size=328,320
+Collapsed=0
+
+[Window][Prefab Loader]
+Pos=324,397
+Size=479,359
+Collapsed=0
+
+[Window][Project Navigator]
+Pos=0,812
+Size=1164,268
+Collapsed=0
+DockId=0x00000006,0
+
+[Window][##DragDropViewport]
+Pos=0,19
+Size=1920,1061
+Collapsed=0
+
+[Window][DragDropViewport]
+Pos=60,60
+Size=32,32
+Collapsed=0
+
+[Window][Level Editor Properties]
+Pos=530,60
+Size=345,416
+Collapsed=0
+
+[Window][Editor Controls]
+Pos=319,19
+Size=1222,47
+Collapsed=0
+DockId=0x00000010,0
+
+[Window][Editor Menu##LevelEditor]
+Pos=1543,19
+Size=377,1061
+Collapsed=0
+DockId=0x0000000A,1
+
+[Window][Hierarchy##LevelEditor]
+Pos=0,19
+Size=317,791
+Collapsed=0
+DockId=0x0000000D,0
+
+[Window][Camera Controls##LevelEditor]
+Pos=0,19
+Size=317,791
+Collapsed=0
+DockId=0x0000000D,1
+
+[Window][Properties##LevelEditor]
+Pos=1543,114
+Size=377,688
+Collapsed=0
+DockId=0x00000002,0
+
+[Window][Game Viewport]
+Pos=321,68
+Size=1220,742
+Collapsed=0
+
+[Window][Editor Dock]
+Pos=0,19
+Size=1920,1061
+Collapsed=0
+
+[Window][MainDockspaceHost]
+Pos=0,19
+Size=1920,1036
+Collapsed=0
+
+[Window][##MainMenuBar]
+Size=1920,19
+Collapsed=0
+
+[Window][OLD HIERARCHY]
+Pos=0,533
+Size=317,277
+Collapsed=0
+DockId=0x0000000E,0
+
+[Window][Save_Layout]
+Pos=848,493
+Size=224,94
+Collapsed=0
+
+[Window][Load_Layout]
+Pos=560,240
+Size=800,600
+Collapsed=0
+
+[Window][Properties##ImGuiSystem]
+Pos=1543,19
+Size=377,1061
+Collapsed=0
+DockId=0x0000000A,0
+
+[Docking][Data]
+DockSpace           ID=0x7E9453EE Window=0xB4CBAEAA Pos=0,19 Size=1920,1061 Split=X
+  DockNode          ID=0x00000005 Parent=0x7E9453EE SizeRef=1541,1061 Split=Y
+    DockNode        ID=0x0000000B Parent=0x00000005 SizeRef=1920,791 Split=X
+      DockNode      ID=0x00000007 Parent=0x0000000B SizeRef=317,1061 Split=Y Selected=0x63DAE22D
+        DockNode    ID=0x0000000D Parent=0x00000007 SizeRef=317,512 Selected=0x63DAE22D
+        DockNode    ID=0x0000000E Parent=0x00000007 SizeRef=317,277 Selected=0x603F3119
+      DockNode      ID=0x00000008 Parent=0x0000000B SizeRef=1601,1061 Split=X
+        DockNode    ID=0x00000001 Parent=0x00000008 SizeRef=1541,1061 Split=Y
+          DockNode  ID=0x00000010 Parent=0x00000001 SizeRef=1220,47 HiddenTabBar=1 Selected=0x8FC9BA99
+          DockNode  ID=0x00000012 Parent=0x00000001 SizeRef=1220,742 CentralNode=1 Selected=0xE9044848
+        DockNode    ID=0x00000002 Parent=0x00000008 SizeRef=377,1061 Selected=0x3871573F
+    DockNode        ID=0x0000000C Parent=0x00000005 SizeRef=1920,268 Split=X Selected=0xC6879187
+      DockNode      ID=0x00000006 Parent=0x0000000C SizeRef=1164,268 Selected=0xC6879187
+      DockNode      ID=0x00000009 Parent=0x0000000C SizeRef=375,268 Selected=0xAB641D12
+  DockNode          ID=0x0000000A Parent=0x7E9453EE SizeRef=377,1061 Selected=0x55FB1164
+DockSpace           ID=0xDBC71D23 Window=0x7266F45C Pos=0,19 Size=1920,1061 Split=Y
+  DockNode          ID=0x00000003 Parent=0xDBC71D23 SizeRef=1920,831 CentralNode=1 Selected=0x5F9B0D43
+  DockNode          ID=0x00000004 Parent=0xDBC71D23 SizeRef=1920,228 Selected=0x67A52875
+

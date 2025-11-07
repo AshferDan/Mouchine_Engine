@@ -252,255 +252,6 @@ void ImGuiSystem::Update(float dt)
             ImGui::End();
         }
 
-        // Begin main GameObject Inspector window
-        ImGui::Begin("OLD HIERARCHY", &InputManager::KeyStateImgui);
-
-        // Toggle GameObject creation menu
-        if (ImGui::Button("Create New Game Object"))
-        {
-            ShowCreateGOMenu = (!ShowCreateGOMenu) ? true : false;
-        }
-
-        // Toggle prefab loading menu
-        if (ImGui::Button("Load Prefabs"))
-        {
-            ReloadPrefabsList();
-            ShowLoadPrefabMenu = (!ShowLoadPrefabMenu) ? true : false;
-        }
-
-        // Stress Test: Spawn 1000 GameObjects
-        static bool addCollidersLater = true;
-        static std::vector<GameObject*> stressObjects;
-        static int colliderIndex = 0;
-
-        const float spawnW = 16.f;
-        const float spawnH = 16.f;
-
-        if (ImGui::Button("Run Stress Test (1000 Objects)"))
-        {
-            auto& factory = GameObjectFactory::Instance();
-            auto& resourceMgr = ResourceManager::Instance();
-
-            stressObjects.clear();
-            colliderIndex = 0;
-
-            // Load the texture once, reuse for all obj
-            const std::string spritePath = "./Assets/protosprite.png";
-            const std::string textureKey = "stress_shared";
-
-            TextureResource* texRes = resourceMgr.GetTexture(textureKey);
-            if (!texRes)
-            {
-                if (!resourceMgr.LoadTexture(textureKey, spritePath))
-                {
-                    std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
-                    return;
-                }
-                texRes = resourceMgr.GetTexture(textureKey);
-            }
-
-            if (!texRes || !texRes->IsLoaded())
-            {
-                std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
-                return;
-            }
-
-            GLuint sharedTexID = texRes->GetTextureID();
-
-            // --- Spawn 1000 objects ---
-            for (int i = 0; i < 1001; ++i)
-            {
-                std::string objName = "StressObj_" + std::to_string(i);
-                GameObject* go = factory.CreateGameObject(objName);
-                stressObjects.push_back(go);
-
-                // --- Transform: random position ---
-                if (auto* t = go->AddComponent<TransformComponent>())
-                {
-                    float x = static_cast<float>(rand() % 1280) - 640;
-                    float y = static_cast<float>(rand() % 720) - 360;                 
-                    t->SetPosition(x, y);
-                    t->SetScale(spawnW, spawnH);
-                }
-
-                // --- RenderComponent (visiblility) ---
-                if (auto* render = go->AddComponent<RenderComponent>())
-                {
-                    render->SetTextureID(sharedTexID);
-                    render->SetTexturePath(spritePath);
-                    render->SetShapeType(RenderComponent::ShapeType::Square);
-                    render->SetColor({ 1.f, 1.f, 1.f, 1.f });
-                }
-            }
-
-            std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
-            addCollidersLater = true;
-        }
-
-        // --- Collider ---
-        if (addCollidersLater)
-        {
-            int batchPerFrame = 50; // add 50 colliders per frame
-
-            for (int i = 0; i < batchPerFrame && colliderIndex < static_cast<int>(stressObjects.size()); ++i, ++colliderIndex)
-            {
-                GameObject* go = stressObjects[colliderIndex];
-                if (go && !go->GetComponent<ColliderComponent>())
-                {
-                    go->AddComponent<ColliderComponent>(
-                        ColliderComponent::Type::Square,
-                        spawnW, spawnH,
-                        CollisionLayer::Enemy
-                    );
-                }
-
-                // --- Physics: random velocity ---
-                if (auto* p = go->AddComponent<PhysicsComponent>())
-                {
-                    float vx = static_cast<float>((rand() % 200) - 100);
-                    float vy = static_cast<float>((rand() % 200) - 100);
-                    p->SetVelocity(vx, vy);
-                    p->SetMass(1.0f);
-                    p->SetGrounded(false);
-                    p->SetGravity(true);
-                }
-            }
-
-            if (colliderIndex >= static_cast<int>(stressObjects.size()))
-            {
-                addCollidersLater = false;
-                colliderIndex = 0;
-                stressObjects.clear(); // clear tracking list
-                std::cout << "[STRESS TEST] All stress-test colliders added.\n";
-            }
-        }
-
-        // Render Asset Browser things here!
-        AssetBrowserWindow.RenderImGui();
-
-        // Iterate through all game objects
-        for (auto &obj : GameObjectFactory::Instance().GetAllGameObjects())
-        {
-            if (!obj->IsActive())
-            {
-                continue; // Skip inactive objects
-            }
-
-            // Doing this so we can have objects with the same name in the hierachy, but with different hidden ids
-            std::string displayName = obj->GetName() + "##" + std::to_string(obj->GetID());
-
-            // Display tree node for each object
-            if (ImGui::TreeNode(displayName.c_str()))
-            {
-                // Access transform component for editing
-                if (auto *transform = obj->GetComponent<TransformComponent>())
-                {
-                    float pos[2];
-                    transform->GetPosition(pos[0], pos[1]);
-                    // Drag to edit position
-                    if (ImGui::DragFloat2("Position", pos, 0.1f))
-                    {
-                        transform->SetPosition(pos[0], pos[1]);
-                    }
-
-                    float scale[2];
-                    transform->GetScale(scale[0], scale[1]);
-                    // Drag to edit scale
-                    if (ImGui::DragFloat2("Scale", scale, 0.1f))
-                    {
-                        transform->SetScale(scale[0], scale[1]);
-                    }
-
-                    float rot = transform->GetRotation();
-                    // Drag to edit rotation
-                    if (ImGui::DragFloat("Rotation", &rot, 0.1f))
-                    {
-                        transform->SetRotation(rot);
-                    }
-                }
-
-                // ---- Save prefab button ----
-                if (ImGui::Button("Save As Prefab"))
-                {
-                    Serialization::SavePrefab(*obj);
-                    ReloadPrefabsList();
-                }
-
-                // ---- Clone object ----
-                if (obj->GetName() != "Hero" && obj->GetName() != "Evil Button")
-                {
-                    if (ImGui::Button("Clone Object"))
-                    {
-                        auto &factory = GameObjectFactory::Instance();
-                        GameObject *clone = factory.CloneGameObject(obj->GetID());
-
-                        if (clone)
-                        {
-                            // Offset position slightly so clones do not overlap
-                            if (auto *t = clone->GetComponent<TransformComponent>())
-                            {
-                                float x, y;
-                                t->GetPosition(x, y);
-                                t->SetPosition(x + 20.f, y + 20.f);
-                            }
-                        }
-                    }
-                }
-
-                // Evil button that spawns 2.5k Circle GOs
-            /*    if (obj && obj->GetName() == "Evil Button")
-                {
-                    if (ImGui::Button("Spawn 2500 Entities"))
-                    {
-                        DemoM1_SpawnGameObjects();
-                        std::cout << "Spawned 2500 Circle Entities!\n";
-                    }
-                }*/
-
-                ImGui::TreePop();
-
-                // Altered for M1 demonstration of 2.5k GOs!
-                // if (obj->GetName() != "Hero" && obj->GetName() != "Evil Button")
-                //{
-                //    if (ImGui::Button("Clone"))
-                //    {
-                //        GameObjectFactory& factory = GameObjectFactory::Instance();
-                //        GameObject* clonedObj = factory.CloneGameObject(obj->GetID());
-
-                //        // Save cloned object data
-                //        Serialize_Writer writer("../Logs/GameObjectData.txt");
-                //        if (writer.IsStreamGood())
-                //        {
-                //            writer.WriteGameObjectData(*clonedObj, 0);
-                //            std::cout << "Cloned object data saved!\n";
-                //        }
-
-                //        std::cout << "button clicked";
-                //    }
-
-                //    // Save GO Data - Serialisation!
-                //    if (ImGui::Button("Save Data"))
-                //    {
-                //        Serialize_Writer writer("../Logs/GameObjectData.txt"); // Create Writer class object with specified path
-                //        if (writer.IsStreamGood())
-                //        {
-                //            writer.WriteGameObjectData(*obj, 0); // If stream is valid, write objects data to file path
-                //            std::cout << "GameObject data saved!\n";
-                //        }
-                //    }
-
-                //    // Create Prefab with GO Data
-                //    if (ImGui::Button("Create Prefab"))
-                //    {
-                //        Serialization::SavePrefab(*obj, "");
-                //        Serialization::GetAllPrefabJSONFiles();
-                //    }
-                //}
-            }
-        }
-
-        ImGui::End();
-
         /**
          * @brief Game Object Creator Menu IMGui Window
          */
@@ -776,6 +527,8 @@ void ImGuiSystem::Hierarchy_Render()
         ImGui::EndMenu();
     }
 
+    M2_RenderStressTest();
+
     // display current file name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
     if (auto* levelEditor = CORE->GetLevelEditor())
@@ -814,155 +567,6 @@ void ImGuiSystem::Hierarchy_Render()
     }
     ImGui::End();
 }
-
-//
-// void ImGuiSystem::Hierarchy_Render()
-//{
-//    ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
-//    ImGui::SetNextWindowSize(ImVec2(250, 600), ImGuiCond_FirstUseEver);
-//
-//    if (!ImGui::Begin("Hierarchy##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
-//    {
-//        ImGui::End();
-//        return;
-//    }
-//
-//    // Render top part to show adding of GOs
-//    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), { icon_size_small.x, icon_size_small.y }, { 0, 1 }, { 1, 0 },
-//        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
-//    {
-//        // this is a file, not sure if we wanna do anything yet
-//        ShowCreateGOMenu = (!ShowCreateGOMenu) ? true : false;
-//    }
-//    CreateHintText("Create Game Object");
-//
-//    ImGui::SameLine();
-//    // Render top part to show adding of GOs
-//    if (ImGui::ImageButton("##Spawn Prefab", ImTextureID(icon_prefab_ui), { icon_size_small.x, icon_size_small.y }, { 0, 1 }, { 1, 0 },
-//        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
-//    {
-//        // this is a file, not sure if we wanna do anything yet
-//        ShowLoadPrefabMenu = (!ShowLoadPrefabMenu) ? true : false;
-//    }
-//    CreateHintText("Spawn Prefab");
-//
-//    ImGui::SameLine();
-//    if (ImGui::BeginMenu("[TEST] Create GO"))
-//    {
-//        ImGui::Text("or we could do something like this too?");
-//        if (ImGui::MenuItem("Create Empty", "cool grey key bind"))
-//        {
-//
-//        }
-//        if (ImGui::MenuItem("Create Shape", "Shift+1"))
-//        {
-//
-//        }
-//        ImGui::EndMenu();
-//    }
-//
-//
-//
-//
-//    // display current file name
-//    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
-//    ImGui::Text("Scene: %s", "XINYEE IDK HOW TO ADD SCENE NAME HERE");
-//    ImGui::PopStyleColor();
-//    ImGui::Separator();
-//
-//    // display object count
-//    auto& allObjects = factory.GetAllGameObjects();
-//    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-//    ImGui::Text("Game Objects: %zu", allObjects.size());
-//    ImGui::PopStyleColor();
-//    ImGui::Separator();
-//
-//    // list all game objects
-//    for (const auto& objPtr : allObjects)
-//    {
-//        // should change to greyed out instead of skipping entirely
-//        if (!objPtr->IsActive()) // || objPtr->GetParent() != nullptr)      // skip stuff w parents bc we already rendering it idented
-//            continue;
-//
-//        GameObject* obj = objPtr.get();
-//        EntityID id = obj->GetID();
-//
-//        ImGui::Indent(15.0f);
-//
-//        // highlight if selected
-//        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-//
-//        // If has children, make it expandable, otherwise just a leaf
-//        if (obj->GetAllChildren().empty()) {
-//            flags |= ImGuiTreeNodeFlags_Leaf;
-//        }
-//
-//        if (selectedGameObjectID == id)
-//        {
-//            flags |= ImGuiTreeNodeFlags_Selected;
-//        }
-//
-//        bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)",
-//            obj->GetName().c_str(), id);
-//
-//        // Drag and drop for Parenting
-//        // might wanna send id as data instead
-//        if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-//        {
-//            SendDragAndDrop(HierarchyPayloadID, obj->GetName(), obj->GetName());
-//        }
-//
-//        {
-//            std::string testdata{};
-//            ReceiveDragAndDrop(HierarchyPayloadID, testdata);
-//            // Do something with DnD data
-//            if (!testdata.empty())
-//            {
-//                if (testdata != obj->GetName())
-//                {
-//                    std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
-//                }
-//                else
-//                {
-//                    std::cout << "[Hierarchy] Invalid Drag and Drop source!\n";
-//                }
-//            }
-//        }
-//
-//        // select on click
-//        if (ImGui::IsItemClicked())
-//        {
-//            SetSelectedGameObject(id);
-//        }
-//
-//        // context menu
-//        if (ImGui::BeginPopupContextItem())
-//        {
-//            if (ImGui::MenuItem("Select"))
-//            {
-//                SetSelectedGameObject(id);
-//            }
-//            if (ImGui::MenuItem("Save as Prefab"))
-//            {
-//                Serialization::SavePrefab(*obj);
-//            }
-//            if (ImGui::MenuItem("Clone"))
-//            {
-//                factory.CloneGameObject(id);
-//            }
-//            if (ImGui::MenuItem("Delete"))
-//            {
-//                RemoveGameObject(id);
-//                if (selectedGameObjectID == id)
-//                    selectedGameObjectID = 0;
-//            }
-//            ImGui::EndPopup();
-//        }
-//
-//    }
-//    ImGui::End();
-//}
-//
 
 void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, EntityID &selectedGameObjectID, GameObjectFactory &factory)
 {
@@ -1102,28 +706,6 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
  */
 void GOCreationMenu_Spawn()
 {
-    //auto& factory = GameObjectFactory::Instance(); // Factory
-    //GameObject* TempGO = nullptr;
-
-    //if (RenderComponent::ShapeType{ current_shape } == RenderComponent::ShapeType::Empty)
-    //{
-    //    TempGO = factory.CreateEmptyGO(tempGO.name, 20.f, 0.f, 5.f, 5.f);
-    //}
-    //else
-    //{
-    //    // very ugly colour code bc that uses a different vec 4 AAAA
-    //    TempGO = factory.CreateShape(tempGO.name, RenderComponent::ShapeType{ current_shape }, 20.f, 0.f, 5.f, 5.f,
-    //        vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f), CollisionLayer::Default);
-    //}
-
-    ////Add transform component to assign transform values
-    //TempGO->AddComponent<TransformComponent>(0, 0);
-    //auto* transform = TempGO->GetComponent<TransformComponent>();
-
-    //transform->SetPosition(tempGO.pos[0], tempGO.pos[1]);
-    //transform->SetScale(tempGO.scale[0], tempGO.scale[1]);
-    //transform->SetRotation(tempGO.rot);
-
     // Determine creation type based on shape
     CreateObjectMessage::ObjectType objType;
     RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);
@@ -1207,13 +789,6 @@ void ImGuiSystem::RemoveGameObject(EntityID id)
 #pragma endregion
 
 #pragma region Prefab ImGui
-/**
- * @brief Simply updates the prefabs directory with the newly added/ removed prefab files
- */
-// void ReloadPrefabsList()
-//{
-//     prefabList = PrefabTools::LoadPrefabList();
-// }
 
 /**
  * @brief Renders the prefab window on screen
@@ -1315,15 +890,6 @@ void PrefabMenu_Render()
 
     ImDrawList *drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
-
-    // if (ImGui::IsItemHovered() && isDragging)
-    //{
-    //     std::cout << "testing if ts works\n";           // yea it works LOL
-    //     //std::string testdata{};
-    //     //ReceiveDragAndDrop(AssetPayloadID, testdata);
-    //     //std::cout << testdata << std::endl;
-    //     isDragging = false;
-    // }
 
     std::string testdata{};
     ReceiveDragAndDrop(AssetPayloadID, testdata);
@@ -1954,4 +1520,117 @@ const char* ImGuiSystem::GetCollisionLayerName(int layer)
     default:
         return "Unknown";
     }
+}
+
+void M2_RenderStressTest()
+{
+    // Stress Test: Spawn 1000 GameObjects
+    static bool addCollidersLater = true;
+    static std::vector<GameObject*> stressObjects;
+    static int colliderIndex = 0;
+
+    const float spawnW = 16.f;
+    const float spawnH = 16.f;
+
+    if (ImGui::Button("Run Stress Test (1000 Objects)"))
+    {
+        auto& factory = GameObjectFactory::Instance();
+        auto& resourceMgr = ResourceManager::Instance();
+
+        stressObjects.clear();
+        colliderIndex = 0;
+
+        // Load the texture once, reuse for all obj
+        const std::string spritePath = "./Assets/protosprite.png";
+        const std::string textureKey = "stress_shared";
+
+        TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+        if (!texRes)
+        {
+            if (!resourceMgr.LoadTexture(textureKey, spritePath))
+            {
+                std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
+                return;
+            }
+            texRes = resourceMgr.GetTexture(textureKey);
+        }
+
+        if (!texRes || !texRes->IsLoaded())
+        {
+            std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
+            return;
+        }
+
+        GLuint sharedTexID = texRes->GetTextureID();
+
+        // --- Spawn 1000 objects ---
+        for (int i = 0; i < 1001; ++i)
+        {
+            std::string objName = "StressObj_" + std::to_string(i);
+            GameObject* go = factory.CreateGameObject(objName);
+            stressObjects.push_back(go);
+
+            // --- Transform: random position ---
+            if (auto* t = go->AddComponent<TransformComponent>())
+            {
+                float x = static_cast<float>(rand() % 1280) - 640;
+                float y = static_cast<float>(rand() % 720) - 360;
+                t->SetPosition(x, y);
+                t->SetScale(spawnW, spawnH);
+            }
+
+            // --- RenderComponent (visiblility) ---
+            if (auto* render = go->AddComponent<RenderComponent>())
+            {
+                render->SetTextureID(sharedTexID);
+                render->SetTexturePath(spritePath);
+                render->SetShapeType(RenderComponent::ShapeType::Square);
+                render->SetColor({ 1.f, 1.f, 1.f, 1.f });
+            }
+        }
+
+        std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
+        addCollidersLater = true;
+    }
+
+    // --- Collider ---
+    if (addCollidersLater)
+    {
+        int batchPerFrame = 50; // add 50 colliders per frame
+
+        for (int i = 0; i < batchPerFrame && colliderIndex < static_cast<int>(stressObjects.size()); ++i, ++colliderIndex)
+        {
+            GameObject* go = stressObjects[colliderIndex];
+            if (go && !go->GetComponent<ColliderComponent>())
+            {
+                go->AddComponent<ColliderComponent>(
+                    ColliderComponent::Type::Square,
+                    spawnW, spawnH,
+                    CollisionLayer::Enemy
+                );
+            }
+
+            // --- Physics: random velocity ---
+            if (auto* p = go->AddComponent<PhysicsComponent>())
+            {
+                float vx = static_cast<float>((rand() % 200) - 100);
+                float vy = static_cast<float>((rand() % 200) - 100);
+                p->SetVelocity(vx, vy);
+                p->SetMass(1.0f);
+                p->SetGrounded(false);
+                p->SetGravity(true);
+            }
+        }
+
+        if (colliderIndex >= static_cast<int>(stressObjects.size()))
+        {
+            addCollidersLater = false;
+            colliderIndex = 0;
+            stressObjects.clear(); // clear tracking list
+            std::cout << "[STRESS TEST] All stress-test colliders added.\n";
+        }
+    }
+
+    // Render Asset Browser things here!
+    AssetBrowserWindow.RenderImGui();
 }

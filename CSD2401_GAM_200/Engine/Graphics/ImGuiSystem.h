@@ -189,3 +189,5 @@ void EditorLayout_LoadPopUp();
 
 
 void CreateHintText(std::string const& displayText);
+
+void M2_RenderStressTest();
