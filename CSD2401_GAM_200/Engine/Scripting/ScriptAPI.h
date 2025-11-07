@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       ScriptAPI.h
+\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+
 #pragma once
 #include <iostream>
 #include <cmath>
@@ -20,6 +35,9 @@
 #include "gameObject.h"
 
 
+/**
+ * @brief Enumeration of shape types for rendering.
+ */
 enum Shape {
     SQUARE,
     CIRCLE,
@@ -27,13 +45,40 @@ enum Shape {
     LINE
 };
 
+/**
+ * @brief Namespace containing API functions accessible from C# scripts.
+ */
 namespace API {
 #pragma region Engine
+    /**
+     * @brief Initializes the engine with the provided CoreEngine and AudioEngine instances.
+     * @param engine Reference to the CoreEngine instance.
+     * @param audio Reference to the AudioEngine instance.
+     */
     void Init_Engine(CoreEngine& engine, AudioEngine& audio);
+    
+    /**
+     * @brief Starts the main engine game loop.
+     * @param engine Reference to the CoreEngine instance.
+     */
     void StartEngineLoop(CoreEngine& engine);
 #pragma endregion
 
 #pragma region Creations
+    /**
+     * @brief Creates a shape GameObject with specified properties.
+     * @param name The name of the GameObject to create.
+     * @param type The shape type to render.
+     * @param x The initial X position.
+     * @param y The initial Y position.
+     * @param width The width of the shape.
+     * @param height The height of the shape.
+     * @param color The color of the shape (RGBA).
+     * @param layer The collision layer for the shape (default: Default).
+     * @param hasPhysics Whether the shape should have physics (default: false).
+     * @param isStatic Whether the shape is static (default: false).
+     * @param hasGravity Whether the shape is affected by gravity (default: false).
+     */
     void CreateShape(const std::string& name,
         RenderComponent::ShapeType type,
         float x, float y,
@@ -44,12 +89,40 @@ namespace API {
         bool isStatic = false,
         bool hasGravity = false);
 
+    /**
+     * @brief Creates an image GameObject with a texture.
+     * @param name The name of the GameObject to create.
+     * @param type The shape type for the image.
+     * @param x The initial X position.
+     * @param y The initial Y position.
+     * @param width The width of the image.
+     * @param height The height of the image.
+     * @param texturePath The file path to the texture image.
+     */
     void CreateImage(const std::string& name,
         RenderComponent::ShapeType type,
         float x, float y,
         float width, float height,
         const std::string& texturePath);
 
+    /**
+     * @brief Creates an animated image GameObject with sprite sheet animation.
+     * @param name The name of the GameObject to create.
+     * @param x The initial X position.
+     * @param y The initial Y position.
+     * @param width The width of the image.
+     * @param height The height of the image.
+     * @param texturePath The file path to the sprite sheet texture.
+     * @param rows The number of rows in the sprite sheet.
+     * @param columns The number of columns in the sprite sheet.
+     * @param startFrame The starting frame index for the animation.
+     * @param endFrame The ending frame index for the animation.
+     * @param fps The frames per second for the animation.
+     * @param layer The collision layer for the image (default: Default).
+     * @param hasPhysics Whether the image should have physics (default: false).
+     * @param isStatic Whether the image is static (default: false).
+     * @param hasGravity Whether the image is affected by gravity (default: false).
+     */
     void CreateAnimatedImage(const std::string& name,
         float x, float y,
         float width, float height,
@@ -65,71 +138,185 @@ namespace API {
 #pragma endregion
 
 #pragma region Graphics
+    /**
+     * @brief Sets the shape type for a GameObject's render component.
+     * @param objectName The name of the GameObject.
+     * @param type The new shape type to set.
+     */
     void SetShapeType(const std::string& objectName, RenderComponent::ShapeType);
+    
+    /**
+     * @brief Sets the texture for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param filename The file path to the texture image.
+     */
     void SetTexture(const std::string& objectName, const char* filename);
+    
+    /**
+     * @brief Sets the color of a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param color The new color (RGBA).
+     */
     void setColor(const std::string& objectName, vec4 color);
+    
+    /**
+     * @brief Sets the alpha (transparency) value for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param alpha The alpha value (0.0 to 1.0).
+     */
     void SetAlpha(const std::string& objectName,float);
+    
+    /**
+     * @brief Sets the background using a texture image.
+     * @param filename The file path to the background texture.
+     */
     void SetBackGround(char const*);
+    
+    /**
+     * @brief Sets the background using a solid color.
+     * @param color The background color (RGBA).
+     */
     void SetBackGround(vec4);
 #pragma endregion
 
 #pragma region Physics
+    /**
+     * @brief Gets the velocity of a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void GetVelocity(const std::string&);
+    
+    /**
+     * @brief Sets the velocity of a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param x The X component of the velocity.
+     * @param y The Y component of the velocity.
+     */
     void SetVelocity(const std::string&, float, float);
 
-    
+    /**
+     * @brief Sets whether a GameObject is static (immovable).
+     * @param objectName The name of the GameObject.
+     * @param isStatic True if the object should be static, false otherwise.
+     */
     void SetStatic(const std::string&,bool);
+    
+    /**
+     * @brief Sets the jump velocity value for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param jumpVal The jump velocity value.
+     */
     void SetJumpVal(const std::string&, float);
-    void SetGravBool(const std::string&,bool); //set whether it have a Gravity
+    
+    /**
+     * @brief Sets whether a GameObject is affected by gravity.
+     * @param objectName The name of the GameObject.
+     * @param hasGravity True if the object should be affected by gravity, false otherwise.
+     */
+    void SetGravBool(const std::string&,bool);
 
 #pragma endregion
 
 #pragma region Transform
+    /**
+     * @brief Sets the position of a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param x The X coordinate.
+     * @param y The Y coordinate.
+     */
     void SetPos(const std::string&, float, float);
 
+    /**
+     * @brief Sets the uniform scale of a GameObject (same for X and Y).
+     * @param objectName The name of the GameObject.
+     * @param scale The scale value for both X and Y axes.
+     */
     void SetScale(const std::string&, float);
+    
+    /**
+     * @brief Sets the scale of a GameObject with separate X and Y values.
+     * @param objectName The name of the GameObject.
+     * @param scaleX The scale value for the X axis.
+     * @param scaleY The scale value for the Y axis.
+     */
     void SetScale(const std::string&, float, float);
 
+    /**
+     * @brief Sets the rotation of a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param rotation The rotation angle in radians.
+     */
     void SetRot(const std::string&, float);
+    
+    /**
+     * @brief Adds to the current rotation of a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param rotation The rotation angle to add (in radians).
+     */
     void AddRot(const std::string&, float);
 
+    /**
+     * @brief Gets the rotation of a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void GetRot(const std::string&);
+    
+    /**
+     * @brief Gets the position of a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void GetPos(const std::string&);
+    
+    /**
+     * @brief Gets the scale of a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void GetScale(const std::string&);
 
 #pragma endregion
 
 #pragma region Components
-    
+    /**
+     * @brief Adds a Transform component to a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void AddTransformComponent(const std::string&);
 
+    /**
+     * @brief Adds a Render component to a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void AddRenderComponent(const std::string&);
     
+    /**
+     * @brief Adds a Collision component to a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void AddCollisionComponent(const std::string&);
     
+    /**
+     * @brief Adds a Physics component to a GameObject.
+     * @param objectName The name of the GameObject.
+     */
     void AddPhysicComponent(const std::string&);
 
 #pragma endregion
 
 #pragma region Collision
+    /**
+     * @brief Sets the collision shape type for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param newShape The new collision shape type.
+     */
     void SetColisionShape(const std::string&, ColliderComponent::Type newShape);
+    
+    /**
+     * @brief Sets the collision layer for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param newlayer The new collision layer.
+     */
     void SetCollisionLayer(const std::string&, CollisionLayer newlayer);
 #pragma endregion
-
-    //#pragma region InputSystem
-    //    void GetMousePos();
-    //    void GetKeyPressed();
-    //    void GetKeyHold();
-    //    void GetKeyRelease();
-    //#pragma endregion
-    //
-    //#pragma region Audio
-    //    void Init_AudioEngine();
-    //    void PlaySound();
-    //    void StopSound();
-    //    void PauseSound();
-    //    void SetBGM();
-    //#pragma endregion
 
 
 

@@ -5,7 +5,7 @@ namespace GameScripts
 {
     public class TestGameObjects2
     {
-        private float rotationSpeed = 90.0f; // Degrees per second
+        private float rotationSpeed = 90.0f;
 
         public void OnStart()
         {
