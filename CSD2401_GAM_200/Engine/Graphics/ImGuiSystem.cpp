@@ -190,7 +190,7 @@ void ImGuiSystem::Update(float dt)
 
         if (!isPlaying)
         {
-            CORE->GetGraphicsSystem()->SetEditorMode();
+            CORE->GetGraphicsSystem()->SetEditorMode(true);
         // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
         {
             ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);

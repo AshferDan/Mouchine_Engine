@@ -164,7 +164,7 @@ void InputManager::Update(float dt)
                 }
                 else if (key == GLFW_KEY_F4)
                 {
-                    CORE->GetGraphicsSystem()->SetEditorMode();
+                    CORE->GetGraphicsSystem()->SetEditorMode(!CORE->GetGraphicsSystem()->IsEditorMode());
                     std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
                 }
             }

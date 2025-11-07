@@ -143,7 +143,7 @@ public:
 
 	bool IsEditorMode() const { return editorMode; };
 
-	void SetEditorMode() { editorMode = !editorMode; };
+	void SetEditorMode(bool enable) { editorMode = enable; };
 
 	GLuint GetFrameBufferTexture() const { return frameBufferTexture; };
 
@@ -187,8 +187,8 @@ private:
 	std::vector<RenderBatch> batches;
 	GLuint batchVAO, batchVBO, batchEBO;
 	GLuint textVAO, textVBO;
-	const size_t MAX_BATCH_VERTICES = 20000; // 2500 quads * 4 vertices
-	const size_t MAX_BATCH_INDICES = 30000;	 // 2500 quads * 6 indices
+	const size_t MAX_BATCH_VERTICES = 12000; // 2500 quads * 4 vertices
+	const size_t MAX_BATCH_INDICES = 18000;	 // 2500 quads * 6 indices
 
 	GLuint frameBuffer, frameBufferTexture, depthRenderBuffer;
 	int frameBufferWidth, frameBufferHeight;
