@@ -1,4 +1,19 @@
-﻿using System;
+﻿
+/* Start Header ************************************************************************/
+/*!
+\file       TestGameObject2.cs
+\author     Jonathan Fam Qian Wei [100% - 38lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+using System;
 using CSharpScript;
 
 namespace GameScripts

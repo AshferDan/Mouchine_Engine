@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Core.h
-\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\author     Jonathan Fam Qian Wei [100% - 54 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 

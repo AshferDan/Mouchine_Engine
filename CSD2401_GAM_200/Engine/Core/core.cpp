@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Core.cpp
-\author     Jonathan Fam Qian Wei [70% - 103 lines]
+\author     Jonathan Fam Qian Wei [70% - 249 lines]
 \co-author  Lee Hwee Min [30% - 45 lines]
 \par        Fam.q@digipen.edu , l.hweemin@digipen.edu
 \date       October, 2, 2025

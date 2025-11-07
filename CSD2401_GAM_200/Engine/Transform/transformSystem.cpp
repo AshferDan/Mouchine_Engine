@@ -1,10 +1,10 @@
+
 /* Start Header ************************************************************************/
 /*!
-\file       tranformSystem.cpp
-\author     Jonathan Fam [100% - 48 lines]
-
-\par        fam.q@digipen.edu
-\date       October, 15, 2025
+\file       TransformSystem.cpp
+\author     Jonathan Fam Qian Wei [100% - 21 lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

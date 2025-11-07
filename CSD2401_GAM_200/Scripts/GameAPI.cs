@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       GameAPI.cs
+\author     Jonathan Fam Qian Wei [100% - 125 lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 using System.Runtime.CompilerServices;
 
 namespace CSharpScript

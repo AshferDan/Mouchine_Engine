@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       MenuLogic.h
-\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\author     Jonathan Fam Qian Wei [100% - 21 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
