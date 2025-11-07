@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       main.cpp
-\author     Lee Hwee Min [100% - 95 lines]
+\author     Lee Hwee Min [100% - 137 lines]
 \par        l.hweemin@digipen.edu
 \date       October, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -54,27 +54,12 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        //Serialization::LoadScene("Prefab_TestScene");
+        //CORE->RequestSceneLoad("Prefab_TestScene");
+       
+        GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+        auto* cam = mainCamera->AddComponent<CameraComponent>();
 
-        GameObject *textObj = GameObjectFactory::Instance().CreateGameObject("ScoreText");
-        textObj->AddComponent<TransformComponent>(100.f, 100.f); // Position on screen
-        textObj->AddComponent<RenderComponent>();
-        auto *text = textObj->AddComponent<TextComponent>(
-            "../Assets/FrederickatheGreat-Regular.ttf",
-            48, // Font size
-            "Score: 0",
-            vec4(1.0f, 1.0f, 1.0f, 1.0f),
-            true);
-        text->SetScreenSpace(true);
-        text->SetScale(1.0f);
-
-        // Later, update the text:
-        text->SetText("Score: 100");
-
-        GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
-        auto *cam = mainCamera->AddComponent<CameraComponent>();
-
-        GameObject *player = GameObjectFactory::Instance().FindGameObject("Hero");
+        GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
         if (player)
         {
             cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
@@ -91,33 +76,31 @@ int main()
         ScriptSystem *scriptSys = engine.GetScriptSystem();
 
         GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+
         if (scriptSys && squareSpawner)
         {
-            // Attach the TestGameObject script (creates red and blue squares)
-            bool attached = scriptSys->AttachScript(squareSpawner, "TestGameObject");
-            if (attached)
+            // 1. Attach the first script (Red Square, Ground, Animation)
+            if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
             {
-                std::cout << "Attached 'TestGameObject' script to SquareSpawner" << std::endl;
-
-                // Call OnStart to actually create the squares
-                scriptSys->CallOnStart(squareSpawner);
-                std::cout << "Called OnStart - Two squares should be created!" << std::endl;
+                std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
             }
             else
             {
-                std::cerr << "ERROR: Failed to attach 'TestGameObject' script!" << std::endl;
-                std::cerr << "Make sure GameScripts.dll is in ./Scripts/ folder" << std::endl;
-                std::cerr << "And that TestGameObject class exists in the DLL" << std::endl;
+                std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
             }
-        }
-        else
-        {
-            if (!scriptSys)
-                std::cerr << "ERROR: ScriptingSystem is null!" << std::endl;
-            if (!squareSpawner)
-                std::cerr << "ERROR: Could not create SquareSpawner GameObject!" << std::endl;
-        }
 
+            // 2. Attach the second script (Blue Square, Green Rotating Square)
+            if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
+            {
+                std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
+            }
+            else
+            {
+                std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
+            }
+            std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
+            scriptSys->CallOnStart(squareSpawner);
+        }
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
@@ -140,7 +123,10 @@ namespace CrashHandler
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
 #endif
-
+    /**
+    * @brief Captures and returns the current stack trace as a formatted string.
+    * @return A string containing the call stack (Windows only).
+    */
     std::string GetStackTrace()
     {
 #if defined(_WIN32)
@@ -170,7 +156,11 @@ namespace CrashHandler
         return "Stacktrace not supported on this platform.";
 #endif
     }
-
+    /**
+    * @brief Logs crash details and stack trace to a file.
+    * @param type Type or category of the crash (e.g., "EXCEPTION").
+    * @param e Optional exception pointer for additional error details.
+    */
     void LogCrash(const char *type, const std::exception *e)
     {
         std::filesystem::create_directories("../Logs");

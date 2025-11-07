@@ -126,6 +126,7 @@ public:
     // Stores if the mouse was clicked *this frame*
     static bool MouseLeftClicked;
 
+    void ResetState();
 
 
 private:

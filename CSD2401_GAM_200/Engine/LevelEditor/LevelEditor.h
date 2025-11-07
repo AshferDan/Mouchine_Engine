@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       LevelEditor.h
+\author     Leck Xin Yee [100% - 150 lines]
+\par        xinyee.leck@digipen.edu
+\date       November, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 
 #include "Animator.hpp"
@@ -129,9 +143,25 @@ public:
      */
     std::string GetName() override { return "LevelEditor"; }
 
-    // Json
+    /*  Json  */
+    /**
+     * @brief Saves the current level as a JSON file
+     * @param filepath File path to save to
+     * @return True if the save operation succeeded
+     */
     bool SaveLevelJSON(const std::string& filepath);
+
+    /**
+     * @brief Loads a level from a JSON file
+     * @param filepath File path to load from
+     * @return True if the load operation succeeded
+     */
     bool LoadLevelJSON(const std::string& filepath);
+
+    /**
+     * @brief Retrieves all available scene files from the Scenes directory
+     * @return Vector of filenames
+     */
     std::vector<std::string> GetAllSceneFiles();
 
     // Level management
@@ -194,18 +224,6 @@ public:
     EditorMode GetEditorMode() const { return editorMode; }
 
     /**
-     * @brief Check if the editor is in play mode
-     * @return true if in play mode, false otherwise
-     */
-    //bool IsPlaying() const { return editorMode == EditorMode::Play; }
-
-    /**
-     * @brief Check if the editor is paused
-     * @return true if paused, false otherwise
-     */
-    //bool IsPaused() const { return editorMode == EditorMode::Paused; }
-
-    /**
      * @brief Enter play mode (save state and start playing)
      */
     void EnterPlayMode();
@@ -225,37 +243,60 @@ public:
      */
     void TogglePlayStop();
 
-    // Camera control functions
-    // render the camera control panel
-    void RenderCameraControls();
+    /*  Camera control functions  */
+    /**
+     * @brief Updates camera control UI and logic
+     * @param renderUI Whether to render the camera control panel
+     */
+    void UpdateCameraControls(bool renderUI);
 
-    // update
-    void UpdateCameraControls();
-
-    // reset camera
+    /**
+     * @brief Resets the editor camera position and zoom
+     */
     void ResetCamera();
 
-    // camera transformations to the rendering system
-    void ApplyCameraTransform();
-
-    // get the editor camera view-projection matrix
+    /**
+     * @brief Computes and retrieves the editor camera's view-projection matrix
+     * @param windowWidth The viewport width
+     * @param windowHeight The viewport height
+     * @return The orthographic view-projection matrix
+     */
     mat4 GetEditorViewProjection(float windowWidth, float windowHeight) const;
 
-    // camera pos x
+    /**
+     * @return Current camera X position
+     */
     float GetCameraX() const { return cameraX; }
 
-    // camera pos y
+    /**
+     * @return Current camera Y position
+     */
     float GetCameraY() const { return cameraY; }
 
-    // camera zoom
+    /**
+     * @return Current camera zoom
+     */
     float GetCameraZoom() const { return cameraZoom; }
 
-    // get current scene filename
+    /**
+     * @return Name of the currently loaded scene
+     */
     const std::string& GetCurrentFilename() const { return currentFilename; }
 
+    /**
+     * @return True if a scene reload is pending
+     */
     bool HasPendingSceneReload() const { return pendingSceneReload; }
+
+    /**
+     * @brief Executes a pending scene reload
+     */
     void PerformSceneReload();
 
+    /**
+     * @brief Plays the loaded background music if available
+     */
+    void PlayLoadedBGM();
 private:
     // GUI rendering functions
     /**
@@ -267,11 +308,6 @@ private:
      * @brief Render the play controls toolbar
      */
     void RenderPlayControls();
-
-    /**
-     * @brief Render the hierarchy panel listing all game objects
-     */
-    void RenderHierarchy();
 
     // Play mode functions
     /**
@@ -343,4 +379,8 @@ private:
     float zoomSpeed;                      // camera zoom sensitivity
     float minZoom;                        // minimum zoom level
     float maxZoom;                        // maximum zoom level
+
+    std::string currentBGMName = "";
+    std::string currentBGMChannel = "bgm_channel";
+    float currentBGMVolume = 0.5f;
 };

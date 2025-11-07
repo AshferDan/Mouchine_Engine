@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       CollisionSystem.cpp
-\author     Khalil Belabadia [100% - 115 lines]
+\author     Khalil Belabadia [96% - 156 lines]
+            Lee Hwee Min [4% - 5 lines]
 \par        khalil.b@digipen.edu
 \date       October, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -192,6 +193,7 @@ void CollisionSystem::Update(float deltaTime)
                     }
                 }
 
+                // If it's a new collision, publish a message and log it
                 if (!wasActive)
                 {
                     CollisionMessage msg(obj1.get(), obj2);

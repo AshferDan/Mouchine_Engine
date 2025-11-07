@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ComponentSerialization.h
-\author     Lee Hwee Min [100% - ?? lines]
+\author     Lee Hwee Min [100% - 31 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -17,6 +17,8 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "Transform.h"
 #include "RenderComponent.h"
+#include "TextComponent.h"
+#include "CameraComponent.h"
 #include "Physics.h"
 #include "Animator.hpp"
 #include "ColliderComponent.h"
@@ -26,7 +28,7 @@ Technology is prohibited.
 class Spritesheet;
 using json = nlohmann::json;
 
-/*!
+/**
 * @brief Declares per-component serialization and deserialization functions.
 *    Each component knows how to read and write its own data to/from JSON.
 */
@@ -38,6 +40,8 @@ namespace ComponentSerialization
     void SerializeSpritesheet(json& j, Spritesheet* s);
     void SerializePhysics(json& j, PhysicsComponent* p);
     void SerializeCollider(json& j, ColliderComponent* c);
+    void SerializeText(json& j, TextComponent* tc);
+    //void SerializeCamera(json& j, CameraComponent* cam);
 
     // ----------- Deserialize Individual Components ----------------
     void DeserializeTransform(const json& j, GameObject* go);
@@ -45,6 +49,8 @@ namespace ComponentSerialization
     void DeserializeSpritesheet(const json& j, GameObject* go);
     void DeserializePhysics(const json& j, GameObject* go);
     void DeserializeCollider(const json& j, GameObject* go);
+    void DeserializeText(const json& j, GameObject* go);
+    //void DeserializeCamera(const json& j, GameObject* go);
 
     // ----------- Convenience Wrappers ------------------------------
     void SerializeAllComponents(GameObject* go, json& j);

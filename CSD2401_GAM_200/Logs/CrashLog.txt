@@ -14,3 +14,19 @@ invalid string position
 [11] BaseThreadInitThunk - 0x7ffe59c8e8c0
 [12] RtlUserThreadStart - 0x7ffe5adac510
 
+
+[EXCEPTION] 2025-11-07 02:09:25
+Attempted to add duplicate PhysicsComponent to GameObject: BlueSquare
+[0] CrashHandler::GetStackTrace - 0x7ff6df334cf0
+[1] CrashHandler::LogCrash - 0x7ff6df334fa0
+[2] main$catch$7 - 0x7ff6df7ba569
+[3] _CxxFrameHandler4 - 0x7ffe660c6c40
+[5] RtlCaptureContext2 - 0x7ffe82460fc0
+[6] main - 0x7ff6df335200
+[7] invoke_main - 0x7ff6df7af5a0
+[8] __scrt_common_main_seh - 0x7ff6df7af390
+[9] __scrt_common_main - 0x7ff6df7af370
+[10] mainCRTStartup - 0x7ff6df7af660
+[11] BaseThreadInitThunk - 0x7ffe803be8c0
+[12] RtlUserThreadStart - 0x7ffe823cc510
+

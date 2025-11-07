@@ -3,7 +3,7 @@
 \file       GraphicsSystem.h
 \author     Guan Shao Jun [100%]
 \par        shaojun.g@digipen.edu
-\date       October 02 2025
+\date       November 07 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -13,187 +13,302 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #pragma once
-#include "stb_image.h"
-#include "System.h"
-#include "gameObject.h"
-#include "glslshader.h"
+// Standard Library and Third-Party Headers
+#include "stb_image.h" // Image loading library
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include <vector>
+#include <map>
+
+// Engine Core and Component Headers
+#include "System.h"
+#include "gameObject.h"
+#include "glslshader.h"
 #include "factory.h"
 #include "transform.h"
 #include "DebugSystem.h"
-#include <iostream>
-#include <RenderComponent.h>
-#include <TextComponent.h>
-#include "CameraManager.h"
-#include <fstream>
-#include "MathLib.h"
-#include <algorithm>
 #include "RenderComponent.h"
+#include "TextComponent.h"
+#include "CameraManager.h"
+#include "MathLib.h"
 #include "GameObjectSystem.h"
 #include "Message.h"
 
 /**
  * @class GraphicsSystem
- * @brief Handles window creation, rendering, and debug drawing utilities (lines, points, shapes).
+ * @brief Manages the rendering pipeline, GLFW window, OpenGL context, and
+ * is responsible for efficient 2D batch rendering and debug visualization.
  *
- * Typical usage:
- *   GraphicsSystem gfx(1280, 720);
- *   gfx.Initialize();
- *   while (!glfwWindowShouldClose(gfx.getWindow())) {
- *       gfx.Update(deltaTime);
- *   }
+ * Implements the ISystem interface for engine loop integration.
  */
 class GraphicsSystem : public ISystem
 {
 public:
+	/**
+	 * @brief Default constructor. Initializes GLFW and creates a default 800x600 window.
+	 */
 	GraphicsSystem();
+
+	/**
+	 * @brief Constructor with specified window dimensions.
+	 * @param W Initial window width.
+	 * @param H Initial window height.
+	 */
 	GraphicsSystem(GLint W, GLint H);
+
+	/**
+	 * @brief Destructor. Cleans up OpenGL resources (FBOs, Buffers) and terminates GLFW.
+	 */
 	~GraphicsSystem();
 
-	// Initializes OpenGL context, shaders, and buffers.
+	/**
+	 * @brief Initializes OpenGL state, GLEW, shaders (default, debug, text), and rendering buffers (VAOs/VBOs).
+	 */
 	void Initialize() override;
 
-	// Called each frame to handle rendering updates.
+	/**
+	 * @brief The main rendering loop function. Binds framebuffer, clears screen, accumulates
+	 * GameObjects into batches, draws batches, and renders debug/text elements.
+	 * @param deltaTime Time elapsed since the last frame (not directly used for rendering logic).
+	 */
 	void Update(float) override;
 
-	/// Returns system name for debugging/identification.
+	/**
+	 * @brief Returns the system's name for debugging/identification.
+	 * @return A string: "Graphics System".
+	 */
 	std::string GetName() override;
 
 	/**
-	 * @brief Loads a 2D texture from file.
+	 * @brief Loads a 2D texture from file using stb_image.
 	 * @param filepath Path to an image file (e.g., PNG, JPG).
-	 * @return GLuint handle to the OpenGL texture.
-	 *
-	 * Example:
-	 *   GLuint tex = GraphicsSystem::LoadTexture("assets/texture.png");
+	 * @return GLuint handle to the OpenGL texture ID, or 0 on failure.
 	 */
-	static GLuint LoadTexture(const char *filepath);
-
-	/// Returns the GLFW window pointer (for input handling, context checks).
-	GLFWwindow *getWindow() { return window; }
+	static GLuint LoadTexture(const char* filepath);
 
 	/**
-	 * @brief Draws a debug line between two 2D points.
-	 * @param start World/Screen coordinate for line start.
-	 * @param end World/Screen coordinate for line end.
+	 * @brief Returns the GLFW window pointer.
+	 * @return Pointer to the underlying GLFWwindow object.
+	 */
+	GLFWwindow* getWindow() { return window; }
+
+	/**
+	 * @brief Draws a debug line segment between two 2D points in world space.
+	 * @param start World coordinate for line start.
+	 * @param end World coordinate for line end.
 	 * @param color RGBA color of the line.
-	 * @param vp View-projection matrix.
-	 *
-	 * Example:
-	 *   gfx.DrawLine({0,0}, {1,1}, {1,0,0,1}, cameraVP);
+	 * @param viewProjection The combined view-projection matrix (MVP).
 	 */
-	void DrawLine(const vec2 &start, const vec2 &end,
-				  const vec4 &color, const mat4 &viewProjection);
+	void DrawLine(const vec2& start, const vec2& end,
+		const vec4& color, const mat4& viewProjection);
 
 	/**
-	 * @brief Draws a debug point at a position.
-	 * @param pos Position in 2D space.
+	 * @brief Draws a single debug point in world space.
+	 * @param pos Position in 2D world space.
 	 * @param color RGBA color of the point.
-	 * @param vp View-projection matrix.
+	 * @param viewProjection The combined view-projection matrix (MVP).
 	 */
-	void DrawPoint(const vec2 &pos,
-				   const vec4 &color, const mat4 &viewProjection);
+	void DrawPoint(const vec2& pos,
+		const vec4& color, const mat4& viewProjection);
 
 	/**
-	 * @brief Draws the outline of a rectangle.
-	 * @param x Left corner x position.
-	 * @param y Bottom corner y position.
+	 * @brief Draws the outline of an axis-aligned rectangle.
+	 * @param x Center X position.
+	 * @param y Center Y position.
 	 * @param w Width of rectangle.
 	 * @param h Height of rectangle.
 	 * @param color RGBA color of outline.
-	 * @param vp View-projection matrix.
+	 * @param viewProjection The combined view-projection matrix (MVP).
 	 */
 	void DrawRectOutline(float x, float y, float w, float h,
-						 const vec4 &color, const mat4 &viewProjection);
+		const vec4& color, const mat4& viewProjection);
 
 	/**
-	 * @brief Draws a circle outline using line segments.
+	 * @brief Draws a circle outline approximated by line segments.
 	 * @param cx Center X position.
 	 * @param cy Center Y position.
-	 * @param r Radius of circle.
+	 * @param r Radius of the circle.
 	 * @param segments Number of line segments (higher = smoother).
 	 * @param color RGBA color.
-	 * @param vp View-projection matrix.
-	 *
-	 * Example:
-	 *   gfx.DrawCircleOutline(0, 0, 1.0f, 32, {0,1,0,1}, cameraVP);
+	 * @param viewProjection The combined view-projection matrix (MVP).
 	 */
 	void DrawCircleOutline(float cx, float cy, float r, int segments,
-						   const vec4 &color, const mat4 &viewProjection);
+		const vec4& color, const mat4& viewProjection);
 
-	// Returns whether debug mode is enabled.
+	/**
+	 * @brief Checks if debug drawing mode is currently enabled.
+	 * @return true if debug drawing is enabled, false otherwise.
+	 */
 	bool isDebugModeOn() const { return debugMode; }
 
-	// Toggles debug drawing mode (on/off).
+	/**
+	 * @brief Toggles the debug drawing mode (on/off).
+	 */
 	void toggleDebugMode() { debugMode = !debugMode; }
 
-	// Returns the current view-projection matrix.
-	const mat4 &getVp() const { return vp; }
+	/**
+	 * @brief Returns the current view-projection matrix being used for rendering.
+	 * @return Constant reference to the mat4 view-projection matrix.
+	 */
+	const mat4& getVp() const { return vp; }
 
-	void SetLevelEditor(class LevelEditor *editor) { levelEditor = editor; }
+	/**
+	 * @brief Sets a pointer to the LevelEditor instance for camera control.
+	 * @param editor Pointer to the LevelEditor object.
+	 */
+	void SetLevelEditor(class LevelEditor* editor) { levelEditor = editor; }
+
+	/**
+	 * @brief Executes all draw calls for the accumulated render batches.
+	 * Uploads vertex and index data and issues GL_TRIANGLES draw calls.
+	 */
 	void DrawBatches();
 
-	void RenderText(const std::map<char, Character> &characters, const std::string &text, float x, float y, float scale, const vec4 &color, bool screenSpace = true);
+	/**
+	 * @brief Renders a string of text using a font atlas.
+	 * @param characters Map containing glyph data (texture ID, metrics).
+	 * @param text The string content to render.
+	 * @param x Starting X position.
+	 * @param y Starting Y position.
+	 * @param scale Scaling factor for text size.
+	 * @param color RGBA color of the text.
+	 * @param screenSpace If true, uses orthographic screen-space projection; otherwise, uses world-space camera VP.
+	 */
+	void RenderText(const std::map<char, Character>& characters, const std::string& text, float x, float y, float scale, const vec4& color, bool screenSpace = true);
 
+	/**
+	 * @brief Manages the off-screen framebuffer for ImGui rendering.
+	 * Resizes the framebuffer if the provided viewport dimensions change.
+	 * @param viewportSizeX Reference to the desired viewport width.
+	 * @param viewportSizeY Reference to the desired viewport height.
+	 */
 	void RenderGameViewportImGui(float& viewportSizeX, float& viewportSizeY);
 
+	/**
+	 * @brief Checks if the system is currently rendering to the off-screen framebuffer (Editor Mode).
+	 * @return true if rendering to FBO, false if rendering directly to the window.
+	 */
 	bool IsEditorMode() const { return editorMode; };
 
-	void SetEditorMode() { editorMode = !editorMode; };
+	/**
+	 * @brief Enables or disables Editor Mode (rendering to the FBO).
+	 * @param enable True to enable FBO rendering, false to disable.
+	 */
+	void SetEditorMode(bool enable) { editorMode = enable; };
 
+	/**
+	 * @brief Returns the OpenGL texture ID of the FBO's color attachment.
+	 * Used by ImGui to display the game viewport.
+	 * @return GLuint texture ID.
+	 */
 	GLuint GetFrameBufferTexture() const { return frameBufferTexture; };
 
+	/**
+	 * @brief Gets the current GLFW window width.
+	 * @return The width in pixels.
+	 */
 	int GetWindowWidth() const { return Wwidth; };
+
+	/**
+	 * @brief Gets the current GLFW window height.
+	 * @return The height in pixels.
+	 */
 	int GetWindowHeight() const { return Wheight; };
 
+	/**
+	 * @brief Handles messages relevant to the Graphics System, specifically CreateObjectMessage
+	 * to ensure new objects receive a default RenderComponent.
+	 * @param msg The incoming CreateObjectMessage.
+	 */
 	void HandleMessage(const CreateObjectMessage& msg);
-private:
-	mat4 vp;				// Current view-projection matrix.
-	bool debugMode = false; // Debug mode flag for showing shapes.
-	GLFWwindow *window;		// GLFW window handle.
-	GLSLShader shader;		// Shader used for debug rendering.
-	GLSLShader textShader;
-	GLuint vao = 0, vbo = 0, tex = 0;		  // OpenGL buffers and texture.
-	GLint Wwidth, Wheight;					  // Window dimensions.
-	class LevelEditor *levelEditor = nullptr; // Level editor for camera control
 
+private:
+	// --- Window and State ---
+	GLFWwindow* window;						// The handle to the GLFW window.
+	GLint Wwidth, Wheight;					// Current dimensions of the window's client area (in screen coordinates).
+	mat4 vp;								// Current view-projection matrix (camera transform).
+	bool debugMode = false;					// Flag to control rendering of debug shapes (lines, outlines).
+	bool editorMode;						// Flag to indicate if rendering should target the FBO (true) or the screen (false).
+	class LevelEditor* levelEditor = nullptr; // Pointer to the level editor for camera manipulation when in editor mode.
+
+	// --- Shaders ---
+	GLSLShader shader;		// Default shader for batched quads/circles.
+	GLSLShader textShader;	// Shader dedicated to rendering font glyphs.
+	GLSLShader debugShader; // Shader for drawing non-batched items like lines and points.
+
+	// --- Single Quad Rendering (Legacy/Test) Buffers ---
+	GLuint vao = 0, vbo = 0, tex = 0;		// VAO/VBO for a simple quad/rectangle draw (used in older pipelines).
+
+	// --- Batch Rendering Structures and Buffers ---
+	/**
+	 * @brief Structure for a single vertex in the batch buffer. Contains local position
+	 * and world transformation data to be processed in the vertex shader.
+	 */
 	struct BatchVertex
 	{
-		vec3 pos;
-		vec2 tex;
-		vec4 color;
-		vec2 uvScale;
-		vec2 uvOffset;
-		vec3 transform;
-		vec2 scale;
+		vec3 pos;		// Local position relative to the object's center (-0.5 to 0.5).
+		vec2 tex;		// Texture coordinates (UV).
+		vec4 color;		// Color tint (RGBA).
+		vec2 uvScale;	// UV tiling/scaling factor (for spritesheets).
+		vec2 uvOffset;	// UV offset (for spritesheets/animation frame selection).
+		vec3 transform;	// World Translation (x, y) and Rotation (z).
+		vec2 scale;		// World Scale (x, y).
 	};
 
+	/**
+	 * @brief Represents a single group of GameObjects that can be drawn in one GL draw call.
+	 * Grouped by Texture ID, Shape Type (Square/Circle), and Layer.
+	 */
 	struct RenderBatch
 	{
-		GLuint textureID;
-		bool isCircle;
-		std::vector<BatchVertex> vertices;
-		std::vector<GLuint> indices;
-		int layer;
+		GLuint textureID;				// The OpenGL texture ID bound for the entire batch.
+		bool isCircle;					// Flag indicating if the geometry should be rendered as a circle (uses specialized fragment shader logic).
+		std::vector<BatchVertex> vertices; // Vertex data for all quads in this batch.
+		std::vector<GLuint> indices;	// Index data (EBO) for all quads in this batch.
+		int layer;						// Rendering layer (for depth sorting, typically based on Z-position).
 
+		/**
+		 * @brief Constructor for RenderBatch.
+		 */
 		RenderBatch(GLuint texID, bool circle, int l) : textureID(texID), isCircle(circle), layer(l) {}
 	};
 
-	std::vector<RenderBatch> batches;
-	GLuint batchVAO, batchVBO, batchEBO;
-	GLuint textVAO, textVBO;
-	const size_t MAX_BATCH_VERTICES = 20000; // 2500 quads * 4 vertices
-	const size_t MAX_BATCH_INDICES = 30000;	 // 2500 quads * 6 indices
+	std::vector<RenderBatch> batches;		// Collection of all accumulated batches for the current frame.
+	GLuint batchVAO, batchVBO, batchEBO;	// OpenGL buffers for the batch rendering system.
 
-	GLuint frameBuffer, frameBufferTexture, depthRenderBuffer;
-	int frameBufferWidth, frameBufferHeight;
-	bool editorMode;
+	// --- Text Rendering Buffers ---
+	GLuint textVAO, textVBO;				// VAO/VBO dedicated to rendering dynamically generated text quads.
 
+	// Batch size constants (must match memory allocation in Initialize)
+	const size_t MAX_BATCH_VERTICES = 12000; // Max vertices the batch VBO can hold (e.g., 3000 quads * 4 vertices).
+	const size_t MAX_BATCH_INDICES = 18000;	 // Max indices the batch EBO can hold (e.g., 3000 quads * 6 indices).
+
+	// --- Frame Buffer Object (FBO) for Editor Viewport ---
+	GLuint frameBuffer, frameBufferTexture, depthRenderBuffer; // FBO, Color Attachment, and Depth/Stencil Attachment.
+	int frameBufferWidth, frameBufferHeight;					// Dimensions of the FBO attachments.
+
+	/**
+	 * @brief Creates and configures the Frame Buffer Object (FBO) and its attachments (texture and renderbuffer).
+	 * @param width The width for the attachments.
+	 * @param height The height for the attachments.
+	 */
 	void CreateFrameBuffer(int width, int height);
+
+	/**
+	 * @brief Deletes all OpenGL resources associated with the FBO.
+	 */
 	void DeleteFrameBuffer();
+
+	/**
+	 * @brief Deletes and recreates the FBO and attachments with new dimensions.
+	 * @param width The new width.
+	 * @param height The new height.
+	 */
 	void ResizeFrameBuffer(int width, int height);
 };

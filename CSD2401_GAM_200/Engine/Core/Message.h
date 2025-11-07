@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Message.h
+\author     Lee Hwee Min [100% - 116 lines]
+\par        l.hweemin@digipen.edu.sg
+\date       Novemeber, 3, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #pragma once
 #include <string>
 #include <iostream>
@@ -13,6 +26,8 @@ class IMessageHandler;
 
 class Message {
 public:
+    /* @brief Message identifiers used to classify message types.
+    */
     enum class Id {
         UNKNOWN,
         KEY_INPUT,
@@ -26,13 +41,22 @@ public:
 
     virtual ~Message() = default;
 
+    /* @brief Message identifiers used to classify message types.
+    *  @returns the message type
+    */
     Id GetType() const { return type; }
 
 protected:
     Id type;
+
+    /* @brief Protected constructor to enforce type-safe creation
+    */
     explicit Message(Id type) : type(type) {}
 };
 
+/**
+ * @brief Message for keyboard input events.
+ */
 class KeyMessage : public Message {
 public:
     int keyCode;
@@ -43,6 +67,9 @@ public:
     }
 };
 
+/**
+ * @brief Message for playing a sound.
+ */
 class PlaySoundMessage : public Message {
 public:
     std::string soundName;
@@ -51,6 +78,9 @@ public:
     }
 };
 
+/**
+ * @brief Message for pausing or resuming a sound channel.
+ */
 class PauseSoundMessage : public Message {
 public:
     std::string channelName;
@@ -61,6 +91,10 @@ public:
     }
 };
 
+
+/**
+ * @brief Message representing a collision event between two objects.
+ */
 class CollisionMessage : public Message {
 public:
     void* objectA;
@@ -71,6 +105,10 @@ public:
     }
 };
 
+
+/**
+ * @brief Message for creating a new GameObject in the scene.
+ */
 class CreateObjectMessage : public Message {
 public:
     enum class ObjectType { Empty, Basic, Prefab };
@@ -103,18 +141,34 @@ public:
 
 };
 
+
+/**
+ * @brief Central hub for subscribing to and publishing messages.
+ *
+ * The MessageBus enables communication between systems without tight coupling.
+ * Systems can subscribe to message types and react when messages are published.
+ */
 class MessageBus {
 private:
     std::unordered_map<std::type_index, std::vector<IMessageHandler*>> subscribers;
 
 public:
-    // Subscribe to a specific message type
+    
+    /**
+     * @brief Subscribes a handler to a specific message type.
+     * @tparam T Message type to subscribe to.
+     * @param handler Pointer to the subscribing IMessageHandler.
+     */
     template<typename T>
     void Subscribe(IMessageHandler* handler) {
         subscribers[typeid(T)].push_back(handler);
     }
 
-    // Unsubscribe a handler from a specific message type
+    /**
+    * @brief Unsubscribes a handler from a specific message type.
+    * @tparam T Message type to unsubscribe from.
+    * @param handler Pointer to the handler to remove.
+    */
     template<typename T>
     void Unsubscribe(IMessageHandler* handler) {
         auto it = subscribers.find(typeid(T));
@@ -124,7 +178,11 @@ public:
         }
     }
 
-    // Publish message to all handlers of this message type
+    /**
+    * @brief Publishes a message to all subscribed handlers of its type.
+    * @tparam T Message type to publish.
+    * @param message Reference to the message instance.
+    */
     template<typename T>
     void Publish(const T& message) {
         auto it = subscribers.find(typeid(T));

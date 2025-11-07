@@ -1,8 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Core.cpp
-\author     Jonathan Fam Qian Wei [71% - 103 lines]
-\co-author  Lee Hwee Min [29% - 41 lines]
+\author     Jonathan Fam Qian Wei [70% - 103 lines]
+\co-author  Lee Hwee Min [30% - 45 lines]
 \par        Fam.q@digipen.edu , l.hweemin@digipen.edu
 \date       October, 2, 2025
 
@@ -12,13 +12,14 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+
 #include "core.h"
 #include "LevelEditor.h"
 #include "Message.h"
 #include "IMessageHandler.h"
 
 bool InputManager::KeyStateQuit = false;
-CoreEngine* CORE;
+CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
@@ -53,9 +54,9 @@ CoreEngine::~CoreEngine()
    window width and height to the graphics system
 
    */
-void CoreEngine::ConfigFile(const char* configF)
+void CoreEngine::ConfigFile(const char *configF)
 {
-    std::ifstream fp{ configF };
+    std::ifstream fp{configF};
     if (!fp)
     {
         std::cout << "Cannot find file" << std::endl;
@@ -112,15 +113,16 @@ void CoreEngine::InitSystems()
     // 10. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
-    
+    menuLogicSystem = AddSystem<MenuLogicSystem>();
+
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
+    // Subscribe systems to specific message types
     messageBus.Subscribe<PlaySoundMessage>(audioEngine);
     messageBus.Subscribe<PauseSoundMessage>(audioEngine);
     messageBus.Subscribe<CollisionMessage>(physicsSystem);
     messageBus.Subscribe<CreateObjectMessage>(gameObjectSystem);
-
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
@@ -158,6 +160,22 @@ void CoreEngine::GameLoop()
 
     while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
     {
+
+        if (m_hasPendingLoad)
+        {
+            LevelEditor *level = GetLevelEditor();
+            level->LoadLevelJSON(m_pendingScene);
+            std::cout << "[CoreEngine] Scene loaded, playing BGM if available..." << std::endl;
+            level->PlayLoadedBGM();
+            m_pendingScene = "";
+            m_hasPendingLoad = false;
+
+            if (inputManager)
+                inputManager->ResetState();
+            CameraManager::Instance().ResetState();
+            accumulator = 0.0;
+        }
+
         // Update variable delta_time and FPS
         update_time(fps_interval);
 
@@ -184,7 +202,7 @@ void CoreEngine::GameLoop()
             g_systemTimings[debugSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
-        if (scriptSystem) 
+        if (scriptSystem)
             g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
@@ -267,7 +285,7 @@ void CoreEngine::GameLoop()
                 if (scriptSystem)
                 {
                     std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    scriptSystem->Update(static_cast<float>(fixed_dt)); // Use variable delta_time
+                    scriptSystem->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
                     std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
                     double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                     g_systemTimings[scriptSystem->GetName()] = ms;
@@ -277,13 +295,12 @@ void CoreEngine::GameLoop()
                 if (menuLogicSystem)
                 {
                     std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    menuLogicSystem->Update(static_cast<float>(fixed_dt)); // Use variable delta_time
+                    menuLogicSystem->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
                     std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
                     double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[scriptSystem->GetName()] = ms;
+                    g_systemTimings[menuLogicSystem->GetName()] = ms;
                     g_totalLoopTime += ms;
                 }
-                
                 stepOnce = false; // Reset after processing one frame
             }
 
@@ -304,8 +321,6 @@ void CoreEngine::GameLoop()
             g_systemTimings[graphicsSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
-
-        
 
         if (debugSystem)
         {
@@ -341,8 +356,6 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
-
-
 
         // End ImGui frame and render
         if (imguiSystem)
@@ -409,7 +422,7 @@ void CoreEngine::update_time(double fps_calc_interval)
 
     title_str = "Game Engine | FPS:" + tempfps + " | DT: " + tempdt + " | Fixed DT: " + tempfixeddt;
 
-    GLFWwindow* Wind = CORE->GetGraphicsSystem()->getWindow();
+    GLFWwindow *Wind = CORE->GetGraphicsSystem()->getWindow();
     if (Wind)
     {
         glfwSetWindowTitle(Wind, title_str.c_str());

@@ -258,13 +258,15 @@ vec4 operator*(mat4 const& m, vec4 const& v)
 
 bool IsAreaClicked(float buttonX, float buttonY, float buttonWidth, float buttonHeight, float mouseX, float mouseY)
 {
-    // Simple AABB (Axis-Aligned Bounding Box) check
-    float left = buttonX - buttonWidth / 2.0f;
-    float right = buttonX + buttonWidth / 2.0f;
-    float top = buttonY + buttonHeight / 2.0f;
-    float bottom = buttonY - buttonHeight / 2.0f;
+   
+    float halfWidth = std::abs(buttonWidth) / 2.0f;
+    float halfHeight = std::abs(buttonHeight) / 2.0f;
 
-    // Uses the world coordinates we set up in InputManager
+    float left = buttonX - halfWidth;
+    float right = buttonX + halfWidth;
+    float top = buttonY + halfHeight;
+    float bottom = buttonY - halfHeight;
+
     return (mouseX >= left && mouseX <= right &&
         mouseY >= bottom && mouseY <= top);
 }

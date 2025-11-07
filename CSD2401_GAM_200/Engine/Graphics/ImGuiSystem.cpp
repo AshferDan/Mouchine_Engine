@@ -193,21 +193,16 @@ void ImGuiSystem::Update(float dt)
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
 
-        TopMenuBar_Render();                        // Render the top tool bar elements
-        Hierarchy_Render();                         // Render hierarchy
+        LevelEditor* levelEditor = CORE->GetLevelEditor();
+        bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
-        // render property editor for selected game object
-        // Property editor is blank by default - and shows a GO's details upon being selected
-        if (showPropertyEditor)
+        if (!isPlaying)
         {
-            RenderPropertyEditor();
-        }
-
-        // commented out bc editor mode isnt rly an editor mode, its more of a game view mode, dragndrop still works tho
-        // if (CORE->GetGraphicsSystem()->IsEditorMode())
+            CORE->GetGraphicsSystem()->SetEditorMode(true);
+        // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
         {
-            ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
             ImGui::Begin("Game Viewport");
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
@@ -248,6 +243,19 @@ void ImGuiSystem::Update(float dt)
             ImGui::End();
         }
 
+        // Only show editor UI when not in play mode
+
+            TopMenuBar_Render();
+            Hierarchy_Render();
+
+            // render property editor for selected game object
+            if (showPropertyEditor)
+            {
+                RenderPropertyEditor();
+            }
+            // Render profiler! Make it toggleable?
+            Profiler_Render();
+        }
         /**
          * @brief Game Object Creator Menu IMGui Window
          */
@@ -263,10 +271,6 @@ void ImGuiSystem::Update(float dt)
         {
             PrefabMenu_Render();
         }
-
-        // Render profiler! Make it toggleable?
-        Profiler_Render();
-
         // Flag with 1 frame delay on whether something is being drag and dropped, used for spawning prefabs via DND
         Serialization::Prefab_DragAndDropped = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
     }
@@ -1626,14 +1630,18 @@ void M2_RenderStressTest()
             {
                 float vx = static_cast<float>((rand() % 200) - 100);
                 float vy = static_cast<float>((rand() % 200) - 100);
-                p->SetVelocity(vx, vy);
+                if (vx == 0 && vy == 0)
+                    vx = (rand() % 2 == 0 ? 50.f : -50.f); // ensure nonzero
+
+                p->SetVelocity(vx, vy + 100.f); // small upward bias
                 p->SetMass(1.0f);
                 p->SetGrounded(false);
                 p->SetGravity(true);
             }
+            
         }
 
-        if (colliderIndex >= static_cast<int>(stressObjects.size()))
+        if (colliderIndex >= totalObjects)
         {
             addCollidersLater = false;
             colliderIndex = 0;

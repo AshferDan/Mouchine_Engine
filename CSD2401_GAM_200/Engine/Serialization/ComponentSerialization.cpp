@@ -1,7 +1,7 @@
 /* Start Header************************************************************************ /
 /*!
 \file       ComponentSerialization.cpp
-\author     Lee Hwee Min [100% - ?? lines]
+\author     Lee Hwee Min [100% - 245 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -99,6 +99,50 @@ void ComponentSerialization::SerializeCollider(json& j, ColliderComponent* c)
         {"layer", EnumConverters::ToString(c->GetLayer())}
     };
 }
+
+/**
+ * @brief Serializes the TextComponent into JSON.
+ * @param j JSON object to write into.
+ * @param tc Pointer to the TextComponent.
+ */
+void ComponentSerialization::SerializeText(json& j, TextComponent* tc) {
+    j["TextComponent"] = {
+        {"fontPath", tc->GetFontPath()},
+        {"fontSize", tc->GetFontSize()},
+        {"text", tc->GetText()},
+        {"color", {tc->GetColor().x, tc->GetColor().y, tc->GetColor().z, tc->GetColor().w}},
+        {"scale", tc->GetScale()},
+        {"screenSpace", tc->isScreenSpace()}
+    };
+}
+
+//void ComponentSerialization::SerializeCamera(json& j, CameraComponent* cam) {
+//    std::string modeStr;
+//    switch (cam->GetMode()) {
+//        case CameraComponent::CameraMode::FIXED:
+//            modeStr = "FIXED";
+//            break;
+//        case CameraComponent::CameraMode::FOLLOW_TARGET:
+//            modeStr = "FOLLOW_TARGET";
+//            break;
+//        case CameraComponent::CameraMode::FREE_MOVE:
+//            modeStr = "FREE_MOVE";
+//            break;
+//        default:
+//            modeStr = "FIXED";
+//            break;
+//    }
+//
+//    j["CameraComponent"] = {
+//        {"mode", modeStr},
+//        {"position", {cam->GetPosition().x, cam->GetPosition().y} },
+//        {"followOffset", {cam->GetFollowOffset().x, cam->GetFollowOffset().y}},
+//        {"smoothing", cam->IsSmoothingEnabled()},
+//        {"smoothingSpeed", cam->GetSmoothingSpeed()},
+//        {"followTargetName", cam->GetFollowTargetName()}
+//    };
+//
+//}
 
 // ------------------- Deserialize -------------------
 /**
@@ -303,6 +347,87 @@ void ComponentSerialization::DeserializeCollider(const json& j, GameObject* go)
     auto* collider = go->AddComponent<ColliderComponent>(type, width, height, layer);
 }
 
+/**
+ * @brief Deserializes TextComponent data from JSON and attaches it to a GameObject.
+ * @param j JSON object containing Text data.
+ * @param go Target GameObject to apply data to.
+ */
+void ComponentSerialization::DeserializeText(const json& j, GameObject* go) {
+    if (!j.contains("TextComponent")) {
+        return;
+    }
+
+    const auto& t = j["TextComponent"];
+
+    std::string fontPath = t.value("fontPath", "../Assets/FrederickatheGreat-Regular.ttf");
+    int fontSize = t.value("fontSize", 48);
+    std::string text = t.value("text", "");
+
+    vec4 color(
+        t["color"][0].get<float>(),
+        t["color"][1].get<float>(),
+        t["color"][2].get<float>(),
+        t["color"][3].get<float>()
+    );
+
+    bool screenSpace = t.value("screenSpace", true);
+
+    auto* textComp = go->AddComponent<TextComponent>(
+        fontPath.c_str(),
+        fontSize,
+        text,
+        color,
+        screenSpace
+    );
+
+    textComp->SetScale(t.value("scale", 1.f));
+}
+
+/**
+ * @brief Deserializes CameraComponent data from JSON and attaches it to a GameObject.
+ * @param j JSON object containing Camera data.
+ * @param go Target GameObject to apply data to.
+ */
+//void ComponentSerialization::DeserializeCamera(const json& j, GameObject* go) {
+//    if (!j.contains("CameraComponent")) {
+//        return;
+//    }
+//
+//    const auto& c = j["CameraComponent"];
+//
+//    auto* cam = go->AddComponent<CameraComponent>();
+//
+//    std::string modeStr = c.value("mode", "FIXED");
+//    if (modeStr == "FIXED") {
+//        cam->SetMode(CameraComponent::CameraMode::FIXED);
+//
+//        if (c.contains("position")) {
+//            cam->SetPosition(
+//                c["position"][0].get<float>(),
+//                c["position"][1].get<float>()
+//            );
+//        }
+//    }
+//    else if (modeStr == "FOLLOW_TARGET") {
+//        cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+//
+//        std::string targetName = c.value("followTargetName", "");
+//        GameObject* target = GameObjectFactory::Instance().FindGameObject(targetName);
+//        if (target) {
+//            cam->SetFollowTarget(target);
+//        }
+//        if (c.contains("followOffset")) {
+//            cam->SetFollowOffset(vec2(
+//                c["followOffset"][0].get<float>(),
+//                c["followOffset"][1].get<float>()
+//            ));
+//        }
+//    }
+//    bool smoothing = c.value("smoothing", true);
+//    float smoothingSpeed = c.value("smoothingSpeed", 2.f);
+//    cam->SetSmoothing(smoothing, smoothingSpeed);
+//}
+
 // ------------------- Serialize / Deserialize All Componenents -------------------
 /**
  * @brief Serializes all components attached to a GameObject.
@@ -316,6 +441,8 @@ void ComponentSerialization::SerializeAllComponents(GameObject* go, json& j)
     if (auto* s = go->GetComponent<Spritesheet>())        SerializeSpritesheet(j, s);
     if (auto* p = go->GetComponent<PhysicsComponent>())   SerializePhysics(j, p);
     if (auto* c = go->GetComponent<ColliderComponent>())  SerializeCollider(j, c);
+    if (auto* tc = go->GetComponent<TextComponent>())     SerializeText(j, tc);
+    //if (auto* cam = go->GetComponent<CameraComponent>())  SerializeCamera(j, cam);
 }
 
 /**
@@ -330,4 +457,6 @@ void ComponentSerialization::DeserializeAllComponents(GameObject* go, const json
     DeserializeSpritesheet(j, go);
     DeserializePhysics(j, go);
     DeserializeCollider(j, go);
+    DeserializeText(j, go);
+    //DeserializeCamera(j, go);
 }

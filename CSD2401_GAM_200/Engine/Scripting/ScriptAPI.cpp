@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       ScriptAPI.cpp
+\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "ScriptAPI.h"
 
 namespace API
@@ -43,14 +57,15 @@ namespace API
         resourceMgr.PrintLoadedResources();
 
         // register the sound with audio engine
-        std::cout << "\n--- Starting Background Music ---" << std::endl;
-        audio.playSound("bgm", "bgm_channel");
-        audio.setVolume("bgm_channel", 0.5f);
+        //std::cout << "\n--- Starting Background Music ---" << std::endl;
+        //audio.playSound("bgm", "bgm_channel");
+        //audio.setVolume("bgm_channel", 0.5f);
 
-        // register wind sound
-        std::cout << "--- Starting Wind Ambient Sound ---" << std::endl;
-        audio.playSound("wind", "wind_channel");
-        audio.setVolume("wind_channel", 0.5f); // Quieter than music for ambient effect
+        //// register wind sound
+        //std::cout << "--- Starting Wind Ambient Sound ---" << std::endl;
+        //audio.playSound("wind", "wind_channel");
+        //audio.setVolume("wind_channel", 0.5f); // Quieter than music for ambient effect
+        std::cout << "\n--- Audio loaded, music will start in play mode ---" << std::endl;
     }
 
     void StartEngineLoop(CoreEngine &engine)

@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Serialization.h
-\author     Muhammad Ashfer [100% - ?? lines]
+\author     Muhammad Ashfer [100% - 27 lines]
 \par        m.binafzalkhan@digipen.edu
 \date       October, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "RenderComponent.h"
 #include "factory.h"
+#include "CameraComponent.h"
 #include "ComponentSerialization.h"
 
 using json = nlohmann::json;
@@ -43,13 +44,34 @@ namespace Serialization
      */
     void DeserializeGameObject(const json& j);
 
+    /**
+    * @brief Saves a single GameObject as a prefab file.
+    */
     void SavePrefab(GameObject& go);
+
+    /**
+    * @brief Loads a prefab from file and instantiates it into the scene.
+    */
     void LoadPrefab(const std::string& path);
 
+    /** 
+    * @brief Saves all GameObjects in the current scene to a JSON file. 
+    */
     void SaveScene(const std::string& existingPath);
+
+    /** 
+    * @brief Loads a complete scene from a JSON file. 
+    */
     void LoadScene(const std::string& path);
 
+    /** 
+    * @brief Deletes a prefab file by name.
+    */
     void RemovePrefab(std::string const& prefabName);
+
+    /**
+    * @brief Renames an existing prefab file.
+    */
     void RenamePrefab(std::string const& oldName, std::string const& newName);
 
     extern bool Prefab_DragAndDropped;

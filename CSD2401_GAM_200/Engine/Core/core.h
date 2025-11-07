@@ -162,16 +162,28 @@ public:
         return debugSystem;
     }
 
+    /**
+     * @brief Gets a pointer to the TransformSystem.
+     * @return A pointer to the TransformSystem.
+     */
     TransformSystem *GetTransformSystem() const
     {
 
         return transformSystem;
     }
 
+    /**
+     * @brief Gets a pointer to the ScriptSystem.
+     * @return A pointer to the ScriptSystem.
+     */
     ScriptSystem *GetScriptSystem() const
     {
         return scriptSystem;
     }
+    /**
+     * @brief Gets a pointer to the CameraSystem.
+     * @return A pointer to the CameraSystem.
+     */
     CameraSystem *GetCameraSystem() const
     {
 
@@ -187,10 +199,19 @@ public:
         return levelEditor;
     }
 
+    /**
+     * @brief Gets a pointer to the MenuLogicSystem.
+     * @return A pointer to the MenuLogicSystem.
+     */
     MenuLogicSystem* GetMenuLogic() const {
         return menuLogicSystem;
     }
 
+    /**
+     * @brief Gets a pointer to the AudioEngine.
+     * @return A pointer to the AudioEngine.
+     */
+    AudioEngine* GetAudioEngine() const { return audioEngine; }
     /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
@@ -238,15 +259,32 @@ public:
      */
     static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
 
+
+
+    /**
+     * @brief Requests a scene to be loaded on the next frame.
+     * @param sceneName The name of the scene file to load.
+     */
+    void RequestSceneLoad(const std::string& sceneName) {
+        m_pendingScene = sceneName;
+        m_hasPendingLoad = true;
+    }
+
     // Step-by-step physics debugging
     bool stepMode;
     bool stepOnce;
     double accumulator; // Accumulator for fixed timestep
 
-    // Message Handling 
+    /**
+     * @brief Gets a reference to the MessageBus for inter-system communication.
+     * @return A reference to the MessageBus.
+     */
     MessageBus& GetMessageBus() { return messageBus; }
 
 private:
+    /**
+     * @brief Initializes all engine systems in the correct order.
+     */
     void InitSystems();
     std::vector<std::unique_ptr<ISystem>> Systems;
 
@@ -263,7 +301,7 @@ private:
     CameraSystem *cameraSystem = nullptr;
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem* menuLogicSystem = nullptr;
-
+ 
 
     unsigned LastTime;
     bool GameActive;
@@ -273,6 +311,8 @@ private:
     int WindWidth;
     int WindHeight;
     MessageBus messageBus;
+    std::string m_pendingScene = "";
+    bool m_hasPendingLoad = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.

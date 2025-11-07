@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       tranformSystem.h
+\author     Jonathan Fam [100% - 48 lines]
+
+\par        fam.q@digipen.edu
+\date       October, 15, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 
 #include "transform.h"

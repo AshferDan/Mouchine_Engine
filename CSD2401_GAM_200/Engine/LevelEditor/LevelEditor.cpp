@@ -1,8 +1,23 @@
+/* Start Header ************************************************************************/
+/*!
+\file       LevelEditor.cpp
+\author     Leck Xin Yee [100% - 1062 lines]
+\par        xinyee.leck@digipen.edu
+\date       November, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "ColliderComponent.h"
 #include "LevelEditor.h"
 #include "physics.h"
 #include "ResourceManager.h"
 #include "Serialization.h"
+#include "audio.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -24,7 +39,7 @@ LevelEditor::LevelEditor()
     editorMode(EditorMode::Stop),
     hasUnsavedChanges(false),
     hasValidSaveState(false),
-    cameraX(0.0f),  cameraY(0.0f), cameraZoom(1.0f),
+    cameraX(0.0f), cameraY(0.0f), cameraZoom(1.0f),
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
     zoomSpeed(0.1f),    //zoom to be implemented
     minZoom(0.1f),
@@ -86,20 +101,15 @@ void LevelEditor::Update(float /*dt*/)
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
     ImGui::End();
 
-    UpdateCameraControls();
+    // camera update with conditional rendering
+    bool shouldRenderCameraUI = (editorMode == EditorMode::Stop);
+    UpdateCameraControls(shouldRenderCameraUI);
+
     RenderPlayControls();
 
     // show editor UI only when not in live Play
-    if (editorMode != EditorMode::Play)
-    {
+    if (editorMode != EditorMode::Play) {
         RenderMenuBar();
-        //RenderHierarchy();
-
-        // only show camera controls in edit mode
-        if (editorMode == EditorMode::Stop)
-        {
-            RenderCameraControls();
-        }
     }
 
     if (showLoadDialog)
@@ -133,6 +143,9 @@ void LevelEditor::Update(float /*dt*/)
     }
 }
 
+/**
+ * @brief Render play/pause/stop control panel
+ */
 void LevelEditor::RenderPlayControls()
 {
     ImGui::Begin("Editor Controls");
@@ -176,7 +189,9 @@ void LevelEditor::RenderPlayControls()
     ImGui::End();
 }
 
-// play state
+/**
+ * @brief Enter play mode - Save current state and start game
+ */
 void LevelEditor::EnterPlayMode()
 {
     if (editorMode == EditorMode::Play)
@@ -229,14 +244,33 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
+
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine && !currentBGMName.empty())
+    {
+        std::cout << "[LevelEditor] Starting background music: " << currentBGMName << std::endl;
+        // Ensure it's stopped before starting to avoid doubling up if spamming play/stop
+        audioEngine->stopSound(currentBGMChannel);
+        audioEngine->playSound(currentBGMName, currentBGMChannel);
+        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+    }
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
 
-// stop state
+/**
+ * @brief Stop play mode - Restore saved scene state
+ */
 void LevelEditor::StopPlayMode()
 {
     if (editorMode == EditorMode::Stop)
         return;
+
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine && !currentBGMChannel.empty())
+    {
+        std::cout << "[LevelEditor] Stopping background music on " << currentBGMChannel << std::endl;
+        audioEngine->stopSound(currentBGMChannel);
+    }
 
     RestoreSceneState();           // restore saved scene
     hasValidSaveState = false;
@@ -246,21 +280,43 @@ void LevelEditor::StopPlayMode()
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 
-// pause state
+/**
+ * @brief Toggle pause state (Play and Pause)
+ */
 void LevelEditor::TogglePause()
 {
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+
     if (editorMode == EditorMode::Play)
     {
         editorMode = EditorMode::Pause;
+
+        if (audioEngine && !currentBGMChannel.empty())
+        {
+            std::cout << "[LevelEditor] Pausing music on channel " << currentBGMChannel << std::endl;
+            // CHANGED: Use currentBGMChannel instead of hardcoded string
+            audioEngine->pauseSound(currentBGMChannel, true);
+        }
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
     else if (editorMode == EditorMode::Pause)
     {
         editorMode = EditorMode::Play;
+
+        if (audioEngine && !currentBGMChannel.empty())
+        {
+            std::cout << "[LevelEditor] Resuming music on channel " << currentBGMChannel << std::endl;
+            // CHANGED: Use currentBGMChannel instead of hardcoded string
+            audioEngine->pauseSound(currentBGMChannel, false);
+        }
+        CORE->GetGraphicsSystem()->SetEditorMode(false);
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
 
+/**
+ * @brief Toggle between play and stop
+ */
 void LevelEditor::TogglePlayStop()
 {
     if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
@@ -272,10 +328,14 @@ void LevelEditor::TogglePlayStop()
     {
         // currently stopped, save & enter play
         EnterPlayMode();
+        CORE->GetGraphicsSystem()->SetEditorMode(false);
     }
 }
 
-// save current scene state
+/*  Scene State Management  */
+/**
+ * @brief Save current scene state for later restoration
+ */
 void LevelEditor::SaveSceneState()
 {
     savedSceneState.gameObjects.clear();
@@ -302,7 +362,9 @@ void LevelEditor::SaveSceneState()
     std::cout << "[LevelEditor] Scene state saved with " << savedSceneState.gameObjects.size() << " objects.\n";
 }
 
-// restore scene state from saved data
+/**
+ * @brief Restore scene state from saved data
+ */
 void LevelEditor::RestoreSceneState()
 {
     if (!hasValidSaveState)
@@ -389,6 +451,7 @@ void LevelEditor::RestoreSceneState()
     std::cout << "[LevelEditor] Scene restored. Camera: (" << cameraX << ", " << cameraY << ")\n";
 }
 
+/*  GUI rendering  */
 /**
  * @brief Render the editor menu windows
  */
@@ -468,127 +531,10 @@ void LevelEditor::RenderMenuBar()
     ImGui::End();
 }
 
-/*void LevelEditor::RenderHierarchy()
-{
-    ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 600), ImGuiCond_FirstUseEver);
-
-    if (!ImGui::Begin("Hierarchy##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
-    {
-        ImGui::End();
-        return;
-    }
-
-    // Render top part to show adding of GOs
-    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
-    {
-        // this is a file, not sure if we wanna do anything yet
-        //ShowCreateGOMenu = true;
-    }
-
-    // display current file name
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
-    ImGui::Text("Scene: %s", currentFilename.c_str());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-
-    // display object count
-    auto &allObjects = factory.GetAllGameObjects();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-    ImGui::Text("Game Objects: %zu", allObjects.size());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-
-    // list all game objects
-    for (const auto &objPtr : allObjects)
-    {
-        if (!objPtr->IsActive())
-            continue;
-
-        GameObject *obj = objPtr.get();
-        EntityID id = obj->GetID();
-
-        // highlight if selected
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        if (selectedGameObjectID == id)
-        {
-            flags |= ImGuiTreeNodeFlags_Selected;
-        }
-
-        bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)",
-                                          obj->GetName().c_str(), id);
-
-        // enter drag and drop stuff here
-
-        {
-            // might wanna send id as data instead
-            if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-            {
-                SendDragAndDrop(HierarchyPayloadID, obj->GetName(), obj->GetName());
-            }
-        }
-
-        {
-            std::string testdata{};
-            ReceiveDragAndDrop(HierarchyPayloadID, testdata);
-            // Do something with DnD data
-            if (!testdata.empty())
-            {
-                if (testdata != obj->GetName())
-                {
-                    std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
-                }
-                else
-                {
-                    std::cout << "[Hierarchy] Invalid Drag and Drop source!\n";
-                }
-                //CompletedDragAndDrop();
-            }
-        }
-
-        // select on click
-        if (ImGui::IsItemClicked())
-        {
-            SetSelectedGameObject(id);
-        }
-
-        // context menu
-        if (ImGui::BeginPopupContextItem())
-        {
-            if (ImGui::MenuItem("Select"))
-            {
-                SetSelectedGameObject(id);
-            }
-            if (ImGui::MenuItem("Save as Prefab"))
-            {
-                Serialization::SavePrefab(*obj);
-            }
-            if (ImGui::MenuItem("Clone"))
-            {
-                factory.CloneGameObject(id);
-            }
-            if (ImGui::MenuItem("Delete"))
-            {
-                RemoveGameObject(id);
-                if (selectedGameObjectID == id)
-                    selectedGameObjectID = 0;
-            }
-            ImGui::EndPopup();
-        }
-    }
-
-    // deselect when clicking on empty space in the hierarchy
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-    {
-        if (!ImGui::IsAnyItemHovered())
-        {
-            selectedGameObjectID = 0;
-        }
-    }
-    ImGui::End();
-}
-*/
-
+/*  File I/O in JSON  */
+/**
+ * @brief Save level to JSON file
+ */
 bool LevelEditor::SaveLevelJSON(const std::string &filepath)
 {
     try
@@ -641,6 +587,9 @@ bool LevelEditor::SaveLevelJSON(const std::string &filepath)
     }
 }
 
+/**
+ * @brief Load level from JSON file
+ */
 bool LevelEditor::LoadLevelJSON(const std::string& filepath)
 {
     try
@@ -702,25 +651,24 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
             if (settings.contains("backgroundMusic") && audio)
             {
                 const auto& bgm = settings["backgroundMusic"];
-                std::string name = bgm.value("name", "bgm");
+                // Store settings in member variables instead of local variables
+                currentBGMName = bgm.value("name", "");
                 std::string path = bgm.value("path", "");
-                bool        loop = bgm.value("looping", true);
-                float       vol = bgm.value("volume", 0.8f);
-                std::string chan = bgm.value("channel", "bgm");
+                bool loop = bgm.value("looping", true);
+                currentBGMVolume = bgm.value("volume", 0.5f);
+                currentBGMChannel = bgm.value("channel", "bgm_channel");
 
-                if (!path.empty())
+                if (!path.empty() && !currentBGMName.empty())
                 {
-                    std::cout << "[LoadLevel] Loading BGM: " << name << " from " << path << "\n";
-                    if (resourceMgr.LoadAudio(name, path, loop))
+                    std::cout << "[LoadLevel] Loading BGM: " << currentBGMName << " from " << path << "\n";
+                    if (resourceMgr.LoadAudio(currentBGMName, path, loop))
                     {
-                        std::cout << "[LoadLevel] Playing BGM on channel: " << chan << "\n";
-                        audio->playSound(name, chan);
-                        audio->setVolume(chan, vol);
-                        std::cout << "[LoadLevel] BGM started successfully\n";
+                        std::cout << "[LoadLevel] BGM loaded successfully (ready for Play Mode)\n";
                     }
                     else
                     {
                         std::cerr << "[LoadLevel] Failed to load BGM: " << path << "\n";
+                        currentBGMName = ""; // Clear if failed to load
                     }
                 }
             }
@@ -789,7 +737,7 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
 }
 
 /**
- * @brief Get all scene files from the prefabs directory
+ * @brief Get all scene files from the Assets/Scenes directory
  */
 std::vector<std::string> LevelEditor::GetAllSceneFiles()
 {
@@ -820,6 +768,7 @@ std::vector<std::string> LevelEditor::GetAllSceneFiles()
     return files;
 }
 
+/*  Level Management  */
 /**
  * @brief Create a new empty level
  */
@@ -837,7 +786,7 @@ void LevelEditor::NewLevel()
 }
 
 /**
- * @brief Save level to file
+ * @brief Save level to file (wrapper for JSON save)
  */
 bool LevelEditor::SaveLevel(const std::string &filepath)
 {
@@ -876,6 +825,7 @@ bool LevelEditor::LoadLevel(const std::string &filepath)
     return false;
 }
 
+/*  Game object management  */
 /**
  * @brief Add a game object to the level
  */
@@ -893,7 +843,7 @@ void LevelEditor::RemoveGameObject(EntityID id)
 }
 
 /**
- * @brief Get the selected game object
+ * @brief Get the currently selected game object
  */
 GameObject *LevelEditor::GetSelectedGameObject() const
 {
@@ -901,13 +851,14 @@ GameObject *LevelEditor::GetSelectedGameObject() const
 }
 
 /**
- * @brief Set the selected game object
+ * @brief Set the currently selected game object
  */
 void LevelEditor::SetSelectedGameObject(EntityID id)
 {
     selectedGameObjectID = id;
 }
 
+/*  Serialisation */
 /**
  * @brief Serialise a game object to data structure
  */
@@ -1044,7 +995,7 @@ GameObjectData LevelEditor::SerialiseGameObject(GameObject *obj)
  */
 GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
 {
-    // create base game object with same id so selection etc. still works
+    // create base game object with same id
     GameObject *obj = factory.CreateGameObjectWithID(data.originalID, data.name);
     if (!obj)
     {
@@ -1192,7 +1143,7 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
 }
 
 /**
- * @brief Load level data from file
+ * @brief Load level data from legacy text file format
  */
 bool LevelEditor::LoadLevelFromFile(const std::string &filepath, LevelData &outData)
 {
@@ -1286,97 +1237,83 @@ bool LevelEditor::LoadLevelFromFile(const std::string &filepath, LevelData &outD
     return true;
 }
 
-// camera control
+ /*  Camera control  */
 /**
- * @brief Render camera control panel
+ * @brief Render camera control panel in ImGui
  */
-void LevelEditor::RenderCameraControls()
+void LevelEditor::UpdateCameraControls(bool renderUI)
 {
-    ImGui::SetNextWindowPos(ImVec2(10, 400), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
+    // RENDER UI PANEL (if requested)
+    if (renderUI) {
+        ImGui::SetNextWindowPos(ImVec2(10, 400), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Camera Controls##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
-    {
+        if (ImGui::Begin("Camera Controls##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse)) {
+            ImGui::Text("Level Editor Camera");
+            ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "For navigation & editing");
+            ImGui::Separator();
+
+            // display current camera info
+            ImGui::Text("Position: (%.1f, %.1f)", cameraX, cameraY);
+            ImGui::Text("Zoom: %.2fx", cameraZoom);
+            ImGui::Separator();
+
+            // camera position sliders
+            ImGui::DragFloat("Camera X", &cameraX, 1.0f, -10000.0f, 10000.0f);
+            ImGui::DragFloat("Camera Y", &cameraY, 1.0f, -10000.0f, 10000.0f);
+
+            if (ImGui::SliderFloat("Zoom", &cameraZoom, minZoom, maxZoom, "%.2f")) {
+                // clamp zoom to min/max
+                if (cameraZoom < minZoom) cameraZoom = minZoom;
+                if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+            }
+            ImGui::Separator();
+
+            // camera settings
+            ImGui::DragFloat("Pan Speed", &panSpeed, 0.1f, 0.1f, 10.0f);
+            ImGui::Separator();
+
+            // reset button
+            if (ImGui::Button("Reset Camera", ImVec2(-1, 0))) {
+                ResetCamera();
+            }
+
+            ImGui::Separator();
+            ImGui::TextWrapped("Controls:\n"
+                "- Middle Mouse: Pan camera\n"
+                "- Arrow Keys: Pan camera (alternative)\n"
+                "- Mouse Wheel: Zoom");
+
+            ImGui::Separator();
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Editor Mode");
+        }
         ImGui::End();
-        return;
     }
 
-    ImGui::Text("Level Editor Camera");
-    ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "For navigation & editing");
-    ImGui::Separator();
-
-    // display current camera info
-    ImGui::Text("Position: (%.1f, %.1f)", cameraX, cameraY);
-    ImGui::Separator();
-
-    // camera position sliders
-    if (ImGui::DragFloat("Camera X", &cameraX, 1.0f, -10000.0f, 10000.0f))
-    {
-    }
-    if (ImGui::DragFloat("Camera Y", &cameraY, 1.0f, -10000.0f, 10000.0f))
-    {
-    }
-    ImGui::Separator();
-
-    // camera settings
-    ImGui::DragFloat("Pan Speed", &panSpeed, 0.1f, 0.1f, 10.0f);
-    ImGui::Separator();
-
-    // reset button
-    if (ImGui::Button("Reset Camera", ImVec2(-1, 0)))
-    {
-        ResetCamera();
-    }
-
-    ImGui::Separator();
-    ImGui::TextWrapped("Controls:\n"
-                       "- Middle Mouse: Pan camera\n"
-                       "- WASD: Pan camera (alternative)");
-
-    ImGui::Separator();
-    ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Editor Mode");
-    ImGui::End();
-}
-
-/**
- * @brief Update camera controls (handle input for panning and zooming in the future)
- */
-void LevelEditor::UpdateCameraControls()
-{
-    ImGuiIO &io = ImGui::GetIO();
+    // update camera input
+    ImGuiIO& io = ImGui::GetIO();
 
     // in play/pause mode camera follows hero
-    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
-    {
+    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause) {
         isPanning = false;
         return;
     }
 
-    // camera moves when not hovering over imgui windows and if its in editor mode
-    if (io.WantCaptureMouse)
-    {
-        isPanning = false;
-        return;
-    }
-
-    // middle mouse button
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
-    {
+    // middle mouse button panning
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) {
         isPanning = true;
         lastMouseX = io.MousePos.x;
         lastMouseY = io.MousePos.y;
     }
-    else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle))
-    {
+    else if (ImGui::IsMouseReleased(ImGuiMouseButton_Middle)) {
         isPanning = false;
     }
 
-    if (isPanning && ImGui::IsMouseDown(ImGuiMouseButton_Middle))
-    {
+    if (isPanning && ImGui::IsMouseDown(ImGuiMouseButton_Middle)) {
         float deltaX = io.MousePos.x - lastMouseX;
         float deltaY = io.MousePos.y - lastMouseY;
 
-        // pan camera
+        // Pan camera
         cameraX -= (deltaX * panSpeed) / cameraZoom;
         cameraY += (deltaY * panSpeed) / cameraZoom;
 
@@ -1385,26 +1322,33 @@ void LevelEditor::UpdateCameraControls()
     }
 
     // keyboard panning
-    if (!io.WantCaptureKeyboard)
-    {
+    bool keyboardOverImGuiWindow = io.WantCaptureKeyboard && ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+
+    if (!keyboardOverImGuiWindow) {
         float keyPanSpeed = panSpeed * 5.0f / cameraZoom;
 
-        if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
-        {
+        if (ImGui::IsKeyDown(ImGuiKey_DownArrow)) {
             cameraY -= keyPanSpeed;
         }
-        if (ImGui::IsKeyDown(ImGuiKey_UpArrow))
-        {
+        if (ImGui::IsKeyDown(ImGuiKey_UpArrow)) {
             cameraY += keyPanSpeed;
         }
-        if (ImGui::IsKeyDown(ImGuiKey_RightArrow))
-        {
+        if (ImGui::IsKeyDown(ImGuiKey_RightArrow)) {
             cameraX += keyPanSpeed;
         }
-        if (ImGui::IsKeyDown(ImGuiKey_LeftArrow))
-        {
+        if (ImGui::IsKeyDown(ImGuiKey_LeftArrow)) {
             cameraX -= keyPanSpeed;
         }
+    }
+
+    // mouse wheel zoom
+    if (io.MouseWheel != 0.0f) {
+        float zoomDelta = io.MouseWheel * zoomSpeed;
+        cameraZoom += zoomDelta;
+
+        // clamp zoom to min/max
+        if (cameraZoom < minZoom) cameraZoom = minZoom;
+        if (cameraZoom > maxZoom) cameraZoom = maxZoom;
     }
 }
 
@@ -1421,11 +1365,6 @@ void LevelEditor::ResetCamera()
 }
 
 /**
- * @brief Apply camera transformations to the rendering system
- */
-void LevelEditor::ApplyCameraTransform() {}
-
-/**
  * @brief Get the editor camera's view-projection matrix
  */
 mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight) const
@@ -1440,18 +1379,23 @@ mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight)
     }
 
     // in edit mode use editor camera
-    mat4 projection = mat4::ortho(0.0f, windowWidth, 0.0f, windowHeight);
-    vec3 editorCamPos(cameraX - windowWidth / 2.0f, cameraY - windowHeight / 2.0f, 0.0f);
-    mat4 view = mat4::translate(-editorCamPos);
+    float halfWidth = (windowWidth / 2.0f) / cameraZoom;
+    float halfHeight = (windowHeight / 2.0f) / cameraZoom;
 
-    // apply zoom by scaling the projection
-    mat4 zoomMatrix = mat4::translate(vec3(windowWidth / 2.0f, windowHeight / 2.0f, 0.0f));
-    zoomMatrix = zoomMatrix * mat4::scale(vec3(cameraZoom, cameraZoom, 1.0f));
-    zoomMatrix = zoomMatrix * mat4::translate(vec3(-windowWidth / 2.0f, -windowHeight / 2.0f, 0.0f));
+    float left = cameraX - halfWidth;
+    float right = cameraX + halfWidth;
+    float bottom = cameraY - halfHeight;
+    float top = cameraY + halfHeight;
 
-    return zoomMatrix * projection * view;
+    mat4 projection = mat4::ortho(left, right, bottom, top);
+
+    return projection;
 }
 
+/*  Deferred scene loading  */
+/**
+ * @brief Perform deferred scene reload
+ */
 void LevelEditor::PerformSceneReload()
 {
     if (!pendingSceneReload)
@@ -1480,4 +1424,39 @@ void LevelEditor::PerformSceneReload()
     hasValidSaveState = false;
     pendingSceneReload = false;
     pendingScenePath.clear();
+}
+
+/*  Audio Management */
+/**
+ * @brief Play loaded background music
+ */
+void LevelEditor::PlayLoadedBGM()
+{
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+
+    if (audioEngine && !currentBGMName.empty())
+    {
+        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
+            << " on channel: " << currentBGMChannel << std::endl;
+
+        // stop any existing sound on this channel first
+        audioEngine->stopSound(currentBGMChannel);
+
+        // play the BGM
+        audioEngine->playSound(currentBGMName, currentBGMChannel);
+        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+
+        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
+    }
+    else
+    {
+        if (!audioEngine)
+        {
+            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
+        }
+        else if (currentBGMName.empty())
+        {
+            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
+        }
+    }
 }

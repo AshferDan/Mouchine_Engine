@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ResourceManager.cpp
-\author     Leck Xin Yee [100% - 156 lines]
+\author     Leck Xin Yee [100% - 384 lines]
 \par        xinyee.leck@digipen.edu
 \date       October, 2, 2025
 
@@ -122,13 +122,17 @@ FontResource::~FontResource()
     Unload();
 }
 
-// loads a font from file using default size (48)
+/**
+ * @brief Loads a font from file using default size
+ */
 bool FontResource::Load(const std::string& filepath)
 {
     return Load(filepath, 48);
 }
 
-// loads a font from file with specified size
+/**
+ * @brief Loads a font from file with specified size
+ */
 bool FontResource::Load(const std::string& filepath, GLuint size)
 {
     if (loaded)
@@ -167,7 +171,9 @@ bool FontResource::Load(const std::string& filepath, GLuint size)
     return true;
 }
 
-// loads all ASCII characters from the font
+/**
+ * @brief Loads all ASCII characters (0-127) from the font
+ */
 void FontResource::LoadCharacters(FT_Face face)
 {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -207,7 +213,9 @@ void FontResource::LoadCharacters(FT_Face face)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
-// unloads the font and deletes all character textures
+/**
+ * @brief Unloads the font and frees all character textures
+ */
 void FontResource::Unload()
 {
     if (loaded)
@@ -349,6 +357,9 @@ void ResourceManager::UnloadAudio(const std::string &name)
     }
 }
 
+/**
+ * @brief Initializes the FreeType library if not already initialized
+ */
 bool ResourceManager::InitialiseFreeType()
 {
     if (ftRefCount == 0)
@@ -364,7 +375,9 @@ bool ResourceManager::InitialiseFreeType()
     return true;
 }
 
-// shutdown FreeType library when no longer needed
+/**
+ * @brief Shuts down the FreeType library when no longer in use
+ */
 void ResourceManager::ShutdownFreeType()
 {
     ftRefCount--;
@@ -376,7 +389,9 @@ void ResourceManager::ShutdownFreeType()
     }
 }
 
-// load font resource
+/**
+ * @brief Loads a font resource or returns existing one if already loaded
+ */
 FontResource* ResourceManager::LoadFont(const std::string& name, const std::string& filepath, GLuint fontSize)
 {
     // create unique key with font name and size
@@ -404,7 +419,9 @@ FontResource* ResourceManager::LoadFont(const std::string& name, const std::stri
     return ptr;
 }
 
-// get font resource
+/**
+ * @brief Retrieves a loaded font resource by name
+ */
 FontResource* ResourceManager::GetFont(const std::string& name)
 {
     // try to find any font with this base name
@@ -420,7 +437,9 @@ FontResource* ResourceManager::GetFont(const std::string& name)
     return nullptr;
 }
 
-//unload font
+/**
+ * @brief Unloads a specific font resource from the manager
+ */
 void ResourceManager::UnloadFont(const std::string& name)
 {
     // unload all fonts with this base name
@@ -468,7 +487,9 @@ void ResourceManager::UnloadAllAudio()
     audioResources.clear();
 }
 
-// unload all font resources
+/**
+ * @brief Unloads all font resources and clears the font map
+ */
 void ResourceManager::UnloadAllFonts()
 {
     std::cout << "Unloading " << fonts.size() << " fonts" << std::endl;

@@ -2,8 +2,9 @@
 /*!
 \file       GraphicsSystem.cpp
 \author     Guan Shao Jun [85%]
+            Lee Hwee Min [ 1% - 8 lines]
 \par        shaojun.g@digipen.edu
-\date       October 02 2025
+\date       November 07 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -15,13 +16,24 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
 
-const char *configFile = "../Logs/config.txt";
+// Global constant for configuration file path (currently unused in this file)
+const char* configFile = "../Logs/config.txt";
+// Global constant for 2*Pi, used for circle approximation
 const double two_pi = 6.28318530717958647692528676655900576;
 
+/**
+ * \brief The GraphicsSystem class manages all OpenGL rendering, GLFW window creation,
+ * and the 2D batch rendering system.
+ */
+
+ /**
+  * \brief Default constructor for GraphicsSystem.
+  * Initializes GLFW, creates the main rendering window, and sets up window callbacks.
+  */
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
-      frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+    frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
+    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -45,8 +57,8 @@ GraphicsSystem::GraphicsSystem()
     glfwSetWindowUserPointer(window, this);
 
     // Set callback for window resizing (updates viewport + stored dimensions).
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *win, int width, int height)
-                                   {
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height)
+        {
             glViewport(0, 0, width, height);
 
             // Update stored window width/height in GraphicsSystem.
@@ -56,23 +68,30 @@ GraphicsSystem::GraphicsSystem()
                 gs->Wheight = height;
             } });
 
-    // Make OpenGL context current for this window.
-    glfwMakeContextCurrent(window);
+            // Make OpenGL context current for this window.
+            glfwMakeContextCurrent(window);
 
-    // Query the framebuffer size (accounts for HiDPI displays).
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
+            // Query the framebuffer size (accounts for HiDPI displays).
+            int fbWidth, fbHeight;
+            glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+            // Set the initial OpenGL viewport to match the actual framebuffer size
+            glViewport(0, 0, fbWidth, fbHeight);
 
-    // Store the actual framebuffer size.
-    Wwidth = fbWidth;
-    Wheight = fbHeight;
+            // Store the actual framebuffer size.
+            Wwidth = fbWidth;
+            Wheight = fbHeight;
 }
 
+/**
+ * \brief Overloaded constructor for GraphicsSystem.
+ * Allows specifying initial window dimensions.
+ * \param w Initial window width.
+ * \param h Initial window height.
+ */
 GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
-      frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+    frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
+    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Same as default constructor, but allows user to specify window size.
 
@@ -96,8 +115,8 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     glfwSetWindowUserPointer(window, this);
 
     // Set callback for window resizing (updates viewport + stored dimensions).
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *win, int width, int height)
-                                   {
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height)
+        {
             glViewport(0, 0, width, height);
 
             // Update stored window width/height in GraphicsSystem.
@@ -107,21 +126,27 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
                 gs->Wheight = height;
             } });
 
-    // Make OpenGL context current for this window.
-    glfwMakeContextCurrent(window);
+            // Make OpenGL context current for this window.
+            glfwMakeContextCurrent(window);
 
-    // Query the framebuffer size (accounts for HiDPI displays).
-    int fbWidth, fbHeight;
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
+            // Query the framebuffer size (accounts for HiDPI displays).
+            int fbWidth, fbHeight;
+            glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+            // Set the initial OpenGL viewport to match the actual framebuffer size
+            glViewport(0, 0, fbWidth, fbHeight);
 
-    // Store the actual framebuffer size.
-    Wwidth = fbWidth;
-    Wheight = fbHeight;
+            // Store the actual framebuffer size.
+            Wwidth = fbWidth;
+            Wheight = fbHeight;
 }
 
+/**
+ * \brief Destructor for GraphicsSystem.
+ * Cleans up OpenGL resources (Frame Buffer, VBOs, VAOs) and terminates GLFW.
+ */
 GraphicsSystem::~GraphicsSystem()
 {
+    // Clean up Frame Buffer resources
     DeleteFrameBuffer();
 
     // Clean up resources on destruction.
@@ -132,6 +157,9 @@ GraphicsSystem::~GraphicsSystem()
     }
 }
 
+/**
+ * \brief Initializes OpenGL state, GLEW, shaders, and main rendering buffers (VAOs/VBOs).
+ */
 void GraphicsSystem::Initialize()
 {
     // Initialize GLEW (required to access modern OpenGL functions).
@@ -143,12 +171,18 @@ void GraphicsSystem::Initialize()
 
     // Enable blending (allows transparency in textures and colors).
     glEnable(GL_BLEND);
+    // Standard blend function for alpha transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Compile and link the default shader program for rendering.
     // Requires "vertices.vert" (vertex shader) and "fragment.frag" (fragment shader).
-    shader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/vertices.vert"},
-                                {GL_FRAGMENT_SHADER, "../Shaders/fragment.frag"}});
+    shader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/vertices.vert"},
+                                {GL_FRAGMENT_SHADER, "../Shaders/fragment.frag"} });
+
+    // Compile and link the debug shader program for lines and points
+    debugShader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/debug.vert"},
+                                {GL_FRAGMENT_SHADER, "../Shaders/debug.frag"} });
+    std::cout << "Debug shader compiled successfully\n\n\n\n" << std::endl;
 
     // Define vertex structure for a textured quad.
     struct Vertex
@@ -166,7 +200,7 @@ void GraphicsSystem::Initialize()
         {{0.5f, 0.5f, 0.f}, {1.f, 1.f}}    // top-right
     };
 
-    // === VAO (Vertex Array Object) + VBO (Vertex Buffer Object) setup ===
+    // === VAO (Vertex Array Object) + VBO (Vertex Buffer Object) setup for single draw ===
 
     // Create a VAO to store the state of vertex attribute bindings.
     glCreateVertexArrays(1, &vao);
@@ -174,6 +208,7 @@ void GraphicsSystem::Initialize()
 
     // Create a VBO and upload vertex data into GPU memory.
     glCreateBuffers(1, &vbo);
+    // Use immutable storage for performance (data is static)
     glNamedBufferStorage(vbo, sizeof(vertices), vertices, 0);
 
     // Bind the VBO to the VAO at binding point 0.
@@ -182,20 +217,24 @@ void GraphicsSystem::Initialize()
 
     // --- Attribute 0: Position (vec3) ---
     glEnableVertexArrayAttrib(vao, 0); // enable attribute location 0
+    // Define the format and offset for the position attribute
     glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
     glVertexArrayAttribBinding(vao, 0, 0); // bind attribute 0 to binding point 0
 
     // --- Attribute 1: Texture coordinates (vec2) ---
     glEnableVertexArrayAttrib(vao, 1); // enable attribute location 1
+    // Define the format and offset for the texture coordinate attribute
     glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, tex));
     glVertexArrayAttribBinding(vao, 1, 0); // bind attribute 1 to binding point 0
 
+    // === Batch Rendering Buffers Setup ===
     // Initialise batch rendering buffers
     glCreateVertexArrays(1, &batchVAO);
-    glCreateBuffers(1, &batchVBO);
-    glCreateBuffers(1, &batchEBO);
+    glCreateBuffers(1, &batchVBO); // Vertex data buffer
+    glCreateBuffers(1, &batchEBO); // Index data buffer
 
     // Allocate large buffers for batch rendering
+    // Use GL_DYNAMIC_STORAGE_BIT because the data changes every frame (SubData is used)
     glNamedBufferStorage(batchVBO, MAX_BATCH_VERTICES * sizeof(BatchVertex), nullptr, GL_DYNAMIC_STORAGE_BIT);
     glNamedBufferStorage(batchEBO, MAX_BATCH_INDICES * sizeof(GLuint), nullptr, GL_DYNAMIC_STORAGE_BIT);
 
@@ -203,6 +242,7 @@ void GraphicsSystem::Initialize()
     glVertexArrayVertexBuffer(batchVAO, 0, batchVBO, 0, sizeof(BatchVertex));
     glVertexArrayElementBuffer(batchVAO, batchEBO);
 
+    // Configure vertex attributes for the BatchVertex structure
     // Attribute 0: Position (vec3)
     glEnableVertexArrayAttrib(batchVAO, 0);
     glVertexArrayAttribFormat(batchVAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, pos));
@@ -228,19 +268,20 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribFormat(batchVAO, 4, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, uvOffset));
     glVertexArrayAttribBinding(batchVAO, 4, 0);
 
-    // Attribute 5: Transform (vec3)
+    // Attribute 5: Transform (vec3) - Stores (x, y, rotation) for the quad center
     glEnableVertexArrayAttrib(batchVAO, 5);
     glVertexArrayAttribFormat(batchVAO, 5, 3, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, transform));
     glVertexArrayAttribBinding(batchVAO, 5, 0);
 
-    // Attribute 6: Scale (vec2)
+    // Attribute 6: Scale (vec2) - Stores (scaleX, scaleY)
     glEnableVertexArrayAttrib(batchVAO, 6);
     glVertexArrayAttribFormat(batchVAO, 6, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, scale));
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
-    // Text Shader Initialize
-    textShader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/text.vert"},
-                                    {GL_FRAGMENT_SHADER, "../Shaders/text.frag"}});
+    // === Text Rendering Buffers Setup ===
+    // Compile and link the text shader
+    textShader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/text.vert"},
+                                    {GL_FRAGMENT_SHADER, "../Shaders/text.frag"} });
 
     glGenVertexArrays(1, &textVAO);
     glGenBuffers(1, &textVBO);
@@ -248,17 +289,26 @@ void GraphicsSystem::Initialize()
     glBindVertexArray(textVAO);
     glBindBuffer(GL_ARRAY_BUFFER, textVBO);
 
+    // Allocate buffer space for a single glyph (6 vertices, 4 floats per vertex)
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
 
+    // Attribute 0: vertex position and texture coordinates (x, y, u, v)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    // Initialize the off-screen framebuffer for the editor viewport
     CreateFrameBuffer(800, 600);
 }
 
+/**
+ * \brief The main rendering loop function.
+ * Handles framebuffer binding, screen clearing, game object accumulation into batches,
+ * batch drawing, and drawing non-batched items (lines, points, text, debug shapes).
+ * \param deltaTime The time elapsed since the last frame (not used in this rendering logic).
+ */
 void GraphicsSystem::Update(float)
 {
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
@@ -266,30 +316,32 @@ void GraphicsSystem::Update(float)
     if (!window)
         return; // Skip if no valid window.
 
+    // === Framebuffer and Viewport Setup ===
     if (editorMode)
     {
+        // Render to the custom framebuffer texture for the editor viewport
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
         glViewport(0, 0, frameBufferWidth, frameBufferHeight);
     }
     else
     {
+        // Render directly to the default window framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, Wwidth, Wheight);
     }
 
     // === Clear Screen ===
     glClearColor(0.6f, 0.5f, 0.45f, 0.0f);              // Background color (RGBA)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color buffer
-    glLineWidth(2.f);                                   // Set line thickness
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear color buffer and depth buffer
+    glLineWidth(2.f);                                   // Set line thickness for wireframes/debug
     glPointSize(50.f);                                  // Set point size (for debug points)
 
     // Use main shader program
     shader.Use();
 
-    //// Orthographic projection: origin at bottom-left, size = window width/height
-    //  Use editor camera for level editing, otherwise use default game camera
-        float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
-        float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+    // === View-Projection Matrix Calculation ===
+    float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
+    float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
     if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop))
     {
         // EDITOR MODE: Use free editor camera for level editing
@@ -298,27 +350,29 @@ void GraphicsSystem::Update(float)
     }
     else
     {
+        // GAME MODE: Use the primary game camera
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
     // Accumulate all geometry into batches
     batches.clear();
 
-    auto &gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
-    for (auto &obj : gameObjects)
+    auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
+    // === Batch Accumulation Loop ===
+    for (auto& obj : gameObjects)
     {
         if (!obj->IsActive())
         {
             continue;
         }
 
-        auto *transform = obj->GetComponent<TransformComponent>();
+        auto* transform = obj->GetComponent<TransformComponent>();
         if (!transform)
         {
             continue;
         }
 
-        auto *rend = obj->GetComponent<RenderComponent>();
+        auto* rend = obj->GetComponent<RenderComponent>();
 
         if (!rend)
         {
@@ -327,32 +381,33 @@ void GraphicsSystem::Update(float)
         // Only batch Square and Circle for now
         if (rend->GetShapeType() != RenderComponent::ShapeType::Circle && rend->GetShapeType() != RenderComponent::ShapeType::Square)
         {
-            continue;
+            continue; // Skip non-batchable shapes (handled later)
         }
 
-        // transform data
+        // Gather transform data
         float x, y, sx, sy;
         transform->GetPosition(x, y);
         transform->GetScale(sx, sy);
         float rot = transform->GetRotation();
 
-        // Render data
+        // Gather render data
         GLuint texID = rend->GetTextureID();
         vec4 color = vec4(rend->GetColor());
         bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
-        int layer = rend->GetLayer();
+        int layer = rend->GetLayer(); // For draw order sorting
 
-        // UV data
+        // Gather UV data for spritesheets/animation
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
-        if (auto *animator = obj->GetComponent<Spritesheet>())
+        if (auto* animator = obj->GetComponent<Spritesheet>())
         {
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
         }
 
-        RenderBatch *targetBatch = nullptr;
-        for (auto &batch : batches)
+        // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
+        RenderBatch* targetBatch = nullptr;
+        for (auto& batch : batches)
         {
             if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer)
             {
@@ -361,11 +416,13 @@ void GraphicsSystem::Update(float)
             }
         }
 
+        // If no matching batch found, create a new one
         if (!targetBatch)
         {
             batches.emplace_back(texID, isCircle, layer);
             targetBatch = &batches.back();
 
+            // Reserve space to minimize reallocations
             targetBatch->vertices.reserve(20000);
             targetBatch->indices.reserve(30000);
 
@@ -374,44 +431,41 @@ void GraphicsSystem::Update(float)
             //     << ", IsCircle: " << isCircle << std::endl;
         }
 
-        //-------------------- TBR -------------------------------
-        // mat4 model = mat4::translate(vec3(x, y, 0.0f));
-        // model = model * mat4::rotate(rot, vec3(0, 0, 1));
-        // model = model * mat4::scale(vec3(sx, sy, 1.0f));
-        //--------------------------------------------------------
-
+        // Local coordinates for a unit quad (centered at 0,0)
         vec3 localVerts[4] = {
             {-0.5f, -0.5f, 0.f},
             {0.5f, -0.5f, 0.f},
             {-0.5f, 0.5f, 0.f},
-            {0.5f, 0.5f, 0.f}};
+            {0.5f, 0.5f, 0.f} };
 
+        // Texture coordinates for the unit quad
         vec2 texCoords[4] = {
             {0.f, 0.f},
             {1.f, 0.f},
             {0.f, 1.f},
-            {1.f, 1.f}};
+            {1.f, 1.f} };
 
-        GLuint baseIndex = (GLuint)targetBatch->vertices.size();
+        GLuint baseIndex = (GLuint)targetBatch->vertices.size(); // Starting index for the new quad
 
-        // add 4 vertices to batch
+        // Add 4 vertices to batch
         for (int i = 0; i < 4; ++i)
         {
-            // vec3 worldPos = model * vec4(localVerts[i], 1.0f);
-
+            // Instead of calculating the full model matrix and world position here,
+            // we store the local vertex and the quad's transformation data in the BatchVertex struct.
+            // The transformation is applied in the vertex shader.
             BatchVertex vert;
-            vert.pos = localVerts[i];
-            vert.tex = texCoords[i];
+            vert.pos = localVerts[i]; // Local position
+            vert.tex = texCoords[i]; // Texture UV
             vert.color = color;
             vert.uvScale = uvScale;
             vert.uvOffset = uvOffset;
-            vert.transform = vec3(x, y, rot);
-            vert.scale = vec2(sx, sy);
+            vert.transform = vec3(x, y, rot); // Translation (x,y) and Rotation (rot)
+            vert.scale = vec2(sx, sy); // Scale (sx, sy)
 
             targetBatch->vertices.push_back(vert);
         }
 
-        // add 6 indices for 2 triangles (quad)
+        // add 6 indices for 2 triangles (quad) using the base index
         targetBatch->indices.push_back(baseIndex + 0);
         targetBatch->indices.push_back(baseIndex + 1);
         targetBatch->indices.push_back(baseIndex + 2);
@@ -420,49 +474,30 @@ void GraphicsSystem::Update(float)
         targetBatch->indices.push_back(baseIndex + 3);
     }
 
-    // auto afterAccumulate = std::chrono::high_resolution_clock::now();
-
-    std::sort(batches.begin(), batches.end(), [](const RenderBatch &a, const RenderBatch &b)
-              { return a.layer < b.layer; });
+    // Sort batches by rendering layer (lower layer draws first)
+    std::sort(batches.begin(), batches.end(), [](const RenderBatch& a, const RenderBatch& b)
+        { return a.layer < b.layer; });
     // auto afterSort = std::chrono::high_resolution_clock::now();
 
-    // std::cout << "\n=== Batch Order After Sorting ===" << std::endl;
-    // for (size_t i = 0; i < batches.size(); ++i) {
-    //     std::cout << "Batch " << i << ": Layer " << batches[i].layer
-    //         << ", TexID " << batches[i].textureID
-    //         << ", Vertices " << batches[i].vertices.size() << std::endl;
-    // }
-    // Draw all batches
+    // Draw all accumulated batches
     DrawBatches();
     // auto afterDraw = std::chrono::high_resolution_clock::now();
 
-    // Print timing (only occasionally, not every frame)
-    // static int frameCount = 0;
-    // if (++frameCount % 60 == 0) {
-    //    auto accumulateMs = std::chrono::duration<double, std::milli>(afterAccumulate - start).count();
-    //    auto sortMs = std::chrono::duration<double, std::milli>(afterSort - afterAccumulate).count();
-    //    auto drawMs = std::chrono::duration<double, std::milli>(afterDraw - afterSort).count();
-
-    //    std::cout << "Accumulate: " << accumulateMs << "ms, "
-    //        << "Sort: " << sortMs << "ms, "
-    //        << "Draw: " << drawMs << "ms" << std::endl;
-    //}
-
-    // Draw Non-batched shapes
-    for (auto &obj : gameObjects)
+    // Draw Non-batched shapes (Lines, Points)
+    for (auto& obj : gameObjects)
     {
         if (!obj->IsActive())
         {
             continue;
         }
 
-        auto *rend = obj->GetComponent<RenderComponent>();
+        auto* rend = obj->GetComponent<RenderComponent>();
         if (!rend)
         {
             continue;
         }
 
-        // Draw Lines and Points (not batched)
+        // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
         switch (rend->GetShapeType())
         {
         case RenderComponent::ShapeType::Line:
@@ -478,51 +513,55 @@ void GraphicsSystem::Update(float)
             break;
         }
         default:
-            break;
+            break; // Batched shapes (Square/Circle) are already drawn
         }
 
-        // Draw debug outlines for ALL shapes (moved outside switch)
+        // Draw debug outlines for ALL shapes
         if (debugMode)
         {
             // std::cout << "went here" << std::endl;
-            auto *transform = obj->GetComponent<TransformComponent>();
+            auto* transform = obj->GetComponent<TransformComponent>();
             if (transform)
             {
                 float x, y, sx, sy;
                 transform->GetPosition(x, y);
                 transform->GetScale(sx, sy);
 
+                // Draw outlines based on the shape type
                 if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
                 {
-                    DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), {0, 1, 0, 1}, vp);
+                    // For circles, the scale is interpreted as diameter, so radius is scale*0.5
+                    DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
                 }
                 else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
                 {
-                    DrawRectOutline(x, y, sx, sy, {0, 1, 0, 1}, vp);
+                    DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
                 }
             }
         }
 
         // Text rendering
-        if (auto *textComp = obj->GetComponent<TextComponent>())
+        if (auto* textComp = obj->GetComponent<TextComponent>())
         {
             if (textComp->IsEnabled())
             {
-                if (auto *transform = obj->GetComponent<TransformComponent>())
+                if (auto* transform = obj->GetComponent<TransformComponent>())
                 {
                     float x, y;
                     transform->GetPosition(x, y);
+                    // Render text using the dedicated text rendering function
                     RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
-                               textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
+                        textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
                 }
             }
         }
     }
 
+    // === Debug System Shapes Drawing ===
     if (debugMode)
     {
-        auto &debugShapes = CORE->GetDebugSystem()->GetShapes();
-        for (auto &shape : debugShapes)
+        auto& debugShapes = CORE->GetDebugSystem()->GetShapes();
+        for (auto& shape : debugShapes)
         {
             switch (shape.type)
             {
@@ -538,6 +577,7 @@ void GraphicsSystem::Update(float)
             }
             case DebugSystem::DebugShape::RECT:
             {
+                // p2 here stores width/height
                 DrawRectOutline(shape.p1.x, shape.p1.y, shape.p2.x, shape.p2.y, shape.color, vp);
                 break;
             }
@@ -550,29 +590,34 @@ void GraphicsSystem::Update(float)
         }
     }
 
+    // Unbind the custom framebuffer to prevent accidental drawing to it
     if (editorMode)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }
 
-// Draw a line between two points in world space
-void GraphicsSystem::DrawLine(const vec2 &start, const vec2 &end,
-                              const vec4 &color, const mat4 &viewProjection)
+/**
+ * \brief Draws a line segment between two points in world space.
+ * Uses a temporary VAO/VBO with the debug shader.
+ * \param start The starting point of the line.
+ * \param end The ending point of the line.
+ * \param color The color of the line.
+ * \param viewProjection The combined view-projection matrix (MVP in shader).
+ */
+void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
+    const vec4& color, const mat4& viewProjection)
 {
     // Tell shader this is a line draw
-    shader.SetUniform("uIsLine", 1);
-    shader.SetUniform("uColor", color);
-    shader.SetUniform("uHasTexture", 0);
-    shader.SetUniform("uIsCircle", 0);
-    shader.SetUniform("uUseBatching", 0);
+    debugShader.Use();
+    debugShader.SetUniform("uColor", color);
 
     // Define 2 vertices for the line
     vec3 verts[2] = {
         {start.x, start.y, 0.0f},
-        {end.x, end.y, 0.0f}};
+        {end.x, end.y, 0.0f} };
 
-    // Create temporary VAO/VBO for this line
+    // Create temporary VAO/VBO for this line (immediate-mode like drawing)
     GLuint tempVBO, tempVAO;
     glGenVertexArrays(1, &tempVAO);
     glGenBuffers(1, &tempVBO);
@@ -583,10 +628,10 @@ void GraphicsSystem::DrawLine(const vec2 &start, const vec2 &end,
 
     // Attribute 0 = vertex position (vec3 in shader)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 
     // Send MVP matrix
-    shader.SetUniform("uMVP", viewProjection);
+    debugShader.SetUniform("uMVP", viewProjection);
 
     // Draw the line
     glDrawArrays(GL_LINES, 0, 2);
@@ -596,18 +641,22 @@ void GraphicsSystem::DrawLine(const vec2 &start, const vec2 &end,
     glDeleteVertexArrays(1, &tempVAO);
 }
 
-// Draw a single point in world space
-void GraphicsSystem::DrawPoint(const vec2 &ppos,
-                               const vec4 &color, const mat4 &viewProjection)
+/**
+ * \brief Draws a single point in world space.
+ * Uses a temporary VAO/VBO with the debug shader.
+ * \param ppos The position of the point.
+ * \param color The color of the point.
+ * \param viewProjection The combined view-projection matrix (MVP in shader).
+ */
+void GraphicsSystem::DrawPoint(const vec2& ppos,
+    const vec4& color, const mat4& viewProjection)
 {
-    // Tell shader this is NOT a line
-    shader.SetUniform("uIsLine", 0);
-    shader.SetUniform("uIsCircle", 0); // keep consistent with line draw
-    shader.SetUniform("uColor", color);
-    shader.SetUniform("uHasTexture", 0);
+    // Use the debug shader
+    debugShader.Use();
+    debugShader.SetUniform("uColor", color);
 
     // Position of the point (use vec3 to match shader input = vec3)
-    vec3 pos = {ppos.x, ppos.y, 0.0f};
+    vec3 pos = { ppos.x, ppos.y, 0.0f };
 
     // Create temporary VAO/VBO for this point
     GLuint tempVBO, tempVAO;
@@ -620,10 +669,10 @@ void GraphicsSystem::DrawPoint(const vec2 &ppos,
 
     // Attribute 0 = vertex position (vec3 in shader)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 
     // Send MVP matrix
-    shader.SetUniform("uMVP", viewProjection);
+    debugShader.SetUniform("uMVP", viewProjection);
 
     // Make point visible (default = 1px, often too small)
     glPointSize(5.0f);
@@ -636,10 +685,18 @@ void GraphicsSystem::DrawPoint(const vec2 &ppos,
     glDeleteVertexArrays(1, &tempVAO);
 }
 
-// Draw an axis-aligned rectangle outline centered at (x, y)
-// w = width, h = height
+/**
+ * \brief Draws the outline of an axis-aligned rectangle.
+ * Achieved by calling DrawLine four times.
+ * \param x Center X coordinate.
+ * \param y Center Y coordinate.
+ * \param w Width of the rectangle.
+ * \param h Height of the rectangle.
+ * \param color The color of the outline.
+ * \param viewProjection The combined view-projection matrix.
+ */
 void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
-                                     const vec4 &color, const mat4 &viewProjection)
+    const vec4& color, const mat4& viewProjection)
 {
     // Half extents (distance from center to edge)
     float halfW = w / 2;
@@ -658,16 +715,23 @@ void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
     DrawLine(p4, p1, color, viewProjection);
 }
 
-// Draw a circle outline centered at (cx, cy)
-// r = radius, segments = how many line segments to approximate the circle
+/**
+ * \brief Draws the outline of a circle approximated by line segments.
+ * \param cx Center X coordinate.
+ * \param cy Center Y coordinate.
+ * \param r Radius of the circle.
+ * \param segments The number of line segments to use for approximation.
+ * \param color The color of the outline.
+ * \param viewProjection The combined view-projection matrix.
+ */
 void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments,
-                                       const vec4 &color, const mat4 &viewProjection)
+    const vec4& color, const mat4& viewProjection)
 {
     // Clamp to a minimum number of segments (otherwise circle looks too blocky)
     if (segments < 8)
         segments = 8;
 
-    // Angle step per segment (full 360� / segments)
+    // Angle step per segment (full 360 degrees / segments)
     float step = static_cast<float>(two_pi) / segments;
 
     // Generate connected line segments around the circle
@@ -676,15 +740,20 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
         float theta1 = step * i;
         float theta2 = step * (i + 1);
 
-        // Two consecutive points on the circle�s circumference
-        vec2 p1 = {cx + r * cos(theta1), cy + r * sin(theta1)};
-        vec2 p2 = {cx + r * cos(theta2), cy + r * sin(theta2)};
+        // Two consecutive points on the circle’s circumference (using polar coordinates)
+        vec2 p1 = { cx + r * cos(theta1), cy + r * sin(theta1) };
+        vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
 
         // Draw line between them
         DrawLine(p1, p2, color, viewProjection);
     }
 }
 
+/**
+ * \brief Draws all accumulated batches.
+ * Iterates through the sorted list of RenderBatches, uploads their data to the
+ * GPU buffers (VBO/EBO), sets uniforms, binds the texture, and issues a single draw call.
+ */
 void GraphicsSystem::DrawBatches()
 {
     if (batches.empty())
@@ -693,12 +762,13 @@ void GraphicsSystem::DrawBatches()
     }
 
     shader.Use();
+    // Signal the shader to use the batch rendering pipeline (instance data)
     shader.SetUniform("uUseBatching", 1);
-    shader.SetUniform("uIsLine", 0);
 
     glBindVertexArray(batchVAO);
 
-    for (auto &batch : batches)
+
+    for (auto& batch : batches)
     {
         if (batch.vertices.empty())
         {
@@ -706,27 +776,28 @@ void GraphicsSystem::DrawBatches()
         }
 
         // === ADD THIS SAFETY CHECK ===
+        // Ensure batch size doesn't exceed pre-allocated buffer size
         if (batch.vertices.size() > MAX_BATCH_VERTICES)
         {
             std::cerr << "ERROR: Batch exceeds vertex buffer size! "
-                      << batch.vertices.size() << " > " << MAX_BATCH_VERTICES << std::endl;
+                << batch.vertices.size() << " > " << MAX_BATCH_VERTICES << std::endl;
             continue;
         }
         if (batch.indices.size() > MAX_BATCH_INDICES)
         {
             std::cerr << "ERROR: Batch exceeds index buffer size! "
-                      << batch.indices.size() << " > " << MAX_BATCH_INDICES << std::endl;
+                << batch.indices.size() << " > " << MAX_BATCH_INDICES << std::endl;
             continue;
         }
         // === END SAFETY CHECK ===
 
-        // Upload vertex data
+        // Upload vertex data (sub-data for dynamic updates)
         glNamedBufferSubData(batchVBO, 0, batch.vertices.size() * sizeof(BatchVertex), batch.vertices.data());
 
-        // Upload index data
+        // Upload index data (sub-data for dynamic updates)
         glNamedBufferSubData(batchEBO, 0, batch.indices.size() * sizeof(GLuint), batch.indices.data());
 
-        // Set Uniform
+        // Set Uniforms that apply to the whole batch
         shader.SetUniform("uMVP", vp);
         shader.SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
 
@@ -736,20 +807,33 @@ void GraphicsSystem::DrawBatches()
             shader.SetUniform("uHasTexture", 1);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, batch.textureID);
-            shader.SetUniform("uTexture", 0);
+            shader.SetUniform("uTexture", 0); // Set sampler to texture unit 0
         }
         else
         {
+            // Disable texturing if no texture is provided
             shader.SetUniform("uHasTexture", 0);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
+        // Issue a single draw call for all elements in the batch
         glDrawElements(GL_TRIANGLES, (GLsizei)batch.indices.size(), GL_UNSIGNED_INT, 0);
     }
+    // Restore shader state to non-batching mode
     shader.SetUniform("uUseBatching", 0);
 }
 
-void GraphicsSystem::RenderText(const std::map<char, Character> &characters, const std::string &text, float x, float y, float scale, const vec4 &color, bool screenSpace)
+/**
+ * \brief Renders text using a font atlas (Characters map).
+ * \param characters Map of character data (texture, bearing, size, advance).
+ * \param text The string to render.
+ * \param x Starting X position.
+ * \param y Starting Y position.
+ * \param scale Scaling factor for the text size.
+ * \param color Color of the text.
+ * \param screenSpace True if projection should be orthographic screen-space, false for world-space.
+ */
+void GraphicsSystem::RenderText(const std::map<char, Character>& characters, const std::string& text, float x, float y, float scale, const vec4& color, bool screenSpace)
 {
     textShader.Use();
     textShader.SetUniform("textColor", color);
@@ -759,10 +843,12 @@ void GraphicsSystem::RenderText(const std::map<char, Character> &characters, con
     float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
     if (screenSpace)
     {
+        // Screen-space projection (origin bottom-left of viewport)
         projection = mat4::ortho(0.0f, (float)renderWidth, 0.0f, (float)renderHeight);
     }
     else
     {
+        // World-space projection (use the camera VP matrix)
         projection = vp;
     }
     textShader.SetUniform("projection", projection);
@@ -770,21 +856,24 @@ void GraphicsSystem::RenderText(const std::map<char, Character> &characters, con
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(textVAO);
 
+    // Iterate through all characters in the string
     for (char c : text)
     {
         auto it = characters.find(c);
         if (it == characters.end())
         {
-            continue;
+            continue; // Skip characters not found in the font atlas
         }
 
-        const Character &ch = it->second;
+        const Character& ch = it->second;
 
+        // Calculate the quad position and size based on the character metrics (bearing, size) and scale
         float xpos = x + ch.bearing.x * scale;
         float ypos = y - (ch.size.y - ch.bearing.y) * scale;
         float w = ch.size.x * scale;
         float h = ch.size.y * scale;
 
+        // Update VBO for each character (4 vertices: pos.x, pos.y, tex.x, tex.y)
         float vertices[6][4] = {
             {xpos, ypos + h, 0.f, 0.f},
             {xpos, ypos, 0.f, 1.f},
@@ -792,77 +881,116 @@ void GraphicsSystem::RenderText(const std::map<char, Character> &characters, con
 
             {xpos, ypos + h, 0.f, 0.f},
             {xpos + w, ypos, 1.f, 1.f},
-            {xpos + w, ypos + h, 1.f, 0.f}};
+            {xpos + w, ypos + h, 1.f, 0.f} };
 
+        // Render the glyph texture
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
 
+        // Update the VBO data with the current glyph's quad vertices
         glBindBuffer(GL_ARRAY_BUFFER, textVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+        // Render the quad (6 vertices, 2 triangles)
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        // Advance the cursor position for the next glyph (advance is in 1/64 pixels)
         x += (ch.advance >> 6) * scale;
     }
 
+    // Cleanup
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+/**
+ * \brief Creates an OpenGL Frame Buffer Object (FBO) for off-screen rendering.
+ * \param width The width of the framebuffer's color and depth attachments.
+ * \param height The height of the framebuffer's color and depth attachments.
+ */
 void GraphicsSystem::CreateFrameBuffer(int width, int height)
 {
     frameBufferWidth = width;
     frameBufferHeight = height;
 
+    // 1. Generate and bind the FBO
     glGenFramebuffers(1, &frameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
+    // 2. Create the Color Attachment (Texture)
     glGenTextures(1, &frameBufferTexture);
     glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+    // Allocate storage for the color texture
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    // Set texture filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // Attach the texture to the FBO's color attachment point
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferTexture, 0);
 
+    // 3. Create the Depth/Stencil Attachment (Renderbuffer)
     glGenRenderbuffers(1, &depthRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+    // Allocate storage for the depth and stencil buffer
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    // Attach the renderbuffer to the FBO's depth/stencil attachment point
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
 
+    // 4. Check for FBO completeness
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         std::cerr << "ERROR: Framebuffer is not complete! \n";
     }
 
+    // 5. Unbind FBO (return to default framebuffer)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     std::cout << "framebuffer created " << width << "x" << height << std::endl;
 }
 
+/**
+ * \brief Deletes all OpenGL resources associated with the Frame Buffer Object (FBO).
+ */
 void GraphicsSystem::DeleteFrameBuffer()
 {
     if (frameBuffer)
     {
+        // Delete the FBO and its attachments
         glDeleteFramebuffers(1, &frameBuffer);
         glDeleteTextures(1, &frameBufferTexture);
         glDeleteRenderbuffers(1, &depthRenderBuffer);
+        // Reset IDs to 0
         frameBuffer = 0;
         frameBufferTexture = 0;
         depthRenderBuffer = 0;
     }
 }
 
+/**
+ * \brief Resizes the Frame Buffer and its attachments.
+ * Calls DeleteFrameBuffer() followed by CreateFrameBuffer(width, height).
+ * \param width The new width.
+ * \param height The new height.
+ */
 void GraphicsSystem::ResizeFrameBuffer(int width, int height)
 {
     if (width <= 0 || height <= 0)
     {
         return;
     }
+    // Delete existing attachments
     DeleteFrameBuffer();
+    // Recreate with new dimensions
     CreateFrameBuffer(width, height);
 }
 
-// apologies for messy code, used 2 float refs instead of ImVec2 because i didnt wanna include imgui.h here and slow compile time
+/**
+ * \brief Updates the framebuffer size to match the provided viewport dimensions.
+ * Intended to be called from an ImGui rendering loop for a game viewport panel.
+ * \param viewportSizeX Reference to the desired viewport width (updated if needed).
+ * \param viewportSizeY Reference to the desired viewport height (updated if needed).
+ */
+ // apologies for messy code, used 2 float refs instead of ImVec2 because i didnt wanna include imgui.h here and slow compile time
 void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewportSizeY)
 {
     //if (!editorMode)
@@ -870,11 +998,13 @@ void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewpo
     //    return;
     //}
 
+    // Clamp minimum viewport size to prevent issues
     if (viewportSizeX < 100.0f)
         viewportSizeX = 800.0f;
     if (viewportSizeY < 100.0f)
         viewportSizeY = 600.0f;
 
+    // Check if a resize is necessary and perform it
     if ((int)viewportSizeX != frameBufferWidth || (int)viewportSizeY != frameBufferHeight)
     {
         if (viewportSizeX > 0 && viewportSizeY > 0)
@@ -884,21 +1014,28 @@ void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewpo
     }
 }
 
+/**
+ * \brief Returns the name of the system.
+ * \return A string representing the system's name.
+ */
 std::string GraphicsSystem::GetName()
 {
     return "Graphics System";
 }
 
-// Load a 2D texture from a file using stb_image
-// Returns the OpenGL texture ID (GLuint), or 0 if loading fails
-GLuint GraphicsSystem::LoadTexture(const char *filepath)
+/**
+ * \brief Loads a 2D texture from a file using stb_image and creates an OpenGL texture object.
+ * \param filepath Path to the image file.
+ * \return The OpenGL texture ID (GLuint), or 0 if loading fails.
+ */
+GLuint GraphicsSystem::LoadTexture(const char* filepath)
 {
     // Tell stb_image to flip images vertically (so origin is bottom-left, like OpenGL expects)
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, channels;
     // Force load with 4 channels (RGBA) regardless of source image format
-    unsigned char *data = stbi_load(filepath, &width, &height, &channels, 4);
+    unsigned char* data = stbi_load(filepath, &width, &height, &channels, 4);
     if (!data)
     {
         std::cerr << "Failed to load texture: " << filepath << std::endl;
@@ -912,7 +1049,7 @@ GLuint GraphicsSystem::LoadTexture(const char *filepath)
 
     // Upload pixel data to GPU (level 0, no border, RGBA format)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, data);
+        GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     // Generate mipmaps for scaling
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -932,7 +1069,12 @@ GLuint GraphicsSystem::LoadTexture(const char *filepath)
     return texture;
 }
 
-std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
+/**
+ * \brief Clones the RenderComponent for a new GameObject.
+ * \param NewClone The new GameObject that will own the cloned component.
+ * \return A unique pointer to the newly cloned RenderComponent.
+ */
+std::unique_ptr<IComponent> RenderComponent::Clone(GameObject* NewClone) const
 {
 
     // 1. Determine which constructor to use based on the original component's state.
@@ -964,7 +1106,7 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
         clonedComponent->SetPoint(this->point.pos, this->point.size);
     }
 
-    // 3. Clone the enabled state.
+    // 3. Clone the enabled state and layer.
     clonedComponent->SetEnabled(this->IsEnabled());
 
     clonedComponent->SetLayer(this->layer);
@@ -972,13 +1114,20 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     return clonedComponent;
 }
 
+/**
+ * \brief Handles a message to create a new object with a RenderComponent.
+ * \param msg The CreateObjectMessage containing object details.
+ */
 void GraphicsSystem::HandleMessage(const CreateObjectMessage& msg)
 {
+    // Find the target GameObject by name
     GameObject* go = GameObjectFactory::Instance().FindByName(msg.name);
     if (!go)
         return;
 
+    // Add a new RenderComponent to the object
     RenderComponent* render = go->AddComponent<RenderComponent>();
+    // Configure the component with data from the message
     render->SetShapeType(msg.shapeType);
     render->SetColor({ msg.color.x, msg.color.y, msg.color.z, msg.color.w });
 

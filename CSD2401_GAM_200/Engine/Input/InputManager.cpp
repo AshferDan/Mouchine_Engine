@@ -72,12 +72,23 @@ std::string InputManager::GetName()
  */
 void InputManager::Update(float dt)
 {
+    glfwGetWindowSize(window, &width, &height);
     static bool wasLeftMousePressed = false;
     bool isLeftMousePressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
 
-   
     MouseLeftClicked = (!wasLeftMousePressed && isLeftMousePressed);
     wasLeftMousePressed = isLeftMousePressed;
+
+    // === UPDATE MOUSE POSITION FIRST - BEFORE ANY EARLY RETURNS ===
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    mouseX = xpos;
+    mouseY = ypos;
+
+    // Convert screen to world coordinates
+    vec2 camPos = CameraManager::Instance().GetCameraPosition();
+    MouseWorldX = static_cast<double>(xpos - width / 2.0) + camPos.x;
+    MouseWorldY = static_cast<double>(height / 2.0 - ypos) + camPos.y; // Flip Y axis
 
     static bool keyPressed = false;
     LevelEditor *levelEditor = CORE->GetLevelEditor();
@@ -153,7 +164,7 @@ void InputManager::Update(float dt)
                 }
                 else if (key == GLFW_KEY_F4)
                 {
-                    CORE->GetGraphicsSystem()->SetEditorMode();
+                    CORE->GetGraphicsSystem()->SetEditorMode(!CORE->GetGraphicsSystem()->IsEditorMode());
                     std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
                 }
             }
@@ -308,13 +319,6 @@ void InputManager::Update(float dt)
                 CORE->GetMessageBus().Publish(msg);
                 // audioEngine->playSound("jump_sfx", "jump_channel");
             }
-            /*if (audioEngine) {
-                Message msg;
-                msg.type = "PlaySound";
-                msg.sender = this;
-                msg.data = (void*)"jump_sfx";
-                CORE->GetMessageBus().Broadcast(msg);
-            }*/
         }
     }
     auto* anim = player->GetComponent<Spritesheet>();
@@ -384,11 +388,22 @@ void InputManager::Update(float dt)
     //    std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
     //}
 
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    mouseX = xpos;
-    mouseY = ypos;
+    }
 
-    MouseWorldX = mouseX - (width / 2.0);
-    MouseWorldY = (height / 2.0) - mouseY;
+    void InputManager::ResetState()
+    {
+        // 1. Reset static mouse click flags
+        MouseLeftClicked = false;
+
+        // 2. Reset internal tracking variables
+        mouseX = 0.0;
+        mouseY = 0.0;
+        scrollX = 0.0;
+        scrollY = 0.0;
+
+        // 3. Reset gameplay-related states
+        isJumping = false;
+        jumpStartY = 0.0f;
+        footstepTimer = 0.0f;
+        std::cout << "[InputManager] State reset." << std::endl;
     }
