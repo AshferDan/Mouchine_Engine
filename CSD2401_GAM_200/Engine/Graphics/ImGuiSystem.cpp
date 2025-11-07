@@ -61,7 +61,6 @@ static int current_shape = 0;
 // Flags for IMGUI (current selection in drop down for GO Creator, and showing of some screens)
 bool ShowCreateGOMenu;
 bool ShowLoadPrefabMenu;
-//bool Serialization::Prefab_DragAndDropped;
 
 std::vector<std::string> editorLayoutList;
 char saveLayoutName[128]{""};
@@ -75,21 +74,25 @@ static bool prefab_renameFocus = false;
 char rename_str[128]{""};
 std::string prefab_oldname{};
 
-// DRAG & DROP VARIABLES
+// STATIC BOOL FLAGS
 static bool greyOutGOSettings = false;
 static bool openLayoutSavePopup = false;
 static bool openLayoutLoadPopup = false;
 static bool saveNamePopupClear = false;
 static bool renderLoadedLayout = false;
-std::string loadLayoutPath{};
 
 // Vars for asset manager interface
-float paddingSize;
-float cellSize;
+const float paddingSize = 16.f;
+const float cellSize = icon_size.x + paddingSize;
 DirectoryNavigator AssetBrowserWindow;
 
+// DRAG AND DROP VARS
 ImVec2 viewportCursorPos;
 
+// LAYOUT LOADING 
+std::string loadLayoutPath{};
+
+// TEXTURE IDS FOR ICONS
 GLuint icon_folder_ui;
 GLuint icon_file_ui;
 GLuint icon_plus_ui;
@@ -97,12 +100,6 @@ GLuint icon_prefab_ui;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
-
-// Helper
-void ReloadPrefabsList()
-{
-    prefabList = Serialization::GetAllPrefabs();
-}
 
 /**
  * @brief Ctor - Inits window variable
@@ -135,24 +132,21 @@ void ImGuiSystem::Initialize()
     ShowCreateGOMenu = false; // Hide create menu initially
 
     // init default docking positions
-    // TODO TODO make this serialisable, so opens selected one
+    // TODO make this serialisable, so it remembers which one to load
     std::string layoutPath = LayoutsFilePath + "DefaultLayout.ini";
     ImGuiIO &io = ImGui::GetIO();
     io.IniFilename = layoutPath.c_str();
     ImGui::LoadIniSettingsFromDisk(layoutPath.c_str());
+
+    // Imgui flags
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
-    // USE SERIALISATION AAAAAAAAAAA
     // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
     // Vars for ImGui::ImageButton
     icon_folder_ui = GraphicsSystem::LoadTexture(icon_folder);
     icon_file_ui = GraphicsSystem::LoadTexture(icon_file);
     icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
     icon_prefab_ui = GraphicsSystem::LoadTexture(icon_prefab);
-
-    // Vars for asset manager interface
-    paddingSize = 16.f;
-    cellSize = icon_size.x + paddingSize;
 }
 
 /**
@@ -163,25 +157,26 @@ void ImGuiSystem::Update(float dt)
 {
     if (renderLoadedLayout)
     {
-        // safely reload layouts!
-        EditorLayout_LoadScene(loadLayoutPath);
-        renderLoadedLayout = false;
+        // reload layouts next frame, do this so won't crash/ have inconsistent frame end times
+        EditorLayout_LoadLayout(loadLayoutPath);
+        renderLoadedLayout = false;                 // set flags that will open imgui windows
         openLayoutLoadPopup = true;
         return;
     }
     if (InputManager::KeyStateImgui)
     {
+        // KEPT HERE FOR OUR REFERENCE - BUT MOVED THIS TO CORE ALREADY
         // ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
         // ImGui_ImplGlfw_NewFrame();    // Start new GLFW frame
         // ImGui::NewFrame();        // Start ImGui frame
         
-
         // Full window docking
         ImGuiViewport *viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
         ImGui::SetNextWindowViewport(viewport->ID);
 
+        // Flags & Docking Settings
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
                                         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
                                         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
@@ -198,10 +193,11 @@ void ImGuiSystem::Update(float dt)
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
 
-        TopMenuBar_Render();
-        Hierarchy_Render();
+        TopMenuBar_Render();                        // Render the top tool bar elements
+        Hierarchy_Render();                         // Render hierarchy
 
         // render property editor for selected game object
+        // Property editor is blank by default - and shows a GO's details upon being selected
         if (showPropertyEditor)
         {
             RenderPropertyEditor();
@@ -214,41 +210,41 @@ void ImGuiSystem::Update(float dt)
             ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
 
             ImGui::Begin("Game Viewport");
-            ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+            ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
             CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
-            ImGui::SetItemAllowOverlap();
-            ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
+            ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport rendering
 
+            // If hovering over viewport, you can click to select a GO
+            // TODO implement outline for selected GO
             if (ImGui::IsItemHovered())
             {
                 Viewport_ClickToSelect();
             }
 
             std::string testdata{};
-            // dont rly wanna accept generic assets yet, because should accept those in specific scenarios like properties tab
+            // Viewport accepts Prefabs for drag and drop
             ReceiveDragAndDrop(PrefabPayloadID, testdata);
-            ReceiveDragAndDrop(ScenePayloadID, testdata);
+            //ReceiveDragAndDrop(ScenePayloadID, testdata);                 // TODO drag and drop scene to load saved scene
             if (!testdata.empty())
             {
                 // filter for type of data here
-                std::cout << testdata << std::endl;
+                std::cout << testdata << std::endl;                         // Prints the data sent via drag and drop
                 Serialization::LoadPrefab(testdata);
             }
 
-            //if (ImGui::IsItemHovered())
-            
             // Get cursor position relative to the image
             ImVec2 cursorScreenPos = ImGui::GetMousePos();
             ImVec2 itemScreenPos = ImGui::GetItemRectMin();
 
+            // Takes cursor position - converts it to viewport space that translates to world space too [centre of screen is (0,0)]
+            // TODO Currently does not take into account camera zoom
             viewportCursorPos = ImVec2(
                 cursorScreenPos.x - itemScreenPos.x - (viewportSize.x / 2.f),
                 (viewportSize.y / 2.f) - (cursorScreenPos.y - itemScreenPos.y));
 
             ImGui::Text("Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
-
-
             ImGui::End();
         }
 
@@ -271,6 +267,7 @@ void ImGuiSystem::Update(float dt)
         // Render profiler! Make it toggleable?
         Profiler_Render();
 
+        // Flag with 1 frame delay on whether something is being drag and dropped, used for spawning prefabs via DND
         Serialization::Prefab_DragAndDropped = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
     }
 }
@@ -293,44 +290,53 @@ std::string ImGuiSystem::GetName()
     return "ImGui_System"; // Return descriptive system name
 }
 
-
+/**
+ * @brief Manages logic for clicking to select GOs and DNDing to move them around
+ */
 void ImGuiSystem::Viewport_ClickToSelect()
 {
     static bool isBeingDragged = false;
+
+    // Loop for all GOs in scene
     for (auto& go : GameObjectFactory::Instance().GetAllGameObjects())
     {
         if (!go->IsActive()) continue;
 
-        auto* transform = go->GetComponent<TransformComponent>();
+        auto* transform = go->GetComponent<TransformComponent>();           // GOs with no transform will not be interactable
         if (!transform) continue;
-        vec2 pos{ 0.f, 0.f }, scale{ 0.f, 0.f };
+
+        vec2 pos{ 0.f, 0.f }, scale{ 0.f, 0.f };                            // Get position and scale
         transform->GetPosition(pos.x, pos.y);
         transform->GetScale(scale.x, scale.y);
 
         if (go->GetComponent<ColliderComponent>())
         {
-
+            // if GO has a collider
+            // Calculates if cursor is within area of GO
             if (viewportCursorPos.x > pos.x - scale.x / 2 && viewportCursorPos.x < pos.x + scale.x / 2 && viewportCursorPos.y > pos.y - scale.y / 2 && viewportCursorPos.y < pos.y + scale.y / 2)
             {
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))              // Set to on release as form of confirmation, so GOs must be selected and THEN dragged. To avoid accidentally moving
                 {
-                    SetSelectedGameObject(go->GetID());
+                    SetSelectedGameObject(go->GetID());                         // Set GO to be selected
                     
                     std::cout << "[has collider]clicked on " << go->GetName() << std::endl;
                 }
+                // If GO has been selected and is dragged (with a threshhold of 25 units - added for human misinput and accidental moving)
                 if (selectedGameObjectID == go->GetID() && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 25.f))
                 {
-                    isBeingDragged = true;
+                    isBeingDragged = true;          // Set flag that updates position 
                 }
             }
         }
         else
         {
+            // if GO does NOT have a collider
+            // Find general distance between object and cursor
             float distance = std::sqrt(std::pow(viewportCursorPos.x - pos.x, 2) + std::pow(viewportCursorPos.y - pos.y, 2));
 
-            if (distance < 50.f)
+            if (distance < 50.f)                // if object is within 50 units (within general area)
             {
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))                      // Click to select, after selecting drag to set flag to true
                 {
                     SetSelectedGameObject(go->GetID());
                     std::cout << "[no colider]clicked on " << go->GetName() << std::endl;
@@ -343,11 +349,12 @@ void ImGuiSystem::Viewport_ClickToSelect()
         }
     }
 
-    
+    // if flag is true and left click is held, set the new position of the GO based off cursor (which is fitted to world space!)
     if (isBeingDragged && ImGui::IsMouseDown(ImGuiMouseButton_Left))
     {
         GetSelectedGameObject()->GetComponent<TransformComponent>()->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
     }
+    // upon mouse release set flag to false
     if (isBeingDragged && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
     {
         isBeingDragged = false;
@@ -483,6 +490,10 @@ void GOCreationMenu_Render()
     ImGui::End(); // End of GO Creation
 }
 
+
+/**
+ * @brief New cool hierarchy! Now handles DND and other scene related features
+ */
 void ImGuiSystem::Hierarchy_Render()
 {
     ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
@@ -504,7 +515,7 @@ void ImGuiSystem::Hierarchy_Render()
     CreateHintText("Create Game Object");
 
     ImGui::SameLine();
-    // Render top part to show adding of GOs
+    // Render top part to show adding of Prefabs
     if (ImGui::ImageButton("##Spawn Prefab", ImTextureID(icon_prefab_ui), {icon_size_small.x, icon_size_small.y}, {0, 1}, {1, 0},
                            (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
     {
@@ -514,6 +525,7 @@ void ImGuiSystem::Hierarchy_Render()
     }
     CreateHintText("Spawn Prefab");
 
+    // THIS IS JUST A SAMPLE I THOUGHT IT WAS COOL, SEE IF WE LIKE THEN ILL PORT OVER TO THIS
     ImGui::SameLine();
     if (ImGui::BeginMenu("[TEST] Create GO"))
     {
@@ -527,9 +539,10 @@ void ImGuiSystem::Hierarchy_Render()
         ImGui::EndMenu();
     }
 
+    // dear god help us all
     M2_RenderStressTest();
 
-    // display current file name
+    // display current scene name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
     if (auto* levelEditor = CORE->GetLevelEditor())
     {
@@ -549,7 +562,7 @@ void ImGuiSystem::Hierarchy_Render()
     ImGui::PopStyleColor();
     ImGui::Separator();
 
-    // list all game objects
+    // list all game objects, if they have no parent (root), if not render the tree display!
     for (const auto &objPtr : allObjects)
     {
         if (!objPtr->GetParent())
@@ -557,7 +570,7 @@ void ImGuiSystem::Hierarchy_Render()
             Hierarchy_GameObjectTree_Renderer(objPtr.get(), 0, selectedGameObjectID, factory);
         }
     }
-    // deselect when clicking on empty space in the hierarchy
+    // remove selected GO when clicking on empty space
     if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
         if (!ImGui::IsAnyItemHovered())
@@ -570,18 +583,19 @@ void ImGuiSystem::Hierarchy_Render()
 
 void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, EntityID &selectedGameObjectID, GameObjectFactory &factory)
 {
+    // Just commented this out in case want to revert, but now we can show inactive GOs but greyed out
     //if (!obj->IsActive())
     //    return;
 
     EntityID id = obj->GetID();
 
     // Apply indentation based on depth
-    ImGui::Indent(depth * 15.0f);
+    ImGui::Indent(depth * 10.0f);
 
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-    // If has children, make it expandable, otherwise just a leaf
+    // If has children, make it expandable
     if (obj->GetAllChildren().empty())
     {
         flags |= ImGuiTreeNodeFlags_Leaf;
@@ -592,35 +606,34 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         flags |= ImGuiTreeNodeFlags_Selected;
     }
 
-    if (!obj->IsActive())
+    if (!obj->IsActive())                       // if GO is inactive, make it grey
     {
         ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     }
 
     // Display the tree node
-    bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)",
-                                      obj->GetName().c_str(), id);
+    bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
 
     if (!obj->IsActive())
     {
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();                 // pop the push
     }
 
     // Drag and drop for Parenting
-    // might wanna send id as data instead
     if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
     {
         SendDragAndDrop(HierarchyPayloadID, obj->GetID(), obj->GetName());
     }
 
     {
+        // receiving drag and drop
         std::string testdata{};
         ReceiveDragAndDrop(HierarchyPayloadID, testdata);
         // Do something with DnD data
         if (!testdata.empty())
         {
             std::vector<EntityID> familyTree{};
-            GetFamilyTree(obj, familyTree);
+            GetFamilyTree(obj, familyTree);                         // Get all descendent game objects (child of child wtv) underneath the parrent GO
 
             std::cout << "GetFamilyTree() has: \n";
             for (auto const &r : familyTree)
@@ -628,20 +641,20 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
                 std::cout << r << std::endl;
             }
 
-            EntityID deliveredID = EntityID(std::stoi(testdata));
+            EntityID deliveredID = EntityID(std::stoi(testdata));       // Convert payload data to EntityID
             auto check = std::find(familyTree.begin(), familyTree.end(), deliveredID);
 
             if (check == familyTree.end())
             {
                 std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
                 GameObject *deliveredGO = factory.GetGameObject(deliveredID);
-                deliveredGO->SetParent(obj);
+                deliveredGO->SetParent(obj);                                        // Set Dragged GO to be parent of receiver GO
 
                 if (!nodeOpen && !obj->GetAllChildren().empty())
                 {
+                    // Sets tree node to be expanded then renders it 
                     ImGuiStorage *storage = ImGui::GetStateStorage();
                     storage->SetInt(ImGui::GetID((void *)(intptr_t)id), 1);
-                    // nodeOpen = true;
                 }
             }
             else
@@ -651,13 +664,13 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         }
     }
 
-    // Select on click
+    // Set selected item
     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
         selectedGameObjectID = id;
     }
 
-    // Context menu
+    // Right Click event (for specific GO in hierarchy)
     if (ImGui::BeginPopupContextItem())
     {
         if (ImGui::MenuItem("Select"))
@@ -682,23 +695,24 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         {
             factory.DestroyGameObject(id);
             if (selectedGameObjectID == id)
+            {
                 selectedGameObjectID = 0;
+            }
         }
         ImGui::EndPopup();
     }
 
-    // Render children if node is open
+    // Render all children of opened parent GO
     if (nodeOpen)
     {
+        // repeats loop again
         for (auto &childPtr : obj->GetAllChildren())
         {
-            Hierarchy_GameObjectTree_Renderer(childPtr, depth + 1, selectedGameObjectID, factory);
+            Hierarchy_GameObjectTree_Renderer(childPtr, depth+1, selectedGameObjectID, factory);
         }
         ImGui::TreePop();
     }
-
-    // Unindent
-    ImGui::Unindent(depth * 15.0f);
+    ImGui::Unindent(depth * 10.0f);
 }
 
 /**
@@ -708,8 +722,9 @@ void GOCreationMenu_Spawn()
 {
     // Determine creation type based on shape
     CreateObjectMessage::ObjectType objType;
-    RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);
+    RenderComponent::ShapeType shapeType = static_cast<RenderComponent::ShapeType>(current_shape);      // get shape type enum
 
+    // Special case for empty GOs
     if (shapeType == RenderComponent::ShapeType::Empty)
     {
         objType = CreateObjectMessage::ObjectType::Empty;
@@ -719,34 +734,27 @@ void GOCreationMenu_Spawn()
         objType = CreateObjectMessage::ObjectType::Basic;
     }
 
-    // Gather data from your temporary editor object
+    
+    // Gather GO data to send
     float pos[2] = { tempGO.pos[0], tempGO.pos[1] };
     float scale[2] = { tempGO.scale[0], tempGO.scale[1] };
     float rot = tempGO.rot;
-    vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f); // assuming ImVec4 in editor
+    vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
     std::string name = tempGO.name;
-    // Build and send message
+
+    // Construct message and send
     CreateObjectMessage msg(
-        name,          // GameObject name
-        objType,              // Empty or Basic
-        shapeType,            // ShapeType
-        pos, scale, rot,
-        color
+        name,                   // GameObject name
+        objType,                // Shape if is Empty or Basic
+        shapeType,              // ShapeType
+        pos, scale, rot,        // Transform
+        color                   // Colour
     );
 
     std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;
     //msg.Dispatch(*CORE);
     CORE->GetMessageBus().Publish(msg);
-
 }
-
-/**
- * @brief Get the selected game object
- */
-// GameObject* ImGuiSystem::GetSelectedGameObject() const
-//{
-//     return factory.GetGameObject(selectedGameObjectID);
-// }
 
 /**
  * @brief Set the selected game object
@@ -755,28 +763,24 @@ void ImGuiSystem::SetSelectedGameObject(EntityID id)
 {
     selectedGameObjectID = id;
 
-    // WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
-    /*auto const& go = GameObjectFactory::Instance().GetGameObject(id);
-    auto* transform = go->GetComponent<TransformComponent>();
+    // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
+    //auto const& go = GameObjectFactory::Instance().GetGameObject(id);
+    //auto* transform = go->GetComponent<TransformComponent>();
 
-    if (transform)
-    {
-        float x, y, sx, sy;
-
-        transform->GetPosition(x, y);
-        transform->GetScale(sx, sy);
-        GraphicsSystem::DrawRectOutline(, CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight));
-    }*/
+    //if (transform)
+    //{
+    //    float x, y, sx, sy;
+    //    
+    //    //CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
+    //    transform->GetPosition(x, y);
+    //    transform->GetScale(sx, sy);
+    //    if (CORE->GetGraphicsSystem())
+    //    {
+    //        std::cout << "azaaaaaaaaaaaa";
+    //    }
+    //    CORE->GetGraphicsSystem()->DrawRectOutline(x,y,sx,sy,{0,1,0,1}, CORE->GetGraphicsSystem()->getVp());
+    //}
 }
-
-/**
- * @brief Add a game object to the level
- */
-// GameObject* ImGuiSystem::AddGameObject(const GameObjectData& data)
-//{
-//     // commented for now, just use what we have first
-//     //return DeserialiseGameObject(data);
-// }
 
 /**
  * @brief Remove a game object from the level
@@ -815,11 +819,11 @@ void PrefabMenu_Render()
                     bool is_selected = (current_prefab == i);
                     if (ImGui::Selectable(prefabList[i].c_str(), &is_selected))
                     {
-                        current_prefab = i; // Selected item in list
+                        current_prefab = i;         // Set selected
                     }
                     else if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
                     {
-                        current_prefab = i; // optional: select on right-click too
+                        current_prefab = i;         // Right click to select and open menu too
                         ImGui::OpenPopup("Prefab_RightClickEvent");
                     }
 
@@ -835,6 +839,7 @@ void PrefabMenu_Render()
                 }
                 else
                 {
+                    // For renaming of prefab files
                     ImGui::PushID(i);
                     if (prefab_renameFocus)
                     {
@@ -844,8 +849,8 @@ void PrefabMenu_Render()
                     if (ImGui::InputText("##", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
                     {
                         prefabList[i] = std::string(rename_str);
-                        // ImGui::SetKeyboardFocusHere(-1);
                     }
+
                     // if (ImGui::IsKeyPressed(ImGuiKey_Escape))          //supposed to be escape but it closes the whole game LMAO
                     if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
                     {
@@ -858,9 +863,9 @@ void PrefabMenu_Render()
             }
         }
 
-        if (ImGui::BeginPopup("Prefab_RightClickEvent")) // If an item in the prefab lists gets right clicked
+        if (ImGui::BeginPopup("Prefab_RightClickEvent"))            // If item in the prefab lists gets right clicked
         {
-            if (ImGui::MenuItem("Rename"))
+            if (ImGui::MenuItem("Rename"))                          // If rename button clicked, get name of input text field and set it to new name
             {
                 prefab_renameIndex = current_prefab;
                 strncpy(rename_str, prefabList[current_prefab].c_str(), sizeof(rename_str));
@@ -870,8 +875,7 @@ void PrefabMenu_Render()
             ImGui::Separator();
             if (ImGui::MenuItem("Delete"))
             {
-                // TODO: DELETE
-                Serialization::RemovePrefab(prefabList[current_prefab]);
+                Serialization::RemovePrefab(prefabList[current_prefab]);        // Remove from file, reload list afterwards
                 ReloadPrefabsList();
             }
             ImGui::EndPopup();
@@ -882,7 +886,9 @@ void PrefabMenu_Render()
     ImGui::EndGroup();
 
     ImGui::SameLine(); // This so its on the right side of the selection box
+
     // draw preview
+    // TODO doesnt actually work yet
     ImGui::BeginGroup();
     ImVec2 boxSize = ImVec2(256, 256);
     ImGui::Text("Preview Render:");
@@ -891,6 +897,7 @@ void PrefabMenu_Render()
     ImDrawList *drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
 
+    // Test for if drag and drop works
     std::string testdata{};
     ReceiveDragAndDrop(AssetPayloadID, testdata);
     ReceiveDragAndDrop(HierarchyPayloadID, testdata);
@@ -903,7 +910,7 @@ void PrefabMenu_Render()
 
     if (ImGui::Button("Spawn -> Load Prefab"))
     {
-        PrefabMenu_Spawn();
+        PrefabMenu_Spawn();                     // Spawn selected prefab as GO
     }
 
     ImGui::End(); // End of Prefab Search Menu
@@ -914,7 +921,7 @@ void PrefabMenu_Render()
  */
 void PrefabMenu_Spawn()
 {
-    Serialization::LoadPrefab(prefabList[current_prefab]);
+    Serialization::LoadPrefab(prefabList[current_prefab]);          // Deserialises the selected prefab
     std::cout << "prefab menu spawn pressed\n";
 }
 #pragma endregion
@@ -931,59 +938,62 @@ DirectoryNavigator::DirectoryNavigator() : currentDir(assetPath) {}
 void DirectoryNavigator::RenderImGui()
 {
     ImGui::Begin("Project Navigator");
+    // Currently project navigator only shows files in assets, not sure if we wanna do anything beyond that
 
     if (currentDir != fs::path(assetPath))
     {
-        if (ImGui::Button("back"))
+        if (ImGui::Button("back"))                  // Go back button
         {
             currentDir = currentDir.parent_path();
         }
     }
 
+    // Get amount of columns depending on space available
     int columns = static_cast<int>((ImGui::GetContentRegionAvail().x) / cellSize);
     if (columns <= 0)
         columns = 1;
     ImGui::Columns(columns, 0, false);
 
+    // For each item in the current folder
     for (auto &iter : fs::directory_iterator(currentDir))
     {
-        std::string path = iter.path().string();
-        auto relativePath = fs::relative(iter.path(), assetPath);
-        std::string fileName = relativePath.filename().string();
+        std::string path = iter.path().string();                            // Path we are currently in
+        auto relativePath = fs::relative(iter.path(), assetPath);           // Path relative from where we started (assets) to where we are
+        std::string fileName = relativePath.filename().string();            // name of the file alone
 
+        // If the current item is a folder
         if (iter.is_directory())
         {
-            // add double click?
-            if (ImGui::ImageButton(fileName.c_str(), (ImTextureID)(uintptr_t)(icon_folder_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
+            // TODO add double click? or is single click fine
+            if (ImGui::ImageButton(fileName.c_str(), (ImTextureID)(uintptr_t)(icon_folder_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))     // Draw image button with folder icon
             {
-                currentDir /= iter.path().filename();
+                currentDir /= iter.path().filename();           // Upon clicking, enter the file path
             }
         }
+        // If current item is a file 
         else
         {
             // add double click to open in windows file explorer?
             if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
             {
-                // this is a file, not sure if we wanna do anything yet
+                // this is a file, not sure if we wanna do anything yet (when we click)
             }
+
             // Can only drag and drop files, not folders
             if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
             {
                 // Depending on folder its in, send the respective payloadIDs to receive
                 if (iter.path().parent_path().filename() == "Scenes")
                 {
-                    // std::cout << "in /Scenes\n";
-                    SendDragAndDrop(ScenePayloadID, iter.path().string(), fileName.c_str());
+                    SendDragAndDrop(ScenePayloadID, iter.path().string(), fileName.c_str());            // For scenes files
                 }
                 else if (iter.path().parent_path().filename() == "Prefabs")
                 {
-                    // std::cout << "in /Prefabs\n";
-                    SendDragAndDrop(PrefabPayloadID, iter.path().stem().string(), fileName);
+                    SendDragAndDrop(PrefabPayloadID, iter.path().stem().string(), fileName);            // For prefab files
                 }
                 else
                 {
-                    // std::cout << "sending Generic Asset\n";
-                    SendDragAndDrop(AssetPayloadID, iter.path().string(), fileName.c_str());
+                    SendDragAndDrop(AssetPayloadID, iter.path().string(), fileName.c_str());            // Anything else considered an general asset
                 }
             }
         }
@@ -1009,38 +1019,32 @@ void DirectoryNavigator::RenderImGui()
 template <typename DataType>
 void SendDragAndDrop(std::string const &PayloadID, DataType const &dataToSend, std::string const &displayText)
 {
-    static_assert(std::is_arithmetic_v<DataType>, "FUNCTION ONLY TAKES STRINGS OR ARITHMETIC TYPES!!!\n");
-    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+    static_assert(std::is_arithmetic_v<DataType>, "FUNCTION ONLY TAKES STRINGS OR ARITHMETIC TYPES!!!\n");          // ONLY ACCEPT NUMBERS
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))                                           // For drag and drop SENDER
     {
         std::string data{std::to_string(dataToSend)};
         if (!data.empty())
         {
-            ImGui::SetDragDropPayload(PayloadID.c_str(), data.c_str(), data.size() + 1, ImGuiCond_Once);
-            // for template ^ might need to take in (filePath.size() + 1) * sizeof(DataType)
-            ImGui::Text(displayText.c_str());
+            ImGui::SetDragDropPayload(PayloadID.c_str(), data.c_str(), data.size() + 1, ImGuiCond_Once);            // Send payload
+            ImGui::Text(displayText.c_str());                                                                       // Set display text for visual feedback
             ImGui::EndDragDropSource();
         }
         else
         {
-            std::cout << "BAD CONVERSION OF " << typeid(DataType).name() << " to std::string!\n";
+            std::cout << "BAD CONVERSION OF " << typeid(DataType).name() << " to std::string!\n";                   // something went wrong with converting data type to string
             return;
         }
-
-        // can do like a check against which targets match the type, then change outline to show matchable slot
     }
 }
 
+// overload for strings as data to send, generally same thing
 void SendDragAndDrop(std::string const &PayloadID, std::string const &dataToSend, std::string const &displayText)
 {
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
     {
-        // if dndcursor.x within viewport x and dndcursor.y within viewport y, then take as valid
-        // if not either cancel dnd or spawn prefab with no pos
         ImGui::SetDragDropPayload(PayloadID.c_str(), dataToSend.c_str(), dataToSend.size() + 1, ImGuiCond_Once);
-        // for template ^ might need to take in (filePath.size() + 1) * sizeof(DataType)
         ImGui::Text(displayText.c_str());
         ImGui::EndDragDropSource();
-        // can do like a check against which targets match the type, then change outline to show matchable slot
     }
 }
 
@@ -1048,13 +1052,13 @@ void SendDragAndDrop(std::string const &PayloadID, std::string const &dataToSend
  * @brief For drag and drop services. This is the 'receiver', takes in a payloadID(specifying what you want to send)
  *        unfortunately cannot be templated bc BeginDragDropTarget only takes in c string...
  */
-void ReceiveDragAndDrop(std::string const &PayloadID, std::string &dataToReceive)
+void ReceiveDragAndDrop(std::string const &PayloadID, std::string &dataToReceive)                                   // For drag and drop RECEIVER
 {
-    if (ImGui::BeginDragDropTarget()) // sets to true open hovering
+    if (ImGui::BeginDragDropTarget())                                                                               // sets to true open hovering
     {
-        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PayloadID.c_str())) // sets to true when payload accepted
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(PayloadID.c_str()))                          // sets to true when payload accepted
         {
-            const char *droppedPath = (const char *)payload->Data; // can also change the lhs type and the rhs cast if need
+            const char *droppedPath = (const char *)payload->Data;                                                  // can also change the lhs type and the rhs cast if need
             dataToReceive = droppedPath;
             // use droppedPath (load texture,model,etc)
             // droppedPath in this case is just the file path that we sent
@@ -1066,10 +1070,15 @@ void ReceiveDragAndDrop(std::string const &PayloadID, std::string &dataToReceive
 
 #pragma endregion
 
+
+/**
+ * @brief Renders the top menu bar that has application settings
+ */
 void TopMenuBar_Render()
 {
-    if (ImGui::BeginMainMenuBar()) // Begin the top menu bar
+    if (ImGui::BeginMainMenuBar()) // Begin the top menu toolbar thingy
     {
+        // TODO largely WIP
         // File menu
         if (ImGui::BeginMenu("File"))
         {
@@ -1103,11 +1112,11 @@ void TopMenuBar_Render()
         {
             if (ImGui::MenuItem("Save Editor Layout"))
             {
-                openLayoutSavePopup = true;
+                openLayoutSavePopup = true;                     // if clicked, set flags for saving scenes
             }
             if (ImGui::MenuItem("Load Editor Layout"))
             {
-                openLayoutLoadPopup = true;
+                openLayoutLoadPopup = true;                     // if clicked, set flags for loading scenes
             }
 
             ImGui::EndMenu();
@@ -1126,42 +1135,47 @@ void TopMenuBar_Render()
         ImGui::EndMainMenuBar();
     }
 
+    // Have to separate bc refreshes every frame and got some crashes with end popup, this keeps it up
     if (openLayoutSavePopup)
     {
-        ImGui::OpenPopup("Save_Layout");
+        ImGui::OpenPopup("Save_Layout");                        // Open respective pop up
         EditorLayout_Refresh();
         openLayoutSavePopup = false;
     }
     if (openLayoutLoadPopup)
     {
-        ImGui::OpenPopup("Load_Layout");
-        // EditorLayout_Refresh();
+        ImGui::OpenPopup("Load_Layout");                        // Open respective pop up
+        EditorLayout_Refresh();
         openLayoutLoadPopup = false;
     }
-    EditorLayout_SaveNamePopUp();
+    EditorLayout_SaveNamePopUp();                               // Update popup checks
     EditorLayout_LoadPopUp();
 }
 
-void EditorLayout_SaveScene(std::string const &fileName)
+/**
+ * @brief Save imgui layout to file
+ */
+void EditorLayout_SaveLayout(std::string const &fileName)
 {
     // Saves docking layout to file, future implementation will have this be attached to a button (Prefences -> save editor layout etc)
     if (!fileName.empty())
     {
         // Save to a specific file
-        std::string layoutPath = LayoutsFilePath + fileName + ".ini";
-        ImGui::SaveIniSettingsToDisk(layoutPath.c_str());
+        std::string layoutPath = LayoutsFilePath + fileName + ".ini";               // Have to specify this if not it saves as generic file
+        ImGui::SaveIniSettingsToDisk(layoutPath.c_str());                           // Save settings to ini file
         std::cout << "Saved window layout to: " << layoutPath << std::endl;
     }
 }
 
-void EditorLayout_LoadScene(std::string const &fileName)
+/**
+ * @brief Load imgui layout
+ */
+void EditorLayout_LoadLayout(std::string const &fileName)
 {
-    std::string layoutPath = LayoutsFilePath + fileName;
+    std::string layoutPath = LayoutsFilePath + fileName;                            // get the directory 
     if (fs::exists(layoutPath))
     {
-        std::cout << "Loading ImGui layout from: " << layoutPath << std::endl;
-
-        ImGui::LoadIniSettingsFromDisk(layoutPath.c_str());
+        ImGui::LoadIniSettingsFromDisk(layoutPath.c_str());                         // Load the settings (gets refreshed in the top of update)
 
         std::cout << "Layout file at path: " << layoutPath << " loaded\n";
     }
@@ -1171,33 +1185,36 @@ void EditorLayout_LoadScene(std::string const &fileName)
     }
 }
 
+/**
+ * @brief Saving of layout POPUP, checks for illegal file names too
+ */
 void EditorLayout_SaveNamePopUp()
 {
     bool PushPopBgColor = false;
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Save_Layout", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    if (ImGui::BeginPopupModal("Save_Layout", nullptr, ImGuiWindowFlags_AlwaysAutoResize))              // modal got that cool grey background
     {
         ImGui::Text("Name");
         if (saveNamePopupClear)
         {
-            ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(255, 0, 0, 100));
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(255, 0, 0, 100));                          // red evil scary box for people trying to save weird file names
             PushPopBgColor = true;
         }
         if (ImGui::InputText("##SaveLayoutName", saveLayoutName, sizeof(saveLayoutName)))
         {
-            saveNamePopupClear = false;
+            saveNamePopupClear = false;                                                 // after getting illegal warning, type to clear the red box
         }
         if (ImGui::IsWindowAppearing())
             ImGui::SetKeyboardFocusHere(-1);
 
         if (PushPopBgColor)
         {
-            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();                                                     // pop the push
         }
         if (saveNamePopupClear)
         {
-            ImGui::Text("Illegal name! Try something else");
+            ImGui::Text("Illegal name! Try something else");                            // if user sets an illegal file name, set flag to true which triggers this text
         }
 
         if (ImGui::Button("Save"))
@@ -1205,9 +1222,9 @@ void EditorLayout_SaveNamePopUp()
             std::string fileName = saveLayoutName;
             // LAMBDA LAMBDA LAMBDA LAMBDA LAMBDA I CANNOT ESCAPE THIS HELL
             fileName.erase(std::remove_if(fileName.begin(), fileName.end(), [](char ch)
-                                          { return std::isspace(ch); }),
-                           fileName.end());
+                                          { return std::isspace(ch); }),fileName.end());
 
+            // list of illegal chars in filename
             if (fileName.empty() || fileName.find_first_of("<>:\"/\\|?*") != std::string::npos || fileName.back() == ' ' || fileName.back() == '.')
             {
                 saveNamePopupClear = true;
@@ -1232,14 +1249,18 @@ void EditorLayout_SaveNamePopUp()
     }
 }
 
+/**
+ * @brief Loading of layout POPUP
+ */
 void EditorLayout_LoadPopUp()
 {
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.5f, ImGui::GetIO().DisplaySize.y * 0.5f), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     ImGui::SetNextWindowSize(ImVec2(800, 600));
 
+    // basically the same as project/ asset navigator
     if (ImGui::BeginPopupModal("Load_Layout", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        if (fs::directory_iterator(LayoutsFilePath) == fs::directory_iterator())
+        if (fs::directory_iterator(LayoutsFilePath) == fs::directory_iterator())                    // if no layouts are found just show empty with text
         {
             ImGui::Text("No layout files found");
             if (ImGui::Button("Close"))
@@ -1252,6 +1273,7 @@ void EditorLayout_LoadPopUp()
         std::string IntroText{"Layouts Found in: " + LayoutsFilePath};
         ImGui::Text(IntroText.c_str());
 
+        // Adjusting column position based on size of window
         int columns = static_cast<int>((ImGui::GetContentRegionAvail().x) / cellSize);
         if (columns <= 0)
         {
@@ -1259,6 +1281,7 @@ void EditorLayout_LoadPopUp()
         }
         ImGui::Columns(columns, 0, false);
 
+        // Loops through all items with .ini file type
         for (auto &iter : fs::directory_iterator(LayoutsFilePath))
         {
             if (iter.path().extension() != ".ini")
@@ -1268,6 +1291,7 @@ void EditorLayout_LoadPopUp()
             auto relativePath = fs::relative(iter.path(), LayoutsFilePath);
             std::string layoutFileName = relativePath.filename().string();
 
+            // each item will have the file icon, on click set the layoutpath to string. Itll then be loaded by the layout loader function
             if (ImGui::ImageButton(layoutFileName.c_str(), (ImTextureID)(uintptr_t)(icon_file_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
             {
                 loadLayoutPath = layoutFileName;
@@ -1292,6 +1316,9 @@ void EditorLayout_LoadPopUp()
     }
 }
 
+/**
+ * @brief Refreshes the vector of layouts, used for loading. OLD CODE!
+ */
 void EditorLayout_Refresh()
 {
     editorLayoutList.clear();
@@ -1299,6 +1326,7 @@ void EditorLayout_Refresh()
     if (!fs::exists(LayoutsFilePath))
         return;
 
+    // Loops through all .ini files in the folder
     for (const auto &file : fs::directory_iterator(LayoutsFilePath))
     {
         if (file.is_regular_file() && file.path().extension() == ".ini")
@@ -1309,7 +1337,10 @@ void EditorLayout_Refresh()
     }
 }
 
-// Wrapper to easily create Hints when hovering over Imgui stuff. Call directly under Imgui element! (Text, buttons etc.)
+
+/**
+ * @brief Wrapper to easily create Hints when hovering over Imgui stuff. Call directly under Imgui element! (Text, buttons etc.)
+ */
 void CreateHintText(std::string const &displayText)
 {
     if (ImGui::IsItemHovered())
@@ -1320,6 +1351,9 @@ void CreateHintText(std::string const &displayText)
     }
 }
 
+/**
+ * @brief Get pointer to selected game object
+ */
 GameObject* ImGuiSystem::GetSelectedGameObject() const
 {
     if (selectedGameObjectID == 0)
@@ -1328,6 +1362,9 @@ GameObject* ImGuiSystem::GetSelectedGameObject() const
     return factory.GetGameObject(selectedGameObjectID);
 }
 
+/**
+ * @brief Render property editor for Selected GOs. Will be empty by default, and then show details if a GO is selected.
+ */
 void ImGuiSystem::RenderPropertyEditor()
 {
     ImGui::SetNextWindowPos(ImVec2(1400, 10), ImGuiCond_FirstUseEver);
@@ -1342,7 +1379,7 @@ void ImGuiSystem::RenderPropertyEditor()
     GameObject* obj = GetSelectedGameObject();
     if (!obj)
     {
-        // empty when nothing is selected
+        // if selected go is nullptr
         ImGui::End();
         return;
     }
@@ -1351,6 +1388,8 @@ void ImGuiSystem::RenderPropertyEditor()
     ImGui::Text("ID: %u", obj->GetID());
     ImGui::Separator();
 
+    // Check box for is active
+    // TODO add eye icon like unity on the side in hierarchy to enable/ disable. or right click option
     bool isActive = obj->IsActive();
     if (ImGui::Checkbox("Active", &isActive))
     {
@@ -1359,11 +1398,13 @@ void ImGuiSystem::RenderPropertyEditor()
 
     ImGui::Spacing();
 
-    // transform
+    // GO transform screen
     if (auto* transform = obj->GetComponent<TransformComponent>())
     {
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
+            // sliders for position, scale, rotation etc
+
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
             if (ImGui::DragFloat2("Position", pos, 0.5f))
@@ -1386,13 +1427,14 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
-    // render component
+    // Render component for GO
     if (auto* render = obj->GetComponent<RenderComponent>())
     {
         if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
 
+            // Show colour picker for GO colour (only if no texture id for custom texture/ sprite)
             if (render->GetTextureID() == 0)
             {
                 vec4 color = render->GetColor();
@@ -1409,11 +1451,12 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
-    // physics component
+    // Physics component
     if (auto* physics = obj->GetComponent<PhysicsComponent>())
     {
         if (ImGui::CollapsingHeader("Physics"))
         {
+            // Physics sliders with respective functions
             float vel[2] = { 0.0f, 0.0f };
             physics->GetVelocity(vel[0], vel[1]);
             if (ImGui::DragFloat2("Velocity", vel, 0.1f))
@@ -1438,9 +1481,10 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
-    // collider component
+    // Collider component
     if (auto* collider = obj->GetComponent<ColliderComponent>())
     {
+        // For now only display text of collider details
         if (ImGui::CollapsingHeader("Collider"))
         {
             ImGui::Text("Type: %s", collider->GetType() == ColliderComponent::Type::Circle ? "Circle" : "Square");
@@ -1463,6 +1507,10 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
+    // TODO WIP drag and drop section for assets from project navigator
+    // currently we dont have drag and drop spot for assets for textures etc, so this is just here to show it works 
+    // Draws a box and lets it take in drag and drops for assets
+
     ImGui::BeginGroup();
     ImVec2 boxSize = ImVec2(256, 256);
     ImGui::Text("Preview:");
@@ -1482,46 +1530,9 @@ void ImGuiSystem::RenderPropertyEditor()
     ImGui::End();
 }
 
-// get shape type name
-const char* ImGuiSystem::GetShapeTypeName(int type)
-{
-    switch (type)
-    {
-    case 0:
-        return "Square";
-    case 1:
-        return "Circle";
-    case 2:
-        return "Line";
-    case 3:
-        return "Point";
-    default:
-        return "Unknown";
-    }
-}
-
-// get collision layer name
-const char* ImGuiSystem::GetCollisionLayerName(int layer)
-{
-    switch (layer)
-    {
-    case 0:
-        return "Player";
-    case 1:
-        return "Ground";
-    case 2:
-        return "Wall";
-    case 3:
-        return "Enemy";
-    case 4:
-        return "Platform";
-    case 5:
-        return "Default";
-    default:
-        return "Unknown";
-    }
-}
-
+/**
+ * @brief HELLO PROFS THIS IS THE STRESS TEST FUNCTION. Spawns 1000 GOs
+ */
 void M2_RenderStressTest()
 {
     // Stress Test: Spawn 1000 GameObjects
@@ -1541,7 +1552,7 @@ void M2_RenderStressTest()
         colliderIndex = 0;
 
         // Load the texture once, reuse for all obj
-        const std::string spritePath = "./Assets/protosprite.png";
+        const std::string spritePath = "../Assets/protosprite.png";
         const std::string textureKey = "stress_shared";
 
         TextureResource* texRes = resourceMgr.GetTexture(textureKey);
@@ -1633,4 +1644,57 @@ void M2_RenderStressTest()
 
     // Render Asset Browser things here!
     AssetBrowserWindow.RenderImGui();
+}
+
+// Helpers
+/**
+ * @brief Refreshes vector of prefabs
+ */
+void ReloadPrefabsList()
+{
+    prefabList = Serialization::GetAllPrefabs();
+}
+
+/**
+ * @brief Get text of shape type
+ */
+const char* ImGuiSystem::GetShapeTypeName(int type)
+{
+    switch (type)
+    {
+    case 0:
+        return "Square";
+    case 1:
+        return "Circle";
+    case 2:
+        return "Line";
+    case 3:
+        return "Point";
+    default:
+        return "Unknown";
+    }
+}
+
+/**
+ * @brief Get Collision layer string
+ */
+const char* ImGuiSystem::GetCollisionLayerName(int layer)
+{
+    switch (layer)
+    {
+    case 0:
+        return "Player";
+    case 1:
+        return "Ground";
+    case 2:
+        return "Wall";
+    case 3:
+        return "Enemy";
+    case 4:
+        return "Platform";
+    case 5:
+        return "Default";
+    default:
+        return "Unknown";
+    }
 }
