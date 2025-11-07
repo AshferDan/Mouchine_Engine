@@ -304,6 +304,7 @@ void LevelEditor::TogglePause()
             // CHANGED: Use currentBGMChannel instead of hardcoded string
             audioEngine->pauseSound(currentBGMChannel, false);
         }
+        CORE->GetGraphicsSystem()->SetEditorMode(false);
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
@@ -322,6 +323,7 @@ void LevelEditor::TogglePlayStop()
     {
         // currently stopped, save & enter play
         EnterPlayMode();
+        CORE->GetGraphicsSystem()->SetEditorMode(false);
     }
 }
 

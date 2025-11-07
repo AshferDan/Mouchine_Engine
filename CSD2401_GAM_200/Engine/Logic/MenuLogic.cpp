@@ -1,8 +1,20 @@
+/* Start Header ************************************************************************/
+/*!
+\file       MenuLogic.cpp
+\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\par        Fam.q@digipen.edu
+\date       October, 2, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "MenuLogic.h"
 #include <iostream>
 
-// Optional: Define your generic generic texture paths if they follow a pattern, 
-// or just hardcode them in the helper function below.
 
 void MenuLogicSystem::Update(float dt)
 {
@@ -11,8 +23,6 @@ void MenuLogicSystem::Update(float dt)
     bool isClicked = InputManager::IsMouseLeftClicked();
 
     auto& factory = GameObjectFactory::Instance();
-
-    // --- 1. HOVER DETECTION ---
     std::string currentHover = "";
 
     // Check all buttons for intersection
@@ -33,7 +43,7 @@ void MenuLogicSystem::Update(float dt)
     // If the hovered button has changed since last frame
     if (currentHover != hoveredButtonName)
     {
-        // Revert the PREVIOUS button texture to normal (if there was one)
+        // Revert the PREVIOUS button texture to normal 
         if (!hoveredButtonName.empty())
         {
             SetButtonTexture(hoveredButtonName, false);
@@ -43,6 +53,7 @@ void MenuLogicSystem::Update(float dt)
         {
             SetButtonTexture(currentHover, true);
             // Play hover sound once when entering the button
+  
             CORE->GetAudioEngine()->loadSound("menu_hover", "../Assets/Audio/hovering_Button.wav", false);
             CORE->GetAudioEngine()->playSound("menu_hover");
         }
@@ -76,8 +87,6 @@ void MenuLogicSystem::Update(float dt)
     }
 }
 
-// Renamed from IsButtonClicked to IsMouseOver for clarity, 
-// since it only checks intersection, not the actual click action.
 bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mouseY)
 {
     if (!button) return false;
@@ -87,21 +96,18 @@ bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mous
     return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, mouseX, mouseY);
 }
 
-// Helper function to swap textures
+//  swap textures
 void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
 {
     auto& factory = GameObjectFactory::Instance();
     GameObject* btn = factory.FindGameObject(buttonName);
     if (!btn) return;
 
-    // Assuming you have a RenderComponent that holds the texture path or ID.
-    // Adjust 'RenderComponent' and 'setTexture' to match your actual engine's names.
     auto* rc = btn->GetComponent<RenderComponent>();
     if (!rc) return;
 
     std::string texturePath;
 
-    // Define your texture swaps here based on the button name
     if (buttonName == "PlayButton") {
         texturePath = isHovered ? "../Assets/Menu_Play_Hover.png" : "../Assets/Menu_Play.png";
     }
@@ -112,7 +118,7 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
         texturePath = isHovered ? "../Assets/Menu_Quit_Hover.png" : "../Assets/Menu_Quit.png";
     }
 
-    // Hypothetical function to update the texture on your render component
+  
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);
 }

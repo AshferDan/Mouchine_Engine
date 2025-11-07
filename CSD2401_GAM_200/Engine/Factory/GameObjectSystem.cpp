@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       gameObjectSystem.cpp
-\author     Jonathan Fam Qian Wei [100% - 20 lines]
+\author     Jonathan Fam Qian Wei [29% - 20 lines]
+            Lee Hwee Min [ 71% - 51 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 
@@ -50,6 +51,17 @@ Technology is prohibited.
          }
      }
  }
+
+
+ /**
+  * @brief Handles CreateObjectMessage to create new GameObjects.
+  *
+  * Depending on the message type (Empty, Basic, or Prefab), this function
+  * initializes a new GameObject using the GameObjectFactory and attaches
+  * necessary components such as Transform, Render, and Collider.
+  *
+  * @param msg Contains the object name, type, shape, position, scale, rotation, and color.
+  */
 
  void GameObjectSystem::HandleMessage(const CreateObjectMessage& msg)
  {
