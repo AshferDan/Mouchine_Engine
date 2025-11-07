@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ComponentSerialization.h
-\author     Lee Hwee Min [100% - ?? lines]
+\author     Lee Hwee Min [100% - 31 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -28,7 +28,7 @@ Technology is prohibited.
 class Spritesheet;
 using json = nlohmann::json;
 
-/*!
+/**
 * @brief Declares per-component serialization and deserialization functions.
 *    Each component knows how to read and write its own data to/from JSON.
 */

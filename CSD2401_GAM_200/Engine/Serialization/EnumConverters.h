@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       EnumConverters.h
-\author     Lee Hwee Min [100% - ?? lines]
+\author     Lee Hwee Min [100% - 42 lines]
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -18,23 +18,6 @@ Technology is prohibited.
  *    and human-readable string representations. This allows JSON-based
  *    serialization and ImGui editors to display meaningful labels instead
  *    of raw integer enum values.
- *
- *    Supported conversions:
- *    - ColliderComponent::Type <-> std::string
- *    - CollisionLayer          <-> std::string
- *
- *    Usage Example:
- *    ----------------------------
- *    json j;
- *    j["shape"] = EnumConverters::ToString(collider->GetType());
- *    j["layer"] = EnumConverters::ToString(collider->GetLayer());
- *
- *    ColliderComponent::Type type =
- *
- *    EnumConverters::ToColliderType(j["shape"]);
- *    CollisionLayer layer =
- *        EnumConverters::ToCollisionLayer(j["layer"]);
- *
  */
 
 namespace EnumConverters

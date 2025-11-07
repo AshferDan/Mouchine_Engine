@@ -2,6 +2,7 @@
 /*!
 \file       GraphicsSystem.cpp
 \author     Guan Shao Jun [85%]
+            Lee Hwee Min [ 1% - 8 lines]
 \par        shaojun.g@digipen.edu
 \date       October 02 2025
 
@@ -971,6 +972,9 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     return clonedComponent;
 }
 
+/** 
+*   @brief Adds a RenderComponent to the specified GameObject. 
+*/
 void GraphicsSystem::HandleMessage(const CreateObjectMessage& msg)
 {
     GameObject* go = GameObjectFactory::Instance().FindByName(msg.name);

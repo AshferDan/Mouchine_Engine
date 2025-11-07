@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       main.cpp
-\author     Lee Hwee Min [100% - 95 lines]
+\author     Lee Hwee Min [100% - 137 lines]
 \par        l.hweemin@digipen.edu
 \date       October, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -123,7 +123,10 @@ namespace CrashHandler
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
 #endif
-
+    /**
+    * @brief Captures and returns the current stack trace as a formatted string.
+    * @return A string containing the call stack (Windows only).
+    */
     std::string GetStackTrace()
     {
 #if defined(_WIN32)
@@ -153,7 +156,11 @@ namespace CrashHandler
         return "Stacktrace not supported on this platform.";
 #endif
     }
-
+    /**
+    * @brief Logs crash details and stack trace to a file.
+    * @param type Type or category of the crash (e.g., "EXCEPTION").
+    * @param e Optional exception pointer for additional error details.
+    */
     void LogCrash(const char *type, const std::exception *e)
     {
         std::filesystem::create_directories("../Logs");

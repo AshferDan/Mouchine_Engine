@@ -1,8 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Core.cpp
-\author     Jonathan Fam Qian Wei [71% - 103 lines]
-\co-author  Lee Hwee Min [29% - 41 lines]
+\author     Jonathan Fam Qian Wei [70% - 103 lines]
+\co-author  Lee Hwee Min [30% - 45 lines]
 \par        Fam.q@digipen.edu , l.hweemin@digipen.edu
 \date       October, 2, 2025
 
@@ -117,6 +117,7 @@ void CoreEngine::InitSystems()
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
+    // Subscribe systems to specific message types
     messageBus.Subscribe<PlaySoundMessage>(audioEngine);
     messageBus.Subscribe<PauseSoundMessage>(audioEngine);
     messageBus.Subscribe<CollisionMessage>(physicsSystem);

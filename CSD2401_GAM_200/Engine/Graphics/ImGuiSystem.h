@@ -159,6 +159,8 @@ void PrefabMenu_Render();
 
 void PrefabMenu_Spawn();
 
+void StressTest_Spawn();
+
 /**
   * @brief 1/2 functions for drag and drop operations within asset browser. This one is for sending. Sends a payload with data + leaves a trailing text for users to see what file is being moved.
   * @param PayloadID        ID that the Receiving end will check against, can be any string!

@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       PhysicsSystem.cpp
-\author     Khalil Belabadia [100% - 231 lines]
+\author     Khalil Belabadia [96% - 231 lines]
+            Lee Hwee Min [4% - 10 lines]
 \par        khalil.b@digipen.edu
 \date       October, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -333,6 +334,9 @@ void PhysicsSystem::ResolveMixed(GameObject* obj1, GameObject* obj2,
     }
 }
 
+/** 
+* @brief Queues collision pairs for physics resolution. 
+*/
 void PhysicsSystem::HandleMessage(const CollisionMessage& msg) {
     // msg.objectA and msg.objectB are GameObject pointers
     GameObject* objA = static_cast<GameObject*>(msg.objectA);

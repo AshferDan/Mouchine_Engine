@@ -319,13 +319,6 @@ void InputManager::Update(float dt)
                 CORE->GetMessageBus().Publish(msg);
                 // audioEngine->playSound("jump_sfx", "jump_channel");
             }
-            /*if (audioEngine) {
-                Message msg;
-                msg.type = "PlaySound";
-                msg.sender = this;
-                msg.data = (void*)"jump_sfx";
-                CORE->GetMessageBus().Broadcast(msg);
-            }*/
         }
     }
     auto* anim = player->GetComponent<Spritesheet>();
