@@ -3,6 +3,7 @@
 #include "physics.h"
 #include "ResourceManager.h"
 #include "Serialization.h"
+#include "audio.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -18,14 +19,13 @@ namespace fs = std::filesystem;
 LevelEditor::LevelEditor()
     : factory(GameObjectFactory::Instance()),
     selectedGameObjectID(0),
-    showPropertyEditor(true),
     showSaveDialog(false),
     showLoadDialog(false),
     currentFilename(""),
     editorMode(EditorMode::Stop),
     hasUnsavedChanges(false),
     hasValidSaveState(false),
-    cameraX(0.0f),  cameraY(0.0f), cameraZoom(1.0f),
+    cameraX(0.0f), cameraY(0.0f), cameraZoom(1.0f),
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
     zoomSpeed(0.1f),    //zoom to be implemented
     minZoom(0.1f),
@@ -64,11 +64,6 @@ void LevelEditor::Update(float /*dt*/)
     if (!InputManager::KeyStateImgui)
         return;
 
-    // render property editor
-    //if (showPropertyEditor && selectedGameObjectID != 0)
-    //{
-    //    return;
-    //}
 
     // Full window docking
     ImGuiViewport *viewport = ImGui::GetMainViewport();
@@ -105,11 +100,6 @@ void LevelEditor::Update(float /*dt*/)
         if (editorMode == EditorMode::Stop)
         {
             RenderCameraControls();
-        }
-
-        if (showPropertyEditor)
-        {
-            RenderPropertyEditor();
         }
     }
 
@@ -235,6 +225,16 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
+
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine && !currentBGMName.empty())
+    {
+        std::cout << "[LevelEditor] Starting background music: " << currentBGMName << std::endl;
+        // Ensure it's stopped before starting to avoid doubling up if spamming play/stop
+        audioEngine->stopSound(currentBGMChannel);
+        audioEngine->playSound(currentBGMName, currentBGMChannel);
+        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+    }
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
 
@@ -243,6 +243,13 @@ void LevelEditor::StopPlayMode()
 {
     if (editorMode == EditorMode::Stop)
         return;
+
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine && !currentBGMChannel.empty())
+    {
+        std::cout << "[LevelEditor] Stopping background music on " << currentBGMChannel << std::endl;
+        audioEngine->stopSound(currentBGMChannel);
+    }
 
     RestoreSceneState();           // restore saved scene
     hasValidSaveState = false;
@@ -255,14 +262,30 @@ void LevelEditor::StopPlayMode()
 // pause state
 void LevelEditor::TogglePause()
 {
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+
     if (editorMode == EditorMode::Play)
     {
         editorMode = EditorMode::Pause;
+
+        if (audioEngine && !currentBGMChannel.empty())
+        {
+            std::cout << "[LevelEditor] Pausing music on channel " << currentBGMChannel << std::endl;
+            // CHANGED: Use currentBGMChannel instead of hardcoded string
+            audioEngine->pauseSound(currentBGMChannel, true);
+        }
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
     else if (editorMode == EditorMode::Pause)
     {
         editorMode = EditorMode::Play;
+
+        if (audioEngine && !currentBGMChannel.empty())
+        {
+            std::cout << "[LevelEditor] Resuming music on channel " << currentBGMChannel << std::endl;
+            // CHANGED: Use currentBGMChannel instead of hardcoded string
+            audioEngine->pauseSound(currentBGMChannel, false);
+        }
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
@@ -474,263 +497,6 @@ void LevelEditor::RenderMenuBar()
     ImGui::End();
 }
 
-void LevelEditor::RenderHierarchy()
-{
-    ImGui::SetNextWindowPos(ImVec2(10, 370), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 600), ImGuiCond_FirstUseEver);
-
-    if (!ImGui::Begin("Hierarchy##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
-    {
-        ImGui::End();
-        return;
-    }
-
-    // Render top part to show adding of GOs
-    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
-    {
-        // this is a file, not sure if we wanna do anything yet
-        //ShowCreateGOMenu = true;
-    }
-
-    // display current file name
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
-    ImGui::Text("Scene: %s", currentFilename.c_str());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-
-    // display object count
-    auto &allObjects = factory.GetAllGameObjects();
-    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-    ImGui::Text("Game Objects: %zu", allObjects.size());
-    ImGui::PopStyleColor();
-    ImGui::Separator();
-
-    // list all game objects
-    for (const auto &objPtr : allObjects)
-    {
-        if (!objPtr->IsActive())
-            continue;
-
-        GameObject *obj = objPtr.get();
-        EntityID id = obj->GetID();
-
-        // highlight if selected
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        if (selectedGameObjectID == id)
-        {
-            flags |= ImGuiTreeNodeFlags_Selected;
-        }
-
-        bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)",
-                                          obj->GetName().c_str(), id);
-
-        // enter drag and drop stuff here
-
-        {
-            // might wanna send id as data instead
-            if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-            {
-                SendDragAndDrop(HierarchyPayloadID, obj->GetName(), obj->GetName());
-            }
-        }
-
-        {
-            std::string testdata{};
-            ReceiveDragAndDrop(HierarchyPayloadID, testdata);
-            // Do something with DnD data
-            if (!testdata.empty())
-            {
-                if (testdata != obj->GetName())
-                {
-                    std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
-                }
-                else
-                {
-                    std::cout << "[Hierarchy] Invalid Drag and Drop source!\n";
-                }
-                //CompletedDragAndDrop();
-            }
-        }
-
-        // select on click
-        if (ImGui::IsItemClicked())
-        {
-            SetSelectedGameObject(id);
-        }
-
-        // context menu
-        if (ImGui::BeginPopupContextItem())
-        {
-            if (ImGui::MenuItem("Select"))
-            {
-                SetSelectedGameObject(id);
-            }
-            if (ImGui::MenuItem("Save as Prefab"))
-            {
-                Serialization::SavePrefab(*obj);
-            }
-            if (ImGui::MenuItem("Clone"))
-            {
-                factory.CloneGameObject(id);
-            }
-            if (ImGui::MenuItem("Delete"))
-            {
-                RemoveGameObject(id);
-                if (selectedGameObjectID == id)
-                    selectedGameObjectID = 0;
-            }
-            ImGui::EndPopup();
-        }
-    }
-
-    // deselect when clicking on empty space in the hierarchy
-    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-    {
-        if (!ImGui::IsAnyItemHovered())
-        {
-            selectedGameObjectID = 0;
-        }
-    }
-    ImGui::End();
-}
-
-void LevelEditor::RenderPropertyEditor()
-{
-    ImGui::SetNextWindowPos(ImVec2(1400, 10), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(500, 900), ImGuiCond_FirstUseEver);
-
-    if (!ImGui::Begin("Properties##LevelEditor", &showPropertyEditor, ImGuiWindowFlags_NoCollapse))
-    {
-        ImGui::End();
-        return;
-    }
-
-    GameObject *obj = GetSelectedGameObject(); 
-    if (!obj)
-    {
-        // empty when nothing is selected
-        ImGui::End();
-        return;
-    }
-
-    ImGui::Text("GameObject: %s", obj->GetName().c_str());
-    ImGui::Text("ID: %u", obj->GetID());
-    ImGui::Separator();
-
-    bool isActive = obj->IsActive();
-    if (ImGui::Checkbox("Active", &isActive))
-    {
-        obj->SetActive(isActive);
-    }
-
-    ImGui::Spacing();
-
-    // transform
-    if (auto *transform = obj->GetComponent<TransformComponent>())
-    {
-        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            float pos[2] = {0.0f, 0.0f};
-            transform->GetPosition(pos[0], pos[1]);
-            if (ImGui::DragFloat2("Position", pos, 0.5f))
-            {
-                transform->SetPosition(pos[0], pos[1]);
-            }
-
-            float scale[2] = {1.0f, 1.0f};
-            transform->GetScale(scale[0], scale[1]);
-            if (ImGui::DragFloat2("Scale", scale, 0.5f))
-            {
-                transform->SetScale(scale[0], scale[1]);
-            }
-
-            float rotation = transform->GetRotation();
-            if (ImGui::DragFloat("Rotation", &rotation, 0.5f))
-            {
-                transform->SetRotation(rotation);
-            }
-        }
-    }
-
-    // render component
-    if (auto *render = obj->GetComponent<RenderComponent>())
-    {
-        if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
-        {
-            ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
-
-            if (render->GetTextureID() == 0)
-            {
-                vec4 color = render->GetColor();
-                float colorArray[4] = {color.x, color.y, color.z, color.w};
-                if (ImGui::ColorEdit4("Color", colorArray))
-                {
-                    render->SetColor(vec4(colorArray[0], colorArray[1], colorArray[2], colorArray[3]));
-                }
-            }
-            else
-            {
-                ImGui::Text("Texture ID: %u", render->GetTextureID());
-            }
-        }
-    }
-
-    // physics component
-    if (auto *physics = obj->GetComponent<PhysicsComponent>())
-    {
-        if (ImGui::CollapsingHeader("Physics"))
-        {
-            float vel[2] = {0.0f, 0.0f};
-            physics->GetVelocity(vel[0], vel[1]);
-            if (ImGui::DragFloat2("Velocity", vel, 0.1f))
-            {
-                physics->SetVelocity(vel[0], vel[1]);
-            }
-
-            bool isStatic = physics->IsStatic();
-            if (ImGui::Checkbox("Static", &isStatic))
-            {
-                physics->SetStatic(isStatic);
-            }
-
-            bool hasGravity = physics->useGravity;
-            if (ImGui::Checkbox("Gravity", &hasGravity))
-            {
-                physics->SetGravity(hasGravity);
-            }
-
-            ImGui::Text("Mass: %.2f", physics->GetMass());
-            ImGui::Text("Grounded: %s", physics->IsGrounded() ? "Yes" : "No");
-        }
-    }
-
-    // collider component
-    if (auto *collider = obj->GetComponent<ColliderComponent>())
-    {
-        if (ImGui::CollapsingHeader("Collider"))
-        {
-            ImGui::Text("Type: %s", collider->GetType() == ColliderComponent::Type::Circle ? "Circle" : "Square");
-
-            if (collider->GetType() == ColliderComponent::Type::Circle)
-            {
-                Circle circle = collider->GetCircle();
-                ImGui::Text("Radius: %.2f", circle.radius);
-            }
-            else
-            {
-                AABB aabb = collider->GetAABB();
-                float width = aabb.max.x - aabb.min.x;
-                float height = aabb.max.y - aabb.min.y;
-                ImGui::Text("Width: %.2f", width);
-                ImGui::Text("Height: %.2f", height);
-            }
-
-            ImGui::Text("Layer: %s", GetCollisionLayerName((int)collider->GetLayer()));
-        }
-    }
-    ImGui::End();
-}
-
 bool LevelEditor::SaveLevelJSON(const std::string &filepath)
 {
     try
@@ -844,25 +610,24 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
             if (settings.contains("backgroundMusic") && audio)
             {
                 const auto& bgm = settings["backgroundMusic"];
-                std::string name = bgm.value("name", "bgm");
+                // Store settings in member variables instead of local variables
+                currentBGMName = bgm.value("name", "");
                 std::string path = bgm.value("path", "");
-                bool        loop = bgm.value("looping", true);
-                float       vol = bgm.value("volume", 0.8f);
-                std::string chan = bgm.value("channel", "bgm");
+                bool loop = bgm.value("looping", true);
+                currentBGMVolume = bgm.value("volume", 0.5f);
+                currentBGMChannel = bgm.value("channel", "bgm_channel");
 
-                if (!path.empty())
+                if (!path.empty() && !currentBGMName.empty())
                 {
-                    std::cout << "[LoadLevel] Loading BGM: " << name << " from " << path << "\n";
-                    if (resourceMgr.LoadAudio(name, path, loop))
+                    std::cout << "[LoadLevel] Loading BGM: " << currentBGMName << " from " << path << "\n";
+                    if (resourceMgr.LoadAudio(currentBGMName, path, loop))
                     {
-                        std::cout << "[LoadLevel] Playing BGM on channel: " << chan << "\n";
-                        audio->playSound(name, chan);
-                        audio->setVolume(chan, vol);
-                        std::cout << "[LoadLevel] BGM started successfully\n";
+                        std::cout << "[LoadLevel] BGM loaded successfully (ready for Play Mode)\n";
                     }
                     else
                     {
                         std::cerr << "[LoadLevel] Failed to load BGM: " << path << "\n";
+                        currentBGMName = ""; // Clear if failed to load
                     }
                 }
             }
@@ -1428,50 +1193,6 @@ bool LevelEditor::LoadLevelFromFile(const std::string &filepath, LevelData &outD
     return true;
 }
 
-/**
- * @brief Get shape type name from enum value
- */
-const char *LevelEditor::GetShapeTypeName(int type)
-{
-    switch (type)
-    {
-    case 0:
-        return "Square";
-    case 1:
-        return "Circle";
-    case 2:
-        return "Line";
-    case 3:
-        return "Point";
-    default:
-        return "Unknown";
-    }
-}
-
-/**
- * @brief Get collision layer name from enum value
- */
-const char *LevelEditor::GetCollisionLayerName(int layer)
-{
-    switch (layer)
-    {
-    case 0:
-        return "Player";
-    case 1:
-        return "Ground";
-    case 2:
-        return "Wall";
-    case 3:
-        return "Enemy";
-    case 4:
-        return "Platform";
-    case 5:
-        return "Default";
-    default:
-        return "Unknown";
-    }
-}
-
 // camera control
 /**
  * @brief Render camera control panel
@@ -1493,14 +1214,19 @@ void LevelEditor::RenderCameraControls()
 
     // display current camera info
     ImGui::Text("Position: (%.1f, %.1f)", cameraX, cameraY);
+    ImGui::Text("Zoom: %.2fx", cameraZoom);
     ImGui::Separator();
 
     // camera position sliders
     if (ImGui::DragFloat("Camera X", &cameraX, 1.0f, -10000.0f, 10000.0f))
-    {
-    }
+    {}
     if (ImGui::DragFloat("Camera Y", &cameraY, 1.0f, -10000.0f, 10000.0f))
+    {}
+    if (ImGui::SliderFloat("Zoom", &cameraZoom, minZoom, maxZoom, "%.2f"))
     {
+        // clamp zoom to min/max
+        if (cameraZoom < minZoom) cameraZoom = minZoom;
+        if (cameraZoom > maxZoom) cameraZoom = maxZoom;
     }
     ImGui::Separator();
 
@@ -1538,12 +1264,23 @@ void LevelEditor::UpdateCameraControls()
         return;
     }
 
-    // camera moves when not hovering over imgui windows and if its in editor mode
-    if (io.WantCaptureMouse)
-    {
-        isPanning = false;
-        return;
-    }
+    //ImGuiWindow* hoveredWindow = ImGui::GetCurrentContext()->HoveredWindow;
+    //const char* hoveredWindowName = hoveredWindow ? hoveredWindow->Name : "";
+
+    //bool blockControls = false;
+    //if (hoveredWindow)
+    //{
+    //    // Add any UI panel names that should NOT allow camera control
+    //    // The viewport is NOT in this list, so it will allow controls
+    //    if (strstr(hoveredWindowName, "Hierarchy") != nullptr ||
+    //        strstr(hoveredWindowName, "Inspector") != nullptr ||
+    //        strstr(hoveredWindowName, "Property") != nullptr ||
+    //        strstr(hoveredWindowName, "Asset") != nullptr ||
+    //        strstr(hoveredWindowName, "Console") != nullptr)
+    //    {
+    //        blockControls = true;
+    //    }
+    //}
 
     // middle mouse button
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
@@ -1570,10 +1307,13 @@ void LevelEditor::UpdateCameraControls()
         lastMouseY = io.MousePos.y;
     }
 
-    // keyboard panning
-    if (!io.WantCaptureKeyboard)
+    // only allow keyboard panning if not typing in an ImGui text field, keyboard panning
+    bool keyboardOverImGuiWindow = io.WantCaptureKeyboard && ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+
+    if (!keyboardOverImGuiWindow)
     {
         float keyPanSpeed = panSpeed * 5.0f / cameraZoom;
+        float dt = static_cast<float>(CoreEngine::GetDeltaTime());
 
         if (ImGui::IsKeyDown(ImGuiKey_DownArrow))
         {
@@ -1591,6 +1331,15 @@ void LevelEditor::UpdateCameraControls()
         {
             cameraX -= keyPanSpeed;
         }
+    }
+    if (io.MouseWheel != 0.0f)
+    {
+        float zoomDelta = io.MouseWheel * zoomSpeed;
+        cameraZoom += zoomDelta;
+
+        // clamp zoom to min/max
+        if (cameraZoom < minZoom) cameraZoom = minZoom;
+        if (cameraZoom > maxZoom) cameraZoom = maxZoom;
     }
 }
 
@@ -1626,16 +1375,17 @@ mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight)
     }
 
     // in edit mode use editor camera
-    mat4 projection = mat4::ortho(0.0f, windowWidth, 0.0f, windowHeight);
-    vec3 editorCamPos(cameraX - windowWidth / 2.0f, cameraY - windowHeight / 2.0f, 0.0f);
-    mat4 view = mat4::translate(-editorCamPos);
+    float halfWidth = (windowWidth / 2.0f) / cameraZoom;
+    float halfHeight = (windowHeight / 2.0f) / cameraZoom;
 
-    // apply zoom by scaling the projection
-    mat4 zoomMatrix = mat4::translate(vec3(windowWidth / 2.0f, windowHeight / 2.0f, 0.0f));
-    zoomMatrix = zoomMatrix * mat4::scale(vec3(cameraZoom, cameraZoom, 1.0f));
-    zoomMatrix = zoomMatrix * mat4::translate(vec3(-windowWidth / 2.0f, -windowHeight / 2.0f, 0.0f));
+    float left = cameraX - halfWidth;
+    float right = cameraX + halfWidth;
+    float bottom = cameraY - halfHeight;
+    float top = cameraY + halfHeight;
 
-    return zoomMatrix * projection * view;
+    mat4 projection = mat4::ortho(left, right, bottom, top);
+
+    return projection;
 }
 
 void LevelEditor::PerformSceneReload()
@@ -1666,3 +1416,33 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+void LevelEditor::PlayLoadedBGM()
+{
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+
+    if (audioEngine && !currentBGMName.empty())
+    {
+        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
+            << " on channel: " << currentBGMChannel << std::endl;
+
+        // stop any existing sound on this channel first
+        audioEngine->stopSound(currentBGMChannel);
+
+        // play the BGM
+        audioEngine->playSound(currentBGMName, currentBGMChannel);
+        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+
+        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
+    }
+    else
+    {
+        if (!audioEngine)
+        {
+            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
+        }
+        else if (currentBGMName.empty())
+        {
+            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
+        }
+    }
+}

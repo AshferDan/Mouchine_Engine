@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       ScriptAPI.cpp
+\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "ScriptAPI.h"
 
 namespace API
@@ -29,28 +43,29 @@ namespace API
         resourceMgr.SetAudioEngine(&audio);
 
         // load audio files
-        resourceMgr.LoadAudio("bgm", "./Assets/audio/level_1.wav", true);            // looping
-        resourceMgr.LoadAudio("jump_sfx", "./Assets/audio/jump.wav", false);         // when jumping only
-        resourceMgr.LoadAudio("footstep_sfx", "./Assets/audio/footstep.wav", false); // footstep sound
+        resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true);            // looping
+        resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false);         // when jumping only
+        resourceMgr.LoadAudio("footstep_sfx", "../Assets/audio/footstep.wav", false); // footstep sound
 
         // load common fonts
         std::cout << "\n--- Loading Fonts ---" << std::endl;
-        resourceMgr.LoadFont("default_font", "./Assets/FrederickatheGreat-Regular.ttf", 48);
-        resourceMgr.LoadFont("small_font", "./Assets/FrederickatheGreat-Regular.ttf", 24);
-        resourceMgr.LoadFont("large_font", "./Assets/FrederickatheGreat-Regular.ttf", 64);
+        resourceMgr.LoadFont("default_font", "../Assets/FrederickatheGreat-Regular.ttf", 48);
+        resourceMgr.LoadFont("small_font", "../Assets/FrederickatheGreat-Regular.ttf", 24);
+        resourceMgr.LoadFont("large_font", "../Assets/FrederickatheGreat-Regular.ttf", 64);
 
         // print loaded resources
         resourceMgr.PrintLoadedResources();
 
         // register the sound with audio engine
-        std::cout << "\n--- Starting Background Music ---" << std::endl;
-        audio.playSound("bgm", "bgm_channel");
-        audio.setVolume("bgm_channel", 0.5f);
+        //std::cout << "\n--- Starting Background Music ---" << std::endl;
+        //audio.playSound("bgm", "bgm_channel");
+        //audio.setVolume("bgm_channel", 0.5f);
 
-        // register wind sound
-        std::cout << "--- Starting Wind Ambient Sound ---" << std::endl;
-        audio.playSound("wind", "wind_channel");
-        audio.setVolume("wind_channel", 0.5f); // Quieter than music for ambient effect
+        //// register wind sound
+        //std::cout << "--- Starting Wind Ambient Sound ---" << std::endl;
+        //audio.playSound("wind", "wind_channel");
+        //audio.setVolume("wind_channel", 0.5f); // Quieter than music for ambient effect
+        std::cout << "\n--- Audio loaded, music will start in play mode ---" << std::endl;
     }
 
     void StartEngineLoop(CoreEngine &engine)

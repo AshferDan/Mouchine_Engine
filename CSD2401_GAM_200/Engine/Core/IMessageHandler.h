@@ -8,7 +8,7 @@ public:
 	virtual ~IMessageHandler() = default;
 
 	 // Generic fallback
-	virtual void HandleMessage(const Message& msg) {
+	virtual void HandleMessage(const Message&) {
 		std::cout << "[IMessageHandler] Unhandled message.\n";
 	}
 

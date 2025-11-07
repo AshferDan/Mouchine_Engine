@@ -193,7 +193,7 @@ void Serialization::SaveScene(const std::string &scenePath)
 	}
 }
 
-void Serialization::LoadScene(const std::string &scenePath)
+void Serialization::LoadScene(const std::string& scenePath)
 {
 	std::string path = SceneFilePath + scenePath + ".json";
 	if (!fs::exists(path))
@@ -214,21 +214,36 @@ void Serialization::LoadScene(const std::string &scenePath)
 	{
 		in >> j;
 	}
-	catch (const std::exception &e)
+	catch (const std::exception& e)
 	{
 		std::cerr << "[LoadScene] Parse error: " << e.what() << "\n";
 		return;
 	}
 
+	// Clear all existing GameObjects before loading new scene
+	std::cout << "[LoadScene] Clearing previous scene GameObjects...\n";
+	GameObjectFactory::Instance().Clear();
+
+	// Stop all currently playing audio and unload audio resources
+	std::cout << "[LoadScene] Stopping all audio and clearing audio resources...\n";
+	AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+	if (audioEngine)
+	{
+		audioEngine->stopAllSound();
+		audioEngine->unloadAllSound();
+	}
+
+	// Clear all audio resources from ResourceManager
+	ResourceManager::Instance().UnloadAllAudio();
+
 	if (j.contains("GameObjects"))
 	{
-		for (const auto &obj : j["GameObjects"])
+		for (const auto& obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
 		std::cout << "[LoadScene] Scene loaded successfully: " << path << "\n";
 	}
 }
-
 void Serialization::RemovePrefab(std::string const &prefabName)
 {
 	for (auto const &prefab : std::filesystem::directory_iterator(PrefabFilePath))

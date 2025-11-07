@@ -26,6 +26,8 @@ Technology is prohibited.
 #include <typeinfo>
 #include <type_traits>
 #include "LevelEditor.h"
+#include "ColliderComponent.h"
+#include "physics.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -100,7 +102,7 @@ void ReloadPrefabsList()
 /**
  * @brief Ctor - Inits window variable
  */
-ImGuiSystem::ImGuiSystem(GLFWwindow *window) : m_window(window), factory(GameObjectFactory::Instance()), selectedGameObjectID(0) {}
+ImGuiSystem::ImGuiSystem(GLFWwindow *window) : m_window(window), factory(GameObjectFactory::Instance()), selectedGameObjectID(0), showPropertyEditor(true) {}
 
 /**
  * @brief Dtor - Calls Funct to terminate properly
@@ -183,20 +185,22 @@ void ImGuiSystem::Update(float dt)
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
 
-        TopMenuBar_Render();
-        Hierarchy_Render();
+        LevelEditor* levelEditor = CORE->GetLevelEditor();
+        bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
-        // commented out bc editor mode isnt rly an editor mode, its more of a game view mode, dragndrop still works tho
-        // if (CORE->GetGraphicsSystem()->IsEditorMode())
+        if (!isPlaying)
         {
-            ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+            CORE->GetGraphicsSystem()->SetEditorMode();
+        // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
+        {
+            ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
             ImGui::Begin("Game Viewport");
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();
             CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
-            ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((void*)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 
             std::string testdata{};
             // dont rly wanna accept generic assets yet, because should accept those in specific scenarios like properties tab
@@ -213,6 +217,20 @@ void ImGuiSystem::Update(float dt)
             ImGui::End();
         }
 
+        // Only show editor UI when not in play mode
+
+            TopMenuBar_Render();
+            Hierarchy_Render();
+
+            // render property editor for selected game object
+            if (showPropertyEditor)
+            {
+                RenderPropertyEditor();
+            }
+            // Render profiler! Make it toggleable?
+            Profiler_Render();
+        }
+/*
         // Begin main GameObject Inspector window
         ImGui::Begin("OLD HIERARCHY", &InputManager::KeyStateImgui);
 
@@ -409,14 +427,14 @@ void ImGuiSystem::Update(float dt)
                 }
 
                 // Evil button that spawns 2.5k Circle GOs
-            /*    if (obj && obj->GetName() == "Evil Button")
-                {
-                    if (ImGui::Button("Spawn 2500 Entities"))
-                    {
-                        DemoM1_SpawnGameObjects();
-                        std::cout << "Spawned 2500 Circle Entities!\n";
-                    }
-                }*/
+            //    if (obj && obj->GetName() == "Evil Button")
+                //{
+                //    if (ImGui::Button("Spawn 2500 Entities"))
+                //    {
+                //        DemoM1_SpawnGameObjects();
+                //        std::cout << "Spawned 2500 Circle Entities!\n";
+                //    }
+                //}
 
                 ImGui::TreePop();
 
@@ -461,6 +479,7 @@ void ImGuiSystem::Update(float dt)
         }
 
         ImGui::End();
+        */
 
         /**
          * @brief Game Object Creator Menu IMGui Window
@@ -477,9 +496,6 @@ void ImGuiSystem::Update(float dt)
         {
             PrefabMenu_Render();
         }
-
-        // Render profiler! Make it toggleable?
-        Profiler_Render();
     }
 }
 
@@ -675,10 +691,17 @@ void ImGuiSystem::Hierarchy_Render()
 
     // display current file name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
-    ImGui::Text("Scene: %s", "XINYEE IDK HOW TO ADD SCENE NAME HERE");
+    if (auto* levelEditor = CORE->GetLevelEditor())
+    {
+        ImGui::Text("Scene: %s", CORE->GetLevelEditor()->GetCurrentFilename().c_str());
+    }
+    else
+    {
+        ImGui::Text("Scene: Unknown");
+    }
     ImGui::PopStyleColor();
     ImGui::Separator();
-
+        
     // display object count
     auto &allObjects = factory.GetAllGameObjects();
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
@@ -692,6 +715,14 @@ void ImGuiSystem::Hierarchy_Render()
         if (!objPtr->GetParent() && objPtr->IsActive())
         {
             Hierarchy_GameObjectTree_Renderer(objPtr.get(), 0, selectedGameObjectID, factory);
+        }
+    }
+    // deselect when clicking on empty space in the hierarchy
+    if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        if (!ImGui::IsAnyItemHovered())
+        {
+            selectedGameObjectID = 0;
         }
     }
     ImGui::End();
@@ -1626,5 +1657,190 @@ void CreateHintText(std::string const &displayText)
         ImGui::BeginTooltip();
         ImGui::Text(displayText.c_str());
         ImGui::EndTooltip();
+    }
+}
+
+GameObject* ImGuiSystem::GetSelectedGameObject() const
+{
+    if (selectedGameObjectID == 0)
+        return nullptr;
+
+    return factory.GetGameObject(selectedGameObjectID);
+}
+
+void ImGuiSystem::RenderPropertyEditor()
+{
+    ImGui::SetNextWindowPos(ImVec2(1400, 10), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(500, 900), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Properties##ImGuiSystem", &showPropertyEditor, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    GameObject* obj = GetSelectedGameObject();
+    if (!obj)
+    {
+        // empty when nothing is selected
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("GameObject: %s", obj->GetName().c_str());
+    ImGui::Text("ID: %u", obj->GetID());
+    ImGui::Separator();
+
+    bool isActive = obj->IsActive();
+    if (ImGui::Checkbox("Active", &isActive))
+    {
+        obj->SetActive(isActive);
+    }
+
+    ImGui::Spacing();
+
+    // transform
+    if (auto* transform = obj->GetComponent<TransformComponent>())
+    {
+        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            float pos[2] = { 0.0f, 0.0f };
+            transform->GetPosition(pos[0], pos[1]);
+            if (ImGui::DragFloat2("Position", pos, 0.5f))
+            {
+                transform->SetPosition(pos[0], pos[1]);
+            }
+
+            float scale[2] = { 1.0f, 1.0f };
+            transform->GetScale(scale[0], scale[1]);
+            if (ImGui::DragFloat2("Scale", scale, 0.5f))
+            {
+                transform->SetScale(scale[0], scale[1]);
+            }
+
+            float rotation = transform->GetRotation();
+            if (ImGui::DragFloat("Rotation", &rotation, 0.5f))
+            {
+                transform->SetRotation(rotation);
+            }
+        }
+    }
+
+    // render component
+    if (auto* render = obj->GetComponent<RenderComponent>())
+    {
+        if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
+
+            if (render->GetTextureID() == 0)
+            {
+                vec4 color = render->GetColor();
+                float colorArray[4] = { color.x, color.y, color.z, color.w };
+                if (ImGui::ColorEdit4("Color", colorArray))
+                {
+                    render->SetColor(vec4(colorArray[0], colorArray[1], colorArray[2], colorArray[3]));
+                }
+            }
+            else
+            {
+                ImGui::Text("Texture ID: %u", render->GetTextureID());
+            }
+        }
+    }
+
+    // physics component
+    if (auto* physics = obj->GetComponent<PhysicsComponent>())
+    {
+        if (ImGui::CollapsingHeader("Physics"))
+        {
+            float vel[2] = { 0.0f, 0.0f };
+            physics->GetVelocity(vel[0], vel[1]);
+            if (ImGui::DragFloat2("Velocity", vel, 0.1f))
+            {
+                physics->SetVelocity(vel[0], vel[1]);
+            }
+
+            bool isStatic = physics->IsStatic();
+            if (ImGui::Checkbox("Static", &isStatic))
+            {
+                physics->SetStatic(isStatic);
+            }
+
+            bool hasGravity = physics->useGravity;
+            if (ImGui::Checkbox("Gravity", &hasGravity))
+            {
+                physics->SetGravity(hasGravity);
+            }
+
+            ImGui::Text("Mass: %.2f", physics->GetMass());
+            ImGui::Text("Grounded: %s", physics->IsGrounded() ? "Yes" : "No");
+        }
+    }
+
+    // collider component
+    if (auto* collider = obj->GetComponent<ColliderComponent>())
+    {
+        if (ImGui::CollapsingHeader("Collider"))
+        {
+            ImGui::Text("Type: %s", collider->GetType() == ColliderComponent::Type::Circle ? "Circle" : "Square");
+
+            if (collider->GetType() == ColliderComponent::Type::Circle)
+            {
+                Circle circle = collider->GetCircle();
+                ImGui::Text("Radius: %.2f", circle.radius);
+            }
+            else
+            {
+                AABB aabb = collider->GetAABB();
+                float width = aabb.max.x - aabb.min.x;
+                float height = aabb.max.y - aabb.min.y;
+                ImGui::Text("Width: %.2f", width);
+                ImGui::Text("Height: %.2f", height);
+            }
+
+            ImGui::Text("Layer: %s", GetCollisionLayerName((int)collider->GetLayer()));
+        }
+    }
+    ImGui::End();
+}
+
+// get shape type name
+const char* ImGuiSystem::GetShapeTypeName(int type)
+{
+    switch (type)
+    {
+    case 0:
+        return "Square";
+    case 1:
+        return "Circle";
+    case 2:
+        return "Line";
+    case 3:
+        return "Point";
+    default:
+        return "Unknown";
+    }
+}
+
+// get collision layer name
+const char* ImGuiSystem::GetCollisionLayerName(int layer)
+{
+    switch (layer)
+    {
+    case 0:
+        return "Player";
+    case 1:
+        return "Ground";
+    case 2:
+        return "Wall";
+    case 3:
+        return "Enemy";
+    case 4:
+        return "Platform";
+    case 5:
+        return "Default";
+    default:
+        return "Unknown";
     }
 }

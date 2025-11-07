@@ -20,6 +20,9 @@ Technology is prohibited.
 #include "IMessageHandler.h"
 
 bool InputManager::KeyStateImgui = true;
+double InputManager::MouseWorldX = 0.0;
+double InputManager::MouseWorldY = 0.0;
+bool InputManager::MouseLeftClicked = false;
 
 /**
  * @brief Constructs an InputManager with specified parameters.
@@ -69,6 +72,24 @@ std::string InputManager::GetName()
  */
 void InputManager::Update(float dt)
 {
+    glfwGetWindowSize(window, &width, &height);
+    static bool wasLeftMousePressed = false;
+    bool isLeftMousePressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+
+    MouseLeftClicked = (!wasLeftMousePressed && isLeftMousePressed);
+    wasLeftMousePressed = isLeftMousePressed;
+
+    // === UPDATE MOUSE POSITION FIRST - BEFORE ANY EARLY RETURNS ===
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    mouseX = xpos;
+    mouseY = ypos;
+
+    // Convert screen to world coordinates
+    vec2 camPos = CameraManager::Instance().GetCameraPosition();
+    MouseWorldX = static_cast<double>(xpos - width / 2.0) + camPos.x;
+    MouseWorldY = static_cast<double>(height / 2.0 - ypos) + camPos.y; // Flip Y axis
+
     static bool keyPressed = false;
     LevelEditor *levelEditor = CORE->GetLevelEditor();
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
@@ -365,17 +386,31 @@ void InputManager::Update(float dt)
     // The Integrate() method will update velocity based on forces
 
     // Mouse
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    {
-        std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
-    }
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-    {
-        std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
+    //if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    //{
+    //    std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
+    //}
+    //if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    //{
+    //    std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
+    //}
+
     }
 
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-    mouseX = xpos;
-    mouseY = ypos;
+    void InputManager::ResetState()
+    {
+        // 1. Reset static mouse click flags
+        MouseLeftClicked = false;
+
+        // 2. Reset internal tracking variables
+        mouseX = 0.0;
+        mouseY = 0.0;
+        scrollX = 0.0;
+        scrollY = 0.0;
+
+        // 3. Reset gameplay-related states
+        isJumping = false;
+        jumpStartY = 0.0f;
+        footstepTimer = 0.0f;
+        std::cout << "[InputManager] State reset." << std::endl;
     }

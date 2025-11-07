@@ -12,13 +12,14 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
+
 #include "core.h"
 #include "LevelEditor.h"
 #include "Message.h"
 #include "IMessageHandler.h"
 
 bool InputManager::KeyStateQuit = false;
-CoreEngine* CORE;
+CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
@@ -53,9 +54,9 @@ CoreEngine::~CoreEngine()
    window width and height to the graphics system
 
    */
-void CoreEngine::ConfigFile(const char* configF)
+void CoreEngine::ConfigFile(const char *configF)
 {
-    std::ifstream fp{ configF };
+    std::ifstream fp{configF};
     if (!fp)
     {
         std::cout << "Cannot find file" << std::endl;
@@ -109,7 +110,11 @@ void CoreEngine::InitSystems()
     // Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
+    // 10. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
+
+    menuLogicSystem = AddSystem<MenuLogicSystem>();
+
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
@@ -117,7 +122,6 @@ void CoreEngine::InitSystems()
     messageBus.Subscribe<PauseSoundMessage>(audioEngine);
     messageBus.Subscribe<CollisionMessage>(physicsSystem);
     messageBus.Subscribe<CreateObjectMessage>(gameObjectSystem);
-
 
     std::cout << "Default systems initialized: GameObjectSystem, GraphicsSystem" << std::endl;
 }
@@ -155,6 +159,22 @@ void CoreEngine::GameLoop()
 
     while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
     {
+
+        if (m_hasPendingLoad)
+        {
+            LevelEditor *level = GetLevelEditor();
+            level->LoadLevelJSON(m_pendingScene);
+            std::cout << "[CoreEngine] Scene loaded, playing BGM if available..." << std::endl;
+            level->PlayLoadedBGM();
+            m_pendingScene = "";
+            m_hasPendingLoad = false;
+
+            if (inputManager)
+                inputManager->ResetState();
+            CameraManager::Instance().ResetState();
+            accumulator = 0.0;
+        }
+
         // Update variable delta_time and FPS
         update_time(fps_interval);
 
@@ -181,10 +201,12 @@ void CoreEngine::GameLoop()
             g_systemTimings[debugSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
-        if (scriptSystem) 
+        if (scriptSystem)
             g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
+        if (menuLogicSystem)
+            g_systemTimings[menuLogicSystem->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
@@ -213,10 +235,10 @@ void CoreEngine::GameLoop()
                 g_totalLoopTime += ms;
             }
 
-            bool isPaused = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause);
+            bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
             // Only run physics if NOT in step mode/paused, OR if stepping once
-            if ((!stepMode && !isPaused) || stepOnce)
+            if ((isPlaying && !stepMode) || stepOnce)
             {
                 // Update physics-dependent systems with FIXED timestep
                 if (gameObjectSystem)
@@ -259,6 +281,25 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
+                if (scriptSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    scriptSystem->Update(static_cast<float>(fixed_dt)); // Use variable delta_time
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[scriptSystem->GetName()] = ms;
+                    g_totalLoopTime += ms;
+                }
+
+                if (menuLogicSystem)
+                {
+                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                    menuLogicSystem->Update(static_cast<float>(fixed_dt)); // Use variable delta_time
+                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                    g_systemTimings[scriptSystem->GetName()] = ms;
+                    g_totalLoopTime += ms;
+                }
                 stepOnce = false; // Reset after processing one frame
             }
 
@@ -277,16 +318,6 @@ void CoreEngine::GameLoop()
             std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[graphicsSystem->GetName()] = ms;
-            g_totalLoopTime += ms;
-        }
-
-        if (scriptSystem)
-        {
-            std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-            scriptSystem->Update(static_cast<float>(delta_time)); // Use variable delta_time
-            std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[scriptSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
 
@@ -390,7 +421,7 @@ void CoreEngine::update_time(double fps_calc_interval)
 
     title_str = "Game Engine | FPS:" + tempfps + " | DT: " + tempdt + " | Fixed DT: " + tempfixeddt;
 
-    GLFWwindow* Wind = CORE->GetGraphicsSystem()->getWindow();
+    GLFWwindow *Wind = CORE->GetGraphicsSystem()->getWindow();
     if (Wind)
     {
         glfwSetWindowTitle(Wind, title_str.c_str());

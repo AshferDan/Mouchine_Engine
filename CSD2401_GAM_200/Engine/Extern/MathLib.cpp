@@ -255,3 +255,18 @@ vec4 operator*(mat4 const& m, vec4 const& v)
     return r;
 }
 
+
+bool IsAreaClicked(float buttonX, float buttonY, float buttonWidth, float buttonHeight, float mouseX, float mouseY)
+{
+   
+    float halfWidth = std::abs(buttonWidth) / 2.0f;
+    float halfHeight = std::abs(buttonHeight) / 2.0f;
+
+    float left = buttonX - halfWidth;
+    float right = buttonX + halfWidth;
+    float top = buttonY + halfHeight;
+    float bottom = buttonY - halfHeight;
+
+    return (mouseX >= left && mouseX <= right &&
+        mouseY >= bottom && mouseY <= top);
+}

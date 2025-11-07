@@ -150,6 +150,10 @@ void GraphicsSystem::Initialize()
     shader.CompileLinkValidate({{GL_VERTEX_SHADER, "../Shaders/vertices.vert"},
                                 {GL_FRAGMENT_SHADER, "../Shaders/fragment.frag"}});
 
+    debugShader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/debug.vert"},
+                                {GL_FRAGMENT_SHADER, "../Shaders/debug.frag"} });
+    std::cout << "Debug shader compiled successfully\n\n\n\n" << std::endl;
+
     // Define vertex structure for a textured quad.
     struct Vertex
     {
@@ -561,11 +565,8 @@ void GraphicsSystem::DrawLine(const vec2 &start, const vec2 &end,
                               const vec4 &color, const mat4 &viewProjection)
 {
     // Tell shader this is a line draw
-    shader.SetUniform("uIsLine", 1);
-    shader.SetUniform("uColor", color);
-    shader.SetUniform("uHasTexture", 0);
-    shader.SetUniform("uIsCircle", 0);
-    shader.SetUniform("uUseBatching", 0);
+    debugShader.Use();
+    debugShader.SetUniform("uColor", color);
 
     // Define 2 vertices for the line
     vec3 verts[2] = {
@@ -586,7 +587,7 @@ void GraphicsSystem::DrawLine(const vec2 &start, const vec2 &end,
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 
     // Send MVP matrix
-    shader.SetUniform("uMVP", viewProjection);
+    debugShader.SetUniform("uMVP", viewProjection);
 
     // Draw the line
     glDrawArrays(GL_LINES, 0, 2);
@@ -601,10 +602,8 @@ void GraphicsSystem::DrawPoint(const vec2 &ppos,
                                const vec4 &color, const mat4 &viewProjection)
 {
     // Tell shader this is NOT a line
-    shader.SetUniform("uIsLine", 0);
-    shader.SetUniform("uIsCircle", 0); // keep consistent with line draw
-    shader.SetUniform("uColor", color);
-    shader.SetUniform("uHasTexture", 0);
+    debugShader.Use();
+    debugShader.SetUniform("uColor", color);
 
     // Position of the point (use vec3 to match shader input = vec3)
     vec3 pos = {ppos.x, ppos.y, 0.0f};
@@ -623,7 +622,7 @@ void GraphicsSystem::DrawPoint(const vec2 &ppos,
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 
     // Send MVP matrix
-    shader.SetUniform("uMVP", viewProjection);
+    debugShader.SetUniform("uMVP", viewProjection);
 
     // Make point visible (default = 1px, often too small)
     glPointSize(5.0f);
@@ -694,9 +693,9 @@ void GraphicsSystem::DrawBatches()
 
     shader.Use();
     shader.SetUniform("uUseBatching", 1);
-    shader.SetUniform("uIsLine", 0);
 
     glBindVertexArray(batchVAO);
+
 
     for (auto &batch : batches)
     {
