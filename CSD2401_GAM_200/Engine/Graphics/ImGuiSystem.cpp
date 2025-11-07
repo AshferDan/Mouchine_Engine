@@ -193,14 +193,14 @@ void ImGuiSystem::Update(float dt)
             CORE->GetGraphicsSystem()->SetEditorMode();
         // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
         {
-            ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
             ImGui::Begin("Game Viewport");
             ImVec2 viewportSize = ImGui::GetContentRegionAvail();
             CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
-            ImGui::Image((void*)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::Image((void*)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f));
 
             std::string testdata{};
             // dont rly wanna accept generic assets yet, because should accept those in specific scenarios like properties tab
