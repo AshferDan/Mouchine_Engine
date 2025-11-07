@@ -578,6 +578,7 @@ void DemoM1_SpawnGameObjects()
     std::uniform_int_distribution<int> distributionX(-960, 960);
     std::uniform_int_distribution<int> distributionY(-540, 540);
 
+    // THIS IS ANIMATED OBJECT FOR COMBI 1 WE JUST NEED A STATIC TEXTURE, STILL GOOD TO GET LOAD TEX ONCE THOUGH
     GLuint sharedTextureID = GraphicsSystem::LoadTexture("../Assets/Mouch_idle.png");
 
     // spawn 2.5k small circles
