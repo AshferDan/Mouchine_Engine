@@ -1,8 +1,10 @@
 /* Start Header ************************************************************************/
 /*!
 \file       audio.h
-\author     Leck Xin Yee [100% - 38 lines]
+\author     Leck Xin Yee [83% - 38 lines]
+			Lee Hwee Min [17% - 8 lines]
 \par        xinyee.leck@digipen.edu
+			l.hweemin@digipen.edu
 \date       October, 2, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -164,11 +166,19 @@ public:
 	 */
 	FMOD::System* GetFMODSystem() const { return system; }
 
+	/**
+	 * @brief Plays a sound when a PlaySoundMessage is received.
+	 * @param msg Contains the sound name to play.
+	 */
 	void HandleMessage(const PlaySoundMessage& msg) override {
 		std::cout << "[AudioEngine] Playing sound: " << msg.soundName << std::endl;
 		playSound(msg.soundName);
 	}
 
+	/**
+	 * @brief Pauses or resumes a sound when a PauseSoundMessage is received.
+	 * @param msg Contains the channel name and pause state.
+	 */
 	void HandleMessage(const PauseSoundMessage& msg) override {
 		std::cout << "[AudioEngine] Pausing sound: " << msg.channelName << std::endl;
 		pauseSound(msg.channelName, msg.pause);

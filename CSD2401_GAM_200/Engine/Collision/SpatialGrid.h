@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       SpatialGrid.h
-\author     Spatial Partitioning System
+\author     Khalil Belabadia [100% - 29 lines]
+\par        khalil.b@digipen.edu
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents

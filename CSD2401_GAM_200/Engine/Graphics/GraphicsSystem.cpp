@@ -2,6 +2,7 @@
 /*!
 \file       GraphicsSystem.cpp
 \author     Guan Shao Jun [85%]
+            Lee Hwee Min [ 1% - 8 lines]
 \par        shaojun.g@digipen.edu
 \date       November 07 2025
 

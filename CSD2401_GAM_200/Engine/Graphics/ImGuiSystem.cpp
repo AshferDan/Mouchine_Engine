@@ -247,113 +247,6 @@ void ImGuiSystem::Update(float dt)
             ShowLoadPrefabMenu = (!ShowLoadPrefabMenu) ? true : false;
         }
 
-        // Stress Test: Spawn 1000 GameObjects
-        static bool addCollidersLater = true;
-        static std::vector<GameObject*> stressObjects;
-        static int colliderIndex = 0;
-
-        const float spawnW = 16.f;
-        const float spawnH = 16.f;
-
-        if (ImGui::Button("Run Stress Test (1000 Objects)"))
-        {
-            auto& factory = GameObjectFactory::Instance();
-            auto& resourceMgr = ResourceManager::Instance();
-
-            stressObjects.clear();
-            colliderIndex = 0;
-
-            // Load the texture once, reuse for all obj
-            const std::string spritePath = "./Assets/protosprite.png";
-            const std::string textureKey = "stress_shared";
-
-            TextureResource* texRes = resourceMgr.GetTexture(textureKey);
-            if (!texRes)
-            {
-                if (!resourceMgr.LoadTexture(textureKey, spritePath))
-                {
-                    std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
-                    return;
-                }
-                texRes = resourceMgr.GetTexture(textureKey);
-            }
-
-            if (!texRes || !texRes->IsLoaded())
-            {
-                std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
-                return;
-            }
-
-            GLuint sharedTexID = texRes->GetTextureID();
-
-            // --- Spawn 1000 objects ---
-            for (int i = 0; i < 1001; ++i)
-            {
-                std::string objName = "StressObj_" + std::to_string(i);
-                GameObject* go = factory.CreateGameObject(objName);
-                stressObjects.push_back(go);
-
-                // --- Transform: random position ---
-                if (auto* t = go->AddComponent<TransformComponent>())
-                {
-                    float x = static_cast<float>(rand() % 1280) - 640;
-                    float y = static_cast<float>(rand() % 720) - 360;                 
-                    t->SetPosition(x, y);
-                    t->SetScale(spawnW, spawnH);
-                }
-
-                // --- RenderComponent (visiblility) ---
-                if (auto* render = go->AddComponent<RenderComponent>())
-                {
-                    render->SetTextureID(sharedTexID);
-                    render->SetTexturePath(spritePath);
-                    render->SetShapeType(RenderComponent::ShapeType::Square);
-                    render->SetColor({ 1.f, 1.f, 1.f, 1.f });
-                }
-            }
-
-            std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
-            addCollidersLater = true;
-        }
-
-        // --- Collider ---
-        if (addCollidersLater)
-        {
-            int batchPerFrame = 50; // add 50 colliders per frame
-
-            for (int i = 0; i < batchPerFrame && colliderIndex < static_cast<int>(stressObjects.size()); ++i, ++colliderIndex)
-            {
-                GameObject* go = stressObjects[colliderIndex];
-                if (go && !go->GetComponent<ColliderComponent>())
-                {
-                    go->AddComponent<ColliderComponent>(
-                        ColliderComponent::Type::Square,
-                        spawnW, spawnH,
-                        CollisionLayer::Enemy
-                    );
-                }
-
-                // --- Physics: random velocity ---
-                if (auto* p = go->AddComponent<PhysicsComponent>())
-                {
-                    float vx = static_cast<float>((rand() % 200) - 100);
-                    float vy = static_cast<float>((rand() % 200) - 100);
-                    p->SetVelocity(vx, vy);
-                    p->SetMass(1.0f);
-                    p->SetGrounded(false);
-                    p->SetGravity(true);
-                }
-            }
-
-            if (colliderIndex >= static_cast<int>(stressObjects.size()))
-            {
-                addCollidersLater = false;
-                colliderIndex = 0;
-                stressObjects.clear(); // clear tracking list
-                std::cout << "[STRESS TEST] All stress-test colliders added.\n";
-            }
-        }
-
         // Render Asset Browser things here!
         AssetBrowserWindow.RenderImGui();
 
@@ -641,6 +534,11 @@ void GOCreationMenu_Render()
         if (ImGui::Button("Generate")) // Button to create new GO
         {
             GOCreationMenu_Spawn();
+        }
+        ImGui::Text("  ");
+        if (ImGui::Button("Run Stress Test (1000 Objects)"))
+        {
+            StressTest_Spawn();
         }
     }
     ImGui::End(); // End of GO Creation
@@ -1803,6 +1701,124 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
     ImGui::End();
+}
+
+/**
+*@brief Stress Test Spawner
+*       Spawns 1000 GameObjects with Transform + Render + Velocity (Physics)
+**/
+void StressTest_Spawn() {
+    // Stress Test:
+    auto& factory = GameObjectFactory::Instance();
+    auto& resourceMgr = ResourceManager::Instance();
+
+    static std::vector<GameObject*> stressObjects;
+    stressObjects.reserve(1000);
+
+    const int totalObjects = 1000;
+    const float spawnW = 32.f;
+    const float spawnH = 32.f;
+
+    // Load the texture once, reuse for all obj
+    const std::string spritePath = "../Assets/protosprite.png";
+    const std::string textureKey = "stress_shared";
+
+    TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+    if (!texRes)
+    {
+        if (!resourceMgr.LoadTexture(textureKey, spritePath))
+        {
+            std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
+            return;
+        }
+        texRes = resourceMgr.GetTexture(textureKey);
+    }
+
+    if (!texRes || !texRes->IsLoaded())
+    {
+        std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
+        return;
+    }
+
+    GLuint sharedTexID = texRes->GetTextureID();
+
+    // --- Spawn 1000 objects ---
+    for (int i = 0; i < totalObjects; ++i)
+    {
+        std::string objName = "StressObj_" + std::to_string(i);
+        GameObject* go = factory.CreateGameObject(objName);
+        stressObjects.push_back(go);
+
+        // --- Transform: random position ---
+        if (auto* t = go->AddComponent<TransformComponent>())
+        {
+            float x = static_cast<float>(rand() % 1280) - 640;
+            float y = static_cast<float>(rand() % 720) - 360 - (i * 0.1f); // small offset to avoid stacking
+            t->SetPosition(x, y);
+            t->SetScale(spawnW, spawnH);
+        }
+
+        // --- RenderComponent (visiblility) ---
+        if (auto* render = go->AddComponent<RenderComponent>())
+        {
+            render->SetTextureID(sharedTexID);
+            render->SetTexturePath(spritePath);
+            render->SetShapeType(RenderComponent::ShapeType::Circle);
+            render->SetColor({ 1.f, 1.f, 1.f, 1.f });
+        }
+    }
+
+    std::cout << "[STRESS TEST] Spawned " << totalObjects
+        << " objects with Transform + Render.\n";
+
+    // --- Add Collider & Physics gradually to avoid frame freeze ---
+    static bool addCollidersLater = true;
+    static int colliderIndex = 0;
+    const int batchPerFrame = 50; // smaller batch = smoother
+
+    //--- Collider ---
+    if (addCollidersLater)
+    {
+        for (int i = 0; i < batchPerFrame && colliderIndex < totalObjects; ++i, ++colliderIndex)
+        {
+            GameObject* go = stressObjects[colliderIndex];
+
+            if (!go) continue;
+
+            // Collider
+            if (!go->GetComponent<ColliderComponent>())
+            {
+                go->AddComponent<ColliderComponent>(
+                    ColliderComponent::Type::Square,
+                    spawnW, spawnH,
+                    CollisionLayer::Enemy
+                );
+            }
+
+            // --- Physics: random velocity ---
+            if (auto* p = go->AddComponent<PhysicsComponent>())
+            {
+                float vx = static_cast<float>((rand() % 200) - 100);
+                float vy = static_cast<float>((rand() % 200) - 100);
+                if (vx == 0 && vy == 0)
+                    vx = (rand() % 2 == 0 ? 50.f : -50.f); // ensure nonzero
+
+                p->SetVelocity(vx, vy + 100.f); // small upward bias
+                p->SetMass(1.0f);
+                p->SetGrounded(false);
+                p->SetGravity(true);
+            }
+            
+        }
+
+        if (colliderIndex >= totalObjects)
+        {
+            addCollidersLater = false;
+            colliderIndex = 0;
+            stressObjects.clear(); // clear tracking list
+            std::cout << "[STRESS TEST] All stress-test colliders added.\n";
+        }
+    }
 }
 
 // get shape type name
