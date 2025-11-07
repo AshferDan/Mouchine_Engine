@@ -8,7 +8,7 @@ namespace GameScripts
     {
         private float redSquareX = -200.0f;
         private const float redSquareY = 300.0f;
-        private const float moveSpeed = 100.0f; // Speed in units per second
+        private const float moveSpeed = 100.0f;
 
         public void OnStart()
         {

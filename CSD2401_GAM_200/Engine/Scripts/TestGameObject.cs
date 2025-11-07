@@ -3,10 +3,15 @@ using GameEngine;
 namespace GameScripts
 {
     /// <summary>
-    /// Simple script that creates two static square objects on start
+    /// Simple script that creates two static square objects on start.
+    /// Demonstrates basic GameObject creation functionality.
     /// </summary>
     public class TestGameObjects
     {
+        /// <summary>
+        /// Called when the script is first initialized.
+        /// Creates two static squares (red and blue) for testing purposes.
+        /// </summary>
         public void OnStart()
         {
             Debug.Log("TwoSquaresSpawner: Creating two squares...");
@@ -40,11 +45,20 @@ namespace GameScripts
             Debug.Log("TwoSquaresSpawner: Two squares created successfully!");
         }
 
+        /// <summary>
+        /// Called every frame to update game logic.
+        /// This script has no update logic as the squares are static.
+        /// </summary>
+        /// <param name="deltaTime">The time elapsed since the last frame in seconds.</param>
         public void OnUpdate(float deltaTime)
         {
             // Nothing to update - squares are static
         }
 
+        /// <summary>
+        /// Called when the script is destroyed or the GameObject is removed.
+        /// Performs cleanup operations and logs a message.
+        /// </summary>
         public void OnDestroy()
         {
             Debug.Log("TwoSquaresSpawner: Cleaning up...");

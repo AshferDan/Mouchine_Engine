@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       ScriptingSystem.h
+\author     Jonathan Fam Qian Wei [100% - 102 lines]
+\par        Fam.q@digipen.edu
+\date       Novenber, 7, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+
 #pragma once
 
 #include "System.h"
@@ -10,6 +25,9 @@
 
 class GameObject;
 
+/**
+ * @brief Represents a C# script class loaded from a Mono assembly.
+ */
 struct ScriptClass {
     MonoClass* monoClass = nullptr;
     MonoMethod* constructor = nullptr;
@@ -18,12 +36,18 @@ struct ScriptClass {
     MonoMethod* onDestroy = nullptr;
 };
 
+/**
+ * @brief Represents an instance of a script attached to a GameObject.
+ */
 struct ScriptInstance {
     MonoObject* instance = nullptr;
     ScriptClass* scriptClass = nullptr;
     uint32_t gcHandle = 0;
 };
 
+/**
+ * @brief System responsible for managing C# scripting integration using Mono.
+ */
 class ScriptSystem : public ISystem {
 private:
     MonoDomain* rootDomain = nullptr;
@@ -37,38 +61,107 @@ private:
     // Map GameObject to their script instances
     std::unordered_map<GameObject*, std::vector<ScriptInstance>> gameObjectScripts;
 
-    // Helper methods
+    /**
+     * @brief Loads a Mono assembly from a file path.
+     * @param filepath The path to the assembly DLL file.
+     * @return A pointer to the loaded MonoAssembly, or nullptr on failure.
+     */
     MonoAssembly* LoadAssembly(const std::string& filepath);
+    
+    /**
+     * @brief Retrieves a class from a Mono assembly by namespace and class name.
+     * @param assembly The Mono assembly to search in.
+     * @param namespaceName The namespace of the class.
+     * @param className The name of the class.
+     * @return A pointer to the MonoClass, or nullptr if not found.
+     */
     MonoClass* GetClassInAssembly(MonoAssembly* assembly, const char* namespaceName, const char* className);
+    
+    /**
+     * @brief Creates an instance of a Mono class.
+     * @param monoClass The Mono class to instantiate.
+     * @return A pointer to the created MonoObject, or nullptr on failure.
+     */
     MonoObject* InstantiateClass(MonoClass* monoClass);
+    
+    /**
+     * @brief Registers internal C++ function calls that can be invoked from C# scripts.
+     */
     void RegisterInternalCalls();
 
 public:
+    /**
+     * @brief Destructor that cleans up Mono resources.
+     */
     ~ScriptSystem() override;
 
+    /**
+     * @brief Initializes the scripting system and Mono runtime.
+     */
     void Initialize() override;
+    
+    /**
+     * @brief Shuts down the scripting system and cleans up Mono domains.
+     */
     void Shutdown();
 
+    /**
+     * @brief Gets the name of this system.
+     * @return The system name as a string.
+     */
     std::string GetName() override {
         return "ScriptingSystem";
     }
 
+    /**
+     * @brief Updates all script instances, calling OnUpdate methods.
+     * @param deltaTime The time elapsed since the last frame.
+     */
     void Update(float deltaTime) override;
 
-    // Load C# assembly
+    /**
+     * @brief Loads a C# script assembly from a file.
+     * @param filepath The path to the assembly DLL file.
+     * @return True if the assembly was loaded successfully, false otherwise.
+     */
     bool LoadScriptAssembly(const std::string& filepath);
 
-    // Attach script to GameObject
+    /**
+     * @brief Attaches a script to a GameObject by class name.
+     * @param gameObject The GameObject to attach the script to.
+     * @param scriptClassName The fully qualified name of the script class (namespace.classname).
+     * @return True if the script was attached successfully, false otherwise.
+     */
     bool AttachScript(GameObject* gameObject, const std::string& scriptClassName);
 
-    // Remove script from GameObject
+    /**
+     * @brief Removes a script from a GameObject.
+     * @param gameObject The GameObject to remove the script from.
+     * @param scriptClassName The name of the script class to remove.
+     */
     void RemoveScript(GameObject* gameObject, const std::string& scriptClassName);
 
-    // Call script methods
+    /**
+     * @brief Calls the OnStart method for all scripts attached to a GameObject.
+     * @param gameObject The GameObject whose scripts should have OnStart called.
+     */
     void CallOnStart(GameObject* gameObject);
+    
+    /**
+     * @brief Calls the OnUpdate method for all scripts attached to a GameObject.
+     * @param gameObject The GameObject whose scripts should have OnUpdate called.
+     * @param deltaTime The time elapsed since the last frame.
+     */
     void CallOnUpdate(GameObject* gameObject, float deltaTime);
+    
+    /**
+     * @brief Calls the OnDestroy method for all scripts attached to a GameObject.
+     * @param gameObject The GameObject whose scripts should have OnDestroy called.
+     */
     void CallOnDestroy(GameObject* gameObject);
 
-    // Reload scripts (hot reload)
+    /**
+     * @brief Reloads the script assembly, enabling hot reload functionality.
+     */
     void ReloadScriptAssembly();
 };
