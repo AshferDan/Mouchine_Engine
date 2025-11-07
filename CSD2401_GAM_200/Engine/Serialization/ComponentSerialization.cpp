@@ -160,7 +160,8 @@ void ComponentSerialization::DeserializeTransform(const json& j, GameObject* go)
     if (Serialization::Prefab_DragAndDropped)
     {
         std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
-        tc->SetPosition(ImGui::GetCursorPosX(), ImGui::GetCursorPosY());
+        tc->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
+        std::cout << "CREATED AT " << "(" << viewportCursorPos.x << ", " << viewportCursorPos.y << ")\n";
     }
     else
     {

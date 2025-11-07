@@ -239,7 +239,7 @@ public:
      * @brief Sets the active state of the GameObject.
      * @param active If true, the GameObject is active; otherwise, it's inactive.
      */
-    void SetActive(bool active) { isActive = active; }
+    void SetActive(bool active);
 
     /**
      * @brief Checks if the GameObject is currently active.

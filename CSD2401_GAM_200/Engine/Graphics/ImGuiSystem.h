@@ -93,8 +93,18 @@ public:
      */
     std::string GetName() override;
 
+    /**
+     * @brief Render the hierarchy, also handles logic
+     */
     void Hierarchy_Render();
 
+    /**
+     * @brief Specifically renders the parent and child part of the hierarchy
+     * @param obj                   ptr to specified GO
+     * @param depth                 how many layers (into the child->grandchildren etc) are we in (for indentation)
+     * @param selectedGameObjectID  ID of selected GO
+     * @param factory               Reference to factory
+     */
     void Hierarchy_GameObjectTree_Renderer(GameObject* obj, int depth, EntityID& selectedGameObjectID, GameObjectFactory& factory);
 
     ///**
@@ -122,8 +132,15 @@ public:
      */
     void SetSelectedGameObject(EntityID id);
 
-    // Property Manager
+    /**
+     * @brief Renders the property editor window. Also handles logic regarding which GO is selected and how to manipulate components
+     */
     void RenderPropertyEditor();
+
+    /**
+     * @brief Function that handles logic of clicking on a GO in the viewport, to select. Also handles logic for drag and dropping to move the GOs around
+     */
+    void Viewport_ClickToSelect();
 
 private:
     /**
@@ -149,14 +166,36 @@ private:
     std::filesystem::path currentDir;
 };
 
+/**
+ * @brief Gets the cursor pos with respect to the viewport's and world's coordinates. Externed for other files to access
+ */
+extern ImVec2 viewportCursorPos;
+
+extern bool isHoveringOverViewport;
+
+/**
+ * @brief Renders performance profiler
+ */
 void Profiler_Render();
 
+/**
+ * @brief Renders Game object creation menu
+ */
 void GOCreationMenu_Render();
 
+/**
+ * @brief Spawns specified GO in menu ^
+ */
 void GOCreationMenu_Spawn();
 
+/**
+ * @brief Render prefab spawn menu
+ */
 void PrefabMenu_Render();
 
+/**
+ * @brief Spawns specified prefab in menu ^
+ */
 void PrefabMenu_Spawn();
 
 void StressTest_Spawn();
@@ -171,21 +210,51 @@ template <typename DataType>
 void SendDragAndDrop(std::string const& PayloadID, DataType const& dataToSend, std::string const& displayText);
 void SendDragAndDrop(std::string const& PayloadID, std::string const& dataToSend, std::string const& displayText);
 
+
+///**
+// * @brief Wrapper to handle the receiving of drag and drop payloads
+// * @param PayloadID       ID of payload
+// * @param dataToReceive   data expecting to receive upon match with id
+// */
 void ReceiveDragAndDrop(std::string const& PayloadID, std::string& dataToReceive);
 
-void CompletedDragAndDrop();
-
+/**
+ * @brief Renders the top menu tool bar
+ */
 void TopMenuBar_Render();
 
-void EditorLayout_SaveScene(std::string const& fileName);
+/**
+ * @brief Saves current layout of imgui with specified file name
+ */
+void EditorLayout_SaveLayout(std::string const& fileName);
 
-void EditorLayout_LoadScene(std::string const& fileName);
+/**
+ * @brief Loads current layout of imgui with specified file name
+ */
+void EditorLayout_LoadLayout(std::string const& fileName);
 
+/**
+ * @brief Refreshes vector of imgui layouts
+ */
 void EditorLayout_Refresh();
 
+/**
+ * @brief Renders pop up for saving current layout
+ */
 void EditorLayout_SaveNamePopUp();
 
+/**
+ * @brief Renders pop up for loading layouts
+ */
 void EditorLayout_LoadPopUp();
 
-
+/**
+ * @brief Wrapper to create hits when hovering over something
+ * @param displayText     text to display when hovering
+ */
 void CreateHintText(std::string const& displayText);
+
+/**
+ * @brief Handles the management of the spawning 1000 Gos
+ */
+void M2_RenderStressTest();
