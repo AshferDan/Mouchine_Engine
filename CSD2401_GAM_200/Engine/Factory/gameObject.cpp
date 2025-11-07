@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       gameObject.cpp
-\author     Jonathan Fam Qian Wei [100% - 42 lines]
+\author     Jonathan Fam Qian Wei [73% - 68 lines]
+\co-author	Muhammad Ashfer [27% - 25 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 

@@ -1,8 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       audio.h
-\author     Leck Xin Yee [83% - 56 lines]  
-			Lee Hwee Min [17% - 8 lines]
+\author     Leck Xin Yee [80% - 52 lines]  
+			Lee Hwee Min [20% - 8 lines]
 \par        xinyee.leck@digipen.edu
 			l.hweemin@digipen.edu
 \date       October, 2, 2025

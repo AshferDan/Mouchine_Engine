@@ -1,9 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ImGuiSystem.cpp
-\author     Guan Shao Jun [25%]
-\co-author	Muhammad Ashfer [66% - 140 lines]
-            Hwee Min [9% - 25 lines]
+\author     Guan Shao Jun [17% - 200 lines]
+\co-author	Muhammad Ashfer [76% - 1049 lines]
+            Hwee Min [7% - 82 lines]
 \par        shaojun.g@digipen.edu,
 \date       October 02 2025
 
