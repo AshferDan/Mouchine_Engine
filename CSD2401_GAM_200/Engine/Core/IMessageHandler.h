@@ -27,7 +27,7 @@ public:
      * @brief Default handler for unrecognized or generic message types.
      * @param msg Reference to a generic Message object.
      */
-    virtual void HandleMessage(const Message &msg)
+    virtual void HandleMessage(const Message &)
     {
         std::cout << "[IMessageHandler] Unhandled message.\n";
     }

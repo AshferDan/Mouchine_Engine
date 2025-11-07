@@ -96,7 +96,7 @@ GameObject *GameObjectFactory::CreateEmptyGO(const std::string &name, float x, f
     GameObject *obj = CreateGameObject(name);
 
     auto *transform = obj->AddComponent<TransformComponent>(x, y);
-    auto *physics = obj->AddComponent<PhysicsComponent>(0, 0);
+    auto *physics = obj->AddComponent<PhysicsComponent>(0.0f, false);
 
     return obj;
 }

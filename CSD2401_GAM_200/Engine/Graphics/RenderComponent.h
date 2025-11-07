@@ -165,7 +165,10 @@ public:
             return "Line";
         case static_cast<int>(ShapeType::Point):
             return "Point";
+        default:
+            return "Square";
         }
+
     }
 
     int GetLayer() const { return layer; };
