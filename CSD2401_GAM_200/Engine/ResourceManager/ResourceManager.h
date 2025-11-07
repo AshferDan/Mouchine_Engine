@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ResourceManager.h
-\author     Leck Xin Yee [100% - 83 lines]
+\author     Leck Xin Yee [100% - 130 lines]
 \par        xinyee.leck@digipen.edu
 \date       October, 2, 2025
 
@@ -193,38 +193,58 @@ private:
  */
 class FontResource : public Resource {
 public:
-    // cnstructs font resource 
+    /**
+     * @brief Constructor - initialise font resource
+     */
     FontResource() : fontSize(0) {}
 
-    // destructs the font resource and unloads font data
+    /**
+     * @brief Destructor - unload font resource
+     */
     ~FontResource() override;
 
-    // loads a font from a file using FreeType
+    /**
+     * @brief Load font using FreeType
+     */
     bool Load(const std::string& filepath) override;
 
-    // loads a font with a specific size
+    /**
+     * @brief Load font with specified size
+     */
     bool Load(const std::string& filepath, GLuint size);
 
-    // unloads the font and deletes all character textures
+    /**
+     * @brief Unload font and glyph data
+     */
     void Unload() override;
 
-    // checks if the font is currently loaded
+    /**
+     * @brief Check if font is loaded
+     */
     bool IsLoaded() const override { return loaded; }
 
-    // gets the map of loaded character glyphs
+    /**
+     * @brief Get character glyph map
+     */
     const std::map<char, Character>& GetCharacters() const { return characters; }
 
-    // gets the font size
+    /**
+     * @brief Get font size
+     */
     GLuint GetFontSize() const { return fontSize; }
 
-    // sets the font size (requires reload to take effect)
+    /**
+     * @brief Set font size
+     */
     void SetFontSize(GLuint size) { fontSize = size; }
 
 private:
     std::map<char, Character> characters;
     GLuint fontSize;
 
-    // loads all ASCII characters (0-127) from the font
+    /**
+     * @brief Load ASCII characters (0-127)
+     */
     void LoadCharacters(FT_Face face);
 };
 
@@ -309,13 +329,26 @@ public:
      */
     AudioEngine* GetAudioEngine() const { return audioEngine; }
 
-    // loads a font resource
+    /**
+     * @brief Loads a font resource
+     * @param name Identifier for the font
+     * @param filepath Path to the font file
+     * @param fontSize Font size to load
+     * @return Pointer to the loaded FontResource, or nullptr if failed
+     */
     FontResource* LoadFont(const std::string& name, const std::string& filepath, GLuint fontSize);
 
-    // retrieves a loaded font resource
+    /**
+     * @brief Retrieves a loaded font resource
+     * @param name Identifier of the font
+     * @return Pointer to the FontResource, or nullptr if not found
+     */
     FontResource* GetFont(const std::string& name);
 
-    // unloads a specific font resource
+    /**
+     * @brief Unloads a specific font resource
+     * @param name Identifier of the font to unload
+     */
     void UnloadFont(const std::string& name);
 
     /**
@@ -333,7 +366,9 @@ public:
      */
     void UnloadAllAudio();
 
-    // unloads all font resources
+    /**
+     * @brief Unloads all font resources
+     */
     void UnloadAllFonts();
 
     /**
@@ -348,7 +383,10 @@ public:
      */
     size_t GetAudioCount() const { return audioResources.size(); }
 
-    // gets the count of loaded fonts
+    /**
+     * @brief Gets the count of loaded font resources
+     * @return Number of loaded font resources
+     */
     size_t GetFontCount() const { return fonts.size(); }
 
     /**
@@ -371,13 +409,21 @@ private:
     FT_Library ftLibrary = nullptr;
     int ftRefCount = 0;
 
-    // initialises FreeType library if not already initialized
+    /**
+     * @brief Initialises the FreeType library if not already initialised
+     * @return True if initialisation succeeded, false otherwise
+     */
     bool InitialiseFreeType();
 
-    // shuts down FreeType library if no fonts are using it
+    /**
+     * @brief Shuts down the FreeType library if no fonts are using it
+     */
     void ShutdownFreeType();
 
-    // gets the FreeType library instance
+    /**
+     * @brief Gets the FreeType library instance
+     * @return Pointer to the FreeType library instance
+     */
     FT_Library GetFreeTypeLibrary() const { return ftLibrary; }
 
     /**

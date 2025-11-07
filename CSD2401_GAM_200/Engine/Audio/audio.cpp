@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       audio.cpp
-\author     Leck Xin Yee [100% - 183 lines]
+\author     Leck Xin Yee [100% - 191 lines]
 \par        xinyee.leck@digipen.edu
 \date       October, 2, 2025
 
@@ -220,13 +220,6 @@ void AudioEngine::pauseSound(const std::string& channelName, bool pause) {
 		std::cout << (pause ? "paused" : "playing") << channelName << std::endl;
 	}
 }
-
-/*
-bool AudioEngine::eventPlaying(const std::string& eventName) {
-	// to be implemented when theres 'events'
-	return isPlaying(eventName);
-}
-*/
 
 // Volume and effects controls
 /**

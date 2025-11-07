@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       audio.h
-\author     Leck Xin Yee [100% - 38 lines]
+\author     Leck Xin Yee [100% - 56 lines]
 \par        xinyee.leck@digipen.edu
 \date       October, 2, 2025
 
@@ -164,11 +164,17 @@ public:
 	 */
 	FMOD::System* GetFMODSystem() const { return system; }
 
+	/**
+	 * @brief Handles PlaySound messages
+	 */
 	void HandleMessage(const PlaySoundMessage& msg) override {
 		std::cout << "[AudioEngine] Playing sound: " << msg.soundName << std::endl;
 		playSound(msg.soundName);
 	}
 
+	/**
+	 * @brief Handles PauseSound messages
+	 */
 	void HandleMessage(const PauseSoundMessage& msg) override {
 		std::cout << "[AudioEngine] Pausing sound: " << msg.channelName << std::endl;
 		pauseSound(msg.channelName, msg.pause);
