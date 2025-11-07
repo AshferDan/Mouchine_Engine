@@ -1341,14 +1341,17 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
         }
     }
 
-    // mouse wheel zoom
-    if (io.MouseWheel != 0.0f) {
-        float zoomDelta = io.MouseWheel * zoomSpeed;
-        cameraZoom += zoomDelta;
+    if (isHoveringOverViewport)
+    {
+        // mouse wheel zoom
+        if (io.MouseWheel != 0.0f) {
+            float zoomDelta = io.MouseWheel * zoomSpeed;
+            cameraZoom += zoomDelta;
 
-        // clamp zoom to min/max
-        if (cameraZoom < minZoom) cameraZoom = minZoom;
-        if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+            // clamp zoom to min/max
+            if (cameraZoom < minZoom) cameraZoom = minZoom;
+            if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+        }
     }
 }
 

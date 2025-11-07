@@ -171,6 +171,8 @@ private:
  */
 extern ImVec2 viewportCursorPos;
 
+extern bool isHoveringOverViewport;
+
 /**
  * @brief Renders performance profiler
  */

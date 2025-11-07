@@ -81,6 +81,8 @@ static bool openLayoutLoadPopup = false;
 static bool saveNamePopupClear = false;
 static bool renderLoadedLayout = false;
 
+bool isHoveringOverViewport;
+
 // Vars for asset manager interface
 const float paddingSize = 16.f;
 const float cellSize = icon_size.x + paddingSize;
@@ -193,60 +195,66 @@ void ImGuiSystem::Update(float dt)
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
 
+        TopMenuBar_Render();
+
         LevelEditor* levelEditor = CORE->GetLevelEditor();
         bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
 
         if (!isPlaying)
         {
             CORE->GetGraphicsSystem()->SetEditorMode(true);
-        // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
-        {
-            ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
-
-            ImGui::Begin("Game Viewport");
-            ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
-            CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
-
-            ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
-            ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport rendering
-
-            // If hovering over viewport, you can click to select a GO
-            // TODO implement outline for selected GO
-            if (ImGui::IsItemHovered())
+            // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
             {
-                Viewport_ClickToSelect();
+                ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
+                ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
+
+                ImGui::Begin("Game Viewport");
+                ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
+                CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
+
+                ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
+                ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport rendering
+
+                // If hovering over viewport, you can click to select a GO
+                // TODO implement outline for selected GO
+                if (ImGui::IsItemHovered())
+                {
+                    Viewport_ClickToSelect();
+                    isHoveringOverViewport = true;
+                }
+                else
+                {
+                    isHoveringOverViewport = false;
+                }
+
+                std::string testdata{};
+                // Viewport accepts Prefabs for drag and drop
+                ReceiveDragAndDrop(PrefabPayloadID, testdata);
+                //ReceiveDragAndDrop(ScenePayloadID, testdata);                 // TODO drag and drop scene to load saved scene
+                if (!testdata.empty())
+                {
+                    // filter for type of data here
+                    std::cout << testdata << std::endl;                         // Prints the data sent via drag and drop
+                    Serialization::LoadPrefab(testdata);
+                }
+
+                // Get cursor position relative to the image
+                ImVec2 cursorScreenPos = ImGui::GetMousePos();
+                ImVec2 itemScreenPos = ImGui::GetItemRectMin();
+
+                // Takes cursor position - converts it to viewport space that translates to world space too [centre of screen is (0,0)]
+                // TODO Currently does not take into account camera zoom
+                viewportCursorPos = ImVec2(
+                    cursorScreenPos.x - itemScreenPos.x - (viewportSize.x / 2.f),
+                    (viewportSize.y / 2.f) - (cursorScreenPos.y - itemScreenPos.y));
+
+                ImGui::Text("Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
+                ImGui::End();
             }
 
-            std::string testdata{};
-            // Viewport accepts Prefabs for drag and drop
-            ReceiveDragAndDrop(PrefabPayloadID, testdata);
-            //ReceiveDragAndDrop(ScenePayloadID, testdata);                 // TODO drag and drop scene to load saved scene
-            if (!testdata.empty())
-            {
-                // filter for type of data here
-                std::cout << testdata << std::endl;                         // Prints the data sent via drag and drop
-                Serialization::LoadPrefab(testdata);
-            }
-
-            // Get cursor position relative to the image
-            ImVec2 cursorScreenPos = ImGui::GetMousePos();
-            ImVec2 itemScreenPos = ImGui::GetItemRectMin();
-
-            // Takes cursor position - converts it to viewport space that translates to world space too [centre of screen is (0,0)]
-            // TODO Currently does not take into account camera zoom
-            viewportCursorPos = ImVec2(
-                cursorScreenPos.x - itemScreenPos.x - (viewportSize.x / 2.f),
-                (viewportSize.y / 2.f) - (cursorScreenPos.y - itemScreenPos.y));
-
-            ImGui::Text("Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
-            ImGui::End();
-        }
-
-        // Only show editor UI when not in play mode
-
-            TopMenuBar_Render();
+            // Only show editor UI when not in play mode
             Hierarchy_Render();
+            AssetBrowserWindow.RenderImGui();
 
             // render property editor for selected game object
             if (showPropertyEditor)
@@ -544,7 +552,10 @@ void ImGuiSystem::Hierarchy_Render()
     }
 
     // dear god help us all
-    M2_RenderStressTest();
+    if (ImGui::Button("Stress Test - 1000 GOs"))
+    {
+        M2_RenderStressTest();
+    }
 
     // display current scene name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
@@ -1539,84 +1550,85 @@ void ImGuiSystem::RenderPropertyEditor()
  */
 void M2_RenderStressTest()
 {
-    // Stress Test: Spawn 1000 GameObjects
-    static bool addCollidersLater = true;
+    // Stress Test:
+    auto& factory = GameObjectFactory::Instance();
+    auto& resourceMgr = ResourceManager::Instance();
+
     static std::vector<GameObject*> stressObjects;
-    static int colliderIndex = 0;
+    stressObjects.reserve(1000);
 
-    const float spawnW = 16.f;
-    const float spawnH = 16.f;
+    const int totalObjects = 1000;
+    const float spawnW = 32.f;
+    const float spawnH = 32.f;
 
-    if (ImGui::Button("Run Stress Test (1000 Objects)"))
+    // Load the texture once, reuse for all obj
+    const std::string spritePath = "../Assets/protosprite.png";
+    const std::string textureKey = "stress_shared";
+
+    TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+    if (!texRes)
     {
-        auto& factory = GameObjectFactory::Instance();
-        auto& resourceMgr = ResourceManager::Instance();
-
-        stressObjects.clear();
-        colliderIndex = 0;
-
-        // Load the texture once, reuse for all obj
-        const std::string spritePath = "../Assets/protosprite.png";
-        const std::string textureKey = "stress_shared";
-
-        TextureResource* texRes = resourceMgr.GetTexture(textureKey);
-        if (!texRes)
+        if (!resourceMgr.LoadTexture(textureKey, spritePath))
         {
-            if (!resourceMgr.LoadTexture(textureKey, spritePath))
-            {
-                std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
-                return;
-            }
-            texRes = resourceMgr.GetTexture(textureKey);
-        }
-
-        if (!texRes || !texRes->IsLoaded())
-        {
-            std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
+            std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
             return;
         }
-
-        GLuint sharedTexID = texRes->GetTextureID();
-
-        // --- Spawn 1000 objects ---
-        for (int i = 0; i < 1001; ++i)
-        {
-            std::string objName = "StressObj_" + std::to_string(i);
-            GameObject* go = factory.CreateGameObject(objName);
-            stressObjects.push_back(go);
-
-            // --- Transform: random position ---
-            if (auto* t = go->AddComponent<TransformComponent>())
-            {
-                float x = static_cast<float>(rand() % 1280) - 640;
-                float y = static_cast<float>(rand() % 720) - 360;
-                t->SetPosition(x, y);
-                t->SetScale(spawnW, spawnH);
-            }
-
-            // --- RenderComponent (visiblility) ---
-            if (auto* render = go->AddComponent<RenderComponent>())
-            {
-                render->SetTextureID(sharedTexID);
-                render->SetTexturePath(spritePath);
-                render->SetShapeType(RenderComponent::ShapeType::Square);
-                render->SetColor({ 1.f, 1.f, 1.f, 1.f });
-            }
-        }
-
-        std::cout << "[STRESS TEST] Spawned 1000 game objects with Transform + Physics + Spritesheet.\n";
-        addCollidersLater = true;
+        texRes = resourceMgr.GetTexture(textureKey);
     }
 
-    // --- Collider ---
+    if (!texRes || !texRes->IsLoaded())
+    {
+        std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
+        return;
+    }
+
+    GLuint sharedTexID = texRes->GetTextureID();
+
+    // --- Spawn 1000 objects ---
+    for (int i = 0; i < totalObjects; ++i)
+    {
+        std::string objName = "StressObj_" + std::to_string(i);
+        GameObject* go = factory.CreateGameObject(objName);
+        stressObjects.push_back(go);
+
+        // --- Transform: random position ---
+        if (auto* t = go->AddComponent<TransformComponent>())
+        {
+            float x = static_cast<float>(rand() % 1280) - 640;
+            float y = static_cast<float>(rand() % 720) - 360 - (i * 0.1f); // small offset to avoid stacking
+            t->SetPosition(x, y);
+            t->SetScale(spawnW, spawnH);
+        }
+
+        // --- RenderComponent (visiblility) ---
+        if (auto* render = go->AddComponent<RenderComponent>())
+        {
+            render->SetTextureID(sharedTexID);
+            render->SetTexturePath(spritePath);
+            render->SetShapeType(RenderComponent::ShapeType::Circle);
+            render->SetColor({ 1.f, 1.f, 1.f, 1.f });
+        }
+    }
+
+    std::cout << "[STRESS TEST] Spawned " << totalObjects
+        << " objects with Transform + Render.\n";
+
+    // --- Add Collider & Physics gradually to avoid frame freeze ---
+    static bool addCollidersLater = true;
+    static int colliderIndex = 0;
+    const int batchPerFrame = 50; // smaller batch = smoother
+
+    //--- Collider ---
     if (addCollidersLater)
     {
-        int batchPerFrame = 50; // add 50 colliders per frame
-
-        for (int i = 0; i < batchPerFrame && colliderIndex < static_cast<int>(stressObjects.size()); ++i, ++colliderIndex)
+        for (int i = 0; i < batchPerFrame && colliderIndex < totalObjects; ++i, ++colliderIndex)
         {
             GameObject* go = stressObjects[colliderIndex];
-            if (go && !go->GetComponent<ColliderComponent>())
+
+            if (!go) continue;
+
+            // Collider
+            if (!go->GetComponent<ColliderComponent>())
             {
                 go->AddComponent<ColliderComponent>(
                     ColliderComponent::Type::Square,
@@ -1638,7 +1650,7 @@ void M2_RenderStressTest()
                 p->SetGrounded(false);
                 p->SetGravity(true);
             }
-            
+
         }
 
         if (colliderIndex >= totalObjects)
@@ -1649,10 +1661,9 @@ void M2_RenderStressTest()
             std::cout << "[STRESS TEST] All stress-test colliders added.\n";
         }
     }
-
-    // Render Asset Browser things here!
-    AssetBrowserWindow.RenderImGui();
 }
+
+
 
 // Helpers
 /**
