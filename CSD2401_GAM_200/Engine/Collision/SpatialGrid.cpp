@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       SpatialGrid.cpp
-\author     Spatial Partitioning System
+\author     Khalil Belabadia [100% - 89 lines]
+\par        khalil.b@digipen.edu
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -134,7 +135,7 @@ std::vector<GameObject*> SpatialGrid::Query(GameObject* obj, ColliderComponent* 
 }
 
 /**
- * @brief Calculates statistics about grid usage
+ * @brief Calculates statistics about grid usage for debugging and choosing right value
  */
 void SpatialGrid::GetStats(float& avgObjectsPerCell, int& maxObjectsInCell, int& occupiedCells) const {
     occupiedCells = 0;
