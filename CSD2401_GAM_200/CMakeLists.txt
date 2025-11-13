@@ -241,6 +241,7 @@ target_link_libraries(Engine PUBLIC
     imgui
     freetype
     stb_image
+    imguizmo
 )
 
 # Link FMOD if available

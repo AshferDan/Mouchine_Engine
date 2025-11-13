@@ -111,6 +111,34 @@ macro(import_imgui)
     endif()
 endmacro()
 
+macro(import_imguizmo)  
+    if(NOT TARGET imguizmo)
+        message(STATUS " Configuring Imguizmo...")
+        FetchContent_Declare(
+            imguizmo
+            GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
+            GIT_TAG master
+            GIT_SHALLOW TRUE
+        )
+        FetchContent_MakeAvailable(imguizmo)
+
+      
+        add_library(imguizmo STATIC
+            ${imguizmo_SOURCE_DIR}/ImGuizmo.cpp
+        )
+        
+        target_include_directories(imguizmo PUBLIC
+            ${imguizmo_SOURCE_DIR}
+        )
+        
+        target_link_libraries(imguizmo PUBLIC imgui)
+
+        message(STATUS "✓ Imguizmo configured")
+    endif()
+endmacro()
+
+
+
 # ======================= FreeType ======================
 macro(import_freetype)
     if(NOT TARGET freetype)
@@ -261,6 +289,7 @@ macro(importDependencies)
     import_glm()
     import_json()
     import_imgui()
+    import_imguizmo()
     import_freetype()
     import_stb_image()
     import_fmod()
