@@ -304,3 +304,32 @@ void Serialization::RenamePrefab(std::string const &oldName, std::string const &
 
 	std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
 }
+
+/**
+* @brief Use full filepath name! Simply checks if file stream is valid & readable.
+*		 Nvm just found out that ifstream automatically closes fstreams but if u ever want to use this its here i guess
+*/
+const bool Serialization::IsStreamGood(std::string const& fullFilePath)
+{
+	// literally just checks if file is readable and closes filestreams properly.
+	std::ifstream ifs(fullFilePath);
+	if (ifs.good())
+	{
+		std::cout << "filepath: " << fullFilePath << " is good.\n";
+		ifs.close();
+		return true;
+	}
+	else
+	{
+		ifs.close();
+		if (std::filesystem::exists(fullFilePath))
+		{
+			std::cout << "WARNING - unable to open: " << fullFilePath << " . Check file type.\n";
+		}
+		else
+		{
+			std::cout << "WARNING - filepath: " << fullFilePath << " DOES NOT EXIST! Check filepath name.\n";
+		}
+		return false;
+	}
+}

@@ -74,5 +74,13 @@ namespace Serialization
     */
     void RenamePrefab(std::string const& oldName, std::string const& newName);
 
+    /**
+    * @brief Use full filepath name! Simply checks if file stream is valid & readable.
+    */
+    const bool IsStreamGood(std::string const& fullFilePath);
+
+    /**
+    * @brief Extern bool for checking if a something is currently being dragged and dropped. For DND from asset browser to viewport.
+    */
     extern bool Prefab_DragAndDropped;
 }
