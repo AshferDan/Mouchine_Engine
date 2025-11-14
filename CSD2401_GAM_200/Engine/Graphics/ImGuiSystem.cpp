@@ -74,6 +74,12 @@ static bool prefab_renameFocus = false;
 char rename_str[128]{""};
 std::string prefab_oldname{};
 
+// HIERARCHY VARS
+static int hierarchy_renameIndex = -1;
+static bool hierarchy_renameFocus = false;
+char hierarchy_rename_str[128]{ "" };
+std::string hierarchy_oldname{};
+
 // STATIC BOOL FLAGS
 static bool greyOutGOSettings = false;
 static bool openLayoutSavePopup = false;
@@ -604,11 +610,51 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
     EntityID id = obj->GetID();
 
-    // Apply indentation based on depth
-    ImGui::Indent(depth * 10.0f);
-
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+
+    // Apply indentation based on depth
+    ImGui::Indent(depth * 10.0f);
+    bool nodeOpen{};
+
+    // if renaming, set the name of the tree node as an input text field
+    if (hierarchy_renameIndex == id)
+    {
+        ImGui::PushID(id);
+        ImGuiTreeNodeFlags nameFlags = flags | ImGuiTreeNodeFlags_Leaf;
+
+        nodeOpen = ImGui::TreeNodeEx("##RenamingNode", nameFlags);
+        ImGui::SameLine();
+        if (hierarchy_renameFocus)
+        {
+            ImGui::SetKeyboardFocusHere();
+            hierarchy_renameFocus = false;
+        }
+        if (ImGui::InputText("##", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        {
+            GetSelectedGameObject()->SetName(std::string(rename_str));
+            hierarchy_renameIndex = -1;
+        }
+
+        // if (ImGui::IsKeyPressed(ImGuiKey_Escape))          //supposed to be escape but it closes the whole game LMAO
+        if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+        {
+            GetSelectedGameObject()->SetName(std::string(rename_str));
+            hierarchy_renameIndex = -1;
+        }
+
+        ImGui::PopID();
+    }
+    else
+    {
+        // Display the tree node
+        nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
+    }
+
+    if (!ImGui::IsItemFocused() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        hierarchy_renameIndex = -1;
+    }
 
     // If has children, make it expandable
     if (obj->GetAllChildren().empty())
@@ -625,9 +671,6 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     {
         ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
     }
-
-    // Display the tree node
-    bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
 
     if (!obj->IsActive())
     {
@@ -688,9 +731,18 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     // Right Click event (for specific GO in hierarchy)
     if (ImGui::BeginPopupContextItem())
     {
+        selectedGameObjectID = id;                                          // right click auto selects them, but sure let them click select also 
         if (ImGui::MenuItem("Select"))
         {
             selectedGameObjectID = id;
+        }
+        if (ImGui::MenuItem("Rename"))
+        {
+            // rename shiz here
+            hierarchy_renameIndex = id;
+            strncpy(rename_str, GetSelectedGameObject()->GetName().c_str(), sizeof(hierarchy_rename_str));
+            prefab_oldname = GetSelectedGameObject()->GetName();
+            hierarchy_renameFocus = true;
         }
         if (ImGui::MenuItem("Save as Prefab"))
         {

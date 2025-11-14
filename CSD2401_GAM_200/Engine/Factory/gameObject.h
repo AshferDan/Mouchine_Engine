@@ -234,6 +234,12 @@ public:
      */
     const std::string& GetName() const { return name; }
 
+    /**
+     * @brief Sets new name for GameObject.
+     * @param A constant reference to the GameObject's new name string.
+     */
+    void SetName(std::string const& newName) { name = newName; }
+
     // Enable/disable
     /**
      * @brief Sets the active state of the GameObject.

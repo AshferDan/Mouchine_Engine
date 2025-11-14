@@ -287,20 +287,40 @@ void Serialization::RemovePrefab(std::string const &prefabName)
  */
 void Serialization::RenamePrefab(std::string const &oldName, std::string const &newName)
 {
-	if (!std::filesystem::exists(PrefabFilePath + oldName + ".json"))
+	std::string path = PrefabFilePath + oldName + ".json";
+	std::string newPath = PrefabFilePath + newName + ".json";
+
+	if (!std::filesystem::exists(path))
 	{
-		std::cout << "File Path " + PrefabFilePath + oldName + ".json\" cannot be found!\n";
+		std::cout << "File Path: \"" << path << "\" cannot be found!\n";
 		return;
 	}
 
-	if (!std::filesystem::exists(PrefabFilePath + newName + ".json"))
+	if (std::filesystem::exists(newPath))
 	{
-		std::filesystem::rename(PrefabFilePath + oldName + ".json", PrefabFilePath + newName + ".json");
+		newPath = PrefabFilePath + newName + "(1).json";
 	}
-	else
+
+	std::filesystem::rename(path, newPath);
+
+	std::ifstream in(newPath);
+	json j;
+	try
 	{
-		std::filesystem::rename(PrefabFilePath + oldName + ".json", PrefabFilePath + newName + "(1).json");
+		in >> j;
 	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "[LoadPrefab] JSON Parse error: " << e.what() << "\n";
+		return;
+	}
+	if (j.contains("GameObjects") && j["GameObjects"].is_array() && !j["GameObjects"].empty())
+	{
+		j["GameObjects"][0]["name"] = newName;
+	}
+	
+	std::ofstream out(newPath);
+	out << j.dump(4);
 
 	std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
 }
