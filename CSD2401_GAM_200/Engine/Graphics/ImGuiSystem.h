@@ -26,6 +26,7 @@ Technology is prohibited.
 #include <filesystem>
 #include "Serialization.h"
 #include "LevelEditor.h"
+#include "ImGuizmo.h"
 
 // FILE SYSTEM
 namespace fs = std::filesystem;
@@ -34,6 +35,8 @@ const std::string AssetPayloadID{ "Asset_Filepath" };
 const std::string PrefabPayloadID{ "Prefab_Filepath" };
 const std::string HierarchyPayloadID{ "GameObject_Name" };
 const std::string ScenePayloadID{ "Scene_Name" };
+const std::string AudioPayloadID{ "Scene_Name" };
+const std::string SpritePayloadID{ "Scene_Name" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton
@@ -41,10 +44,14 @@ inline const char* icon_folder = "../Assets/Editor_Icons/Folder.png";
 inline const char* icon_file = "../Assets/Editor_Icons/File_Generic.png";
 inline const char* icon_plus = "../Assets/Editor_Icons/Plus.png";
 inline const char* icon_prefab = "../Assets/Editor_Icons/Cube.png";
+inline const char* icon_audio = "../Assets/Editor_Icons/File_Audio.png";
+inline const char* icon_json = "../Assets/Editor_Icons/File_Json.png";
 extern GLuint icon_folder_ui;
 extern GLuint icon_file_ui;
 extern GLuint icon_plus_ui;
 extern GLuint icon_prefab_ui;
+extern GLuint icon_audio_ui;
+extern GLuint icon_json_ui;
 
 
 // CONST VARIABLES
@@ -141,6 +148,8 @@ public:
      * @brief Function that handles logic of clicking on a GO in the viewport, to select. Also handles logic for drag and dropping to move the GOs around
      */
     void Viewport_ClickToSelect();
+
+    void Viewport_ManageGizmos();
 
 private:
     /**

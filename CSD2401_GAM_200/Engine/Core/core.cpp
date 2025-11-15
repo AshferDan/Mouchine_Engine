@@ -220,6 +220,7 @@ void CoreEngine::GameLoop()
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
+            ImGuizmo::BeginFrame();
         }
 
         // FIXED TIMESTEP LOOP - Run physics multiple times if needed

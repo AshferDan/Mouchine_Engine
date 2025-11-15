@@ -172,4 +172,11 @@ vec4 operator*(mat4 const& m, vec4 const& v);
 inline vec3::vec3(vec4 const& v) : x(v.x), y(v.y), z(v.z) {}
 inline vec4::vec4(vec3 const& v, float pw) : x(v.x), y(v.y), z(v.z), w(pw) {}
 
+inline float* value_ptr(mat4 const& mat) 
+{
+	return (float*)&mat;
+}
+
+void DecomposeMatrix(mat4 const& m, float& x, float& y, float& w, float& h, float& rot);
+
 #endif // MATH_LIB

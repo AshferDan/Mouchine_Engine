@@ -87,7 +87,9 @@ static bool openLayoutLoadPopup = false;
 static bool saveNamePopupClear = false;
 static bool renderLoadedLayout = false;
 
+// VIEWPORT
 bool isHoveringOverViewport;
+int gizmo_type = -1;
 
 // Vars for asset manager interface
 const float paddingSize = 16.f;
@@ -105,6 +107,8 @@ GLuint icon_folder_ui;
 GLuint icon_file_ui;
 GLuint icon_plus_ui;
 GLuint icon_prefab_ui;
+GLuint icon_audio_ui;
+GLuint icon_json_ui;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
@@ -155,6 +159,8 @@ void ImGuiSystem::Initialize()
     icon_file_ui = GraphicsSystem::LoadTexture(icon_file);
     icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
     icon_prefab_ui = GraphicsSystem::LoadTexture(icon_prefab);
+    icon_audio_ui = GraphicsSystem::LoadTexture(icon_audio);
+    icon_json_ui = GraphicsSystem::LoadTexture(icon_json);
 }
 
 /**
@@ -366,11 +372,13 @@ void ImGuiSystem::Viewport_ClickToSelect()
             }
         }
     }
+    Viewport_ManageGizmos();
+
 
     // if flag is true and left click is held, set the new position of the GO based off cursor (which is fitted to world space!)
     if (isBeingDragged && ImGui::IsMouseDown(ImGuiMouseButton_Left))
     {
-        GetSelectedGameObject()->GetComponent<TransformComponent>()->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
+        //GetSelectedGameObject()->GetComponent<TransformComponent>()->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
     }
     // upon mouse release set flag to false
     if (isBeingDragged && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
@@ -993,6 +1001,57 @@ void PrefabMenu_Spawn()
 }
 #pragma endregion
 
+#pragma region Viewport/ Gizmos
+void ImGuiSystem::Viewport_ManageGizmos()
+{
+    if (ImGui::IsKeyPressed(ImGuiKey_0))
+    {
+        gizmo_type = -1;
+    }
+    else if (ImGui::IsKeyPressed(ImGuiKey_1))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
+    }
+    else if (ImGui::IsKeyPressed(ImGuiKey_2))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::SCALE);
+    }
+    else if (ImGui::IsKeyPressed(ImGuiKey_3))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
+    }
+
+    if (selectedGameObjectID != 0 && gizmo_type != -1)
+    {
+        auto* go = GetSelectedGameObject();
+        auto* transform = go->GetComponent<TransformComponent>();
+
+        ImGuizmo::SetOrthographic(true);        // or false idk
+        ImGuizmo::SetDrawlist();                                                                                                            // draws current window
+        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());             // set rect to viewport
+
+        auto* camComp = CameraManager::Instance().GetActiveCamera();
+        mat4 view = camComp->GetViewMatrix();
+        mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        mat4 mtx = transform->GetMatrix();
+        ImGuizmo::Manipulate(value_ptr(view), value_ptr(projection), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::LOCAL, value_ptr(mtx));
+
+        if (ImGuizmo::IsUsing)
+        {
+            vec3 trans{}, scale{}, rot{};
+            DecomposeMatrix(mtx, trans.x, trans.y, scale.x, scale.y, rot.x);
+
+
+            transform->SetPosition(trans.x, trans.y);
+            transform->SetScale(scale.x, scale.y);
+            transform->Rotate(rot.x - transform->GetRotation());
+        }
+    }
+}
+#pragma endregion
+
+
+
 #pragma region Asset Browser/ Directory Navigator ImGui
 /**
  * @brief Ctor - Inits Directory Navigator for asset manager
@@ -1027,6 +1086,7 @@ void DirectoryNavigator::RenderImGui()
         std::string path = iter.path().string();                            // Path we are currently in
         auto relativePath = fs::relative(iter.path(), assetPath);           // Path relative from where we started (assets) to where we are
         std::string fileName = relativePath.filename().string();            // name of the file alone
+        std::string extension = iter.path().extension().string();
 
         // If the current item is a folder
         if (iter.is_directory())
@@ -1040,10 +1100,32 @@ void DirectoryNavigator::RenderImGui()
         // If current item is a file 
         else
         {
+            // this is a file, not sure if we wanna do anything yet (when we click)
             // add double click to open in windows file explorer?
-            if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
+
+            // Json files
+            if (extension == ".json")
             {
-                // this is a file, not sure if we wanna do anything yet (when we click)
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_json_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
+            }
+            // Audio Files
+            else if (extension == ".wav" || extension == ".mp3" || extension == ".ogg" || extension == ".flac")
+            {
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_audio_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
+            }
+            // Generic file
+            else
+            {
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
             }
 
             // Can only drag and drop files, not folders
@@ -1057,6 +1139,14 @@ void DirectoryNavigator::RenderImGui()
                 else if (iter.path().parent_path().filename() == "Prefabs")
                 {
                     SendDragAndDrop(PrefabPayloadID, iter.path().stem().string(), fileName);            // For prefab files
+                }
+                else if (iter.path().parent_path().filename() == "Audio")
+                {
+                    SendDragAndDrop(AudioPayloadID, iter.path().string(), fileName.c_str());            // For Audio files
+                }
+                if (iter.path().parent_path().filename() == "Sprites")
+                {
+                    SendDragAndDrop(SpritePayloadID, iter.path().string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
                 else
                 {

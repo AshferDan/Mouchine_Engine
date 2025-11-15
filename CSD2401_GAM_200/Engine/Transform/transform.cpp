@@ -169,3 +169,12 @@ void TransformComponent::MoveRight(float distance)
     posX += std::cos(rotation + 1.5708f) * distance; // +90 degrees
     posY += std::sin(rotation + 1.5708f) * distance;
 }
+
+mat4 TransformComponent::GetMatrix()
+{
+    mat4 trans = mat4::translate(vec3(posX, posY, 0.0f));
+    mat4 rot = mat4::rotateZ(rotation);
+    mat4 scale = mat4::scale(vec3(scaleX, scaleY, 1.0f));
+
+    return trans * rot * scale;
+}
