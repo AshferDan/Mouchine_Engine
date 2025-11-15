@@ -36,16 +36,22 @@ namespace API
         {
             std::cout << "Audio system initialised successfully" << std::endl;
         }
+        
+        // Initialise Audio Manager
+        std::cout << "\n--- Initialising Audio Manager ---" << std::endl;
+        AudioManager* audioManager = new AudioManager(&audio);
+        engine.SetAudioManager(audioManager);
+        std::cout << "AudioManager created and set in engine" << std::endl;
 
-        // Initialise ResourceManager
+        // Initialise Resource Manager
         std::cout << "\n--- Initialising Resource Manager ---" << std::endl;
         auto &resourceMgr = ResourceManager::Instance();
         resourceMgr.SetAudioEngine(&audio);
 
         // load audio files
-        resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true);            // looping
-        resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false);         // when jumping only
-        resourceMgr.LoadAudio("footstep_sfx", "../Assets/audio/footstep.wav", false); // footstep sound
+        //resourceMgr.LoadAudio("bgm", "../Assets/audio/level_1.wav", true);            // looping
+        //resourceMgr.LoadAudio("jump_sfx", "../Assets/audio/jump.wav", false);         // when jumping only
+        //resourceMgr.LoadAudio("footstep_sfx", "../Assets/audio/footstep.wav", false); // footstep sound
 
         // load common fonts
         std::cout << "\n--- Loading Fonts ---" << std::endl;

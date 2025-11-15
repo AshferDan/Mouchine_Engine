@@ -296,7 +296,7 @@ public:
     /**
      * @brief Plays the loaded background music if available
      */
-    void PlayLoadedBGM();
+    //void PlayLoadedBGM();
 private:
     // GUI rendering functions
     /**

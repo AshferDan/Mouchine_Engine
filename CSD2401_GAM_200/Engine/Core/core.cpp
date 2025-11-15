@@ -163,12 +163,29 @@ void CoreEngine::GameLoop()
 
         if (m_hasPendingLoad)
         {
-            LevelEditor *level = GetLevelEditor();
+            std::cout << "[CoreEngine] ===== PENDING SCENE LOAD DETECTED =====" << std::endl;
+            std::cout << "[CoreEngine] Scene to load: " << m_pendingScene << std::endl;
+            std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
+
+            LevelEditor* level = GetLevelEditor();
             level->LoadLevelJSON(m_pendingScene);
-            std::cout << "[CoreEngine] Scene loaded, playing BGM if available..." << std::endl;
-            level->PlayLoadedBGM();
+            std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
+
+            // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
+            if (m_autoPlayAfterLoad)
+            {
+                std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
+                level->EnterPlayMode();
+                std::cout << "[CoreEngine] Play mode entered\n";
+            }
+            else
+            {
+                std::cout << "[CoreEngine] Auto-play flag is FALSE - NOT entering play mode\n";
+            }
+
             m_pendingScene = "";
             m_hasPendingLoad = false;
+            m_autoPlayAfterLoad = false;  // Reset flag
 
             if (inputManager)
                 inputManager->ResetState();
