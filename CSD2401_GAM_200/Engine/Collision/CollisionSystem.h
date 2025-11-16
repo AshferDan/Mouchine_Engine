@@ -17,6 +17,8 @@ Technology is prohibited.
 #include "SpatialGrid.h"
 #include <vector>
 #include <utility>
+#include <unordered_set>
+#include <string>
 
 class GameObject;
 class ColliderComponent;
@@ -65,6 +67,12 @@ public:
      */
     static bool ShouldCollide(CollisionLayer layer1, CollisionLayer layer2);
 
+    // ===== Helper Functions for Specific Object Collision Queries =====
+    bool AreColliding(GameObject* obj1, GameObject* obj2);
+    bool JustCollided(GameObject* obj1, GameObject* obj2);
+    bool StillColliding(GameObject* obj1, GameObject* obj2);
+    bool JustStopped(GameObject* obj1, GameObject* obj2);
+
 private:
     // Track collision pairs to avoid spam
     std::vector<std::pair<GameObject*, GameObject*>> activeCollisions;
@@ -73,5 +81,8 @@ private:
     PhysicsSystem* physicsSystem;
 
     // Spatial grid for broad-phase collision detection
+    std::string GetCollisionKey(GameObject* obj1, GameObject* obj2);
+    std::unordered_set<std::string> previousCollisions;
+    std::unordered_set<std::string> currentCollisions;
     SpatialGrid spatialGrid;
 };
