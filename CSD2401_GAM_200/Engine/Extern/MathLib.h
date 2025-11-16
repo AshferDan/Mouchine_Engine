@@ -18,6 +18,8 @@ Technology is prohibited.
 #include <cmath>
 #include <cstdint>
 
+constexpr float pi = 3.14159265358979323846f;
+
 struct vec3;
 struct vec4;
 //----------------- vec2 -----------------//

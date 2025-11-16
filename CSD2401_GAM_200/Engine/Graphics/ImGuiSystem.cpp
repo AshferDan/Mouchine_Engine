@@ -54,7 +54,7 @@ struct TempGOData
     ImVec4 color{0.f, 0.f, 0.f, 1.f};
 };
 
-// GO CREATION MENU VARIABLES
+// GO CREATION MENU VARS
 TempGOData tempGO{"Game Object"};
 static int current_shape = 0;
 
@@ -62,10 +62,11 @@ static int current_shape = 0;
 bool ShowCreateGOMenu;
 bool ShowLoadPrefabMenu;
 
+// SAVE/ LOAD EDITOR VARS
 std::vector<std::string> editorLayoutList;
 char saveLayoutName[128]{""};
 
-// PREFAB VARIABLES
+// PREFAB VARS
 std::vector<std::string> prefabList;
 TempGOData tempPrefab;
 static int current_prefab = 0;
@@ -79,6 +80,9 @@ static int hierarchy_renameIndex = -1;
 static bool hierarchy_renameFocus = false;
 char hierarchy_rename_str[128]{ "" };
 std::string hierarchy_oldname{};
+
+// PROPERTIES TAB SLOT 
+std::vector<PropertiesSlot> propertySlotsList;
 
 // STATIC BOOL FLAGS
 static bool greyOutGOSettings = false;
@@ -109,6 +113,10 @@ GLuint icon_plus_ui;
 GLuint icon_prefab_ui;
 GLuint icon_audio_ui;
 GLuint icon_json_ui;
+GLuint icon_giz_select_ui;
+GLuint icon_giz_translate_ui;
+GLuint icon_giz_scale_ui;
+GLuint icon_giz_rotate_ui;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
@@ -161,6 +169,10 @@ void ImGuiSystem::Initialize()
     icon_prefab_ui = GraphicsSystem::LoadTexture(icon_prefab);
     icon_audio_ui = GraphicsSystem::LoadTexture(icon_audio);
     icon_json_ui = GraphicsSystem::LoadTexture(icon_json);
+    icon_giz_select_ui = GraphicsSystem::LoadTexture(icon_giz_select);
+    icon_giz_translate_ui = GraphicsSystem::LoadTexture(icon_giz_translate);
+    icon_giz_scale_ui = GraphicsSystem::LoadTexture(icon_giz_scale);
+    icon_giz_rotate_ui = GraphicsSystem::LoadTexture(icon_giz_rotate);
 }
 
 /**
@@ -220,12 +232,18 @@ void ImGuiSystem::Update(float dt)
                 ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
                 ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
-                ImGui::Begin("Game Viewport");
+                ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus);
                 ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
                 CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
                 ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
                 ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport rendering
+
+                // Toolbar for controlling gizmos
+                {
+                    
+                    Viewport_ManageGizmos();
+                }
 
                 // If hovering over viewport, you can click to select a GO
                 // TODO implement outline for selected GO
@@ -372,8 +390,6 @@ void ImGuiSystem::Viewport_ClickToSelect()
             }
         }
     }
-    Viewport_ManageGizmos();
-
 
     // if flag is true and left click is held, set the new position of the GO based off cursor (which is fitted to world space!)
     if (isBeingDragged && ImGui::IsMouseDown(ImGuiMouseButton_Left))
@@ -532,7 +548,7 @@ void ImGuiSystem::Hierarchy_Render()
     }
 
     // Render top part to show adding of GOs
-    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), {icon_size_small.x, icon_size_small.y}, {0, 1}, {1, 0},
+    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), icon_size_small, {0, 1}, {1, 0},
                            (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
     {
         // this is a file, not sure if we wanna do anything yet
@@ -542,7 +558,7 @@ void ImGuiSystem::Hierarchy_Render()
 
     ImGui::SameLine();
     // Render top part to show adding of Prefabs
-    if (ImGui::ImageButton("##Spawn Prefab", ImTextureID(icon_prefab_ui), {icon_size_small.x, icon_size_small.y}, {0, 1}, {1, 0},
+    if (ImGui::ImageButton("##Spawn Prefab", ImTextureID(icon_prefab_ui), icon_size_small, {0, 1}, {1, 0},
                            (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
     {
         // this is a file, not sure if we wanna do anything yet
@@ -644,8 +660,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
             hierarchy_renameIndex = -1;
         }
 
-        // if (ImGui::IsKeyPressed(ImGuiKey_Escape))          //supposed to be escape but it closes the whole game LMAO
-        if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape) || ImGui::IsKeyPressed(ImGuiKey_Enter))
         {
             GetSelectedGameObject()->SetName(std::string(rename_str));
             hierarchy_renameIndex = -1;
@@ -656,6 +671,9 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     else
     {
         // Display the tree node
+        if (selectedGameObjectID == id)
+            flags |= ImGuiTreeNodeFlags_Selected;
+
         nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
     }
 
@@ -926,8 +944,7 @@ void PrefabMenu_Render()
                         prefabList[i] = std::string(rename_str);
                     }
 
-                    // if (ImGui::IsKeyPressed(ImGuiKey_Escape))          //supposed to be escape but it closes the whole game LMAO
-                    if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+                    if (ImGui::IsKeyPressed(ImGuiKey_Escape) || ImGui::IsKeyPressed(ImGuiKey_Enter))
                     {
                         prefab_renameIndex = -1;
                         Serialization::RenamePrefab(prefab_oldname, rename_str);
@@ -1004,33 +1021,62 @@ void PrefabMenu_Spawn()
 #pragma region Viewport/ Gizmos
 void ImGuiSystem::Viewport_ManageGizmos()
 {
-    if (ImGui::IsKeyPressed(ImGuiKey_0))
+    ImVec2 viewportPos = ImGui::GetWindowPos();
+    // IMGUI SECTION
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+
+    // Set background alpha BEFORE Begin()
+    ImGui::SetNextWindowBgAlpha(0.75f);
+
+    // Optional: Set default position (placed inside viewport)
+    ImGui::SetNextWindowPos(ImVec2(viewportPos.x + 15, viewportPos.y + 35), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(58.0f, 215.0f), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("##Toolbar", nullptr, flags);
+
+    // GIZMO CONTROLS
+    if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_Q))
     {
         gizmo_type = -1;
     }
-    else if (ImGui::IsKeyPressed(ImGuiKey_1))
+    CreateHintText("(Q) Select");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_W))
     {
         gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
     }
-    else if (ImGui::IsKeyPressed(ImGuiKey_2))
+    CreateHintText("(W) Move");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_E))
     {
         gizmo_type = int(ImGuizmo::OPERATION::SCALE);
     }
-    else if (ImGui::IsKeyPressed(ImGuiKey_3))
+    CreateHintText("(E) Scale");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_R))
     {
         gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
     }
+    CreateHintText("(R) Rotate");
 
+    ImGui::End();
+
+    // LOGIC SECTION
     if (selectedGameObjectID != 0 && gizmo_type != -1)
     {
         auto* go = GetSelectedGameObject();
         auto* transform = go->GetComponent<TransformComponent>();
+        auto* camComp = CameraManager::Instance().GetActiveCamera();
+        if (!camComp || !transform) return;
 
         ImGuizmo::SetOrthographic(true);        // or false idk
         ImGuizmo::SetDrawlist();                                                                                                            // draws current window
         ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());             // set rect to viewport
 
-        auto* camComp = CameraManager::Instance().GetActiveCamera();
         mat4 view = camComp->GetViewMatrix();
         mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
         mat4 mtx = transform->GetMatrix();
@@ -1038,13 +1084,16 @@ void ImGuiSystem::Viewport_ManageGizmos()
 
         if (ImGuizmo::IsUsing)
         {
+            //std::cout << "Original rot: " << transform->GetRotation() << "\n";
             vec3 trans{}, scale{}, rot{};
             DecomposeMatrix(mtx, trans.x, trans.y, scale.x, scale.y, rot.x);
 
+            //std::cout << "Decomposed rot: " << rot.x << " " << rot.y << " " << rot.z << "\n";
+            // debugging the c# anim image flipping for some reason AAAAAAAAAAAAAAAAAAAAAAA
 
             transform->SetPosition(trans.x, trans.y);
             transform->SetScale(scale.x, scale.y);
-            transform->Rotate(rot.x - transform->GetRotation());
+            transform->SetRotation(rot.x);
         }
     }
 }
@@ -1092,7 +1141,7 @@ void DirectoryNavigator::RenderImGui()
         if (iter.is_directory())
         {
             // TODO add double click? or is single click fine
-            if (ImGui::ImageButton(fileName.c_str(), (ImTextureID)(uintptr_t)(icon_folder_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))     // Draw image button with folder icon
+            if (ImGui::ImageButton(fileName.c_str(), (ImTextureID)(uintptr_t)(icon_folder_ui), icon_size, {0, 1}, {1, 0}))     // Draw image button with folder icon
             {
                 currentDir /= iter.path().filename();           // Upon clicking, enter the file path
             }
@@ -1106,7 +1155,7 @@ void DirectoryNavigator::RenderImGui()
             // Json files
             if (extension == ".json")
             {
-                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_json_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_json_ui), icon_size, { 0, 1 }, { 1, 0 }))
                 {
                     // do nothin for now
                 }
@@ -1114,7 +1163,7 @@ void DirectoryNavigator::RenderImGui()
             // Audio Files
             else if (extension == ".wav" || extension == ".mp3" || extension == ".ogg" || extension == ".flac")
             {
-                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_audio_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_audio_ui), icon_size, { 0, 1 }, { 1, 0 }))
                 {
                     // do nothin for now
                 }
@@ -1122,7 +1171,7 @@ void DirectoryNavigator::RenderImGui()
             // Generic file
             else
             {
-                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), { icon_size.x, icon_size.y }, { 0, 1 }, { 1, 0 }))
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), icon_size, { 0, 1 }, { 1, 0 }))
                 {
                     // do nothin for now
                 }
@@ -1449,7 +1498,7 @@ void EditorLayout_LoadPopUp()
             std::string layoutFileName = relativePath.filename().string();
 
             // each item will have the file icon, on click set the layoutpath to string. Itll then be loaded by the layout loader function
-            if (ImGui::ImageButton(layoutFileName.c_str(), (ImTextureID)(uintptr_t)(icon_file_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
+            if (ImGui::ImageButton(layoutFileName.c_str(), (ImTextureID)(uintptr_t)(icon_file_ui), icon_size, {0, 1}, {1, 0}))
             {
                 loadLayoutPath = layoutFileName;
                 renderLoadedLayout = true;
@@ -1519,6 +1568,7 @@ GameObject* ImGuiSystem::GetSelectedGameObject() const
     return factory.GetGameObject(selectedGameObjectID);
 }
 
+PropertiesSlot ps("test", PrefabPayloadID);
 /**
  * @brief Render property editor for Selected GOs. Will be empty by default, and then show details if a GO is selected.
  */
@@ -1554,6 +1604,8 @@ void ImGuiSystem::RenderPropertyEditor()
     }
 
     ImGui::Spacing();
+    // this is done, just need to attach to a component? so it'll belong to a specific component where users can drag and drop stuff
+    ps.RenderImGui();
 
     // GO transform screen
     if (auto* transform = obj->GetComponent<TransformComponent>())
@@ -1577,8 +1629,12 @@ void ImGuiSystem::RenderPropertyEditor()
             }
 
             float rotation = transform->GetRotation();
-            if (ImGui::DragFloat("Rotation", &rotation, 0.5f))
+            if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
             {
+                if (rotation > 2 * pi || rotation < -2 * pi)
+                {
+                    rotation = 0;
+                }
                 transform->SetRotation(rotation);
             }
         }
@@ -1679,12 +1735,26 @@ void ImGuiSystem::RenderPropertyEditor()
     static std::string testdata{};
     ReceiveDragAndDrop(AssetPayloadID, testdata);
 
-    
     ImGui::EndGroup();
     // Do something with DnD asset data - maybe insert into boxes to assign sprites
     ImGui::Text(testdata.c_str());
 
     ImGui::End();
+}
+
+void PropertiesSlot::RenderImGui()
+{
+    ImGui::PushID(std::to_string(_id).c_str());
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(_displayText.c_str());
+    ImGui::SameLine();
+
+    if (ImGui::Button(_receivedData.empty() ? "None" : _receivedData.c_str(), ImVec2(200, 0)))
+    {
+
+    }
+    ReceiveDragAndDrop(PrefabPayloadID, _receivedData);
+    ImGui::PopID();
 }
 
 /**

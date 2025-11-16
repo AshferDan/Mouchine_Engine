@@ -281,6 +281,5 @@ void DecomposeMatrix(mat4 const& m, float& x, float& y, float& w, float& h, floa
     w = std::sqrt(m.m[0] * m.m[0] + m.m[1] * m.m[1]);
     h = std::sqrt(m.m[4] * m.m[4] + m.m[5] * m.m[5]);
 
-    // rotation
     rot = std::atan2(m.m[1], m.m[0]);
 }
