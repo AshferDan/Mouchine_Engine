@@ -294,7 +294,7 @@ void LevelEditor::StopPlayMode()
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
-    CameraManager::Instance().ClearActiveCamera();
+    //CameraManager::Instance().ClearActiveCamera();
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 
