@@ -71,6 +71,8 @@ int main()
         }
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
+        //CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
+
         std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
         ScriptSystem *scriptSys = engine.GetScriptSystem();

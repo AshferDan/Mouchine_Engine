@@ -66,6 +66,11 @@ GraphicsSystem::GraphicsSystem()
             if (gs) {
                 gs->Wwidth = width;
                 gs->Wheight = height;
+
+                if (gs->editorMode) {
+                    gs->ResizeFrameBuffer(width, height);
+                }
+
             } });
 
             // Make OpenGL context current for this window.
@@ -299,6 +304,25 @@ void GraphicsSystem::Initialize()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    float flashQuad[]{
+        -1.f, -1.f,
+        1.f, -1.f,
+        -1.f, 1.f,
+        1.f, 1.f
+    };
+
+    glGenVertexArrays(1, &flashVAO);
+    glGenBuffers(1, &flashVBO);
+
+    glBindVertexArray(flashVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, flashVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(flashQuad), flashQuad, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+
+    glBindVertexArray(0);
+
     // Initialize the off-screen framebuffer for the editor viewport
     CreateFrameBuffer(800, 600);
 }
@@ -327,6 +351,15 @@ void GraphicsSystem::Update(float)
     {
         // Render directly to the default window framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        int currentWidth, currentHeight;
+        glfwGetFramebufferSize(window, &currentWidth, &currentHeight);
+
+        // Update stored dimensions if they changed
+        if (currentWidth != Wwidth || currentHeight != Wheight)
+        {
+            Wwidth = currentWidth;
+            Wheight = currentHeight;
+        }
         glViewport(0, 0, Wwidth, Wheight);
     }
 
@@ -535,6 +568,7 @@ void GraphicsSystem::Update(float)
                 }
                 else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
                 {
+                    //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
                     DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
                 }
             }
@@ -588,6 +622,17 @@ void GraphicsSystem::Update(float)
             }
             }
         }
+    }
+
+    auto* activeCamera = CameraManager::Instance().GetActiveCamera();
+    if (activeCamera) {
+        if (activeCamera->IsFlashing()) {
+            DrawFlashOverlay(activeCamera->GetFlashColor());
+        }
+    }
+
+    if (currentSelection.exist) {
+        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 0,1,0,1 }, vp);
     }
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
@@ -1012,6 +1057,16 @@ void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewpo
             ResizeFrameBuffer((int)viewportSizeX, (int)viewportSizeY);
         }
     }
+}
+
+void GraphicsSystem::DrawFlashOverlay(const vec4& color) {
+    debugShader.Use();
+    debugShader.SetUniform("uColor", color);
+    debugShader.SetUniform("uMVP", mat4::identity());
+
+    glBindVertexArray(flashVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }
 
 /**

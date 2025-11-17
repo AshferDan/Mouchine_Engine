@@ -244,6 +244,10 @@ void InputManager::Update(float dt)
         // Remove left movement if present
         forcesManager.RemoveForcesByType(ForceType::MoveLeft);
     }
+    else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+        CameraManager::Instance().AddCameraTrauma(1.f);
+        CameraManager::Instance().FlashActiveCamera(0.3, vec4(1.f, 0.f, 0.f, 0.7f));
+    }
     else
     {
         // No movement keys pressed - remove all movement forces

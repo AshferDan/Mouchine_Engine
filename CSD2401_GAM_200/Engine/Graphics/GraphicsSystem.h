@@ -221,6 +221,16 @@ public:
 	 */
 	int GetWindowHeight() const { return Wheight; };
 
+	void DrawFlashOverlay(const vec4& color);
+
+	void SetEditorSelection(float x, float y, float sx, float sy) {
+		currentSelection = { x,y,sx,sy,true };
+	}
+	
+	void ClearEditorSelection() {
+		currentSelection.exist = false;
+	}
+
 	/**
 	 * @brief Handles messages relevant to the Graphics System, specifically CreateObjectMessage
 	 * to ensure new objects receive a default RenderComponent.
@@ -285,6 +295,10 @@ private:
 	// --- Text Rendering Buffers ---
 	GLuint textVAO, textVBO;				// VAO/VBO dedicated to rendering dynamically generated text quads.
 
+	//Flash Overlay
+	GLuint flashVAO = 0;
+	GLuint flashVBO = 0;
+
 	// Batch size constants (must match memory allocation in Initialize)
 	const size_t MAX_BATCH_VERTICES = 12000; // Max vertices the batch VBO can hold (e.g., 3000 quads * 4 vertices).
 	const size_t MAX_BATCH_INDICES = 18000;	 // Max indices the batch EBO can hold (e.g., 3000 quads * 6 indices).
@@ -311,4 +325,11 @@ private:
 	 * @param height The new height.
 	 */
 	void ResizeFrameBuffer(int width, int height);
+
+	struct EditorSelection {
+		float x, y, sx, sy;
+		bool exist = false;
+	};
+
+	EditorSelection currentSelection;
 };
