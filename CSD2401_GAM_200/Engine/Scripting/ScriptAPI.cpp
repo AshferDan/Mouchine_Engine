@@ -55,16 +55,6 @@ namespace API
 
         // print loaded resources
         resourceMgr.PrintLoadedResources();
-
-        // register the sound with audio engine
-        //std::cout << "\n--- Starting Background Music ---" << std::endl;
-        //audio.playSound("bgm", "bgm_channel");
-        //audio.setVolume("bgm_channel", 0.5f);
-
-        //// register wind sound
-        //std::cout << "--- Starting Wind Ambient Sound ---" << std::endl;
-        //audio.playSound("wind", "wind_channel");
-        //audio.setVolume("wind_channel", 0.5f); // Quieter than music for ambient effect
         std::cout << "\n--- Audio loaded, music will start in play mode ---" << std::endl;
     }
 
@@ -270,24 +260,6 @@ namespace API
         }
     }
 
-    // void SetGravVal(const std::string& objectName, float x, float y)
-    //{
-    //     auto& factory = GameObjectFactory::Instance();
-
-    //    GameObject* obj = factory.FindGameObject(objectName);
-
-    //    if (obj)
-    //    {
-    //        auto* physics = obj->GetComponent<PhysicsComponent>();
-    //        if (physics)
-    //        {
-    //            // Remove existing gravity and add new one with custom direction
-    //            physics->GetForcesManager().RemoveForcesByType(ForceType::Gravity);
-
-    //            physics->GetForcesManager().AddForce(ForceType::Gravity, physics->GetMass());
-    //        }
-    //    }
-    //}
 
     void SetStatic(const std::string &objectName, bool val)
     {
@@ -493,5 +465,50 @@ namespace API
         }
     }
 #pragma endregion
+
+#pragma region Camera
+
+    void setCameraPos(vec2 pos)
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) {
+            return;
+        }
+
+        camtemp->SetPosition(pos.x, pos.y);
+    }
+
+
+    void setCameraZoom(float val)
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) {
+            return;
+        }
+        camtemp->SetZoom(val);
+    }
+
+    void setCameraMode(CameraComponent::CameraMode val)
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) {
+            return;
+        }
+        camtemp->SetMode(val);
+    }
+#pragma endregion
+
+#pragma region Misc
+    int RandomNumberGen(int max, int min)
+    {
+        int range = max - min + 1;
+        int result = rand() % range + min;
+        return result;
+    }
+#pragma endregion
+
 
 }

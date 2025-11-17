@@ -33,6 +33,9 @@ Technology is prohibited.
 #include "audio.h"
 #include "InputManager.h"
 #include "gameObject.h"
+#include <random>
+#include "CameraComponent.h"
+#include "CameraManager.h"
 
 
 /**
@@ -62,6 +65,7 @@ namespace API {
      * @param engine Reference to the CoreEngine instance.
      */
     void StartEngineLoop(CoreEngine& engine);
+
 #pragma endregion
 
 #pragma region Creations
@@ -316,14 +320,42 @@ namespace API {
      * @param newlayer The new collision layer.
      */
     void SetCollisionLayer(const std::string&, CollisionLayer newlayer);
+
+    void OnTriggerEnter();
+    void OnTriggerExit();
+    void OnTriggerStay();
+
+#pragma endregion
+
+#pragma region Audio
+
+    void AddSound();
+    void muteSound();
+    void muteSound();
+
+    void setBGMVol();
+    void setSFXVol();
+    void setMasterVol();
 #pragma endregion
 
 
+#pragma region Corountine
+    void WaitForSeconds();
+
+#pragma endregion
+
+#pragma region Camera
+    void setCameraPos(vec2);
+    void setCameraZoom(float);
+    void setCameraMode(CameraComponent::CameraMode);
+
+#pragma endregion
 
 
-
-
-
+#pragma region Misc
+    int RandomNumberGen(int, int);
+    bool InAreaCheck(float, float, float, float);
+#pragma endregion
 
 
 
