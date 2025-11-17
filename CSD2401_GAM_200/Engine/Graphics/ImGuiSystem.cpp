@@ -270,15 +270,21 @@ void ImGuiSystem::Update(float dt)
 
                 // Get cursor position relative to the image
                 ImVec2 cursorScreenPos = ImGui::GetMousePos();
-                ImVec2 itemScreenPos = ImGui::GetItemRectMin();
+                ImVec2 viewportPos = ImGui::GetItemRectMin();
 
-                // Takes cursor position - converts it to viewport space that translates to world space too [centre of screen is (0,0)]
-                // TODO Currently does not take into account camera zoom
+                // camera bounds
+                const float camZoom = CORE->GetLevelEditor()->GetCameraZoom();
+                const vec2 camPos = { CORE->GetLevelEditor()->GetCameraX(), CORE->GetLevelEditor()->GetCameraY() };
+
+                // Evil function that took me like an hour to figure out and prolly took even more years off my lifespan
+                // but basically the gist is
+                // [from top left] local cursor pos - viewports position - viewportsize/2 (so we can have 0,0 be centered) / camerazoom + camera position
+                // camera zoom represents how zoomed in we are, so cursor needs to scale off that. Camera pos is alr in world space so just add it onto!
                 viewportCursorPos = ImVec2(
-                    cursorScreenPos.x - itemScreenPos.x - (viewportSize.x / 2.f),
-                    (viewportSize.y / 2.f) - (cursorScreenPos.y - itemScreenPos.y));
+                    (cursorScreenPos.x - viewportPos.x - (viewportSize.x / 2.f)) / camZoom + camPos.x,
+                    ((viewportSize.y / 2.f) - (cursorScreenPos.y - viewportPos.y)) / camZoom + camPos.y);
 
-                ImGui::Text("Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
+                ImGui::Text("(World Space) Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
                 ImGui::End();
             }
 
