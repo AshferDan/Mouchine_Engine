@@ -34,6 +34,7 @@ namespace fs = std::filesystem;
 LevelEditor::LevelEditor()
     : factory(GameObjectFactory::Instance()),
     selectedGameObjectID(0),
+    savedEntityIDCounter(0),
     showSaveDialog(false),
     showLoadDialog(false),
     currentFilename(""),
@@ -326,7 +327,11 @@ void LevelEditor::TogglePause()
             std::cout << "[LevelEditor] Resuming music" << std::endl;
             audioManager->PlaySound("bgm", "bgm_channel");
         }
-        CORE->GetGraphicsSystem()->SetEditorMode(false);
+
+        if (CORE)
+        {
+            CORE->GetGraphicsSystem()->SetEditorMode(false);
+        }
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
