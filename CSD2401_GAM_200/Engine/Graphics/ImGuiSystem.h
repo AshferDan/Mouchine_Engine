@@ -151,11 +151,14 @@ public:
     void SetSelectedGameObject(EntityID id);
 
     /**
+     * @brief Deselects the selected game object. Has other logic things attached such as selection highlight etc.
+     */
+    void ResetSelectedGameObject();
+
+    /**
      * @brief Renders the property editor window. Also handles logic regarding which GO is selected and how to manipulate components
      */
     void RenderPropertyEditor();
-
-    void Properties_DragAndDropSlot(std::string const& SlotText, std::string const& ExpectedPayloadType);
 
     /**
      * @brief Function that handles logic of clicking on a GO in the viewport, to select. Also handles logic for drag and dropping to move the GOs around
@@ -163,6 +166,8 @@ public:
     void Viewport_ClickToSelect();
 
     void Viewport_ManageGizmos();
+
+    void Viewport_HighlightGO();
 
 private:
     /**

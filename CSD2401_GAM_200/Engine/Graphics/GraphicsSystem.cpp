@@ -590,6 +590,10 @@ void GraphicsSystem::Update(float)
         }
     }
 
+    if (currentSelection.exist) {
+        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 0,1,0,1 }, vp);
+    }
+
     // Unbind the custom framebuffer to prevent accidental drawing to it
     if (editorMode)
     {

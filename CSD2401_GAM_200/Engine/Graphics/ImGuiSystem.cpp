@@ -92,6 +92,7 @@ static bool saveNamePopupClear = false;
 static bool renderLoadedLayout = false;
 
 // VIEWPORT
+ImVec2 viewportSize{};
 bool isHoveringOverViewport;
 int gizmo_type = -1;
 
@@ -233,7 +234,7 @@ void ImGuiSystem::Update(float dt)
                 ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
                 ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus);
-                ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
+                viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
                 CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
                 ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
@@ -292,6 +293,12 @@ void ImGuiSystem::Update(float dt)
             Hierarchy_Render();
             AssetBrowserWindow.RenderImGui();
 
+            // drawing highlight when a GO is selected
+            if (selectedGameObjectID != 0)
+            {
+                Viewport_HighlightGO();
+            }
+            
             // render property editor for selected game object
             if (showPropertyEditor)
             {
@@ -299,6 +306,12 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
+        }
+        // if IS in play mode
+        else
+        {
+            // toggle off other debug/ editor stuff.
+            CORE->GetGraphicsSystem()->ClearEditorSelection();
         }
         /**
          * @brief Game Object Creator Menu IMGui Window
@@ -343,8 +356,6 @@ std::string ImGuiSystem::GetName()
  */
 void ImGuiSystem::Viewport_ClickToSelect()
 {
-    static bool isBeingDragged = false;
-
     // Loop for all GOs in scene
     for (auto& go : GameObjectFactory::Instance().GetAllGameObjects())
     {
@@ -363,16 +374,11 @@ void ImGuiSystem::Viewport_ClickToSelect()
             // Calculates if cursor is within area of GO
             if (viewportCursorPos.x > pos.x - scale.x / 2 && viewportCursorPos.x < pos.x + scale.x / 2 && viewportCursorPos.y > pos.y - scale.y / 2 && viewportCursorPos.y < pos.y + scale.y / 2)
             {
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))              // Set to on release as form of confirmation, so GOs must be selected and THEN dragged. To avoid accidentally moving
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))            // changed back to on mouse click, since we have gizmos, wont have accidental moving anymore
                 {
                     SetSelectedGameObject(go->GetID());                         // Set GO to be selected
                     
                     std::cout << "[has collider]clicked on " << go->GetName() << std::endl;
-                }
-                // If GO has been selected and is dragged (with a threshhold of 25 units - added for human misinput and accidental moving)
-                if (selectedGameObjectID == go->GetID() && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 25.f))
-                {
-                    isBeingDragged = true;          // Set flag that updates position 
                 }
             }
         }
@@ -384,28 +390,13 @@ void ImGuiSystem::Viewport_ClickToSelect()
 
             if (distance < 50.f)                // if object is within 50 units (within general area)
             {
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))                      // Click to select, after selecting drag to set flag to true
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))                      // Click to select, after selecting drag to set flag to true
                 {
                     SetSelectedGameObject(go->GetID());
                     std::cout << "[no colider]clicked on " << go->GetName() << std::endl;
                 }
-                if (selectedGameObjectID == go->GetID() && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 10.f))
-                {
-                    isBeingDragged = true;
-                }
             }
         }
-    }
-
-    // if flag is true and left click is held, set the new position of the GO based off cursor (which is fitted to world space!)
-    if (isBeingDragged && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-    {
-        //GetSelectedGameObject()->GetComponent<TransformComponent>()->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
-    }
-    // upon mouse release set flag to false
-    if (isBeingDragged && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-    {
-        isBeingDragged = false;
     }
 }
 
@@ -626,10 +617,24 @@ void ImGuiSystem::Hierarchy_Render()
     {
         if (!ImGui::IsAnyItemHovered())
         {
-            selectedGameObjectID = 0;
+            ResetSelectedGameObject();
         }
     }
     ImGui::End();
+
+    // Press F to focus onto GO
+    // TODO can make this like a nice panning if we want, but naw
+    if (ImGui::IsKeyPressed(ImGuiKey_F) && selectedGameObjectID != 0)
+    {
+        // TODO set camera focus to that game object
+        auto* transform = GetSelectedGameObject()->GetComponent<TransformComponent>();
+        if (!transform) return;
+        vec2 newPos{};
+        float newZoom{ (viewportSize.x - transform->scaleX)/viewportSize.x };
+        transform->GetPosition(newPos.x, newPos.y);
+        CORE->GetLevelEditor()->SetCameraPos(newPos);
+        CORE->GetLevelEditor()->SetCameraZoom(newZoom);
+    }
 }
 
 void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, EntityID &selectedGameObjectID, GameObjectFactory &factory)
@@ -642,6 +647,8 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    if (selectedGameObjectID == id)
+        flags |= ImGuiTreeNodeFlags_Selected;
 
     // Apply indentation based on depth
     ImGui::Indent(depth * 10.0f);
@@ -677,9 +684,6 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     else
     {
         // Display the tree node
-        if (selectedGameObjectID == id)
-            flags |= ImGuiTreeNodeFlags_Selected;
-
         nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
     }
 
@@ -757,16 +761,16 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     // Set selected item
     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
-        selectedGameObjectID = id;
+        SetSelectedGameObject(id);
     }
 
     // Right Click event (for specific GO in hierarchy)
     if (ImGui::BeginPopupContextItem())
     {
-        selectedGameObjectID = id;                                          // right click auto selects them, but sure let them click select also 
+        SetSelectedGameObject(id);                                          // right click auto selects them, but sure let them click select also 
         if (ImGui::MenuItem("Select"))
         {
-            selectedGameObjectID = id;
+            SetSelectedGameObject(id);
         }
         if (ImGui::MenuItem("Rename"))
         {
@@ -795,7 +799,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
             factory.DestroyGameObject(id);
             if (selectedGameObjectID == id)
             {
-                selectedGameObjectID = 0;
+                ResetSelectedGameObject();
             }
         }
         ImGui::EndPopup();
@@ -861,24 +865,12 @@ void GOCreationMenu_Spawn()
 void ImGuiSystem::SetSelectedGameObject(EntityID id)
 {
     selectedGameObjectID = id;
+}
 
-    // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
-    //auto const& go = GameObjectFactory::Instance().GetGameObject(id);
-    //auto* transform = go->GetComponent<TransformComponent>();
-
-    //if (transform)
-    //{
-    //    float x, y, sx, sy;
-    //    
-    //    //CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
-    //    transform->GetPosition(x, y);
-    //    transform->GetScale(sx, sy);
-    //    if (CORE->GetGraphicsSystem())
-    //    {
-    //        std::cout << "azaaaaaaaaaaaa";
-    //    }
-    //    CORE->GetGraphicsSystem()->DrawRectOutline(x,y,sx,sy,{0,1,0,1}, CORE->GetGraphicsSystem()->getVp());
-    //}
+void ImGuiSystem::ResetSelectedGameObject()
+{
+    selectedGameObjectID = 0;
+    CORE->GetGraphicsSystem()->ClearEditorSelection();
 }
 
 /**
@@ -1079,14 +1071,17 @@ void ImGuiSystem::Viewport_ManageGizmos()
         auto* camComp = CameraManager::Instance().GetActiveCamera();
         if (!camComp || !transform) return;
 
+        ImVec2 vpSize{ ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y };
+        ImVec2 vpPos{ ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
+
         ImGuizmo::SetOrthographic(true);        // or false idk
         ImGuizmo::SetDrawlist();                                                                                                            // draws current window
-        ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());             // set rect to viewport
+        ImGuizmo::SetRect(vpPos.x, vpPos.y, vpSize.x, vpSize.y);             // set rect to viewport
 
         mat4 view = camComp->GetViewMatrix();
-        mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
+        //mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());                                // replaced with getVp() bc this doesnt scale with cam zoom etc
         mat4 mtx = transform->GetMatrix();
-        ImGuizmo::Manipulate(value_ptr(view), value_ptr(projection), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::LOCAL, value_ptr(mtx));
+        ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::WORLD, value_ptr(mtx));
 
         if (ImGuizmo::IsUsing)
         {
@@ -1100,6 +1095,26 @@ void ImGuiSystem::Viewport_ManageGizmos()
             transform->SetPosition(trans.x, trans.y);
             transform->SetScale(scale.x, scale.y);
             transform->SetRotation(rot.x);
+        }
+    }
+}
+
+void ImGuiSystem::Viewport_HighlightGO()
+{
+    // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
+    if (!selectedGameObjectID) return;
+    auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
+    //CORE->GetLevelEditor()->GetEditorViewProjection()
+    if (transform)
+    {
+        float x, y, sx, sy;
+
+        //CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
+        transform->GetPosition(x, y);
+        transform->GetScale(sx, sy);
+        if (CORE->GetGraphicsSystem())
+        {
+            CORE->GetGraphicsSystem()->SetEditorSelection(x, y, sx, sy);
         }
     }
 }

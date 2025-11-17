@@ -279,6 +279,16 @@ public:
     float GetCameraZoom() const { return cameraZoom; }
 
     /**
+     * @brief Set now position of camera.
+     */
+    void SetCameraPos(vec2 const& pos) { cameraX = pos.x; cameraY = pos.y; }
+
+    /**
+     * @brief Set now zoom value of camera.
+     */
+    void SetCameraZoom(float zoomValue) { cameraZoom = zoomValue; }
+
+    /**
      * @return Name of the currently loaded scene
      */
     const std::string& GetCurrentFilename() const { return currentFilename; }

@@ -276,7 +276,7 @@ void LevelEditor::StopPlayMode()
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
-    CameraManager::Instance().ClearActiveCamera();
+    //CameraManager::Instance().ClearActiveCamera();                                // COMMENTED OUT 18TH NOV BC OF BUG W PLAYING -> STOPPING -> PLAYING
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 

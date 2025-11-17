@@ -170,6 +170,14 @@ public:
 	 */
 	void DrawBatches();
 
+	void SetEditorSelection(float x, float y, float sx, float sy) {
+		currentSelection = { x,y,sx,sy,true };
+	}
+
+	void ClearEditorSelection() {
+		currentSelection.exist = false;
+	}
+
 	/**
 	 * @brief Renders a string of text using a font atlas.
 	 * @param characters Map containing glyph data (texture ID, metrics).
@@ -278,6 +286,14 @@ private:
 		 */
 		RenderBatch(GLuint texID, bool circle, int l) : textureID(texID), isCircle(circle), layer(l) {}
 	};
+
+	// For drawing outline of individual GOs
+	struct EditorSelection {
+		float x, y, sx, sy;
+		bool exist = false;
+	};
+
+	EditorSelection currentSelection;
 
 	std::vector<RenderBatch> batches;		// Collection of all accumulated batches for the current frame.
 	GLuint batchVAO, batchVBO, batchEBO;	// OpenGL buffers for the batch rendering system.
