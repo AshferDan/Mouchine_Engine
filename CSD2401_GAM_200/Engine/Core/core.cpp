@@ -168,7 +168,7 @@ void CoreEngine::GameLoop()
             std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
 
             LevelEditor* level = GetLevelEditor();
-            level->LoadLevelJSON(m_pendingScene);
+            level->LoadLevel(m_pendingScene);
             std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
             // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====

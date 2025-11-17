@@ -43,7 +43,7 @@ LevelEditor::LevelEditor()
     hasValidSaveState(false),
     cameraX(0.0f), cameraY(0.0f), cameraZoom(1.0f),
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
-    zoomSpeed(0.1f),    //zoom to be implemented
+    zoomSpeed(0.1f),
     minZoom(0.1f),
     maxZoom(5.0f)
 {
@@ -124,7 +124,7 @@ void LevelEditor::Update(float /*dt*/)
 
             if (ImGui::Button("Load", ImVec2(120, 0)))
             {
-                if (LoadLevelJSON(loadFilepath))
+                if (LoadLevel(loadFilepath))
                 {
                     std::cout << "Level loaded successfully from: " << loadFilepath << std::endl;
                     showLoadDialog = false;
@@ -515,7 +515,7 @@ void LevelEditor::RenderMenuBar()
             filepath += ".json";
         }
 
-        if (SaveLevelJSON(filepath))
+        if (SaveLevel(filepath))
         {
             std::cout << "Level saved successfully to: " << filepath << std::endl;
         }
@@ -557,7 +557,7 @@ void LevelEditor::RenderMenuBar()
 /**
  * @brief Save level to JSON file
  */
-bool LevelEditor::SaveLevelJSON(const std::string &filepath)
+bool LevelEditor::SaveLevel(const std::string &filepath)
 {
     try
     {
@@ -597,12 +597,12 @@ bool LevelEditor::SaveLevelJSON(const std::string &filepath)
             }
             else
             {
-                std::cerr << "[SaveLevelJSON] WARNING: AudioManager is NULL" << std::endl;
+                std::cerr << "[SaveLevel] WARNING: AudioManager is NULL" << std::endl;
             }
         }
         else
         {
-            std::cerr << "[SaveLevelJSON] WARNING: CORE is NULL" << std::endl;
+            std::cerr << "[SaveLevel] WARNING: CORE is NULL" << std::endl;
         }
         
         // write to file
@@ -629,7 +629,7 @@ bool LevelEditor::SaveLevelJSON(const std::string &filepath)
 /**
  * @brief Load level from JSON file
  */
-bool LevelEditor::LoadLevelJSON(const std::string& filepath)
+bool LevelEditor::LoadLevel(const std::string& filepath)
 {
     try
     {
@@ -819,46 +819,6 @@ void LevelEditor::NewLevel()
     CameraManager::Instance().ClearActiveCamera();
 
     std::cout << "New level created" << std::endl;
-}
-
-/**
- * @brief Save level to file (wrapper for JSON save)
- */
-bool LevelEditor::SaveLevel(const std::string &filepath)
-{
-    return SaveLevelJSON(filepath); // redirect to JSON version
-}
-
-/**
- * @brief Load level from file
- */
-bool LevelEditor::LoadLevel(const std::string &filepath)
-{
-    // check if it's a JSON file
-    if (filepath.ends_with(".json"))
-    {
-        return LoadLevelJSON(filepath);
-    }
-
-    LevelData data;
-    if (LoadLevelFromFile(filepath, data))
-    {
-        // convert to current level
-        currentLevel = data;
-
-        // clear and recreate game objects
-        factory.Clear();
-        selectedGameObjectID = 0;
-
-        for (const auto &objData : data.gameObjects)
-        {
-            DeserialiseGameObject(objData);
-        }
-        hasValidSaveState = false;
-        return true;
-    }
-
-    return false;
 }
 
 /*  Game object management  */
@@ -1178,101 +1138,6 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
     return obj;
 }
 
-/**
- * @brief Load level data from legacy text file format
- */
-bool LevelEditor::LoadLevelFromFile(const std::string &filepath, LevelData &outData)
-{
-    std::ifstream file(filepath);
-    if (!file.is_open())
-    {
-        std::cerr << "Failed to open file for reading: " << filepath << std::endl;
-        return false;
-    }
-
-    std::string line;
-    outData = LevelData(); // reset
-
-    // read level
-    while (std::getline(file, line))
-    {
-        if (line == "LEVEL_BEGIN")
-        {
-            continue;
-        }
-        else if (line == "GAMEOBJECT_BEGIN")
-        {
-            break; // start reading game objects
-        }
-    }
-
-    // read game objects
-    GameObjectData currentObj;
-    bool readingObject = true;
-
-    while (readingObject && std::getline(file, line))
-    {
-        if (line == "GAMEOBJECT_BEGIN")
-        {
-            currentObj = GameObjectData(); // reset for new object
-        }
-        else if (line.find("Name: ") == 0)
-        {
-            currentObj.name = line.substr(6);
-        }
-        else if (line.find("Active: ") == 0)
-        {
-            currentObj.isActive = (line.substr(8) == "1");
-        }
-        else if (line.find("Transform: ") == 0)
-        {
-            std::istringstream iss(line.substr(11));
-            iss >> currentObj.posX >> currentObj.posY >> currentObj.scaleX >> currentObj.scaleY >> currentObj.rotation;
-            currentObj.hasTransform = true;
-        }
-        else if (line.find("Render: ") == 0)
-        {
-            std::istringstream iss(line.substr(8));
-            int hasTexInt;
-            iss >> currentObj.shapeType >> hasTexInt >> currentObj.colorR >> currentObj.colorG >> currentObj.colorB >> currentObj.colorA;
-            currentObj.hasRender = true;
-            currentObj.hasTexture = (hasTexInt == 1);
-        }
-        else if (line.find("Texture: ") == 0)
-        {
-            currentObj.texturePath = line.substr(9);
-        }
-        else if (line.find("Physics: ") == 0)
-        {
-            std::istringstream iss(line.substr(9));
-            int staticInt, gravityInt;
-            iss >> currentObj.mass >> currentObj.velocityX >> currentObj.velocityY >> staticInt >> gravityInt;
-            currentObj.hasPhysics = true;
-            currentObj.isStatic = (staticInt == 1);
-            currentObj.hasGravity = (gravityInt == 1);
-        }
-        else if (line.find("Collider: ") == 0)
-        {
-            std::istringstream iss(line.substr(10));
-            iss >> currentObj.colliderType >> currentObj.colliderWidth >> currentObj.colliderHeight >> currentObj.collisionLayer;
-            currentObj.hasCollider = true;
-        }
-        else if (line == "GAMEOBJECT_END")
-        {
-            outData.gameObjects.push_back(currentObj);
-            currentObj = GameObjectData();
-        }
-        else if (line == "LEVEL_END")
-        {
-            readingObject = false;
-            break;
-        }
-    }
-
-    file.close();
-    return true;
-}
-
  /*  Camera control  */
 /**
  * @brief Render camera control panel in ImGui
@@ -1447,7 +1312,7 @@ void LevelEditor::PerformSceneReload()
     factory.Clear();
     selectedGameObjectID = 0;
 
-    if (LoadLevelJSON(pendingScenePath))
+    if (LoadLevel(pendingScenePath))
     {
         std::string filename = fs::path(currentFilename).filename().string();
 
@@ -1464,6 +1329,8 @@ void LevelEditor::PerformSceneReload()
     pendingSceneReload = false;
     pendingScenePath.clear();
 }
+
+
 
 /*  Audio Management */
 /**
@@ -1499,4 +1366,3 @@ void LevelEditor::PerformSceneReload()
 //        }
 //    }
 //}
-
