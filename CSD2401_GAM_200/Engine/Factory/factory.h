@@ -284,6 +284,11 @@ public:
     void DestroyGameObject(EntityID id);
 
     /**
+     * @brief Destroys all child and further descended game objects in the family tree. 
+     */
+    void DestroyAllRelatedGameObjects(EntityID parentID);
+
+    /**
      * @brief Destroys all currently managed GameObjects.
      * This method clears all GameObjects but does NOT reset the EntityID counter.
      * Use this for level editor play/stop functionality to avoid ID conflicts.

@@ -259,6 +259,9 @@ public:
 
     void SetParent(GameObject* ParentGO);
 
+    void RemoveParent();
+
+
     GameObject* GetParent() const;
 
     std::vector<GameObject*> GetAllChildren() const;

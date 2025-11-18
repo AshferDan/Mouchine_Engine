@@ -96,6 +96,11 @@ ImVec2 viewportSize{};
 bool isHoveringOverViewport;
 int gizmo_type = -1;
 
+// IMGUI COLOURS
+ImVec4 color_icon_highlighted{ 0.5f, 0.5f, 0.5f, .7f };
+ImVec4 color_icon_normal{ 1.f, 1.f, 1.f, .7f };
+ImVec4 color_icon_bg{ 1.f, 1.f, 1.f, 1.f };
+
 // Vars for asset manager interface
 const float paddingSize = 16.f;
 const float cellSize = icon_size.x + paddingSize;
@@ -258,15 +263,15 @@ void ImGuiSystem::Update(float dt)
                     isHoveringOverViewport = false;
                 }
 
-                std::string testdata{};
+                std::string draggedPrefab{};
                 // Viewport accepts Prefabs for drag and drop
-                ReceiveDragAndDrop(PrefabPayloadID, testdata);
-                //ReceiveDragAndDrop(ScenePayloadID, testdata);                 // TODO drag and drop scene to load saved scene
-                if (!testdata.empty())
+                ReceiveDragAndDrop(PrefabPayloadID, draggedPrefab);
+
+                if (!draggedPrefab.empty())
                 {
                     // filter for type of data here
-                    std::cout << testdata << std::endl;                         // Prints the data sent via drag and drop
-                    Serialization::LoadPrefab(testdata);
+                    std::cout << draggedPrefab << std::endl;                         // Prints the data sent via drag and drop
+                    Serialization::LoadPrefab(draggedPrefab);
                 }
 
                 // Get cursor position relative to the image
@@ -620,6 +625,24 @@ void ImGuiSystem::Hierarchy_Render()
             ResetSelectedGameObject();
         }
     }
+
+    ImVec2 spaceAvail = ImGui::GetContentRegionAvail();
+    ImGui::Dummy(spaceAvail);
+    if (spaceAvail.y > 0.f)
+    {
+        std::string draggedID{};
+        ReceiveDragAndDrop(HierarchyPayloadID, draggedID);
+        if (!draggedID.empty())
+        {
+            EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
+            GameObject* go = factory.GetGameObject(deliveredID);
+            GameObject* goParent = go->GetParent();
+            if (goParent)
+            {
+                goParent->RemoveChild(go);
+            }
+        }
+    }
     ImGui::End();
 
     // Press F to focus onto GO
@@ -721,27 +744,31 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
     {
         // receiving drag and drop
-        std::string testdata{};
-        ReceiveDragAndDrop(HierarchyPayloadID, testdata);
+        std::string draggedID{};
+        ReceiveDragAndDrop(HierarchyPayloadID, draggedID);
         // Do something with DnD data
-        if (!testdata.empty())
+        if (!draggedID.empty())
         {
             std::vector<EntityID> familyTree{};
             GetFamilyTree(obj, familyTree);                         // Get all descendent game objects (child of child wtv) underneath the parrent GO
 
-            std::cout << "GetFamilyTree() has: \n";
+            /*std::cout <<  obj->GetName() <<"'s GetFamilyTree() has: \n";
             for (auto const &r : familyTree)
             {
-                std::cout << r << std::endl;
-            }
+                std::cout << factory.GetGameObject(r)->GetName() << std::endl;
+            }*/
 
-            EntityID deliveredID = EntityID(std::stoi(testdata));       // Convert payload data to EntityID
+            EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
             auto check = std::find(familyTree.begin(), familyTree.end(), deliveredID);
 
-            if (check == familyTree.end())
+            std::vector<EntityID> selfParentingTree{};
+            GetFamilyTree(factory.GetGameObject(deliveredID), selfParentingTree);
+            auto checkSelfParenting = std::find(selfParentingTree.begin(), selfParentingTree.end(), obj->GetID());
+
+            if (check == familyTree.end() && checkSelfParenting == selfParentingTree.end())
             {
-                std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
                 GameObject *deliveredGO = factory.GetGameObject(deliveredID);
+                std::cout << "[Hierarchy] Setting " << deliveredGO->GetName() << " to be child of " << obj->GetName() << std::endl;
                 deliveredGO->SetParent(obj);                                        // Set Dragged GO to be parent of receiver GO
 
                 if (!nodeOpen && !obj->GetAllChildren().empty())
@@ -796,7 +823,8 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
         if (ImGui::MenuItem("Delete"))
         {
-            factory.DestroyGameObject(id);
+            // TODO - block out the deleting of main camera - crashes the game
+            factory.DestroyAllRelatedGameObjects(id);                   // handles cases for both individual GOs and parented GOs
             if (selectedGameObjectID == id)
             {
                 ResetSelectedGameObject();
@@ -986,16 +1014,6 @@ void PrefabMenu_Render()
 
     ImDrawList *drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
-
-    // Test for if drag and drop works
-    std::string testdata{};
-    ReceiveDragAndDrop(AssetPayloadID, testdata);
-    ReceiveDragAndDrop(HierarchyPayloadID, testdata);
-    // Do something with DnD data
-    if (!testdata.empty())
-    {
-        std::cout << testdata << std::endl;
-    }
     ImGui::EndGroup();
 
     if (ImGui::Button("Spawn -> Load Prefab"))
@@ -1034,28 +1052,28 @@ void ImGuiSystem::Viewport_ManageGizmos()
 
     // GIZMO CONTROLS
     if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_Q))
+        (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
     {
         gizmo_type = -1;
     }
     CreateHintText("(Q) Select");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_W))
+        (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
     {
         gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
     }
     CreateHintText("(W) Move");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_E))
+        (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
     {
         gizmo_type = int(ImGuizmo::OPERATION::SCALE);
     }
     CreateHintText("(E) Scale");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))) || ImGui::IsKeyPressed(ImGuiKey_R))
+        (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
     {
         gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
     }
@@ -1753,12 +1771,12 @@ void ImGuiSystem::RenderPropertyEditor()
     ImDrawList* drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
 
-    static std::string testdata{};
-    ReceiveDragAndDrop(AssetPayloadID, testdata);
+    static std::string draggedAsset{};
+    ReceiveDragAndDrop(AssetPayloadID, draggedAsset);
 
     ImGui::EndGroup();
     // Do something with DnD asset data - maybe insert into boxes to assign sprites
-    ImGui::Text(testdata.c_str());
+    ImGui::Text(draggedAsset.c_str());
 
     ImGui::End();
 }
