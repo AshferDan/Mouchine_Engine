@@ -37,11 +37,6 @@ namespace API
             std::cout << "Audio system initialised successfully" << std::endl;
         }
         
-        // Initialise Audio Manager
-        std::cout << "\n--- Initialising Audio Manager ---" << std::endl;
-        AudioManager* audioManager = new AudioManager(&audio);
-        engine.SetAudioManager(audioManager);
-        std::cout << "AudioManager created and set in engine" << std::endl;
 
         // Initialise Resource Manager
         std::cout << "\n--- Initialising Resource Manager ---" << std::endl;

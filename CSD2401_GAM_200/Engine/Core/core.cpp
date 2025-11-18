@@ -134,6 +134,17 @@ void CoreEngine::InitSystems()
 void CoreEngine::Init()
 {
     InitSystems();
+    if (audioEngine)
+    {
+        std::cout << "[CoreEngine] Creating AudioManager internally..." << std::endl;
+        // We use 'new' here because we store it in a raw pointer member variable.
+        // We MUST delete this in DestroySystems() to avoid leaks.
+        audioManager = new AudioManager(audioEngine);
+    }
+    else
+    {
+        std::cerr << "[CoreEngine] WARNING: AudioEngine not set before Init! AudioManager will be null." << std::endl;
+    }
 
     std::cout << "Initializing CoreEngine with " << Systems.size() << " systems" << std::endl;
 
@@ -395,6 +406,12 @@ void CoreEngine::DestroySystems()
 {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
+    if (audioManager)
+    {
+        std::cout << "[CoreEngine] Deleting AudioManager..." << std::endl;
+        delete audioManager;
+        audioManager = nullptr; // Good practice to nullify after delete
+    }
 }
 
 void CoreEngine::update_time(double fps_calc_interval)

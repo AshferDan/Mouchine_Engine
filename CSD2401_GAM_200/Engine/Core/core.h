@@ -222,7 +222,6 @@ public:
 
     // audio manager stuff
     AudioManager* GetAudioManager() const { return audioManager; }
-    void SetAudioManager(AudioManager* manager) { audioManager = manager; }
 
     /**
      * @brief Reads and applies configuration settings from a file.
@@ -309,6 +308,7 @@ private:
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem* menuLogicSystem = nullptr;
     AudioManager* audioManager = nullptr;
+
 
     unsigned LastTime;
     bool GameActive;
