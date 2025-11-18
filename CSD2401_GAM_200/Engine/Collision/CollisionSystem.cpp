@@ -64,20 +64,20 @@ bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2
     {
         CollisionLayer other = (layer1 == CollisionLayer::Player) ? layer2 : layer1;
         return (other == CollisionLayer::Ground ||
-                other == CollisionLayer::Wall ||
-                other == CollisionLayer::Enemy ||
-                other == CollisionLayer::Platform ||
-                other == CollisionLayer::Player);
+            other == CollisionLayer::Wall ||
+            other == CollisionLayer::Enemy ||
+            other == CollisionLayer::Platform ||
+            other == CollisionLayer::Player);
     }
 
     if (layer1 == CollisionLayer::Enemy || layer2 == CollisionLayer::Enemy)
     {
         CollisionLayer other = (layer1 == CollisionLayer::Enemy) ? layer2 : layer1;
         return (other == CollisionLayer::Player ||
-                other == CollisionLayer::Ground ||
-                other == CollisionLayer::Wall ||
-                other == CollisionLayer::Platform ||
-                other == CollisionLayer::Enemy);
+            other == CollisionLayer::Ground ||
+            other == CollisionLayer::Wall ||
+            other == CollisionLayer::Platform ||
+            other == CollisionLayer::Enemy);
     }
 
     if (layer1 == CollisionLayer::Ground && layer2 == CollisionLayer::Ground)
@@ -112,16 +112,16 @@ bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2
 void CollisionSystem::Update(float deltaTime)
 {
     (void)deltaTime;
-    auto &factory = GameObjectFactory::Instance();
-    const auto &gameObjects = factory.GetAllGameObjects();
+    auto& factory = GameObjectFactory::Instance();
+    const auto& gameObjects = factory.GetAllGameObjects();
 
     // Clear and rebuild spatial grid each frame
     spatialGrid.Clear();
 
     // Insert all objects with colliders into the grid
-    for (const auto &obj : gameObjects)
+    for (const auto& obj : gameObjects)
     {
-        auto *collider = obj->GetComponent<ColliderComponent>();
+        auto* collider = obj->GetComponent<ColliderComponent>();
         if (collider)
         {
             spatialGrid.Insert(obj.get(), collider);
@@ -129,19 +129,19 @@ void CollisionSystem::Update(float deltaTime)
     }
 
     // Use spatial grid for broad-phase collision detection
-    for (const auto &obj1 : gameObjects)
+    for (const auto& obj1 : gameObjects)
     {
-        auto *col1 = obj1->GetComponent<ColliderComponent>();
+        auto* col1 = obj1->GetComponent<ColliderComponent>();
         if (!col1)
             continue;
 
         // Query nearby objects from spatial grid (MUCH FASTER than checking all)
-        std::vector<GameObject *> nearbyObjects = spatialGrid.Query(obj1.get(), col1);
+        std::vector<GameObject*> nearbyObjects = spatialGrid.Query(obj1.get(), col1);
 
         // Check collisions only with nearby objects
-        for (GameObject *obj2 : nearbyObjects)
+        for (GameObject* obj2 : nearbyObjects)
         {
-            auto *col2 = obj2->GetComponent<ColliderComponent>();
+            auto* col2 = obj2->GetComponent<ColliderComponent>();
             if (!col2)
                 continue;
 
@@ -155,7 +155,7 @@ void CollisionSystem::Update(float deltaTime)
                     col1->GetCircle(), col2->GetCircle());
             }
             else if (col1->GetType() == ColliderComponent::Type::Square &&
-                     col2->GetType() == ColliderComponent::Type::Square)
+                col2->GetType() == ColliderComponent::Type::Square)
             {
                 isColliding = CollisionIntersection_RectRect_Static(
                     col1->GetAABB(), col2->GetAABB());
@@ -183,7 +183,7 @@ void CollisionSystem::Update(float deltaTime)
             if (isColliding)
             {
                 bool wasActive = false;
-                for (auto &pair : activeCollisions)
+                for (auto& pair : activeCollisions)
                 {
                     if ((pair.first == obj1.get() && pair.second == obj2) ||
                         (pair.first == obj2 && pair.second == obj1.get()))
@@ -199,8 +199,8 @@ void CollisionSystem::Update(float deltaTime)
                     CollisionMessage msg(obj1.get(), obj2);
                     CORE->GetMessageBus().Publish(msg);
                     std::cout << "Collision: " << obj1->GetName() << " <-> "
-                              << obj2->GetName() << std::endl;
-                    activeCollisions.push_back({obj1.get(), obj2});
+                        << obj2->GetName() << std::endl;
+                    activeCollisions.push_back({ obj1.get(), obj2 });
                 }
 
                 // Report collision to PhysicsSystem for resolution
@@ -214,13 +214,96 @@ void CollisionSystem::Update(float deltaTime)
                 // Remove from active collisions
                 activeCollisions.erase(
                     std::remove_if(activeCollisions.begin(), activeCollisions.end(),
-                                   [&](const auto &pair)
-                                   {
-                                       return (pair.first == obj1.get() && pair.second == obj2) ||
-                                              (pair.first == obj2 && pair.second == obj1.get());
-                                   }),
+                        [&](const auto& pair)
+                        {
+                            return (pair.first == obj1.get() && pair.second == obj2) ||
+                                (pair.first == obj2 && pair.second == obj1.get());
+                        }),
                     activeCollisions.end());
             }
         }
     }
+
+    // Update collision tracking for helper functions
+    previousCollisions = currentCollisions;
+    currentCollisions.clear();
+
+    // Rebuild current collisions set
+    for (const auto& obj1 : gameObjects) {
+        auto* col1 = obj1->GetComponent<ColliderComponent>();
+        if (!col1) continue;
+
+        std::vector<GameObject*> nearbyObjects = spatialGrid.Query(obj1.get(), col1);
+
+        for (GameObject* obj2 : nearbyObjects) {
+            auto* col2 = obj2->GetComponent<ColliderComponent>();
+            if (!col2) continue;
+
+            if (AreColliding(obj1.get(), obj2)) {
+                std::string key = GetCollisionKey(obj1.get(), obj2);
+                currentCollisions.insert(key);
+            }
+        }
+    }
+}
+// ===== Helper Functions for Specific Object Collision Queries =====
+
+std::string CollisionSystem::GetCollisionKey(GameObject* obj1, GameObject* obj2) {
+
+    // GetCollisionKey(player, enemy) and GetCollisionKey(enemy, player) 
+    // both become GetCollisionKey(player, enemy) after this line
+    if (obj1 > obj2) std::swap(obj1, obj2);
+
+    //   Hero vs Enemy1 ? "Hero_Enemy_100_200"
+    //   Hero vs Enemy2 ? "Hero_Enemy_100_300" (different address for Enemy2)
+    return obj1->GetName() + "_" + obj2->GetName() + "_" +
+        std::to_string(reinterpret_cast<uintptr_t>(obj1)) + "_" +
+        std::to_string(reinterpret_cast<uintptr_t>(obj2));
+}
+
+bool CollisionSystem::AreColliding(GameObject* obj1, GameObject* obj2) {
+    if (!obj1 || !obj2) return false;
+
+    auto* col1 = obj1->GetComponent<ColliderComponent>();
+    auto* col2 = obj2->GetComponent<ColliderComponent>();
+
+    if (!col1 || !col2) return false;
+
+    if (col1->GetType() == ColliderComponent::Type::Circle &&
+        col2->GetType() == ColliderComponent::Type::Circle) {
+        return CollisionIntersection_CircleCircle_Static(col1->GetCircle(), col2->GetCircle());
+    }
+    else if (col1->GetType() == ColliderComponent::Type::Square &&
+        col2->GetType() == ColliderComponent::Type::Square) {
+        return CollisionIntersection_RectRect_Static(col1->GetAABB(), col2->GetAABB());
+    }
+    else {
+        if (col1->GetType() == ColliderComponent::Type::Square) {
+            return CollisionIntersection_RectCircle_Static(col1->GetAABB(), col2->GetCircle());
+        }
+        else {
+            return CollisionIntersection_RectCircle_Static(col2->GetAABB(), col1->GetCircle());
+        }
+    }
+}
+
+bool CollisionSystem::JustCollided(GameObject* obj1, GameObject* obj2) {
+    std::string key = GetCollisionKey(obj1, obj2);
+    bool collidingNow = currentCollisions.find(key) != currentCollisions.end();
+    bool collidingBefore = previousCollisions.find(key) != previousCollisions.end();
+    return collidingNow && !collidingBefore;
+}
+
+bool CollisionSystem::StillColliding(GameObject* obj1, GameObject* obj2) {
+    std::string key = GetCollisionKey(obj1, obj2);
+    bool collidingNow = currentCollisions.find(key) != currentCollisions.end();
+    bool collidingBefore = previousCollisions.find(key) != previousCollisions.end();
+    return collidingNow && collidingBefore;
+}
+
+bool CollisionSystem::JustStopped(GameObject* obj1, GameObject* obj2) {
+    std::string key = GetCollisionKey(obj1, obj2);
+    bool collidingNow = currentCollisions.find(key) != currentCollisions.end();
+    bool collidingBefore = previousCollisions.find(key) != previousCollisions.end();
+    return !collidingNow && collidingBefore;
 }
