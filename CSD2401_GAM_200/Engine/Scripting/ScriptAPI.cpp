@@ -502,6 +502,8 @@ namespace API
         return false;
     }
 
+    
+
 #pragma endregion
 
 #pragma region Camera
@@ -545,6 +547,92 @@ namespace API
         int range = max - min + 1;
         int result = rand() % range + min;
         return result;
+    }
+#pragma endregion
+
+#pragma region Audio
+
+    void AddSound(const std::string name, const std::string filepath,
+        bool loop, float volume, std::string category) {
+        SoundData newSound{ name,filepath,loop,volume,category };
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->AddSound(newSound);
+        }
+    }
+
+    void PlaySound(const std::string soundName, const std::string channel)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->PlaySound(soundName, channel);
+        }
+
+    }
+
+    void StopSound(const std::string soundName)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->StopSound(soundName);
+        }
+    }
+
+    void StopAllSound()
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->StopAllSounds();
+        }
+    }
+
+    void RemoveSound(const std::string soundName)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->RemoveSound(soundName);
+        }
+    }
+
+    void TriggerEvent(const std::string eventname)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->TriggerEvent(eventname);
+        }
+    }
+
+    void AddEventSound(const std::string eventName, const std::string soundName)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->AddEventMapping(eventName, soundName);
+        }
+    }
+
+    void SetVolume(const std::string soundName, float volume)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->SetSoundVolume(soundName, volume);
+        }
+    }
+
+    void SetCategoryVolume(const std::string CatName, float vol)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->SetCategoryVolume(CatName, vol);
+        }
     }
 #pragma endregion
 

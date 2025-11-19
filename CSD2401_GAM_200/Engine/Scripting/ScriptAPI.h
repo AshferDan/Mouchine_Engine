@@ -329,14 +329,16 @@ namespace API {
 #pragma endregion
 
 #pragma region Audio
+    void PlaySound(const std::string,const std::string);
+    void StopSound(const std::string);
+    void StopAllSound(const std::string);
+    void RemoveSound(const std::string);
 
-    void AddSound();
-    void muteSound();
-    void muteSound();
-
-    void setBGMVol();
-    void setSFXVol();
-    void setMasterVol();
+    void TriggerEvent(const std::string);
+    void AddEventSound(const std::string, const std::string);
+   
+    void SetVolume(const std::string,float);
+    void SetCategoryVolume(const std::string,float);
 #pragma endregion
 
 
