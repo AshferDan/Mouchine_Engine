@@ -283,6 +283,8 @@ public:
      * @brief Plays the loaded background music if available
      */
     //void PlayLoadedBGM();
+
+    std::string GetCurrentBGMChannel() const { return currentBGMChannel; }
 private:
     // GUI rendering functions
     /**

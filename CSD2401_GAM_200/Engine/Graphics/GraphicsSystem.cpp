@@ -340,6 +340,18 @@ void GraphicsSystem::Update(float)
     if (!window)
         return; // Skip if no valid window.
 
+    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
+        {
+            if (focused == GLFW_FALSE)
+            {
+                CORE->SetGamePaused(true);
+            }
+            else
+            {
+                CORE->SetGamePaused(false);
+            }
+        });
+
     // === Framebuffer and Viewport Setup ===
     if (editorMode)
     {
@@ -1067,6 +1079,33 @@ void GraphicsSystem::DrawFlashOverlay(const vec4& color) {
     glBindVertexArray(flashVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
+}
+
+void GraphicsSystem::ToggleFullScreen() {
+    if (!window) {
+        return;
+    }
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+    if (!isFullscreen) {
+        glfwGetWindowPos(window, &windowedPosX, &windowedPosY);
+        glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
+
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        isFullscreen = true;
+
+        std::cout << "[GraphicsSystem] Switched to fullscreen: " << mode->width << "x" << mode->height << std::endl;
+    }
+    else {
+
+        glfwSetWindowMonitor(window, nullptr, windowedPosX, windowedPosY, windowedWidth, windowedHeight, GLFW_DONT_CARE);
+
+        isFullscreen = false;
+
+        std::cout << "[GraphicsSytem] Switched to windowed " << Wwidth << "x" << Wheight << std::endl;
+    }
 }
 
 /**

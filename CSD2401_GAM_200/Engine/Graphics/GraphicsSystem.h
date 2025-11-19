@@ -238,14 +238,21 @@ public:
 	 */
 	void HandleMessage(const CreateObjectMessage& msg);
 
+	void ToggleFullScreen();
+	bool IsFullscreen() const { return isFullscreen; }
+
 private:
 	// --- Window and State ---
 	GLFWwindow* window;						// The handle to the GLFW window.
 	GLint Wwidth, Wheight;					// Current dimensions of the window's client area (in screen coordinates).
+	int windowedPosX, windowedPosY;
+	int windowedWidth, windowedHeight;
+	bool isFullscreen = false;
 	mat4 vp;								// Current view-projection matrix (camera transform).
 	bool debugMode = false;					// Flag to control rendering of debug shapes (lines, outlines).
 	bool editorMode;						// Flag to indicate if rendering should target the FBO (true) or the screen (false).
 	class LevelEditor* levelEditor = nullptr; // Pointer to the level editor for camera manipulation when in editor mode.
+
 
 	// --- Shaders ---
 	GLSLShader shader;		// Default shader for batched quads/circles.
