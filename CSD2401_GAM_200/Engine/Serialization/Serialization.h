@@ -20,6 +20,7 @@ Technology is prohibited.
 #include "factory.h"
 #include "CameraComponent.h"
 #include "ComponentSerialization.h"
+#include "AudioManager.h"
 
 using json = nlohmann::json;
 const std::string PrefabFilePath { "../Assets/Prefabs/" };
@@ -73,6 +74,10 @@ namespace Serialization
     * @brief Renames an existing prefab file.
     */
     void RenamePrefab(std::string const& oldName, std::string const& newName);
+
+    // audio serialisation
+    json SerializeAudioManager(AudioManager* audioManager);
+    void DeserializeAudioManager(const json& j, AudioManager* audioManager);
 
     extern bool Prefab_DragAndDropped;
 }

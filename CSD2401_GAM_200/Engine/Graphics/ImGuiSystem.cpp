@@ -21,6 +21,8 @@ Technology is prohibited.
 #include <map>
 #include <string>
 #include <filesystem>
+#include <algorithm>
+#include <cctype>  
 #include "core.h"
 #include "RenderComponent.h"
 #include <typeinfo>
@@ -28,6 +30,7 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "ColliderComponent.h"
 #include "physics.h"
+#include "AudioManager.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -80,6 +83,9 @@ static bool openLayoutSavePopup = false;
 static bool openLayoutLoadPopup = false;
 static bool saveNamePopupClear = false;
 static bool renderLoadedLayout = false;
+static bool showAudioAssetsPanel = false;
+static bool g_showAudioErrorPopup = false;
+static std::string g_audioErrorMessage;
 
 bool isHoveringOverViewport;
 
@@ -99,6 +105,8 @@ GLuint icon_folder_ui;
 GLuint icon_file_ui;
 GLuint icon_plus_ui;
 GLuint icon_prefab_ui;
+GLuint icon_audio_ui;
+GLuint icon_json_ui;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
@@ -149,6 +157,7 @@ void ImGuiSystem::Initialize()
     icon_file_ui = GraphicsSystem::LoadTexture(icon_file);
     icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
     icon_prefab_ui = GraphicsSystem::LoadTexture(icon_prefab);
+    icon_audio_ui = GraphicsSystem::LoadTexture(icon_audio);
 }
 
 /**
@@ -255,6 +264,12 @@ void ImGuiSystem::Update(float dt)
             // Only show editor UI when not in play mode
             Hierarchy_Render();
             AssetBrowserWindow.RenderImGui();
+
+            // only show audio assets if toggled on
+            if (showAudioAssetsPanel)
+            {
+                AudioAssetsPanel_Render();
+            }
 
             // render property editor for selected game object
             if (showPropertyEditor)
@@ -536,6 +551,17 @@ void ImGuiSystem::Hierarchy_Render()
         ShowLoadPrefabMenu = (!ShowLoadPrefabMenu) ? true : false;
     }
     CreateHintText("Spawn Prefab");
+
+    ImGui::SameLine();
+    // Audio Assets toggle button
+    if (ImGui::ImageButton("##AudioAssetsToggle", ImTextureID(icon_audio_ui),
+        { icon_size_small.x, icon_size_small.y },
+        { 0, 1 }, { 1, 0 },
+        ImVec4(1.f, 1.f, 1.f, 0.7f), ImVec4(1, 1, 1, 1)))
+    {
+        showAudioAssetsPanel = !showAudioAssetsPanel;
+    }
+    CreateHintText("Toggle Audio Assets panel");
 
     // THIS IS JUST A SAMPLE I THOUGHT IT WAS COOL, SEE IF WE LIKE THEN ILL PORT OVER TO THIS
     ImGui::SameLine();
@@ -975,6 +1001,7 @@ void DirectoryNavigator::RenderImGui()
         std::string path = iter.path().string();                            // Path we are currently in
         auto relativePath = fs::relative(iter.path(), assetPath);           // Path relative from where we started (assets) to where we are
         std::string fileName = relativePath.filename().string();            // name of the file alone
+        std::string extension = iter.path().extension().string();
 
         // If the current item is a folder
         if (iter.is_directory())
@@ -988,10 +1015,24 @@ void DirectoryNavigator::RenderImGui()
         // If current item is a file 
         else
         {
+            // this is a file, not sure if we wanna do anything yet (when we click)
             // add double click to open in windows file explorer?
-            if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
+
+            // Json files
+            if (extension == ".json")
             {
-                // this is a file, not sure if we wanna do anything yet (when we click)
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_json_ui), icon_size, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
+            }
+            // Audio Files
+            else if (extension == ".wav" || extension == ".mp3" || extension == ".ogg" || extension == ".flac")
+            {
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_audio_ui), icon_size, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
             }
 
             // Can only drag and drop files, not folders
@@ -1005,6 +1046,10 @@ void DirectoryNavigator::RenderImGui()
                 else if (iter.path().parent_path().filename() == "Prefabs")
                 {
                     SendDragAndDrop(PrefabPayloadID, iter.path().stem().string(), fileName);            // For prefab files
+                }
+                else if (iter.path().parent_path().filename() == "Audio" || iter.path().parent_path().filename() == "audio")    //for some reason its lowercase in property editor?
+                {
+                    SendDragAndDrop(AudioPayloadID, iter.path().string(), fileName.c_str());            // For Audio files
                 }
                 else
                 {
@@ -1663,7 +1708,252 @@ void M2_RenderStressTest()
     }
 }
 
+#pragma region Audio Assets ImGui
+// Renders the Audio Assets panel
+void AudioAssetsPanel_Render()
+{
+    // use the flag to control visibility
+    if (!showAudioAssetsPanel)
+        return;
 
+    bool open = true;
+
+    ImGui::SetNextWindowSize(ImVec2(350, 600), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
+
+    if (!ImGui::Begin("Audio Assets", &open))
+    {
+        // even if collapsed still need to handle closing
+        if (!open)
+        {
+            showAudioAssetsPanel = false;
+        }
+            
+        ImGui::End();
+        return;
+    }
+
+    if (!open)
+    {
+        showAudioAssetsPanel = false;
+        ImGui::End();
+        return;
+    }
+
+    AudioManager* audioMgr = CORE->GetAudioManager();
+    if (!audioMgr)
+    {
+        ImGui::TextDisabled("AudioManager not available");
+        ImGui::End();
+        return;
+    }
+
+    ImGui::TextWrapped("Drag .wav / .mp3 / .ogg files from Project Navigator into this window to add them to the AudioManager");
+    ImGui::Separator();
+
+    // global controls
+    if (ImGui::Button("Stop All Sounds"))
+    {
+        audioMgr->StopAllSounds();
+    }
+    ImGui::SameLine();
+    ImGui::Separator();
+    ImGui::Text("Drop zone:");
+
+    ImVec2 dropSize = ImVec2(ImGui::GetContentRegionAvail().x, 120.0f);
+    ImGui::Dummy(dropSize);     // big area as the target
+
+    // draw an outline so it's visible... to change ltr on
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    ImVec2 min = ImGui::GetItemRectMin();
+    ImVec2 max = ImGui::GetItemRectMax();
+    dl->AddRect(min, max, IM_COL32(200, 200, 200, 255));
+
+    if (ImGui::BeginDragDropTarget())
+    {
+        const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AudioPayloadID.c_str());
+        if (!payload)
+            payload = ImGui::AcceptDragDropPayload(AssetPayloadID.c_str());
+        if (!payload)
+            payload = ImGui::AcceptDragDropPayload(ScenePayloadID.c_str());
+        if (!payload)
+            payload = ImGui::AcceptDragDropPayload(PrefabPayloadID.c_str());
+        if (!payload)
+            payload = ImGui::AcceptDragDropPayload(HierarchyPayloadID.c_str());
+
+        if (payload)
+        {
+            const char* droppedPath = (const char*)payload->Data;
+            std::string droppedPathStr = droppedPath;
+
+            fs::path p(droppedPathStr);
+            std::string ext = p.extension().string();
+
+            // normalise extension to lowercase
+            std::transform(ext.begin(), ext.end(), ext.begin(),
+                [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+            if (ext == ".wav" || ext == ".mp3" || ext == ".ogg")
+            {
+                SoundData sound{};
+                sound.filepath = droppedPathStr;
+                sound.name = p.stem().string();
+                sound.loop = false;
+                sound.volume = 1.0f;
+                sound.category = "sfx";
+
+                audioMgr->AddSound(sound);
+
+                if (audioMgr->LoadSound(sound))
+                {
+                    std::cout << "[Audio Assets] Added and loaded sound: " << sound.name << std::endl;
+                }
+                else
+                {
+                    std::cout << "[Audio Assets] Failed to load sound: " << sound.name << std::endl;
+                }
+            }
+            else
+            {
+                // trigger imgui error popup
+                g_audioErrorMessage = "Unsupported audio file type: " + ext + "\n\nSupported formats: .wav, .mp3, .ogg";
+                g_showAudioErrorPopup = true;
+                std::cout << "[Audio Assets] Unsupported audio type: " << ext << std::endl;
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    std::string soundToRemove;
+    // show current audio database
+    auto& db = audioMgr->GetSoundDatabase();
+    if (db.empty())
+    {
+        ImGui::TextDisabled("No sounds added yet");
+    }
+    else
+    {
+        if (ImGui::BeginTable("AudioAssetsTable", 5,
+            ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+            ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY))
+        {
+            ImGui::TableSetupColumn("Name");
+            ImGui::TableSetupColumn("Category");
+            ImGui::TableSetupColumn("Loop");
+            ImGui::TableSetupColumn("Volume");
+            ImGui::TableSetupColumn("Actions");
+            ImGui::TableHeadersRow();
+
+            for (auto& pair : db)
+            {
+                SoundData& sound = pair.second;
+
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::TextUnformatted(sound.name.c_str());
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::TextUnformatted(sound.category.c_str());
+
+                // loop
+                ImGui::TableSetColumnIndex(2);
+                {
+                    bool loop = sound.loop;
+                    if (ImGui::Checkbox(("##loop_" + sound.name).c_str(), &loop))
+                    {
+                        sound.loop = loop;
+                        audioMgr->ReloadSound(sound.name);
+
+                        std::cout << "[Audio Assets] Updated loop for " << sound.name << " = " << (sound.loop ? "true" : "false") << std::endl;
+                    }
+                }
+
+                // volume
+                ImGui::TableSetColumnIndex(3);
+                {
+                    float volume = sound.volume;
+                    if (ImGui::SliderFloat(("##vol_" + sound.name).c_str(),
+                        &volume, 0.0f, 1.0f))
+                    {
+                        sound.volume = volume;
+                        audioMgr->SetSoundVolume(sound.name, volume);
+                        std::cout << "[Audio Assets] Updated volume for " << sound.name << " = " << sound.volume << std::endl;
+                    }
+                }
+
+                ImGui::TableSetColumnIndex(4);
+                std::string playLabel = "Play##" + sound.name;
+                if (ImGui::SmallButton(playLabel.c_str()))
+                {
+                    audioMgr->PlaySound(sound.name);
+                }
+                ImGui::SameLine();
+
+                // stop button
+                std::string stopLabel = "Stop##" + sound.name;
+                if (ImGui::SmallButton(stopLabel.c_str()))
+                {
+                    audioMgr->StopSound(sound.name + "_channel");
+                }
+
+                // remove sound button
+                std::string removeLabel = "Remove##" + sound.name;
+                if (ImGui::SmallButton(removeLabel.c_str()))
+                {
+                    soundToRemove = sound.name;
+                }
+            }
+
+            ImGui::EndTable();
+        }
+        if (!soundToRemove.empty())
+        {
+            audioMgr->RemoveSound(soundToRemove);
+        }
+    }
+
+    // audio file error popup centered and top most
+    if (g_showAudioErrorPopup)
+    {
+        ImGui::OpenPopup("Audio File Error");
+        g_showAudioErrorPopup = false; // only open once
+    }
+
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImVec2 center = viewport->GetCenter();
+    ImGui::SetNextWindowSize(ImVec2(320, 180), ImGuiCond_Appearing);
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Audio File Error", nullptr,
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::TextWrapped("%s", g_audioErrorMessage.c_str());
+        ImGui::Separator();
+
+        ImGui::Dummy(ImVec2(0.0f, 4.0f));
+        ImGui::SetCursorPosX(
+            ImGui::GetCursorPosX()
+            + (ImGui::GetContentRegionAvail().x - 120.0f) * 0.5f
+        );
+        if (ImGui::Button("OK", ImVec2(120.0f, 0.0f)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::End();
+
+    if (!open)
+    { 
+        showAudioAssetsPanel = false;
+    }
+}
+#pragma endregion
 
 // Helpers
 /**

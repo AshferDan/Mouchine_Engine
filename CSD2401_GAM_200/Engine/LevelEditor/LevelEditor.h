@@ -149,14 +149,14 @@ public:
      * @param filepath File path to save to
      * @return True if the save operation succeeded
      */
-    bool SaveLevelJSON(const std::string& filepath);
+    bool SaveLevel(const std::string& filepath);
 
     /**
      * @brief Loads a level from a JSON file
      * @param filepath File path to load from
      * @return True if the load operation succeeded
      */
-    bool LoadLevelJSON(const std::string& filepath);
+    bool LoadLevel(const std::string& filepath);
 
     /**
      * @brief Retrieves all available scene files from the Scenes directory
@@ -164,21 +164,7 @@ public:
      */
     std::vector<std::string> GetAllSceneFiles();
 
-    // Level management
-    /**
-     * @brief Save the current level to a file
-     * @param filepath Path to save the level file
-     * @return true if save successful, false otherwise
-     */
-    bool SaveLevel(const std::string& filepath);
-
-    /**
-     * @brief Load a level from a file
-     * @param filepath Path to the level file
-     * @return true if load successful, false otherwise
-     */
-    bool LoadLevel(const std::string& filepath);
-
+    /*  Level Management  */
     /**
      * @brief Create a new empty level
      */
@@ -296,7 +282,7 @@ public:
     /**
      * @brief Plays the loaded background music if available
      */
-    void PlayLoadedBGM();
+    //void PlayLoadedBGM();
 private:
     // GUI rendering functions
     /**
@@ -334,14 +320,6 @@ private:
      * @return Pointer to created GameObject
      */
     GameObject* DeserialiseGameObject(const GameObjectData& data);
-
-    /**
-     * @brief Load level data from JSON file
-     * @param filepath File path to load from
-     * @param outData Output level data
-     * @return true if successful, false otherwise
-     */
-    bool LoadLevelFromFile(const std::string& filepath, LevelData& outData);
 
 private:
     GameObjectFactory& factory;           // reference to game object factory

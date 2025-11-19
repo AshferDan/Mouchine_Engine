@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "ResourceManager.h"
 #include "Serialization.h"
 #include "audio.h"
+#include "AudioManager.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -33,6 +34,7 @@ namespace fs = std::filesystem;
 LevelEditor::LevelEditor()
     : factory(GameObjectFactory::Instance()),
     selectedGameObjectID(0),
+    savedEntityIDCounter(0),
     showSaveDialog(false),
     showLoadDialog(false),
     currentFilename(""),
@@ -41,7 +43,7 @@ LevelEditor::LevelEditor()
     hasValidSaveState(false),
     cameraX(0.0f), cameraY(0.0f), cameraZoom(1.0f),
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
-    zoomSpeed(0.1f),    //zoom to be implemented
+    zoomSpeed(0.1f),
     minZoom(0.1f),
     maxZoom(5.0f)
 {
@@ -122,7 +124,7 @@ void LevelEditor::Update(float /*dt*/)
 
             if (ImGui::Button("Load", ImVec2(120, 0)))
             {
-                if (LoadLevelJSON(loadFilepath))
+                if (LoadLevel(loadFilepath))
                 {
                     std::cout << "Level loaded successfully from: " << loadFilepath << std::endl;
                     showLoadDialog = false;
@@ -196,9 +198,10 @@ void LevelEditor::EnterPlayMode()
 {
     if (editorMode == EditorMode::Play)
         return;
+
     if (!hasValidSaveState)
     {
-        SaveSceneState(); // save the current scene as a JSON snapshot
+        SaveSceneState();
         hasValidSaveState = true;
         std::cout << "[LevelEditor] Saved original scene state.\n";
     }
@@ -206,6 +209,7 @@ void LevelEditor::EnterPlayMode()
     {
         std::cout << "[LevelEditor] Using existing saved state (not overwriting).\n";
     }
+
     // setting up game camera to follow hero
     GameObject* cameraObj = factory.FindGameObject("MainCamera");
     if (cameraObj)
@@ -222,12 +226,8 @@ void LevelEditor::EnterPlayMode()
                 {
                     float hx, hy;
                     heroTransform->GetPosition(hx, hy);
-
-                    // set camera component's position directly
                     camComponent->SetPosition(hx, hy);
                     std::cout << "[LevelEditor] Camera position set to: (" << hx << ", " << hy << ")\n";
-                    std::cout << "[LevelEditor] Camera GetPosition returns: (" << camComponent->GetPosition().x << ", " << camComponent->GetPosition().y << ")\n";
-                    
                 }
 
                 // now set up follow mode
@@ -245,15 +245,33 @@ void LevelEditor::EnterPlayMode()
 
     editorMode = EditorMode::Play;
 
-    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-    if (audioEngine && !currentBGMName.empty())
+    // start bgm when play is click
+    AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
+    if (audioManager)
     {
-        std::cout << "[LevelEditor] Starting background music: " << currentBGMName << std::endl;
-        // Ensure it's stopped before starting to avoid doubling up if spamming play/stop
-        audioEngine->stopSound(currentBGMChannel);
-        audioEngine->playSound(currentBGMName, currentBGMChannel);
-        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+        std::cout << "[LevelEditor] Play button clicked - starting BGM\n";
+
+        // Check what sounds are available and play the appropriate BGM
+        const auto& sounds = audioManager->GetSoundDatabase();
+
+        if (sounds.find("bgm") != sounds.end())
+        {
+            // Game scene - play game BGM
+            std::cout << "[LevelEditor] Playing game BGM\n";
+            audioManager->PlaySound("bgm", "bgm_channel");
+        }
+        else if (sounds.find("MainMenuBGM") != sounds.end())
+        {
+            // Main menu scene - play menu BGM
+            std::cout << "[LevelEditor] Playing main menu BGM\n";
+            audioManager->PlaySound("MainMenuBGM", "menu_bgm_channel");
+        }
+        else
+        {
+            std::cout << "[LevelEditor] No BGM found in AudioManager\n";
+        }
     }
+
     std::cout << "[LevelEditor] Entered Play Mode.\n";
 }
 
@@ -265,18 +283,19 @@ void LevelEditor::StopPlayMode()
     if (editorMode == EditorMode::Stop)
         return;
 
-    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-    if (audioEngine && !currentBGMChannel.empty())
+    // audio manager to stop souund
+    AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
+    if (audioManager)
     {
-        std::cout << "[LevelEditor] Stopping background music on " << currentBGMChannel << std::endl;
-        audioEngine->stopSound(currentBGMChannel);
+        std::cout << "[LevelEditor] Stopping background music through AudioManager\n";
+        audioManager->StopSound("bgm_channel");
     }
 
     RestoreSceneState();           // restore saved scene
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
-    CameraManager::Instance().ClearActiveCamera();
+    //CameraManager::Instance().ClearActiveCamera();
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 
@@ -285,17 +304,17 @@ void LevelEditor::StopPlayMode()
  */
 void LevelEditor::TogglePause()
 {
-    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
 
     if (editorMode == EditorMode::Play)
     {
         editorMode = EditorMode::Pause;
 
-        if (audioEngine && !currentBGMChannel.empty())
+        if (audioManager)
         {
-            std::cout << "[LevelEditor] Pausing music on channel " << currentBGMChannel << std::endl;
-            // CHANGED: Use currentBGMChannel instead of hardcoded string
-            audioEngine->pauseSound(currentBGMChannel, true);
+            std::cout << "[LevelEditor] Pausing music" << std::endl;
+            // stop the sound, to implement proper pause in audio manager
+            audioManager->StopSound("bgm_channel");
         }
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
@@ -303,13 +322,16 @@ void LevelEditor::TogglePause()
     {
         editorMode = EditorMode::Play;
 
-        if (audioEngine && !currentBGMChannel.empty())
+        if (audioManager)
         {
-            std::cout << "[LevelEditor] Resuming music on channel " << currentBGMChannel << std::endl;
-            // CHANGED: Use currentBGMChannel instead of hardcoded string
-            audioEngine->pauseSound(currentBGMChannel, false);
+            std::cout << "[LevelEditor] Resuming music" << std::endl;
+            audioManager->PlaySound("bgm", "bgm_channel");
         }
-        CORE->GetGraphicsSystem()->SetEditorMode(false);
+
+        if (CORE)
+        {
+            CORE->GetGraphicsSystem()->SetEditorMode(false);
+        }
         std::cout << "[LevelEditor] Game resumed." << std::endl;
     }
 }
@@ -493,7 +515,7 @@ void LevelEditor::RenderMenuBar()
             filepath += ".json";
         }
 
-        if (SaveLevelJSON(filepath))
+        if (SaveLevel(filepath))
         {
             std::cout << "Level saved successfully to: " << filepath << std::endl;
         }
@@ -535,7 +557,7 @@ void LevelEditor::RenderMenuBar()
 /**
  * @brief Save level to JSON file
  */
-bool LevelEditor::SaveLevelJSON(const std::string &filepath)
+bool LevelEditor::SaveLevel(const std::string &filepath)
 {
     try
     {
@@ -566,6 +588,23 @@ bool LevelEditor::SaveLevelJSON(const std::string &filepath)
             }
         }
 
+        if (CORE)
+        {
+            AudioManager* audioMgr = CORE->GetAudioManager();
+            if (audioMgr)
+            {
+                root["AudioManager"] = Serialization::SerializeAudioManager(audioMgr);
+            }
+            else
+            {
+                std::cerr << "[SaveLevel] WARNING: AudioManager is NULL" << std::endl;
+            }
+        }
+        else
+        {
+            std::cerr << "[SaveLevel] WARNING: CORE is NULL" << std::endl;
+        }
+        
         // write to file
         std::ofstream outFile(filepath);
         if (!outFile.is_open())
@@ -590,7 +629,7 @@ bool LevelEditor::SaveLevelJSON(const std::string &filepath)
 /**
  * @brief Load level from JSON file
  */
-bool LevelEditor::LoadLevelJSON(const std::string& filepath)
+bool LevelEditor::LoadLevel(const std::string& filepath)
 {
     try
     {
@@ -627,6 +666,10 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
         factory.Clear();
         selectedGameObjectID = 0;
 
+        // reset editor mode to stop when loading a new scene
+        editorMode = EditorMode::Stop;
+        hasValidSaveState = false; 
+
         // also clear any active camera binding
         CameraManager::Instance().ClearActiveCamera();
 
@@ -642,40 +685,33 @@ bool LevelEditor::LoadLevelJSON(const std::string& filepath)
 
         currentFilename = filenameOnly;
 
-        // scene settings
-        if (root.contains("SceneSettings"))
+        // load audio manager configuration
+        if (root.contains("AudioManager") && CORE)
         {
-            std::cout << "[LoadLevel] Loading scene settings...\n";
-            const auto& settings = root["SceneSettings"];
-
-            if (settings.contains("backgroundMusic") && audio)
+            std::cout << "[LoadLevel] Found AudioManager section in JSON\n";
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
             {
-                const auto& bgm = settings["backgroundMusic"];
-                // Store settings in member variables instead of local variables
-                currentBGMName = bgm.value("name", "");
-                std::string path = bgm.value("path", "");
-                bool loop = bgm.value("looping", true);
-                currentBGMVolume = bgm.value("volume", 0.5f);
-                currentBGMChannel = bgm.value("channel", "bgm_channel");
-
-                if (!path.empty() && !currentBGMName.empty())
-                {
-                    std::cout << "[LoadLevel] Loading BGM: " << currentBGMName << " from " << path << "\n";
-                    if (resourceMgr.LoadAudio(currentBGMName, path, loop))
-                    {
-                        std::cout << "[LoadLevel] BGM loaded successfully (ready for Play Mode)\n";
-                    }
-                    else
-                    {
-                        std::cerr << "[LoadLevel] Failed to load BGM: " << path << "\n";
-                        currentBGMName = ""; // Clear if failed to load
-                    }
-                }
+                std::cout << "[LoadLevel] AudioManager pointer is valid\n";
+                Serialization::DeserializeAudioManager(root, audioManager);
+                std::cout << "[LoadLevel] AudioManager deserialization complete\n";
+                audioManager->PrintConfig();
+            }
+            else
+            {
+                std::cerr << "[LoadLevel] ERROR: AudioManager pointer is NULL!\n";
             }
         }
         else
         {
-            std::cout << "[LoadLevel] No Scene Settings found in JSON\n";
+            if (!root.contains("AudioManager"))
+            {
+                std::cerr << "[LoadLevel] ERROR: No AudioManager section found in JSON!\n";
+            }
+            if (!CORE)
+            {
+                std::cerr << "[LoadLevel] ERROR: CORE is NULL!\n";
+            }
         }
 
         // load all game objects
@@ -783,46 +819,6 @@ void LevelEditor::NewLevel()
     CameraManager::Instance().ClearActiveCamera();
 
     std::cout << "New level created" << std::endl;
-}
-
-/**
- * @brief Save level to file (wrapper for JSON save)
- */
-bool LevelEditor::SaveLevel(const std::string &filepath)
-{
-    return SaveLevelJSON(filepath); // redirect to JSON version
-}
-
-/**
- * @brief Load level from file
- */
-bool LevelEditor::LoadLevel(const std::string &filepath)
-{
-    // check if it's a JSON file
-    if (filepath.ends_with(".json"))
-    {
-        return LoadLevelJSON(filepath);
-    }
-
-    LevelData data;
-    if (LoadLevelFromFile(filepath, data))
-    {
-        // convert to current level
-        currentLevel = data;
-
-        // clear and recreate game objects
-        factory.Clear();
-        selectedGameObjectID = 0;
-
-        for (const auto &objData : data.gameObjects)
-        {
-            DeserialiseGameObject(objData);
-        }
-        hasValidSaveState = false;
-        return true;
-    }
-
-    return false;
 }
 
 /*  Game object management  */
@@ -1142,101 +1138,6 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
     return obj;
 }
 
-/**
- * @brief Load level data from legacy text file format
- */
-bool LevelEditor::LoadLevelFromFile(const std::string &filepath, LevelData &outData)
-{
-    std::ifstream file(filepath);
-    if (!file.is_open())
-    {
-        std::cerr << "Failed to open file for reading: " << filepath << std::endl;
-        return false;
-    }
-
-    std::string line;
-    outData = LevelData(); // reset
-
-    // read level
-    while (std::getline(file, line))
-    {
-        if (line == "LEVEL_BEGIN")
-        {
-            continue;
-        }
-        else if (line == "GAMEOBJECT_BEGIN")
-        {
-            break; // start reading game objects
-        }
-    }
-
-    // read game objects
-    GameObjectData currentObj;
-    bool readingObject = true;
-
-    while (readingObject && std::getline(file, line))
-    {
-        if (line == "GAMEOBJECT_BEGIN")
-        {
-            currentObj = GameObjectData(); // reset for new object
-        }
-        else if (line.find("Name: ") == 0)
-        {
-            currentObj.name = line.substr(6);
-        }
-        else if (line.find("Active: ") == 0)
-        {
-            currentObj.isActive = (line.substr(8) == "1");
-        }
-        else if (line.find("Transform: ") == 0)
-        {
-            std::istringstream iss(line.substr(11));
-            iss >> currentObj.posX >> currentObj.posY >> currentObj.scaleX >> currentObj.scaleY >> currentObj.rotation;
-            currentObj.hasTransform = true;
-        }
-        else if (line.find("Render: ") == 0)
-        {
-            std::istringstream iss(line.substr(8));
-            int hasTexInt;
-            iss >> currentObj.shapeType >> hasTexInt >> currentObj.colorR >> currentObj.colorG >> currentObj.colorB >> currentObj.colorA;
-            currentObj.hasRender = true;
-            currentObj.hasTexture = (hasTexInt == 1);
-        }
-        else if (line.find("Texture: ") == 0)
-        {
-            currentObj.texturePath = line.substr(9);
-        }
-        else if (line.find("Physics: ") == 0)
-        {
-            std::istringstream iss(line.substr(9));
-            int staticInt, gravityInt;
-            iss >> currentObj.mass >> currentObj.velocityX >> currentObj.velocityY >> staticInt >> gravityInt;
-            currentObj.hasPhysics = true;
-            currentObj.isStatic = (staticInt == 1);
-            currentObj.hasGravity = (gravityInt == 1);
-        }
-        else if (line.find("Collider: ") == 0)
-        {
-            std::istringstream iss(line.substr(10));
-            iss >> currentObj.colliderType >> currentObj.colliderWidth >> currentObj.colliderHeight >> currentObj.collisionLayer;
-            currentObj.hasCollider = true;
-        }
-        else if (line == "GAMEOBJECT_END")
-        {
-            outData.gameObjects.push_back(currentObj);
-            currentObj = GameObjectData();
-        }
-        else if (line == "LEVEL_END")
-        {
-            readingObject = false;
-            break;
-        }
-    }
-
-    file.close();
-    return true;
-}
-
  /*  Camera control  */
 /**
  * @brief Render camera control panel in ImGui
@@ -1411,7 +1312,7 @@ void LevelEditor::PerformSceneReload()
     factory.Clear();
     selectedGameObjectID = 0;
 
-    if (LoadLevelJSON(pendingScenePath))
+    if (LoadLevel(pendingScenePath))
     {
         std::string filename = fs::path(currentFilename).filename().string();
 
@@ -1429,37 +1330,39 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+
+
 /*  Audio Management */
 /**
  * @brief Play loaded background music
  */
-void LevelEditor::PlayLoadedBGM()
-{
-    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-
-    if (audioEngine && !currentBGMName.empty())
-    {
-        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
-            << " on channel: " << currentBGMChannel << std::endl;
-
-        // stop any existing sound on this channel first
-        audioEngine->stopSound(currentBGMChannel);
-
-        // play the BGM
-        audioEngine->playSound(currentBGMName, currentBGMChannel);
-        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
-
-        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
-    }
-    else
-    {
-        if (!audioEngine)
-        {
-            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
-        }
-        else if (currentBGMName.empty())
-        {
-            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
-        }
-    }
-}
+//void LevelEditor::PlayLoadedBGM()
+//{
+//    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+//
+//    if (audioEngine && !currentBGMName.empty())
+//    {
+//        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
+//            << " on channel: " << currentBGMChannel << std::endl;
+//
+//        // stop any existing sound on this channel first
+//        audioEngine->stopSound(currentBGMChannel);
+//
+//        // play the BGM
+//        audioEngine->playSound(currentBGMName, currentBGMChannel);
+//        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
+//
+//        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
+//    }
+//    else
+//    {
+//        if (!audioEngine)
+//        {
+//            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
+//        }
+//        else if (currentBGMName.empty())
+//        {
+//            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
+//        }
+//    }
+//}

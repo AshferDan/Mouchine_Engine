@@ -134,6 +134,17 @@ void CoreEngine::InitSystems()
 void CoreEngine::Init()
 {
     InitSystems();
+    if (audioEngine)
+    {
+        std::cout << "[CoreEngine] Creating AudioManager internally..." << std::endl;
+        // We use 'new' here because we store it in a raw pointer member variable.
+        // We MUST delete this in DestroySystems() to avoid leaks.
+        audioManager = new AudioManager(audioEngine);
+    }
+    else
+    {
+        std::cerr << "[CoreEngine] WARNING: AudioEngine not set before Init! AudioManager will be null." << std::endl;
+    }
 
     std::cout << "Initializing CoreEngine with " << Systems.size() << " systems" << std::endl;
 
@@ -163,12 +174,29 @@ void CoreEngine::GameLoop()
 
         if (m_hasPendingLoad)
         {
-            LevelEditor *level = GetLevelEditor();
-            level->LoadLevelJSON(m_pendingScene);
-            std::cout << "[CoreEngine] Scene loaded, playing BGM if available..." << std::endl;
-            level->PlayLoadedBGM();
+            std::cout << "[CoreEngine] ===== PENDING SCENE LOAD DETECTED =====" << std::endl;
+            std::cout << "[CoreEngine] Scene to load: " << m_pendingScene << std::endl;
+            std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
+
+            LevelEditor* level = GetLevelEditor();
+            level->LoadLevel(m_pendingScene);
+            std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
+
+            // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
+            if (m_autoPlayAfterLoad)
+            {
+                std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
+                level->EnterPlayMode();
+                std::cout << "[CoreEngine] Play mode entered\n";
+            }
+            else
+            {
+                std::cout << "[CoreEngine] Auto-play flag is FALSE - NOT entering play mode\n";
+            }
+
             m_pendingScene = "";
             m_hasPendingLoad = false;
+            m_autoPlayAfterLoad = false;  // Reset flag
 
             if (inputManager)
                 inputManager->ResetState();
@@ -378,6 +406,12 @@ void CoreEngine::DestroySystems()
 {
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
     Systems.clear();
+    if (audioManager)
+    {
+        std::cout << "[CoreEngine] Deleting AudioManager..." << std::endl;
+        delete audioManager;
+        audioManager = nullptr; // Good practice to nullify after delete
+    }
 }
 
 void CoreEngine::update_time(double fps_calc_interval)

@@ -118,15 +118,12 @@ void InputManager::Update(float dt)
     {
         if (!singleTriggerKeys[GLFW_KEY_M])
         {
-            if (audioEngine)
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
             {
                 bgmPaused = !bgmPaused;
-                /*audioEngine->pauseSound("bgm_channel", bgmPaused);
-                std::cout << "bgm paused" << std::endl;*/
-
-                PauseSoundMessage msg("bgm_channel", bgmPaused);
-                std::cout << "[InputManager] Sending PauseSoundMessage: " << bgmPaused << "\n";
-                CORE->GetMessageBus().Publish(msg);
+                audioManager->StopSound("bgm_channel");
+                std::cout << "BGM " << (bgmPaused ? "paused" : "resumed") << std::endl;
             }
             singleTriggerKeys[GLFW_KEY_M] = true;
         }
@@ -274,8 +271,12 @@ void InputManager::Update(float dt)
         // Play footstep sound at intervals
         if (footstepTimer >= footstepInterval)
         {
-            audioEngine->playSound("footstep_sfx", "footstep_channel");
-            audioEngine->setVolume("footstep_channel", 1.0f);
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("PlayerLand");
+                //audioManager->PlaySound("footstep_sfx");
+            }
             footstepTimer = 0.0f; // reset timer
         }
     }
@@ -315,8 +316,10 @@ void InputManager::Update(float dt)
             physics->GetForcesManager().AddForce(ForceType::Jump);
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
-            if (audioEngine)
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
             {
+                audioManager->TriggerEvent("PlayerJump");
                 std::cout << "[InputManager] SPACE pressed to sending PlaySoundMessage\n";
                 std::cout << "[InputManager] CORE pointer = " << CORE << std::endl;
                 PlaySoundMessage msg("jump_sfx");
