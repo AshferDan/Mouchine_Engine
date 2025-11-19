@@ -464,6 +464,43 @@ namespace API
             }
         }
     }
+    bool OnTriggerEnter(const std::string obj1_name,const std::string obj2_name)
+    {
+        auto& factory = GameObjectFactory::Instance();
+
+        GameObject* obj1 = factory.FindGameObject(obj1_name);
+        GameObject* obj2 = factory.FindGameObject(obj2_name);
+        CollisionSystem* collisys = CORE->GetCollisionSystem();
+        if (collisys->CollisionSystem::JustCollided(obj1, obj2)) {
+            return true;
+        }
+        return false;
+    }
+    bool OnTriggerExit(const std::string obj1_name, const std::string obj2_name)
+    {
+        auto& factory = GameObjectFactory::Instance();
+
+        GameObject* obj1 = factory.FindGameObject(obj1_name);
+        GameObject* obj2 = factory.FindGameObject(obj2_name);
+        CollisionSystem* collisys = CORE->GetCollisionSystem();
+        if (collisys->CollisionSystem::JustStopped(obj1, obj2)) {
+            return true;
+        }
+        return false;
+    }
+    bool OnTriggerStay(const std::string obj1_name, const std::string obj2_name)
+    {
+        auto& factory = GameObjectFactory::Instance();
+
+        GameObject* obj1 = factory.FindGameObject(obj1_name);
+        GameObject* obj2 = factory.FindGameObject(obj2_name);
+        CollisionSystem* collisys = CORE->GetCollisionSystem();
+        if (collisys->CollisionSystem::StillColliding(obj1, obj2)) {
+            return true;
+        }
+        return false;
+    }
+
 #pragma endregion
 
 #pragma region Camera

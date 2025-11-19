@@ -26,6 +26,7 @@ Technology is prohibited.
 #include "Transform.h"
 #include "Collision.h"
 #include "Collidercomponent.h"
+#include "CollisionSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "Animator.hpp"
@@ -321,9 +322,9 @@ namespace API {
      */
     void SetCollisionLayer(const std::string&, CollisionLayer newlayer);
 
-    void OnTriggerEnter();
-    void OnTriggerExit();
-    void OnTriggerStay();
+    bool OnTriggerEnter(const std::string, const std::string);
+    bool OnTriggerExit(const std::string, const std::string);
+    bool OnTriggerStay(const std::string, const std::string);
 
 #pragma endregion
 
@@ -354,8 +355,8 @@ namespace API {
 
 #pragma region Misc
     int RandomNumberGen(int, int);
-    bool InAreaCheck(float, float, float, float);
 #pragma endregion
+
 
 
 
