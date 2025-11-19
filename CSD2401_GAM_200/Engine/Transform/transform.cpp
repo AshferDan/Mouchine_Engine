@@ -49,27 +49,16 @@ void TransformComponent::SetPosition(float x, float y)
     float diffX{ posX - x }, diffY{ posY - y };
     posX = x;
     posY = y;
+
+    // apply for children
     if (!owner->GetAllChildren().empty())
     {
-        GameObjectFactory& factory = GameObjectFactory::Instance();
-        GameObject* GO = factory.GetGameObject(owner->GetID());
-        std::vector<EntityID> familyTree{};
-        GetFamilyTree(GO, familyTree);
-
-        std::cout << "GetFamilyTree() has: \n";
-        for (auto const& r : familyTree)
+        for (auto& childGO : owner->GetAllChildren())
         {
-            std::cout << r << std::endl;
-        }
-
-        // incredibly scuffed but it kinda works
-        // better to add a local (WRT parent) and global (scene space) vec2 for positions, then just adjust accordingly
-        for (auto& childID : familyTree)
-        {
-            GameObject* childGO = factory.GetGameObject(childID);
+            if (!childGO->GetComponent<TransformComponent>()) continue;
             vec2 newPos{};
             childGO->GetComponent<TransformComponent>()->GetPosition(newPos.x, newPos.y);
-            childGO->GetComponent<TransformComponent>()->SetPosition(newPos.x + diffX, newPos.y + diffY);
+            childGO->GetComponent<TransformComponent>()->SetPosition(newPos.x - diffX, newPos.y - diffY);
         }
     }
 }
@@ -89,6 +78,16 @@ void TransformComponent::GetPosition(float &x, float &y) const
 void TransformComponent::SetRotation(float angle)
 {
     rotation = angle;
+
+    // apply for children
+    if (!owner->GetAllChildren().empty())
+    {
+        for (auto& childGO : owner->GetAllChildren())
+        {
+            if (!childGO->GetComponent<TransformComponent>()) continue;
+            childGO->GetComponent<TransformComponent>()->SetRotation(angle);
+        }
+    }
 }
 
 /**
@@ -104,8 +103,28 @@ float TransformComponent::GetRotation() const
  */
 void TransformComponent::SetScale(float x, float y)
 {
+    vec2 oldScale = { scaleX, scaleY };
     scaleX = x;
     scaleY = y;
+
+    if (!owner->GetAllChildren().empty())
+    {
+        // not sure if this works but prevents weird scaling issues when scale gets zeroed out
+        if (!oldScale.x || !oldScale.y) return;
+
+        vec2 scaleChange{ x / oldScale.x , y / oldScale.y };
+
+        for (auto& childGO : owner->GetAllChildren())
+        {
+            if (!childGO->GetComponent<TransformComponent>()) continue;
+
+            auto* transform = childGO->GetComponent<TransformComponent>();
+            vec2 scale{};
+
+            transform->GetScale(scale.x, scale.y);
+            transform->SetScale(scale.x * scaleChange.x, scale.y * scaleChange.y);
+        }
+    }
 }
 
 /**
@@ -113,7 +132,27 @@ void TransformComponent::SetScale(float x, float y)
  */
 void TransformComponent::SetScale(float uniformScale)
 {
+    float oldScale = scaleX;
     scaleX = scaleY = uniformScale;
+
+    if (!owner->GetAllChildren().empty())
+    {
+        // not sure if this works but prevents weird scaling issues when scale gets zeroed out
+        if (!oldScale) return;
+
+        float scaleChange = uniformScale;
+
+        for (auto& childGO : owner->GetAllChildren())
+        {
+            if (!childGO->GetComponent<TransformComponent>()) continue;
+
+            auto* transform = childGO->GetComponent<TransformComponent>();
+            vec2 scale{};
+
+            transform->GetScale(scale.x, scale.y);
+            transform->SetScale(scale.x * scaleChange, scale.y * scaleChange);
+        }
+    }
 }
 
 /**

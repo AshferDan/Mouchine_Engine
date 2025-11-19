@@ -123,6 +123,9 @@ GLuint icon_giz_select_ui;
 GLuint icon_giz_translate_ui;
 GLuint icon_giz_scale_ui;
 GLuint icon_giz_rotate_ui;
+GLuint icon_giz_resize_ui;
+GLuint icon_active_ui;
+GLuint icon_inactive_ui;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
@@ -179,6 +182,9 @@ void ImGuiSystem::Initialize()
     icon_giz_translate_ui = GraphicsSystem::LoadTexture(icon_giz_translate);
     icon_giz_scale_ui = GraphicsSystem::LoadTexture(icon_giz_scale);
     icon_giz_rotate_ui = GraphicsSystem::LoadTexture(icon_giz_rotate);
+    icon_giz_resize_ui = GraphicsSystem::LoadTexture(icon_giz_resize);
+    icon_active_ui = GraphicsSystem::LoadTexture(icon_active);
+    icon_inactive_ui = GraphicsSystem::LoadTexture(icon_inactive);
 }
 
 /**
@@ -677,6 +683,36 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     ImGui::Indent(depth * 10.0f);
     bool nodeOpen{};
 
+    // gotta do this for proper ids, was causing crashes
+    std::string buttonName = "##Toggle Active" + std::to_string(int(id));
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));             // remove bg for image [PUSH]
+    if (obj->IsActive())
+    {
+        if (ImGui::ImageButton(buttonName.c_str(), ImTextureID(icon_active_ui), icon_size_smallest, {0, 1}, {1, 0},
+            ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
+        {
+            obj->SetActive(false);
+        }
+    }
+    else
+    {
+        if (ImGui::ImageButton(buttonName.c_str(), ImTextureID(icon_inactive_ui), icon_size_smallest, { 0, 1 }, { 1, 0 },
+            ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
+        {
+            obj->SetActive(true);
+        }
+    }
+    ImGui::PopStyleColor();                                                 // remove bg for image [POP]
+    ImGui::SameLine();
+
+    // Grey out text if inactive [PUSH]
+    if (!obj->IsActive())
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    }
+
+    ImGui::AlignTextToFramePadding();
     // if renaming, set the name of the tree node as an input text field
     if (hierarchy_renameIndex == id)
     {
@@ -690,7 +726,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
             ImGui::SetKeyboardFocusHere();
             hierarchy_renameFocus = false;
         }
-        if (ImGui::InputText("##", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        if (ImGui::InputText("##Renaming", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
         {
             GetSelectedGameObject()->SetName(std::string(rename_str));
             hierarchy_renameIndex = -1;
@@ -710,6 +746,12 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
     }
 
+    // Grey out text if inactive [POP]
+    if (!obj->IsActive())
+    {
+        ImGui::PopStyleColor();
+    }
+
     if (!ImGui::IsItemFocused() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
         hierarchy_renameIndex = -1;
@@ -724,16 +766,6 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     if (selectedGameObjectID == id)
     {
         flags |= ImGuiTreeNodeFlags_Selected;
-    }
-
-    if (!obj->IsActive())                       // if GO is inactive, make it grey
-    {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-    }
-
-    if (!obj->IsActive())
-    {
-        ImGui::PopStyleColor();                 // pop the push
     }
 
     // Drag and drop for Parenting
@@ -1037,49 +1069,57 @@ void PrefabMenu_Spawn()
 #pragma region Viewport/ Gizmos
 void ImGuiSystem::Viewport_ManageGizmos()
 {
+    // On screen GUI settings
     ImVec2 viewportPos = ImGui::GetWindowPos();
-    // IMGUI SECTION
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
 
-    // Set background alpha BEFORE Begin()
     ImGui::SetNextWindowBgAlpha(0.75f);
-
-    // Optional: Set default position (placed inside viewport)
     ImGui::SetNextWindowPos(ImVec2(viewportPos.x + 15, viewportPos.y + 35), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(58.0f, 215.0f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(58.0f, 260.0f), ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("##Toolbar", nullptr, flags);
 
-    // GIZMO CONTROLS
-    if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
+    // GIZMO CONTROLS - its v long and ugly so just collapse it [handles logic for gizmo operations and GUI on vp for controls]
     {
-        gizmo_type = -1;
-    }
-    CreateHintText("(Q) Select");
-    ImGui::Separator();
-    if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
-    {
-        gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
-    }
-    CreateHintText("(W) Move");
-    ImGui::Separator();
-    if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
-    {
-        gizmo_type = int(ImGuizmo::OPERATION::SCALE);
-    }
-    CreateHintText("(E) Scale");
-    ImGui::Separator();
-    if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
-    {
-        gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
-    }
-    CreateHintText("(R) Rotate");
+        ImGui::Begin("##Toolbar", nullptr, flags);
 
-    ImGui::End();
+        if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
+        {
+            gizmo_type = -1;
+        }
+        CreateHintText("(Q) Select");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
+        }
+        CreateHintText("(W) Move");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::SCALE);
+        }
+        CreateHintText("(E) Scale");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
+        }
+        CreateHintText("(R) Rotate");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Resize", ImTextureID(icon_giz_resize_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::BOUNDS)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_T))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::BOUNDS);
+        }
+        CreateHintText("(T) Resize");
+
+        ImGui::End();
+    }
+
 
     // LOGIC SECTION
     if (selectedGameObjectID != 0 && gizmo_type != -1)
@@ -1101,14 +1141,24 @@ void ImGuiSystem::Viewport_ManageGizmos()
         mat4 mtx = transform->GetMatrix();
         ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::WORLD, value_ptr(mtx));
 
+        if (gizmo_type == (int)(ImGuizmo::OPERATION::BOUNDS))
+        {
+            float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
+            float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
+            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
+        }
+
         if (ImGuizmo::IsUsing)
         {
-            //std::cout << "Original rot: " << transform->GetRotation() << "\n";
             vec3 trans{}, scale{}, rot{};
             DecomposeMatrix(mtx, trans.x, trans.y, scale.x, scale.y, rot.x);
 
             //std::cout << "Decomposed rot: " << rot.x << " " << rot.y << " " << rot.z << "\n";
             // debugging the c# anim image flipping for some reason AAAAAAAAAAAAAAAAAAAAAAA
+
+            // clamps so stuff doesnt get out of hand - only on gizmos bc its likely to be an accident here, will not check for clamps if edited via editor slider
+            scale.x = (scale.x < 1.f) ? 1.f : scale.x;
+            scale.y = (scale.y < 1.f) ? 1.f : scale.y;
 
             transform->SetPosition(trans.x, trans.y);
             transform->SetScale(scale.x, scale.y);

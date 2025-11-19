@@ -50,6 +50,9 @@ inline const char* icon_giz_select = "../Assets/Editor_Icons/Gizmo_Select.png";
 inline const char* icon_giz_translate = "../Assets/Editor_Icons/Gizmo_Translate.png";
 inline const char* icon_giz_scale = "../Assets/Editor_Icons/Gizmo_Scale.png";
 inline const char* icon_giz_rotate = "../Assets/Editor_Icons/Gizmo_Rotate.png";
+inline const char* icon_giz_resize = "../Assets/Editor_Icons/Gizmo_Resize.png";
+inline const char* icon_active = "../Assets/Editor_Icons/Eye-Active.png";
+inline const char* icon_inactive = "../Assets/Editor_Icons/Eye-Inactive.png";
 
 extern GLuint icon_folder_ui;
 extern GLuint icon_file_ui;
@@ -61,13 +64,19 @@ extern GLuint icon_giz_select_ui;
 extern GLuint icon_giz_translate_ui;
 extern GLuint icon_giz_scale_ui;
 extern GLuint icon_giz_rotate_ui;
+extern GLuint icon_giz_resize_ui;
+extern GLuint icon_active_ui;
+extern GLuint icon_inactive_ui;
 
 
 // CONST VARIABLES
-const ImVec2 icon_size(64, 64); // AssetManager icon sizes
-const ImVec2 icon_size_large(48, 48); // AssetManager icon sizes
-const ImVec2 icon_size_medium(32, 32); // AssetManager icon sizes
-const ImVec2 icon_size_small(20, 20); // AssetManager icon sizes
+// AssetManager/ Hierarchy icon sizes
+const ImVec2 icon_size(64, 64); 
+const ImVec2 icon_size_large(48, 48);
+const ImVec2 icon_size_medium(32, 32);
+const ImVec2 icon_size_small(20, 20);
+const ImVec2 icon_size_smallest(14, 14);
+
 // Payload IDs (for different types of drag and drops)
 static const fs::path assetPath = "../Assets";
 
