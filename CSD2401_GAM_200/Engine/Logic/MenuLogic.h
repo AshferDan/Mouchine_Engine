@@ -56,6 +56,8 @@ public:
 
 private:
     std::string hoveredButtonName = "";   ///< The name of the currently hovered button
+    bool pendingSceneChange = false;
+    float pendingTimer = 0.0f;
     
     /**
      * @brief Checks if the mouse cursor is over a button GameObject.

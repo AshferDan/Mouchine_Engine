@@ -18,6 +18,37 @@ Technology is prohibited.
 
 void MenuLogicSystem::Update(float dt)
 {
+    // if a scene change is pending, count down timer first so the click sound can be played
+    if (pendingSceneChange)
+    {
+        pendingTimer -= dt;
+        if (pendingTimer <= 0.0f)
+        {
+            if (hoveredButtonName == "PlayButton")
+            {
+                std::cout << "PlayButton Clicked!" << std::endl;
+                std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                CORE->RequestSceneLoad("../Assets/Scenes/Prefab_TestScene.json", true);
+                std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
+            }
+            else if (hoveredButtonName == "SettingsButton")
+            {
+                std::cout << "SettingsButton Clicked!" << std::endl;
+                CORE->RequestSceneLoad("../Assets/Scenes/Prefab_TestScene2.json", true);
+            }
+            else if (hoveredButtonName == "QuitButton")
+            {
+                std::cout << "QuitButton Clicked!" << std::endl;
+                CORE->RequestSceneLoad("../Assets/Scenes/Prefab_TestScene3.json", true);
+            }
+
+            pendingSceneChange = false;
+            hoveredButtonName.clear();
+        }
+
+        return;
+    }
+
     double mouseX = InputManager::GetMouseWorldX();
     double mouseY = InputManager::GetMouseWorldY();
     bool isClicked = InputManager::IsMouseLeftClicked();
@@ -54,8 +85,14 @@ void MenuLogicSystem::Update(float dt)
             SetButtonTexture(currentHover, true);
             // Play hover sound once when entering the button
   
-            CORE->GetAudioEngine()->loadSound("menu_hover", "../Assets/Audio/hovering_Button.wav", false);
-            CORE->GetAudioEngine()->playSound("menu_hover");
+            //CORE->GetAudioEngine()->loadSound("menu_hover", "../Assets/Audio/hovering_Button.wav", false);
+            //CORE->GetAudioEngine()->playSound("menu_hover");
+
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Hover");
+            }
         }
 
         // Update tracked state
@@ -66,24 +103,18 @@ void MenuLogicSystem::Update(float dt)
     if (isClicked && !hoveredButtonName.empty())
     {
         // Play Click Sound
-        CORE->GetAudioEngine()->loadSound("menu_click", "../Assets/Audio/Menu_Button_Press.wav",false);
-        CORE->GetAudioEngine()->playSound("menu_click");
+        //CORE->GetAudioEngine()->loadSound("menu_click", "../Assets/Audio/Menu_Button_Press.wav",false);
+        //CORE->GetAudioEngine()->playSound("menu_click");
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->TriggerEvent("UI_Click");
+            std::cout << "menu button clicking sound is triggered" << std::endl;
+        }
 
-        if (hoveredButtonName == "PlayButton")
-        {
-            std::cout << "PlayButton Clicked!" << std::endl;
-            CORE->RequestSceneLoad("../Assets/Scenes/Prefab_TestScene.json");
-        }
-        else if (hoveredButtonName == "SettingsButton")
-        {
-            std::cout << "SettingsButton Clicked!" << std::endl;
-            CORE->RequestSceneLoad("../Assets/Scenes/Prefab_TestScene2.json");
-        }
-        else if (hoveredButtonName == "QuitButton")
-        {
-            std::cout << "QuitButton Clicked!" << std::endl;
-            CORE->RequestSceneLoad("../Assets/Scenes/Prefab_TestScene3.json");
-        }
+        // Start small delay before loading scene
+        pendingSceneChange = true;
+        pendingTimer = 0.40f; // 400ms delay to let click sound play
     }
 }
 

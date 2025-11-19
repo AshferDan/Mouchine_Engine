@@ -49,8 +49,8 @@ int main()
     {
 
         EnableMemoryLeakChecking();
-        CoreEngine engine;
         AudioEngine audio;
+        CoreEngine engine;
 
         API::Init_Engine(engine, audio);
 
