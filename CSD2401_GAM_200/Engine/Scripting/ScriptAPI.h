@@ -354,10 +354,14 @@ namespace API {
 
 #pragma endregion
 
+#pragma region Animator
+    
+#pragma endregion
 
 #pragma region Misc
     int RandomNumberGen(int, int);
 #pragma endregion
+
 
 
 

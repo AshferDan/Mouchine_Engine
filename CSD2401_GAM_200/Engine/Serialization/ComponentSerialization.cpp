@@ -62,12 +62,28 @@ void ComponentSerialization::SerializeRender(json& j, RenderComponent* r)
  */
 void ComponentSerialization::SerializeSpritesheet(json& j, Spritesheet* s)
 {
+    json animArray = json::array();
+
+    for (const auto& pair : s->GetAnimationRegistry())
+    {
+        const std::string& name = pair.first;
+        const auto& data = pair.second;
+
+        json animNode = {
+            {"name", name},
+            {"filepath", data.filepath},
+            {"rows", data.row},
+            {"cols", data.col},
+            {"startFrame", data.startframe},
+            {"endFrame", data.endframe},
+            {"fps", data.fps}
+        };
+
+        animArray.push_back(animNode);
+    }
     j["Spritesheet"] = {
-        {"rows", s->GetRows()},
-        {"cols", s->GetCols()},
-        {"startFrame", s->GetCurrentStartFrame()},
-        {"endFrame", s->GetCols() * s->GetRows() - 1},
-        {"fps", s->GetTimePerFrame()}
+        {"defaultAnimation", s->GetCurrentAnimationName()},
+        {"animations", animArray}
     };
 }
 
@@ -282,22 +298,51 @@ void ComponentSerialization::DeserializeSpritesheet(const json& j, GameObject* g
 {
     if (!j.contains("Spritesheet")) return;
     const auto& s = j["Spritesheet"];
-    std::string texPath = j["RenderComponent"].value("texturePath", "");
+
+    std::string initialPath = "";
+    int initialRows = 1;
+    int initialCols = 1;
+
+    // Try to find a valid animation to initialize with
+    if (s.contains("animations") && s["animations"].is_array() && !s["animations"].empty())
+    {
+        const auto& firstAnim = s["animations"][0];
+        initialPath = firstAnim.value("filepath", "");
+        initialRows = firstAnim.value("rows", 1);
+        initialCols = firstAnim.value("cols", 1);
+    }
 
     auto* spr = go->AddComponent<Spritesheet>(
-        texPath.c_str(),
-        s.value("rows", 1),
-        s.value("cols", 1)
+        initialPath.c_str(),
+        initialRows,
+        initialCols
     );
-    spr->LoadNewSpritesheet(texPath.c_str(),
-        s.value("rows", 1),
-        s.value("cols", 1));
-    spr->SetAnimation(
-        s.value("startFrame", 0),
-        s.value("endFrame", 0),
-        s.value("fps", 1.0f));
-}
 
+    // 3. Loop through the "animations" array and Register them
+    if (s.contains("animations") && s["animations"].is_array())
+    {
+        for (const auto& anim : s["animations"])
+        {
+            std::string name = anim.value("name", "Default");
+            std::string path = anim.value("filepath", "");
+            int rows = anim.value("rows", 1);
+            int cols = anim.value("cols", 1);
+            int start = anim.value("startFrame", 0);
+            int end = anim.value("endFrame", 0);
+            float fps = anim.value("fps", 1.0f);
+
+            // Register the animation into the component memory
+            spr->RegisterAnimation(name, path, rows, cols, start, end, fps);
+        }
+    }
+
+    // 4. Start playing the default animation
+    std::string defaultAnim = s.value("defaultAnimation", "");
+    if (!defaultAnim.empty()) {
+        spr->PlayAnimation(defaultAnim);
+    }
+    std::cout << "collected SpriteAnimation" << std::endl;
+}
 /**
  * @brief Deserializes PhysicsComponent data from JSON and attaches it to a GameObject.
  * @param j JSON object containing Physics data.
@@ -460,3 +505,4 @@ void ComponentSerialization::DeserializeAllComponents(GameObject* go, const json
     DeserializeText(j, go);
     //DeserializeCamera(j, go);
 }
+

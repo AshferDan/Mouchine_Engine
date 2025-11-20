@@ -636,5 +636,9 @@ namespace API
     }
 #pragma endregion
 
+#pragma region Animator
+
+#pragma endregion
+
 
 }

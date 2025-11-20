@@ -12,6 +12,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "Animator.hpp"
+
 /**
  * @brief Ctor with GO, texture file path, amount of rows and cols for that spritesheet
  */
@@ -223,10 +224,50 @@ void Spritesheet::SetCols(int val)
 	currCol = val;
 }
 
-// startFrameIdx - index of first frame of spritesheet
-// endFrameIdx	 - index of last frame of spritesheet
-// duration		 - length of entire anim (start frame to end frame)
-// eg: ~player_sprite.Loop(0, 7, .8f);~ means go from frame 0 to 7 within 0.8s
-void Spritesheet::LoopSpriteSheetAnim(int, int, float)
+bool SupportedImageFile(const std::string& path) {
+
+	std::filesystem::path p(path);
+	std::string ext = p.extension().string();
+
+	std::transform(ext.begin(), ext.end(), ext.begin(),
+		[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+	return (ext == ".png" || ext == ".jpeg");
+}
+
+void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int rows, int cols, int startIdx, int endIdx, float fps)
 {
+	AnimationData newState;
+	newState.filepath = path;
+	newState.row= rows;
+	newState.col = cols;
+	newState.startframe = startIdx;
+	newState.endframe = endIdx;
+	newState.fps = fps;
+
+	animation_mList[name] = newState;
+}
+
+void Spritesheet::PlayAnimation(const std::string& name)
+{
+	if (currentAnimName == name) return;
+
+	// Check if this animation name exists in our registry
+	auto it = animation_mList.find(name);
+	if (it == animation_mList.end()) {
+		return;
+	}
+
+	// Get the data we stored earlier
+	const AnimationData& state = it->second;
+
+	
+	if (std::string(GetSpriteFile()) != state.filepath) {
+		LoadNewSpritesheet(state.filepath.c_str(), state.row, state.col);
+	}
+
+	SetAnimation(state.startframe, state.endframe, state.fps);
+
+	// Update current name
+	currentAnimName = name;
 }

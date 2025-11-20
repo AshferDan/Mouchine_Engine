@@ -336,46 +336,19 @@ void InputManager::Update(float dt)
             transform->SetScale(newScaleX, transform->scaleY);
         }
 
-        const char* IDLE_SS = "../Assets/Mouch_Idle.png";
-        int _ROWS = 1;
-        int _COLS = 2;
-        const int FRAME_START = 0;
-        const int FRAME_END = 1;
-        const float IDLE_FPS = 2.0f;
-        const float RUN_FPS = 7.0f;
-        const char* RUN_SS = "../Assets/Mouch_Running.png";
-        const char* JUMP_SS = "../Assets/Mouch_jump.png";
-        // --------------------------------------------------------
+        std::string requestedState = "Idle";
 
-        float newFPS;
-        const char* newSpritesheet;
-
-        if (std::abs(vx) > 0.0f) // Player is running/moving
+        if (is_jumping)
         {
-            newFPS = RUN_FPS;
-            newSpritesheet = RUN_SS;
+            requestedState = "Jump";
         }
-        else if (is_jumping)
+        else if (std::abs(vx) > 2.0f) // Use a small threshold for movement
         {
-            _COLS = 1;
-            newFPS = 0;
-            newSpritesheet = JUMP_SS;
-        }
-        else // Player is stopped (vx is 0)
-        {
-            newFPS = IDLE_FPS;
-            newSpritesheet = IDLE_SS;
+            requestedState = "Run";
         }
 
-        float desiredTimePerFrame = 1.0f / newFPS;
-
-        if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
-        {
-
-            anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
-
-            anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
-        }
+        // The Spritesheet component handles the details internally now
+        anim->PlayAnimation(requestedState);
     }
 
     // Note: Don't call SetVelocity anymore - forces handle movement

@@ -54,7 +54,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        //CORE->RequestSceneLoad("Prefab_TestScene");
+        CORE->RequestSceneLoad("Prefab_TestScene");
        
         GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto* cam = mainCamera->AddComponent<CameraComponent>();
