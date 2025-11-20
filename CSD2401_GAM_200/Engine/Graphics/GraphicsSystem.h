@@ -221,6 +221,16 @@ public:
 	 */
 	int GetWindowHeight() const { return Wheight; };
 
+	void DrawFlashOverlay(const vec4& color);
+
+	void SetEditorSelection(float x, float y, float sx, float sy) {
+		currentSelection = { x,y,sx,sy,true };
+	}
+	
+	void ClearEditorSelection() {
+		currentSelection.exist = false;
+	}
+
 	/**
 	 * @brief Handles messages relevant to the Graphics System, specifically CreateObjectMessage
 	 * to ensure new objects receive a default RenderComponent.
@@ -228,14 +238,21 @@ public:
 	 */
 	void HandleMessage(const CreateObjectMessage& msg);
 
+	void ToggleFullScreen();
+	bool IsFullscreen() const { return isFullscreen; }
+
 private:
 	// --- Window and State ---
 	GLFWwindow* window;						// The handle to the GLFW window.
 	GLint Wwidth, Wheight;					// Current dimensions of the window's client area (in screen coordinates).
+	int windowedPosX, windowedPosY;
+	int windowedWidth, windowedHeight;
+	bool isFullscreen = false;
 	mat4 vp;								// Current view-projection matrix (camera transform).
 	bool debugMode = false;					// Flag to control rendering of debug shapes (lines, outlines).
 	bool editorMode;						// Flag to indicate if rendering should target the FBO (true) or the screen (false).
 	class LevelEditor* levelEditor = nullptr; // Pointer to the level editor for camera manipulation when in editor mode.
+
 
 	// --- Shaders ---
 	GLSLShader shader;		// Default shader for batched quads/circles.
@@ -285,6 +302,10 @@ private:
 	// --- Text Rendering Buffers ---
 	GLuint textVAO, textVBO;				// VAO/VBO dedicated to rendering dynamically generated text quads.
 
+	//Flash Overlay
+	GLuint flashVAO = 0;
+	GLuint flashVBO = 0;
+
 	// Batch size constants (must match memory allocation in Initialize)
 	const size_t MAX_BATCH_VERTICES = 12000; // Max vertices the batch VBO can hold (e.g., 3000 quads * 4 vertices).
 	const size_t MAX_BATCH_INDICES = 18000;	 // Max indices the batch EBO can hold (e.g., 3000 quads * 6 indices).
@@ -311,4 +332,11 @@ private:
 	 * @param height The new height.
 	 */
 	void ResizeFrameBuffer(int width, int height);
+
+	struct EditorSelection {
+		float x, y, sx, sy;
+		bool exist = false;
+	};
+
+	EditorSelection currentSelection;
 };

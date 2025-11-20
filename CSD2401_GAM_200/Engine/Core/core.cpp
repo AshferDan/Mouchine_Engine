@@ -265,9 +265,9 @@ void CoreEngine::GameLoop()
             }
 
             bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
-
+            bool shouldRunPhysics = ((isPlaying && !stepMode) || stepOnce) && !m_gamePause;
             // Only run physics if NOT in step mode/paused, OR if stepping once
-            if ((isPlaying && !stepMode) || stepOnce)
+            if (shouldRunPhysics)
             {
                 // Update physics-dependent systems with FIXED timestep
                 if (gameObjectSystem)
@@ -460,5 +460,21 @@ void CoreEngine::update_time(double fps_calc_interval)
     if (Wind)
     {
         glfwSetWindowTitle(Wind, title_str.c_str());
+    }
+}
+
+void CoreEngine::SetGamePaused(bool paused) {
+    std::cout << (m_gamePause ? "Game is paused\n" : "Game is resuming\n");
+    if (m_gamePause == paused) {
+        return;
+    }
+
+    m_gamePause = paused;
+
+    if (audioEngine && levelEditor) {
+        std::string bgmChannel = levelEditor->GetCurrentBGMChannel();
+        if (!bgmChannel.empty()) {
+            audioEngine->pauseSound(bgmChannel, paused);
+        }
     }
 }

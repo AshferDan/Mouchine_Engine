@@ -287,6 +287,10 @@ public:
      */
     MessageBus& GetMessageBus() { return messageBus; }
 
+    void SetGamePaused(bool paused);
+
+    bool IsGamePaused() const { return m_gamePause; }
+
 private:
     /**
      * @brief Initializes all engine systems in the correct order.
@@ -321,6 +325,7 @@ private:
     std::string m_pendingScene = "";
     bool m_hasPendingLoad = false;
     bool m_autoPlayAfterLoad = false;
+    bool m_gamePause = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.
