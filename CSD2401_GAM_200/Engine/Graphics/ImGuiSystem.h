@@ -36,7 +36,6 @@ const std::string PrefabPayloadID{ "Prefab_Filepath" };
 const std::string HierarchyPayloadID{ "GameObject_Name" };
 const std::string AudioPayloadID("Audio_Filepath");
 const std::string ScenePayloadID{ "Scene_Name" };
-const std::string AudioPayloadID{ "Scene_Name" };
 const std::string SpritePayloadID{ "Scene_Name" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
@@ -229,6 +228,9 @@ private:
  * @brief Gets the cursor pos with respect to the viewport's and world's coordinates. Externed for other files to access
  */
 extern ImVec2 viewportCursorPos;
+
+static ImVec2 viewportSize{};
+static ImVec2 viewportPos{};
 
 ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize);
 

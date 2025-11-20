@@ -98,7 +98,6 @@ static bool g_showAudioErrorPopup = false;
 static std::string g_audioErrorMessage;
 
 // VIEWPORT
-ImVec2 viewportSize{};
 bool isHoveringOverViewport;
 int gizmo_type = -1;
 
@@ -287,7 +286,7 @@ void ImGuiSystem::Update(float dt)
                 }
 
                 // gets cursor pos WRT world pos
-                ImVec2 viewportPos = ImGui::GetItemRectMin();
+                viewportPos = ImGui::GetItemRectMin();
                 viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
 
                 ImGui::Text("(World Space) Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
@@ -1153,7 +1152,16 @@ void ImGuiSystem::Viewport_ManageGizmos()
         auto* go = GetSelectedGameObject();
         auto* transform = go->GetComponent<TransformComponent>();
         auto* camComp = CameraManager::Instance().GetActiveCamera();
-        if (!camComp || !transform) return;
+        if (!camComp)
+        {
+            std::cout << "[ManageGizmos]NO CAMERA FOUND!\n";
+            return;
+        }
+        if (!transform)
+        {
+            std::cout << "[ManageGizmos]NO TRANSFORM FOUND!\n";
+            return;
+        }
 
         ImVec2 vpSize{ ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y };
         ImVec2 vpPos{ ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };

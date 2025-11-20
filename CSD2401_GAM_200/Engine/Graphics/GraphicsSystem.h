@@ -231,14 +231,6 @@ public:
 
 	void DrawFlashOverlay(const vec4& color);
 
-	void SetEditorSelection(float x, float y, float sx, float sy) {
-		currentSelection = { x,y,sx,sy,true };
-	}
-	
-	void ClearEditorSelection() {
-		currentSelection.exist = false;
-	}
-
 	/**
 	 * @brief Handles messages relevant to the Graphics System, specifically CreateObjectMessage
 	 * to ensure new objects receive a default RenderComponent.
@@ -348,11 +340,4 @@ private:
 	 * @param height The new height.
 	 */
 	void ResizeFrameBuffer(int width, int height);
-
-	struct EditorSelection {
-		float x, y, sx, sy;
-		bool exist = false;
-	};
-
-	EditorSelection currentSelection;
 };

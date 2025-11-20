@@ -735,6 +735,7 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             auto* camComp = mainCam->AddComponent<CameraComponent>();
             camComp->SetZoom(1.0f);
             camComp->SetMode(CameraComponent::CameraMode::FIXED);
+            CameraManager::Instance().SetActiveCamera(mainCam);
 
             std::cout << "[LevelEditor] MainCamera created successfully\n";
         }
@@ -750,6 +751,7 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                 camComp = mainCam->AddComponent<CameraComponent>();
                 camComp->SetZoom(1.0f);
                 camComp->SetMode(CameraComponent::CameraMode::FIXED);
+                CameraManager::Instance().SetActiveCamera(mainCam);
 
                 std::cout << "[LevelEditor] CameraComponent added successfully\n";
             }
@@ -1245,13 +1247,18 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
     if (isHoveringOverViewport)
     {
         // mouse wheel zoom
+        // !!!!TODO FIX CAMERA ZOOM TOWARDS CURSOR!!!!!!
         if (io.MouseWheel != 0.0f) {
-            float zoomDelta = io.MouseWheel * zoomSpeed;
-            cameraZoom += zoomDelta;
+            ImVec2 worldAfter = CursorToWorldPos(viewportPos, viewportSize);
+            std::cout << viewportPos.x << " " << viewportPos.y << " " << viewportSize.x << " " << viewportSize.y << std::endl;
+            //cameraX = worldAfter.x;
+            //cameraY = worldAfter.y ;
+            //float zoomDelta = io.MouseWheel * zoomSpeed;
+            //cameraZoom += zoomDelta;
 
-            // clamp zoom to min/max
-            if (cameraZoom < minZoom) cameraZoom = minZoom;
-            if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+            //// clamp zoom to min/max
+            //if (cameraZoom < minZoom) cameraZoom = minZoom;
+            //if (cameraZoom > maxZoom) cameraZoom = maxZoom;
 
             //ImGuiIO& io = ImGui::GetIO();
 
@@ -1259,8 +1266,9 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
             //float mouseX = io.MousePos.x;
             //float mouseY = io.MousePos.y;
 
-            //// world position under the cursor before zoom
-            //vec2 worldBefore = ScreenToWorld(mouseX, mouseY, cameraX, cameraY, cameraZoom);
+            // world position under the cursor before zoom
+            //ImVec2 worldBefore = CursorToWorldPos(viewportPos, viewportSize);
+            //
 
             //// apply zoom
             //float oldZoom = cameraZoom;
@@ -1268,7 +1276,7 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
             //cameraZoom = std::clamp(cameraZoom, minZoom, maxZoom);
 
             //// world position under the cursor AFTER zoom
-            //vec2 worldAfter = ScreenToWorld(mouseX, mouseY, cameraX, cameraY, cameraZoom);
+            //ImVec2 worldAfter = CursorToWorldPos(viewportPos, viewportSize);
 
             //// shift camera so the world point under cursor stays fixed
             //cameraX += worldBefore.x - worldAfter.x;

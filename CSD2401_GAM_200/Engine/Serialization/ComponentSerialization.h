@@ -41,7 +41,7 @@ namespace ComponentSerialization
     void SerializePhysics(json& j, PhysicsComponent* p);
     void SerializeCollider(json& j, ColliderComponent* c);
     void SerializeText(json& j, TextComponent* tc);
-    //void SerializeCamera(json& j, CameraComponent* cam);
+    void SerializeCamera(json& j, CameraComponent* cam);
 
     // ----------- Deserialize Individual Components ----------------
     void DeserializeTransform(const json& j, GameObject* go);
@@ -50,7 +50,7 @@ namespace ComponentSerialization
     void DeserializePhysics(const json& j, GameObject* go);
     void DeserializeCollider(const json& j, GameObject* go);
     void DeserializeText(const json& j, GameObject* go);
-    //void DeserializeCamera(const json& j, GameObject* go);
+    void DeserializeCamera(const json& j, GameObject* go);
 
     // ----------- Convenience Wrappers ------------------------------
     void SerializeAllComponents(GameObject* go, json& j);

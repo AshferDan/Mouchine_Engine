@@ -381,6 +381,8 @@ const bool Serialization::IsStreamGood(std::string const& fullFilePath)
 		}
 		return false;
 	}
+}
+
 json Serialization::SerializeAudioManager(AudioManager* audioManager) 
 {
 	if (!audioManager) 
