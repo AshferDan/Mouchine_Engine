@@ -387,7 +387,7 @@ void GraphicsSystem::Update(float)
     // === View-Projection Matrix Calculation ===
     float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
     float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
-    if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop))
+    if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop || levelEditor->GetEditorMode() == EditorMode::Pause))
     {
         // EDITOR MODE: Use free editor camera for level editing
         // This allows designers to navigate and edit the level

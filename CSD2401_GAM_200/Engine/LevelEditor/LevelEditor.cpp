@@ -105,7 +105,7 @@ void LevelEditor::Update(float /*dt*/)
     ImGui::End();
 
     // camera update with conditional rendering
-    bool shouldRenderCameraUI = (editorMode == EditorMode::Stop);
+    bool shouldRenderCameraUI = (editorMode == EditorMode::Stop || editorMode == EditorMode::Pause);
     UpdateCameraControls(shouldRenderCameraUI);
 
     RenderPlayControls();
@@ -1197,7 +1197,7 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
                 "- Mouse Wheel: Zoom");
 
             ImGui::Separator();
-            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Editor Mode");
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Edit and Pause Mode");
         }
         ImGui::End();
     }
@@ -1205,8 +1205,8 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
     // update camera input
     ImGuiIO& io = ImGui::GetIO();
 
-    // in play/pause mode camera follows hero
-    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause) {
+    // in play mode camera follows hero
+    if (editorMode == EditorMode::Play) {
         isPanning = false;
         return;
     }
@@ -1296,7 +1296,7 @@ void LevelEditor::ResetCamera()
 mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight) const
 {
     // In play pause mode, use the game camera
-    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
+    if (editorMode == EditorMode::Play)
     {
         if (CameraManager::Instance().HasActiveCamera())
         {
