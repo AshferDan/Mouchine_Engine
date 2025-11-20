@@ -131,25 +131,59 @@ vec2 Spritesheet::GetUVOffset() const
  */
 void Spritesheet::LoadNewSpritesheet(const char *textureFile, int numRows, int numCols)
 {
-	if (textureID)
+	if (textureID != 0 && SpriteFile && strcmp(SpriteFile, textureFile) == 0)
+	{
+		// Just update rows/cols in case the animation changed but the sheet didn't
+		rows = numRows;
+		cols = numCols;
+		uv_width = 1.0f / (float)numCols;
+		uv_height = 1.0f / (float)numRows;
+
+		// Reset frames logic
+		currRow = 0;
+		currCol = 0;
+		startFrame = 0;
+		endFrame = 0;
+		return;
+	}
+
+	//  Unload only if we own it 
+	if (ownsTexture && textureID)
 	{
 		Unload();
-	} // If valid textureID, unload texture
+	}
 
-	textureID = GraphicsSystem::LoadTexture(textureFile); // Reload texture
+	// Use Resource Manager to get the texture
+	// We use the filepath as the 'name' key
+	TextureResource* tex = ResourceManager::Instance().LoadTexture(textureFile, textureFile);
 
-	rows = numRows; // Set Rows and Cols
+	if (tex)
+	{
+		textureID = tex->GetTextureID();
+	}
+	else
+	{
+		// Fallback
+		textureID = GraphicsSystem::LoadTexture(textureFile);
+	}
+
+	// Update Tracking Variables
+	SpriteFile = textureFile;
+	ownsTexture = false; // Manager owns it now
+
+	// Update UVs
+	rows = numRows;
 	cols = numCols;
-	uv_width = 1.0f / (float)numCols; // Set new uv WxH
+	uv_width = 1.0f / (float)numCols;
 	uv_height = 1.0f / (float)numRows;
 
-	currRow = 0; // Reset priv members
+	currRow = 0;
 	currCol = 0;
 	startFrame = 0;
 	endFrame = 0;
 
-	if (auto *render = owner->GetComponent<RenderComponent>())
-	{ // Set texture ID of new animation
+	if (auto* render = owner->GetComponent<RenderComponent>())
+	{
 		render->SetTextureID(textureID);
 	}
 }

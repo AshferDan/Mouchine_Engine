@@ -173,23 +173,26 @@ void InputManager::Update(float dt)
         }
     }
 
-    auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
-    if (!player)
+    if (!cachedPlayerObject)
+    {
+        cachedPlayerObject = GameObjectFactory::Instance().FindGameObject("Hero");
+    }
+
+    if (!cachedPlayerObject)
     {
         return;
     }
 
-    auto *physics = player->GetComponent<PhysicsComponent>();
-    if (!physics)
-    {
-        return;
-    }
 
-    TransformComponent *transform = player->GetComponent<TransformComponent>();
-    if (!transform)
-    {
-        return;
-    }
+    auto* physics = cachedPlayerObject->GetComponent<PhysicsComponent>();
+
+    if (!physics) return;
+
+    TransformComponent* transform = cachedPlayerObject->GetComponent<TransformComponent>();
+    if (!transform) return;
+
+
+  
 
     //// Ensure player has drag force for smooth stopping (add once)
     // static bool dragInitialized = false;
@@ -324,32 +327,38 @@ void InputManager::Update(float dt)
             }
         }
     }
-    auto* anim = player->GetComponent<Spritesheet>();
-
-    if (transform && anim)
-    {
-
-        if (std::abs(moveDirectionX) > 0.0f)
+    auto* anim = cachedPlayerObject->GetComponent<Spritesheet>();
+        if (transform && anim)
         {
-            float baseWidth = std::abs(transform->scaleX);
-            float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
-            transform->SetScale(newScaleX, transform->scaleY);
-        }
+            float absWidth = std::abs(transform->scaleX);
+            transform->SetScale(absWidth, transform->scaleY);
 
-        std::string requestedState = "Idle";
+      
+            static bool isFacingRight = true;
 
-        if (is_jumping)
-        {
-            requestedState = "Jump";
-        }
-        else if (std::abs(vx) > 2.0f) // Use a small threshold for movement
-        {
-            requestedState = "Run";
-        }
+            if (moveDirectionX > 0.0f) isFacingRight = true;
+            if (moveDirectionX < 0.0f) isFacingRight = false;
 
-        // The Spritesheet component handles the details internally now
-        anim->PlayAnimation(requestedState);
-    }
+            // 3. Determine Animation Name based on State AND Direction
+            std::string requestedState = "";
+
+            if (is_jumping)
+            {
+                requestedState = isFacingRight ? "Jump_R" : "Jump_L";
+            }
+            else if (std::abs(vx) > 1.0f)
+            {
+                requestedState = isFacingRight ? "Run_R" : "Run_L";
+            }
+            else
+            {
+                // If stopped, use the last known direction
+                requestedState = isFacingRight ? "Idle_R" : "Idle_L";
+            }
+
+            // 4. Play the specific Left/Right animation
+            anim->PlayAnimation(requestedState);
+        }
 
     // Note: Don't call SetVelocity anymore - forces handle movement
     // The Integrate() method will update velocity based on forces
@@ -368,18 +377,18 @@ void InputManager::Update(float dt)
 
     void InputManager::ResetState()
     {
-        // 1. Reset static mouse click flags
+ 
         MouseLeftClicked = false;
 
-        // 2. Reset internal tracking variables
         mouseX = 0.0;
         mouseY = 0.0;
         scrollX = 0.0;
         scrollY = 0.0;
 
-        // 3. Reset gameplay-related states
         isJumping = false;
         jumpStartY = 0.0f;
         footstepTimer = 0.0f;
+       cachedPlayerObject = nullptr;
         std::cout << "[InputManager] State reset." << std::endl;
     }
+

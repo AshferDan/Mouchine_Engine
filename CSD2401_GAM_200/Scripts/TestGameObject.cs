@@ -41,8 +41,8 @@ namespace GameScripts
             GameObject.CreateAnimatedImage("C#_AniImage",0,0,
                 300, 300,
                 "../Assets/spritesheet_R.png",
-                11,8,//size of the spritesheet
-                24,29,//start and end frames
+                13,10,//size of the spritesheet
+                114,115,//start and end frames
                 8,(int)CollisionLayer.Default,
                 false,false,
                 false);
