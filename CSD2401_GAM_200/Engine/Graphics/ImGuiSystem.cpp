@@ -1718,10 +1718,10 @@ void AudioAssetsPanel_Render()
 
     bool open = true;
 
-    ImGui::SetNextWindowSize(ImVec2(350, 600), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Audio Assets", &open))
+    if (!ImGui::Begin("Audio Manager", &open))
     {
         // even if collapsed still need to handle closing
         if (!open)
@@ -1748,7 +1748,7 @@ void AudioAssetsPanel_Render()
         return;
     }
 
-    ImGui::TextWrapped("Drag .wav / .mp3 / .ogg files from Project Navigator into this window to add them to the AudioManager");
+    ImGui::TextWrapped("Drag .wav / .mp3 / .ogg files from Project Navigator into this window to add them to the game");
     ImGui::Separator();
 
     // global controls
@@ -1800,6 +1800,7 @@ void AudioAssetsPanel_Render()
                 sound.name = p.stem().string();
                 sound.loop = false;
                 sound.volume = 1.0f;
+                sound.pitch = 1.0f;
                 sound.category = "sfx";
 
                 audioMgr->AddSound(sound);
@@ -1833,7 +1834,7 @@ void AudioAssetsPanel_Render()
     }
     else
     {
-        if (ImGui::BeginTable("AudioAssetsTable", 5,
+        if (ImGui::BeginTable("AudioAssetsTable", 6,
             ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
             ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY))
         {
@@ -1841,6 +1842,7 @@ void AudioAssetsPanel_Render()
             ImGui::TableSetupColumn("Category");
             ImGui::TableSetupColumn("Loop");
             ImGui::TableSetupColumn("Volume");
+            ImGui::TableSetupColumn("Pitch");
             ImGui::TableSetupColumn("Actions");
             ImGui::TableHeadersRow();
 
@@ -1873,16 +1875,42 @@ void AudioAssetsPanel_Render()
                 ImGui::TableSetColumnIndex(3);
                 {
                     float volume = sound.volume;
+                    ImGui::SetNextItemWidth(-60.0f);
                     if (ImGui::SliderFloat(("##vol_" + sound.name).c_str(),
                         &volume, 0.0f, 1.0f))
                     {
+                        volume = std::round(volume * 10.0f) / 10.0f;
                         sound.volume = volume;
                         audioMgr->SetSoundVolume(sound.name, volume);
                         std::cout << "[Audio Assets] Updated volume for " << sound.name << " = " << sound.volume << std::endl;
                     }
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(50.0f);
+                    float volDisplay = sound.volume;
+                    ImGui::InputFloat(("##vol_val_" + sound.name).c_str(), &volDisplay, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_ReadOnly);
                 }
 
+                //pitch
                 ImGui::TableSetColumnIndex(4);
+                {
+                    float pitch = (sound.pitch <= 0.0f ? 1.0f : sound.pitch);
+                    ImGui::SetNextItemWidth(-60.0f);
+                    if (ImGui::SliderFloat(("##pitch_" + sound.name).c_str(),
+                        &pitch, 0.5f, 2.0f, "%.2f"))
+                    {
+                        pitch = std::round(pitch * 10.0f) / 10.0f;
+                        sound.pitch = pitch;
+                        audioMgr->SetSoundPitch(sound.name, pitch);
+                        std::cout << "[Audio Assets] Updated pitch for " << sound.name << " = " << sound.pitch << std::endl;
+                    }
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(50.0f);
+                    float pitchDisplay = sound.pitch;
+                    ImGui::InputFloat(("#pitch_val_" + sound.name).c_str(), &pitchDisplay, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_ReadOnly);
+                }
+                /* actions */
+                // play button
+                ImGui::TableSetColumnIndex(5);
                 std::string playLabel = "Play##" + sound.name;
                 if (ImGui::SmallButton(playLabel.c_str()))
                 {

@@ -349,12 +349,31 @@ json Serialization::SerializeAudioManager(AudioManager* audioManager)
 	for (const auto& pair : audioManager->GetSoundDatabase())
 	{
 		const SoundData& sound = pair.second;
+
+		//volume
+		float v = sound.volume;
+		v = std::clamp(v, 0.0f, 1.0f);
+
+		// pitch
+		float p = sound.pitch;
+		p = std::clamp(p, 0.5f, 2.0f);
+
+		// format as strings with 2 decimal places
+		std::ostringstream volStream;
+		volStream << std::fixed << std::setprecision(2) << v;
+		std::string volStr = volStream.str();
+
+		std::ostringstream pitchStream;
+		pitchStream << std::fixed << std::setprecision(2) << p;
+		std::string pitchStr = pitchStream.str();
+
 		json soundJson = 
 		{ 
 			{"name", sound.name},
 			{"filepath", sound.filepath},
 			{"loop", sound.loop},
-			{"volume", sound.volume},
+			{"volume", v},
+			{"pitch", p},
 			{"category", sound.category}
 		};
 		j["sounds"].push_back(soundJson);
@@ -394,6 +413,7 @@ void Serialization::DeserializeAudioManager(const json& j, AudioManager* audioMa
 			sound.filepath = soundJson.value("filepath", "");
 			sound.loop = soundJson.value("loop", false);
 			sound.volume = soundJson.value("volume", 1.0f);
+			sound.pitch = soundJson.value("pitch", 1.0f);
 			sound.category = soundJson.value("category", "sfx");
 
 			audioManager->AddSound(sound);

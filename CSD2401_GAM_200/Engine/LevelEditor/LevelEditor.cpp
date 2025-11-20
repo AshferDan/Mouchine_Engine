@@ -1252,6 +1252,27 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
             // clamp zoom to min/max
             if (cameraZoom < minZoom) cameraZoom = minZoom;
             if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+
+            //ImGuiIO& io = ImGui::GetIO();
+
+            //// get mouse position
+            //float mouseX = io.MousePos.x;
+            //float mouseY = io.MousePos.y;
+
+            //// world position under the cursor before zoom
+            //vec2 worldBefore = ScreenToWorld(mouseX, mouseY, cameraX, cameraY, cameraZoom);
+
+            //// apply zoom
+            //float oldZoom = cameraZoom;
+            //cameraZoom += io.MouseWheel * zoomSpeed;
+            //cameraZoom = std::clamp(cameraZoom, minZoom, maxZoom);
+
+            //// world position under the cursor AFTER zoom
+            //vec2 worldAfter = ScreenToWorld(mouseX, mouseY, cameraX, cameraY, cameraZoom);
+
+            //// shift camera so the world point under cursor stays fixed
+            //cameraX += worldBefore.x - worldAfter.x;
+            //cameraY += worldBefore.y - worldAfter.y;
         }
     }
 }

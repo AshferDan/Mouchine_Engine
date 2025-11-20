@@ -11,6 +11,7 @@ struct SoundData {
     std::string filepath;
     bool loop;
     float volume;
+    float pitch;
     std::string category;
 };
 
@@ -42,6 +43,7 @@ public:
     void PlaySound(const std::string& soundName, const std::string& channelName = "");
     void SetSoundVolume(const std::string& soundName, float volume);
     void SetCategoryVolume(const std::string& category, float volume);
+    void SetSoundPitch(const std::string& soundName, float pitch);
     void StopSound(const std::string& channelName);
     void StopAllSounds();
     void ReloadSound(const std::string& soundName);
