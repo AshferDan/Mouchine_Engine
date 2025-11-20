@@ -280,21 +280,9 @@ void ImGuiSystem::Update(float dt)
                     Serialization::LoadPrefab(draggedPrefab);
                 }
 
-                // Get cursor position relative to the image
-                ImVec2 cursorScreenPos = ImGui::GetMousePos();
+                // gets cursor pos WRT world pos
                 ImVec2 viewportPos = ImGui::GetItemRectMin();
-
-                // camera bounds
-                const float camZoom = CORE->GetLevelEditor()->GetCameraZoom();
-                const vec2 camPos = { CORE->GetLevelEditor()->GetCameraX(), CORE->GetLevelEditor()->GetCameraY() };
-
-                // Evil function that took me like an hour to figure out and prolly took even more years off my lifespan
-                // but basically the gist is
-                // [from top left] local cursor pos - viewports position - viewportsize/2 (so we can have 0,0 be centered) / camerazoom + camera position
-                // camera zoom represents how zoomed in we are, so cursor needs to scale off that. Camera pos is alr in world space so just add it onto!
-                viewportCursorPos = ImVec2(
-                    (cursorScreenPos.x - viewportPos.x - (viewportSize.x / 2.f)) / camZoom + camPos.x,
-                    ((viewportSize.y / 2.f) - (cursorScreenPos.y - viewportPos.y)) / camZoom + camPos.y);
+                viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
 
                 ImGui::Text("(World Space) Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
                 ImGui::End();
@@ -360,6 +348,21 @@ void ImGuiSystem::Shutdown()
 std::string ImGuiSystem::GetName()
 {
     return "ImGui_System"; // Return descriptive system name
+}
+
+ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize)
+{
+    ImVec2 cursorScreenPos = ImGui::GetMousePos();
+    const float camZoom = CORE->GetLevelEditor()->GetCameraZoom();
+    const vec2 camPos = { CORE->GetLevelEditor()->GetCameraX(), CORE->GetLevelEditor()->GetCameraY() };
+
+    // Evil function that took me like an hour to figure out and prolly took even more years off my lifespan
+    // but basically the gist is
+    // [from top left] local cursor pos - viewports position - viewportsize/2 (so we can have 0,0 be centered) / camerazoom + camera position
+    // camera zoom represents how zoomed in we are, so cursor needs to scale off that. Camera pos is alr in world space so just add it onto!
+    float worldx = (cursorScreenPos.x - vpPos.x - (vpSize.x / 2.f)) / camZoom + camPos.x;
+    float worldy = ((vpSize.y / 2.f) - (cursorScreenPos.y - vpPos.y)) / camZoom + camPos.y;
+    return ImVec2(worldx, worldy);
 }
 
 /**

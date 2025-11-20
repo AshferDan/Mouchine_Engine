@@ -229,6 +229,8 @@ private:
  */
 extern ImVec2 viewportCursorPos;
 
+ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize);
+
 extern bool isHoveringOverViewport;
 
 void ReloadPrefabsList();
