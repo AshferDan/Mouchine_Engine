@@ -39,6 +39,7 @@ Technology is prohibited.
 #include "Serialization.h"
 #include "LevelEditor.h"
 #include "MenuLogic.h"
+#include "AudioManager.h"
 
 #include "Message.h"
 #include "IMessageHandler.h"
@@ -55,6 +56,7 @@ class TransformSystem;
 class ScriptSystem;
 class LevelEditor;
 class MenuLogicSystem;
+class AudioManager;
 class CoreEngine : public IMessageHandler
 {
 public:
@@ -218,6 +220,9 @@ public:
      */
     void SetAudioEngine(AudioEngine *audio) { audioEngine = audio; }
 
+    // audio manager stuff
+    AudioManager* GetAudioManager() const { return audioManager; }
+
     /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
@@ -265,9 +270,10 @@ public:
      * @brief Requests a scene to be loaded on the next frame.
      * @param sceneName The name of the scene file to load.
      */
-    void RequestSceneLoad(const std::string& sceneName) {
+    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false) {
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
+        m_autoPlayAfterLoad = autoPlay;
     }
 
     // Step-by-step physics debugging
@@ -280,6 +286,10 @@ public:
      * @return A reference to the MessageBus.
      */
     MessageBus& GetMessageBus() { return messageBus; }
+
+    void SetGamePaused(bool paused);
+
+    bool IsGamePaused() const { return m_gamePause; }
 
 private:
     /**
@@ -301,7 +311,8 @@ private:
     CameraSystem *cameraSystem = nullptr;
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem* menuLogicSystem = nullptr;
- 
+    AudioManager* audioManager = nullptr;
+
 
     unsigned LastTime;
     bool GameActive;
@@ -313,6 +324,8 @@ private:
     MessageBus messageBus;
     std::string m_pendingScene = "";
     bool m_hasPendingLoad = false;
+    bool m_autoPlayAfterLoad = false;
+    bool m_gamePause = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.

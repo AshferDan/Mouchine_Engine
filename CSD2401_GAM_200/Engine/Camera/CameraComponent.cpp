@@ -48,6 +48,9 @@ void CameraComponent::Update(float dt) {
 		return;
 	}
 
+	UpdateTrauma(dt);
+	UpdateFlash(dt);
+
 	// Follow Target Logic: Execute only if in FOLLOW mode and a valid, active target exists.
 	if (mode == CameraMode::FOLLOW_TARGET && followTarget && followTarget->IsActive()) {
 		// Attempt to get the target's position component.
@@ -205,7 +208,8 @@ void CameraComponent::ApplyBounds() {
  */
 mat4 CameraComponent::GetViewMatrix() const {
 	// Translate the world opposite to the camera's position
-	return mat4::translate(vec3(-position.x, -position.y, 0.f));
+	vec2 shakenPosition = position + traumaShakeOffset;
+	return mat4::translate(vec3(-shakenPosition.x, -shakenPosition.y, 0.f));
 }
 
 /**
@@ -237,6 +241,63 @@ mat4 CameraComponent::GetViewProjectionMatrix(float screenWidth, float screenHei
 	mat4 view = GetViewMatrix();
 	return projection * view;
 }
+
+void CameraComponent::AddTrauma(float amount) {
+	trauma = std::min(1.f, trauma + amount);
+}
+
+void CameraComponent::UpdateTrauma(float deltaTime) {
+	if (trauma > 0.f) {
+		trauma = std::max(0.f, trauma - traumaDecayRate * deltaTime);
+	}
+
+	if (trauma <= 0.f) {
+		traumaShakeOffset = vec2(0.f, 0.f);
+		return;
+	}
+
+	float shake = trauma * trauma;
+
+	float angle = ((float)rand()/RAND_MAX) * 6.28318530718f; // Random angle (0 to 2pi)
+	traumaShakeOffset.x = cos(angle) * shake * maxShakeOffset;
+	traumaShakeOffset.y = sin(angle) * shake * maxShakeOffset;
+}
+
+void CameraComponent::StartFlash(float duration, const vec4& color, bool fadeOut) {
+	isFlashing = true;
+	flashDuration = duration;
+	flashTimer = 0.f;
+	flashColor = color;
+	flashFadeOut = fadeOut;
+}
+
+void CameraComponent::StopFlash() {
+	isFlashing = false;
+	flashTimer = 0.f;
+}
+
+void CameraComponent::UpdateFlash(float dt) {
+	if (!isFlashing) { return; };
+
+	flashTimer += dt;
+
+	if (flashTimer >= flashDuration) {
+		StopFlash();
+	}
+}
+
+vec4 CameraComponent::GetFlashColor() const {
+	if (!isFlashing) { return vec4(0.f, 0.f, 0.f, 0.f); };
+
+	vec4 currentColor = flashColor;
+
+	if (flashFadeOut) {
+		float progress = flashTimer / flashDuration;
+		currentColor.w = flashColor.w * (1.f - progress);
+	}
+	return currentColor;
+}
+
 
 /**
  * @brief Creates a deep copy of the component for a new GameObject.

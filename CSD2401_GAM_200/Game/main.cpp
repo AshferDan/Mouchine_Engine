@@ -49,8 +49,8 @@ int main()
     {
 
         EnableMemoryLeakChecking();
-        CoreEngine engine;
         AudioEngine audio;
+        CoreEngine engine;
 
         API::Init_Engine(engine, audio);
 
@@ -70,6 +70,8 @@ int main()
             cam->SetSmoothing(true, 2.f);
         }
         CameraManager::Instance().SetActiveCamera(mainCamera);
+
+        //CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
 
         std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 

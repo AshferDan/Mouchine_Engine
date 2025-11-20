@@ -190,6 +190,25 @@ void Serialization::SaveScene(const std::string &scenePath)
 		}
 	}
 
+	// serialise audio manager
+	if (CORE)
+	{
+		AudioManager* audioMgr = CORE->GetAudioManager();
+		if (audioMgr)
+		{
+			j["AudioManager"] = SerializeAudioManager(audioMgr);
+			std::cout << "[SaveScene] AudioManager configuration saved" << std::endl;
+		}
+		else
+		{
+			std::cerr << "[SaveScene] WARNING: AudioManager is NULL, no audio config saved" << std::endl;
+		}
+	}
+	else
+	{
+		std::cerr << "[SaveScene] WARNING: CORE is NULL, cannot save AudioManager" << std::endl;
+	}
+
 	// Write scene JSON to disk
 	std::ofstream out(path, std::ios::trunc);
 	if (out.is_open())
@@ -257,6 +276,16 @@ void Serialization::LoadScene(const std::string& scenePath)
 		for (const auto& obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
+		// load audio manager configuration
+		if (CORE && j.contains("AudioManager")) 
+		{
+			AudioManager* audioMgr = CORE->GetAudioManager();
+			if (audioMgr) 
+			{
+				DeserializeAudioManager(j, audioMgr);
+				std::cout << "[LoadScene] AudioManager configuration loaded" << std::endl;
+			}
+		}
 		std::cout << "[LoadScene] Scene loaded successfully: " << path << "\n";
 	}
 }
@@ -352,4 +381,105 @@ const bool Serialization::IsStreamGood(std::string const& fullFilePath)
 		}
 		return false;
 	}
+json Serialization::SerializeAudioManager(AudioManager* audioManager) 
+{
+	if (!audioManager) 
+	{
+		return json();
+	}
+
+	json j;
+	j["sounds"] = json::array();
+	j["events"] = json::array();
+
+	// serialise sound
+	for (const auto& pair : audioManager->GetSoundDatabase())
+	{
+		const SoundData& sound = pair.second;
+
+		//volume
+		float v = sound.volume;
+		v = std::clamp(v, 0.0f, 1.0f);
+
+		// pitch
+		float p = sound.pitch;
+		p = std::clamp(p, 0.5f, 2.0f);
+
+		// format as strings with 2 decimal places
+		std::ostringstream volStream;
+		volStream << std::fixed << std::setprecision(2) << v;
+		std::string volStr = volStream.str();
+
+		std::ostringstream pitchStream;
+		pitchStream << std::fixed << std::setprecision(2) << p;
+		std::string pitchStr = pitchStream.str();
+
+		json soundJson = 
+		{ 
+			{"name", sound.name},
+			{"filepath", sound.filepath},
+			{"loop", sound.loop},
+			{"volume", v},
+			{"pitch", p},
+			{"category", sound.category}
+		};
+		j["sounds"].push_back(soundJson);
+	}
+
+	// serialise events
+	for (const auto& pair : audioManager->GetEventMappings())
+	{
+		json eventJson = 
+		{
+			{"event", pair.first},
+			{"sound", pair.second}
+		};
+		j["events"].push_back(eventJson);
+	}
+	return j;
+}
+
+void Serialization::DeserializeAudioManager(const json& j, AudioManager* audioManager)
+{
+	if (!audioManager || !j.contains("AudioManager"))
+	{
+		return;
+	}
+
+	const auto& audioJson = j["AudioManager"];
+
+	audioManager->Clear();
+
+	// deserialise sounds
+	if (audioJson.contains("sounds")) 
+	{
+		for (const auto& soundJson : audioJson["sounds"]) 
+		{
+			SoundData sound;
+			sound.name = soundJson.value("name", "");
+			sound.filepath = soundJson.value("filepath", "");
+			sound.loop = soundJson.value("loop", false);
+			sound.volume = soundJson.value("volume", 1.0f);
+			sound.pitch = soundJson.value("pitch", 1.0f);
+			sound.category = soundJson.value("category", "sfx");
+
+			audioManager->AddSound(sound);
+		}
+	}
+
+	// deserialise events
+	if (audioJson.contains("events")) 
+	{
+		for (const auto& eventJson : audioJson["events"]) 
+		{
+			std::string eventName = eventJson.value("event", "");
+			std::string soundName = eventJson.value("sound", "");
+
+			if (!eventName.empty() && !soundName.empty()) 
+			{
+				audioManager->AddEventMapping(eventName, soundName);
+			}
+		}
+	}
+	audioManager->LoadAllSounds();
 }

@@ -66,6 +66,11 @@ GraphicsSystem::GraphicsSystem()
             if (gs) {
                 gs->Wwidth = width;
                 gs->Wheight = height;
+
+                if (gs->editorMode) {
+                    gs->ResizeFrameBuffer(width, height);
+                }
+
             } });
 
             // Make OpenGL context current for this window.
@@ -299,6 +304,25 @@ void GraphicsSystem::Initialize()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    float flashQuad[]{
+        -1.f, -1.f,
+        1.f, -1.f,
+        -1.f, 1.f,
+        1.f, 1.f
+    };
+
+    glGenVertexArrays(1, &flashVAO);
+    glGenBuffers(1, &flashVBO);
+
+    glBindVertexArray(flashVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, flashVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(flashQuad), flashQuad, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+
+    glBindVertexArray(0);
+
     // Initialize the off-screen framebuffer for the editor viewport
     CreateFrameBuffer(800, 600);
 }
@@ -316,6 +340,18 @@ void GraphicsSystem::Update(float)
     if (!window)
         return; // Skip if no valid window.
 
+    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
+        {
+            if (focused == GLFW_FALSE)
+            {
+                CORE->SetGamePaused(true);
+            }
+            else
+            {
+                CORE->SetGamePaused(false);
+            }
+        });
+
     // === Framebuffer and Viewport Setup ===
     if (editorMode)
     {
@@ -327,6 +363,15 @@ void GraphicsSystem::Update(float)
     {
         // Render directly to the default window framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        int currentWidth, currentHeight;
+        glfwGetFramebufferSize(window, &currentWidth, &currentHeight);
+
+        // Update stored dimensions if they changed
+        if (currentWidth != Wwidth || currentHeight != Wheight)
+        {
+            Wwidth = currentWidth;
+            Wheight = currentHeight;
+        }
         glViewport(0, 0, Wwidth, Wheight);
     }
 
@@ -535,6 +580,7 @@ void GraphicsSystem::Update(float)
                 }
                 else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
                 {
+                    //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
                     DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
                 }
             }
@@ -587,6 +633,13 @@ void GraphicsSystem::Update(float)
                 break;
             }
             }
+        }
+    }
+
+    auto* activeCamera = CameraManager::Instance().GetActiveCamera();
+    if (activeCamera) {
+        if (activeCamera->IsFlashing()) {
+            DrawFlashOverlay(activeCamera->GetFlashColor());
         }
     }
 
@@ -1015,6 +1068,43 @@ void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewpo
         {
             ResizeFrameBuffer((int)viewportSizeX, (int)viewportSizeY);
         }
+    }
+}
+
+void GraphicsSystem::DrawFlashOverlay(const vec4& color) {
+    debugShader.Use();
+    debugShader.SetUniform("uColor", color);
+    debugShader.SetUniform("uMVP", mat4::identity());
+
+    glBindVertexArray(flashVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+
+void GraphicsSystem::ToggleFullScreen() {
+    if (!window) {
+        return;
+    }
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+    if (!isFullscreen) {
+        glfwGetWindowPos(window, &windowedPosX, &windowedPosY);
+        glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
+
+        glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        isFullscreen = true;
+
+        std::cout << "[GraphicsSystem] Switched to fullscreen: " << mode->width << "x" << mode->height << std::endl;
+    }
+    else {
+
+        glfwSetWindowMonitor(window, nullptr, windowedPosX, windowedPosY, windowedWidth, windowedHeight, GLFW_DONT_CARE);
+
+        isFullscreen = false;
+
+        std::cout << "[GraphicsSytem] Switched to windowed " << Wwidth << "x" << Wheight << std::endl;
     }
 }
 

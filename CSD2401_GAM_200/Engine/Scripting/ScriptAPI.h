@@ -26,6 +26,7 @@ Technology is prohibited.
 #include "Transform.h"
 #include "Collision.h"
 #include "Collidercomponent.h"
+#include "CollisionSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
 #include "Animator.hpp"
@@ -33,6 +34,9 @@ Technology is prohibited.
 #include "audio.h"
 #include "InputManager.h"
 #include "gameObject.h"
+#include <random>
+#include "CameraComponent.h"
+#include "CameraManager.h"
 
 
 /**
@@ -62,6 +66,7 @@ namespace API {
      * @param engine Reference to the CoreEngine instance.
      */
     void StartEngineLoop(CoreEngine& engine);
+
 #pragma endregion
 
 #pragma region Creations
@@ -316,13 +321,41 @@ namespace API {
      * @param newlayer The new collision layer.
      */
     void SetCollisionLayer(const std::string&, CollisionLayer newlayer);
+
+    bool OnTriggerEnter(const std::string, const std::string);
+    bool OnTriggerExit(const std::string, const std::string);
+    bool OnTriggerStay(const std::string, const std::string);
+
+#pragma endregion
+
+#pragma region Audio
+
+    void AddSound();
+    void muteSound();
+    void muteSound();
+
+    void setBGMVol();
+    void setSFXVol();
+    void setMasterVol();
 #pragma endregion
 
 
+#pragma region Corountine
+    void WaitForSeconds();
+
+#pragma endregion
+
+#pragma region Camera
+    void setCameraPos(vec2);
+    void setCameraZoom(float);
+    void setCameraMode(CameraComponent::CameraMode);
+
+#pragma endregion
 
 
-
-
+#pragma region Misc
+    int RandomNumberGen(int, int);
+#pragma endregion
 
 
 

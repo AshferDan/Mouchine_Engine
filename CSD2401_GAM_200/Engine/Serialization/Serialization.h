@@ -20,6 +20,7 @@ Technology is prohibited.
 #include "factory.h"
 #include "CameraComponent.h"
 #include "ComponentSerialization.h"
+#include "AudioManager.h"
 
 using json = nlohmann::json;
 const std::string PrefabFilePath { "../Assets/Prefabs/" };
@@ -82,5 +83,9 @@ namespace Serialization
     /**
     * @brief Extern bool for checking if a something is currently being dragged and dropped. For DND from asset browser to viewport.
     */
+    // audio serialisation
+    json SerializeAudioManager(AudioManager* audioManager);
+    void DeserializeAudioManager(const json& j, AudioManager* audioManager);
+
     extern bool Prefab_DragAndDropped;
 }

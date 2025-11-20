@@ -34,6 +34,7 @@ namespace fs = std::filesystem;
 const std::string AssetPayloadID{ "Asset_Filepath" };
 const std::string PrefabPayloadID{ "Prefab_Filepath" };
 const std::string HierarchyPayloadID{ "GameObject_Name" };
+const std::string AudioPayloadID("Audio_Filepath");
 const std::string ScenePayloadID{ "Scene_Name" };
 const std::string AudioPayloadID{ "Scene_Name" };
 const std::string SpritePayloadID{ "Scene_Name" };
@@ -319,3 +320,5 @@ void CreateHintText(std::string const& displayText);
  * @brief Handles the management of the spawning 1000 Gos
  */
 void M2_RenderStressTest();
+
+void AudioAssetsPanel_Render();

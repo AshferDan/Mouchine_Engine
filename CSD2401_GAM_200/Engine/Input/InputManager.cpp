@@ -109,7 +109,28 @@ void InputManager::Update(float dt)
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
+        {GLFW_KEY_ENTER, false}, // ADD THIS for Alt+Enter detection
     };
+
+    static bool altEnterPressed = false;
+    bool altPressed = (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) ||
+        (glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS);
+    bool enterPressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) ||
+        (glfwGetKey(window, GLFW_KEY_KP_ENTER) == GLFW_PRESS);
+
+    if (altPressed && enterPressed) {
+        if (!altEnterPressed) {
+            altEnterPressed = true;
+            // Toggle fullscreen
+            if (CORE && CORE->GetGraphicsSystem()) {
+                CORE->GetGraphicsSystem()->ToggleFullScreen();
+            }
+        }
+    }
+    else {
+        altEnterPressed = false;
+    }
+
 
     // handle M key for pausing and resuming background music
     static bool bgmPaused = false;
@@ -118,15 +139,12 @@ void InputManager::Update(float dt)
     {
         if (!singleTriggerKeys[GLFW_KEY_M])
         {
-            if (audioEngine)
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
             {
                 bgmPaused = !bgmPaused;
-                /*audioEngine->pauseSound("bgm_channel", bgmPaused);
-                std::cout << "bgm paused" << std::endl;*/
-
-                PauseSoundMessage msg("bgm_channel", bgmPaused);
-                std::cout << "[InputManager] Sending PauseSoundMessage: " << bgmPaused << "\n";
-                CORE->GetMessageBus().Publish(msg);
+                audioManager->StopSound("bgm_channel");
+                std::cout << "BGM " << (bgmPaused ? "paused" : "resumed") << std::endl;
             }
             singleTriggerKeys[GLFW_KEY_M] = true;
         }
@@ -244,6 +262,11 @@ void InputManager::Update(float dt)
         // Remove left movement if present
         forcesManager.RemoveForcesByType(ForceType::MoveLeft);
     }
+    else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+        CameraManager::Instance().AddCameraTrauma(1.f);
+        CameraManager::Instance().FlashActiveCamera(0.3, vec4(1.f, 0.f, 0.f, 0.7f));
+        //CORE->SetGamePaused(!CORE->IsGamePaused());
+    }
     else
     {
         // No movement keys pressed - remove all movement forces
@@ -270,8 +293,12 @@ void InputManager::Update(float dt)
         // Play footstep sound at intervals
         if (footstepTimer >= footstepInterval)
         {
-            audioEngine->playSound("footstep_sfx", "footstep_channel");
-            audioEngine->setVolume("footstep_channel", 1.0f);
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("PlayerLand");
+                //audioManager->PlaySound("footstep_sfx");
+            }
             footstepTimer = 0.0f; // reset timer
         }
     }
@@ -311,8 +338,10 @@ void InputManager::Update(float dt)
             physics->GetForcesManager().AddForce(ForceType::Jump);
             physics->GetVelocity(vx, vy); // Get updated VY after jump
             // Play jump sound effect
-            if (audioEngine)
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
             {
+                audioManager->TriggerEvent("PlayerJump");
                 std::cout << "[InputManager] SPACE pressed to sending PlaySoundMessage\n";
                 std::cout << "[InputManager] CORE pointer = " << CORE << std::endl;
                 PlaySoundMessage msg("jump_sfx");

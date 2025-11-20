@@ -120,6 +120,19 @@ struct mat4
 
 	mat4 operator*(mat4 const &o) const;
 
+	static mat4 identity()
+	{
+		mat4 result;
+		for (int i = 0; i < 16; i++)
+			result.m[i] = 0.0f;
+
+		result.m[0] = 1.0f;  // [0,0]
+		result.m[5] = 1.0f;  // [1,1] 
+		result.m[10] = 1.0f; // [2,2]
+		result.m[15] = 1.0f; // [3,3]
+
+		return result;
+	}
 
 	static mat4 ortho(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f)
 	{
