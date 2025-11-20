@@ -275,6 +275,16 @@ public:
     void SetCameraZoom(float zoomValue) { cameraZoom = zoomValue; }
 
     /**
+     * @brief Get the smoothing factor for zooming.
+     */
+    float GetCameraSmoothing() const { return zoomSmoothing; }
+
+    /**
+     * @brief (0.0f - 1.0f) Set the smoothing factor for zooming.
+     */
+    void SetCameraSmoothing(float smoothValue) { zoomSmoothing = smoothValue; }
+
+    /**
      * @return Name of the currently loaded scene
      */
     const std::string& GetCurrentFilename() const { return currentFilename; }
@@ -369,6 +379,7 @@ private:
     float zoomSpeed;                      // camera zoom sensitivity
     float minZoom;                        // minimum zoom level
     float maxZoom;                        // maximum zoom level
+    float zoomSmoothing;                  // (0-1) controls how much added smoothing there is 
 
     std::string currentBGMName = "";
     std::string currentBGMChannel = "bgm_channel";

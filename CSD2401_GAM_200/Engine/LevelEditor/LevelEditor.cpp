@@ -45,7 +45,8 @@ LevelEditor::LevelEditor()
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
     zoomSpeed(0.1f),
     minZoom(0.1f),
-    maxZoom(5.0f)
+    maxZoom(5.0f),
+    zoomSmoothing(0.2f)
 {
     strcpy(saveFilepath, "");
     strcpy(loadFilepath, "../Assets/Scenes/Prefab_TestScene.json");
@@ -1172,6 +1173,14 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
             }
             ImGui::Separator();
 
+            // Hardcoded values because they really shouldn't be anything else aside from 0 and 1 (well 0.99f) :)
+            if (ImGui::SliderFloat("Smoothing", &zoomSmoothing, 0.f, 0.99f, "%.2f")) {
+                // clamp zoom to min/max
+                if (zoomSmoothing < 0.f) zoomSmoothing = 0.f;
+                if (zoomSmoothing > 0.99f) zoomSmoothing = 0.99f;
+            }
+            ImGui::Separator();
+
             // camera settings
             ImGui::DragFloat("Pan Speed", &panSpeed, 0.1f, 0.1f, 10.0f);
             ImGui::Separator();
@@ -1247,40 +1256,24 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
     if (isHoveringOverViewport)
     {
         // mouse wheel zoom
-        // !!!!TODO FIX CAMERA ZOOM TOWARDS CURSOR!!!!!!
         if (io.MouseWheel != 0.0f) {
+            //world pos under before zoom
+            ImVec2 worldBefore = CursorToWorldPos(viewportPos, viewportSize);
+            
+            // apply zoom 
+            float oldZoom = cameraZoom;
+            cameraZoom += io.MouseWheel * zoomSpeed;                            // increase zooming
+            cameraZoom = cameraZoom + (oldZoom - cameraZoom) * zoomSmoothing;   // lerping algorithm to help with smoothness
+
+            if (cameraZoom < minZoom) cameraZoom = minZoom;         // clamp
+            if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+
+            //world pos under after zoom
             ImVec2 worldAfter = CursorToWorldPos(viewportPos, viewportSize);
-            std::cout << viewportPos.x << " " << viewportPos.y << " " << viewportSize.x << " " << viewportSize.y << std::endl;
-            //cameraX = worldAfter.x;
-            //cameraY = worldAfter.y ;
-            //float zoomDelta = io.MouseWheel * zoomSpeed;
-            //cameraZoom += zoomDelta;
 
-            //// clamp zoom to min/max
-            //if (cameraZoom < minZoom) cameraZoom = minZoom;
-            //if (cameraZoom > maxZoom) cameraZoom = maxZoom;
-
-            //ImGuiIO& io = ImGui::GetIO();
-
-            //// get mouse position
-            //float mouseX = io.MousePos.x;
-            //float mouseY = io.MousePos.y;
-
-            // world position under the cursor before zoom
-            //ImVec2 worldBefore = CursorToWorldPos(viewportPos, viewportSize);
-            //
-
-            //// apply zoom
-            //float oldZoom = cameraZoom;
-            //cameraZoom += io.MouseWheel * zoomSpeed;
-            //cameraZoom = std::clamp(cameraZoom, minZoom, maxZoom);
-
-            //// world position under the cursor AFTER zoom
-            //ImVec2 worldAfter = CursorToWorldPos(viewportPos, viewportSize);
-
-            //// shift camera so the world point under cursor stays fixed
-            //cameraX += worldBefore.x - worldAfter.x;
-            //cameraY += worldBefore.y - worldAfter.y;
+            // set diff as camera pos
+            cameraX += worldBefore.x - worldAfter.x;
+            cameraY += worldBefore.y - worldAfter.y;
         }
     }
 }

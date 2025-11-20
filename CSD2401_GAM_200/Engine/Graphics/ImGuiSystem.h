@@ -229,8 +229,8 @@ private:
  */
 extern ImVec2 viewportCursorPos;
 
-static ImVec2 viewportSize{};
-static ImVec2 viewportPos{};
+extern ImVec2 viewportSize;
+extern ImVec2 viewportPos;
 
 ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize);
 

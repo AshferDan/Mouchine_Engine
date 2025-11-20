@@ -100,6 +100,8 @@ static std::string g_audioErrorMessage;
 // VIEWPORT
 bool isHoveringOverViewport;
 int gizmo_type = -1;
+ImVec2 viewportSize;
+ImVec2 viewportPos;
 
 // IMGUI COLOURS
 ImVec4 color_icon_highlighted{ 0.5f, 0.5f, 0.5f, .7f };
