@@ -37,6 +37,10 @@ Technology is prohibited.
 #include <random>
 #include "CameraComponent.h"
 #include "CameraManager.h"
+#include <functional>
+
+    using TimerCallback = std::function<void()>;
+    using TimerID = unsigned int;
 
 
 /**
@@ -342,10 +346,16 @@ namespace API {
 #pragma endregion
 
 
-#pragma region Corountine
-    void WaitForSeconds();
 
-#pragma endregion
+    TimerID WaitForSeconds(float duration, TimerCallback callback);
+    TimerID Delay(float duration, TimerCallback callback);
+    TimerID InvokeRepeating(float interval, TimerCallback callback);
+    TimerID Invoke(float delay, void (*functionToCall)());
+    TimerID Schedule(float delay, std::function<void()> callback);
+    void CancelTimer(TimerID id);
+    void CancelTimerByName(std::string name);
+    void PauseTimer(TimerID id);
+    void ResumeTimer(TimerID id);
 
 #pragma region Camera
     void setCameraPos(vec2);

@@ -640,5 +640,75 @@ namespace API
 
 #pragma endregion
 
+#pragma region Timer
+    TimerID WaitForSeconds(float duration, TimerCallback callback)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(duration, callback, false, "WaitForSeconds");
+        }
+        return 0;
+    }
+
+    TimerID Delay(float duration, TimerCallback callback)
+    {
+        return WaitForSeconds(duration, callback);
+    }
+
+    TimerID InvokeRepeating(float interval, TimerCallback callback)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(interval, callback, true, "InvokeRepeating");
+        }
+        return 0;
+    }
+
+    TimerID Invoke(float delay, void (*functionToCall)())
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(delay, functionToCall, false, "Invoke");
+        }
+        return 0;
+    }
+
+    TimerID Schedule(float delay, std::function<void()> callback)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(delay, callback, false, "Schedule");
+        }
+        return 0;
+    }
+
+    void CancelTimer(TimerID id)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->CancelTimer(id);
+    }
+
+    void CancelTimerByName(std::string name)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->CancelTimerByName(name);
+    }
+
+    void PauseTimer(TimerID id)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->PauseTimer(id);
+    }
+
+    void ResumeTimer(TimerID id)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->ResumeTimer(id);
+    }
+#pragma endregion
 
 }

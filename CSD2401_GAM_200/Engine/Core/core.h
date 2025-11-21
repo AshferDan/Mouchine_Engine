@@ -44,6 +44,10 @@ Technology is prohibited.
 #include "Message.h"
 #include "IMessageHandler.h"
 
+#include "TimerSystem.h" 
+
+// Inside CoreEngine class
+
 // Forward declarations
 class GameObjectSystem;
 class GraphicsSystem;
@@ -223,6 +227,10 @@ public:
     // audio manager stuff
     AudioManager* GetAudioManager() const { return audioManager; }
 
+    
+
+    TimerSystem* GetTimerSystem() const { return timerSystem; }
+
     /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
@@ -308,6 +316,7 @@ private:
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem* menuLogicSystem = nullptr;
     AudioManager* audioManager = nullptr;
+    TimerSystem* timerSystem = nullptr; 
 
 
     unsigned LastTime;

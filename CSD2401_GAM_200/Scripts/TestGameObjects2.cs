@@ -34,7 +34,7 @@ namespace GameScripts
                 (int)CollisionLayer.Default,
                 false, false, false
             );
-            Components.AddPhysicsComponent("BlueSquare");
+            //Components.AddPhysicsComponent("BlueSquare");
 
             GameObject.CreateShape(
                 "GreenSquare",

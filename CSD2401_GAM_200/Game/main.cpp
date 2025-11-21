@@ -35,6 +35,23 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
+void MoveRedSquareLeft()
+{
+    std::cout << "[GameLogic] 5 Seconds have passed! Moving Red Square..." << std::endl;
+
+    // We find the object by name since we aren't capturing it
+    GameObject* redSquare = GameObjectFactory::Instance().FindGameObject("RedSquare");
+    if (redSquare)
+    {
+        // Assuming you have a physics component, apply velocity
+        // If using Transform directly:
+        API::SetPos("RedSquare2", -100.0f, 0.0f); // Teleport
+
+        // Using Physics (Velocity):
+        //API::SetVelocity("RedSquare", -200.0f, 0.0f); // Move Left at speed 200
+    }
+}
+
 /**
  * @brief Main entry point of the program.
  *
@@ -54,7 +71,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        CORE->RequestSceneLoad("Prefab_TestScene");
+        //CORE->RequestSceneLoad("Prefab_TestScene");
        
         GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto* cam = mainCamera->AddComponent<CameraComponent>();
@@ -69,7 +86,16 @@ int main()
             cam->SetFollowOffset(vec2(0.f, 0.f));
             cam->SetSmoothing(true, 2.f);
         }
+        
         CameraManager::Instance().SetActiveCamera(mainCamera);
+
+        API::CreateShape("RedSquare2", RenderComponent::ShapeType::Square,
+            400.0f, 0.0f, 100.0f, 100.0f,
+            vec4(1.0f, 0.0f, 0.0f, 1.0f), // Red Color
+            CollisionLayer::Default,
+            false,  // Has Physics
+            false, // Not Static (so it can move later)
+            false); // No Gravity
 
         std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
@@ -101,6 +127,7 @@ int main()
             std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
             scriptSys->CallOnStart(squareSpawner);
         }
+        API::Invoke(5.0f, &MoveRedSquareLeft);
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
@@ -173,3 +200,5 @@ namespace CrashHandler
         log.close();
     }
 } // namespace CrashHandler
+
+

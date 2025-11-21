@@ -115,6 +115,8 @@ void CoreEngine::InitSystems()
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
 
+    timerSystem = AddSystem<TimerSystem>();
+
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
@@ -236,6 +238,9 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = 0.0;
         if (menuLogicSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if(timerSystem)
+            g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+
 
         // Start ImGui frame
         if (imguiSystem)
@@ -375,6 +380,10 @@ void CoreEngine::GameLoop()
             levelEditor->PerformSceneReload();
         }
 
+        if (timerSystem) {
+            timerSystem->Update(static_cast<float>(delta_time));
+        }
+
         if (imguiSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -384,6 +393,7 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = ms;
             g_totalLoopTime += ms;
         }
+
 
         // End ImGui frame and render
         if (imguiSystem)
