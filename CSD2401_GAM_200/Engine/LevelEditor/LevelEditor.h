@@ -109,6 +109,16 @@ struct LevelData
     std::vector<GameObjectData> gameObjects;
 };
 
+struct EditorUndoCommand {
+    enum class ActionType { ObjectTransform, ObjectCreated, ObjectDeleted };
+
+    ActionType action;
+    EntityID entityID;
+
+    GameObjectData beforeState;
+    GameObjectData afterState;
+};
+
 /**
  * @class LevelEditor
  * @brief System for editing, saving, and loading game levels through ImGui interface
@@ -305,6 +315,29 @@ public:
     //void PlayLoadedBGM();
 
     std::string GetCurrentBGMChannel() const { return currentBGMChannel; }
+
+    // Helper functions
+    /**
+     * @brief Serialise a GameObject to GameObjectData structure
+     * @param obj GameObject to serialise
+     * @return GameObjectData structure with object's data
+     */
+    GameObjectData SerialiseGameObject(GameObject* obj);
+
+    /**
+     * @brief Deserialise GameObjectData and create GameObject instance
+     * @param data GameObject data to deserialise
+     * @return Pointer to created GameObject
+     */
+    GameObject* DeserialiseGameObject(const GameObjectData& data);
+
+    void RecordUndo(const EditorUndoCommand& cmd);
+    void PerformUndo();
+    //void PerformRedo();
+
+    std::vector<EditorUndoCommand> undoStack;
+    std::vector<EditorUndoCommand> redoStack;
+
 private:
     // GUI rendering functions
     /**
@@ -328,20 +361,20 @@ private:
      */
     void RestoreSceneState();
 
-    // Helper functions
-    /**
-     * @brief Serialise a GameObject to GameObjectData structure
-     * @param obj GameObject to serialise
-     * @return GameObjectData structure with object's data
-     */
-    GameObjectData SerialiseGameObject(GameObject* obj);
+    //// Helper functions
+    ///**
+    // * @brief Serialise a GameObject to GameObjectData structure
+    // * @param obj GameObject to serialise
+    // * @return GameObjectData structure with object's data
+    // */
+    //GameObjectData SerialiseGameObject(GameObject* obj);
 
-    /**
-     * @brief Deserialise GameObjectData and create GameObject instance
-     * @param data GameObject data to deserialise
-     * @return Pointer to created GameObject
-     */
-    GameObject* DeserialiseGameObject(const GameObjectData& data);
+    ///**
+    // * @brief Deserialise GameObjectData and create GameObject instance
+    // * @param data GameObject data to deserialise
+    // * @return Pointer to created GameObject
+    // */
+    //GameObject* DeserialiseGameObject(const GameObjectData& data);
 
 private:
     GameObjectFactory& factory;           // reference to game object factory
@@ -384,4 +417,5 @@ private:
     std::string currentBGMName = "";
     std::string currentBGMChannel = "bgm_channel";
     float currentBGMVolume = 0.5f;
+    static const int undoCapacity = 20;  // Maximum (action) history size
 };

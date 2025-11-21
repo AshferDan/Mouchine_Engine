@@ -621,6 +621,16 @@ void ImGuiSystem::Hierarchy_Render()
     {
         M2_RenderStressTest();
     }
+    // Undo feature
+    LevelEditor* editor = CORE->GetLevelEditor();
+    bool canUndo = !editor->undoStack.empty();
+
+    if (!canUndo) ImGui::BeginDisabled();
+    if (ImGui::Button("Undo"))
+    {
+        if (canUndo) CORE->GetLevelEditor()->PerformUndo();
+    }
+    if (!canUndo) ImGui::EndDisabled();
 
     // display current scene name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
@@ -882,11 +892,30 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
         if (ImGui::MenuItem("Delete"))
         {
-            // TODO - block out the deleting of main camera - crashes the game
-            factory.DestroyAllRelatedGameObjects(id);                   // handles cases for both individual GOs and parented GOs
-            if (selectedGameObjectID == id)
+            //// TODO - block out the deleting of main camera - crashes the game
+            //factory.DestroyAllRelatedGameObjects(id);                   // handles cases for both individual GOs and parented GOs
+            //if (selectedGameObjectID == id)
+            //{
+            //    ResetSelectedGameObject();
+            //}
+
+            LevelEditor* editor = CORE->GetLevelEditor();
+            GameObject* obj = factory.GetGameObject(id);
+
+            if (obj)
             {
-                ResetSelectedGameObject();
+                // UNDO DELETE: store object before deletion
+                EditorUndoCommand cmd;
+                cmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
+                cmd.entityID = id;
+                cmd.beforeState = editor->SerialiseGameObject(obj);
+                editor->RecordUndo(cmd);
+
+                factory.DestroyAllRelatedGameObjects(id);  // handles cases for both individual GOs and parented GOs
+
+                // Clear selection if it was selected
+                if (selectedGameObjectID == id)
+                    ResetSelectedGameObject();
             }
         }
         ImGui::EndPopup();
@@ -1737,21 +1766,60 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            // sliders for position, scale, rotation etc
+            // For Undo Feature
+            LevelEditor* editor = CORE->GetLevelEditor();
 
+            static bool editingTransform = false;
+            static GameObjectData beforeState;
+            bool changed = false;
+
+            // Start a new edit session if ANY transform widget becomes active
+            auto BeginEditIfNeeded = [&](void)
+                {
+                    if (!editingTransform && ImGui::IsItemActivated())
+                    {
+                        editingTransform = true;
+                        beforeState = editor->SerialiseGameObject(obj); // store BEFORE
+                    }
+                };
+
+            // End edit session if user stopped dragging
+            auto EndEditIfNeeded = [&](void)
+                {
+                    if (editingTransform && ImGui::IsItemDeactivatedAfterEdit())
+                    {
+                        editingTransform = false;
+
+                        EditorUndoCommand cmd;
+                        cmd.action = EditorUndoCommand::ActionType::ObjectTransform;
+                        cmd.entityID = obj->GetID();
+                        cmd.beforeState = beforeState;
+                        cmd.afterState = editor->SerialiseGameObject(obj);
+                        editor->RecordUndo(cmd);
+                    }
+                };
+
+            // sliders for position, scale, rotation etc
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
             if (ImGui::DragFloat2("Position", pos, 0.5f))
             {
                 transform->SetPosition(pos[0], pos[1]);
+                changed = true;
+                
             }
+            BeginEditIfNeeded();
+            EndEditIfNeeded();
 
             float scale[2] = { 1.0f, 1.0f };
             transform->GetScale(scale[0], scale[1]);
             if (ImGui::DragFloat2("Scale", scale, 0.5f))
             {
                 transform->SetScale(scale[0], scale[1]);
+                changed = true;
             }
+            BeginEditIfNeeded();
+            EndEditIfNeeded();
 
             float rotation = transform->GetRotation();
             if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
@@ -1761,7 +1829,11 @@ void ImGuiSystem::RenderPropertyEditor()
                     rotation = 0;
                 }
                 transform->SetRotation(rotation);
+                changed = true;
+
             }
+            BeginEditIfNeeded();
+            EndEditIfNeeded();
         }
     }
 

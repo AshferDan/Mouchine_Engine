@@ -1352,7 +1352,95 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
+    
+    // Check if undo exceed 20
+    if (undoStack.size() >= undoCapacity) {
+        undoStack.erase(undoStack.begin()); // Remove oldest
+    }
 
+    undoStack.push_back(undocmd);
+
+    // New edit after undo means redo should be cleared
+    //redoStack.clear();
+    
+}
+
+void LevelEditor::PerformUndo() {
+    if (undoStack.empty()) return;
+
+    EditorUndoCommand undocmd = undoStack.back();
+    undoStack.pop_back();
+
+    switch (undocmd.action) {
+        case EditorUndoCommand::ActionType::ObjectTransform: {
+            GameObject* go = factory.GetGameObject(undocmd.entityID);
+            //if (!go) return;
+            //RestoreTransformState(go, undocmd.before);
+
+            if (go && undocmd.beforeState.hasTransform) {
+                auto* t = go->GetComponent<TransformComponent>();
+                if (!t) break;
+
+
+                t->SetPosition(undocmd.beforeState.posX, undocmd.beforeState.posY);
+                t->SetScale(undocmd.beforeState.scaleX, undocmd.beforeState.scaleY);
+                t->SetRotation(undocmd.beforeState.rotation);
+            }
+
+            break;
+        }
+
+        case EditorUndoCommand::ActionType::ObjectCreated: {
+            factory.DestroyGameObject(undocmd.entityID);
+            break;
+        }
+        case EditorUndoCommand::ActionType::ObjectDeleted: {
+            DeserialiseGameObject(undocmd.beforeState);
+            break;
+        }
+
+    }
+
+    redoStack.push_back(undocmd);
+}
+
+//void LevelEditor::PerformRedo() {
+//    if (redoStack.empty()) return;
+//
+//    EditorUndoCommand undocmd = redoHistory.back();
+//    redoHistory.pop_back();
+//
+//    switch (undocmd.action) {
+//        case EditorUndoCommand::ActionType::TransformChange: {
+//            GameObject* go = factory.GetGameObject(undocmd.entityID);
+//            if (go && undocmd.afterState.hasTransform) {
+//                auto* t = go->GetComponent<TransformComponent>();
+//                if (!t) break;
+//
+//                t->SetPosition(undocmd.afterState.posX, undocmd.afterState.posY);
+//                t->SetScale(undocmd.afterState.scaleX, undocmd.afterState.scaleY);
+//                t->SetRotation(undocmd.afterState.rotation);
+//            }
+//            break;
+//        }
+//        case EditorUndoCommand::ActionType::ObjectCreated: {
+//            // Recreate Object
+//            GameObject* createdGO = DeserialiseGameObject(undocmd.afterState);
+//            break;
+//        }
+//        case EditorUndoCommand::ActionType::ObjectDeleted: {
+//            factory.DestroyGameObject(undocmd.entityID);
+//            break;
+//        }
+//    }
+//
+//    // Move back to undo buffer
+//    if (undoHistory.size() >= undoCapacity) {
+//        undoHistory.erase(undoHistory.begin());
+//    }
+//    undoHistory.push_back(undocmd);
+//}
 
 /*  Audio Management */
 /**
