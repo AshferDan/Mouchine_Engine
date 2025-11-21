@@ -69,13 +69,30 @@ void ComponentSerialization::SerializeSpritesheet(json& j, Spritesheet* s)
         const std::string& name = pair.first;
         const auto& data = pair.second;
 
+        // Calculate back the Row and Col from the linear Index
+        // Row = Index / TotalCols
+        // Col = Index % TotalCols
+        int startRow = 0;
+        int startCol = 0;
+        int endRow = 0;
+        int endCol = 0;
+
+        if (data.col > 0) {
+            startRow = data.startframe / data.col;
+            startCol = data.startframe % data.col;
+            endRow = data.endframe / data.col;
+            endCol = data.endframe % data.col;
+        }
+
         json animNode = {
             {"name", name},
             {"filepath", data.filepath},
             {"rows", data.row},
             {"cols", data.col},
-            {"startFrame", data.startframe},
-            {"endFrame", data.endframe},
+            {"startRow", startRow},
+            {"startCol", startCol},
+            {"endRow", endRow},
+            {"endCol", endCol},
             {"fps", data.fps}
         };
 
@@ -86,6 +103,7 @@ void ComponentSerialization::SerializeSpritesheet(json& j, Spritesheet* s)
         {"animations", animArray}
     };
 }
+
 
 /**
  * @brief Serializes the PhysicsComponent into JSON.
@@ -327,12 +345,17 @@ void ComponentSerialization::DeserializeSpritesheet(const json& j, GameObject* g
             std::string path = anim.value("filepath", "");
             int rows = anim.value("rows", 1);
             int cols = anim.value("cols", 1);
-            int start = anim.value("startFrame", 0);
-            int end = anim.value("endFrame", 0);
+
+            // READ NEW COORDINATE KEYS
+            int startRow = anim.value("startRow", 0);
+            int startCol = anim.value("startCol", 0);
+            int endRow = anim.value("endRow", 0);
+            int endCol = anim.value("endCol", 0);
+
             float fps = anim.value("fps", 1.0f);
 
-            // Register the animation into the component memory
-            spr->RegisterAnimation(name, path, rows, cols, start, end, fps);
+            // Register using the new function
+            spr->RegisterAnimation(name, path, rows, cols, startRow, startCol, endRow, endCol, fps);
         }
     }
 

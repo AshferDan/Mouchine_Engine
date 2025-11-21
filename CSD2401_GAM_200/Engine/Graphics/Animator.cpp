@@ -154,7 +154,6 @@ void Spritesheet::LoadNewSpritesheet(const char *textureFile, int numRows, int n
 	}
 
 	// Use Resource Manager to get the texture
-	// We use the filepath as the 'name' key
 	TextureResource* tex = ResourceManager::Instance().LoadTexture(textureFile, textureFile);
 
 	if (tex)
@@ -269,19 +268,27 @@ bool SupportedImageFile(const std::string& path) {
 	return (ext == ".png" || ext == ".jpeg");
 }
 
-void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int rows, int cols, int startIdx, int endIdx, float fps)
+void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps)
 {
+	
+	if (startRow >= numRows || startCol >= numCols || endRow >= numRows || endCol >= numCols) {
+		std::cerr << "Error: Animation " << name << " has out of bounds coordinates!" << std::endl;
+		return; 
+	}
+
+	int startIdx = (startRow * numCols) + startCol;
+	int endIdx = (endRow * numCols) + endCol;
+
 	AnimationData newState;
 	newState.filepath = path;
-	newState.row= rows;
-	newState.col = cols;
+	newState.row = numRows;
+	newState.col = numCols; // This is the Total columns of the sheet
 	newState.startframe = startIdx;
 	newState.endframe = endIdx;
 	newState.fps = fps;
 
 	animation_mList[name] = newState;
 }
-
 void Spritesheet::PlayAnimation(const std::string& name)
 {
 	if (currentAnimName == name) return;

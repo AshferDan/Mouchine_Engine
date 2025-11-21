@@ -77,7 +77,7 @@ public:
 	 */
 	GLuint GetTextureID() const { return textureID; }
 
-	void RegisterAnimation(const std::string& name, const std::string& path, int rows, int cols, int startIdx, int endIdx, float fps);
+	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps);
 
 	void PlayAnimation(const std::string& name);
 	/**
