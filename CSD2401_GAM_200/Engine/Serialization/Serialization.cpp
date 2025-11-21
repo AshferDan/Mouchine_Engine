@@ -21,6 +21,15 @@ Technology is prohibited.
 namespace fs = std::filesystem;
 static const std::string PREFAB_DIR = PrefabFilePath;
 
+// Stores hierarchy information until all objects are created
+struct PendingHierarchy
+{
+	GameObject* go;
+	std::string parentName;
+	json childrenJson;
+};
+static std::vector<PendingHierarchy> pendingList;
+
 std::string Serialization::GetFullPath(const std::string &filename)
 {
 	return PREFAB_DIR + filename + ".json";
@@ -63,7 +72,21 @@ json Serialization::SerializeGameObject(GameObject *go)
 	j["name"] = go->GetName();
 	j["active"] = go->IsActive();
 
+	// Parent
+	if (go->GetParent())
+		j["parent"] = go->GetParent()->GetName();
+	else
+		j["parent"] = nullptr;
+
+	// Components
 	ComponentSerialization::SerializeAllComponents(go, j);
+
+	// Children (recursive)
+	j["children"] = json::array();
+	for (GameObject* child : go->GetAllChildren())
+	{
+		j["children"].push_back(SerializeGameObject(child));
+	}
 	return j;
 }
 
@@ -87,6 +110,51 @@ void Serialization::DeserializeGameObject(const json &j)
 	go->SetActive(j.value("active", true));
 
 	ComponentSerialization::DeserializeAllComponents(go, j);
+
+	// Store parent + children for later
+	PendingHierarchy info;
+	info.go = go;
+
+	if (j.contains("parent") && j["parent"].is_string())
+		info.parentName = j["parent"];
+	else
+		info.parentName = "";
+
+	if (j.contains("children"))
+		info.childrenJson = j["children"];
+	else
+		info.childrenJson = json::array();
+
+	pendingList.push_back(info);
+}
+
+void Serialization::ResolveHierarchy()
+{
+	GameObjectFactory& factory = GameObjectFactory::Instance();
+
+	// 1) Assign parent to each GameObject
+	for (auto& entry : pendingList)
+	{
+		if (!entry.parentName.empty())
+		{
+			GameObject* parent = factory.FindByName(entry.parentName);
+			if (parent)
+			{
+				parent->AddChild(entry.go);  // uses your existing function
+			}
+		}
+	}
+
+	// 2) Recursively create children
+	for (auto& entry : pendingList)
+	{
+		for (const auto& childJson : entry.childrenJson)
+		{
+			DeserializeGameObject(childJson);   // recursive call
+		}
+	}
+
+	pendingList.clear();
 }
 
 /**
@@ -164,6 +232,7 @@ void Serialization::LoadPrefab(const std::string &prefabName)
 		for (const auto &obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
+		ResolveHierarchy();
 		std::cout << "[LoadPrefab] Prefab instantiated successfully.\n";
 	}
 }
@@ -174,6 +243,7 @@ void Serialization::LoadPrefab(const std::string &prefabName)
  */
 void Serialization::SaveScene(const std::string &scenePath)
 {
+	GameObjectFactory& factory = GameObjectFactory::Instance();
 	std::string path = SceneFilePath + scenePath + ".json";
 	json j;
 	j["GameObjects"] = json::array();
@@ -185,8 +255,11 @@ void Serialization::SaveScene(const std::string &scenePath)
 	{
 		if (obj && obj->IsActive())
 		{
-			// Serialize and add to JSON array
-			j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
+			if (obj->GetParent() == nullptr)  // Only save top-level objects
+			{
+				// Serialize and add to JSON array
+				j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
+			}
 		}
 	}
 
@@ -230,6 +303,10 @@ void Serialization::SaveScene(const std::string &scenePath)
  */
 void Serialization::LoadScene(const std::string& scenePath)
 {
+	GameObjectFactory& factory = GameObjectFactory::Instance();
+	factory.Clear();
+	pendingList.clear();
+
 	std::string path = SceneFilePath + scenePath + ".json";
 	if (!fs::exists(path))
 	{
@@ -288,6 +365,7 @@ void Serialization::LoadScene(const std::string& scenePath)
 		}
 		std::cout << "[LoadScene] Scene loaded successfully: " << path << "\n";
 	}
+	ResolveHierarchy();
 }
 
 /**

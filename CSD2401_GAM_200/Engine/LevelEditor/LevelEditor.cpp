@@ -578,15 +578,35 @@ bool LevelEditor::SaveLevel(const std::string &filepath)
         json root;
         root["GameObjects"] = json::array();
 
-        // serialise all active game objects
-        auto &allObjects = factory.GetAllGameObjects();
-        for (const auto &objPtr : allObjects)
+        //// serialise all active game objects
+        //auto &allObjects = factory.GetAllGameObjects();
+        //for (const auto &objPtr : allObjects)
+        //{
+        //    if (objPtr && objPtr->IsActive())
+        //    {
+        //        json objData = Serialization::SerializeGameObject(objPtr.get());
+        //        root["GameObjects"].push_back(objData);
+        //    }
+        //}
+        // Collect only ROOT objects
+        std::vector<GameObject*> roots;
+        auto& allObjects = factory.GetAllGameObjects();
+
+        for (const auto& objPtr : allObjects)
         {
-            if (objPtr && objPtr->IsActive())
-            {
-                json objData = Serialization::SerializeGameObject(objPtr.get());
-                root["GameObjects"].push_back(objData);
-            }
+            if (!objPtr || !objPtr->IsActive())
+                continue;
+
+            GameObject* obj = objPtr.get();
+            if (obj->GetParent() == nullptr)   // <-- ROOT OBJECT ONLY
+                roots.push_back(obj);
+        }
+
+        // Recursively serialize ONLY the root trees 
+        for (GameObject* rootObj : roots)
+        {
+            json objData = Serialization::SerializeGameObject(rootObj);
+            root["GameObjects"].push_back(objData);
         }
 
         if (CORE)
@@ -724,6 +744,8 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                 Serialization::DeserializeGameObject(objData);
             }
         }
+        Serialization::ResolveHierarchy();
+
 
         // check if MainCamera exists, create one if not
         GameObject* mainCam = factory.FindGameObject("MainCamera");

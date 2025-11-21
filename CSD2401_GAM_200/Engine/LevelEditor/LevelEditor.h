@@ -29,7 +29,7 @@ Technology is prohibited.
 #include <nlohmann/json.hpp>
 
 class GameObjectFactory;
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 /**
  * @enum EditorMode

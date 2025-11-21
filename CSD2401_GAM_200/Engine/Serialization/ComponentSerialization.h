@@ -26,7 +26,7 @@ Technology is prohibited.
 #include "Serialization.h"
 
 class Spritesheet;
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 /**
 * @brief Declares per-component serialization and deserialization functions.
