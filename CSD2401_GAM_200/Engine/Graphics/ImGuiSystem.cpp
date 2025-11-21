@@ -1477,6 +1477,12 @@ void ImGuiSystem::RenderPropertyEditor()
             if (ImGui::DragFloat2("Scale", scale, 0.5f))
             {
                 transform->SetScale(scale[0], scale[1]);
+
+                // Sync collider
+                auto* collider = obj->GetComponent<ColliderComponent>();
+                if (collider) {
+                    collider->SetSize(scale[0], scale[1]);
+                }
             }
 
             float rotation = transform->GetRotation();
