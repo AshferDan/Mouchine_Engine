@@ -26,6 +26,7 @@ Technology is prohibited.
 #include <filesystem>
 #include "Serialization.h"
 #include "LevelEditor.h"
+#include "ImGuizmo.h"
 
 // FILE SYSTEM
 namespace fs = std::filesystem;
@@ -35,6 +36,7 @@ const std::string PrefabPayloadID{ "Prefab_Filepath" };
 const std::string HierarchyPayloadID{ "GameObject_Name" };
 const std::string AudioPayloadID("Audio_Filepath");
 const std::string ScenePayloadID{ "Scene_Name" };
+const std::string SpritePayloadID{ "Scene_Name" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton
@@ -44,17 +46,37 @@ inline const char* icon_plus = "../Assets/Editor_Icons/Plus.png";
 inline const char* icon_prefab = "../Assets/Editor_Icons/Cube.png";
 inline const char* icon_audio = "../Assets/Editor_Icons/File_Audio.png";
 inline const char* icon_json = "../Assets/Editor_Icons/File_Json.png";
+inline const char* icon_giz_select = "../Assets/Editor_Icons/Gizmo_Select.png";
+inline const char* icon_giz_translate = "../Assets/Editor_Icons/Gizmo_Translate.png";
+inline const char* icon_giz_scale = "../Assets/Editor_Icons/Gizmo_Scale.png";
+inline const char* icon_giz_rotate = "../Assets/Editor_Icons/Gizmo_Rotate.png";
+inline const char* icon_giz_resize = "../Assets/Editor_Icons/Gizmo_Resize.png";
+inline const char* icon_active = "../Assets/Editor_Icons/Eye-Active.png";
+inline const char* icon_inactive = "../Assets/Editor_Icons/Eye-Inactive.png";
+
 extern GLuint icon_folder_ui;
 extern GLuint icon_file_ui;
 extern GLuint icon_plus_ui;
 extern GLuint icon_prefab_ui;
 extern GLuint icon_audio_ui;
 extern GLuint icon_json_ui;
+extern GLuint icon_giz_select_ui;
+extern GLuint icon_giz_translate_ui;
+extern GLuint icon_giz_scale_ui;
+extern GLuint icon_giz_rotate_ui;
+extern GLuint icon_giz_resize_ui;
+extern GLuint icon_active_ui;
+extern GLuint icon_inactive_ui;
 
 
 // CONST VARIABLES
-const ImVec2 icon_size(64, 64); // AssetManager icon sizes
-const ImVec2 icon_size_small(20, 20); // AssetManager icon sizes
+// AssetManager/ Hierarchy icon sizes
+const ImVec2 icon_size(64, 64); 
+const ImVec2 icon_size_large(48, 48);
+const ImVec2 icon_size_medium(32, 32);
+const ImVec2 icon_size_small(20, 20);
+const ImVec2 icon_size_smallest(14, 14);
+
 // Payload IDs (for different types of drag and drops)
 static const fs::path assetPath = "../Assets";
 
@@ -138,6 +160,11 @@ public:
     void SetSelectedGameObject(EntityID id);
 
     /**
+     * @brief Deselects the selected game object. Has other logic things attached such as selection highlight etc.
+     */
+    void ResetSelectedGameObject();
+
+    /**
      * @brief Renders the property editor window. Also handles logic regarding which GO is selected and how to manipulate components
      */
     void RenderPropertyEditor();
@@ -146,6 +173,10 @@ public:
      * @brief Function that handles logic of clicking on a GO in the viewport, to select. Also handles logic for drag and dropping to move the GOs around
      */
     void Viewport_ClickToSelect();
+
+    void Viewport_ManageGizmos();
+
+    void Viewport_HighlightGO();
 
 private:
     /**
@@ -160,7 +191,6 @@ private:
     GLFWwindow* m_window; ///< Pointer to the GLFW window
 };
 
-void ReloadPrefabsList();
 
 class DirectoryNavigator
 {
@@ -171,13 +201,42 @@ private:
     std::filesystem::path currentDir;
 };
 
+class PropertiesSlot
+{
+public:
+    PropertiesSlot() = delete;
+    ~PropertiesSlot() { --_totalID; }
+    PropertiesSlot(std::string const& displayText, std::string const& expectedPayload) : _displayText(displayText), _expectedPayload(expectedPayload), _id(++_totalID), _receivedData{} {}
+    PropertiesSlot(PropertiesSlot const& rhs) : _displayText(rhs._displayText), _expectedPayload(rhs._expectedPayload), _id(++_totalID), _receivedData{} {}
+    PropertiesSlot(PropertiesSlot&& rhs) noexcept : _displayText(std::move(rhs._displayText)), _expectedPayload(std::move(rhs._expectedPayload)), _id(++_totalID), _receivedData{} {}
+
+    void RenderImGui();
+    void SetDisplayText(std::string const& text) { _displayText = text; }
+
+    unsigned int GetID() const { return _id; }
+    std::string GetDisplayText() const { return _displayText; }
+    std::string GetExpectedPayload() const { return _expectedPayload; }
+private:
+    unsigned int _id;
+    std::string _displayText;
+    std::string _expectedPayload;
+    std::string _receivedData;
+    inline static unsigned int _totalID = 0;
+};
+
 /**
  * @brief Gets the cursor pos with respect to the viewport's and world's coordinates. Externed for other files to access
  */
 extern ImVec2 viewportCursorPos;
 
+extern ImVec2 viewportSize;
+extern ImVec2 viewportPos;
+
+ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize);
+
 extern bool isHoveringOverViewport;
 
+void ReloadPrefabsList();
 /**
  * @brief Renders performance profiler
  */

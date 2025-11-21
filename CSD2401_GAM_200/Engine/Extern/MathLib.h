@@ -18,6 +18,8 @@ Technology is prohibited.
 #include <cmath>
 #include <cstdint>
 
+constexpr float pi = 3.14159265358979323846f;
+
 struct vec3;
 struct vec4;
 //----------------- vec2 -----------------//
@@ -118,6 +120,19 @@ struct mat4
 
 	mat4 operator*(mat4 const &o) const;
 
+	static mat4 identity()
+	{
+		mat4 result;
+		for (int i = 0; i < 16; i++)
+			result.m[i] = 0.0f;
+
+		result.m[0] = 1.0f;  // [0,0]
+		result.m[5] = 1.0f;  // [1,1] 
+		result.m[10] = 1.0f; // [2,2]
+		result.m[15] = 1.0f; // [3,3]
+
+		return result;
+	}
 
 	static mat4 ortho(float left, float right, float bottom, float top, float near = -1.0f, float far = 1.0f)
 	{
@@ -171,5 +186,12 @@ vec4 operator*(mat4 const& m, vec4 const& v);
 
 inline vec3::vec3(vec4 const& v) : x(v.x), y(v.y), z(v.z) {}
 inline vec4::vec4(vec3 const& v, float pw) : x(v.x), y(v.y), z(v.z), w(pw) {}
+
+inline float* value_ptr(mat4 const& mat) 
+{
+	return (float*)&mat;
+}
+
+void DecomposeMatrix(mat4 const& m, float& x, float& y, float& w, float& h, float& rot);
 
 #endif // MATH_LIB

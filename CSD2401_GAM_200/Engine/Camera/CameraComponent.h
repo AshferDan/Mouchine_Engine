@@ -207,6 +207,27 @@ public:
 	 */
 	mat4 GetViewProjectionMatrix(float screenWidth, float screenHeight) const;
 
+	void AddTrauma(float amount);
+
+	void UpdateTrauma(float deltaTime);
+
+	vec2 GetTraumaOffset() const { return traumaShakeOffset; };
+
+	float GetTrauma() const { return trauma; };
+
+	void SetTraumaDecayRate(float rate) { traumaDecayRate = rate; };
+
+	void SetMaxShakeOffset(float offset) { maxShakeOffset = offset; };
+
+	void StartFlash(float duration, const vec4& color, bool fadeOut = true);
+
+	void StopFlash();
+
+	void UpdateFlash(float deltaTime);
+
+	bool IsFlashing() const { return isFlashing; };
+
+	vec4 GetFlashColor() const;
 
 private:
 	vec2 position; 				///< The center position of the camera in world coordinates.
@@ -231,4 +252,18 @@ private:
 	 * This is called after any operation that changes the camera's position.
 	 */
 	void ApplyBounds();
+
+	//Trauma Shake
+	float trauma = 0.f;
+	float traumaDecayRate = 2.0f;
+	float maxShakeOffset = 20.0f;
+	vec2 traumaShakeOffset = vec2(0.f, 0.f);
+
+	//Flash Effect
+	bool isFlashing = false;
+	float flashTimer = 0.f;
+	float flashDuration = 0.f;
+	vec4 flashColor = vec4(1.f, 0.f, 0.f, 0.5f);
+	bool flashFadeOut = true;
+
 };

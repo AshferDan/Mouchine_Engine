@@ -316,22 +316,71 @@ void Serialization::RemovePrefab(std::string const &prefabName)
  */
 void Serialization::RenamePrefab(std::string const &oldName, std::string const &newName)
 {
-	if (!std::filesystem::exists(PrefabFilePath + oldName + ".json"))
+	std::string path = PrefabFilePath + oldName + ".json";
+	std::string newPath = PrefabFilePath + newName + ".json";
+
+	if (!std::filesystem::exists(path))
 	{
-		std::cout << "File Path " + PrefabFilePath + oldName + ".json\" cannot be found!\n";
+		std::cout << "File Path: \"" << path << "\" cannot be found!\n";
 		return;
 	}
 
-	if (!std::filesystem::exists(PrefabFilePath + newName + ".json"))
+	if (std::filesystem::exists(newPath))
 	{
-		std::filesystem::rename(PrefabFilePath + oldName + ".json", PrefabFilePath + newName + ".json");
+		newPath = PrefabFilePath + newName + "(1).json";
+	}
+
+	std::filesystem::rename(path, newPath);
+
+	std::ifstream in(newPath);
+	json j;
+	try
+	{
+		in >> j;
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "[LoadPrefab] JSON Parse error: " << e.what() << "\n";
+		return;
+	}
+	if (j.contains("GameObjects") && j["GameObjects"].is_array() && !j["GameObjects"].empty())
+	{
+		j["GameObjects"][0]["name"] = newName;
+	}
+	
+	std::ofstream out(newPath);
+	out << j.dump(4);
+
+	std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
+}
+
+/**
+* @brief Use full filepath name! Simply checks if file stream is valid & readable.
+*		 Nvm just found out that ifstream automatically closes fstreams but if u ever want to use this its here i guess
+*/
+const bool Serialization::IsStreamGood(std::string const& fullFilePath)
+{
+	// literally just checks if file is readable and closes filestreams properly.
+	std::ifstream ifs(fullFilePath);
+	if (ifs.good())
+	{
+		std::cout << "filepath: " << fullFilePath << " is good.\n";
+		ifs.close();
+		return true;
 	}
 	else
 	{
-		std::filesystem::rename(PrefabFilePath + oldName + ".json", PrefabFilePath + newName + "(1).json");
+		ifs.close();
+		if (std::filesystem::exists(fullFilePath))
+		{
+			std::cout << "WARNING - unable to open: " << fullFilePath << " . Check file type.\n";
+		}
+		else
+		{
+			std::cout << "WARNING - filepath: " << fullFilePath << " DOES NOT EXIST! Check filepath name.\n";
+		}
+		return false;
 	}
-
-	std::cout << "Prefab: " << oldName << " changed to " << newName << std::endl;
 }
 
 json Serialization::SerializeAudioManager(AudioManager* audioManager) 
@@ -349,12 +398,31 @@ json Serialization::SerializeAudioManager(AudioManager* audioManager)
 	for (const auto& pair : audioManager->GetSoundDatabase())
 	{
 		const SoundData& sound = pair.second;
+
+		//volume
+		float v = sound.volume;
+		v = std::clamp(v, 0.0f, 1.0f);
+
+		// pitch
+		float p = sound.pitch;
+		p = std::clamp(p, 0.5f, 2.0f);
+
+		// format as strings with 2 decimal places
+		std::ostringstream volStream;
+		volStream << std::fixed << std::setprecision(2) << v;
+		std::string volStr = volStream.str();
+
+		std::ostringstream pitchStream;
+		pitchStream << std::fixed << std::setprecision(2) << p;
+		std::string pitchStr = pitchStream.str();
+
 		json soundJson = 
 		{ 
 			{"name", sound.name},
 			{"filepath", sound.filepath},
 			{"loop", sound.loop},
-			{"volume", sound.volume},
+			{"volume", v},
+			{"pitch", p},
 			{"category", sound.category}
 		};
 		j["sounds"].push_back(soundJson);
@@ -394,6 +462,7 @@ void Serialization::DeserializeAudioManager(const json& j, AudioManager* audioMa
 			sound.filepath = soundJson.value("filepath", "");
 			sound.loop = soundJson.value("loop", false);
 			sound.volume = soundJson.value("volume", 1.0f);
+			sound.pitch = soundJson.value("pitch", 1.0f);
 			sound.category = soundJson.value("category", "sfx");
 
 			audioManager->AddSound(sound);

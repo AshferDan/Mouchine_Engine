@@ -270,3 +270,16 @@ bool IsAreaClicked(float buttonX, float buttonY, float buttonWidth, float button
     return (mouseX >= left && mouseX <= right &&
         mouseY >= bottom && mouseY <= top);
 }
+
+void DecomposeMatrix(mat4 const& m, float& x, float& y, float& w, float& h, float& rot)
+{
+    // translate
+    x = m.m[12];
+    y = m.m[13];
+
+    // scale
+    w = std::sqrt(m.m[0] * m.m[0] + m.m[1] * m.m[1]);
+    h = std::sqrt(m.m[4] * m.m[4] + m.m[5] * m.m[5]);
+
+    rot = std::atan2(m.m[1], m.m[0]);
+}

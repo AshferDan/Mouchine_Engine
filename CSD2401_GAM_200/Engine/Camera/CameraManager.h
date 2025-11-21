@@ -83,6 +83,10 @@ public:
 	 */
 	void ClearActiveCamera();
 
+	void AddCameraTrauma(float amount);
+
+	void FlashActiveCamera(float duration, const vec4& color, bool fadeOut = true);
+
 private:
 	/**
 	 * @brief Private constructor (for Singleton pattern).

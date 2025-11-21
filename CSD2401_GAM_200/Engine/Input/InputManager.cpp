@@ -109,7 +109,28 @@ void InputManager::Update(float dt)
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
+        {GLFW_KEY_ENTER, false}, // ADD THIS for Alt+Enter detection
     };
+
+    static bool altEnterPressed = false;
+    bool altPressed = (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) ||
+        (glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS);
+    bool enterPressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) ||
+        (glfwGetKey(window, GLFW_KEY_KP_ENTER) == GLFW_PRESS);
+
+    if (altPressed && enterPressed) {
+        if (!altEnterPressed) {
+            altEnterPressed = true;
+            // Toggle fullscreen
+            if (CORE && CORE->GetGraphicsSystem()) {
+                CORE->GetGraphicsSystem()->ToggleFullScreen();
+            }
+        }
+    }
+    else {
+        altEnterPressed = false;
+    }
+
 
     // handle M key for pausing and resuming background music
     static bool bgmPaused = false;
@@ -240,6 +261,11 @@ void InputManager::Update(float dt)
         forcesManager.AddForce(ForceType::MoveRight);
         // Remove left movement if present
         forcesManager.RemoveForcesByType(ForceType::MoveLeft);
+    }
+    else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
+        CameraManager::Instance().AddCameraTrauma(1.f);
+        CameraManager::Instance().FlashActiveCamera(0.3, vec4(1.f, 0.f, 0.f, 0.7f));
+        //CORE->SetGamePaused(!CORE->IsGamePaused());
     }
     else
     {

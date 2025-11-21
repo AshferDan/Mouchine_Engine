@@ -14,6 +14,7 @@ Technology is prohibited.
 
 #pragma once
 #include "Component.h"
+#include "MathLib.h"
 
 /**
  * @class TransformComponent
@@ -126,6 +127,11 @@ public:
      * @param distance Distance to move right
      */
     void MoveRight(float distance);
+
+    /**
+     * @brief Gets mat4 for translate, scale, rotation
+     */
+    mat4 GetMatrix();
 
 public:
     float posX, posY;     // Position
