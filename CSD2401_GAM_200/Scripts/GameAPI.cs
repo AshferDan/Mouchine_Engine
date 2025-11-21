@@ -292,6 +292,15 @@ namespace CSharpScript
         /// <param name="layer">The collision layer (use CollisionLayer enum values).</param>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetCollisionLayer(string objectName, int layer);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool OnTriggerEnter(string obj1, string obj2);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool OnTriggerExit(string obj1, string obj2);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool OnTriggerStay(string obj1, string obj2);
     }
 
     /// <summary>
@@ -375,5 +384,65 @@ namespace CSharpScript
         /// <summary>Circle collider type.</summary>
         Circle = 1
         // Add more if you have them in C++
+    }
+
+    /// <summary>
+    /// Audio system functions.
+    /// </summary>
+    public static class Audio
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddSound(string name, string filepath, bool loop, float volume, string category);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void PlaySound(string soundName, string channel);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void StopSound(string soundName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void StopAllSounds();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void RemoveSound(string soundName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void TriggerEvent(string eventName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddEventSound(string eventName, string soundName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetVolume(string soundName, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetCategoryVolume(string categoryName, float volume);
+    }
+
+    /// <summary>
+    /// Camera management functions.
+    /// </summary>
+    public static class Camera
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetPosition(float x, float y);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetZoom(float zoom);
+
+        /// <summary>
+        /// Sets camera mode. Ensure enum matches C++ CameraComponent::CameraMode.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetMode(int mode);
+    }
+
+    /// <summary>
+    /// Utility functions.
+    /// </summary>
+    public static class Utils
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int RandomRange(int min, int max);
     }
 }

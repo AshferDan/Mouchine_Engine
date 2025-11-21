@@ -12,6 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
+#include "core.h"
 #include "ColliderComponent.h"
 #include "LevelEditor.h"
 #include "physics.h"
@@ -19,6 +20,7 @@ Technology is prohibited.
 #include "Serialization.h"
 #include "audio.h"
 #include "AudioManager.h"
+#include "TimerSystem.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -289,6 +291,16 @@ void LevelEditor::StopPlayMode()
     {
         std::cout << "[LevelEditor] Stopping background music through AudioManager\n";
         audioManager->StopSound("bgm_channel");
+    }
+
+    if (CORE)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            std::cout << "[LevelEditor] Clearing all active timers.\n";
+            ts->ClearAllTimers();
+        }
     }
 
     RestoreSceneState();           // restore saved scene
