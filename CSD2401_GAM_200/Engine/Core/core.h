@@ -41,6 +41,7 @@ Technology is prohibited.
 #include "MenuLogic.h"
 #include "AudioManager.h"
 
+#include "GameManager.h"
 #include "Message.h"
 #include "IMessageHandler.h"
 

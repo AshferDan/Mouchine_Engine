@@ -26,6 +26,7 @@ double CoreEngine::delta_time = 0.0;
 double CoreEngine::fixed_dt = 1.0 / 60.0; // Default: 60 updates per second
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
+bool g_UseGameStates = false; // TRUE: GameState Mode, FALSE: Engine Mode
 
 /* brief
    Constuctor
@@ -391,6 +392,10 @@ void CoreEngine::GameLoop()
         {
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+
+        if (g_UseGameStates) {
+            GameManager::Instance().GameStateLoop(delta_time);
         }
 
         // Swap buffers and poll events

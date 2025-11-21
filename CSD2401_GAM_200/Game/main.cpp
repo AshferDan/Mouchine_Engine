@@ -54,8 +54,9 @@ int main()
 
         API::Init_Engine(engine, audio);
 
+        g_UseGameStates = true; // Set the flag to use Game States
         //CORE->RequestSceneLoad("Prefab_TestScene");
-       
+
         GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto* cam = mainCamera->AddComponent<CameraComponent>();
 
@@ -75,9 +76,9 @@ int main()
 
         std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
-        ScriptSystem *scriptSys = engine.GetScriptSystem();
+        ScriptSystem* scriptSys = engine.GetScriptSystem();
 
-        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        GameObject* squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
 
         if (scriptSys && squareSpawner)
         {
@@ -103,6 +104,10 @@ int main()
             std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
             scriptSys->CallOnStart(squareSpawner);
         }
+        
+        // Initialise Game State Manager (Level1)
+        GameManager::Instance().ChangeState(std::make_unique<Level1>());
+        
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
