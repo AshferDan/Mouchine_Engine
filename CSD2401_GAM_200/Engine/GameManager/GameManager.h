@@ -14,7 +14,7 @@ public:
 
 	virtual void Load() {}
 	virtual void Init() {}
-	virtual void Update(float dt) {}
+	virtual void Update(float dt) { (void)dt; }
 	virtual void Draw() {}
 	virtual void Free() {}
 	virtual void Unload() {}
