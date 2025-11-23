@@ -31,6 +31,7 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "physics.h"
 #include "AudioManager.h"
+#include "logic.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -900,21 +901,21 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
             if (obj)
             {             
-                EditorUndoCommand cmd;
-                cmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
-                cmd.entityID = id;
+                EditorUndoCommand undocmd;
+                undocmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
+                undocmd.entityID = id;
                 //cmd.beforeState = editor->SerialiseGameObject(obj);
-                cmd.beforeJson = Serialization::SerializeGameObject(obj);
+                undocmd.beforeJson = Serialization::SerializeGameObject(obj);
 
                 // Store Parent
                 GameObject* parent = obj->GetParent();
-                cmd.parentName = parent ? parent->GetName() : "";
+                undocmd.parentName = parent ? parent->GetName() : "";
 
                 // Store Children
                 for (GameObject* c : obj->GetAllChildren())
-                    cmd.childNames.push_back(c->GetName());
+                    undocmd.childNames.push_back(c->GetName());
 
-                editor->RecordUndo(cmd);
+                editor->RecordUndo(undocmd);
 
                 factory.DestroyAllRelatedGameObjects(id);  // handles cases for both individual GOs and parented GOs
 
@@ -1918,6 +1919,9 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
+    // Add event into GameObjects
+    RenderEventComponent(obj); 
+
     // TODO WIP drag and drop section for assets from project navigator
     // currently we dont have drag and drop spot for assets for textures etc, so this is just here to show it works 
     // Draws a box and lets it take in drag and drops for assets
@@ -1939,6 +1943,119 @@ void ImGuiSystem::RenderPropertyEditor()
 
     ImGui::End();
 }
+
+void ImGuiSystem::RenderEventComponent(GameObject* obj)
+{
+    auto* ec = obj->GetComponent<EventComponent>();
+
+    // Add component button
+    if (!ec)
+    {
+        if (ImGui::Button("Add Event Component"))
+            obj->AddComponent<EventComponent>();
+        return;
+    }
+
+    // --- Begin UI ---
+    if (ImGui::CollapsingHeader("Event Component", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text("Rules: %zu", ec->rules.size());
+        ImGui::Separator();
+
+        // Draw each rule
+        int index = 0;
+        for (auto& rule : ec->rules)
+        {
+            ImGui::PushID(index);
+
+            if (ImGui::TreeNodeEx("Rule", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                // Event Type selection
+                static const char* eventNames[] = {
+                    "None",
+                    "OnStart",
+                    "OnEnable",
+                    "OnDisable",
+                    "OnDestroy",
+                    "OnUpdate",
+                    "OnKeyPressed",
+                    "OnKeyReleased",
+                    "OnMousePressed",
+                    "OnMouseReleased",
+                    "OnMouseOver",
+                    "OnCollisionEnter",
+                    "OnCollisionStay",
+                    "OnCollisionExit",
+                    "OnTriggerEnter",
+                    "OnTriggerStay",
+                    "OnTriggerExit",
+                    "OnGoalReached",
+                    "OnFellOutOfMap"
+                };
+
+                int evIndex = (int)rule.eventType;
+                if (ImGui::Combo("Event", &evIndex, eventNames, IM_ARRAYSIZE(eventNames)))
+                    rule.eventType = (EventType)evIndex;
+
+                // Target filter
+                char buf[64];
+                strncpy(buf, rule.targetFilter.c_str(), sizeof(buf));
+                if (ImGui::InputText("Target Filter", buf, sizeof(buf)))
+                    rule.targetFilter = buf;
+
+                // Action selection
+                static const char* actionNames[] = {
+                    "None",
+                    "Shrink",
+                    "Grow",
+                    "ScaleTo",
+                    "MoveTo",
+                    "TeleportTo",
+                    "EnableObject",
+                    "DisableObject",
+                    "DestroyObject",
+                    "PlaySound",
+                    "StopSound",
+                    "LoadNextLevel",
+                    "Respawn",
+                    "AddScore",
+                    "TakeDamage",
+                    "FlashColor",
+                };
+
+                int acIndex = (int)rule.action;
+                if (ImGui::Combo("Action", &acIndex, actionNames, IM_ARRAYSIZE(actionNames)))
+                    rule.action = (ActionType)acIndex;
+
+                ImGui::Spacing();
+
+                // Remove rule
+                if (ImGui::Button("Remove Rule"))
+                {
+                    ec->rules.erase(ec->rules.begin() + index);
+                    ImGui::TreePop();
+                    ImGui::PopID();
+                    break; // exit loop safely
+                }
+
+                ImGui::TreePop();
+            }
+
+            ImGui::PopID();
+            index++;
+        }
+
+        ImGui::Separator();
+
+        // Add new rule
+        if (ImGui::Button("Add Rule"))
+        {
+            EventRule newRule;
+            ec->rules.push_back(newRule);
+        }
+    }
+}
+
 
 void PropertiesSlot::RenderImGui()
 {

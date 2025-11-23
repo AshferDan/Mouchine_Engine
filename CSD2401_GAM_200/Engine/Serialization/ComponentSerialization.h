@@ -24,6 +24,7 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "EnumConverters.h"
 #include "Serialization.h"
+#include "logic.h"
 
 class Spritesheet;
 using json = nlohmann::ordered_json;
@@ -42,6 +43,7 @@ namespace ComponentSerialization
     void SerializeCollider(json& j, ColliderComponent* c);
     void SerializeText(json& j, TextComponent* tc);
     void SerializeCamera(json& j, CameraComponent* cam);
+    void SerializeEvent(json& j, EventComponent* ec);
 
     // ----------- Deserialize Individual Components ----------------
     void DeserializeTransform(const json& j, GameObject* go);
@@ -51,6 +53,7 @@ namespace ComponentSerialization
     void DeserializeCollider(const json& j, GameObject* go);
     void DeserializeText(const json& j, GameObject* go);
     void DeserializeCamera(const json& j, GameObject* go);
+    void DeserializeEvent(const json& j, GameObject* go);
 
     // ----------- Convenience Wrappers ------------------------------
     void SerializeAllComponents(GameObject* go, json& j);

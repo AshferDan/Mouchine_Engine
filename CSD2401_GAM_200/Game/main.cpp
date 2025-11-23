@@ -54,7 +54,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        g_UseGameStates = true; // Set the flag to use Game States
+        g_UseGameStates = false; // Set the flag to use Game States
         //CORE->RequestSceneLoad("Prefab_TestScene");
 
         GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");

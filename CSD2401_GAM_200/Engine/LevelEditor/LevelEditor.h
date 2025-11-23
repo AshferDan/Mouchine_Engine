@@ -336,7 +336,6 @@ public:
 
     void RecordUndo(const EditorUndoCommand& cmd);
     void PerformUndo();
-    //void PerformRedo();
 
     std::vector<EditorUndoCommand> undoStack;
     std::vector<EditorUndoCommand> redoStack;

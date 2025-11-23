@@ -116,8 +116,11 @@ void CoreEngine::InitSystems()
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
 
+    eventSystemRunner = AddSystem<EventSystemRunner>();
+
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
+
 
     // Subscribe systems to specific message types
     messageBus.Subscribe<PlaySoundMessage>(audioEngine);
@@ -237,6 +240,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = 0.0;
         if (menuLogicSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if (eventSystemRunner)
+            g_systemTimings[eventSystemRunner->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
@@ -330,8 +335,18 @@ void CoreEngine::GameLoop()
                     double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                     g_systemTimings[menuLogicSystem->GetName()] = ms;
                     g_totalLoopTime += ms;
-                }
-                stepOnce = false; // Reset after processing one frame
+                }           
+                stepOnce = false; // Reset after processing one frame           
+            }
+
+            if (eventSystemRunner)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                eventSystemRunner->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[eventSystemRunner->GetName()] = ms;
+                g_totalLoopTime += ms;
             }
 
             // In step mode, only process ONE timestep then break

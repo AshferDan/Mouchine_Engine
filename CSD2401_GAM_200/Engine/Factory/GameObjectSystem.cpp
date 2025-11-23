@@ -147,14 +147,14 @@ Technology is prohibited.
          LevelEditor* editor = CORE->GetLevelEditor();
          if (editor)
          {
-             EditorUndoCommand cmd;
-             cmd.action = EditorUndoCommand::ActionType::ObjectCreated;
-             cmd.entityID = go->GetID();
+             EditorUndoCommand undocmd;
+             undocmd.action = EditorUndoCommand::ActionType::ObjectCreated;
+             undocmd.entityID = go->GetID();
 
              // Save newly created object as JSON
-             cmd.afterJson = Serialization::SerializeGameObject(go);
+             undocmd.afterJson = Serialization::SerializeGameObject(go);
 
-             editor->RecordUndo(cmd);
+             editor->RecordUndo(undocmd);
          }
      }
  }

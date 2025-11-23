@@ -13,6 +13,7 @@ Technology is prohibited.
 
 #include "ComponentSerialization.h"
 #include "Animator.hpp"
+#include "logic.h"
 
 std::unordered_map<GLuint, std::string> s_TexturePathByID;
 std::unordered_map<std::string, GLuint> s_IDByTexturePath;
@@ -142,6 +143,25 @@ void ComponentSerialization::SerializeCamera(json& j, CameraComponent* cam) {
         {"followTargetName", cam->GetFollowTargetName()}
     };
 
+}
+
+void ComponentSerialization::SerializeEvent(json& j, EventComponent* ec)
+{
+    if (!ec) return;
+
+    json rulesJson = json::array();
+
+    for (const auto& rule : ec->rules)
+    {
+        json r;
+        r["eventType"] = EventTypeToString(rule.eventType);
+        r["targetFilter"] = rule.targetFilter;
+        r["action"] = ActionTypeToString(rule.action);
+
+        rulesJson.push_back(r);
+    }
+
+    j["EventComponent"] = rulesJson;
 }
 
 // ------------------- Deserialize -------------------
@@ -428,6 +448,24 @@ void ComponentSerialization::DeserializeCamera(const json& j, GameObject* go) {
     cam->SetSmoothing(smoothing, smoothingSpeed);
 }
 
+void ComponentSerialization::DeserializeEvent(const json& j, GameObject* go)
+{
+    if (!j.contains("EventComponent")) return;
+
+    auto* ec = go->AddComponent<EventComponent>();
+    const auto& rulesJson = j["EventComponent"];
+
+    for (const auto& item : rulesJson)
+    {
+        EventRule rule;
+        rule.eventType = StringToEventType(item.value("eventType", "None"));
+        rule.targetFilter = item.value("targetFilter", "");
+        rule.action = StringToActionType(item.value("action", "None"));
+
+        ec->rules.push_back(rule);
+    }
+}
+
 // ------------------- Serialize / Deserialize All Componenents -------------------
 /**
  * @brief Serializes all components attached to a GameObject.
@@ -443,6 +481,7 @@ void ComponentSerialization::SerializeAllComponents(GameObject* go, json& j)
     if (auto* c = go->GetComponent<ColliderComponent>())  SerializeCollider(j, c);
     if (auto* tc = go->GetComponent<TextComponent>())     SerializeText(j, tc);
     //if (auto* cam = go->GetComponent<CameraComponent>())  SerializeCamera(j, cam);
+    if (auto* t = go->GetComponent<EventComponent>()) SerializeEvent(j, t);
 }
 
 /**
@@ -459,4 +498,5 @@ void ComponentSerialization::DeserializeAllComponents(GameObject* go, const json
     DeserializeCollider(j, go);
     DeserializeText(j, go);
     //DeserializeCamera(j, go);
+    DeserializeEvent(j, go);
 }

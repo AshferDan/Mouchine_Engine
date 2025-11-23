@@ -37,6 +37,7 @@ Technology is prohibited.
 #include <map>
 #include "MathLib.h"
 #include "Serialization.h"
+#include "logic.h"
 #include "LevelEditor.h"
 #include "MenuLogic.h"
 #include "AudioManager.h"
@@ -313,7 +314,7 @@ private:
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem* menuLogicSystem = nullptr;
     AudioManager* audioManager = nullptr;
-
+    EventSystemRunner* eventSystemRunner = nullptr;
 
     unsigned LastTime;
     bool GameActive;
