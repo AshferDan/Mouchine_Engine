@@ -295,6 +295,66 @@ void ImGuiSystem::Update(float dt)
                     Serialization::LoadPrefab(draggedPrefab);
                 }
 
+                // Viewport accepts Sprites for drag and drop
+                std::string draggedSprite{};
+                ReceiveDragAndDrop(SpritePayloadID, draggedSprite);
+
+                if (!draggedSprite.empty())
+                {
+                    std::cout << "[Viewport] Dropped sprite: " << draggedSprite << std::endl;
+
+                    // Extract sprite name from path
+                    fs::path spritePath(draggedSprite);
+                    std::string spriteName = spritePath.stem().string();
+
+                    // Create GameObject
+                    GameObject* newGO = factory.CreateGameObject(spriteName);
+
+                    if (newGO)
+                    {
+                        // Add Transform at cursor position
+                        auto* transform = newGO->AddComponent<TransformComponent>();
+                        if (transform)
+                        {
+                            transform->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
+                            transform->SetScale(64.0f, 64.0f); // Default size
+                        }
+
+                        // Add Render with texture
+                        auto* render = newGO->AddComponent<RenderComponent>();
+                        if (render)
+                        {
+                            auto& resourceMgr = ResourceManager::Instance();
+                            std::string textureKey = spriteName + "_texture";
+
+                            if (resourceMgr.LoadTexture(textureKey, draggedSprite))
+                            {
+                                TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+                                if (texRes && texRes->IsLoaded())
+                                {
+                                    render->SetTextureID(texRes->GetTextureID());
+                                    render->SetTexturePath(draggedSprite);
+                                    render->SetShapeType(RenderComponent::ShapeType::Square);
+                                    render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                                }
+                            }
+                        }
+
+                        // Add Square Collider - CORRECTED CONSTRUCTOR CALL!
+                        // Constructor: ColliderComponent(owner, type, width, height, layer)
+                        newGO->AddComponent<ColliderComponent>(
+                            ColliderComponent::Type::Square,
+                            64.0f,
+                            64.0f,
+                            CollisionLayer::Default
+                        );
+
+                        // Select the new GameObject
+                        SetSelectedGameObject(newGO->GetID());
+
+                        std::cout << "[Viewport] Created sprite GameObject: " << spriteName << std::endl;
+                    }
+                }
                 // gets cursor pos WRT world pos
                 viewportPos = ImGui::GetItemRectMin();
                 viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
@@ -1344,7 +1404,7 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().string(), fileName.c_str());            // For Audio files
                 }
-                if (iter.path().parent_path().filename() == "Sprites")
+                else if (iter.path().parent_path().filename() == "Sprites")
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
