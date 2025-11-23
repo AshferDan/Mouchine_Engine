@@ -28,6 +28,7 @@ Technology is prohibited.
 #include <typeinfo>
 #include <type_traits>
 #include "LevelEditor.h"
+#include "TilemapEditor.h"
 #include "ColliderComponent.h"
 #include "physics.h"
 #include "AudioManager.h"
@@ -96,6 +97,8 @@ static bool renderLoadedLayout = false;
 static bool showAudioAssetsPanel = false;
 static bool g_showAudioErrorPopup = false;
 static std::string g_audioErrorMessage;
+static bool showTilemapEditor = false;
+static std::unique_ptr<TilemapEditor> tilemapEditor = nullptr;
 
 // VIEWPORT
 bool isHoveringOverViewport;
@@ -177,6 +180,8 @@ void ImGuiSystem::Initialize()
     // Imgui flags
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
+    tilemapEditor = std::make_unique<TilemapEditor>();
+
     // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
     // Vars for ImGui::ImageButton
     icon_folder_ui = GraphicsSystem::LoadTexture(icon_folder);
@@ -214,7 +219,10 @@ void ImGuiSystem::Update(float dt)
         // ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
         // ImGui_ImplGlfw_NewFrame();    // Start new GLFW frame
         // ImGui::NewFrame();        // Start ImGui frame
-        
+        if (ImGui::IsKeyPressed(ImGuiKey_T) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+        {
+            showTilemapEditor = !showTilemapEditor;
+        }
         // Full window docking
         ImGuiViewport *viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -318,6 +326,24 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
+
+            // Renders the tilemap
+            if (showTilemapEditor)
+            {
+                tilemapEditor->SetVisible(true);
+                tilemapEditor->Update(dt);
+                tilemapEditor->Render();
+
+                //handle window close button
+                if (!tilemapEditor->IsVisible())
+                {
+                    showTilemapEditor = false;
+                }
+            }
+            else
+            {
+                tilemapEditor->SetVisible(false);
+            }
         }
         // if IS in play mode
         else
@@ -1449,6 +1475,10 @@ void TopMenuBar_Render()
             {
                 openLayoutLoadPopup = true;                     // if clicked, set flags for loading scenes
             }
+
+            ImGui::Separator();  // Add a separator line
+
+            ImGui::MenuItem("Tilemap Editor", "Ctrl+T", &showTilemapEditor);
 
             ImGui::EndMenu();
         }
