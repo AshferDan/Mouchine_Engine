@@ -142,6 +142,17 @@ Technology is prohibited.
          std::cout << "   Has Render:    " << (go->GetComponent<RenderComponent>() ? "Yes" : "No") << std::endl;
          std::cout << "   Has Physics:   " << (go->GetComponent<PhysicsComponent>() ? "Yes" : "No") << std::endl;
          std::cout << "   Has Collider:  " << (go->GetComponent<ColliderComponent>() ? "Yes" : "No") << std::endl;
+         
+         LevelEditor* editor = CORE->GetLevelEditor();
+         if (editor)
+         {
+             EditorUndoCommand cmd;
+             cmd.action = EditorUndoCommand::ActionType::ObjectCreated;
+             cmd.entityID = go->GetID();
+             cmd.afterState = editor->SerialiseGameObject(go);
+
+             editor->RecordUndo(cmd);
+         }
      }
  }
 

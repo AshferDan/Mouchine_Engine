@@ -1414,7 +1414,17 @@ void LevelEditor::PerformUndo() {
         }
 
         case EditorUndoCommand::ActionType::ObjectCreated: {
-            factory.DestroyGameObject(undocmd.entityID);
+            GameObject* obj = factory.GetGameObject(undocmd.entityID);
+
+            if (obj)
+            {
+                if (CORE && CORE->GetImguiSystem())
+                {
+                    CORE->GetImguiSystem()->ResetSelectedGameObject();
+                }
+
+                factory.DestroyGameObject(undocmd.entityID);
+            }
             break;
         }
         case EditorUndoCommand::ActionType::ObjectDeleted: {
@@ -1426,43 +1436,6 @@ void LevelEditor::PerformUndo() {
 
     redoStack.push_back(undocmd);
 }
-
-//void LevelEditor::PerformRedo() {
-//    if (redoStack.empty()) return;
-//
-//    EditorUndoCommand undocmd = redoHistory.back();
-//    redoHistory.pop_back();
-//
-//    switch (undocmd.action) {
-//        case EditorUndoCommand::ActionType::TransformChange: {
-//            GameObject* go = factory.GetGameObject(undocmd.entityID);
-//            if (go && undocmd.afterState.hasTransform) {
-//                auto* t = go->GetComponent<TransformComponent>();
-//                if (!t) break;
-//
-//                t->SetPosition(undocmd.afterState.posX, undocmd.afterState.posY);
-//                t->SetScale(undocmd.afterState.scaleX, undocmd.afterState.scaleY);
-//                t->SetRotation(undocmd.afterState.rotation);
-//            }
-//            break;
-//        }
-//        case EditorUndoCommand::ActionType::ObjectCreated: {
-//            // Recreate Object
-//            GameObject* createdGO = DeserialiseGameObject(undocmd.afterState);
-//            break;
-//        }
-//        case EditorUndoCommand::ActionType::ObjectDeleted: {
-//            factory.DestroyGameObject(undocmd.entityID);
-//            break;
-//        }
-//    }
-//
-//    // Move back to undo buffer
-//    if (undoHistory.size() >= undoCapacity) {
-//        undoHistory.erase(undoHistory.begin());
-//    }
-//    undoHistory.push_back(undocmd);
-//}
 
 /*  Audio Management */
 /**
