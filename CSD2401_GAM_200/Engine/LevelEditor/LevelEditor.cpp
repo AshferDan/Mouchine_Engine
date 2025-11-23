@@ -69,6 +69,7 @@ void LevelEditor::Initialize()
     currentFilename = "start level";
     editorMode = EditorMode::Stop;
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable docking
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
     //icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
 }
