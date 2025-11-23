@@ -1859,7 +1859,9 @@ void ImGuiSystem::RenderPropertyEditor()
                 transform->SetRotation(rotation);
             }
         }
+
     }
+        
 
     // Render component for GO
     if (auto* render = obj->GetComponent<RenderComponent>())
@@ -1916,13 +1918,26 @@ void ImGuiSystem::RenderPropertyEditor()
     }
 
     // Collider component
+    // Collider component
     if (auto* collider = obj->GetComponent<ColliderComponent>())
     {
-        // For now only display text of collider details
         if (ImGui::CollapsingHeader("Collider"))
         {
-            ImGui::Text("Type: %s", collider->GetType() == ColliderComponent::Type::Circle ? "Circle" : "Square");
+            // Editable Collider Type Dropdown
+            const char* colliderTypes[] = { "Square", "Circle" };
+            int currentType = (collider->GetType() == ColliderComponent::Type::Circle) ? 1 : 0;
 
+            if (ImGui::Combo("Type", &currentType, colliderTypes, 2))
+            {
+                ColliderComponent::Type newType = (currentType == 1)
+                    ? ColliderComponent::Type::Circle
+                    : ColliderComponent::Type::Square;
+                collider->setColliShape(newType);
+                std::cout << "[Property Editor] Changed collider type to "
+                    << colliderTypes[currentType] << std::endl;
+            }
+
+            // Display dimensions
             if (collider->GetType() == ColliderComponent::Type::Circle)
             {
                 Circle circle = collider->GetCircle();
@@ -1937,7 +1952,45 @@ void ImGuiSystem::RenderPropertyEditor()
                 ImGui::Text("Height: %.2f", height);
             }
 
-            ImGui::Text("Layer: %s", GetCollisionLayerName((int)collider->GetLayer()));
+            // Editable Size (In case we need it)
+            if (collider->GetType() == ColliderComponent::Type::Square)
+            {
+                AABB aabb = collider->GetAABB();
+                float width = aabb.max.x - aabb.min.x;
+                float height = aabb.max.y - aabb.min.y;
+
+                float newSize[2] = { width, height };
+                if (ImGui::DragFloat2("Size", newSize, 1.0f, 1.0f, 500.0f))
+                {
+                    collider->SetSize(newSize[0], newSize[1]);
+                    std::cout << "[Property Editor] Changed collider size to "
+                        << newSize[0] << "x" << newSize[1] << std::endl;
+                }
+            }
+            else if (collider->GetType() == ColliderComponent::Type::Circle)
+            {
+                Circle circle = collider->GetCircle();
+                float radius = circle.radius;
+
+                if (ImGui::DragFloat("Radius", &radius, 1.0f, 1.0f, 250.0f))
+                {
+                    collider->SetSize(radius * 2.0f, radius * 2.0f);
+                    std::cout << "[Property Editor] Changed circle radius to "
+                        << radius << std::endl;
+                }
+            }
+
+
+            // Editable Collision Layer Dropdown
+            const char* layerNames[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+            int currentLayer = static_cast<int>(collider->GetLayer());
+
+            if (ImGui::Combo("Layer", &currentLayer, layerNames, 6))
+            {
+                collider->SetLayer(static_cast<CollisionLayer>(currentLayer));
+                std::cout << "[Property Editor] Changed collision layer to "
+                    << layerNames[currentLayer] << std::endl;
+            }
         }
     }
 
