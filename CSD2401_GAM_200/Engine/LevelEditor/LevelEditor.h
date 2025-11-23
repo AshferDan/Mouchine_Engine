@@ -112,11 +112,14 @@ struct LevelData
 struct EditorUndoCommand {
     enum class ActionType { ObjectTransform, ObjectCreated, ObjectDeleted };
 
-    ActionType action;
-    EntityID entityID;
+    ActionType action = ActionType::ObjectTransform;
+    EntityID entityID = 0;
 
-    GameObjectData beforeState;
-    GameObjectData afterState;
+    json beforeJson;
+    json afterJson;
+
+    std::string parentName;
+    std::vector<std::string> childNames;
 };
 
 /**

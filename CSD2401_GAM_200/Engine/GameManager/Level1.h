@@ -18,5 +18,5 @@ public:
 	void Unload();
 
 private:
-	float timer;
+	float timer = 0;
 };

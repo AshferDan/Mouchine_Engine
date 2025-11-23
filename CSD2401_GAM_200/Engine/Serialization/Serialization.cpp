@@ -26,6 +26,7 @@ struct PendingHierarchy
 {
 	GameObject* go;
 	std::string parentName;
+	int siblingIndex;
 	json childrenJson;
 };
 static std::vector<PendingHierarchy> pendingList;
@@ -73,10 +74,38 @@ json Serialization::SerializeGameObject(GameObject *go)
 	j["active"] = go->IsActive();
 
 	// Parent
-	if (go->GetParent())
+	if (go->GetParent()) {
 		j["parent"] = go->GetParent()->GetName();
-	else
-		j["parent"] = nullptr;
+
+		// find index within parent's children
+		const auto& siblings = go->GetParent()->GetAllChildren();
+		int index = 0;
+		for (int i = 0; i < (int)siblings.size(); ++i)
+		{
+			if (siblings[i] == go)
+			{
+				index = i;
+				break;
+			}
+		}
+		j["siblingIndex"] = index;
+	}
+	else {
+		j["parent"] = nullptr;	
+
+		// find index in root list
+		const auto& roots = GameObjectFactory::Instance().GetAllGameObjects();
+		int index = 0;
+		for (int i = 0; i < (int)roots.size(); ++i)
+		{
+			if (roots[i].get() == go)
+			{
+				index = i;
+				break;
+			}
+		}
+		j["siblingIndex"] = index;
+	}
 
 	// Components
 	ComponentSerialization::SerializeAllComponents(go, j);
@@ -115,15 +144,11 @@ void Serialization::DeserializeGameObject(const json &j)
 	PendingHierarchy info;
 	info.go = go;
 
-	if (j.contains("parent") && j["parent"].is_string())
-		info.parentName = j["parent"];
-	else
-		info.parentName = "";
-
-	if (j.contains("children"))
-		info.childrenJson = j["children"];
-	else
-		info.childrenJson = json::array();
+	info.parentName = (j.contains("parent") && j["parent"].is_string())
+		? j["parent"].get<std::string>()
+		: "";
+	info.siblingIndex = j.value("siblingIndex", 0);
+	info.childrenJson = j.value("children", json::array());
 
 	pendingList.push_back(info);
 }
@@ -132,25 +157,23 @@ void Serialization::ResolveHierarchy()
 {
 	GameObjectFactory& factory = GameObjectFactory::Instance();
 
-	// 1) Assign parent to each GameObject
+	// Recursively create children
+	std::vector<json> childrenBuffer;
+	for (auto& entry : pendingList)
+		for (auto& c : entry.childrenJson)
+			childrenBuffer.push_back(c);
+
+	for (auto& childJson : childrenBuffer)
+		DeserializeGameObject(childJson);
+
+	// Assign actual parents
 	for (auto& entry : pendingList)
 	{
 		if (!entry.parentName.empty())
 		{
 			GameObject* parent = factory.FindByName(entry.parentName);
 			if (parent)
-			{
-				parent->AddChild(entry.go);  // uses your existing function
-			}
-		}
-	}
-
-	// 2) Recursively create children
-	for (auto& entry : pendingList)
-	{
-		for (const auto& childJson : entry.childrenJson)
-		{
-			DeserializeGameObject(childJson);   // recursive call
+				parent->AddChild(entry.go);
 		}
 	}
 

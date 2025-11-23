@@ -1396,39 +1396,45 @@ void LevelEditor::PerformUndo() {
 
     switch (undocmd.action) {
         case EditorUndoCommand::ActionType::ObjectTransform: {
-            GameObject* go = factory.GetGameObject(undocmd.entityID);
-            //if (!go) return;
-            //RestoreTransformState(go, undocmd.before);
+            GameObject* obj = factory.GetGameObject(undocmd.entityID);
+            if (!obj) break;
 
-            if (go && undocmd.beforeState.hasTransform) {
-                auto* t = go->GetComponent<TransformComponent>();
-                if (!t) break;
+            auto* transform = obj->GetComponent<TransformComponent>();
+            if (!transform) break;
 
+            json t = undocmd.beforeJson;
 
-                t->SetPosition(undocmd.beforeState.posX, undocmd.beforeState.posY);
-                t->SetScale(undocmd.beforeState.scaleX, undocmd.beforeState.scaleY);
-                t->SetRotation(undocmd.beforeState.rotation);
-            }
+            // Restore ONLY transform fields
+            if (t.contains("pos"))
+                transform->SetPosition(t["pos"][0], t["pos"][1]);
+
+            if (t.contains("scale"))
+                transform->SetScale(t["scale"][0], t["scale"][1]);
+
+            if (t.contains("rotation"))
+                transform->SetRotation(t["rotation"]);
 
             break;
         }
 
         case EditorUndoCommand::ActionType::ObjectCreated: {
             GameObject* obj = factory.GetGameObject(undocmd.entityID);
-
+            
             if (obj)
             {
-                if (CORE && CORE->GetImguiSystem())
+                if (CORE && CORE->GetImguiSystem()) // Deselect from Editor
                 {
                     CORE->GetImguiSystem()->ResetSelectedGameObject();
                 }
 
-                factory.DestroyGameObject(undocmd.entityID);
+                factory.DestroyAllRelatedGameObjects(undocmd.entityID);
             }
             break;
         }
         case EditorUndoCommand::ActionType::ObjectDeleted: {
-            DeserialiseGameObject(undocmd.beforeState);
+            Serialization::DeserializeGameObject(undocmd.beforeJson);
+            Serialization::ResolveHierarchy();
+
             break;
         }
 

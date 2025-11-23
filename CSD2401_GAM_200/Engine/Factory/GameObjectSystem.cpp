@@ -143,13 +143,16 @@ Technology is prohibited.
          std::cout << "   Has Physics:   " << (go->GetComponent<PhysicsComponent>() ? "Yes" : "No") << std::endl;
          std::cout << "   Has Collider:  " << (go->GetComponent<ColliderComponent>() ? "Yes" : "No") << std::endl;
          
+         // Update the last undo entry with new ID
          LevelEditor* editor = CORE->GetLevelEditor();
          if (editor)
          {
              EditorUndoCommand cmd;
              cmd.action = EditorUndoCommand::ActionType::ObjectCreated;
              cmd.entityID = go->GetID();
-             cmd.afterState = editor->SerialiseGameObject(go);
+
+             // Save newly created object as JSON
+             cmd.afterJson = Serialization::SerializeGameObject(go);
 
              editor->RecordUndo(cmd);
          }

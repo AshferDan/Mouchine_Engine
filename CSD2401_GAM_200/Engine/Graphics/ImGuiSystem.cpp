@@ -892,23 +892,28 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
         if (ImGui::MenuItem("Delete"))
         {
-            //// TODO - block out the deleting of main camera - crashes the game
-            //factory.DestroyAllRelatedGameObjects(id);                   // handles cases for both individual GOs and parented GOs
-            //if (selectedGameObjectID == id)
-            //{
-            //    ResetSelectedGameObject();
-            //}
+            // TODO - block out the deleting of main camera - crashes the game
 
+            // Record undo-delete
             LevelEditor* editor = CORE->GetLevelEditor();
             GameObject* obj = factory.GetGameObject(id);
 
             if (obj)
-            {
-                // UNDO DELETE: store object before deletion
+            {             
                 EditorUndoCommand cmd;
                 cmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
                 cmd.entityID = id;
-                cmd.beforeState = editor->SerialiseGameObject(obj);
+                //cmd.beforeState = editor->SerialiseGameObject(obj);
+                cmd.beforeJson = Serialization::SerializeGameObject(obj);
+
+                // Store Parent
+                GameObject* parent = obj->GetParent();
+                cmd.parentName = parent ? parent->GetName() : "";
+
+                // Store Children
+                for (GameObject* c : obj->GetAllChildren())
+                    cmd.childNames.push_back(c->GetName());
+
                 editor->RecordUndo(cmd);
 
                 factory.DestroyAllRelatedGameObjects(id);  // handles cases for both individual GOs and parented GOs
@@ -1770,21 +1775,19 @@ void ImGuiSystem::RenderPropertyEditor()
             LevelEditor* editor = CORE->GetLevelEditor();
 
             static bool editingTransform = false;
-            static GameObjectData beforeState;
-            bool changed = false;
+            static json beforeJson;   // JSON before edit
 
-            // Start a new edit session if ANY transform widget becomes active
-            auto BeginEditIfNeeded = [&](void)
+            // Helper lambdas (when on drag)
+            auto BeginEdit = [&](void)
                 {
                     if (!editingTransform && ImGui::IsItemActivated())
                     {
                         editingTransform = true;
-                        beforeState = editor->SerialiseGameObject(obj); // store BEFORE
+                        beforeJson = Serialization::SerializeGameObject(obj)["TransformComponent"];
                     }
                 };
 
-            // End edit session if user stopped dragging
-            auto EndEditIfNeeded = [&](void)
+            auto EndEdit = [&](void)
                 {
                     if (editingTransform && ImGui::IsItemDeactivatedAfterEdit())
                     {
@@ -1793,8 +1796,9 @@ void ImGuiSystem::RenderPropertyEditor()
                         EditorUndoCommand cmd;
                         cmd.action = EditorUndoCommand::ActionType::ObjectTransform;
                         cmd.entityID = obj->GetID();
-                        cmd.beforeState = beforeState;
-                        cmd.afterState = editor->SerialiseGameObject(obj);
+                        cmd.beforeJson = beforeJson;
+                        cmd.afterJson = Serialization::SerializeGameObject(obj)["TransformComponent"];
+
                         editor->RecordUndo(cmd);
                     }
                 };
@@ -1805,21 +1809,19 @@ void ImGuiSystem::RenderPropertyEditor()
             if (ImGui::DragFloat2("Position", pos, 0.5f))
             {
                 transform->SetPosition(pos[0], pos[1]);
-                changed = true;
                 
             }
-            BeginEditIfNeeded();
-            EndEditIfNeeded();
+            BeginEdit();
+            EndEdit();
 
             float scale[2] = { 1.0f, 1.0f };
             transform->GetScale(scale[0], scale[1]);
             if (ImGui::DragFloat2("Scale", scale, 0.5f))
             {
                 transform->SetScale(scale[0], scale[1]);
-                changed = true;
             }
-            BeginEditIfNeeded();
-            EndEditIfNeeded();
+            BeginEdit();
+            EndEdit();
 
             float rotation = transform->GetRotation();
             if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
@@ -1829,11 +1831,10 @@ void ImGuiSystem::RenderPropertyEditor()
                     rotation = 0;
                 }
                 transform->SetRotation(rotation);
-                changed = true;
 
             }
-            BeginEditIfNeeded();
-            EndEditIfNeeded();
+            BeginEdit();
+            EndEdit();
         }
     }
 
