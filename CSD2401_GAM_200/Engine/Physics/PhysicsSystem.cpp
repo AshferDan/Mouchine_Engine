@@ -401,3 +401,9 @@ void PhysicsSystem::HandleMessage(const CollisionMessage &msg)
     // Queue for resolution during physics update
     pendingCollisions.push_back({objA, objB, colA, colB});
 }
+
+void PhysicsSystem::ClearCollisionQueue()
+{
+    pendingCollisions.clear();
+    std::cout << "[PhysicsSystem] Collision queue cleared." << std::endl;
+}

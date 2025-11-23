@@ -711,4 +711,52 @@ namespace API
     }
 #pragma endregion
 
+
+#pragma region Input
+    bool IsKeyDown(int key)
+    {
+        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
+        if (window)
+        {
+            return glfwGetKey(window, key) == GLFW_PRESS;
+        }
+        return false;
+    }
+
+    bool IsMouseButtonDown(int button)
+    {
+        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
+        if (window)
+        {
+            return glfwGetMouseButton(window, button) == GLFW_PRESS;
+        }
+        return false;
+    }
+
+    float GetMouseX()
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return (float)input->GetMouseX();
+        return 0.0f;
+    }
+
+    float GetMouseY()
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return (float)input->GetMouseY();
+        return 0.0f;
+    }
+
+    float GetMouseWorldX()
+    {
+        // InputManager static accessor from your previous code
+        return (float)InputManager::GetMouseWorldX();
+    }
+
+    float GetMouseWorldY()
+    {
+        return (float)InputManager::GetMouseWorldY();
+    }
+#pragma endregion
+
 }

@@ -149,7 +149,7 @@ private:
     // Footstep audio timing
     float footstepTimer = 0.0f;
     float footstepInterval = 0.4f; // time between footstep sounds
-    GameObject* cachedPlayerObject = nullptr; // Add this variable
+    EntityID cachedPlayerID = 0;
 };
 
 #endif

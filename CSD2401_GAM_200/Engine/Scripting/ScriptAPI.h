@@ -336,7 +336,7 @@ namespace API {
     void AddSound(const std::string, const std::string, bool, float, std::string);
     void PlaySound(const std::string,const std::string);
     void StopSound(const std::string);
-    void StopAllSound(const std::string);
+    void StopAllSound();
     void RemoveSound(const std::string);
 
     void TriggerEvent(const std::string);
@@ -374,6 +374,15 @@ namespace API {
 #pragma endregion
 
 
+
+#pragma region Input
+    bool IsKeyDown(int key);
+    bool IsMouseButtonDown(int button);
+    float GetMouseX();
+    float GetMouseY();
+    float GetMouseWorldX();
+    float GetMouseWorldY();
+#pragma endregion
 
 
 

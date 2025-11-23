@@ -23,7 +23,7 @@ CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
-double CoreEngine::fixed_dt = 1.0 / 60.0; // Default: 60 updates per second
+double CoreEngine::fixed_dt = 1.0 / 60.0; 
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 

@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 using System.Runtime.CompilerServices;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace CSharpScript
 {
@@ -444,5 +445,93 @@ namespace CSharpScript
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int RandomRange(int min, int max);
+    }
+
+    public static class Input
+    {
+        /// Key codes mapping to standard GLFW/ASCII constants.
+        /// </summary>
+        public enum KeyCode
+        {
+            // Printable keys
+            Space = 32,
+            Apostrophe = 39,  /* ' */
+            Comma = 44,       /* , */
+            Minus = 45,       /* - */
+            Period = 46,      /* . */
+            Slash = 47,       /* / */
+
+            // Alphabet
+            A = 65, B = 66, C = 67, D = 68, E = 69, F = 70, G = 71, H = 72,
+            I = 73, J = 74, K = 75, L = 76, M = 77, N = 78, O = 79, P = 80,
+            Q = 81, R = 82, S = 83, T = 84, U = 85, V = 86, W = 87, X = 88,
+            Y = 89, Z = 90,
+
+            // Function Keys & Modifiers
+            Escape = 256,
+            Enter = 257,
+            Right = 262,
+            Left = 263,
+            Down = 264,
+            Up = 265,
+            Pause = 284,
+            LeftShift = 340,
+            LeftControl = 341,
+            LeftAlt = 342,
+            RightShift = 344,
+            RightControl = 345,
+            RightAlt = 346,
+            Menu = 348
+        }
+
+            [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsKeyDown(int key);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsMouseButtonDown(int button);
+
+        /// <summary>
+        /// Gets the mouse X position in screen coordinates.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseX();
+
+        /// <summary>
+        /// Gets the mouse Y position in screen coordinates.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseY();
+
+        /// <summary>
+        /// Gets the mouse X position in world coordinates (accounting for camera).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseWorldX();
+
+        /// <summary>
+        /// Gets the mouse Y position in world coordinates (accounting for camera).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseWorldY();
+
+
+        /// <summary>
+        /// Checks if a specific key is currently held down.
+        /// </summary>
+        /// <param name="key">The KeyCode to check.</param>
+        /// <returns>True if the key is pressed.</returns>
+        public static bool GetKey(KeyCode key)
+        {
+            return IsKeyDown((int)key);
+        }
+
+        /// <summary>
+        /// Checks if a mouse button is held down.
+        /// 0 = Left, 1 = Right, 2 = Middle.
+        /// </summary>
+        public static bool GetMouseButton(int button)
+        {
+            return IsMouseButtonDown(button);
+        }
     }
 }

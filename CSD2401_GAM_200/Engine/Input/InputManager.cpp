@@ -29,7 +29,7 @@ bool InputManager::MouseLeftClicked = false;
  * @param window Pointer to the GLFW window.
  * @param audio Optional pointer to the AudioEngine.
  */
-InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
+InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0),cachedPlayerID(0)
 {
     glfwSetWindowUserPointer(window, this);
 
@@ -172,23 +172,33 @@ void InputManager::Update(float dt)
             wasPressed = false;
         }
     }
+    GameObject* player = nullptr;
 
-    if (!cachedPlayerObject)
+
+    if (cachedPlayerID != 0)
     {
-        cachedPlayerObject = GameObjectFactory::Instance().FindGameObject("Hero");
+        player = GameObjectFactory::Instance().GetGameObject(cachedPlayerID);
     }
 
-    if (!cachedPlayerObject)
+    if (!player)
+    {
+        player = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (player)
+        {
+            cachedPlayerID = player->GetID();
+        }
+    }
+
+    if (!player)
     {
         return;
     }
 
 
-    auto* physics = cachedPlayerObject->GetComponent<PhysicsComponent>();
-
+    auto* physics = player->GetComponent<PhysicsComponent>();
     if (!physics) return;
 
-    TransformComponent* transform = cachedPlayerObject->GetComponent<TransformComponent>();
+    TransformComponent* transform = player->GetComponent<TransformComponent>();
     if (!transform) return;
 
 
@@ -327,7 +337,7 @@ void InputManager::Update(float dt)
             }
         }
     }
-    auto* anim = cachedPlayerObject->GetComponent<Spritesheet>();
+    auto* anim = player->GetComponent<Spritesheet>();
         if (transform && anim)
         {
             float absWidth = std::abs(transform->scaleX);
@@ -388,7 +398,7 @@ void InputManager::Update(float dt)
         isJumping = false;
         jumpStartY = 0.0f;
         footstepTimer = 0.0f;
-       cachedPlayerObject = nullptr;
+        cachedPlayerID = 0;
         std::cout << "[InputManager] State reset." << std::endl;
     }
 

@@ -659,6 +659,22 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         inFile >> root;
         inFile.close();
 
+        if (CORE)
+        {
+            TimerSystem* ts = CORE->GetTimerSystem();
+            if (ts)
+            {
+                std::cout << "[LoadLevel] Clearing active timers...\n";
+                ts->ClearAllTimers();
+            }
+            PhysicsSystem* ps = CORE->GetPhysicsSystem();
+            if (ps)
+            {
+                ps->ClearCollisionQueue();
+            }
+        }
+    
+
         // stop/unload audio (if any)
         auto& resourceMgr = ResourceManager::Instance();
         AudioEngine* audio = resourceMgr.GetAudioEngine();

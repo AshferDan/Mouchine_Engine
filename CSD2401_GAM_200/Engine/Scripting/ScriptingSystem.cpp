@@ -231,10 +231,9 @@ static void Internal_StopSound(MonoString* soundName) {
     mono_free(cName);
 }
 
-static void Internal_StopAllSounds(MonoString* soundName) {
-    char* cName = mono_string_to_utf8(soundName);
-    API::StopAllSound(cName); // Note: Renamed to match API::StopAllSound
-    mono_free(cName);
+static void Internal_StopAllSounds() {
+    API::StopAllSound();
+    
 }
 
 static void Internal_RemoveSound(MonoString* soundName) {
@@ -320,6 +319,36 @@ static int Internal_RandomRange(int min, int max) {
 ScriptSystem::~ScriptSystem()
 {
     Shutdown();
+}
+// === Input ===
+static bool Internal_IsKeyDown(int key)
+{
+    return API::IsKeyDown(key);
+}
+
+static bool Internal_IsMouseButtonDown(int button)
+{
+    return API::IsMouseButtonDown(button);
+}
+
+static float Internal_GetMouseX()
+{
+    return API::GetMouseX();
+}
+
+static float Internal_GetMouseY()
+{
+    return API::GetMouseY();
+}
+
+static float Internal_GetMouseWorldX()
+{
+    return API::GetMouseWorldX();
+}
+
+static float Internal_GetMouseWorldY()
+{
+    return API::GetMouseWorldY();
 }
 
 void ScriptSystem::Initialize()
@@ -448,6 +477,13 @@ void ScriptSystem::RegisterInternalCalls()
     // === Utils ===
     mono_add_internal_call("CSharpScript.Utils::RandomRange", (void*)Internal_RandomRange);
 
+    // === Input ===
+    mono_add_internal_call("CSharpScript.Input::IsKeyDown", (void*)Internal_IsKeyDown);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonDown", (void*)Internal_IsMouseButtonDown);
+    mono_add_internal_call("CSharpScript.Input::GetMouseX", (void*)Internal_GetMouseX);
+    mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
+    mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);
+    mono_add_internal_call("CSharpScript.Input::GetMouseWorldY", (void*)Internal_GetMouseWorldY);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)
