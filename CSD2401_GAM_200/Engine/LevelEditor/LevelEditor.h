@@ -118,8 +118,10 @@ struct EditorUndoCommand {
     json beforeJson;
     json afterJson;
 
-    std::string parentName;
-    std::vector<std::string> childNames;
+    EntityID parentID = -1;
+    std::vector<EntityID> childIDs;
+    std::vector<EntityID> siblingOrderIDs;
+    std::vector<EntityID> rootOrderIDs;
 };
 
 /**

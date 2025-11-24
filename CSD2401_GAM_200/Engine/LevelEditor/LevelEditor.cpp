@@ -1433,14 +1433,32 @@ void LevelEditor::PerformUndo() {
         }
         case EditorUndoCommand::ActionType::ObjectDeleted: {
             Serialization::DeserializeGameObject(undocmd.beforeJson);
-            Serialization::ResolveHierarchy();
+            Serialization::ResolveHierarchy(); // Reconnect hierarchy via parentID & children
 
+            GameObject* restored = factory.GetGameObject(undocmd.entityID);
+            GameObject* parent = factory.GetGameObject(undocmd.parentID);
+
+             //Reattach restored object to parent
+            if (restored && parent) {
+                parent->AddChild(restored);
+            }
+
+            if (parent && !undocmd.siblingOrderIDs.empty()) // Restore original sibling order
+            {
+                parent->GameObject::ReorderChildren(undocmd.siblingOrderIDs);
+            }
+            else {                                         // Restore root order
+                if (!undocmd.rootOrderIDs.empty()) {
+                    factory.ReorderRootObjects(undocmd.rootOrderIDs);
+                }
+            }
+         
             break;
         }
 
     }
 
-    redoStack.push_back(undocmd);
+    //redoStack.push_back(undocmd);
 }
 
 /*  Audio Management */

@@ -18,18 +18,14 @@ Technology is prohibited.
 #include <iostream>
 #include <filesystem>
 
+using namespace Serialization;
 namespace fs = std::filesystem;
+
 static const std::string PREFAB_DIR = PrefabFilePath;
 
-// Stores hierarchy information until all objects are created
-struct PendingHierarchy
-{
-	GameObject* go;
-	std::string parentName;
-	int siblingIndex;
-	json childrenJson;
-};
-static std::vector<PendingHierarchy> pendingList;
+// Global temporary loading maps (cleared after load)
+std::unordered_map<EntityID, GameObject*> Serialization::idToObject{};
+std::vector<PendingHierarchyInfo> Serialization::pendingHierarchy{};
 
 std::string Serialization::GetFullPath(const std::string &filename)
 {
@@ -67,55 +63,23 @@ std::vector<std::string> Serialization::GetAllPrefabs()
 json Serialization::SerializeGameObject(GameObject *go)
 {
 	json j;
-	if (!go)
-		return j;
+	if (!go) return j;
 
 	j["name"] = go->GetName();
+	j["localID"] = go->GetID();
+	j["parentID"] = go->GetParent() ? go->GetParent()->GetID() : -1; // -1 if root
+
 	j["active"] = go->IsActive();
 
-	// Parent
-	if (go->GetParent()) {
-		j["parent"] = go->GetParent()->GetName();
-
-		// find index within parent's children
-		const auto& siblings = go->GetParent()->GetAllChildren();
-		int index = 0;
-		for (int i = 0; i < (int)siblings.size(); ++i)
-		{
-			if (siblings[i] == go)
-			{
-				index = i;
-				break;
-			}
-		}
-		j["siblingIndex"] = index;
-	}
-	else {
-		j["parent"] = nullptr;	
-
-		// find index in root list
-		const auto& roots = GameObjectFactory::Instance().GetAllGameObjects();
-		int index = 0;
-		for (int i = 0; i < (int)roots.size(); ++i)
-		{
-			if (roots[i].get() == go)
-			{
-				index = i;
-				break;
-			}
-		}
-		j["siblingIndex"] = index;
-	}
-
-	// Components
+	// Serialize components
 	ComponentSerialization::SerializeAllComponents(go, j);
 
-	// Children (recursive)
+	// Serialize children in order
 	j["children"] = json::array();
-	for (GameObject* child : go->GetAllChildren())
-	{
+	for (GameObject* child : go->GetAllChildren()) {
 		j["children"].push_back(SerializeGameObject(child));
 	}
+
 	return j;
 }
 
@@ -129,55 +93,61 @@ json Serialization::SerializeGameObject(GameObject *go)
  */
 void Serialization::DeserializeGameObject(const json &j)
 {
-	GameObjectFactory &factory = GameObjectFactory::Instance();
 	std::string name = j.value("name", "Unnamed");
 
-	std::cout << "[Deserialize] Creating: " << name << std::endl;
-	GameObject *go = factory.CreateGameObject(name);
-	std::cout << "[Deserialize] Created GO at " << go << " (ID " << go->GetID() << ")\n";
+	EntityID localID = j.value("localID", -1);
+	if (localID < 0) {
+		localID = GameObjectFactory::Instance().GetNextEntityID();
+	}
+
+	EntityID parentID = j.value("parentID", -1);
+
+	// Create object with preserved ID
+	GameObject* go = GameObjectFactory::Instance().CreateGameObjectWithID(localID, name);
+	idToObject[localID] = go;
 
 	go->SetActive(j.value("active", true));
 
+	// Store parent-child relationship for later
+	pendingHierarchy.push_back({ localID, parentID });
+
+	// Deserialize components
 	ComponentSerialization::DeserializeAllComponents(go, j);
 
-	// Store parent + children for later
-	PendingHierarchy info;
-	info.go = go;
-
-	info.parentName = (j.contains("parent") && j["parent"].is_string())
-		? j["parent"].get<std::string>()
-		: "";
-	info.siblingIndex = j.value("siblingIndex", 0);
-	info.childrenJson = j.value("children", json::array());
-
-	pendingList.push_back(info);
+	// Recursively load children (order is preversed by JSON)
+	if (j.contains("children")) {
+		for (const auto& childJSON : j["children"]) {
+			DeserializeGameObject(childJSON);
+		}
+	}
 }
 
 void Serialization::ResolveHierarchy()
 {
-	GameObjectFactory& factory = GameObjectFactory::Instance();
+	// Reset all children to preserve ordering
+	//for (auto& pair : idToObject) {
+	//	GameObject* go = pair.second;
+	//	if (go) go->GetAllChildren().clear();
+	//}
 
-	// Recursively create children
-	std::vector<json> childrenBuffer;
-	for (auto& entry : pendingList)
-		for (auto& c : entry.childrenJson)
-			childrenBuffer.push_back(c);
+	for (const auto& info : pendingHierarchy) {
+		EntityID childID = info.localID;
+		EntityID parentID = info.parentID;
 
-	for (auto& childJson : childrenBuffer)
-		DeserializeGameObject(childJson);
+		GameObject* child = idToObject[childID];
+		if (!child) continue;
 
-	// Assign actual parents
-	for (auto& entry : pendingList)
-	{
-		if (!entry.parentName.empty())
-		{
-			GameObject* parent = factory.FindByName(entry.parentName);
-			if (parent)
-				parent->AddChild(entry.go);
+		if (parentID != -1) { // is a child
+			GameObject* parent = idToObject[parentID];
+			if (parent) {
+				if (child->GetParent() != parent)
+					parent->AddChild(child);
+			}
 		}
 	}
 
-	pendingList.clear();
+	idToObject.clear();
+	pendingHierarchy.clear();
 }
 
 /**
@@ -328,7 +298,6 @@ void Serialization::LoadScene(const std::string& scenePath)
 {
 	GameObjectFactory& factory = GameObjectFactory::Instance();
 	factory.Clear();
-	pendingList.clear();
 
 	std::string path = SceneFilePath + scenePath + ".json";
 	if (!fs::exists(path))

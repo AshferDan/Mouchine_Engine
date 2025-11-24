@@ -167,6 +167,32 @@ void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree)
     }
 }
 
+void GameObject::ReorderChildren(const std::vector<EntityID>& newOrder) {
+    if (children.empty()) return;
+
+    // map id to gameObject*
+    std::unordered_map<EntityID, GameObject*> lookup;
+    lookup.reserve(children.size());
+
+    for (GameObject* c : children) {
+        if (c)
+            lookup[c->GetID()] = c;
+    }
+
+    std::vector<GameObject*> reordered;
+    reordered.reserve(newOrder.size());
+
+    // Rebuild list in correct order
+    for (EntityID id : newOrder) {
+        auto it = lookup.find(id);
+        if (it != lookup.end()) {
+            reordered.push_back(it->second);
+        }
+    }
+    // Reassign back
+    children = reordered;
+}
+
 void GameObject::OnEventTriggered(EventType eventType, GameObject* other)
 {
     std::cout << "[OnEventTriggered] object=" << GetName()

@@ -14,7 +14,9 @@ Technology is prohibited.
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
+
 #include "GameObject.h"
 #include "RenderComponent.h"
 #include "factory.h"
@@ -23,12 +25,28 @@ Technology is prohibited.
 #include "AudioManager.h"
 
 using json = nlohmann::ordered_json;
+
 const std::string PrefabFilePath { "../Assets/Prefabs/" };
 const std::string SceneFilePath{ "../Assets/Scenes/" };
 const std::string LayoutsFilePath{ "../Logs/EditorLayout/" };
 
 namespace Serialization
 {
+    /**
+     * @brief Temporary structure used during loading.
+     *
+     * Stores the relationship between a child object and its parent
+     * BEFORE the actual parenting happens. Parenting is resolved
+     * AFTER all GameObjects are fully created.
+     */
+    struct PendingHierarchyInfo {
+        EntityID localID;   // The ID of this object
+        EntityID parentID;  // The ID of its parent (-1 if root)
+    };
+
+    extern std::unordered_map<EntityID, GameObject*> idToObject;    // Maps EntityID to GameObject*
+    extern std::vector<PendingHierarchyInfo> pendingHierarchy;      // Stores parent-child relationships during loading
+
     std::vector<std::string> GetAllPrefabs();
     std::string GetFullPath(const std::string& filename);
 
@@ -89,6 +107,8 @@ namespace Serialization
 
     extern bool Prefab_DragAndDropped;
 
-    // Called after all DeserializeGameObject calls
+    /**
+     * @brief After all GameObjects are created, attach them to their parents.
+     */
     void ResolveHierarchy();
 }

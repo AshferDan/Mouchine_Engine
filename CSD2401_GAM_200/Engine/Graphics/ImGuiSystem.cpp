@@ -629,7 +629,9 @@ void ImGuiSystem::Hierarchy_Render()
     if (!canUndo) ImGui::BeginDisabled();
     if (ImGui::Button("Undo"))
     {
-        if (canUndo) CORE->GetLevelEditor()->PerformUndo();
+        if (canUndo) {
+            CORE->GetLevelEditor()->PerformUndo();       
+        } 
     }
     if (!canUndo) ImGui::EndDisabled();
 
@@ -899,6 +901,16 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
             LevelEditor* editor = CORE->GetLevelEditor();
             GameObject* obj = factory.GetGameObject(id);
 
+            {
+                GameObject* p = obj->GetParent();
+                std::cout << "\n[BEFORE DELETE CHILD ORDER]\n";
+                if (p) {
+                    auto kids = p->GetAllChildren();
+                    for (size_t i = 0; i < kids.size(); ++i)
+                        std::cout << " [" << i << "] " << kids[i]->GetName()
+                        << " (ID=" << kids[i]->GetID() << ")\n";
+                }
+            }
             if (obj)
             {             
                 EditorUndoCommand undocmd;
@@ -909,11 +921,23 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
                 // Store Parent
                 GameObject* parent = obj->GetParent();
-                undocmd.parentName = parent ? parent->GetName() : "";
+                undocmd.parentID = parent ? parent->GetID() : 0;
+
+                if (parent) // Get child order
+                {
+                    for (GameObject* c : parent->GetAllChildren()) 
+                        undocmd.siblingOrderIDs.push_back(c->GetID()); // Order of children
+                }
+                else { // Get root order
+                    auto& allObjs = GameObjectFactory::Instance().GetAllGameObjects();
+                    for (auto& u : allObjs) {
+                        undocmd.rootOrderIDs.push_back(u->GetID()); // Order of root objects
+                    }
+                }
 
                 // Store Children
                 for (GameObject* c : obj->GetAllChildren())
-                    undocmd.childNames.push_back(c->GetName());
+                    undocmd.childIDs.push_back(c->GetID());
 
                 editor->RecordUndo(undocmd);
 
@@ -1219,7 +1243,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
             ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
         }
 
-        // ---------------- UNDO SUPPORT FOR IMGUIZMO ----------------
+        // UNDO FEATURE FOR IMGUIZMO 
         static bool gizmoEditing = false;
         static json gizmoBeforeJson;
 

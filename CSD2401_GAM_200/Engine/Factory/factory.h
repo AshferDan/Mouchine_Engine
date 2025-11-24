@@ -306,6 +306,7 @@ public:
 
     GameObject* FindByName(const std::string& name);
 
+    void ReorderRootObjects(const std::vector<EntityID>& order);
 private:
     GameObjectFactory() : nextEntityID(1), cloneCounter(0) {}
     EntityID nextEntityID;
