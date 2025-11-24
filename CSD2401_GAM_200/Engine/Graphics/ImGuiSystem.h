@@ -39,6 +39,7 @@ const std::string HierarchyPayloadID{ "GameObject_Name" };
 const std::string AudioPayloadID("Audio_Filepath");
 const std::string ScenePayloadID{ "Scene_Name" };
 const std::string SpritePayloadID{ "Sprite_Name" };
+const std::string TilesetPayloadID{ "Tileset_Name" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton

@@ -1519,25 +1519,30 @@ void DirectoryNavigator::RenderImGui()
             if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
             {
                 // Depending on folder its in, send the respective payloadIDs to receive
+                // changed from string() to generic_string() because of weird issues with front n back slashes
                 if (iter.path().parent_path().filename() == "Scenes")
                 {
-                    SendDragAndDrop(ScenePayloadID, iter.path().string(), fileName.c_str());            // For scenes files
+                    SendDragAndDrop(ScenePayloadID, iter.path().generic_string(), fileName.c_str());            // For scenes files
                 }
                 else if (iter.path().parent_path().filename() == "Prefabs")
                 {
-                    SendDragAndDrop(PrefabPayloadID, iter.path().stem().string(), fileName);            // For prefab files
+                    SendDragAndDrop(PrefabPayloadID, iter.path().stem().generic_string(), fileName);            // For prefab files
                 }
                 else if (iter.path().parent_path().filename() == "Audio" || iter.path().parent_path().filename() == "audio")
                 {
-                    SendDragAndDrop(AudioPayloadID, iter.path().string(), fileName.c_str());            // For Audio files
+                    SendDragAndDrop(AudioPayloadID, iter.path().generic_string(), fileName.c_str());            // For Audio files
                 }
                 else if (iter.path().parent_path().filename() == "Sprites")
                 {
-                    SendDragAndDrop(SpritePayloadID, iter.path().string(), fileName.c_str());            // For Sprites/ Spritesheets files
+                    SendDragAndDrop(SpritePayloadID, iter.path().generic_string(), fileName.c_str());            // For Sprites/ Spritesheets files
+                }
+                else if (iter.path().parent_path().filename() == "Tiles")
+                {
+                    SendDragAndDrop(TilesetPayloadID, iter.path().generic_string(), fileName.c_str());            // For Tilesets for tile editor
                 }
                 else
                 {
-                    SendDragAndDrop(AssetPayloadID, iter.path().string(), fileName.c_str());            // Anything else considered an general asset
+                    SendDragAndDrop(AssetPayloadID, iter.path().generic_string(), fileName.c_str());            // Anything else considered an general asset
                 }
             }
         }
