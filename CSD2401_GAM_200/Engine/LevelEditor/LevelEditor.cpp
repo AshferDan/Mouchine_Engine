@@ -47,7 +47,8 @@ LevelEditor::LevelEditor()
     isPanning(false), lastMouseX(0.0f), lastMouseY(0.0f), panSpeed(1.0f),
     zoomSpeed(0.1f),
     minZoom(0.1f),
-    maxZoom(5.0f)
+    maxZoom(5.0f),
+    zoomSmoothing(0.2f)
 {
     strcpy(saveFilepath, "");
     strcpy(loadFilepath, "../Assets/Scenes/Prefab_TestScene.json");
@@ -106,7 +107,7 @@ void LevelEditor::Update(float /*dt*/)
     ImGui::End();
 
     // camera update with conditional rendering
-    bool shouldRenderCameraUI = (editorMode == EditorMode::Stop);
+    bool shouldRenderCameraUI = (editorMode == EditorMode::Stop || editorMode == EditorMode::Pause);
     UpdateCameraControls(shouldRenderCameraUI);
 
     RenderPlayControls();
@@ -307,7 +308,7 @@ void LevelEditor::StopPlayMode()
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
-    //CameraManager::Instance().ClearActiveCamera();
+    //CameraManager::Instance().ClearActiveCamera();                                // COMMENTED OUT 18TH NOV BC OF BUG W PLAYING -> STOPPING -> PLAYING
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
 
@@ -763,6 +764,7 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             auto* camComp = mainCam->AddComponent<CameraComponent>();
             camComp->SetZoom(1.0f);
             camComp->SetMode(CameraComponent::CameraMode::FIXED);
+            CameraManager::Instance().SetActiveCamera(mainCam);
 
             std::cout << "[LevelEditor] MainCamera created successfully\n";
         }
@@ -778,6 +780,7 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                 camComp = mainCam->AddComponent<CameraComponent>();
                 camComp->SetZoom(1.0f);
                 camComp->SetMode(CameraComponent::CameraMode::FIXED);
+                CameraManager::Instance().SetActiveCamera(mainCam);
 
                 std::cout << "[LevelEditor] CameraComponent added successfully\n";
             }
@@ -1198,6 +1201,14 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
             }
             ImGui::Separator();
 
+            // Hardcoded values because they really shouldn't be anything else aside from 0 and 1 (well 0.99f) :)
+            if (ImGui::SliderFloat("Smoothing", &zoomSmoothing, 0.f, 0.99f, "%.2f")) {
+                // clamp zoom to min/max
+                if (zoomSmoothing < 0.f) zoomSmoothing = 0.f;
+                if (zoomSmoothing > 0.99f) zoomSmoothing = 0.99f;
+            }
+            ImGui::Separator();
+
             // camera settings
             ImGui::DragFloat("Pan Speed", &panSpeed, 0.1f, 0.1f, 10.0f);
             ImGui::Separator();
@@ -1214,7 +1225,7 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
                 "- Mouse Wheel: Zoom");
 
             ImGui::Separator();
-            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Editor Mode");
+            ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.3f, 1.0f), "Only active in Edit and Pause Mode");
         }
         ImGui::End();
     }
@@ -1222,8 +1233,8 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
     // update camera input
     ImGuiIO& io = ImGui::GetIO();
 
-    // in play/pause mode camera follows hero
-    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause) {
+    // in play mode camera follows hero
+    if (editorMode == EditorMode::Play) {
         isPanning = false;
         return;
     }
@@ -1274,12 +1285,23 @@ void LevelEditor::UpdateCameraControls(bool renderUI)
     {
         // mouse wheel zoom
         if (io.MouseWheel != 0.0f) {
-            float zoomDelta = io.MouseWheel * zoomSpeed;
-            cameraZoom += zoomDelta;
+            //world pos under before zoom
+            ImVec2 worldBefore = CursorToWorldPos(viewportPos, viewportSize);
+            
+            // apply zoom 
+            float oldZoom = cameraZoom;
+            cameraZoom += io.MouseWheel * zoomSpeed;                            // increase zooming
+            cameraZoom = cameraZoom + (oldZoom - cameraZoom) * zoomSmoothing;   // lerping algorithm to help with smoothness
 
-            // clamp zoom to min/max
-            if (cameraZoom < minZoom) cameraZoom = minZoom;
+            if (cameraZoom < minZoom) cameraZoom = minZoom;         // clamp
             if (cameraZoom > maxZoom) cameraZoom = maxZoom;
+
+            //world pos under after zoom
+            ImVec2 worldAfter = CursorToWorldPos(viewportPos, viewportSize);
+
+            // set diff as camera pos
+            cameraX += worldBefore.x - worldAfter.x;
+            cameraY += worldBefore.y - worldAfter.y;
         }
     }
 }
@@ -1302,7 +1324,7 @@ void LevelEditor::ResetCamera()
 mat4 LevelEditor::GetEditorViewProjection(float windowWidth, float windowHeight) const
 {
     // In play pause mode, use the game camera
-    if (editorMode == EditorMode::Play || editorMode == EditorMode::Pause)
+    if (editorMode == EditorMode::Play)
     {
         if (CameraManager::Instance().HasActiveCamera())
         {

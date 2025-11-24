@@ -150,33 +150,33 @@ void ComponentSerialization::SerializeText(json& j, TextComponent* tc) {
     };
 }
 
-//void ComponentSerialization::SerializeCamera(json& j, CameraComponent* cam) {
-//    std::string modeStr;
-//    switch (cam->GetMode()) {
-//        case CameraComponent::CameraMode::FIXED:
-//            modeStr = "FIXED";
-//            break;
-//        case CameraComponent::CameraMode::FOLLOW_TARGET:
-//            modeStr = "FOLLOW_TARGET";
-//            break;
-//        case CameraComponent::CameraMode::FREE_MOVE:
-//            modeStr = "FREE_MOVE";
-//            break;
-//        default:
-//            modeStr = "FIXED";
-//            break;
-//    }
-//
-//    j["CameraComponent"] = {
-//        {"mode", modeStr},
-//        {"position", {cam->GetPosition().x, cam->GetPosition().y} },
-//        {"followOffset", {cam->GetFollowOffset().x, cam->GetFollowOffset().y}},
-//        {"smoothing", cam->IsSmoothingEnabled()},
-//        {"smoothingSpeed", cam->GetSmoothingSpeed()},
-//        {"followTargetName", cam->GetFollowTargetName()}
-//    };
-//
-//}
+void ComponentSerialization::SerializeCamera(json& j, CameraComponent* cam) {
+    std::string modeStr;
+    switch (cam->GetMode()) {
+        case CameraComponent::CameraMode::FIXED:
+            modeStr = "FIXED";
+            break;
+        case CameraComponent::CameraMode::FOLLOW_TARGET:
+            modeStr = "FOLLOW_TARGET";
+            break;
+        case CameraComponent::CameraMode::FREE_MOVE:
+            modeStr = "FREE_MOVE";
+            break;
+        default:
+            modeStr = "FIXED";
+            break;
+    }
+
+    j["CameraComponent"] = {
+        {"mode", modeStr},
+        {"position", {cam->GetPosition().x, cam->GetPosition().y} },
+        {"followOffset", {cam->GetFollowOffset().x, cam->GetFollowOffset().y}},
+        {"smoothing", cam->IsSmoothingEnabled()},
+        {"smoothingSpeed", cam->GetSmoothingSpeed()},
+        {"followTargetName", cam->GetFollowTargetName()}
+    };
+
+}
 
 // ------------------- Deserialize -------------------
 /**
@@ -456,45 +456,45 @@ void ComponentSerialization::DeserializeText(const json& j, GameObject* go) {
  * @param j JSON object containing Camera data.
  * @param go Target GameObject to apply data to.
  */
-//void ComponentSerialization::DeserializeCamera(const json& j, GameObject* go) {
-//    if (!j.contains("CameraComponent")) {
-//        return;
-//    }
-//
-//    const auto& c = j["CameraComponent"];
-//
-//    auto* cam = go->AddComponent<CameraComponent>();
-//
-//    std::string modeStr = c.value("mode", "FIXED");
-//    if (modeStr == "FIXED") {
-//        cam->SetMode(CameraComponent::CameraMode::FIXED);
-//
-//        if (c.contains("position")) {
-//            cam->SetPosition(
-//                c["position"][0].get<float>(),
-//                c["position"][1].get<float>()
-//            );
-//        }
-//    }
-//    else if (modeStr == "FOLLOW_TARGET") {
-//        cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
-//
-//        std::string targetName = c.value("followTargetName", "");
-//        GameObject* target = GameObjectFactory::Instance().FindGameObject(targetName);
-//        if (target) {
-//            cam->SetFollowTarget(target);
-//        }
-//        if (c.contains("followOffset")) {
-//            cam->SetFollowOffset(vec2(
-//                c["followOffset"][0].get<float>(),
-//                c["followOffset"][1].get<float>()
-//            ));
-//        }
-//    }
-//    bool smoothing = c.value("smoothing", true);
-//    float smoothingSpeed = c.value("smoothingSpeed", 2.f);
-//    cam->SetSmoothing(smoothing, smoothingSpeed);
-//}
+void ComponentSerialization::DeserializeCamera(const json& j, GameObject* go) {
+    if (!j.contains("CameraComponent")) {
+        return;
+    }
+
+    const auto& c = j["CameraComponent"];
+
+    auto* cam = go->AddComponent<CameraComponent>();
+
+    std::string modeStr = c.value("mode", "FIXED");
+    if (modeStr == "FIXED") {
+        cam->SetMode(CameraComponent::CameraMode::FIXED);
+
+        if (c.contains("position")) {
+            cam->SetPosition(
+                c["position"][0].get<float>(),
+                c["position"][1].get<float>()
+            );
+        }
+    }
+    else if (modeStr == "FOLLOW_TARGET") {
+        cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
+
+        std::string targetName = c.value("followTargetName", "");
+        GameObject* target = GameObjectFactory::Instance().FindGameObject(targetName);
+        if (target) {
+            cam->SetFollowTarget(target);
+        }
+        if (c.contains("followOffset")) {
+            cam->SetFollowOffset(vec2(
+                c["followOffset"][0].get<float>(),
+                c["followOffset"][1].get<float>()
+            ));
+        }
+    }
+    bool smoothing = c.value("smoothing", true);
+    float smoothingSpeed = c.value("smoothingSpeed", 2.f);
+    cam->SetSmoothing(smoothing, smoothingSpeed);
+}
 
 // ------------------- Serialize / Deserialize All Componenents -------------------
 /**

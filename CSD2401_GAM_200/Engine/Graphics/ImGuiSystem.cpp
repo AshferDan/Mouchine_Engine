@@ -57,7 +57,7 @@ struct TempGOData
     ImVec4 color{0.f, 0.f, 0.f, 1.f};
 };
 
-// GO CREATION MENU VARIABLES
+// GO CREATION MENU VARS
 TempGOData tempGO{"Game Object"};
 static int current_shape = 0;
 
@@ -65,10 +65,11 @@ static int current_shape = 0;
 bool ShowCreateGOMenu;
 bool ShowLoadPrefabMenu;
 
+// SAVE/ LOAD EDITOR VARS
 std::vector<std::string> editorLayoutList;
 char saveLayoutName[128]{""};
 
-// PREFAB VARIABLES
+// PREFAB VARS
 std::vector<std::string> prefabList;
 TempGOData tempPrefab;
 static int current_prefab = 0;
@@ -76,6 +77,15 @@ static int prefab_renameIndex = -1;
 static bool prefab_renameFocus = false;
 char rename_str[128]{""};
 std::string prefab_oldname{};
+
+// HIERARCHY VARS
+static int hierarchy_renameIndex = -1;
+static bool hierarchy_renameFocus = false;
+char hierarchy_rename_str[128]{ "" };
+std::string hierarchy_oldname{};
+
+// PROPERTIES TAB SLOT 
+std::vector<PropertiesSlot> propertySlotsList;
 
 // STATIC BOOL FLAGS
 static bool greyOutGOSettings = false;
@@ -87,7 +97,16 @@ static bool showAudioAssetsPanel = false;
 static bool g_showAudioErrorPopup = false;
 static std::string g_audioErrorMessage;
 
+// VIEWPORT
 bool isHoveringOverViewport;
+int gizmo_type = -1;
+ImVec2 viewportSize;
+ImVec2 viewportPos;
+
+// IMGUI COLOURS
+ImVec4 color_icon_highlighted{ 0.5f, 0.5f, 0.5f, .7f };
+ImVec4 color_icon_normal{ 1.f, 1.f, 1.f, .7f };
+ImVec4 color_icon_bg{ 1.f, 1.f, 1.f, 1.f };
 
 // Vars for asset manager interface
 const float paddingSize = 16.f;
@@ -107,6 +126,13 @@ GLuint icon_plus_ui;
 GLuint icon_prefab_ui;
 GLuint icon_audio_ui;
 GLuint icon_json_ui;
+GLuint icon_giz_select_ui;
+GLuint icon_giz_translate_ui;
+GLuint icon_giz_scale_ui;
+GLuint icon_giz_rotate_ui;
+GLuint icon_giz_resize_ui;
+GLuint icon_active_ui;
+GLuint icon_inactive_ui;
 
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
@@ -158,6 +184,14 @@ void ImGuiSystem::Initialize()
     icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
     icon_prefab_ui = GraphicsSystem::LoadTexture(icon_prefab);
     icon_audio_ui = GraphicsSystem::LoadTexture(icon_audio);
+    icon_json_ui = GraphicsSystem::LoadTexture(icon_json);
+    icon_giz_select_ui = GraphicsSystem::LoadTexture(icon_giz_select);
+    icon_giz_translate_ui = GraphicsSystem::LoadTexture(icon_giz_translate);
+    icon_giz_scale_ui = GraphicsSystem::LoadTexture(icon_giz_scale);
+    icon_giz_rotate_ui = GraphicsSystem::LoadTexture(icon_giz_rotate);
+    icon_giz_resize_ui = GraphicsSystem::LoadTexture(icon_giz_resize);
+    icon_active_ui = GraphicsSystem::LoadTexture(icon_active);
+    icon_inactive_ui = GraphicsSystem::LoadTexture(icon_inactive);
 }
 
 /**
@@ -217,12 +251,18 @@ void ImGuiSystem::Update(float dt)
                 ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
                 ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
-                ImGui::Begin("Game Viewport");
-                ImVec2 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
+                ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus);
+                viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
                 CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
                 ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
                 ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport rendering
+
+                // Toolbar for controlling gizmos
+                {
+                    
+                    Viewport_ManageGizmos();
+                }
 
                 // If hovering over viewport, you can click to select a GO
                 // TODO implement outline for selected GO
@@ -236,28 +276,22 @@ void ImGuiSystem::Update(float dt)
                     isHoveringOverViewport = false;
                 }
 
-                std::string testdata{};
+                std::string draggedPrefab{};
                 // Viewport accepts Prefabs for drag and drop
-                ReceiveDragAndDrop(PrefabPayloadID, testdata);
-                //ReceiveDragAndDrop(ScenePayloadID, testdata);                 // TODO drag and drop scene to load saved scene
-                if (!testdata.empty())
+                ReceiveDragAndDrop(PrefabPayloadID, draggedPrefab);
+
+                if (!draggedPrefab.empty())
                 {
                     // filter for type of data here
-                    std::cout << testdata << std::endl;                         // Prints the data sent via drag and drop
-                    Serialization::LoadPrefab(testdata);
+                    std::cout << draggedPrefab << std::endl;                         // Prints the data sent via drag and drop
+                    Serialization::LoadPrefab(draggedPrefab);
                 }
 
-                // Get cursor position relative to the image
-                ImVec2 cursorScreenPos = ImGui::GetMousePos();
-                ImVec2 itemScreenPos = ImGui::GetItemRectMin();
+                // gets cursor pos WRT world pos
+                viewportPos = ImGui::GetItemRectMin();
+                viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
 
-                // Takes cursor position - converts it to viewport space that translates to world space too [centre of screen is (0,0)]
-                // TODO Currently does not take into account camera zoom
-                viewportCursorPos = ImVec2(
-                    cursorScreenPos.x - itemScreenPos.x - (viewportSize.x / 2.f),
-                    (viewportSize.y / 2.f) - (cursorScreenPos.y - itemScreenPos.y));
-
-                ImGui::Text("Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
+                ImGui::Text("(World Space) Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
                 ImGui::End();
             }
 
@@ -265,6 +299,12 @@ void ImGuiSystem::Update(float dt)
             Hierarchy_Render();
             AssetBrowserWindow.RenderImGui();
 
+            // drawing highlight when a GO is selected
+            if (selectedGameObjectID != 0)
+            {
+                Viewport_HighlightGO();
+            }
+            
             // only show audio assets if toggled on
             if (showAudioAssetsPanel)
             {
@@ -278,6 +318,12 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
+        }
+        // if IS in play mode
+        else
+        {
+            // toggle off other debug/ editor stuff.
+            CORE->GetGraphicsSystem()->ClearEditorSelection();
         }
         /**
          * @brief Game Object Creator Menu IMGui Window
@@ -317,13 +363,26 @@ std::string ImGuiSystem::GetName()
     return "ImGui_System"; // Return descriptive system name
 }
 
+ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize)
+{
+    ImVec2 cursorScreenPos = ImGui::GetMousePos();
+    const float camZoom = CORE->GetLevelEditor()->GetCameraZoom();
+    const vec2 camPos = { CORE->GetLevelEditor()->GetCameraX(), CORE->GetLevelEditor()->GetCameraY() };
+
+    // Evil function that took me like an hour to figure out and prolly took even more years off my lifespan
+    // but basically the gist is
+    // [from top left] local cursor pos - viewports position - viewportsize/2 (so we can have 0,0 be centered) / camerazoom + camera position
+    // camera zoom represents how zoomed in we are, so cursor needs to scale off that. Camera pos is alr in world space so just add it onto!
+    float worldx = (cursorScreenPos.x - vpPos.x - (vpSize.x / 2.f)) / camZoom + camPos.x;
+    float worldy = ((vpSize.y / 2.f) - (cursorScreenPos.y - vpPos.y)) / camZoom + camPos.y;
+    return ImVec2(worldx, worldy);
+}
+
 /**
  * @brief Manages logic for clicking to select GOs and DNDing to move them around
  */
 void ImGuiSystem::Viewport_ClickToSelect()
 {
-    static bool isBeingDragged = false;
-
     // Loop for all GOs in scene
     for (auto& go : GameObjectFactory::Instance().GetAllGameObjects())
     {
@@ -342,16 +401,11 @@ void ImGuiSystem::Viewport_ClickToSelect()
             // Calculates if cursor is within area of GO
             if (viewportCursorPos.x > pos.x - scale.x / 2 && viewportCursorPos.x < pos.x + scale.x / 2 && viewportCursorPos.y > pos.y - scale.y / 2 && viewportCursorPos.y < pos.y + scale.y / 2)
             {
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))              // Set to on release as form of confirmation, so GOs must be selected and THEN dragged. To avoid accidentally moving
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))            // changed back to on mouse click, since we have gizmos, wont have accidental moving anymore
                 {
                     SetSelectedGameObject(go->GetID());                         // Set GO to be selected
                     
                     std::cout << "[has collider]clicked on " << go->GetName() << std::endl;
-                }
-                // If GO has been selected and is dragged (with a threshhold of 25 units - added for human misinput and accidental moving)
-                if (selectedGameObjectID == go->GetID() && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 25.f))
-                {
-                    isBeingDragged = true;          // Set flag that updates position 
                 }
             }
         }
@@ -363,28 +417,13 @@ void ImGuiSystem::Viewport_ClickToSelect()
 
             if (distance < 50.f)                // if object is within 50 units (within general area)
             {
-                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))                      // Click to select, after selecting drag to set flag to true
+                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))                      // Click to select, after selecting drag to set flag to true
                 {
                     SetSelectedGameObject(go->GetID());
                     std::cout << "[no colider]clicked on " << go->GetName() << std::endl;
                 }
-                if (selectedGameObjectID == go->GetID() && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 10.f))
-                {
-                    isBeingDragged = true;
-                }
             }
         }
-    }
-
-    // if flag is true and left click is held, set the new position of the GO based off cursor (which is fitted to world space!)
-    if (isBeingDragged && ImGui::IsMouseDown(ImGuiMouseButton_Left))
-    {
-        GetSelectedGameObject()->GetComponent<TransformComponent>()->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
-    }
-    // upon mouse release set flag to false
-    if (isBeingDragged && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-    {
-        isBeingDragged = false;
     }
 }
 
@@ -533,7 +572,7 @@ void ImGuiSystem::Hierarchy_Render()
     }
 
     // Render top part to show adding of GOs
-    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), {icon_size_small.x, icon_size_small.y}, {0, 1}, {1, 0},
+    if (ImGui::ImageButton("##Create GO Button", ImTextureID(icon_plus_ui), icon_size_small, {0, 1}, {1, 0},
                            (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
     {
         // this is a file, not sure if we wanna do anything yet
@@ -543,7 +582,7 @@ void ImGuiSystem::Hierarchy_Render()
 
     ImGui::SameLine();
     // Render top part to show adding of Prefabs
-    if (ImGui::ImageButton("##Spawn Prefab", ImTextureID(icon_prefab_ui), {icon_size_small.x, icon_size_small.y}, {0, 1}, {1, 0},
+    if (ImGui::ImageButton("##Spawn Prefab", ImTextureID(icon_prefab_ui), icon_size_small, {0, 1}, {1, 0},
                            (ImVec4(1.f, 1.f, 1.f, .7f)), (ImVec4(1, 1, 1, 1))))
     {
         // this is a file, not sure if we wanna do anything yet
@@ -616,10 +655,42 @@ void ImGuiSystem::Hierarchy_Render()
     {
         if (!ImGui::IsAnyItemHovered())
         {
-            selectedGameObjectID = 0;
+            ResetSelectedGameObject();
+        }
+    }
+
+    ImVec2 spaceAvail = ImGui::GetContentRegionAvail();
+    ImGui::Dummy(spaceAvail);
+    if (spaceAvail.y > 0.f)
+    {
+        std::string draggedID{};
+        ReceiveDragAndDrop(HierarchyPayloadID, draggedID);
+        if (!draggedID.empty())
+        {
+            EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
+            GameObject* go = factory.GetGameObject(deliveredID);
+            GameObject* goParent = go->GetParent();
+            if (goParent)
+            {
+                goParent->RemoveChild(go);
+            }
         }
     }
     ImGui::End();
+
+    // Press F to focus onto GO
+    // TODO can make this like a nice panning if we want, but naw
+    if (ImGui::IsKeyPressed(ImGuiKey_F) && selectedGameObjectID != 0)
+    {
+        // TODO set camera focus to that game object
+        auto* transform = GetSelectedGameObject()->GetComponent<TransformComponent>();
+        if (!transform) return;
+        vec2 newPos{};
+        float newZoom{ (viewportSize.x - transform->scaleX)/viewportSize.x };
+        transform->GetPosition(newPos.x, newPos.y);
+        CORE->GetLevelEditor()->SetCameraPos(newPos);
+        CORE->GetLevelEditor()->SetCameraZoom(newZoom);
+    }
 }
 
 void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, EntityID &selectedGameObjectID, GameObjectFactory &factory)
@@ -630,11 +701,88 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
     EntityID id = obj->GetID();
 
-    // Apply indentation based on depth
-    ImGui::Indent(depth * 10.0f);
-
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    if (selectedGameObjectID == id)
+        flags |= ImGuiTreeNodeFlags_Selected;
+
+    // Apply indentation based on depth
+    ImGui::Indent(depth * 10.0f);
+    bool nodeOpen{};
+
+    // gotta do this for proper ids, was causing crashes
+    std::string buttonName = "##Toggle Active" + std::to_string(int(id));
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));             // remove bg for image [PUSH]
+    if (obj->IsActive())
+    {
+        if (ImGui::ImageButton(buttonName.c_str(), ImTextureID(icon_active_ui), icon_size_smallest, {0, 1}, {1, 0},
+            ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
+        {
+            obj->SetActive(false);
+        }
+    }
+    else
+    {
+        if (ImGui::ImageButton(buttonName.c_str(), ImTextureID(icon_inactive_ui), icon_size_smallest, { 0, 1 }, { 1, 0 },
+            ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
+        {
+            obj->SetActive(true);
+        }
+    }
+    ImGui::PopStyleColor();                                                 // remove bg for image [POP]
+    ImGui::SameLine();
+
+    // Grey out text if inactive [PUSH]
+    if (!obj->IsActive())
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+    }
+
+    ImGui::AlignTextToFramePadding();
+    // if renaming, set the name of the tree node as an input text field
+    if (hierarchy_renameIndex == id)
+    {
+        ImGui::PushID(id);
+        ImGuiTreeNodeFlags nameFlags = flags | ImGuiTreeNodeFlags_Leaf;
+
+        nodeOpen = ImGui::TreeNodeEx("##RenamingNode", nameFlags);
+        ImGui::SameLine();
+        if (hierarchy_renameFocus)
+        {
+            ImGui::SetKeyboardFocusHere();
+            hierarchy_renameFocus = false;
+        }
+        if (ImGui::InputText("##Renaming", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+        {
+            GetSelectedGameObject()->SetName(std::string(rename_str));
+            hierarchy_renameIndex = -1;
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+        {
+            GetSelectedGameObject()->SetName(std::string(rename_str));
+            hierarchy_renameIndex = -1;
+        }
+
+        ImGui::PopID();
+    }
+    else
+    {
+        // Display the tree node
+        nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
+    }
+
+    // Grey out text if inactive [POP]
+    if (!obj->IsActive())
+    {
+        ImGui::PopStyleColor();
+    }
+
+    if (!ImGui::IsItemFocused() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        hierarchy_renameIndex = -1;
+    }
 
     // If has children, make it expandable
     if (obj->GetAllChildren().empty())
@@ -647,19 +795,6 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         flags |= ImGuiTreeNodeFlags_Selected;
     }
 
-    if (!obj->IsActive())                       // if GO is inactive, make it grey
-    {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-    }
-
-    // Display the tree node
-    bool nodeOpen = ImGui::TreeNodeEx((void *)(intptr_t)id, flags, "%s (ID: %u)", obj->GetName().c_str(), id);
-
-    if (!obj->IsActive())
-    {
-        ImGui::PopStyleColor();                 // pop the push
-    }
-
     // Drag and drop for Parenting
     if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
     {
@@ -668,27 +803,31 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
     {
         // receiving drag and drop
-        std::string testdata{};
-        ReceiveDragAndDrop(HierarchyPayloadID, testdata);
+        std::string draggedID{};
+        ReceiveDragAndDrop(HierarchyPayloadID, draggedID);
         // Do something with DnD data
-        if (!testdata.empty())
+        if (!draggedID.empty())
         {
             std::vector<EntityID> familyTree{};
             GetFamilyTree(obj, familyTree);                         // Get all descendent game objects (child of child wtv) underneath the parrent GO
 
-            std::cout << "GetFamilyTree() has: \n";
+            /*std::cout <<  obj->GetName() <<"'s GetFamilyTree() has: \n";
             for (auto const &r : familyTree)
             {
-                std::cout << r << std::endl;
-            }
+                std::cout << factory.GetGameObject(r)->GetName() << std::endl;
+            }*/
 
-            EntityID deliveredID = EntityID(std::stoi(testdata));       // Convert payload data to EntityID
+            EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
             auto check = std::find(familyTree.begin(), familyTree.end(), deliveredID);
 
-            if (check == familyTree.end())
+            std::vector<EntityID> selfParentingTree{};
+            GetFamilyTree(factory.GetGameObject(deliveredID), selfParentingTree);
+            auto checkSelfParenting = std::find(selfParentingTree.begin(), selfParentingTree.end(), obj->GetID());
+
+            if (check == familyTree.end() && checkSelfParenting == selfParentingTree.end())
             {
-                std::cout << "[Hierarchy] Setting " << testdata << " to be child of " << obj->GetName() << std::endl;
                 GameObject *deliveredGO = factory.GetGameObject(deliveredID);
+                std::cout << "[Hierarchy] Setting " << deliveredGO->GetName() << " to be child of " << obj->GetName() << std::endl;
                 deliveredGO->SetParent(obj);                                        // Set Dragged GO to be parent of receiver GO
 
                 if (!nodeOpen && !obj->GetAllChildren().empty())
@@ -708,15 +847,24 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     // Set selected item
     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
-        selectedGameObjectID = id;
+        SetSelectedGameObject(id);
     }
 
     // Right Click event (for specific GO in hierarchy)
     if (ImGui::BeginPopupContextItem())
     {
+        SetSelectedGameObject(id);                                          // right click auto selects them, but sure let them click select also 
         if (ImGui::MenuItem("Select"))
         {
-            selectedGameObjectID = id;
+            SetSelectedGameObject(id);
+        }
+        if (ImGui::MenuItem("Rename"))
+        {
+            // rename shiz here
+            hierarchy_renameIndex = id;
+            strncpy(rename_str, GetSelectedGameObject()->GetName().c_str(), sizeof(hierarchy_rename_str));
+            prefab_oldname = GetSelectedGameObject()->GetName();
+            hierarchy_renameFocus = true;
         }
         if (ImGui::MenuItem("Save as Prefab"))
         {
@@ -734,10 +882,11 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
         if (ImGui::MenuItem("Delete"))
         {
-            factory.DestroyGameObject(id);
+            // TODO - block out the deleting of main camera - crashes the game
+            factory.DestroyAllRelatedGameObjects(id);                   // handles cases for both individual GOs and parented GOs
             if (selectedGameObjectID == id)
             {
-                selectedGameObjectID = 0;
+                ResetSelectedGameObject();
             }
         }
         ImGui::EndPopup();
@@ -803,24 +952,12 @@ void GOCreationMenu_Spawn()
 void ImGuiSystem::SetSelectedGameObject(EntityID id)
 {
     selectedGameObjectID = id;
+}
 
-    // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
-    //auto const& go = GameObjectFactory::Instance().GetGameObject(id);
-    //auto* transform = go->GetComponent<TransformComponent>();
-
-    //if (transform)
-    //{
-    //    float x, y, sx, sy;
-    //    
-    //    //CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
-    //    transform->GetPosition(x, y);
-    //    transform->GetScale(sx, sy);
-    //    if (CORE->GetGraphicsSystem())
-    //    {
-    //        std::cout << "azaaaaaaaaaaaa";
-    //    }
-    //    CORE->GetGraphicsSystem()->DrawRectOutline(x,y,sx,sy,{0,1,0,1}, CORE->GetGraphicsSystem()->getVp());
-    //}
+void ImGuiSystem::ResetSelectedGameObject()
+{
+    selectedGameObjectID = 0;
+    CORE->GetGraphicsSystem()->ClearEditorSelection();
 }
 
 /**
@@ -892,8 +1029,7 @@ void PrefabMenu_Render()
                         prefabList[i] = std::string(rename_str);
                     }
 
-                    // if (ImGui::IsKeyPressed(ImGuiKey_Escape))          //supposed to be escape but it closes the whole game LMAO
-                    if (ImGui::IsKeyPressed(ImGuiKey_Tab) || ImGui::IsKeyPressed(ImGuiKey_Enter))
+                    if (ImGui::IsKeyPressed(ImGuiKey_Escape) || ImGui::IsKeyPressed(ImGuiKey_Enter))
                     {
                         prefab_renameIndex = -1;
                         Serialization::RenamePrefab(prefab_oldname, rename_str);
@@ -937,16 +1073,6 @@ void PrefabMenu_Render()
 
     ImDrawList *drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
-
-    // Test for if drag and drop works
-    std::string testdata{};
-    ReceiveDragAndDrop(AssetPayloadID, testdata);
-    ReceiveDragAndDrop(HierarchyPayloadID, testdata);
-    // Do something with DnD data
-    if (!testdata.empty())
-    {
-        std::cout << testdata << std::endl;
-    }
     ImGui::EndGroup();
 
     if (ImGui::Button("Spawn -> Load Prefab"))
@@ -966,6 +1092,139 @@ void PrefabMenu_Spawn()
     std::cout << "prefab menu spawn pressed\n";
 }
 #pragma endregion
+
+#pragma region Viewport/ Gizmos
+void ImGuiSystem::Viewport_ManageGizmos()
+{
+    // On screen GUI settings
+    ImVec2 viewportPos = ImGui::GetWindowPos();
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+
+    ImGui::SetNextWindowBgAlpha(0.75f);
+    ImGui::SetNextWindowPos(ImVec2(viewportPos.x + 15, viewportPos.y + 35), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(58.0f, 260.0f), ImGuiCond_FirstUseEver);
+
+
+    // GIZMO CONTROLS - its v long and ugly so just collapse it [handles logic for gizmo operations and GUI on vp for controls]
+    {
+        ImGui::Begin("##Toolbar", nullptr, flags);
+
+        if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
+        {
+            gizmo_type = -1;
+        }
+        CreateHintText("(Q) Select");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
+        }
+        CreateHintText("(W) Move");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::SCALE);
+        }
+        CreateHintText("(E) Scale");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
+        }
+        CreateHintText("(R) Rotate");
+        ImGui::Separator();
+        if (ImGui::ImageButton("##Gizmo_Resize", ImTextureID(icon_giz_resize_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+            (gizmo_type == int(ImGuizmo::OPERATION::BOUNDS)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_T))
+        {
+            gizmo_type = int(ImGuizmo::OPERATION::BOUNDS);
+        }
+        CreateHintText("(T) Resize");
+
+        ImGui::End();
+    }
+
+
+    // LOGIC SECTION
+    if (selectedGameObjectID != 0 && gizmo_type != -1)
+    {
+        auto* go = GetSelectedGameObject();
+        auto* transform = go->GetComponent<TransformComponent>();
+        auto* camComp = CameraManager::Instance().GetActiveCamera();
+        if (!camComp)
+        {
+            std::cout << "[ManageGizmos]NO CAMERA FOUND!\n";
+            return;
+        }
+        if (!transform)
+        {
+            std::cout << "[ManageGizmos]NO TRANSFORM FOUND!\n";
+            return;
+        }
+
+        ImVec2 vpSize{ ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y };
+        ImVec2 vpPos{ ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
+
+        ImGuizmo::SetOrthographic(true);        // or false idk
+        ImGuizmo::SetDrawlist();                                                                                                            // draws current window
+        ImGuizmo::SetRect(vpPos.x, vpPos.y, vpSize.x, vpSize.y);             // set rect to viewport
+
+        mat4 view = camComp->GetViewMatrix();
+        //mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());                                // replaced with getVp() bc this doesnt scale with cam zoom etc
+        mat4 mtx = transform->GetMatrix();
+        ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::WORLD, value_ptr(mtx));
+
+        if (gizmo_type == (int)(ImGuizmo::OPERATION::BOUNDS))
+        {
+            float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
+            float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
+            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
+        }
+
+        if (ImGuizmo::IsUsing)
+        {
+            vec3 trans{}, scale{}, rot{};
+            DecomposeMatrix(mtx, trans.x, trans.y, scale.x, scale.y, rot.x);
+
+            //std::cout << "Decomposed rot: " << rot.x << " " << rot.y << " " << rot.z << "\n";
+            // debugging the c# anim image flipping for some reason AAAAAAAAAAAAAAAAAAAAAAA
+
+            // clamps so stuff doesnt get out of hand - only on gizmos bc its likely to be an accident here, will not check for clamps if edited via editor slider
+            scale.x = (scale.x < 1.f) ? 1.f : scale.x;
+            scale.y = (scale.y < 1.f) ? 1.f : scale.y;
+
+            transform->SetPosition(trans.x, trans.y);
+            transform->SetScale(scale.x, scale.y);
+            transform->SetRotation(rot.x);
+        }
+    }
+}
+
+void ImGuiSystem::Viewport_HighlightGO()
+{
+    // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
+    if (!selectedGameObjectID) return;
+    auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
+    //CORE->GetLevelEditor()->GetEditorViewProjection()
+    if (transform)
+    {
+        float x, y, sx, sy;
+
+        //CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
+        transform->GetPosition(x, y);
+        transform->GetScale(sx, sy);
+        if (CORE->GetGraphicsSystem())
+        {
+            CORE->GetGraphicsSystem()->SetEditorSelection(x, y, sx, sy);
+        }
+    }
+}
+#pragma endregion
+
+
 
 #pragma region Asset Browser/ Directory Navigator ImGui
 /**
@@ -1007,7 +1266,7 @@ void DirectoryNavigator::RenderImGui()
         if (iter.is_directory())
         {
             // TODO add double click? or is single click fine
-            if (ImGui::ImageButton(fileName.c_str(), (ImTextureID)(uintptr_t)(icon_folder_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))     // Draw image button with folder icon
+            if (ImGui::ImageButton(fileName.c_str(), (ImTextureID)(uintptr_t)(icon_folder_ui), icon_size, {0, 1}, {1, 0}))     // Draw image button with folder icon
             {
                 currentDir /= iter.path().filename();           // Upon clicking, enter the file path
             }
@@ -1034,6 +1293,14 @@ void DirectoryNavigator::RenderImGui()
                     // do nothin for now
                 }
             }
+            // Generic file
+            else
+            {
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_file_ui), icon_size, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
+            }
 
             // Can only drag and drop files, not folders
             if (ImGui::IsItemActive() && ImGui::IsMouseDown(ImGuiMouseButton_Left))
@@ -1047,9 +1314,13 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(PrefabPayloadID, iter.path().stem().string(), fileName);            // For prefab files
                 }
-                else if (iter.path().parent_path().filename() == "Audio" || iter.path().parent_path().filename() == "audio")    //for some reason its lowercase in property editor?
+                else if (iter.path().parent_path().filename() == "Audio" || iter.path().parent_path().filename() == "audio")
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().string(), fileName.c_str());            // For Audio files
+                }
+                if (iter.path().parent_path().filename() == "Sprites")
+                {
+                    SendDragAndDrop(SpritePayloadID, iter.path().string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
                 else
                 {
@@ -1352,7 +1623,7 @@ void EditorLayout_LoadPopUp()
             std::string layoutFileName = relativePath.filename().string();
 
             // each item will have the file icon, on click set the layoutpath to string. Itll then be loaded by the layout loader function
-            if (ImGui::ImageButton(layoutFileName.c_str(), (ImTextureID)(uintptr_t)(icon_file_ui), {icon_size.x, icon_size.y}, {0, 1}, {1, 0}))
+            if (ImGui::ImageButton(layoutFileName.c_str(), (ImTextureID)(uintptr_t)(icon_file_ui), icon_size, {0, 1}, {1, 0}))
             {
                 loadLayoutPath = layoutFileName;
                 renderLoadedLayout = true;
@@ -1422,6 +1693,7 @@ GameObject* ImGuiSystem::GetSelectedGameObject() const
     return factory.GetGameObject(selectedGameObjectID);
 }
 
+PropertiesSlot ps("test", PrefabPayloadID);
 /**
  * @brief Render property editor for Selected GOs. Will be empty by default, and then show details if a GO is selected.
  */
@@ -1457,6 +1729,8 @@ void ImGuiSystem::RenderPropertyEditor()
     }
 
     ImGui::Spacing();
+    // this is done, just need to attach to a component? so it'll belong to a specific component where users can drag and drop stuff
+    ps.RenderImGui();
 
     // GO transform screen
     if (auto* transform = obj->GetComponent<TransformComponent>())
@@ -1480,8 +1754,12 @@ void ImGuiSystem::RenderPropertyEditor()
             }
 
             float rotation = transform->GetRotation();
-            if (ImGui::DragFloat("Rotation", &rotation, 0.5f))
+            if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
             {
+                if (rotation > 2 * pi || rotation < -2 * pi)
+                {
+                    rotation = 0;
+                }
                 transform->SetRotation(rotation);
             }
         }
@@ -1579,15 +1857,29 @@ void ImGuiSystem::RenderPropertyEditor()
     ImDrawList* drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
 
-    static std::string testdata{};
-    ReceiveDragAndDrop(AssetPayloadID, testdata);
+    static std::string draggedAsset{};
+    ReceiveDragAndDrop(AssetPayloadID, draggedAsset);
 
-    
     ImGui::EndGroup();
     // Do something with DnD asset data - maybe insert into boxes to assign sprites
-    ImGui::Text(testdata.c_str());
+    ImGui::Text(draggedAsset.c_str());
 
     ImGui::End();
+}
+
+void PropertiesSlot::RenderImGui()
+{
+    ImGui::PushID(std::to_string(_id).c_str());
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(_displayText.c_str());
+    ImGui::SameLine();
+
+    if (ImGui::Button(_receivedData.empty() ? "None" : _receivedData.c_str(), ImVec2(200, 0)))
+    {
+
+    }
+    ReceiveDragAndDrop(PrefabPayloadID, _receivedData);
+    ImGui::PopID();
 }
 
 /**
@@ -1718,10 +2010,10 @@ void AudioAssetsPanel_Render()
 
     bool open = true;
 
-    ImGui::SetNextWindowSize(ImVec2(350, 600), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Audio Assets", &open))
+    if (!ImGui::Begin("Audio Manager", &open))
     {
         // even if collapsed still need to handle closing
         if (!open)
@@ -1748,7 +2040,7 @@ void AudioAssetsPanel_Render()
         return;
     }
 
-    ImGui::TextWrapped("Drag .wav / .mp3 / .ogg files from Project Navigator into this window to add them to the AudioManager");
+    ImGui::TextWrapped("Drag .wav / .mp3 / .ogg files from Project Navigator into this window to add them to the game");
     ImGui::Separator();
 
     // global controls
@@ -1800,6 +2092,7 @@ void AudioAssetsPanel_Render()
                 sound.name = p.stem().string();
                 sound.loop = false;
                 sound.volume = 1.0f;
+                sound.pitch = 1.0f;
                 sound.category = "sfx";
 
                 audioMgr->AddSound(sound);
@@ -1833,7 +2126,7 @@ void AudioAssetsPanel_Render()
     }
     else
     {
-        if (ImGui::BeginTable("AudioAssetsTable", 5,
+        if (ImGui::BeginTable("AudioAssetsTable", 6,
             ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
             ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY))
         {
@@ -1841,6 +2134,7 @@ void AudioAssetsPanel_Render()
             ImGui::TableSetupColumn("Category");
             ImGui::TableSetupColumn("Loop");
             ImGui::TableSetupColumn("Volume");
+            ImGui::TableSetupColumn("Pitch");
             ImGui::TableSetupColumn("Actions");
             ImGui::TableHeadersRow();
 
@@ -1873,16 +2167,42 @@ void AudioAssetsPanel_Render()
                 ImGui::TableSetColumnIndex(3);
                 {
                     float volume = sound.volume;
+                    ImGui::SetNextItemWidth(-60.0f);
                     if (ImGui::SliderFloat(("##vol_" + sound.name).c_str(),
                         &volume, 0.0f, 1.0f))
                     {
+                        volume = std::round(volume * 10.0f) / 10.0f;
                         sound.volume = volume;
                         audioMgr->SetSoundVolume(sound.name, volume);
                         std::cout << "[Audio Assets] Updated volume for " << sound.name << " = " << sound.volume << std::endl;
                     }
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(50.0f);
+                    float volDisplay = sound.volume;
+                    ImGui::InputFloat(("##vol_val_" + sound.name).c_str(), &volDisplay, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_ReadOnly);
                 }
 
+                //pitch
                 ImGui::TableSetColumnIndex(4);
+                {
+                    float pitch = (sound.pitch <= 0.0f ? 1.0f : sound.pitch);
+                    ImGui::SetNextItemWidth(-60.0f);
+                    if (ImGui::SliderFloat(("##pitch_" + sound.name).c_str(),
+                        &pitch, 0.5f, 2.0f, "%.2f"))
+                    {
+                        pitch = std::round(pitch * 10.0f) / 10.0f;
+                        sound.pitch = pitch;
+                        audioMgr->SetSoundPitch(sound.name, pitch);
+                        std::cout << "[Audio Assets] Updated pitch for " << sound.name << " = " << sound.pitch << std::endl;
+                    }
+                    ImGui::SameLine();
+                    ImGui::SetNextItemWidth(50.0f);
+                    float pitchDisplay = sound.pitch;
+                    ImGui::InputFloat(("#pitch_val_" + sound.name).c_str(), &pitchDisplay, 0.0f, 0.0f, "%.1f", ImGuiInputTextFlags_ReadOnly);
+                }
+                /* actions */
+                // play button
+                ImGui::TableSetColumnIndex(5);
                 std::string playLabel = "Play##" + sound.name;
                 if (ImGui::SmallButton(playLabel.c_str()))
                 {

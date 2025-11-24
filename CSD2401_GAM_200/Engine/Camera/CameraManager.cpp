@@ -174,3 +174,21 @@ void CameraManager::ResetState() {
 		camComp->SetPosition(0.f, 0.f);
 	}
 }
+
+void CameraManager::AddCameraTrauma(float amount) {
+	if (activeCameraObject) {
+		auto* cam = activeCameraObject->GetComponent<CameraComponent>();
+		if (cam) {
+			cam->AddTrauma(amount);
+		}
+	}
+}
+
+void CameraManager::FlashActiveCamera(float duration, const vec4& color, bool fadeOut) {
+	if (activeCameraObject) {
+		auto* cam = activeCameraObject->GetComponent<CameraComponent>();
+		if (cam) {
+			cam->StartFlash(duration, color, fadeOut);
+		}
+	}
+}

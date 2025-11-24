@@ -52,9 +52,9 @@ public:
 	 */
 	~AudioEngine();
 
-
 	AudioEngine(const AudioEngine&) = delete;
 	AudioEngine& operator=(const AudioEngine&) = delete;
+
 	/*  Core Functionalities  */
 	/**
 	 * @brief Initializes the FMOD audio system
@@ -154,6 +154,8 @@ public:
 	 * @param channelName Name of the channel to mute/unmute
 	 */
 	void muteSound(const std::string& channelName);
+
+	void setPitch(const std::string& channelName, float pitch);
 
 	/*  Error Handling  */
 	/**

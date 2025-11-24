@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "Factory.h"
+#include <queue>
 
 /*
     /brief
@@ -490,18 +491,62 @@ This is the function that calls the destroyGameObject to destroy/ delete/ set un
 void GameObjectFactory::DestroyGameObject(EntityID id)
 {
     auto it = entityToIndex.find(id);
-    if (it != entityToIndex.end())
+    if (it == entityToIndex.end()) return;
+
+    GameObject* gameObject = GetGameObject(id);
+    if (!gameObject) return;
+
+    // remove parenting
+    GameObject* goParent = gameObject->GetParent();
+    if (goParent)
     {
-        size_t index = it->second;
+        std::cout << goParent->GetName() << " is removing child: " << gameObject->GetName() << std::endl;
+        goParent->RemoveChild(gameObject);
+    }
 
-        if (index < gameObjects.size() - 1)
+    // swap and pop for factory side
+    size_t index = it->second;
+    if (index < gameObjects.size() - 1)
+    {
+        std::swap(gameObjects[index], gameObjects.back());
+        entityToIndex[gameObjects[index]->GetID()] = index;
+    }
+
+    gameObjects.pop_back();
+    entityToIndex.erase(it);
+}
+
+void GameObjectFactory::DestroyAllRelatedGameObjects(EntityID parentID)
+{
+    std::vector<EntityID> goDestroyList;                // vector to gather all items to destroy - cant use getfamilytree because we need the order 
+    std::queue<EntityID> queue;                         // queue to sort by which needs to go first (bottom to up)
+    queue.push(parentID);
+
+    // the gist - add everything to queue, then add items in queue to vector
+    // starting from the parent, dig all the way down and find all children
+    while (!queue.empty())
+    {
+        EntityID currID = queue.front();
+        queue.pop();                                            // pop and add to the vector
+        goDestroyList.push_back(currID);
+
+        // if valid pointer, get all children, GET EVERYTHING 
+        if (GetGameObject(currID))
         {
-            std::swap(gameObjects[index], gameObjects.back());
-            entityToIndex[gameObjects[index]->GetID()] = index;
+            std::vector<GameObject*> children = GetGameObject(currID)->GetAllChildren();
+            for (auto const& child : children)
+            {
+                queue.push(child->GetID());
+            }
         }
-
-        gameObjects.pop_back();
-        entityToIndex.erase(it);
+    }
+    // since queue was ordered in sequence, reverse iterator to get from deepest in to out
+    auto begin = goDestroyList.rbegin();
+    auto end = goDestroyList.rend();
+    while (begin != end)
+    {
+        DestroyGameObject(*begin);          // destroy one by one
+        begin++;
     }
 }
 

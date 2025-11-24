@@ -265,6 +265,26 @@ public:
     float GetCameraZoom() const { return cameraZoom; }
 
     /**
+     * @brief Set now position of camera.
+     */
+    void SetCameraPos(vec2 const& pos) { cameraX = pos.x; cameraY = pos.y; }
+
+    /**
+     * @brief Set now zoom value of camera.
+     */
+    void SetCameraZoom(float zoomValue) { cameraZoom = zoomValue; }
+
+    /**
+     * @brief Get the smoothing factor for zooming.
+     */
+    float GetCameraSmoothing() const { return zoomSmoothing; }
+
+    /**
+     * @brief (0.0f - 1.0f) Set the smoothing factor for zooming.
+     */
+    void SetCameraSmoothing(float smoothValue) { zoomSmoothing = smoothValue; }
+
+    /**
      * @return Name of the currently loaded scene
      */
     const std::string& GetCurrentFilename() const { return currentFilename; }
@@ -283,6 +303,8 @@ public:
      * @brief Plays the loaded background music if available
      */
     //void PlayLoadedBGM();
+
+    std::string GetCurrentBGMChannel() const { return currentBGMChannel; }
 private:
     // GUI rendering functions
     /**
@@ -357,6 +379,7 @@ private:
     float zoomSpeed;                      // camera zoom sensitivity
     float minZoom;                        // minimum zoom level
     float maxZoom;                        // maximum zoom level
+    float zoomSmoothing;                  // (0-1) controls how much added smoothing there is 
 
     std::string currentBGMName = "";
     std::string currentBGMChannel = "bgm_channel";

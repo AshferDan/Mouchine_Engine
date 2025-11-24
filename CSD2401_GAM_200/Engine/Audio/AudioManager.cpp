@@ -49,7 +49,7 @@ bool AudioManager::LoadSound(const SoundData& sound)
         std::cerr << "[AudioManager] Unsupported audio file type for " << sound.filepath << " (expected .wav, .mp3, .ogg)" << std::endl;
         return false;
     }
-
+        
     std::cout << "Loading (single): " << sound.name << " from " << sound.filepath << std::endl;
 
     bool success = audioEngine->loadSound(sound.name, sound.filepath, sound.loop);
@@ -132,6 +132,7 @@ void AudioManager::PlaySound(const std::string& soundName, const std::string& ch
     }
 
     audioEngine->setVolume(channel, finalVolume);
+    audioEngine->setPitch(channel, sound.pitch <= 0.0f ? 1.0f : sound.pitch);
 }
 
 void AudioManager::SetSoundVolume(const std::string& soundName, float volume)
@@ -158,6 +159,25 @@ void AudioManager::SetCategoryVolume(const std::string& category, float volume)
 {
     categoryVolumes[category] = std::max(0.0f, std::min(1.0f, volume));
     std::cout << "Set " << category << " volume to " << volume << std::endl;
+}
+
+void AudioManager::SetSoundPitch(const std::string& soundName, float pitch)
+{
+    auto it = soundDatabase.find(soundName);
+    if (it == soundDatabase.end())
+        return;
+
+    if (pitch < 0.25f) pitch = 0.25f;
+    if (pitch > 3.0f)  pitch = 3.0f;
+
+    it->second.pitch = pitch;
+
+    if (!audioEngine)
+        return;
+
+    // update currently playing default channel for this sound
+    std::string channel = soundName + "_channel";
+    audioEngine->setPitch(channel, pitch);
 }
 
 void AudioManager::StopSound(const std::string& channelName) 

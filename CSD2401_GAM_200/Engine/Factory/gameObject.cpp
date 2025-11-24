@@ -116,18 +116,22 @@ void GameObject::AddChild(GameObject* ChildGO)
 {
     ChildGO->parent = this;
     children.push_back(ChildGO);
-    std::cout << "oh my beautiful children: \n";
-    for (auto const& child : children)
+    std::cout << this->GetName() <<" is the parent of: \n";
+    for (auto& child : children)
     {
-        std::cout << '\t' << ChildGO->GetName() << std::endl;
+        std::cout << '\t' << child->GetName() << std::endl;
     }
 }
 
 void GameObject::RemoveChild(GameObject* ChildGO)
 {
-    std::cout << ChildGO->GetName() << " is gone\n";
-    children.erase(std::remove(children.begin(), children.end(), ChildGO), children.end());
-    ChildGO->parent = nullptr;
+    auto it = std::find(children.begin(), children.end(), ChildGO);
+    if (it != children.end())
+    {
+        children.erase(it);
+        RemoveParent();
+        std::cout << "Removed " << ChildGO->GetName() << " from " << this->GetName() << "'s children\n";
+    }
 }
 
 void GameObject::SetParent(GameObject* ParentGO)
@@ -137,6 +141,11 @@ void GameObject::SetParent(GameObject* ParentGO)
         GetParent()->RemoveChild(this);
     }
     ParentGO->AddChild(this);
+}
+
+void GameObject::RemoveParent()
+{
+    parent = nullptr;
 }
 
 GameObject* GameObject::GetParent() const

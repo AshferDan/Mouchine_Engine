@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "audio.h"
+#include <algorithm>
 
 AudioEngine::AudioEngine() : sounds(), channels(), system(nullptr) {}
 AudioEngine::~AudioEngine() { stopAudio(); }
@@ -271,6 +272,17 @@ void AudioEngine::muteSound(const std::string& channelName) {
 		it->second->getMute(&muted); // current mute state
 		it->second->setMute(!muted); // if muted, unmute it,  if unmuted, mute it
 		std::cout << (muted ? "unmuted" : "muted") << "channel" << channelName << std::endl;
+	}
+}
+
+void AudioEngine::setPitch(const std::string& channelName, float pitch) 
+{
+	auto it = channels.find(channelName);
+	if (it != channels.end() && it->second)
+	{
+		if (pitch < 0.0f)
+			pitch = 0.0f; 
+		it->second->setPitch(pitch);
 	}
 }
 
