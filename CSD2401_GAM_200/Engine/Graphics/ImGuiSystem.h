@@ -25,6 +25,7 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include <filesystem>
 #include "Serialization.h"
+#include "logic.h"
 #include "LevelEditor.h"
 #include "ImGuizmo.h"
 
@@ -191,6 +192,8 @@ public:
     void Viewport_ManageGizmos();
 
     void Viewport_HighlightGO();
+
+    void RenderEventComponent(GameObject* obj);
 
 private:
     /**

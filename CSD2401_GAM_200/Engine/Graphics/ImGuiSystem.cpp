@@ -31,6 +31,7 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "physics.h"
 #include "AudioManager.h"
+#include "logic.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -626,6 +627,16 @@ void ImGuiSystem::Hierarchy_Render()
     {
         M2_RenderStressTest();
     }
+    // Undo feature
+    LevelEditor* editor = CORE->GetLevelEditor();
+    bool canUndo = !editor->undoStack.empty();
+
+    if (!canUndo) ImGui::BeginDisabled();
+    if (ImGui::Button("Undo"))
+    {
+        if (canUndo) CORE->GetLevelEditor()->PerformUndo();
+    }
+    if (!canUndo) ImGui::EndDisabled();
 
     // display current scene name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
@@ -888,10 +899,34 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         if (ImGui::MenuItem("Delete"))
         {
             // TODO - block out the deleting of main camera - crashes the game
-            factory.DestroyAllRelatedGameObjects(id);                   // handles cases for both individual GOs and parented GOs
-            if (selectedGameObjectID == id)
-            {
-                ResetSelectedGameObject();
+
+            // Record undo-delete
+            LevelEditor* editor = CORE->GetLevelEditor();
+            GameObject* obj = factory.GetGameObject(id);
+
+            if (obj)
+            {             
+                EditorUndoCommand undocmd;
+                undocmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
+                undocmd.entityID = id;
+                //cmd.beforeState = editor->SerialiseGameObject(obj);
+                undocmd.beforeJson = Serialization::SerializeGameObject(obj);
+
+                // Store Parent
+                GameObject* parent = obj->GetParent();
+                undocmd.parentName = parent ? parent->GetName() : "";
+
+                // Store Children
+                for (GameObject* c : obj->GetAllChildren())
+                    undocmd.childNames.push_back(c->GetName());
+
+                editor->RecordUndo(undocmd);
+
+                factory.DestroyAllRelatedGameObjects(id);  // handles cases for both individual GOs and parented GOs
+
+                // Clear selection if it was selected
+                if (selectedGameObjectID == id)
+                    ResetSelectedGameObject();
             }
         }
         ImGui::EndPopup();
@@ -1869,14 +1904,48 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            // sliders for position, scale, rotation etc
+            // For Undo Feature
+            LevelEditor* editor = CORE->GetLevelEditor();
 
+            static bool editingTransform = false;
+            static json beforeJson;   // JSON before edit
+
+            // Helper lambdas (when on drag)
+            auto BeginEdit = [&](void)
+                {
+                    if (!editingTransform && ImGui::IsItemActivated())
+                    {
+                        editingTransform = true;
+                        beforeJson = Serialization::SerializeGameObject(obj)["TransformComponent"];
+                    }
+                };
+
+            auto EndEdit = [&](void)
+                {
+                    if (editingTransform && ImGui::IsItemDeactivatedAfterEdit())
+                    {
+                        editingTransform = false;
+
+                        EditorUndoCommand cmd;
+                        cmd.action = EditorUndoCommand::ActionType::ObjectTransform;
+                        cmd.entityID = obj->GetID();
+                        cmd.beforeJson = beforeJson;
+                        cmd.afterJson = Serialization::SerializeGameObject(obj)["TransformComponent"];
+
+                        editor->RecordUndo(cmd);
+                    }
+                };
+
+            // sliders for position, scale, rotation etc
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
             if (ImGui::DragFloat2("Position", pos, 0.5f))
             {
                 transform->SetPosition(pos[0], pos[1]);
+                
             }
+            BeginEdit();
+            EndEdit();
 
             float scale[2] = { 1.0f, 1.0f };
             transform->GetScale(scale[0], scale[1]);
@@ -1884,6 +1953,8 @@ void ImGuiSystem::RenderPropertyEditor()
             {
                 transform->SetScale(scale[0], scale[1]);
             }
+            BeginEdit();
+            EndEdit();
 
             float rotation = transform->GetRotation();
             if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
@@ -1893,7 +1964,10 @@ void ImGuiSystem::RenderPropertyEditor()
                     rotation = 0;
                 }
                 transform->SetRotation(rotation);
+
             }
+            BeginEdit();
+            EndEdit();
         }
     }
 
@@ -1977,6 +2051,9 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
+    // Add event into GameObjects
+    RenderEventComponent(obj); 
+
     // TODO WIP drag and drop section for assets from project navigator
     // currently we dont have drag and drop spot for assets for textures etc, so this is just here to show it works 
     // Draws a box and lets it take in drag and drops for assets
@@ -2039,6 +2116,119 @@ void ImGuiSystem::RenderPropertyEditor()
 
     ImGui::End();
 }
+
+void ImGuiSystem::RenderEventComponent(GameObject* obj)
+{
+    auto* ec = obj->GetComponent<EventComponent>();
+
+    // Add component button
+    if (!ec)
+    {
+        if (ImGui::Button("Add Event Component"))
+            obj->AddComponent<EventComponent>();
+        return;
+    }
+
+    // --- Begin UI ---
+    if (ImGui::CollapsingHeader("Event Component", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text("Rules: %zu", ec->rules.size());
+        ImGui::Separator();
+
+        // Draw each rule
+        int index = 0;
+        for (auto& rule : ec->rules)
+        {
+            ImGui::PushID(index);
+
+            if (ImGui::TreeNodeEx("Rule", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                // Event Type selection
+                static const char* eventNames[] = {
+                    "None",
+                    "OnStart",
+                    "OnEnable",
+                    "OnDisable",
+                    "OnDestroy",
+                    "OnUpdate",
+                    "OnKeyPressed",
+                    "OnKeyReleased",
+                    "OnMousePressed",
+                    "OnMouseReleased",
+                    "OnMouseOver",
+                    "OnCollisionEnter",
+                    "OnCollisionStay",
+                    "OnCollisionExit",
+                    "OnTriggerEnter",
+                    "OnTriggerStay",
+                    "OnTriggerExit",
+                    "OnGoalReached",
+                    "OnFellOutOfMap"
+                };
+
+                int evIndex = (int)rule.eventType;
+                if (ImGui::Combo("Event", &evIndex, eventNames, IM_ARRAYSIZE(eventNames)))
+                    rule.eventType = (EventType)evIndex;
+
+                // Target filter
+                char buf[64];
+                strncpy(buf, rule.targetFilter.c_str(), sizeof(buf));
+                if (ImGui::InputText("Target Filter", buf, sizeof(buf)))
+                    rule.targetFilter = buf;
+
+                // Action selection
+                static const char* actionNames[] = {
+                    "None",
+                    "Shrink",
+                    "Grow",
+                    "ScaleTo",
+                    "MoveTo",
+                    "TeleportTo",
+                    "EnableObject",
+                    "DisableObject",
+                    "DestroyObject",
+                    "PlaySound",
+                    "StopSound",
+                    "LoadNextLevel",
+                    "Respawn",
+                    "AddScore",
+                    "TakeDamage",
+                    "FlashColor",
+                };
+
+                int acIndex = (int)rule.action;
+                if (ImGui::Combo("Action", &acIndex, actionNames, IM_ARRAYSIZE(actionNames)))
+                    rule.action = (ActionType)acIndex;
+
+                ImGui::Spacing();
+
+                // Remove rule
+                if (ImGui::Button("Remove Rule"))
+                {
+                    ec->rules.erase(ec->rules.begin() + index);
+                    ImGui::TreePop();
+                    ImGui::PopID();
+                    break; // exit loop safely
+                }
+
+                ImGui::TreePop();
+            }
+
+            ImGui::PopID();
+            index++;
+        }
+
+        ImGui::Separator();
+
+        // Add new rule
+        if (ImGui::Button("Add Rule"))
+        {
+            EventRule newRule;
+            ec->rules.push_back(newRule);
+        }
+    }
+}
+
 
 void PropertiesSlot::RenderImGui()
 {
@@ -2173,6 +2363,24 @@ void M2_RenderStressTest()
     }
 }
 
+//  generate unique sound name if one already exists
+static std::string MakeUniqueSoundName(const std::string& baseName,
+    const std::map<std::string, SoundData>& db)
+{
+    // if base not used, just use it
+    if (db.find(baseName) == db.end())
+        return baseName;
+
+    int counter = 1;
+    std::string candidate;
+    do
+    {
+        candidate = baseName + "_" + std::to_string(counter++);
+    } while (db.find(candidate) != db.end());
+
+    return candidate;
+}
+
 #pragma region Audio Assets ImGui
 // Renders the Audio Assets panel
 void AudioAssetsPanel_Render()
@@ -2260,6 +2468,12 @@ void AudioAssetsPanel_Render()
 
             if (ext == ".wav" || ext == ".mp3" || ext == ".ogg")
             {
+                // get current database so we can avoid name clashes
+                auto& db = audioMgr->GetSoundDatabase();
+
+                std::string baseName = p.stem().string();                   // "bgm"
+                std::string uniqueName = MakeUniqueSoundName(baseName, db); // "bgm1"
+
                 SoundData sound{};
                 sound.filepath = droppedPathStr;
                 sound.name = p.stem().string();

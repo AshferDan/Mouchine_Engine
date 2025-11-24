@@ -15,6 +15,7 @@ Technology is prohibited.
 
 #include "GameObject.h"
 #include "factory.h"
+#include "logic.h"
 #include <iostream>
 #include <sstream>
 
@@ -163,5 +164,82 @@ void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree)
     for (auto& child : parent->GetAllChildren()) {
         familyTree.push_back(child->GetID());
         GetFamilyTree(child, familyTree); // Recursively get grandchildren
+    }
+}
+
+void GameObject::OnEventTriggered(EventType eventType, GameObject* other)
+{
+    std::cout << "[OnEventTriggered] object=" << GetName()
+        << " | event=" << EventTypeToString(eventType)
+        << "\n";
+
+    auto* ec = GetComponent<EventComponent>();
+
+    std::cout << "[EventComponent] Rules count = " << ec->rules.size() << "\n";
+
+    if (!ec) return;
+
+    for (auto& rule : ec->rules)
+    {
+        std::cout << "Comparing: rule="
+            << EventTypeToString(rule.eventType)
+            << " vs event="
+            << EventTypeToString(eventType)
+            << "\n";
+
+        // EVENT TYPE MATCH?
+        if (rule.eventType != eventType)
+            continue;
+
+        // TARGET FILTER MATCH?
+        if (!rule.targetFilter.empty())
+        {
+            if (!other) continue;
+            if (other->GetName() != rule.targetFilter)
+                continue;
+        }
+
+        // Execute Action
+        std::cout << "Action = " << (int)rule.action << std::endl;
+        std::cout << "Action = " << ActionTypeToString(rule.action) << std::endl;
+
+        auto* t = GetComponent<TransformComponent>();
+
+        switch (rule.action)
+        {
+        case ActionType::Shrink:        
+            break;
+
+        case ActionType::Grow:
+            break;
+
+        case ActionType::DestroyObject:
+            SetActive(false);
+            break;
+
+        case ActionType::DisableObject:
+            SetActive(false);
+            break;
+
+        case ActionType::EnableObject:
+            SetActive(true);
+            break;
+
+        case ActionType::PlaySound:
+            //CORE->GetAudioManager()->PlaySound("");
+            break;
+
+        case ActionType::LoadNextLevel:
+     
+            break;
+
+        case ActionType::Respawn:
+            if (t)
+                t->SetPosition(0, 0);
+            break;
+
+        default:
+            break;
+        }
     }
 }

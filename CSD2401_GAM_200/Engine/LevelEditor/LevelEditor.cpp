@@ -12,6 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
+#include "core.h"
 #include "ColliderComponent.h"
 #include "LevelEditor.h"
 #include "physics.h"
@@ -19,6 +20,7 @@ Technology is prohibited.
 #include "Serialization.h"
 #include "audio.h"
 #include "AudioManager.h"
+#include "TimerSystem.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -290,6 +292,16 @@ void LevelEditor::StopPlayMode()
     {
         std::cout << "[LevelEditor] Stopping background music through AudioManager\n";
         audioManager->StopSound("bgm_channel");
+    }
+
+    if (CORE)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            std::cout << "[LevelEditor] Clearing all active timers.\n";
+            ts->ClearAllTimers();
+        }
     }
 
     RestoreSceneState();           // restore saved scene
@@ -578,15 +590,35 @@ bool LevelEditor::SaveLevel(const std::string &filepath)
         json root;
         root["GameObjects"] = json::array();
 
-        // serialise all active game objects
-        auto &allObjects = factory.GetAllGameObjects();
-        for (const auto &objPtr : allObjects)
+        //// serialise all active game objects
+        //auto &allObjects = factory.GetAllGameObjects();
+        //for (const auto &objPtr : allObjects)
+        //{
+        //    if (objPtr && objPtr->IsActive())
+        //    {
+        //        json objData = Serialization::SerializeGameObject(objPtr.get());
+        //        root["GameObjects"].push_back(objData);
+        //    }
+        //}
+        // Collect only ROOT objects
+        std::vector<GameObject*> roots;
+        auto& allObjects = factory.GetAllGameObjects();
+
+        for (const auto& objPtr : allObjects)
         {
-            if (objPtr && objPtr->IsActive())
-            {
-                json objData = Serialization::SerializeGameObject(objPtr.get());
-                root["GameObjects"].push_back(objData);
-            }
+            if (!objPtr || !objPtr->IsActive())
+                continue;
+
+            GameObject* obj = objPtr.get();
+            if (obj->GetParent() == nullptr)   // <-- ROOT OBJECT ONLY
+                roots.push_back(obj);
+        }
+
+        // Recursively serialize ONLY the root trees 
+        for (GameObject* rootObj : roots)
+        {
+            json objData = Serialization::SerializeGameObject(rootObj);
+            root["GameObjects"].push_back(objData);
         }
 
         if (CORE)
@@ -647,6 +679,22 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         json root;
         inFile >> root;
         inFile.close();
+
+        if (CORE)
+        {
+            TimerSystem* ts = CORE->GetTimerSystem();
+            if (ts)
+            {
+                std::cout << "[LoadLevel] Clearing active timers...\n";
+                ts->ClearAllTimers();
+            }
+            PhysicsSystem* ps = CORE->GetPhysicsSystem();
+            if (ps)
+            {
+                ps->ClearCollisionQueue();
+            }
+        }
+    
 
         // stop/unload audio (if any)
         auto& resourceMgr = ResourceManager::Instance();
@@ -724,6 +772,8 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                 Serialization::DeserializeGameObject(objData);
             }
         }
+        Serialization::ResolveHierarchy();
+
 
         // check if MainCamera exists, create one if not
         GameObject* mainCam = factory.FindGameObject("MainCamera");
@@ -820,6 +870,26 @@ void LevelEditor::NewLevel()
     selectedGameObjectID = 0;
     hasValidSaveState = false;
     CameraManager::Instance().ClearActiveCamera();
+
+    // stop and unload all sounds from the underlying audi engine
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine)
+    {
+        audioEngine->stopAllSound();
+        audioEngine->unloadAllSound();
+    }
+
+    // clear audio resources from resource manager
+    ResourceManager::Instance().UnloadAllAudio();
+
+    // clear the editor audio manager database (all added sounds)
+    if (CORE)
+    {
+        if (AudioManager* audioMgr = CORE->GetAudioManager())
+        {
+            audioMgr->Clear();
+        }
+    }
 
     std::cout << "New level created" << std::endl;
 }
@@ -1352,7 +1422,74 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
+    
+    // Check if undo exceed 20
+    if (undoStack.size() >= undoCapacity) {
+        undoStack.erase(undoStack.begin()); // Remove oldest
+    }
 
+    undoStack.push_back(undocmd);
+
+    // New edit after undo means redo should be cleared
+    //redoStack.clear();
+    
+}
+
+void LevelEditor::PerformUndo() {
+    if (undoStack.empty()) return;
+
+    EditorUndoCommand undocmd = undoStack.back();
+    undoStack.pop_back();
+
+    switch (undocmd.action) {
+        case EditorUndoCommand::ActionType::ObjectTransform: {
+            GameObject* obj = factory.GetGameObject(undocmd.entityID);
+            if (!obj) break;
+
+            auto* transform = obj->GetComponent<TransformComponent>();
+            if (!transform) break;
+
+            json t = undocmd.beforeJson;
+
+            // Restore ONLY transform fields
+            if (t.contains("pos"))
+                transform->SetPosition(t["pos"][0], t["pos"][1]);
+
+            if (t.contains("scale"))
+                transform->SetScale(t["scale"][0], t["scale"][1]);
+
+            if (t.contains("rotation"))
+                transform->SetRotation(t["rotation"]);
+
+            break;
+        }
+
+        case EditorUndoCommand::ActionType::ObjectCreated: {
+            GameObject* obj = factory.GetGameObject(undocmd.entityID);
+            
+            if (obj)
+            {
+                if (CORE && CORE->GetImguiSystem()) // Deselect from Editor
+                {
+                    CORE->GetImguiSystem()->ResetSelectedGameObject();
+                }
+
+                factory.DestroyAllRelatedGameObjects(undocmd.entityID);
+            }
+            break;
+        }
+        case EditorUndoCommand::ActionType::ObjectDeleted: {
+            Serialization::DeserializeGameObject(undocmd.beforeJson);
+            Serialization::ResolveHierarchy();
+
+            break;
+        }
+
+    }
+
+    redoStack.push_back(undocmd);
+}
 
 /*  Audio Management */
 /**

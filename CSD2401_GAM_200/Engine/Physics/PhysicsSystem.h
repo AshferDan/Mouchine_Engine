@@ -72,6 +72,7 @@ public:
         ColliderComponent* col1, ColliderComponent* col2);
 
     void HandleMessage(const CollisionMessage& msg) override;
+    void ClearCollisionQueue();
 
 private:
     /**
@@ -106,4 +107,5 @@ private:
 
     // Store collisions reported this frame for batch resolution
     std::vector<CollisionData> pendingCollisions;
+
 };

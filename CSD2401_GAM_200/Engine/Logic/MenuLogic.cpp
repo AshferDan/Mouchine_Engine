@@ -85,8 +85,6 @@ void MenuLogicSystem::Update(float dt)
             SetButtonTexture(currentHover, true);
             // Play hover sound once when entering the button
   
-            //CORE->GetAudioEngine()->loadSound("menu_hover", "../Assets/Audio/hovering_Button.wav", false);
-            //CORE->GetAudioEngine()->playSound("menu_hover");
 
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
@@ -103,8 +101,6 @@ void MenuLogicSystem::Update(float dt)
     if (isClicked && !hoveredButtonName.empty())
     {
         // Play Click Sound
-        //CORE->GetAudioEngine()->loadSound("menu_click", "../Assets/Audio/Menu_Button_Press.wav",false);
-        //CORE->GetAudioEngine()->playSound("menu_click");
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
