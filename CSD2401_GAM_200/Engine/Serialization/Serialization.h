@@ -88,6 +88,7 @@ namespace Serialization
     void DeserializeAudioManager(const json& j, AudioManager* audioManager);
 
     extern bool Prefab_DragAndDropped;
+    extern bool Prefab_Reinstantiate;
 
     // Called after all DeserializeGameObject calls
     void ResolveHierarchy();

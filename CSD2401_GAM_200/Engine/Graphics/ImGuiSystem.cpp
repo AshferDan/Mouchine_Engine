@@ -87,6 +87,8 @@ std::string hierarchy_oldname{};
 
 // PROPERTIES TAB SLOT 
 std::vector<PropertiesSlot> propertySlotsList;
+std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;
+std::unordered_map<std::string, std::vector<EntityID>> prefabInstances;
 
 // STATIC BOOL FLAGS
 static bool greyOutGOSettings = false;
@@ -116,6 +118,7 @@ DirectoryNavigator AssetBrowserWindow;
 
 // DRAG AND DROP VARS
 ImVec2 viewportCursorPos;
+vec2 Prefab_Reinstantiate_Pos;
 
 // LAYOUT LOADING 
 std::string loadLayoutPath{};
@@ -193,6 +196,8 @@ void ImGuiSystem::Initialize()
     icon_giz_resize_ui = GraphicsSystem::LoadTexture(icon_giz_resize);
     icon_active_ui = GraphicsSystem::LoadTexture(icon_active);
     icon_inactive_ui = GraphicsSystem::LoadTexture(icon_inactive);
+
+    PopulateComponentList();
 }
 
 /**
@@ -1010,9 +1015,9 @@ void ImGuiSystem::RemoveGameObject(EntityID id)
 /**
  * @brief Renders the prefab window on screen
  */
-void PrefabMenu_Render()
+void ImGuiSystem::PrefabMenu_Render()
 {
-    ImGui::Begin("Prefab Loader", &ShowLoadPrefabMenu);
+    ImGui::Begin("Prefab Menu", &ShowLoadPrefabMenu);
 
     ImGui::Text("Prefab Menu");
     ImGui::BeginGroup();
@@ -1103,28 +1108,144 @@ void PrefabMenu_Render()
     // TODO doesnt actually work yet
     ImGui::BeginGroup();
     ImVec2 boxSize = ImVec2(256, 256);
-    ImGui::Text("Preview Render:");
+    ImGui::Text("[WIP] Preview Render:");
     ImGui::Dummy(boxSize); // Reserves space for preview
 
-    ImDrawList *drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
+    ImDrawList* drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
     drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
     ImGui::EndGroup();
+
 
     if (ImGui::Button("Spawn -> Load Prefab"))
     {
         PrefabMenu_Spawn();                     // Spawn selected prefab as GO
+    }
+    CreateHintText("Spawn prefab as Game Object in scene.");
+
+    ImGui::Dummy({30, 30}); // Reserves space for preview
+    std::string dispText;
+    bool bothSelected{ selectedGameObjectID && current_prefab };
+    if (!selectedGameObjectID && !current_prefab)
+    {
+        dispText = "Select GO and prefab to override";
+    }
+    else
+    {
+        std::string goName{}, prefabName{};
+
+        if (selectedGameObjectID) { goName = factory.GetGameObject(selectedGameObjectID)->GetName(); }
+            else goName = "_____";
+        if (current_prefab) { prefabName = prefabList[current_prefab]; }
+            else prefabName = "_____";
+
+        dispText = "Override " + prefabName + " with " + goName;
+    }
+    // looks kinda ugly but it makes it more obvious
+    if (!bothSelected)
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), dispText.c_str());
+    else
+        ImGui::Text(dispText.c_str());
+
+    if (!bothSelected)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1, 0, 0, 1)),
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1, 0.3f, 0.3f, 1)),
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0, 0, 1));
+    }
+    if (ImGui::Button("Override"))
+    {
+        // takes the selected GO and replace the selected prefab with all the GO's data
+        if (bothSelected)
+        {
+            PrefabMenu_Override();
+        }
+        else
+        {
+            std::cout << "Select GO in Scene + prefab in Prefab Menu!\n";
+        }
+    }
+    CreateHintText("Override an existing prefab with a selected Game Object.");
+    ImGui::SameLine();
+    if (ImGui::Button("Update all instances"))
+    {
+        if (bothSelected)
+        {
+            // tweaked to work with spawned prefab objects or any game object
+            // Gets selected prefab/ game object, replaces ALL newly spawned prefabs to be of that newly edited game prefab/ game object
+            PrefabMenu_Reinstantiate();
+        }
+        else
+        {
+            std::cout << "Select GO in Scene + prefab in Prefab Menu!\n";
+        }
+    }
+    CreateHintText("Update all newly created prefabs of selected type.");
+    if (!bothSelected)
+    {
+        ImGui::PopStyleColor(3);
     }
 
     ImGui::End(); // End of Prefab Search Menu
 }
 
 /**
+ * @brief Override existing prefab with edited prefab. Tweaked to also work for any GO in scene.
+ */
+void ImGuiSystem::PrefabMenu_Override()
+{
+    auto* selectedGO = factory.GetGameObject(selectedGameObjectID);
+    if (!selectedGO) return;
+    std::string selectedPrefabName = prefabList[current_prefab];
+
+    // if same name, simply override 
+    Serialization::SavePrefab(*selectedGO);
+    if (selectedGO->GetName() != selectedPrefabName)                     // only delete prefab if names are different, if names are the same it gets overriden automatically
+    {
+        Serialization::RemovePrefab(selectedPrefabName);
+        Serialization::RenamePrefab(selectedGO->GetName(), selectedPrefabName);
+    }
+}
+
+
+/**
+ * @brief Reinstantiated all newly spawned prefabs to be as the selected GO in scene.
+ */
+void ImGuiSystem::PrefabMenu_Reinstantiate()
+{
+    // If want to tweak for it to replace with only newly added prefabs, just do a check if the selectedGO is also in prefabInstances.
+    // Tried to only replace components so we can keep the same entity IDs, but parenting is not a component and it causes issues. So we just delete and spawn again at specified location.
+
+    Serialization::Prefab_Reinstantiate = true;                             // flag for specifying location of where to spawn prefab (Prefab_Reinstantiate_Pos)
+    auto* selectedGO = factory.GetGameObject(selectedGameObjectID);
+    std::string selectedPrefabName = prefabList[current_prefab];
+    selectedGO->SetName(selectedPrefabName);                                // force set the name to be of selected prefab
+
+    Serialization::SavePrefab(*selectedGO);                                 // Properly overrides the old prefab
+
+    std::vector<EntityID> prefabReiterationList = prefabInstances[selectedPrefabName];          // make a copy because we will be deleting things from the active list
+    for (auto& p : prefabReiterationList)
+    {
+        GameObject* currPrefab = factory.GetGameObject(p);                                      // get GO
+        if (!currPrefab || !currPrefab->GetComponent<TransformComponent>())
+        {
+            std::cout << "Could not find GO id: " << p << " or its transform. Skipping...\n";           // print if unable to modify GO, skip as well
+            continue;
+        }
+
+        currPrefab->GetComponent<TransformComponent>()->GetPosition(Prefab_Reinstantiate_Pos.x, Prefab_Reinstantiate_Pos.y);            // get position for spawning of new prefab (handled in loadprefab)
+        factory.DestroyGameObject(p);                                                               // destroy old GO and spawn new GO
+        Serialization::LoadPrefab(selectedPrefabName);
+    }
+    Serialization::Prefab_Reinstantiate = false;                                // reset flag to false
+}
+
+
+/**
  * @brief Ctor - Spawns the selected prefab as a game object in scene
  */
-void PrefabMenu_Spawn()
+void ImGuiSystem::PrefabMenu_Spawn()
 {
     Serialization::LoadPrefab(prefabList[current_prefab]);          // Deserialises the selected prefab
-    std::cout << "prefab menu spawn pressed\n";
 }
 #pragma endregion
 
@@ -1448,6 +1569,9 @@ void TopMenuBar_Render()
         // File menu
         if (ImGui::BeginMenu("File"))
         {
+            if (ImGui::MenuItem("[WIP]"))
+            {
+            }
             if (ImGui::MenuItem("Open"))
             {
             }
@@ -1466,8 +1590,12 @@ void TopMenuBar_Render()
         // Edit menu
         if (ImGui::BeginMenu("Edit"))
         {
+            if (ImGui::MenuItem("[WIP]"))
+            {
+            }
             if (ImGui::MenuItem("Preferences"))
             {
+                // key binds? Rebinding keys for shortcuts?
             }
 
             ImGui::EndMenu();
@@ -1491,6 +1619,9 @@ void TopMenuBar_Render()
         // Help menu
         if (ImGui::BeginMenu("Help"))
         {
+            if (ImGui::MenuItem("[WIP]"))
+            {
+            }
             if (ImGui::MenuItem("Naw"))
             {
             }
@@ -1501,6 +1632,7 @@ void TopMenuBar_Render()
         ImGui::EndMainMenuBar();
     }
 
+    // POP UP CALLS HERE
     // Have to separate bc refreshes every frame and got some crashes with end popup, this keeps it up
     if (openLayoutSavePopup)
     {
@@ -1926,20 +2058,61 @@ void ImGuiSystem::RenderPropertyEditor()
     // currently we dont have drag and drop spot for assets for textures etc, so this is just here to show it works 
     // Draws a box and lets it take in drag and drops for assets
 
-    ImGui::BeginGroup();
-    ImVec2 boxSize = ImVec2(256, 256);
-    ImGui::Text("Preview:");
-    ImGui::Dummy(boxSize); // Reserves space for preview
+    //ImGui::BeginGroup();
+    //ImVec2 boxSize = ImVec2(256, 256);
+    //ImGui::Text("Preview:");
+    //ImGui::Dummy(boxSize); // Reserves space for preview
 
-    ImDrawList* drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
-    drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
+    //ImDrawList* drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
+    //drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
 
-    static std::string draggedAsset{};
-    ReceiveDragAndDrop(AssetPayloadID, draggedAsset);
+    //static std::string draggedAsset{};
+    //ReceiveDragAndDrop(AssetPayloadID, draggedAsset);
 
-    ImGui::EndGroup();
-    // Do something with DnD asset data - maybe insert into boxes to assign sprites
-    ImGui::Text(draggedAsset.c_str());
+    //ImGui::EndGroup();
+    //// Do something with DnD asset data - maybe insert into boxes to assign sprites
+    //ImGui::Text(draggedAsset.c_str());
+
+    // Add Component Button
+    ImVec2 space = ImGui::GetContentRegionAvail();
+    ImVec2 buttonSize{ 100,25 };
+    ImGui::SetCursorPos({ (space.x - buttonSize.x)/2, space.y });
+    if (ImGui::Button("Add Component", buttonSize))
+    {
+        ImGui::OpenPopup("Add_Component");
+    }
+    if (ImGui::BeginPopup("Add_Component"))
+    {
+        {
+            for (auto& comp : AllComponents)
+            {
+                // can use to sort by component type in the future when we got more components, and can add explanation text
+                ComponentType type      { std::get<0>(comp) };
+                std::string& name       { std::get<1>(comp) };
+                ImTextureID& textureID  { std::get<2>(comp) };
+                auto& onclick           { std::get<3>(comp) };
+
+                std::string idname = "##iconItem" + name;
+                bool onClick = ImGui::Selectable(idname.c_str(), false, ImGuiSelectableFlags_SpanAllColumns);
+                ImGui::SameLine();
+
+                // Draw the icon
+                ImGui::Image(textureID, icon_size_smallest);
+
+                ImGui::SameLine(40); // spacing between icon and label
+
+                ImGui::Text(name.c_str());
+                CreateHintText("Explanation text here.");
+
+                if (onClick)
+                {
+                    // clicked 
+                    onclick(GetSelectedGameObject());
+                }
+            }
+        }
+        ImGui::EndPopup();
+    }
 
     ImGui::End();
 }
@@ -2490,6 +2663,42 @@ void AudioAssetsPanel_Render()
 #pragma endregion
 
 // Helpers
+// cover your eyes this will be hardcoded based off what we have rn
+// [WIP] Consider adding explanation text in the tuple for specific explanation.
+void PopulateComponentList()
+{
+    //transform physics collider camera render text animator
+    // stores Display Text, icon texture, std::function to check if component is alr present, if not add it.
+    // ^ might have to rethink this because we might want multiple of the same components 
+
+    // push_back to vector the component details
+        // lambda for adding component checks if already has component
+            // if dont have, then add
+    AllComponents.push_back({ ComponentType::Transform, "Transform Component" , ImTextureID(icon_active_ui), [](GameObject* go){ 
+        if (!go->GetComponent<TransformComponent>()){
+            go->AddComponent<TransformComponent>();     std::cout << "Added Transform Component to " << go->GetName() << std::endl; } } });
+                
+    AllComponents.push_back({ ComponentType::Transform, "Physics Component"   , ImTextureID(icon_active_ui), [](GameObject* go){ 
+            if (!go->GetComponent<PhysicsComponent>()){ 
+                go->AddComponent<PhysicsComponent>();   std::cout << "Added Physics Component to " << go->GetName() << std::endl; } } });
+
+    AllComponents.push_back({ ComponentType::Transform, "Collider Component"  , ImTextureID(icon_active_ui), [](GameObject* go){ 
+            if (!go->GetComponent<ColliderComponent>()) { 
+                go->AddComponent<ColliderComponent>();  std::cout << "Added Collider Component to " << go->GetName() << std::endl; } } });
+
+    AllComponents.push_back({ ComponentType::Camera, "Camera Component"    , ImTextureID(icon_active_ui), [](GameObject* go){ 
+            if (!go->GetComponent<CameraComponent>()) { 
+                go->AddComponent<CameraComponent>();    std::cout << "Added Camera Component to " << go->GetName() << std::endl; } } });
+
+    AllComponents.push_back({ ComponentType::Render, "Render Component"    , ImTextureID(icon_active_ui), [](GameObject* go){ 
+            if (!go->GetComponent<RenderComponent>()) { 
+                go->AddComponent<RenderComponent>();    std::cout << "Added Render Component to " << go->GetName() << std::endl; } } });
+
+    //AllComponents.push_back({ "Text Component"      , ImTextureID(icon_active_ui), [](GameObject* go) { go->AddComponent<TextComponent>(); } });
+    //AllComponents.push_back({ "Animator Component"  , ImTextureID(icon_active_ui), [](GameObject* go) { go->AddComponent<Spritesheet>(); } });
+    // cant add these because theyre abit special, not just a simple slap on component
+}
+
 /**
  * @brief Refreshes vector of prefabs
  */

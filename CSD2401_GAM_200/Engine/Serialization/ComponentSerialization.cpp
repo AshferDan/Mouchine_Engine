@@ -19,6 +19,7 @@ std::unordered_map<GLuint, std::string> s_TexturePathByID;
 std::unordered_map<std::string, GLuint> s_IDByTexturePath;
 
 bool Serialization::Prefab_DragAndDropped;
+bool Serialization::Prefab_Reinstantiate;
 
 // ------------------- Serialize -------------------
 /**
@@ -213,6 +214,11 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
         std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
         tc->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
         std::cout << "CREATED AT " << "(" << viewportCursorPos.x << ", " << viewportCursorPos.y << ")\n";
+    }
+    else if (Serialization::Prefab_Reinstantiate)
+    {
+        tc->SetPosition(Prefab_Reinstantiate_Pos.x, Prefab_Reinstantiate_Pos.y);
+        std::cout << "REINSTANTIATED AT " << "(" << viewportCursorPos.x << ", " << viewportCursorPos.y << ")\n";
     }
     else
     {
