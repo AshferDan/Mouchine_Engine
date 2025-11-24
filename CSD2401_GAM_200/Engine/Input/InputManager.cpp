@@ -29,7 +29,7 @@ bool InputManager::MouseLeftClicked = false;
  * @param window Pointer to the GLFW window.
  * @param audio Optional pointer to the AudioEngine.
  */
-InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0)
+InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(window), audioEngine(audio), width(0), height(0), mouseX(0.0), mouseY(0.0), scrollX(0.0), scrollY(0.0),cachedPlayerID(0)
 {
     glfwSetWindowUserPointer(window, this);
 
@@ -193,24 +193,37 @@ void InputManager::Update(float dt)
             wasPressed = false;
         }
     }
+    GameObject* player = nullptr;
 
-    auto *player = GameObjectFactory::Instance().FindGameObject("Hero");
+
+    if (cachedPlayerID != 0)
+    {
+        player = GameObjectFactory::Instance().GetGameObject(cachedPlayerID);
+    }
+
+    if (!player)
+    {
+        player = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (player)
+        {
+            cachedPlayerID = player->GetID();
+        }
+    }
+
     if (!player)
     {
         return;
     }
 
-    auto *physics = player->GetComponent<PhysicsComponent>();
-    if (!physics)
-    {
-        return;
-    }
 
-    TransformComponent *transform = player->GetComponent<TransformComponent>();
-    if (!transform)
-    {
-        return;
-    }
+    auto* physics = player->GetComponent<PhysicsComponent>();
+    if (!physics) return;
+
+    TransformComponent* transform = player->GetComponent<TransformComponent>();
+    if (!transform) return;
+
+
+  
 
     //// Ensure player has drag force for smooth stopping (add once)
     // static bool dragInitialized = false;
@@ -350,59 +363,115 @@ void InputManager::Update(float dt)
             }
         }
     }
-    auto* anim = player->GetComponent<Spritesheet>();
 
-    if (transform && anim)
+    // ===== DASH SYSTEM =====
+    static bool hasUsedAirDash = false;
+    static bool dashKeyPressed = false;
+    static bool wasDashing = false;
+
+    // Dash input (LEFT SHIFT key)
+    bool dashKeyDown = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+
+    if (dashKeyDown && !dashKeyPressed)
     {
+        dashKeyPressed = true;
 
-        if (std::abs(moveDirectionX) > 0.0f)
+        // Check conditions
+        bool isDashing = physics->GetForcesManager().HasForceType(ForceType::Dash);
+        bool isGrounded = physics->IsGrounded();
+
+        // Can dash if: not already dashing AND (grounded OR has air dash available)
+        if (!isDashing && (isGrounded || !hasUsedAirDash))
         {
-            float baseWidth = std::abs(transform->scaleX);
-            float newScaleX = (moveDirectionX < 0) ? -baseWidth : baseWidth;
-            transform->SetScale(newScaleX, transform->scaleY);
+            // Determine dash direction using moveDirectionX if available, otherwise use velocityX
+            float dashDirection = 1.0f;  // Default right
+
+            if (std::abs(moveDirectionX) > 0.01f) {
+                // Use current movement direction
+                dashDirection = moveDirectionX;
+            }
+            else if (vx < -0.1f) {
+                // Fallback to velocity direction if not pressing movement keys
+                dashDirection = -1.0f;
+            }
+            else if (vx > 0.1f) {
+                dashDirection = 1.0f;
+            }
+            // If both are zero, dash right by default
+
+            // Add dash force
+            physics->ApplyDashImpulse(dashDirection);
+
+            // Disable gravity during dash
+            physics->SetGravity(false);
+
+            // Mark air dash as used if in air
+            if (!isGrounded) {
+                hasUsedAirDash = true;
+                std::cout << "[Dash] Air dash used!" << std::endl;
+            }
+
+            std::cout << "[Dash] Started! Direction: " << (dashDirection > 0 ? "Right" : "Left") << std::endl;
         }
-
-        const char* IDLE_SS = "../Assets/Mouch_Idle.png";
-        int _ROWS = 1;
-        int _COLS = 2;
-        const int FRAME_START = 0;
-        const int FRAME_END = 1;
-        const float IDLE_FPS = 2.0f;
-        const float RUN_FPS = 7.0f;
-        const char* RUN_SS = "../Assets/Mouch_Running.png";
-        const char* JUMP_SS = "../Assets/Mouch_jump.png";
-        // --------------------------------------------------------
-
-        float newFPS;
-        const char* newSpritesheet;
-
-        if (std::abs(vx) > 0.0f) // Player is running/moving
-        {
-            newFPS = RUN_FPS;
-            newSpritesheet = RUN_SS;
+        else if (isDashing) {
+            std::cout << "[Dash] Already dashing!" << std::endl;
         }
-        else if (is_jumping)
-        {
-            _COLS = 1;
-            newFPS = 0;
-            newSpritesheet = JUMP_SS;
-        }
-        else // Player is stopped (vx is 0)
-        {
-            newFPS = IDLE_FPS;
-            newSpritesheet = IDLE_SS;
-        }
-
-        float desiredTimePerFrame = 1.0f / newFPS;
-
-        if (std::abs(anim->GetTimePerFrame() - desiredTimePerFrame) > 0.0001f)
-        {
-
-            anim->LoadNewSpritesheet(newSpritesheet, _ROWS, _COLS);
-
-            anim->SetAnimation(FRAME_START, FRAME_END, newFPS);
+        else if (!isGrounded && hasUsedAirDash) {
+            std::cout << "[Dash] Air dash already used!" << std::endl;
         }
     }
+    else if (!dashKeyDown) {
+        dashKeyPressed = false;
+    }
+
+    // Check if dash just ended and restore gravity
+    bool isDashing = physics->GetForcesManager().HasForceType(ForceType::Dash);
+    if (wasDashing && !isDashing) {
+        // Dash just ended - restore gravity
+        physics->SetGravity(true);
+        std::cout << "[Dash] Ended, gravity restored" << std::endl;
+    }
+    wasDashing = isDashing;
+
+    // Restore air dash when grounded
+    if (physics->IsGrounded() && hasUsedAirDash) {
+        hasUsedAirDash = false;
+        std::cout << "[Dash] Air dash restored (grounded)" << std::endl;
+    }
+    // ===== END DASH SYSTEM =====
+
+    auto* anim = player->GetComponent<Spritesheet>();
+        if (transform && anim)
+        {
+            float absWidth = std::abs(transform->scaleX);
+            transform->SetScale(absWidth, transform->scaleY);
+
+      
+            static bool isFacingRight = true;
+
+            if (moveDirectionX > 0.0f) isFacingRight = true;
+            if (moveDirectionX < 0.0f) isFacingRight = false;
+
+            // 3. Determine Animation Name based on State AND Direction
+            std::string requestedState = "";
+
+            if (is_jumping)
+            {
+                requestedState = isFacingRight ? "Jump_R" : "Jump_L";
+            }
+            else if (std::abs(vx) > 1.0f)
+            {
+                requestedState = isFacingRight ? "Run_R" : "Run_L";
+            }
+            else
+            {
+                // If stopped, use the last known direction
+                requestedState = isFacingRight ? "Idle_R" : "Idle_L";
+            }
+
+            // 4. Play the specific Left/Right animation
+            anim->PlayAnimation(requestedState);
+        }
 
     // Note: Don't call SetVelocity anymore - forces handle movement
     // The Integrate() method will update velocity based on forces
@@ -421,18 +490,18 @@ void InputManager::Update(float dt)
 
     void InputManager::ResetState()
     {
-        // 1. Reset static mouse click flags
+ 
         MouseLeftClicked = false;
 
-        // 2. Reset internal tracking variables
         mouseX = 0.0;
         mouseY = 0.0;
         scrollX = 0.0;
         scrollY = 0.0;
 
-        // 3. Reset gameplay-related states
         isJumping = false;
         jumpStartY = 0.0f;
         footstepTimer = 0.0f;
+        cachedPlayerID = 0;
         std::cout << "[InputManager] State reset." << std::endl;
     }
+

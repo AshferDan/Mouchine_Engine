@@ -106,6 +106,7 @@ void Serialization::DeserializeGameObject(const json &j)
 	GameObject* go = GameObjectFactory::Instance().CreateGameObjectWithID(localID, name);
 	idToObject[localID] = go;
 
+	prefabInstances[name].push_back(go->GetID());						// keeps tracks of the newly created prefabs
 	go->SetActive(j.value("active", true));
 
 	// Store parent-child relationship for later

@@ -12,6 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
+#include "core.h"
 #include "ColliderComponent.h"
 #include "LevelEditor.h"
 #include "physics.h"
@@ -19,6 +20,7 @@ Technology is prohibited.
 #include "Serialization.h"
 #include "audio.h"
 #include "AudioManager.h"
+#include "TimerSystem.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -151,7 +153,8 @@ void LevelEditor::Update(float /*dt*/)
  */
 void LevelEditor::RenderPlayControls()
 {
-    ImGui::Begin("Editor Controls");
+    //ImGui::SetNextWindowSize(ImVec2(250, 200), ImGuiCond_Once);
+    ImGui::Begin("Editor Controls", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2.f);
     ImGui::BeginGroup();
     
@@ -289,7 +292,17 @@ void LevelEditor::StopPlayMode()
     if (audioManager)
     {
         std::cout << "[LevelEditor] Stopping background music through AudioManager\n";
-        audioManager->StopSound("bgm_channel");
+        audioManager->StopAllSounds();
+    }
+
+    if (CORE)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            std::cout << "[LevelEditor] Clearing all active timers.\n";
+            ts->ClearAllTimers();
+        }
     }
 
     RestoreSceneState();           // restore saved scene
@@ -668,6 +681,22 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         inFile >> root;
         inFile.close();
 
+        if (CORE)
+        {
+            TimerSystem* ts = CORE->GetTimerSystem();
+            if (ts)
+            {
+                std::cout << "[LoadLevel] Clearing active timers...\n";
+                ts->ClearAllTimers();
+            }
+            PhysicsSystem* ps = CORE->GetPhysicsSystem();
+            if (ps)
+            {
+                ps->ClearCollisionQueue();
+            }
+        }
+    
+
         // stop/unload audio (if any)
         auto& resourceMgr = ResourceManager::Instance();
         AudioEngine* audio = resourceMgr.GetAudioEngine();
@@ -842,6 +871,26 @@ void LevelEditor::NewLevel()
     selectedGameObjectID = 0;
     hasValidSaveState = false;
     CameraManager::Instance().ClearActiveCamera();
+
+    // stop and unload all sounds from the underlying audi engine
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine)
+    {
+        audioEngine->stopAllSound();
+        audioEngine->unloadAllSound();
+    }
+
+    // clear audio resources from resource manager
+    ResourceManager::Instance().UnloadAllAudio();
+
+    // clear the editor audio manager database (all added sounds)
+    if (CORE)
+    {
+        if (AudioManager* audioMgr = CORE->GetAudioManager())
+        {
+            audioMgr->Clear();
+        }
+    }
 
     std::cout << "New level created" << std::endl;
 }

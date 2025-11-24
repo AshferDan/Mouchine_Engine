@@ -32,8 +32,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(ImportDependencies)
 importDependencies()
 
-add_definitions(-DUSE_CSD3151_AUTOMATION=0)
-
 # ======================= Directories =============================
 # Game directory - contains Main.cpp and Main.h only
 set(Game_DIR          ./Game)
@@ -486,7 +484,10 @@ endif()
 
 # ======================= Compiler Warnings =================
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(Game PRIVATE -Wall)
+   target_compile_options(Game PRIVATE -Wall)
+    target_compile_options(Engine PRIVATE -Wall)
+
 elseif(MSVC)
     target_compile_options(Game PRIVATE /W4 /WX-)
+    target_compile_options(Engine PRIVATE /W4 /WX-)
 endif()

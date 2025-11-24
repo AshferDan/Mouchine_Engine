@@ -55,12 +55,12 @@ int main()
         API::Init_Engine(engine, audio);
 
         g_UseGameStates = false; // Set the flag to use Game States
-        //CORE->RequestSceneLoad("Prefab_TestScene");
+        // CORE->RequestSceneLoad("Prefab_TestScene");
 
-        GameObject* mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
-        auto* cam = mainCamera->AddComponent<CameraComponent>();
+        GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
+        auto *cam = mainCamera->AddComponent<CameraComponent>();
 
-        GameObject* player = GameObjectFactory::Instance().FindGameObject("Hero");
+        GameObject *player = GameObjectFactory::Instance().FindGameObject("Hero");
         if (player)
         {
             cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
@@ -70,15 +70,16 @@ int main()
             cam->SetFollowOffset(vec2(0.f, 0.f));
             cam->SetSmoothing(true, 2.f);
         }
+
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
-        //CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
+        // CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
 
         std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
-        ScriptSystem* scriptSys = engine.GetScriptSystem();
+        ScriptSystem *scriptSys = engine.GetScriptSystem();
 
-        GameObject* squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
 
         if (scriptSys && squareSpawner)
         {
@@ -104,10 +105,10 @@ int main()
             std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
             scriptSys->CallOnStart(squareSpawner);
         }
-        
+
         // Initialise Game State Manager (Level1)
         GameManager::Instance().ChangeState(std::make_unique<Level1>());
-        
+
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)
@@ -131,9 +132,9 @@ namespace CrashHandler
 #pragma comment(lib, "dbghelp.lib")
 #endif
     /**
-    * @brief Captures and returns the current stack trace as a formatted string.
-    * @return A string containing the call stack (Windows only).
-    */
+     * @brief Captures and returns the current stack trace as a formatted string.
+     * @return A string containing the call stack (Windows only).
+     */
     std::string GetStackTrace()
     {
 #if defined(_WIN32)
@@ -164,10 +165,10 @@ namespace CrashHandler
 #endif
     }
     /**
-    * @brief Logs crash details and stack trace to a file.
-    * @param type Type or category of the crash (e.g., "EXCEPTION").
-    * @param e Optional exception pointer for additional error details.
-    */
+     * @brief Logs crash details and stack trace to a file.
+     * @param type Type or category of the crash (e.g., "EXCEPTION").
+     * @param e Optional exception pointer for additional error details.
+     */
     void LogCrash(const char *type, const std::exception *e)
     {
         std::filesystem::create_directories("../Logs");

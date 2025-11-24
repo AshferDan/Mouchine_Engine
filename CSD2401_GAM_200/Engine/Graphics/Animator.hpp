@@ -17,6 +17,22 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include "RenderComponent.h"
 #include "gameObject.h"
+#include <filesystem>
+#include <iostream>
+#include <cctype>
+#include <map>
+#include <string>
+
+struct AnimationData {
+	std::string filepath;
+	int col, row;
+	int startframe, endframe;
+	float fps;
+
+};
+
+
+bool SupportedImageFile(const std::string& path);
 
 /**
  * @brief Spritesheet class, derived from Components class, to get GO/ Comp IDs etc. But should not be viewed as a component (We can build upon this in the future)
@@ -61,6 +77,9 @@ public:
 	 */
 	GLuint GetTextureID() const { return textureID; }
 
+	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps);
+
+	void PlayAnimation(const std::string& name);
 	/**
 	 * @brief Loads a new spritesheet file within the same object.
 	 * @param textureFile Filepath for spritesheet
@@ -115,9 +134,12 @@ public:
 		}
 	}
 
-
-	// function to loop anim if reach last frame
-	void LoopSpriteSheetAnim(int startFrameIdx, int endFrameIdx, float time);
+	const std::map<std::string, AnimationData>& GetAnimationRegistry() const {
+		return animation_mList;
+	}
+	std::string GetCurrentAnimationName() const {
+		return currentAnimName;
+	}
 
 private:
 	/**
@@ -129,6 +151,9 @@ private:
 	float timePerFrame;		   // Timer between swapping to next frame
 	float currentFrameTime;	   // Current timer
 	int startFrame, endFrame;  // Starting and Ending frame of specific animation
+
+	std::map<std::string, AnimationData> animation_mList;
+	std::string currentAnimName;
 
 	const char *SpriteFile; // File path for spritesheet
 	GLuint textureID;		// Personalised ID for the texture

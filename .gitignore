@@ -21,7 +21,7 @@ Release
 .vs
 .tmp
 *.vcxproj.filters
-*.json
+
 *.html
 _deps
 CmakeCache.txt
@@ -30,3 +30,5 @@ Build/
 *.csproj.filters
 *.cache
 *.g.props
+CSD2401_GAM_200/Scripts/obj/GameScript.csproj.nuget.dgspec.json
+CSD2401_GAM_200/Scripts/obj/project.assets.json

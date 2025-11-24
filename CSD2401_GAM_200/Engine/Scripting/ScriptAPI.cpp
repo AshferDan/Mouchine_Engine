@@ -50,7 +50,7 @@ namespace API
 
         // load common fonts
         std::cout << "\n--- Loading Fonts ---" << std::endl;
-        resourceMgr.LoadFont("default_font", "../Assets/FrederickatheGreat-Regular.ttf", 48);
+        resourceMgr.LoadFont("default_font", "../Assets/PinyonScript-Regular.ttf", 48);
         resourceMgr.LoadFont("small_font", "../Assets/FrederickatheGreat-Regular.ttf", 24);
         resourceMgr.LoadFont("large_font", "../Assets/FrederickatheGreat-Regular.ttf", 64);
 
@@ -502,6 +502,8 @@ namespace API
         return false;
     }
 
+    
+
 #pragma endregion
 
 #pragma region Camera
@@ -548,5 +550,209 @@ namespace API
     }
 #pragma endregion
 
+#pragma region Audio
+
+    void AddSound(const std::string name, const std::string filepath,
+        bool loop, float volume,float pitch, std::string category) {
+        SoundData newSound{ name,filepath,loop,volume,pitch,category };
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->AddSound(newSound);
+        }
+    }
+
+    void PlaySound(const std::string soundName, const std::string channel)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->PlaySound(soundName, channel);
+        }
+
+    }
+
+    void StopSound(const std::string soundName)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->StopSound(soundName);
+        }
+    }
+
+    void StopAllSound()
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->StopAllSounds();
+        }
+    }
+
+    void RemoveSound(const std::string soundName)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->RemoveSound(soundName);
+        }
+    }
+
+    void TriggerEvent(const std::string eventname)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->TriggerEvent(eventname);
+        }
+    }
+
+    void AddEventSound(const std::string eventName, const std::string soundName)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->AddEventMapping(eventName, soundName);
+        }
+    }
+
+    void SetVolume(const std::string soundName, float volume)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->SetSoundVolume(soundName, volume);
+        }
+    }
+
+    void SetCategoryVolume(const std::string CatName, float vol)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->SetCategoryVolume(CatName, vol);
+        }
+    }
+#pragma endregion
+
+#pragma region Timer
+    TimerID WaitForSeconds(float duration, TimerCallback callback)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(duration, callback, false, "WaitForSeconds");
+        }
+        return 0;
+    }
+
+    TimerID Delay(float duration, TimerCallback callback)
+    {
+        return WaitForSeconds(duration, callback);
+    }
+
+    TimerID InvokeRepeating(float interval, TimerCallback callback)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(interval, callback, true, "InvokeRepeating");
+        }
+        return 0;
+    }
+
+    TimerID Invoke(float delay, void (*functionToCall)())
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(delay, functionToCall, false, "Invoke");
+        }
+        return 0;
+    }
+
+    TimerID Schedule(float delay, std::function<void()> callback)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts)
+        {
+            return ts->AddTimer(delay, callback, false, "Schedule");
+        }
+        return 0;
+    }
+
+    void CancelTimer(TimerID id)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->CancelTimer(id);
+    }
+
+    void CancelTimerByName(std::string name)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->CancelTimerByName(name);
+    }
+
+    void PauseTimer(TimerID id)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->PauseTimer(id);
+    }
+
+    void ResumeTimer(TimerID id)
+    {
+        TimerSystem* ts = CORE->GetTimerSystem();
+        if (ts) ts->ResumeTimer(id);
+    }
+#pragma endregion
+
+
+#pragma region Input
+    bool IsKeyDown(int key)
+    {
+        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
+        if (window)
+        {
+            return glfwGetKey(window, key) == GLFW_PRESS;
+        }
+        return false;
+    }
+
+    bool IsMouseButtonDown(int button)
+    {
+        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
+        if (window)
+        {
+            return glfwGetMouseButton(window, button) == GLFW_PRESS;
+        }
+        return false;
+    }
+
+    float GetMouseX()
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return (float)input->GetMouseX();
+        return 0.0f;
+    }
+
+    float GetMouseY()
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return (float)input->GetMouseY();
+        return 0.0f;
+    }
+
+    float GetMouseWorldX()
+    {
+        // InputManager static accessor from your previous code
+        return (float)InputManager::GetMouseWorldX();
+    }
+
+    float GetMouseWorldY()
+    {
+        return (float)InputManager::GetMouseWorldY();
+    }
+#pragma endregion
 
 }

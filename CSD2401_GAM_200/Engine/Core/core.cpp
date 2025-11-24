@@ -23,7 +23,7 @@ CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
-double CoreEngine::fixed_dt = 1.0 / 60.0; // Default: 60 updates per second
+double CoreEngine::fixed_dt = 1.0 / 60.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
 bool g_UseGameStates = false; // TRUE: GameState Mode, FALSE: Engine Mode
@@ -116,11 +116,11 @@ void CoreEngine::InitSystems()
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
 
+    timerSystem = AddSystem<TimerSystem>();
     eventSystemRunner = AddSystem<EventSystemRunner>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
-
 
     // Subscribe systems to specific message types
     messageBus.Subscribe<PlaySoundMessage>(audioEngine);
@@ -182,7 +182,7 @@ void CoreEngine::GameLoop()
             std::cout << "[CoreEngine] Scene to load: " << m_pendingScene << std::endl;
             std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
 
-            LevelEditor* level = GetLevelEditor();
+            LevelEditor *level = GetLevelEditor();
             level->LoadLevel(m_pendingScene);
             std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
@@ -200,7 +200,7 @@ void CoreEngine::GameLoop()
 
             m_pendingScene = "";
             m_hasPendingLoad = false;
-            m_autoPlayAfterLoad = false;  // Reset flag
+            m_autoPlayAfterLoad = false; // Reset flag
 
             if (inputManager)
                 inputManager->ResetState();
@@ -240,6 +240,9 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = 0.0;
         if (menuLogicSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if (timerSystem)
+            g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+
         if (eventSystemRunner)
             g_systemTimings[eventSystemRunner->GetName()] = 0.0;
 
@@ -335,8 +338,8 @@ void CoreEngine::GameLoop()
                     double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                     g_systemTimings[menuLogicSystem->GetName()] = ms;
                     g_totalLoopTime += ms;
-                }           
-                stepOnce = false; // Reset after processing one frame           
+                }
+                stepOnce = false; // Reset after processing one frame
             }
 
             if (eventSystemRunner)
@@ -392,6 +395,11 @@ void CoreEngine::GameLoop()
             levelEditor->PerformSceneReload();
         }
 
+        if (timerSystem)
+        {
+            timerSystem->Update(static_cast<float>(delta_time));
+        }
+
         if (imguiSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -409,7 +417,8 @@ void CoreEngine::GameLoop()
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
 
-        if (g_UseGameStates) {
+        if (g_UseGameStates)
+        {
             GameManager::Instance().GameStateLoop(delta_time);
         }
 
@@ -484,17 +493,21 @@ void CoreEngine::update_time(double fps_calc_interval)
     }
 }
 
-void CoreEngine::SetGamePaused(bool paused) {
+void CoreEngine::SetGamePaused(bool paused)
+{
     std::cout << (m_gamePause ? "Game is paused\n" : "Game is resuming\n");
-    if (m_gamePause == paused) {
+    if (m_gamePause == paused)
+    {
         return;
     }
 
     m_gamePause = paused;
 
-    if (audioEngine && levelEditor) {
+    if (audioEngine && levelEditor)
+    {
         std::string bgmChannel = levelEditor->GetCurrentBGMChannel();
-        if (!bgmChannel.empty()) {
+        if (!bgmChannel.empty())
+        {
             audioEngine->pauseSound(bgmChannel, paused);
         }
     }

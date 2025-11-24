@@ -1,0 +1,295 @@
+{
+  "SceneSettings": {
+    "backgroundMusic": {
+      "name": "bgm",
+      "path": "../Assets/audio/level_1.wav",
+      "looping": true,
+      "volume": 0.5,
+      "channel": "bgm_channel"
+    }
+  },
+  "GameObjects": [
+    {
+      "name": "bgImage",
+      "RenderComponent": {
+        "texturePath": "../Assets/wallpaper_transparent.png",
+        "shapeType": "Square"
+      },
+      "TransformComponent": {
+        "pos": [
+          0,
+          0
+        ],
+        "scale": [
+          2400,
+          1380
+        ],
+        "rotation": 0.0
+      }
+    },
+    {
+      "name": "Hero",
+      "RenderComponent": {
+        "texturePath": "../Assets/spritesheet_R.png",
+        "shapeType": "Square"
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle_R",
+        "animations": [
+          {
+            "name": "Idle_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 2,
+            "fps": 16.0
+          },
+          {
+            "name": "Idle_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 2,
+            "fps": 16.0
+          },
+          {
+            "name": "Run_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 16.0
+          },
+          {
+            "name": "Run_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 16.0
+          },
+          {
+            "name": "Jump_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 11,
+            "startCol": 4,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 12.0
+          },
+          {
+            "name": "Jump_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 11,
+            "startCol": 4,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 12.0
+          }
+        ]
+      },
+      "TransformComponent": {
+        "pos": [
+          0,
+          0
+        ],
+        "scale": [
+          150,
+          150
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Player"
+      },
+      "PhysicsComponent": {
+        "useGravity": true,
+        "isStatic": false,
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "Ground",
+      "RenderComponent": {
+        "shapeType": "Square",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "TransformComponent": {
+        "pos": [
+          0,
+          -500
+        ],
+        "scale": [
+          3000,
+          500
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Ground"
+      },
+      "PhysicsComponent": {
+        "isStatic": true,
+        "useGravity": false
+      }
+    },
+    {
+      "name": "Wall",
+      "RenderComponent": {
+        "shapeType": "Square",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "TransformComponent": {
+        "pos": [
+          1500,
+          -500
+        ],
+        "scale": [
+          1000,
+          3000
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Ground"
+      },
+      "PhysicsComponent": {
+        "isStatic": true,
+        "useGravity": false
+      }
+    },
+    {
+      "name": "Wall2",
+      "RenderComponent": {
+        "shapeType": "Square",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "TransformComponent": {
+        "pos": [
+          -1500,
+          -500
+        ],
+        "scale": [
+          1000,
+          3000
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Ground"
+      },
+      "PhysicsComponent": {
+        "isStatic": true,
+        "useGravity": false
+      }
+    },
+    {
+      "name": "Circle",
+      "RenderComponent": {
+        "shapeType": "Circle",
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "TransformComponent": {
+        "pos": [
+          150,
+          300
+        ],
+        "scale": [
+          100,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "shape": "Circle",
+        "layer": "Enemy"
+      },
+      "PhysicsComponent": {
+        "velocity": [
+          -250,
+          0
+        ],
+        "isStatic": false,
+        "useGravity": true
+      }
+    },
+    {
+      "name": "Circle2",
+      "RenderComponent": {
+        "shapeType": "Circle",
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "TransformComponent": {
+        "pos": [
+          -150,
+          300
+        ],
+        "scale": [
+          100,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "shape": "Circle",
+        "layer": "Enemy"
+      },
+      "PhysicsComponent": {
+        "velocity": [
+          250,
+          0
+        ],
+        "isStatic": false,
+        "useGravity": true
+      }
+    }
+  ]
+}
