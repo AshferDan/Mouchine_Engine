@@ -1,0 +1,33 @@
+{
+    "GameObjects": [
+        {
+            "ColliderComponent": {
+                "layer": "Default",
+                "shape": "Square"
+            },
+            "RenderComponent": {
+                "color": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "shapeType": "Square",
+                "texturePath": ""
+            },
+            "TransformComponent": {
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "rotation": 0.0,
+                "scale": [
+                    50.0,
+                    50.0
+                ]
+            },
+            "active": true,
+            "name": "jon"
+        }
+    ]
+}
