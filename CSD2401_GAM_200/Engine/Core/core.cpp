@@ -23,9 +23,10 @@ CoreEngine *CORE;
 
 double CoreEngine::fps = 0.0;
 double CoreEngine::delta_time = 0.0;
-double CoreEngine::fixed_dt = 1.0 / 60.0; 
+double CoreEngine::fixed_dt = 1.0 / 60.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
+bool g_UseGameStates = false; // TRUE: GameState Mode, FALSE: Engine Mode
 
 /* brief
    Constuctor
@@ -116,6 +117,7 @@ void CoreEngine::InitSystems()
     menuLogicSystem = AddSystem<MenuLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
+    eventSystemRunner = AddSystem<EventSystemRunner>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
@@ -180,7 +182,7 @@ void CoreEngine::GameLoop()
             std::cout << "[CoreEngine] Scene to load: " << m_pendingScene << std::endl;
             std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
 
-            LevelEditor* level = GetLevelEditor();
+            LevelEditor *level = GetLevelEditor();
             level->LoadLevel(m_pendingScene);
             std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
@@ -198,7 +200,7 @@ void CoreEngine::GameLoop()
 
             m_pendingScene = "";
             m_hasPendingLoad = false;
-            m_autoPlayAfterLoad = false;  // Reset flag
+            m_autoPlayAfterLoad = false; // Reset flag
 
             if (inputManager)
                 inputManager->ResetState();
@@ -238,9 +240,11 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = 0.0;
         if (menuLogicSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
-        if(timerSystem)
+        if (timerSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
 
+        if (eventSystemRunner)
+            g_systemTimings[eventSystemRunner->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
@@ -338,6 +342,16 @@ void CoreEngine::GameLoop()
                 stepOnce = false; // Reset after processing one frame
             }
 
+            if (eventSystemRunner)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                eventSystemRunner->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[eventSystemRunner->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
+
             // In step mode, only process ONE timestep then break
             if (stepMode)
                 break;
@@ -381,7 +395,8 @@ void CoreEngine::GameLoop()
             levelEditor->PerformSceneReload();
         }
 
-        if (timerSystem) {
+        if (timerSystem)
+        {
             timerSystem->Update(static_cast<float>(delta_time));
         }
 
@@ -395,12 +410,16 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
-
         // End ImGui frame and render
         if (imguiSystem)
         {
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
+
+        if (g_UseGameStates)
+        {
+            GameManager::Instance().GameStateLoop(delta_time);
         }
 
         // Swap buffers and poll events
@@ -474,17 +493,21 @@ void CoreEngine::update_time(double fps_calc_interval)
     }
 }
 
-void CoreEngine::SetGamePaused(bool paused) {
+void CoreEngine::SetGamePaused(bool paused)
+{
     std::cout << (m_gamePause ? "Game is paused\n" : "Game is resuming\n");
-    if (m_gamePause == paused) {
+    if (m_gamePause == paused)
+    {
         return;
     }
 
     m_gamePause = paused;
 
-    if (audioEngine && levelEditor) {
+    if (audioEngine && levelEditor)
+    {
         std::string bgmChannel = levelEditor->GetCurrentBGMChannel();
-        if (!bgmChannel.empty()) {
+        if (!bgmChannel.empty())
+        {
             audioEngine->pauseSound(bgmChannel, paused);
         }
     }

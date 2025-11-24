@@ -35,7 +35,6 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
-
 /**
  * @brief Main entry point of the program.
  *
@@ -55,7 +54,8 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-         //CORE->RequestSceneLoad("Prefab_TestScene");
+        g_UseGameStates = false; // Set the flag to use Game States
+        // CORE->RequestSceneLoad("Prefab_TestScene");
 
         GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto *cam = mainCamera->AddComponent<CameraComponent>();
@@ -105,6 +105,10 @@ int main()
             std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
             scriptSys->CallOnStart(squareSpawner);
         }
+
+        // Initialise Game State Manager (Level1)
+        GameManager::Instance().ChangeState(std::make_unique<Level1>());
+
         API::StartEngineLoop(engine);
     }
     catch (const std::exception &e)

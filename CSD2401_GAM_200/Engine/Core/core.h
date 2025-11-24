@@ -37,14 +37,16 @@ Technology is prohibited.
 #include <map>
 #include "MathLib.h"
 #include "Serialization.h"
+#include "logic.h"
 #include "LevelEditor.h"
 #include "MenuLogic.h"
 #include "AudioManager.h"
 
+#include "GameManager.h"
 #include "Message.h"
 #include "IMessageHandler.h"
 
-#include "TimerSystem.h" 
+#include "TimerSystem.h"
 
 // Inside CoreEngine class
 
@@ -209,7 +211,8 @@ public:
      * @brief Gets a pointer to the MenuLogicSystem.
      * @return A pointer to the MenuLogicSystem.
      */
-    MenuLogicSystem* GetMenuLogic() const {
+    MenuLogicSystem *GetMenuLogic() const
+    {
         return menuLogicSystem;
     }
 
@@ -217,7 +220,7 @@ public:
      * @brief Gets a pointer to the AudioEngine.
      * @return A pointer to the AudioEngine.
      */
-    AudioEngine* GetAudioEngine() const { return audioEngine; }
+    AudioEngine *GetAudioEngine() const { return audioEngine; }
     /**
      * @brief Sets the pointer to the AudioEngine.
      * @param audio A pointer to the external AudioEngine instance.
@@ -225,11 +228,9 @@ public:
     void SetAudioEngine(AudioEngine *audio) { audioEngine = audio; }
 
     // audio manager stuff
-    AudioManager* GetAudioManager() const { return audioManager; }
+    AudioManager *GetAudioManager() const { return audioManager; }
 
-    
-
-    TimerSystem* GetTimerSystem() const { return timerSystem; }
+    TimerSystem *GetTimerSystem() const { return timerSystem; }
 
     /**
      * @brief Reads and applies configuration settings from a file.
@@ -272,13 +273,12 @@ public:
      */
     static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
 
-
-
     /**
      * @brief Requests a scene to be loaded on the next frame.
      * @param sceneName The name of the scene file to load.
      */
-    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false) {
+    void RequestSceneLoad(const std::string &sceneName, bool autoPlay = false)
+    {
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
@@ -293,7 +293,7 @@ public:
      * @brief Gets a reference to the MessageBus for inter-system communication.
      * @return A reference to the MessageBus.
      */
-    MessageBus& GetMessageBus() { return messageBus; }
+    MessageBus &GetMessageBus() { return messageBus; }
 
     void SetGamePaused(bool paused);
 
@@ -318,10 +318,11 @@ private:
     ScriptSystem *scriptSystem = nullptr;
     CameraSystem *cameraSystem = nullptr;
     LevelEditor *levelEditor = nullptr;
-    MenuLogicSystem* menuLogicSystem = nullptr;
-    AudioManager* audioManager = nullptr;
-    TimerSystem* timerSystem = nullptr; 
+    MenuLogicSystem *menuLogicSystem = nullptr;
+    AudioManager *audioManager = nullptr;
+    TimerSystem *timerSystem = nullptr;
 
+    EventSystemRunner *eventSystemRunner = nullptr;
 
     unsigned LastTime;
     bool GameActive;

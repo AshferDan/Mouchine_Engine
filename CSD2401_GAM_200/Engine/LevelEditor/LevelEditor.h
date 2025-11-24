@@ -29,7 +29,7 @@ Technology is prohibited.
 #include <nlohmann/json.hpp>
 
 class GameObjectFactory;
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 /**
  * @enum EditorMode
@@ -107,6 +107,19 @@ struct GameObjectData
 struct LevelData
 {
     std::vector<GameObjectData> gameObjects;
+};
+
+struct EditorUndoCommand {
+    enum class ActionType { ObjectTransform, ObjectCreated, ObjectDeleted };
+
+    ActionType action = ActionType::ObjectTransform;
+    EntityID entityID = 0;
+
+    json beforeJson;
+    json afterJson;
+
+    std::string parentName;
+    std::vector<std::string> childNames;
 };
 
 /**
@@ -305,6 +318,28 @@ public:
     //void PlayLoadedBGM();
 
     std::string GetCurrentBGMChannel() const { return currentBGMChannel; }
+
+    // Helper functions
+    /**
+     * @brief Serialise a GameObject to GameObjectData structure
+     * @param obj GameObject to serialise
+     * @return GameObjectData structure with object's data
+     */
+    GameObjectData SerialiseGameObject(GameObject* obj);
+
+    /**
+     * @brief Deserialise GameObjectData and create GameObject instance
+     * @param data GameObject data to deserialise
+     * @return Pointer to created GameObject
+     */
+    GameObject* DeserialiseGameObject(const GameObjectData& data);
+
+    void RecordUndo(const EditorUndoCommand& cmd);
+    void PerformUndo();
+
+    std::vector<EditorUndoCommand> undoStack;
+    std::vector<EditorUndoCommand> redoStack;
+
 private:
     // GUI rendering functions
     /**
@@ -328,20 +363,20 @@ private:
      */
     void RestoreSceneState();
 
-    // Helper functions
-    /**
-     * @brief Serialise a GameObject to GameObjectData structure
-     * @param obj GameObject to serialise
-     * @return GameObjectData structure with object's data
-     */
-    GameObjectData SerialiseGameObject(GameObject* obj);
+    //// Helper functions
+    ///**
+    // * @brief Serialise a GameObject to GameObjectData structure
+    // * @param obj GameObject to serialise
+    // * @return GameObjectData structure with object's data
+    // */
+    //GameObjectData SerialiseGameObject(GameObject* obj);
 
-    /**
-     * @brief Deserialise GameObjectData and create GameObject instance
-     * @param data GameObject data to deserialise
-     * @return Pointer to created GameObject
-     */
-    GameObject* DeserialiseGameObject(const GameObjectData& data);
+    ///**
+    // * @brief Deserialise GameObjectData and create GameObject instance
+    // * @param data GameObject data to deserialise
+    // * @return Pointer to created GameObject
+    // */
+    //GameObject* DeserialiseGameObject(const GameObjectData& data);
 
 private:
     GameObjectFactory& factory;           // reference to game object factory
@@ -384,4 +419,5 @@ private:
     std::string currentBGMName = "";
     std::string currentBGMChannel = "bgm_channel";
     float currentBGMVolume = 0.5f;
+    static const int undoCapacity = 20;  // Maximum (action) history size
 };
