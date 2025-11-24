@@ -1219,6 +1219,33 @@ void ImGuiSystem::Viewport_ManageGizmos()
             ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
         }
 
+        // ---------------- UNDO SUPPORT FOR IMGUIZMO ----------------
+        static bool gizmoEditing = false;
+        static json gizmoBeforeJson;
+
+        if (ImGuizmo::IsUsing() && !gizmoEditing)
+        {
+            // User STARTED dragging gizmo, record BEFORE state
+            gizmoEditing = true;
+            gizmoBeforeJson = Serialization::SerializeGameObject(go)["TransformComponent"];
+        }
+
+        if (!ImGuizmo::IsUsing() && gizmoEditing)
+        {
+            // User STOPPED dragging, record AFTER & push undo
+            gizmoEditing = false;
+
+            LevelEditor* editor = CORE->GetLevelEditor();
+
+            EditorUndoCommand cmd;
+            cmd.action = EditorUndoCommand::ActionType::ObjectTransform;
+            cmd.entityID = go->GetID();
+            cmd.beforeJson = gizmoBeforeJson;
+            cmd.afterJson = Serialization::SerializeGameObject(go)["TransformComponent"];
+
+            editor->RecordUndo(cmd);
+        }
+
         if (ImGuizmo::IsUsing)
         {
             vec3 trans{}, scale{}, rot{};
