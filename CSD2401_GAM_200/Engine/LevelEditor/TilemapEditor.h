@@ -20,7 +20,7 @@ Technology is prohibited.
 #include "MathLib.h"
 #include <nlohmann/json.hpp>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 
 /**
  * @struct TileData
@@ -226,3 +226,5 @@ private:
     int tempMapWidth;
     int tempMapHeight;
 };
+
+extern bool isTileMapFocused;

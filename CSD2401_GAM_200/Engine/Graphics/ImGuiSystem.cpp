@@ -100,11 +100,12 @@ static bool renderLoadedLayout = false;
 static bool showAudioAssetsPanel = false;
 static bool g_showAudioErrorPopup = false;
 static std::string g_audioErrorMessage;
-static bool showTilemapEditor = false;
+static bool showTilemapEditor = true;
 static std::unique_ptr<TilemapEditor> tilemapEditor = nullptr;
 
 // VIEWPORT
 bool isHoveringOverViewport;
+bool isViewportFocused;
 int gizmo_type = -1;
 ImVec2 viewportSize;
 ImVec2 viewportPos;
@@ -262,6 +263,8 @@ void ImGuiSystem::Update(float dt)
             CORE->GetGraphicsSystem()->SetEditorMode(true);
             // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
             {
+                TileMap_Render(dt);                       // Rendering first so viewport shows first by default
+
                 ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
                 ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
 
@@ -269,14 +272,17 @@ void ImGuiSystem::Update(float dt)
                 viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
                 CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
 
-                ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
-                ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport rendering
+                //ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
+                ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport 
 
-                // Toolbar for controlling gizmos
+                // Render gizmos on viewport
+                if (!isTileMapFocused)
                 {
-                    
-                    Viewport_ManageGizmos();
+                    // RENDER SECTION
+                    Viewport_RenderGizmoToolbar();
                 }
+                // LOGIC SECTION
+                Viewport_ManageGizmos();
 
                 // If hovering over viewport, you can click to select a GO
                 // TODO implement outline for selected GO
@@ -392,24 +398,6 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
-
-            // Renders the tilemap
-            if (showTilemapEditor)
-            {
-                tilemapEditor->SetVisible(true);
-                tilemapEditor->Update(dt);
-                tilemapEditor->Render();
-
-                //handle window close button
-                if (!tilemapEditor->IsVisible())
-                {
-                    showTilemapEditor = false;
-                }
-            }
-            else
-            {
-                tilemapEditor->SetVisible(false);
-            }
         }
         // if IS in play mode
         else
@@ -693,20 +681,6 @@ void ImGuiSystem::Hierarchy_Render()
         showAudioAssetsPanel = !showAudioAssetsPanel;
     }
     CreateHintText("Toggle Audio Assets panel");
-
-    // THIS IS JUST A SAMPLE I THOUGHT IT WAS COOL, SEE IF WE LIKE THEN ILL PORT OVER TO THIS
-    ImGui::SameLine();
-    if (ImGui::BeginMenu("[TEST] Create GO"))
-    {
-        ImGui::Text("or we could do something like this too?");
-        if (ImGui::MenuItem("Create Empty", "cool grey key bind"))
-        {
-        }
-        if (ImGui::MenuItem("Create Shape", "Shift+1"))
-        {
-        }
-        ImGui::EndMenu();
-    }
 
     // dear god help us all
     if (ImGui::Button("Stress Test - 1000 GOs"))
@@ -1338,59 +1312,6 @@ void ImGuiSystem::PrefabMenu_Spawn()
 #pragma region Viewport/ Gizmos
 void ImGuiSystem::Viewport_ManageGizmos()
 {
-    // On screen GUI settings
-    ImVec2 viewportPos = ImGui::GetWindowPos();
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
-
-    ImGui::SetNextWindowBgAlpha(0.75f);
-    ImGui::SetNextWindowPos(ImVec2(viewportPos.x + 15, viewportPos.y + 35), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(58.0f, 260.0f), ImGuiCond_FirstUseEver);
-
-
-    // GIZMO CONTROLS - its v long and ugly so just collapse it [handles logic for gizmo operations and GUI on vp for controls]
-    {
-        ImGui::Begin("##Toolbar", nullptr, flags);
-
-        if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-            (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
-        {
-            gizmo_type = -1;
-        }
-        CreateHintText("(Q) Select");
-        ImGui::Separator();
-        if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-            (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
-        {
-            gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
-        }
-        CreateHintText("(W) Move");
-        ImGui::Separator();
-        if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-            (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
-        {
-            gizmo_type = int(ImGuizmo::OPERATION::SCALE);
-        }
-        CreateHintText("(E) Scale");
-        ImGui::Separator();
-        if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-            (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
-        {
-            gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
-        }
-        CreateHintText("(R) Rotate");
-        ImGui::Separator();
-        if (ImGui::ImageButton("##Gizmo_Resize", ImTextureID(icon_giz_resize_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-            (gizmo_type == int(ImGuizmo::OPERATION::BOUNDS)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_T))
-        {
-            gizmo_type = int(ImGuizmo::OPERATION::BOUNDS);
-        }
-        CreateHintText("(T) Resize");
-
-        ImGui::End();
-    }
-
-
-    // LOGIC SECTION
     if (selectedGameObjectID != 0 && gizmo_type != -1)
     {
         auto* go = GetSelectedGameObject();
@@ -1443,6 +1364,56 @@ void ImGuiSystem::Viewport_ManageGizmos()
             transform->SetRotation(rot.x);
         }
     }
+}
+
+void ImGuiSystem::Viewport_RenderGizmoToolbar()
+{
+    // On screen GUI settings
+    ImVec2 viewportPos = ImGui::GetWindowPos();
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+
+    ImGui::SetNextWindowBgAlpha(0.75f);
+    ImGui::SetNextWindowPos(ImVec2(viewportPos.x + 15, viewportPos.y + 35), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(58.0f, 260.0f), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("##Toolbar", nullptr, flags);
+
+    if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
+    {
+        gizmo_type = -1;
+    }
+    CreateHintText("(Q) Select");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
+    }
+    CreateHintText("(W) Move");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::SCALE);
+    }
+    CreateHintText("(E) Scale");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
+    }
+    CreateHintText("(R) Rotate");
+    ImGui::Separator();
+    if (ImGui::ImageButton("##Gizmo_Resize", ImTextureID(icon_giz_resize_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
+        (gizmo_type == int(ImGuizmo::OPERATION::BOUNDS)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_T))
+    {
+        gizmo_type = int(ImGuizmo::OPERATION::BOUNDS);
+    }
+    CreateHintText("(T) Resize");
+
+    ImGui::End();
 }
 
 void ImGuiSystem::Viewport_HighlightGO()
@@ -2897,5 +2868,26 @@ const char* ImGuiSystem::GetCollisionLayerName(int layer)
         return "Default";
     default:
         return "Unknown";
+    }
+}
+
+void TileMap_Render(float dt)
+{
+    // Renders the tilemap - putting up here so game opens showing viewport first
+    if (showTilemapEditor)
+    {
+        tilemapEditor->SetVisible(true);
+        tilemapEditor->Update(dt);
+        tilemapEditor->Render();
+
+        //handle window close button
+        if (!tilemapEditor->IsVisible())
+        {
+            showTilemapEditor = false;
+        }
+    }
+    else
+    {
+        tilemapEditor->SetVisible(false);
     }
 }

@@ -18,11 +18,13 @@ Technology is prohibited.
 #include <queue>
 #include <cstring>
 
+bool isTileMapFocused;
+
 /**
  * @brief Constructor - initialize tilemap editor
  */
 TilemapEditor::TilemapEditor()
-    : isVisible(false),
+    : isVisible(true),
     tilemapWidth(20),
     tilemapHeight(15),
     selectedTileID(0),
@@ -84,9 +86,11 @@ void TilemapEditor::Render()
     ImGui::SetNextWindowSize(ImVec2(1200, 800), ImGuiCond_FirstUseEver);
 
     bool windowOpen = isVisible;  // Track if window should be open
-
+    isTileMapFocused = false;
     if (ImGui::Begin("Tilemap Editor", &windowOpen, ImGuiWindowFlags_MenuBar))
     {
+        if (!ImGui::IsWindowFocused(ImGuiHoveredFlags_ChildWindows))
+            isTileMapFocused = false;
         RenderMenuBar();
 
         // Main content area with two columns
@@ -111,6 +115,7 @@ void TilemapEditor::Render()
         RenderPropertiesPanel();
 
         ImGui::Columns(1);
+        isTileMapFocused |= ImGui::IsWindowFocused(ImGuiHoveredFlags_ChildWindows);
     }
     ImGui::End();
 

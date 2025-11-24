@@ -192,6 +192,8 @@ public:
 
     void Viewport_ManageGizmos();
 
+    void Viewport_RenderGizmoToolbar();
+
     void Viewport_HighlightGO();
 
     void RenderEventComponent(GameObject* obj);
@@ -349,3 +351,5 @@ void CreateHintText(std::string const& displayText);
 void M2_RenderStressTest();
 
 void AudioAssetsPanel_Render();
+
+void TileMap_Render(float dt);
