@@ -86,8 +86,7 @@ static bool hierarchy_renameFocus = false;
 char hierarchy_rename_str[128]{ "" };
 std::string hierarchy_oldname{};
 
-// PROPERTIES TAB SLOT 
-std::vector<PropertiesSlot> propertySlotsList;
+// CONTAINERS
 std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;
 std::unordered_map<std::string, std::vector<EntityID>> prefabInstances;
 
@@ -1926,7 +1925,6 @@ GameObject* ImGuiSystem::GetSelectedGameObject() const
     return factory.GetGameObject(selectedGameObjectID);
 }
 
-PropertiesSlot ps("test", PrefabPayloadID);
 /**
  * @brief Render property editor for Selected GOs. Will be empty by default, and then show details if a GO is selected.
  */
@@ -1963,7 +1961,7 @@ void ImGuiSystem::RenderPropertyEditor()
 
     ImGui::Spacing();
     // this is done, just need to attach to a component? so it'll belong to a specific component where users can drag and drop stuff
-    ps.RenderImGui();
+    //ps.RenderImGui();
 
     // GO transform screen
     if (auto* transform = obj->GetComponent<TransformComponent>())
@@ -2040,6 +2038,11 @@ void ImGuiSystem::RenderPropertyEditor()
             }
             BeginEdit();
             EndEdit();
+
+            if (ImGui::Button("ljlacbifuckingsot"))
+            {
+                transform->test();
+            }
         }
 
     }
@@ -2352,22 +2355,6 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
             ec->rules.push_back(newRule);
         }
     }
-}
-
-
-void PropertiesSlot::RenderImGui()
-{
-    ImGui::PushID(std::to_string(_id).c_str());
-    ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(_displayText.c_str());
-    ImGui::SameLine();
-
-    if (ImGui::Button(_receivedData.empty() ? "None" : _receivedData.c_str(), ImVec2(200, 0)))
-    {
-
-    }
-    ReceiveDragAndDrop(PrefabPayloadID, _receivedData);
-    ImGui::PopID();
 }
 
 /**

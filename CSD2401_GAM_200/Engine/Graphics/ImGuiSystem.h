@@ -222,29 +222,6 @@ private:
     std::filesystem::path currentDir;
 };
 
-class PropertiesSlot
-{
-public:
-    PropertiesSlot() = delete;
-    ~PropertiesSlot() { --_totalID; }
-    PropertiesSlot(std::string const& displayText, std::string const& expectedPayload) : _displayText(displayText), _expectedPayload(expectedPayload), _id(++_totalID), _receivedData{} {}
-    PropertiesSlot(PropertiesSlot const& rhs) : _displayText(rhs._displayText), _expectedPayload(rhs._expectedPayload), _id(++_totalID), _receivedData{} {}
-    PropertiesSlot(PropertiesSlot&& rhs) noexcept : _displayText(std::move(rhs._displayText)), _expectedPayload(std::move(rhs._expectedPayload)), _id(++_totalID), _receivedData{} {}
-
-    void RenderImGui();
-    void SetDisplayText(std::string const& text) { _displayText = text; }
-
-    unsigned int GetID() const { return _id; }
-    std::string GetDisplayText() const { return _displayText; }
-    std::string GetExpectedPayload() const { return _expectedPayload; }
-private:
-    unsigned int _id;
-    std::string _displayText;
-    std::string _expectedPayload;
-    std::string _receivedData;
-    inline static unsigned int _totalID = 0;
-};
-
 /**
  * @brief Gets the cursor pos with respect to the viewport's and world's coordinates. Externed for other files to access
  */
