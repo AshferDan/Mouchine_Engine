@@ -22,7 +22,7 @@ Technology is prohibited.
 #include "ComponentSerialization.h"
 #include "AudioManager.h"
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
 const std::string PrefabFilePath { "../Assets/Prefabs/" };
 const std::string SceneFilePath{ "../Assets/Scenes/" };
 const std::string LayoutsFilePath{ "../Logs/EditorLayout/" };
@@ -88,4 +88,8 @@ namespace Serialization
     void DeserializeAudioManager(const json& j, AudioManager* audioManager);
 
     extern bool Prefab_DragAndDropped;
+    extern bool Prefab_Reinstantiate;
+
+    // Called after all DeserializeGameObject calls
+    void ResolveHierarchy();
 }

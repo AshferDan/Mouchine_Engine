@@ -178,6 +178,15 @@ public:
         }
     }
 
+    void UnsubscribeAll(IMessageHandler* handler)
+    {
+        for (auto& entry : subscribers)
+        {
+            auto& list = entry.second;
+            list.erase(std::remove(list.begin(), list.end(), handler), list.end());
+        }
+    }
+
     /**
     * @brief Publishes a message to all subscribed handlers of its type.
     * @tparam T Message type to publish.

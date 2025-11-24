@@ -207,9 +207,148 @@ static void Internal_AddPhysicsComponent(MonoString *objectName)
     mono_free(name);
 }
 
+static void Internal_AddSound(MonoString* name, MonoString* filepath, bool loop, float volume, float pitch,MonoString* category) {
+    char* cName = mono_string_to_utf8(name);
+    char* cPath = mono_string_to_utf8(filepath);
+    char* cCat = mono_string_to_utf8(category);
+    API::AddSound(cName, cPath, loop, volume, pitch, cCat);
+    mono_free(cName);
+    mono_free(cPath);
+    mono_free(cCat);
+}
+
+static void Internal_PlaySound(MonoString* soundName, MonoString* channel) {
+    char* cName = mono_string_to_utf8(soundName);
+    char* cChannel = mono_string_to_utf8(channel);
+    API::PlaySound(cName, cChannel);
+    mono_free(cName);
+    mono_free(cChannel);
+}
+
+static void Internal_StopSound(MonoString* soundName) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::StopSound(cName);
+    mono_free(cName);
+}
+
+static void Internal_StopAllSounds() {
+    API::StopAllSound();
+    
+}
+
+static void Internal_RemoveSound(MonoString* soundName) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::RemoveSound(cName);
+    mono_free(cName);
+
+}
+
+static void Internal_TriggerEvent(MonoString* eventName) {
+    char* cName = mono_string_to_utf8(eventName);
+    API::TriggerEvent(cName);
+    mono_free(cName);
+}
+
+static void Internal_AddEventSound(MonoString* eventName, MonoString* soundName) {
+    char* cEvent = mono_string_to_utf8(eventName);
+    char* cSound = mono_string_to_utf8(soundName);
+    API::AddEventSound(cEvent, cSound);
+    mono_free(cEvent);
+    mono_free(cSound);
+}
+
+static void Internal_SetVolume(MonoString* soundName, float volume) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::SetVolume(cName, volume);
+    mono_free(cName);
+}
+
+static void Internal_SetCategoryVolume(MonoString* catName, float volume) {
+    char* cName = mono_string_to_utf8(catName);
+    API::SetCategoryVolume(cName, volume);
+    mono_free(cName);
+}
+
+// === Camera ===
+static void Internal_SetCameraPosition(float x, float y) {
+    vec2 pos = { x, y };
+    API::setCameraPos(pos);
+}
+
+static void Internal_SetCameraZoom(float zoom) {
+    API::setCameraZoom(zoom);
+}
+
+static void Internal_SetCameraMode(int mode) {
+    API::setCameraMode((CameraComponent::CameraMode)mode);
+}
+
+// === Collision Queries ===
+static bool Internal_OnTriggerEnter(MonoString* obj1, MonoString* obj2) {
+    char* n1 = mono_string_to_utf8(obj1);
+    char* n2 = mono_string_to_utf8(obj2);
+    bool result = API::OnTriggerEnter(n1, n2);
+    mono_free(n1);
+    mono_free(n2);
+    return result;
+}
+
+static bool Internal_OnTriggerExit(MonoString* obj1, MonoString* obj2) {
+    char* n1 = mono_string_to_utf8(obj1);
+    char* n2 = mono_string_to_utf8(obj2);
+    bool result = API::OnTriggerExit(n1, n2);
+    mono_free(n1);
+    mono_free(n2);
+    return result;
+}
+
+static bool Internal_OnTriggerStay(MonoString* obj1, MonoString* obj2) {
+    char* n1 = mono_string_to_utf8(obj1);
+    char* n2 = mono_string_to_utf8(obj2);
+    bool result = API::OnTriggerStay(n1, n2);
+    mono_free(n1);
+    mono_free(n2);
+    return result;
+}
+
+// === Misc ===
+static int Internal_RandomRange(int min, int max) {
+    return API::RandomNumberGen(max, min); // Note: API args are (max, min)
+}
+
 ScriptSystem::~ScriptSystem()
 {
     Shutdown();
+}
+// === Input ===
+static bool Internal_IsKeyDown(int key)
+{
+    return API::IsKeyDown(key);
+}
+
+static bool Internal_IsMouseButtonDown(int button)
+{
+    return API::IsMouseButtonDown(button);
+}
+
+static float Internal_GetMouseX()
+{
+    return API::GetMouseX();
+}
+
+static float Internal_GetMouseY()
+{
+    return API::GetMouseY();
+}
+
+static float Internal_GetMouseWorldX()
+{
+    return API::GetMouseWorldX();
+}
+
+static float Internal_GetMouseWorldY()
+{
+    return API::GetMouseWorldY();
 }
 
 void ScriptSystem::Initialize()
@@ -313,6 +452,38 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
     mono_add_internal_call("CSharpScript.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
     mono_add_internal_call("CSharpScript.Components::AddPhysicsComponent", (void *)Internal_AddPhysicsComponent);
+    
+    // === Audio ===
+    mono_add_internal_call("CSharpScript.Audio::AddSound", (void*)Internal_AddSound);
+    mono_add_internal_call("CSharpScript.Audio::PlaySound", (void*)Internal_PlaySound);
+    mono_add_internal_call("CSharpScript.Audio::StopSound", (void*)Internal_StopSound);
+    mono_add_internal_call("CSharpScript.Audio::StopAllSounds", (void*)Internal_StopAllSounds);
+    mono_add_internal_call("CSharpScript.Audio::RemoveSound", (void*)Internal_RemoveSound);
+    mono_add_internal_call("CSharpScript.Audio::TriggerEvent", (void*)Internal_TriggerEvent);
+    mono_add_internal_call("CSharpScript.Audio::AddEventSound", (void*)Internal_AddEventSound);
+    mono_add_internal_call("CSharpScript.Audio::SetVolume", (void*)Internal_SetVolume);
+    mono_add_internal_call("CSharpScript.Audio::SetCategoryVolume", (void*)Internal_SetCategoryVolume);
+
+    // === Camera ===
+    mono_add_internal_call("CSharpScript.Camera::SetPosition", (void*)Internal_SetCameraPosition);
+    mono_add_internal_call("CSharpScript.Camera::SetZoom", (void*)Internal_SetCameraZoom);
+    mono_add_internal_call("CSharpScript.Camera::SetMode", (void*)Internal_SetCameraMode);
+
+    // === Collision Queries ===
+    mono_add_internal_call("CSharpScript.Collision::OnTriggerEnter", (void*)Internal_OnTriggerEnter);
+    mono_add_internal_call("CSharpScript.Collision::OnTriggerExit", (void*)Internal_OnTriggerExit);
+    mono_add_internal_call("CSharpScript.Collision::OnTriggerStay", (void*)Internal_OnTriggerStay);
+
+    // === Utils ===
+    mono_add_internal_call("CSharpScript.Utils::RandomRange", (void*)Internal_RandomRange);
+
+    // === Input ===
+    mono_add_internal_call("CSharpScript.Input::IsKeyDown", (void*)Internal_IsKeyDown);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonDown", (void*)Internal_IsMouseButtonDown);
+    mono_add_internal_call("CSharpScript.Input::GetMouseX", (void*)Internal_GetMouseX);
+    mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
+    mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);
+    mono_add_internal_call("CSharpScript.Input::GetMouseWorldY", (void*)Internal_GetMouseWorldY);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)

@@ -21,6 +21,7 @@ Technology is prohibited.
 #include <iostream>
 #include <cmath>
 #include "MathLib.h"
+#include "logic.h"
 
 #include "Message.h"
 #include "IMessageHandler.h"
@@ -45,13 +46,7 @@ PhysicsSystem::~PhysicsSystem()
 void PhysicsSystem::Initialize()
 {
     std::cout << "Initializing system: PhysicsSystem" << std::endl;
-
-    // CORE->GetMessageBus().Subscribe("CollisionEnter", [this](const Message& msg)
-    //     {
-    //         GameObject* obj = static_cast<GameObject*>(msg.data);
-    //         if (obj)
-    //             std::cout << "[PhysicsSystem] Collision ENTER with: " << obj->GetName() << std::endl;
-    //     });
+    //CORE->GetMessageBus().Subscribe<CollisionMessage>(this);
 }
 
 /**
@@ -398,6 +393,21 @@ void PhysicsSystem::HandleMessage(const CollisionMessage &msg)
     if (!colA || !colB)
         return;
 
+    auto RaiseIfNeeded = [&](GameObject* receiver, GameObject* other)
+        {
+            if (receiver->GetComponent<EventComponent>())
+                EventSystem::Raise(EventType::OnCollisionEnter, receiver, other);
+        };
+
+    RaiseIfNeeded(objA, objB);
+    RaiseIfNeeded(objB, objA);
+
     // Queue for resolution during physics update
     pendingCollisions.push_back({objA, objB, colA, colB});
+}
+
+void PhysicsSystem::ClearCollisionQueue()
+{
+    pendingCollisions.clear();
+    std::cout << "[PhysicsSystem] Collision queue cleared." << std::endl;
 }

@@ -37,6 +37,10 @@ Technology is prohibited.
 #include <random>
 #include "CameraComponent.h"
 #include "CameraManager.h"
+#include <functional>
+
+    using TimerCallback = std::function<void()>;
+    using TimerID = unsigned int;
 
 
 /**
@@ -329,20 +333,30 @@ namespace API {
 #pragma endregion
 
 #pragma region Audio
+    void AddSound(const std::string, const std::string, bool, float, float,std::string);
+    void PlaySound(const std::string,const std::string);
+    void StopSound(const std::string);
+    void StopAllSound();
+    void RemoveSound(const std::string);
 
-    void AddSound();
-    void muteSound();
-    void muteSound();
-
-    void setBGMVol();
-    void setSFXVol();
-    void setMasterVol();
+    void TriggerEvent(const std::string);
+    void AddEventSound(const std::string, const std::string);
+   
+    void SetVolume(const std::string,float);
+    void SetCategoryVolume(const std::string,float);
 #pragma endregion
 
 
-#pragma region Corountine
-    void WaitForSeconds();
-
+#pragma region Timer
+    TimerID WaitForSeconds(float duration, TimerCallback callback);
+    TimerID Delay(float duration, TimerCallback callback);
+    TimerID InvokeRepeating(float interval, TimerCallback callback);
+    TimerID Invoke(float delay, void (*functionToCall)());
+    TimerID Schedule(float delay, std::function<void()> callback);
+    void CancelTimer(TimerID id);
+    void CancelTimerByName(std::string name);
+    void PauseTimer(TimerID id);
+    void ResumeTimer(TimerID id);
 #pragma endregion
 
 #pragma region Camera
@@ -352,12 +366,25 @@ namespace API {
 
 #pragma endregion
 
+#pragma region Animator
+    void setAnimation();
+    void playAnimation();
+#pragma endregion
 
 #pragma region Misc
     int RandomNumberGen(int, int);
+    float GetDelta_Time();
 #pragma endregion
 
 
 
+#pragma region Input
+    bool IsKeyDown(int key);
+    bool IsMouseButtonDown(int button);
+    float GetMouseX();
+    float GetMouseY();
+    float GetMouseWorldX();
+    float GetMouseWorldY();
+#pragma endregion
 
 }

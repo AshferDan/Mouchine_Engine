@@ -25,6 +25,7 @@ Technology is prohibited.
 #include "GraphicsSystem.h"
 #include <filesystem>
 #include "Serialization.h"
+#include "logic.h"
 #include "LevelEditor.h"
 #include "ImGuizmo.h"
 
@@ -36,7 +37,7 @@ const std::string PrefabPayloadID{ "Prefab_Filepath" };
 const std::string HierarchyPayloadID{ "GameObject_Name" };
 const std::string AudioPayloadID("Audio_Filepath");
 const std::string ScenePayloadID{ "Scene_Name" };
-const std::string SpritePayloadID{ "Scene_Name" };
+const std::string SpritePayloadID{ "Sprite_Name" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton
@@ -165,6 +166,20 @@ public:
     void ResetSelectedGameObject();
 
     /**
+     * @brief Render prefab spawn menu
+     */
+    void PrefabMenu_Render();
+
+    /**
+     * @brief Spawns specified prefab in menu ^
+     */
+    void PrefabMenu_Spawn();
+
+    void PrefabMenu_Override();
+
+    void PrefabMenu_Reinstantiate();
+
+    /**
      * @brief Renders the property editor window. Also handles logic regarding which GO is selected and how to manipulate components
      */
     void RenderPropertyEditor();
@@ -177,6 +192,8 @@ public:
     void Viewport_ManageGizmos();
 
     void Viewport_HighlightGO();
+
+    void RenderEventComponent(GameObject* obj);
 
 private:
     /**
@@ -228,6 +245,7 @@ private:
  * @brief Gets the cursor pos with respect to the viewport's and world's coordinates. Externed for other files to access
  */
 extern ImVec2 viewportCursorPos;
+extern vec2 Prefab_Reinstantiate_Pos;
 
 extern ImVec2 viewportSize;
 extern ImVec2 viewportPos;
@@ -235,6 +253,22 @@ extern ImVec2 viewportPos;
 ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize);
 
 extern bool isHoveringOverViewport;
+
+// temporarily putting this here just for add component button (can just throw this into a struct ngl)
+// 'group', name of component, icon texture, add component
+enum ComponentType {
+    Transform = 0,
+    Render,
+    Camera,
+    Misc
+};
+extern std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;
+
+// instances of each spawned prefab, key: prefab name, value: vec of entityIDs
+extern std::unordered_map<std::string, std::vector<EntityID>> prefabInstances;
+
+// will be hard coded for now
+void PopulateComponentList();
 
 void ReloadPrefabsList();
 /**
@@ -251,16 +285,6 @@ void GOCreationMenu_Render();
  * @brief Spawns specified GO in menu ^
  */
 void GOCreationMenu_Spawn();
-
-/**
- * @brief Render prefab spawn menu
- */
-void PrefabMenu_Render();
-
-/**
- * @brief Spawns specified prefab in menu ^
- */
-void PrefabMenu_Spawn();
 
 void StressTest_Spawn();
 

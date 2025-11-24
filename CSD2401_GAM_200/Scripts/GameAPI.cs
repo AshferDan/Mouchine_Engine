@@ -13,9 +13,60 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 using System.Runtime.CompilerServices;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace CSharpScript
 {
+    // --- Enums ---
+    // These must match your C++ enum values exactly
+
+    /// <summary>
+    /// Enumeration of shape types for rendering.
+    /// Must match the C++ ShapeType enum values exactly.
+    /// </summary>
+    public enum ShapeType
+    {
+        /// <summary>Square shape.</summary>
+        Square = 0,
+        /// <summary>Circle shape.</summary>
+        Circle = 1,
+        /// <summary>Point shape.</summary>
+        Point = 2,
+        /// <summary>Line shape.</summary>
+        Line = 3
+    }
+
+    /// <summary>
+    /// Enumeration of collision layers for collision detection.
+    /// Must match the C++ CollisionLayer enum values exactly.
+    /// </summary>
+    public enum CollisionLayer
+    {
+        /// <summary>Default collision layer.</summary>
+        Default = 0,
+        /// <summary>Player collision layer.</summary>
+        Player = 1,
+        /// <summary>Enemy collision layer.</summary>
+        Enemy = 2,
+        /// <summary>Ground collision layer.</summary>
+        Ground = 3
+        // Add more layers as defined in your C++ Collision.h
+    }
+
+    /// <summary>
+    /// Enumeration of collider types for collision shapes.
+    /// Must match the C++ ColliderType enum values exactly.
+    /// </summary>
+    public enum ColliderType
+    {
+        /// <summary>Box collider type.</summary>
+        Box = 0,
+        /// <summary>Circle collider type.</summary>
+        Circle = 1
+        // Add more if you have them in C++
+    }
+
+
     /// <summary>
     /// Debug utilities for logging from C# to C++ console.
     /// </summary>
@@ -292,6 +343,15 @@ namespace CSharpScript
         /// <param name="layer">The collision layer (use CollisionLayer enum values).</param>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetCollisionLayer(string objectName, int layer);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool OnTriggerEnter(string obj1, string obj2);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool OnTriggerExit(string obj1, string obj2);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool OnTriggerStay(string obj1, string obj2);
     }
 
     /// <summary>
@@ -328,52 +388,154 @@ namespace CSharpScript
         public static extern void AddPhysicsComponent(string objectName);
     }
 
-    // --- Enums ---
-    // These must match your C++ enum values exactly
 
     /// <summary>
-    /// Enumeration of shape types for rendering.
-    /// Must match the C++ ShapeType enum values exactly.
+    /// Audio system functions.
     /// </summary>
-    public enum ShapeType
+    public static class Audio
     {
-        /// <summary>Square shape.</summary>
-        Square = 0,
-        /// <summary>Circle shape.</summary>
-        Circle = 1,
-        /// <summary>Point shape.</summary>
-        Point = 2,
-        /// <summary>Line shape.</summary>
-        Line = 3
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddSound(string name, string filepath, bool loop, float volume,float pitch, string category);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void PlaySound(string soundName, string channel);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void StopSound(string soundName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void StopAllSounds();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void RemoveSound(string soundName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void TriggerEvent(string eventName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddEventSound(string eventName, string soundName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetVolume(string soundName, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetCategoryVolume(string categoryName, float volume);
     }
 
     /// <summary>
-    /// Enumeration of collision layers for collision detection.
-    /// Must match the C++ CollisionLayer enum values exactly.
+    /// Camera management functions.
     /// </summary>
-    public enum CollisionLayer
+    public static class Camera
     {
-        /// <summary>Default collision layer.</summary>
-        Default = 0,
-        /// <summary>Player collision layer.</summary>
-        Player = 1,
-        /// <summary>Enemy collision layer.</summary>
-        Enemy = 2,
-        /// <summary>Ground collision layer.</summary>
-        Ground = 3
-        // Add more layers as defined in your C++ Collision.h
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetPosition(float x, float y);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetZoom(float zoom);
+
+        /// <summary>
+        /// Sets camera mode. Ensure enum matches C++ CameraComponent::CameraMode.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetMode(int mode);
     }
 
     /// <summary>
-    /// Enumeration of collider types for collision shapes.
-    /// Must match the C++ ColliderType enum values exactly.
+    /// Utility functions.
     /// </summary>
-    public enum ColliderType
+    public static class Utils
     {
-        /// <summary>Box collider type.</summary>
-        Box = 0,
-        /// <summary>Circle collider type.</summary>
-        Circle = 1
-        // Add more if you have them in C++
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int RandomRange(int min, int max);
     }
+
+    public static class Input
+    {
+        /// Key codes mapping to standard GLFW/ASCII constants.
+        /// </summary>
+        public enum KeyCode
+        {
+            // Printable keys
+            Space = 32,
+            Apostrophe = 39,  /* ' */
+            Comma = 44,       /* , */
+            Minus = 45,       /* - */
+            Period = 46,      /* . */
+            Slash = 47,       /* / */
+
+            // Alphabet
+            A = 65, B = 66, C = 67, D = 68, E = 69, F = 70, G = 71, H = 72,
+            I = 73, J = 74, K = 75, L = 76, M = 77, N = 78, O = 79, P = 80,
+            Q = 81, R = 82, S = 83, T = 84, U = 85, V = 86, W = 87, X = 88,
+            Y = 89, Z = 90,
+
+            // Function Keys & Modifiers
+            Escape = 256,
+            Enter = 257,
+            Right = 262,
+            Left = 263,
+            Down = 264,
+            Up = 265,
+            Pause = 284,
+            LeftShift = 340,
+            LeftControl = 341,
+            LeftAlt = 342,
+            RightShift = 344,
+            RightControl = 345,
+            RightAlt = 346,
+            Menu = 348
+        }
+
+            [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsKeyDown(int key);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsMouseButtonDown(int button);
+
+        /// <summary>
+        /// Gets the mouse X position in screen coordinates.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseX();
+
+        /// <summary>
+        /// Gets the mouse Y position in screen coordinates.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseY();
+
+        /// <summary>
+        /// Gets the mouse X position in world coordinates (accounting for camera).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseWorldX();
+
+        /// <summary>
+        /// Gets the mouse Y position in world coordinates (accounting for camera).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetMouseWorldY();
+
+
+        /// <summary>
+        /// Checks if a specific key is currently held down.
+        /// </summary>
+        /// <param name="key">The KeyCode to check.</param>
+        /// <returns>True if the key is pressed.</returns>
+        public static bool GetKey(KeyCode key)
+        {
+            return IsKeyDown((int)key);
+        }
+
+        /// <summary>
+        /// Checks if a mouse button is held down.
+        /// 0 = Left, 1 = Right, 2 = Middle.
+        /// </summary>
+        public static bool GetMouseButton(int button)
+        {
+            return IsMouseButtonDown(button);
+        }
+    }
+
+
 }

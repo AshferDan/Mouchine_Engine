@@ -51,6 +51,7 @@ Technology is prohibited.
 #include <string>
 
 using EntityID = std::uint32_t;
+enum class EventType;
 
 class GameObject {
 public:
@@ -261,10 +262,11 @@ public:
 
     void RemoveParent();
 
-
     GameObject* GetParent() const;
 
     std::vector<GameObject*> GetAllChildren() const;
+
+    virtual void OnEventTriggered(EventType event, GameObject* other);
 
 private:
     EntityID entityID;

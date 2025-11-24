@@ -36,6 +36,9 @@ Technology is prohibited.
 #include "PrefabManager.h"
 #include "LevelEditor.h"
 
+#include "GameManager.h"
+#include "Level1.h"
+
 /**
  * @brief Initializes all main systems and resources for the game.
  */
