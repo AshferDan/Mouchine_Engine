@@ -17,6 +17,56 @@ using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace CSharpScript
 {
+    // --- Enums ---
+    // These must match your C++ enum values exactly
+
+    /// <summary>
+    /// Enumeration of shape types for rendering.
+    /// Must match the C++ ShapeType enum values exactly.
+    /// </summary>
+    public enum ShapeType
+    {
+        /// <summary>Square shape.</summary>
+        Square = 0,
+        /// <summary>Circle shape.</summary>
+        Circle = 1,
+        /// <summary>Point shape.</summary>
+        Point = 2,
+        /// <summary>Line shape.</summary>
+        Line = 3
+    }
+
+    /// <summary>
+    /// Enumeration of collision layers for collision detection.
+    /// Must match the C++ CollisionLayer enum values exactly.
+    /// </summary>
+    public enum CollisionLayer
+    {
+        /// <summary>Default collision layer.</summary>
+        Default = 0,
+        /// <summary>Player collision layer.</summary>
+        Player = 1,
+        /// <summary>Enemy collision layer.</summary>
+        Enemy = 2,
+        /// <summary>Ground collision layer.</summary>
+        Ground = 3
+        // Add more layers as defined in your C++ Collision.h
+    }
+
+    /// <summary>
+    /// Enumeration of collider types for collision shapes.
+    /// Must match the C++ ColliderType enum values exactly.
+    /// </summary>
+    public enum ColliderType
+    {
+        /// <summary>Box collider type.</summary>
+        Box = 0,
+        /// <summary>Circle collider type.</summary>
+        Circle = 1
+        // Add more if you have them in C++
+    }
+
+
     /// <summary>
     /// Debug utilities for logging from C# to C++ console.
     /// </summary>
@@ -338,54 +388,6 @@ namespace CSharpScript
         public static extern void AddPhysicsComponent(string objectName);
     }
 
-    // --- Enums ---
-    // These must match your C++ enum values exactly
-
-    /// <summary>
-    /// Enumeration of shape types for rendering.
-    /// Must match the C++ ShapeType enum values exactly.
-    /// </summary>
-    public enum ShapeType
-    {
-        /// <summary>Square shape.</summary>
-        Square = 0,
-        /// <summary>Circle shape.</summary>
-        Circle = 1,
-        /// <summary>Point shape.</summary>
-        Point = 2,
-        /// <summary>Line shape.</summary>
-        Line = 3
-    }
-
-    /// <summary>
-    /// Enumeration of collision layers for collision detection.
-    /// Must match the C++ CollisionLayer enum values exactly.
-    /// </summary>
-    public enum CollisionLayer
-    {
-        /// <summary>Default collision layer.</summary>
-        Default = 0,
-        /// <summary>Player collision layer.</summary>
-        Player = 1,
-        /// <summary>Enemy collision layer.</summary>
-        Enemy = 2,
-        /// <summary>Ground collision layer.</summary>
-        Ground = 3
-        // Add more layers as defined in your C++ Collision.h
-    }
-
-    /// <summary>
-    /// Enumeration of collider types for collision shapes.
-    /// Must match the C++ ColliderType enum values exactly.
-    /// </summary>
-    public enum ColliderType
-    {
-        /// <summary>Box collider type.</summary>
-        Box = 0,
-        /// <summary>Circle collider type.</summary>
-        Circle = 1
-        // Add more if you have them in C++
-    }
 
     /// <summary>
     /// Audio system functions.
@@ -534,4 +536,6 @@ namespace CSharpScript
             return IsMouseButtonDown(button);
         }
     }
+
+
 }

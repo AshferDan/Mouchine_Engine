@@ -50,7 +50,7 @@ namespace API
 
         // load common fonts
         std::cout << "\n--- Loading Fonts ---" << std::endl;
-        resourceMgr.LoadFont("default_font", "../Assets/FrederickatheGreat-Regular.ttf", 48);
+        resourceMgr.LoadFont("default_font", "../Assets/PinyonScript-Regular.ttf", 48);
         resourceMgr.LoadFont("small_font", "../Assets/FrederickatheGreat-Regular.ttf", 24);
         resourceMgr.LoadFont("large_font", "../Assets/FrederickatheGreat-Regular.ttf", 64);
 

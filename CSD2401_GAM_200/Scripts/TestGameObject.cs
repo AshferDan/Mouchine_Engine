@@ -15,6 +15,7 @@ Technology is prohibited.
 
 using CSharpScript;
 using System;
+using System.Threading;
 
 namespace GameScripts
 {
@@ -76,8 +77,7 @@ namespace GameScripts
             {
                 redSquareX = 500;
             }
-
-
+            Console.WriteLine(Input.GetMouseX());
          }
 
         public void OnDestroy()

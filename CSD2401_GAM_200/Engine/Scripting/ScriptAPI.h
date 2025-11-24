@@ -347,7 +347,7 @@ namespace API {
 #pragma endregion
 
 
-
+#pragma region Timer
     TimerID WaitForSeconds(float duration, TimerCallback callback);
     TimerID Delay(float duration, TimerCallback callback);
     TimerID InvokeRepeating(float interval, TimerCallback callback);
@@ -357,6 +357,7 @@ namespace API {
     void CancelTimerByName(std::string name);
     void PauseTimer(TimerID id);
     void ResumeTimer(TimerID id);
+#pragma endregion
 
 #pragma region Camera
     void setCameraPos(vec2);
@@ -366,11 +367,13 @@ namespace API {
 #pragma endregion
 
 #pragma region Animator
-    
+    void setAnimation();
+    void playAnimation();
 #pragma endregion
 
 #pragma region Misc
     int RandomNumberGen(int, int);
+    float GetDelta_Time();
 #pragma endregion
 
 
@@ -383,7 +386,5 @@ namespace API {
     float GetMouseWorldX();
     float GetMouseWorldY();
 #pragma endregion
-
-
 
 }

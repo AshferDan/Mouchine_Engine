@@ -35,22 +35,6 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
-void MoveRedSquareLeft()
-{
-    std::cout << "[GameLogic] 5 Seconds have passed! Moving Red Square..." << std::endl;
-
-    // We find the object by name since we aren't capturing it
-    GameObject *redSquare = GameObjectFactory::Instance().FindGameObject("RedSquare");
-    if (redSquare)
-    {
-        // Assuming you have a physics component, apply velocity
-        // If using Transform directly:
-        API::SetPos("RedSquare2", -100.0f, 0.0f); // Teleport
-
-        // Using Physics (Velocity):
-        // API::SetVelocity("RedSquare", -200.0f, 0.0f); // Move Left at speed 200
-    }
-}
 
 /**
  * @brief Main entry point of the program.
@@ -71,7 +55,7 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        // CORE->RequestSceneLoad("Prefab_TestScene");
+         //CORE->RequestSceneLoad("Prefab_TestScene");
 
         GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto *cam = mainCamera->AddComponent<CameraComponent>();
