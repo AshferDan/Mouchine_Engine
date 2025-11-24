@@ -291,7 +291,7 @@ void LevelEditor::StopPlayMode()
     if (audioManager)
     {
         std::cout << "[LevelEditor] Stopping background music through AudioManager\n";
-        audioManager->StopSound("bgm_channel");
+        audioManager->StopAllSounds();
     }
 
     if (CORE)
