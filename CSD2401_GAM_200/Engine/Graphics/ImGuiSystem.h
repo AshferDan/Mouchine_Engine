@@ -28,6 +28,7 @@ Technology is prohibited.
 #include "logic.h"
 #include "LevelEditor.h"
 #include "ImGuizmo.h"
+#include "TilemapEditor.h"  // NEW: Tilemap Editor
 
 // FILE SYSTEM
 namespace fs = std::filesystem;

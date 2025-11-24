@@ -28,6 +28,7 @@ Technology is prohibited.
 #include <typeinfo>
 #include <type_traits>
 #include "LevelEditor.h"
+#include "TilemapEditor.h"
 #include "ColliderComponent.h"
 #include "physics.h"
 #include "AudioManager.h"
@@ -99,6 +100,8 @@ static bool renderLoadedLayout = false;
 static bool showAudioAssetsPanel = false;
 static bool g_showAudioErrorPopup = false;
 static std::string g_audioErrorMessage;
+static bool showTilemapEditor = false;
+static std::unique_ptr<TilemapEditor> tilemapEditor = nullptr;
 
 // VIEWPORT
 bool isHoveringOverViewport;
@@ -181,6 +184,8 @@ void ImGuiSystem::Initialize()
     // Imgui flags
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
+    tilemapEditor = std::make_unique<TilemapEditor>();
+
     // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
     // Vars for ImGui::ImageButton
     icon_folder_ui = GraphicsSystem::LoadTexture(icon_folder);
@@ -220,7 +225,10 @@ void ImGuiSystem::Update(float dt)
         // ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
         // ImGui_ImplGlfw_NewFrame();    // Start new GLFW frame
         // ImGui::NewFrame();        // Start ImGui frame
-        
+        if (ImGui::IsKeyPressed(ImGuiKey_T) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+        {
+            showTilemapEditor = !showTilemapEditor;
+        }
         // Full window docking
         ImGuiViewport *viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -293,6 +301,66 @@ void ImGuiSystem::Update(float dt)
                     Serialization::LoadPrefab(draggedPrefab);
                 }
 
+                // Viewport accepts Sprites for drag and drop
+                std::string draggedSprite{};
+                ReceiveDragAndDrop(SpritePayloadID, draggedSprite);
+
+                if (!draggedSprite.empty())
+                {
+                    std::cout << "[Viewport] Dropped sprite: " << draggedSprite << std::endl;
+
+                    // Extract sprite name from path
+                    fs::path spritePath(draggedSprite);
+                    std::string spriteName = spritePath.stem().string();
+
+                    // Create GameObject
+                    GameObject* newGO = factory.CreateGameObject(spriteName);
+
+                    if (newGO)
+                    {
+                        // Add Transform at cursor position
+                        auto* transform = newGO->AddComponent<TransformComponent>();
+                        if (transform)
+                        {
+                            transform->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
+                            transform->SetScale(64.0f, 64.0f); // Default size
+                        }
+
+                        // Add Render with texture
+                        auto* render = newGO->AddComponent<RenderComponent>();
+                        if (render)
+                        {
+                            auto& resourceMgr = ResourceManager::Instance();
+                            std::string textureKey = spriteName + "_texture";
+
+                            if (resourceMgr.LoadTexture(textureKey, draggedSprite))
+                            {
+                                TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+                                if (texRes && texRes->IsLoaded())
+                                {
+                                    render->SetTextureID(texRes->GetTextureID());
+                                    render->SetTexturePath(draggedSprite);
+                                    render->SetShapeType(RenderComponent::ShapeType::Square);
+                                    render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                                }
+                            }
+                        }
+
+                        // Add Square Collider - CORRECTED CONSTRUCTOR CALL!
+                        // Constructor: ColliderComponent(owner, type, width, height, layer)
+                        newGO->AddComponent<ColliderComponent>(
+                            ColliderComponent::Type::Square,
+                            64.0f,
+                            64.0f,
+                            CollisionLayer::Default
+                        );
+
+                        // Select the new GameObject
+                        SetSelectedGameObject(newGO->GetID());
+
+                        std::cout << "[Viewport] Created sprite GameObject: " << spriteName << std::endl;
+                    }
+                }
                 // gets cursor pos WRT world pos
                 viewportPos = ImGui::GetItemRectMin();
                 viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
@@ -324,6 +392,24 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
+
+            // Renders the tilemap
+            if (showTilemapEditor)
+            {
+                tilemapEditor->SetVisible(true);
+                tilemapEditor->Update(dt);
+                tilemapEditor->Render();
+
+                //handle window close button
+                if (!tilemapEditor->IsVisible())
+                {
+                    showTilemapEditor = false;
+                }
+            }
+            else
+            {
+                tilemapEditor->SetVisible(false);
+            }
         }
         // if IS in play mode
         else
@@ -1474,7 +1560,7 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().string(), fileName.c_str());            // For Audio files
                 }
-                if (iter.path().parent_path().filename() == "Sprites")
+                else if (iter.path().parent_path().filename() == "Sprites")
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
@@ -1612,6 +1698,10 @@ void TopMenuBar_Render()
             {
                 openLayoutLoadPopup = true;                     // if clicked, set flags for loading scenes
             }
+
+            ImGui::Separator();  // Add a separator line
+
+            ImGui::MenuItem("Tilemap Editor", "Ctrl+T", &showTilemapEditor);
 
             ImGui::EndMenu();
         }
@@ -1952,6 +2042,12 @@ void ImGuiSystem::RenderPropertyEditor()
             if (ImGui::DragFloat2("Scale", scale, 0.5f))
             {
                 transform->SetScale(scale[0], scale[1]);
+
+                // Sync collider
+                auto* collider = obj->GetComponent<ColliderComponent>();
+                if (collider) {
+                    collider->SetSize(scale[0], scale[1]);
+                }
             }
             BeginEdit();
             EndEdit();
@@ -1969,7 +2065,9 @@ void ImGuiSystem::RenderPropertyEditor()
             BeginEdit();
             EndEdit();
         }
+
     }
+        
 
     // Render component for GO
     if (auto* render = obj->GetComponent<RenderComponent>())
@@ -2026,13 +2124,26 @@ void ImGuiSystem::RenderPropertyEditor()
     }
 
     // Collider component
+    // Collider component
     if (auto* collider = obj->GetComponent<ColliderComponent>())
     {
-        // For now only display text of collider details
         if (ImGui::CollapsingHeader("Collider"))
         {
-            ImGui::Text("Type: %s", collider->GetType() == ColliderComponent::Type::Circle ? "Circle" : "Square");
+            // Editable Collider Type Dropdown
+            const char* colliderTypes[] = { "Square", "Circle" };
+            int currentType = (collider->GetType() == ColliderComponent::Type::Circle) ? 1 : 0;
 
+            if (ImGui::Combo("Type", &currentType, colliderTypes, 2))
+            {
+                ColliderComponent::Type newType = (currentType == 1)
+                    ? ColliderComponent::Type::Circle
+                    : ColliderComponent::Type::Square;
+                collider->setColliShape(newType);
+                std::cout << "[Property Editor] Changed collider type to "
+                    << colliderTypes[currentType] << std::endl;
+            }
+
+            // Display dimensions
             if (collider->GetType() == ColliderComponent::Type::Circle)
             {
                 Circle circle = collider->GetCircle();
@@ -2047,7 +2158,45 @@ void ImGuiSystem::RenderPropertyEditor()
                 ImGui::Text("Height: %.2f", height);
             }
 
-            ImGui::Text("Layer: %s", GetCollisionLayerName((int)collider->GetLayer()));
+            // Editable Size (In case we need it)
+            if (collider->GetType() == ColliderComponent::Type::Square)
+            {
+                AABB aabb = collider->GetAABB();
+                float width = aabb.max.x - aabb.min.x;
+                float height = aabb.max.y - aabb.min.y;
+
+                float newSize[2] = { width, height };
+                if (ImGui::DragFloat2("Size", newSize, 1.0f, 1.0f, 500.0f))
+                {
+                    collider->SetSize(newSize[0], newSize[1]);
+                    std::cout << "[Property Editor] Changed collider size to "
+                        << newSize[0] << "x" << newSize[1] << std::endl;
+                }
+            }
+            else if (collider->GetType() == ColliderComponent::Type::Circle)
+            {
+                Circle circle = collider->GetCircle();
+                float radius = circle.radius;
+
+                if (ImGui::DragFloat("Radius", &radius, 1.0f, 1.0f, 250.0f))
+                {
+                    collider->SetSize(radius * 2.0f, radius * 2.0f);
+                    std::cout << "[Property Editor] Changed circle radius to "
+                        << radius << std::endl;
+                }
+            }
+
+
+            // Editable Collision Layer Dropdown
+            const char* layerNames[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+            int currentLayer = static_cast<int>(collider->GetLayer());
+
+            if (ImGui::Combo("Layer", &currentLayer, layerNames, 6))
+            {
+                collider->SetLayer(static_cast<CollisionLayer>(currentLayer));
+                std::cout << "[Property Editor] Changed collision layer to "
+                    << layerNames[currentLayer] << std::endl;
+            }
         }
     }
 
