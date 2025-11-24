@@ -2190,6 +2190,24 @@ void M2_RenderStressTest()
     }
 }
 
+//  generate unique sound name if one already exists
+static std::string MakeUniqueSoundName(const std::string& baseName,
+    const std::map<std::string, SoundData>& db)
+{
+    // if base not used, just use it
+    if (db.find(baseName) == db.end())
+        return baseName;
+
+    int counter = 1;
+    std::string candidate;
+    do
+    {
+        candidate = baseName + "_" + std::to_string(counter++);
+    } while (db.find(candidate) != db.end());
+
+    return candidate;
+}
+
 #pragma region Audio Assets ImGui
 // Renders the Audio Assets panel
 void AudioAssetsPanel_Render()
@@ -2277,6 +2295,12 @@ void AudioAssetsPanel_Render()
 
             if (ext == ".wav" || ext == ".mp3" || ext == ".ogg")
             {
+                // get current database so we can avoid name clashes
+                auto& db = audioMgr->GetSoundDatabase();
+
+                std::string baseName = p.stem().string();                   // "bgm"
+                std::string uniqueName = MakeUniqueSoundName(baseName, db); // "bgm1"
+
                 SoundData sound{};
                 sound.filepath = droppedPathStr;
                 sound.name = p.stem().string();
