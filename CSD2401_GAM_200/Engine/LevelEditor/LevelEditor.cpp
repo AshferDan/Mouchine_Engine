@@ -821,6 +821,26 @@ void LevelEditor::NewLevel()
     hasValidSaveState = false;
     CameraManager::Instance().ClearActiveCamera();
 
+    // stop and unload all sounds from the underlying audi engine
+    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+    if (audioEngine)
+    {
+        audioEngine->stopAllSound();
+        audioEngine->unloadAllSound();
+    }
+
+    // clear audio resources from resource manager
+    ResourceManager::Instance().UnloadAllAudio();
+
+    // clear the editor audio manager database (all added sounds)
+    if (CORE)
+    {
+        if (AudioManager* audioMgr = CORE->GetAudioManager())
+        {
+            audioMgr->Clear();
+        }
+    }
+
     std::cout << "New level created" << std::endl;
 }
 
