@@ -463,11 +463,13 @@ void GraphicsSystem::Update(float)
     auto* textObj = GameObjectFactory::Instance().FindGameObject("Text FPS");
     if (textObj) {
         auto* textFPS = textObj->GetComponent<TextComponent>();
-        if (CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
+        if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
+            textFPS->SetEnabled(true);
             textFPS->SetText(std::to_string(CORE->GetFPS()));
         }
         else {
             textFPS->SetText("FPS");
+            textFPS->SetEnabled(false);
         }
     }
 

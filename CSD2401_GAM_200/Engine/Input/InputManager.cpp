@@ -23,6 +23,7 @@ bool InputManager::KeyStateImgui = true;
 double InputManager::MouseWorldX = 0.0;
 double InputManager::MouseWorldY = 0.0;
 bool InputManager::MouseLeftClicked = false;
+bool InputManager::ShowFPS = false;
 
 /**
  * @brief Constructs an InputManager with specified parameters.
@@ -109,7 +110,8 @@ void InputManager::Update(float dt)
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
-        {GLFW_KEY_ENTER, false}, // ADD THIS for Alt+Enter detection
+        {GLFW_KEY_ENTER, false}, 
+        {GLFW_KEY_P, false}
     };
 
     static bool altEnterPressed = false;
@@ -184,6 +186,10 @@ void InputManager::Update(float dt)
                 {
                     CORE->GetGraphicsSystem()->SetEditorMode(!CORE->GetGraphicsSystem()->IsEditorMode());
                     std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
+                }
+                else if (key == GLFW_KEY_P) {
+                    ShowFPS = !ShowFPS;
+                    std::cout << "FPS display " << (ShowFPS ? "ENABLED" : "DISABLED") << std::endl;
                 }
             }
             wasPressed = true;
@@ -336,10 +342,10 @@ void InputManager::Update(float dt)
     /**
      * @brief Toggle on and off imgui
      */
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-    {
-        InputManager::KeyStateImgui = true;
-    }
+    //if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+    //{
+    //    InputManager::KeyStateImgui = true;
+    //}
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
