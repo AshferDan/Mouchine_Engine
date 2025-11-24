@@ -553,8 +553,8 @@ namespace API
 #pragma region Audio
 
     void AddSound(const std::string name, const std::string filepath,
-        bool loop, float volume, std::string category) {
-        SoundData newSound{ name,filepath,loop,volume,category };
+        bool loop, float volume,float pitch, std::string category) {
+        SoundData newSound{ name,filepath,loop,volume,pitch,category };
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
@@ -634,10 +634,6 @@ namespace API
             audioManager->SetCategoryVolume(CatName, vol);
         }
     }
-#pragma endregion
-
-#pragma region Animator
-
 #pragma endregion
 
 #pragma region Timer

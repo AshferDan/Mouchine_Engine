@@ -207,11 +207,11 @@ static void Internal_AddPhysicsComponent(MonoString *objectName)
     mono_free(name);
 }
 
-static void Internal_AddSound(MonoString* name, MonoString* filepath, bool loop, float volume, MonoString* category) {
+static void Internal_AddSound(MonoString* name, MonoString* filepath, bool loop, float volume, float pitch,MonoString* category) {
     char* cName = mono_string_to_utf8(name);
     char* cPath = mono_string_to_utf8(filepath);
     char* cCat = mono_string_to_utf8(category);
-    API::AddSound(cName, cPath, loop, volume, cCat);
+    API::AddSound(cName, cPath, loop, volume, pitch, cCat);
     mono_free(cName);
     mono_free(cPath);
     mono_free(cCat);

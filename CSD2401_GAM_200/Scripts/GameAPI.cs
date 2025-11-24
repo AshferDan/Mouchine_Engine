@@ -393,7 +393,7 @@ namespace CSharpScript
     public static class Audio
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void AddSound(string name, string filepath, bool loop, float volume, string category);
+        public static extern void AddSound(string name, string filepath, bool loop, float volume,float pitch, string category);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void PlaySound(string soundName, string channel);

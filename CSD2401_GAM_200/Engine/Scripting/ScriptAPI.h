@@ -333,7 +333,7 @@ namespace API {
 #pragma endregion
 
 #pragma region Audio
-    void AddSound(const std::string, const std::string, bool, float, std::string);
+    void AddSound(const std::string, const std::string, bool, float, float,std::string);
     void PlaySound(const std::string,const std::string);
     void StopSound(const std::string);
     void StopAllSound();
