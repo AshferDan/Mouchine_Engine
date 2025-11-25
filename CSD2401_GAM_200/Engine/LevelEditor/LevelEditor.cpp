@@ -715,6 +715,7 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         // clear current level
         factory.Clear();
         selectedGameObjectID = 0;
+        ClearUndoStack();
 
         // reset editor mode to stop when loading a new scene
         editorMode = EditorMode::Stop;
@@ -892,6 +893,26 @@ void LevelEditor::NewLevel()
         }
     }
 
+    { // Just to make sure gizmo work on new level, not sure needed or not
+        GameObject* mainCam = factory.CreateGameObject("MainCamera");
+
+        // Add Transform
+        auto* t = mainCam->AddComponent<TransformComponent>();
+        t->SetPosition(0.f, 0.f);
+        t->SetScale(1.f, 1.f);
+
+        // Add CameraComponent
+        auto* camComp = mainCam->AddComponent<CameraComponent>();
+        camComp->SetZoom(1.0f);
+        camComp->SetMode(CameraComponent::CameraMode::FIXED);
+
+        // Register as active camera
+        CameraManager::Instance().SetActiveCamera(mainCam);
+
+        std::cout << "[NewLevel] MainCamera created and set as active.\n";
+    }
+
+    ClearUndoStack();
     std::cout << "New level created" << std::endl;
 }
 
@@ -1404,6 +1425,7 @@ void LevelEditor::PerformSceneReload()
     // clear and reload safely at start of frame
     factory.Clear();
     selectedGameObjectID = 0;
+    ClearUndoStack();
 
     if (LoadLevel(pendingScenePath))
     {
@@ -1508,6 +1530,10 @@ void LevelEditor::PerformUndo() {
     }
 
     //redoStack.push_back(undocmd);
+}
+
+void LevelEditor::ClearUndoStack() {
+    undoStack.clear();
 }
 
 /*  Audio Management */

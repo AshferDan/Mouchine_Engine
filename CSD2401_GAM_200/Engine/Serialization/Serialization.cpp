@@ -23,6 +23,7 @@ using namespace Serialization;
 namespace fs = std::filesystem;
 
 static const std::string PREFAB_DIR = PrefabFilePath;
+static GameObject* s_CapturedRoot = nullptr;
 
 // Global temporary loading maps (cleared after load)
 std::unordered_map<EntityID, GameObject*> Serialization::idToObject{};
@@ -109,7 +110,7 @@ void Serialization::DeserializeGameObject(const json& j)
 	// PREFAB CASE — ID must be unique
 	if (idExists)
 	{
-		newID = factory.GetNextEntityID();   // assign new unique ID
+		newID = factory.GetSmallestAvailableID();   // assign new unique ID
 		g_OldToNewID[oldID] = newID;         // store mapping
 	}
 	else
@@ -121,6 +122,11 @@ void Serialization::DeserializeGameObject(const json& j)
 	// Create GameObject
 	GameObject* go = factory.CreateGameObjectWithID(newID, name);
 	idToObject[newID] = go;
+
+	// Return GameObject for LoadPrefabWithReturn
+	if (s_CapturedRoot == nullptr)
+		s_CapturedRoot = go;
+
 
 	go->SetActive(j.value("active", true));
 
@@ -251,6 +257,14 @@ void Serialization::LoadPrefab(const std::string &prefabName)
 		ResolveHierarchy();
 
 	}
+}
+
+GameObject* Serialization::LoadPrefabWithReturn(const std::string& filename)
+{
+	s_CapturedRoot = nullptr;  // reset
+	LoadPrefab(filename);      // existing void LoadPrefab function
+
+	return s_CapturedRoot;     // filled by deserializer
 }
 
 /**

@@ -302,8 +302,29 @@ void ImGuiSystem::Update(float dt)
                 if (!draggedPrefab.empty())
                 {
                     // filter for type of data here
-                    std::cout << draggedPrefab << std::endl;                         // Prints the data sent via drag and drop
-                    Serialization::LoadPrefab(draggedPrefab);
+                    //std::cout << draggedPrefab << std::endl;                         // Prints the data sent via drag and drop
+                    //Serialization::LoadPrefab(draggedPrefab);
+
+                   // Load prefab AND retrieve the root object created
+                    GameObject* root = Serialization::LoadPrefabWithReturn(draggedPrefab);
+
+                    if (root)
+                    {
+                        // Record Undo Entries - Undo Create on Drag and Drop
+                        LevelEditor* editor = CORE->GetLevelEditor();
+                        if (editor)
+                        {
+                            EditorUndoCommand cmd;
+                            cmd.action = EditorUndoCommand::ActionType::ObjectCreated;
+                            cmd.entityID = root->GetID();
+
+                            // Save object's entire state for redo
+                            cmd.afterJson = Serialization::SerializeGameObject(root);
+
+                            editor->RecordUndo(cmd);
+                        }
+                    }
+                
                 }
 
                 // Viewport accepts Sprites for drag and drop
@@ -686,7 +707,7 @@ void ImGuiSystem::Hierarchy_Render()
     {
         M2_RenderStressTest();
     }
-    // Undo feature
+    // Undo Feature
     LevelEditor* editor = CORE->GetLevelEditor();
     bool canUndo = !editor->undoStack.empty();
 
@@ -961,18 +982,14 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         {
             // TODO - block out the deleting of main camera - crashes the game
 
-            // Record undo-delete
+            // Record Undo Entries - Undo Delete
             LevelEditor* editor = CORE->GetLevelEditor();
             GameObject* obj = factory.GetGameObject(id);
 
             {
-                GameObject* p = obj->GetParent();
-                std::cout << "\n[BEFORE DELETE CHILD ORDER]\n";
+                GameObject* p = obj->GetParent();              
                 if (p) {
-                    auto kids = p->GetAllChildren();
-                    for (size_t i = 0; i < kids.size(); ++i)
-                        std::cout << " [" << i << "] " << kids[i]->GetName()
-                        << " (ID=" << kids[i]->GetID() << ")\n";
+                    auto kids = p->GetAllChildren();                  
                 }
             }
             if (obj)
@@ -1370,7 +1387,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
             ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
         }
 
-        // UNDO FEATURE FOR IMGUIZMO 
+        // Record Undo Entries - Undo Transform on Gizmo
         static bool gizmoEditing = false;
         static json gizmoBeforeJson;
 
@@ -2019,7 +2036,7 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            // For Undo Feature
+            // Record Undo Entries - Undo Transform
             LevelEditor* editor = CORE->GetLevelEditor();
 
             static bool editingTransform = false;

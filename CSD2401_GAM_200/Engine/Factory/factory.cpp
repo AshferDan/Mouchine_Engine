@@ -594,6 +594,17 @@ EntityID GameObjectFactory::GetNextEntityID() const
     return nextEntityID;
 }
 
+EntityID GameObjectFactory::GetSmallestAvailableID() const
+{
+    EntityID candidate = 1;
+
+    while (const_cast<GameObjectFactory*>(this)->GetGameObject(candidate) != nullptr)
+        candidate++;
+
+    return candidate;
+}
+
+
 GameObject* GameObjectFactory::FindByName(const std::string& name)
 {
     for (auto& go : gameObjects)

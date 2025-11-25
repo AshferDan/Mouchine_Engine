@@ -20,6 +20,7 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "RenderComponent.h"
 #include "factory.h"
+#include "gameObject.h"
 #include "CameraComponent.h"
 #include "ComponentSerialization.h"
 #include "AudioManager.h"
@@ -73,6 +74,8 @@ namespace Serialization
     * @brief Loads a prefab from file and instantiates it into the scene.
     */
     void LoadPrefab(const std::string& path);
+
+    GameObject* LoadPrefabWithReturn(const std::string& filename);
 
     /** 
     * @brief Saves all GameObjects in the current scene to a JSON file. 

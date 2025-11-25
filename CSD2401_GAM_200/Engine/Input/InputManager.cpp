@@ -385,9 +385,9 @@ void InputManager::Update(float dt)
                 audioManager->TriggerEvent("PlayerJump");
                 std::cout << "[InputManager] SPACE pressed to sending PlaySoundMessage\n";
                 std::cout << "[InputManager] CORE pointer = " << CORE << std::endl;
-                PlaySoundMessage msg("jump_sfx");
-                CORE->GetMessageBus().Publish(msg);
-                // audioEngine->playSound("jump_sfx", "jump_channel");
+                //PlaySoundMessage msg("jump_sfx");
+                //CORE->GetMessageBus().Publish(msg);
+                 audioEngine->playSound("jump_sfx", "jump_channel");
             }
         }
     }
