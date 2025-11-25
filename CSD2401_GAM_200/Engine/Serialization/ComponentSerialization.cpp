@@ -21,6 +21,10 @@ std::unordered_map<std::string, GLuint> s_IDByTexturePath;
 bool Serialization::Prefab_DragAndDropped;
 bool Serialization::Prefab_Reinstantiate;
 
+bool DND_firstObject = true;
+float DND_rootJsonX = 0.0f;
+float DND_rootJsonY = 0.0f;
+
 // ------------------- Serialize -------------------
 /**
  * @brief Serializes the TransformComponent into JSON.
@@ -209,6 +213,9 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
     const auto &t = j["TransformComponent"];
     auto *tc = go->AddComponent<TransformComponent>();
 
+    float jsonX = t["pos"][0];
+    float jsonY = t["pos"][1];
+
     if (Serialization::Prefab_DragAndDropped)
     {
         /*std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
@@ -216,41 +223,24 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
         std::cout << "CREATED AT " << "(" << viewportCursorPos.x << ", " << viewportCursorPos.y << ")\n";
         */
 
-        static bool firstObject = true;
-        static float rootJsonX = 0.0f;
-        static float rootJsonY = 0.0f;
         ImVec2 spawnPos = viewportCursorPos;
 
-        float jsonX = t["pos"][0];
-        float jsonY = t["pos"][1];
-
-        if (firstObject)
+        if (DND_firstObject)
         {
-            // This is the root(parent) JSON position
-            rootJsonX = jsonX;
-            rootJsonY = jsonY;
+            // ROOT JSON position
+            DND_rootJsonX = jsonX;
+            DND_rootJsonY = jsonY;
 
-            firstObject = false;
-
-            // ROOT snaps to cursor
             tc->SetPosition(spawnPos.x, spawnPos.y);
+            DND_firstObject = false;
         }
         else
         {
-            // RELATIVE OFFSET
-            float relX = jsonX - rootJsonX;
-            float relY = jsonY - rootJsonY;
+            // RELATIVE offset based on JSON
+            float relX = jsonX - DND_rootJsonX;
+            float relY = jsonY - DND_rootJsonY;
 
-            float finalX = spawnPos.x + relX;
-            float finalY = spawnPos.y + relY;
-
-            tc->SetPosition(finalX, finalY);
-        }
-
-        // reset AFTER whole prefab finishes loading
-        if (go->GetParent() == nullptr)
-        {
-            // DO NOTHING HERE, Reset happens in LoadPrefab
+            tc->SetPosition(spawnPos.x + relX, spawnPos.y + relY);
         }
     }
     else if (Serialization::Prefab_Reinstantiate)

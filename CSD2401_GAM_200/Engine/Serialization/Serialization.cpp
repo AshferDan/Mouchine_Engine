@@ -12,6 +12,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "serialization.h"
+#include "ComponentSerialization.h"
 
 #include <fstream>
 #include <sstream>
@@ -236,6 +237,14 @@ void Serialization::LoadPrefab(const std::string &prefabName)
 
 	if (j.contains("GameObjects"))
 	{
+		if (Prefab_DragAndDropped)
+		{
+			// RESET the DND transform state for THIS prefab load
+			DND_firstObject = true;
+			DND_rootJsonX = 0.0f;
+			DND_rootJsonY = 0.0f;
+		}
+
 		for (const auto& obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
