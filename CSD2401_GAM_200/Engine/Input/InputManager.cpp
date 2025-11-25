@@ -102,6 +102,34 @@ void InputManager::Update(float dt)
         return;
     }
 
+    // ------------------- UNDO: Ctrl + Z -------------------//
+    {
+        LevelEditor* editor = CORE->GetLevelEditor();
+        if (editor)
+        {
+            bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
+                glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
+
+            bool zPressed = glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS;
+
+            static bool undoConsumed = false;
+
+            if (ctrl && zPressed)
+            {
+                if (!undoConsumed && !editor->undoStack.empty())
+                {
+                    editor->PerformUndo();
+                    undoConsumed = true;       // Prevents rapid repeat
+                }
+            }
+            else
+            {
+                undoConsumed = false;          // Reset when keys released
+            }
+        }
+    }
+
+
     static std::unordered_map<int, bool> singleTriggerKeys = {
         {GLFW_KEY_SPACE, false},
         {GLFW_KEY_F1, false},

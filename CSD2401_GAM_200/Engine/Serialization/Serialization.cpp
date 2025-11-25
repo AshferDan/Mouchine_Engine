@@ -26,6 +26,7 @@ static const std::string PREFAB_DIR = PrefabFilePath;
 // Global temporary loading maps (cleared after load)
 std::unordered_map<EntityID, GameObject*> Serialization::idToObject{};
 std::vector<PendingHierarchyInfo> Serialization::pendingHierarchy{};
+std::unordered_map<EntityID, EntityID> Serialization::g_OldToNewID;
 
 std::string Serialization::GetFullPath(const std::string &filename)
 {
@@ -91,65 +92,77 @@ json Serialization::SerializeGameObject(GameObject *go)
  *
  * @param j JSON object describing the GameObject.
  */
-void Serialization::DeserializeGameObject(const json &j)
+void Serialization::DeserializeGameObject(const json& j)
 {
 	std::string name = j.value("name", "Unnamed");
 
-	EntityID localID = j.value("localID", -1);
-	if (localID < 0) {
-		localID = GameObjectFactory::Instance().GetNextEntityID();
+	EntityID oldID = j.value("localID", -1);
+	EntityID oldParentID = j.value("parentID", -1);
+
+	// Check if ID already exists
+	GameObjectFactory& factory = GameObjectFactory::Instance();
+	bool idExists = (oldID != -1 && factory.GetGameObject(oldID) != nullptr);
+
+	EntityID newID = oldID;
+
+	// PREFAB CASE — ID must be unique
+	if (idExists)
+	{
+		newID = factory.GetNextEntityID();   // assign new unique ID
+		g_OldToNewID[oldID] = newID;         // store mapping
+	}
+	else
+	{
+		// SCENE or UNDO CASE — ID must be preserved
+		g_OldToNewID[oldID] = newID;
 	}
 
-	EntityID parentID = j.value("parentID", -1);
+	// Create GameObject
+	GameObject* go = factory.CreateGameObjectWithID(newID, name);
+	idToObject[newID] = go;
 
-	// Create object with preserved ID
-	GameObject* go = GameObjectFactory::Instance().CreateGameObjectWithID(localID, name);
-	idToObject[localID] = go;
-
-	prefabInstances[name].push_back(go->GetID());						// keeps tracks of the newly created prefabs
 	go->SetActive(j.value("active", true));
 
-	// Store parent-child relationship for later
-	pendingHierarchy.push_back({ localID, parentID });
+	// Store parent-child link using ORIGINAL old parent ID
+	pendingHierarchy.push_back({ oldID, oldParentID });
 
 	// Deserialize components
 	ComponentSerialization::DeserializeAllComponents(go, j);
 
-	// Recursively load children (order is preversed by JSON)
-	if (j.contains("children")) {
-		for (const auto& childJSON : j["children"]) {
+	// Load children recursively
+	if (j.contains("children"))
+	{
+		for (const auto& childJSON : j["children"])
 			DeserializeGameObject(childJSON);
-		}
 	}
 }
 
 void Serialization::ResolveHierarchy()
 {
-	// Reset all children to preserve ordering
-	//for (auto& pair : idToObject) {
-	//	GameObject* go = pair.second;
-	//	if (go) go->GetAllChildren().clear();
-	//}
+	for (auto& info : pendingHierarchy)
+	{
+		EntityID oldChildID = info.localID;
+		EntityID oldParentID = info.parentID;
 
-	for (const auto& info : pendingHierarchy) {
-		EntityID childID = info.localID;
-		EntityID parentID = info.parentID;
+		EntityID newChildID = g_OldToNewID[oldChildID];
+		EntityID newParentID = (oldParentID == -1 ? -1 : g_OldToNewID[oldParentID]);
 
-		GameObject* child = idToObject[childID];
-		if (!child) continue;
+		GameObject* child = idToObject[newChildID];
 
-		if (parentID != -1) { // is a child
-			GameObject* parent = idToObject[parentID];
-			if (parent) {
-				if (child->GetParent() != parent)
-					parent->AddChild(child);
+		if (newParentID != -1)
+		{
+			GameObject* parent = idToObject[newParentID];
+			if (child && parent) {
+				parent->AddChild(child);
 			}
 		}
 	}
 
 	idToObject.clear();
 	pendingHierarchy.clear();
+	g_OldToNewID.clear();
 }
+
 
 /**
  * @brief Saves a single GameObject as a prefab JSON file.
@@ -223,11 +236,11 @@ void Serialization::LoadPrefab(const std::string &prefabName)
 
 	if (j.contains("GameObjects"))
 	{
-		for (const auto &obj : j["GameObjects"])
+		for (const auto& obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
 		ResolveHierarchy();
-		std::cout << "[LoadPrefab] Prefab instantiated successfully.\n";
+
 	}
 }
 

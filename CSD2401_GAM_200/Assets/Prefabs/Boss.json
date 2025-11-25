@@ -1,0 +1,94 @@
+{
+    "GameObjects": [
+        {
+            "name": "Boss",
+            "localID": 100,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "pos": [
+                    -200.0,
+                    300.0
+                ],
+                "scale": [
+                    120.0,
+                    120.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "shapeType": "Square",
+                "texturePath": "",
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            "ColliderComponent": {
+                "shape": "Circle",
+                "layer": "Enemy"
+            },
+            "EventComponent": [],
+            "children": [
+                {
+                    "name": "LeftWing",
+                    "localID": 101,
+                    "parentID": 100,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            -300.0,
+                            300.0
+                        ],
+                        "scale": [
+                            70.0,
+                            70.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.30000001192092896,
+                            0.30000001192092896,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "RightWing",
+                    "localID": 102,
+                    "parentID": 100,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            -100.0,
+                            300.0
+                        ],
+                        "scale": [
+                            70.0,
+                            70.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.30000001192092896,
+                            0.30000001192092896,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

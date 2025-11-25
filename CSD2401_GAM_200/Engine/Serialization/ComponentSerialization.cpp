@@ -211,9 +211,47 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
 
     if (Serialization::Prefab_DragAndDropped)
     {
-        std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
+        /*std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
         tc->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
         std::cout << "CREATED AT " << "(" << viewportCursorPos.x << ", " << viewportCursorPos.y << ")\n";
+        */
+
+        static bool firstObject = true;
+        static float rootJsonX = 0.0f;
+        static float rootJsonY = 0.0f;
+        ImVec2 spawnPos = viewportCursorPos;
+
+        float jsonX = t["pos"][0];
+        float jsonY = t["pos"][1];
+
+        if (firstObject)
+        {
+            // This is the root(parent) JSON position
+            rootJsonX = jsonX;
+            rootJsonY = jsonY;
+
+            firstObject = false;
+
+            // ROOT snaps to cursor
+            tc->SetPosition(spawnPos.x, spawnPos.y);
+        }
+        else
+        {
+            // RELATIVE OFFSET
+            float relX = jsonX - rootJsonX;
+            float relY = jsonY - rootJsonY;
+
+            float finalX = spawnPos.x + relX;
+            float finalY = spawnPos.y + relY;
+
+            tc->SetPosition(finalX, finalY);
+        }
+
+        // reset AFTER whole prefab finishes loading
+        if (go->GetParent() == nullptr)
+        {
+            // DO NOTHING HERE, Reset happens in LoadPrefab
+        }
     }
     else if (Serialization::Prefab_Reinstantiate)
     {

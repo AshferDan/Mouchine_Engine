@@ -46,6 +46,7 @@ namespace Serialization
 
     extern std::unordered_map<EntityID, GameObject*> idToObject;    // Maps EntityID to GameObject*
     extern std::vector<PendingHierarchyInfo> pendingHierarchy;      // Stores parent-child relationships during loading
+    extern std::unordered_map<EntityID, EntityID> g_OldToNewID;
 
     std::vector<std::string> GetAllPrefabs();
     std::string GetFullPath(const std::string& filename);

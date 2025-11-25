@@ -130,7 +130,8 @@ void GameObject::RemoveChild(GameObject* ChildGO)
     if (it != children.end())
     {
         children.erase(it);
-        RemoveParent();
+        //RemoveParent();
+        ChildGO->RemoveParent();
         std::cout << "Removed " << ChildGO->GetName() << " from " << this->GetName() << "'s children\n";
     }
 }
