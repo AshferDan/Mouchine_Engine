@@ -2039,9 +2039,17 @@ void ImGuiSystem::RenderPropertyEditor()
             BeginEdit();
             EndEdit();
 
-            if (ImGui::Button("ljlacbifuckingsot"))
+            if (ImGui::Button("Press Here to add DND Slot"))
             {
-                transform->test();
+                transform->AddDragDropSlot("todayisaBADday", PrefabPayloadID);
+            }
+
+            if (transform->GetPropertySlots().size())
+            {
+                for (auto& slot : transform->GetPropertySlots())
+                {
+                    slot.RenderImGui();
+                }
             }
         }
 
@@ -2182,29 +2190,10 @@ void ImGuiSystem::RenderPropertyEditor()
     // Add event into GameObjects
     RenderEventComponent(obj); 
 
-    // TODO WIP drag and drop section for assets from project navigator
-    // currently we dont have drag and drop spot for assets for textures etc, so this is just here to show it works 
-    // Draws a box and lets it take in drag and drops for assets
-
-    //ImGui::BeginGroup();
-    //ImVec2 boxSize = ImVec2(256, 256);
-    //ImGui::Text("Preview:");
-    //ImGui::Dummy(boxSize); // Reserves space for preview
-
-    //ImDrawList* drawList = ImGui::GetWindowDrawList(); // Imgui rendering for box with white outline
-    //drawList->AddRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(255, 255, 255, 255));
-
-    //static std::string draggedAsset{};
-    //ReceiveDragAndDrop(AssetPayloadID, draggedAsset);
-
-    //ImGui::EndGroup();
-    //// Do something with DnD asset data - maybe insert into boxes to assign sprites
-    //ImGui::Text(draggedAsset.c_str());
-
     // Add Component Button
     ImVec2 space = ImGui::GetContentRegionAvail();
     ImVec2 buttonSize{ 100,25 };
-    ImGui::SetCursorPos({ (space.x - buttonSize.x)/2, space.y });
+    ImGui::SetCursorPosX((space.x - buttonSize.x)/2);
     if (ImGui::Button("Add Component", buttonSize))
     {
         ImGui::OpenPopup("Add_Component");
