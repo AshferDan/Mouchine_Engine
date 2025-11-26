@@ -1,4 +1,39 @@
 {
+      "AudioManager": {
+    "sounds": [
+      {
+        "name": "MainMenuBGM",
+        "filepath": "../Assets/audio/menu_loop.wav",
+        "loop": true,
+        "volume": 0.5,
+        "category": "music"
+      },
+      {
+        "name": "menu_hover",
+        "filepath": "../Assets/Audio/hovering_Button.wav",
+        "loop": false,
+        "volume": 0.8,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_click",
+        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
+        "loop": false,
+        "volume": 1.0,
+        "category": "sfx"
+      }
+    ],
+    "events": [
+      {
+        "event": "UI_Hover",
+        "sound": "menu_hover"
+      },
+      {
+        "event": "UI_Click",
+        "sound": "menu_click"
+      }
+    ]
+  },
   "GameObjects": [
     {
       "name": "Title",
