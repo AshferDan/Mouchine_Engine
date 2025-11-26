@@ -103,21 +103,12 @@ void Serialization::DeserializeGameObject(const json& j)
 
 	// Check if ID already exists
 	GameObjectFactory& factory = GameObjectFactory::Instance();
-	bool idExists = (oldID != -1 && factory.GetGameObject(oldID) != nullptr);
+	//bool idExists = (oldID != -1 && factory.GetGameObject(oldID) != nullptr);
 
 	EntityID newID = oldID;
-
-	// PREFAB CASE — ID must be unique
-	if (idExists)
-	{
-		newID = factory.GetSmallestAvailableID();   // assign new unique ID
-		g_OldToNewID[oldID] = newID;         // store mapping
-	}
-	else
-	{
-		// SCENE or UNDO CASE — ID must be preserved
-		g_OldToNewID[oldID] = newID;
-	}
+	// Get smallest available ID map to GameObjects 
+	newID = factory.GetSmallestAvailableID();   // assign new unique ID
+	g_OldToNewID[oldID] = newID;         // store mapping
 
 	// Create GameObject
 	GameObject* go = factory.CreateGameObjectWithID(newID, name);
