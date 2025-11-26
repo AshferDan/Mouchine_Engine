@@ -56,7 +56,7 @@
             {
       "name": "PlayButton",
       "localID": 2,
-      "parentID": 1,
+      "parentID": -1,
       "active": true,
 
       "TransformComponent": {
@@ -76,7 +76,7 @@
     {
       "name": "SettingsButton",
       "localID": 3,
-      "parentID": 1,
+      "parentID": -1,
       "active": true,
 
       "TransformComponent": {
@@ -96,7 +96,7 @@
     {
       "name": "QuitButton",
       "localID": 4,
-      "parentID": 1,
+      "parentID": -1,
       "active": true,
 
       "TransformComponent": {

@@ -69,43 +69,17 @@
     {
       "name": "Hero",
       "localID": 2,
-      "parentID": 4294967295,
+      "parentID": -1,
       "active": true,
-      "TransformComponent": {
-        "pos": [
-          62.851619720458984,
-          -175.0352783203125
-        ],
-        "scale": [
-          150.0,
-          150.0
-        ],
-        "rotation": 0.0
-      },
+
       "RenderComponent": {
-        "shapeType": "Square",
         "texturePath": "../Assets/spritesheet_R.png",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ]
+        "shapeType": "Square"
       },
+
       "Spritesheet": {
-        "defaultAnimation": "Run_R",
+        "defaultAnimation": "Idle_R",
         "animations": [
-          {
-            "name": "Idle_L",
-            "filepath": "../Assets/spritesheet_L.png",
-            "rows": 13,
-            "cols": 10,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 2,
-            "fps": 4.0
-          },
           {
             "name": "Idle_R",
             "filepath": "../Assets/spritesheet_R.png",
@@ -118,26 +92,26 @@
             "fps": 4.0
           },
           {
-            "name": "Jump_L",
+            "name": "Idle_L",
             "filepath": "../Assets/spritesheet_L.png",
             "rows": 13,
             "cols": 10,
-            "startRow": 11,
-            "startCol": 4,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 12.0
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 2,
+            "fps": 4.0
           },
           {
-            "name": "Jump_R",
+            "name": "Run_R",
             "filepath": "../Assets/spritesheet_R.png",
             "rows": 13,
             "cols": 10,
-            "startRow": 11,
-            "startCol": 4,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 12.0
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 16.0
           },
           {
             "name": "Run_L",
@@ -151,32 +125,47 @@
             "fps": 16.0
           },
           {
-            "name": "Run_R",
+            "name": "Jump_R",
             "filepath": "../Assets/spritesheet_R.png",
             "rows": 13,
             "cols": 10,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 7,
-            "fps": 16.0
+            "startRow": 11,
+            "startCol": 4,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 12.0
+          },
+          {
+            "name": "Jump_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 11,
+            "startCol": 4,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 12.0
           }
         ]
       },
-      "PhysicsComponent": {
-        "mass": 1.0,
-        "isStatic": false,
-        "useGravity": true,
-        "isGrounded": false,
-        "velocity": [
-          -163.06198120117188,
-          0.0
-        ]
+
+      "TransformComponent": {
+        "pos": [0, 0],
+        "scale": [150, 150],
+        "rotation": 0.0
       },
+
       "ColliderComponent": {
         "shape": "Square",
         "layer": "Player"
       },
+
+      "PhysicsComponent": {
+        "useGravity": true,
+        "isStatic": false,
+        "velocity": [0, 0]
+      },
+
       "children": []
     },
     {
