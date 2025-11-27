@@ -128,7 +128,7 @@ public:
 
     void ResetState();
 
-
+    static bool ShowFPS;
 private:
     // Window info
     GLFWwindow *window;

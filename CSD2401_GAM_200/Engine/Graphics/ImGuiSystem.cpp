@@ -169,6 +169,7 @@ void ImGuiSystem::Initialize()
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);                 // Initialize GLFW backend
     ImGui_ImplOpenGL3_Init("#version 450");                       // Initialize OpenGL backend
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable docking
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
     // ReloadPrefabsList();
 

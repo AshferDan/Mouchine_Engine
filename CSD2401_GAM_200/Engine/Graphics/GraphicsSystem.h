@@ -241,6 +241,11 @@ public:
 	void ToggleFullScreen();
 	bool IsFullscreen() const { return isFullscreen; }
 
+	void LoadClickCursors(const char* normalPath, const char* clickPath, int normalHotX = 0, int normalHotY = 0, int clickHotX = 0, int clickHotY = 0);
+	void LoadDefaultCursor(const char* cursorPath, int hotX = 0, int hotY = 0);
+	GLFWcursor* GetNormalCursor() const { return normalCursor; }
+	GLFWcursor* GetClickCursor() const { return clickCursor; }
+
 private:
 	// --- Window and State ---
 	GLFWwindow* window;						// The handle to the GLFW window.
@@ -253,6 +258,8 @@ private:
 	bool editorMode;						// Flag to indicate if rendering should target the FBO (true) or the screen (false).
 	class LevelEditor* levelEditor = nullptr; // Pointer to the level editor for camera manipulation when in editor mode.
 
+	GLFWcursor* normalCursor = nullptr;
+	GLFWcursor* clickCursor = nullptr;
 
 	// --- Shaders ---
 	GLSLShader shader;		// Default shader for batched quads/circles.
