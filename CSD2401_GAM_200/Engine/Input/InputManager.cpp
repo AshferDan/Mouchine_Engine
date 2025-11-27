@@ -212,12 +212,11 @@ void InputManager::Update(float dt)
                 }
                 else if (key == GLFW_KEY_F4)
                 {
-                    CORE->GetGraphicsSystem()->SetEditorMode(!CORE->GetGraphicsSystem()->IsEditorMode());
-                    std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
-                }
-                else if (key == GLFW_KEY_P) {
                     ShowFPS = !ShowFPS;
                     std::cout << "FPS display " << (ShowFPS ? "ENABLED" : "DISABLED") << std::endl;
+                }
+                else if (key == GLFW_KEY_P) {
+
                 }
             }
             wasPressed = true;
