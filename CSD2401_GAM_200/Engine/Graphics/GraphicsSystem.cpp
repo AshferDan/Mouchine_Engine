@@ -732,8 +732,11 @@ void GraphicsSystem::Update(float)
         }
     }
 
+    if (currentSelection_ColliderOnly.exist) {
+        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, { 1,1,0.4,1 }, vp);       // draw yellow outline
+    }
     if (currentSelection.exist) {
-        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 0,1,0,1 }, vp);
+        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 1,1,1,1 }, vp);         // draw white outline
     }
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
