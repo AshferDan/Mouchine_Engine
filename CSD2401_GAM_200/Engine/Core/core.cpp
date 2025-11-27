@@ -503,12 +503,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    if (audioEngine && levelEditor)
+    if (audioEngine)
     {
-        std::string bgmChannel = levelEditor->GetCurrentBGMChannel();
-        if (!bgmChannel.empty())
-        {
-            audioEngine->pauseSound(bgmChannel, paused);
-        }
+        audioEngine->stopAllSound();
     }
 }

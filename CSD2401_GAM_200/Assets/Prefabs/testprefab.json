@@ -1,0 +1,33 @@
+{
+    "GameObjects": [
+        {
+            "ColliderComponent": {
+                "layer": "Default",
+                "shape": "Circle"
+            },
+            "RenderComponent": {
+                "color": [
+                    0.8823528289794922,
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                "shapeType": "Circle",
+                "texturePath": ""
+            },
+            "TransformComponent": {
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "rotation": 0.0,
+                "scale": [
+                    151.3000030517578,
+                    50.0
+                ]
+            },
+            "active": true,
+            "name": "testprefab"
+        }
+    ]
+}

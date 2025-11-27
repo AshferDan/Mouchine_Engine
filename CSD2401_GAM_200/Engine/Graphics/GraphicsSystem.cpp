@@ -72,7 +72,7 @@ GraphicsSystem::GraphicsSystem()
                 }
 
             } });
-
+    
             // Make OpenGL context current for this window.
             glfwMakeContextCurrent(window);
 
@@ -97,9 +97,8 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
     frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
     frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
-{
     // Same as default constructor, but allows user to specify window size.
-
+{
     if (!glfwInit())
     {
         std::cerr << "Failed to initialize GLFW\n";
@@ -151,8 +150,21 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
  */
 GraphicsSystem::~GraphicsSystem()
 {
+    if (window) {
+        glfwSetCursor(window, nullptr); // Reset to default cursor
+    }
+
     // Clean up Frame Buffer resources
     DeleteFrameBuffer();
+
+    if (normalCursor) {
+        glfwDestroyCursor(normalCursor);
+        normalCursor = nullptr;
+    }
+    if (clickCursor) {
+        glfwDestroyCursor(clickCursor);
+        clickCursor = nullptr;
+    }
 
     // Clean up resources on destruction.
     if (window)
@@ -173,6 +185,84 @@ void GraphicsSystem::Initialize()
         std::cerr << "Failed to initialize GLEW\n";
         return;
     }
+    LoadDefaultCursor("../Assets/Mouse.png");
+    clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+
+    // Initialize cursors with null checks
+    //normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    //clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+
+    //std::cout << "Normal cursor created: " << (normalCursor ? "SUCCESS" : "FAILED") << std::endl;
+    //std::cout << "Click cursor created: " << (clickCursor ? "SUCCESS" : "FAILED") << std::endl;
+
+    // Set initial cursor - only if creation was successful
+    //if (normalCursor) {
+    //    glfwSetCursor(window, clickCursor);
+    //}
+    //else {
+    //    std::cerr << "WARNING: Failed to create normal cursor, using default" << std::endl;
+    //}
+
+    // Improved mouse button callback with better error handling
+    //glfwSetMouseButtonCallback(window, [](GLFWwindow* win, int button, int action, int mods) {
+    //    auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
+    //    if (!gs) {
+    //        return;
+    //    }
+
+    //    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+    //        if (action == GLFW_PRESS) {
+    //            // Safe cursor switching
+    //            GLFWcursor* clickCursor = gs->GetClickCursor();
+    //            if (clickCursor) {
+    //                glfwSetCursor(win, clickCursor);
+    //            }
+    //        }
+    //        else if (action == GLFW_RELEASE) {
+    //            // Safe cursor switching back to normal
+    //            GLFWcursor* normalCursor = gs->GetNormalCursor();
+    //            if (normalCursor) {
+    //                glfwSetCursor(win, normalCursor);
+    //            }
+    //            else {
+    //                // Fallback to default cursor if custom normal cursor is unavailable
+    //                glfwSetCursor(win, nullptr);
+    //            }
+    //        }
+    //    }
+    //    });
+
+    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
+        {
+            if (focused == GLFW_FALSE)
+            {
+                CORE->SetGamePaused(true);
+            }
+            else
+            {
+                CORE->SetGamePaused(false);
+                auto* audioManager = CORE->GetAudioManager();
+
+                const auto& sounds = audioManager->GetSoundDatabase();
+
+                if (sounds.find("bgm") != sounds.end())
+                {
+                    // Game scene - play game BGM
+                    std::cout << "Playing game BGM\n";
+                    audioManager->PlaySound("bgm", "bgm_channel");
+                }
+                else if (sounds.find("MainMenuBGM") != sounds.end())
+                {
+                    // Main menu scene - play menu BGM
+                    std::cout << "Playing main menu BGM\n";
+                    audioManager->PlaySound("MainMenuBGM", "menu_bgm_channel");
+                }
+                else
+                {
+                    std::cout << "No BGM found in AudioManager\n";
+                }
+            }
+        });
 
     // Enable blending (allows transparency in textures and colors).
     glEnable(GL_BLEND);
@@ -340,18 +430,6 @@ void GraphicsSystem::Update(float)
     if (!window)
         return; // Skip if no valid window.
 
-    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
-        {
-            if (focused == GLFW_FALSE)
-            {
-                CORE->SetGamePaused(true);
-            }
-            else
-            {
-                CORE->SetGamePaused(false);
-            }
-        });
-
     // === Framebuffer and Viewport Setup ===
     if (editorMode)
     {
@@ -401,6 +479,19 @@ void GraphicsSystem::Update(float)
     }
     // Accumulate all geometry into batches
     batches.clear();
+
+    auto* textObj = GameObjectFactory::Instance().FindGameObject("Text FPS");
+    if (textObj) {
+        auto* textFPS = textObj->GetComponent<TextComponent>();
+        if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
+            textFPS->SetEnabled(true);
+            textFPS->SetText(std::to_string(static_cast<int>(CORE->GetFPS())));
+        }
+        else {
+            textFPS->SetText("FPS");
+            textFPS->SetEnabled(false);
+        }
+    }
 
     auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
     // === Batch Accumulation Loop ===
@@ -643,8 +734,11 @@ void GraphicsSystem::Update(float)
         }
     }
 
+    if (currentSelection_ColliderOnly.exist) {
+        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, { 1,1,0.4,1 }, vp);       // draw yellow outline
+    }
     if (currentSelection.exist) {
-        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 0,1,0,1 }, vp);
+        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 1,1,1,1 }, vp);         // draw white outline
     }
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
@@ -1105,6 +1199,91 @@ void GraphicsSystem::ToggleFullScreen() {
         isFullscreen = false;
 
         std::cout << "[GraphicsSytem] Switched to windowed " << Wwidth << "x" << Wheight << std::endl;
+    }
+}
+
+void GraphicsSystem::LoadClickCursors(const char* normalPath, const char* clickPath, int normalHotX, int normalHotY, int clickHotX, int clickHotY) {
+    if (window) {
+        glfwSetCursor(window, nullptr);
+    }
+
+    if (normalCursor) {
+        glfwDestroyCursor(normalCursor);
+        normalCursor = nullptr;
+    }
+
+    if (clickCursor) {
+        glfwDestroyCursor(clickCursor);
+        clickCursor = nullptr;
+    }
+
+    int width, height, channels;
+    unsigned char* pixels = stbi_load(normalPath, &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        normalCursor = glfwCreateCursor(&image, normalHotX, normalHotY);
+        stbi_image_free(pixels);
+        std::cout << "Loaded normal cursor: " << normalPath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load normal cursor: " << normalPath << std::endl;
+        normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    }
+
+    pixels = stbi_load(clickPath, &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        clickCursor = glfwCreateCursor(&image, clickHotX, clickHotY);
+        std::cout << "Loaded click cursor: " << clickPath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load click cursor: " << clickPath << std::endl;
+        clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+    }
+
+    if (normalCursor) {
+        glfwSetCursor(window, normalCursor);
+    }
+}
+
+void GraphicsSystem::LoadDefaultCursor(const char* cursorPath, int hotX, int hotY) {
+    // Reset to default cursor before changing
+    if (window) {
+        glfwSetCursor(window, nullptr);
+    }
+
+    // Destroy old cursor if it exists
+    if (normalCursor) {
+        glfwDestroyCursor(normalCursor);
+        normalCursor = nullptr;
+    }
+
+    int width, height, channels;
+    unsigned char* pixels = stbi_load(cursorPath, &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        normalCursor = glfwCreateCursor(&image, hotX, hotY);
+        stbi_image_free(pixels);
+        std::cout << "Loaded custom cursor: " << cursorPath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load custom cursor: " << cursorPath
+            << " - Using default arrow cursor" << std::endl;
+        normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    }
+
+    // Set the new cursor
+    if (normalCursor && window) {
+        glfwSetCursor(window, normalCursor);
     }
 }
 

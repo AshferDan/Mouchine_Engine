@@ -71,6 +71,7 @@ void LevelEditor::Initialize()
     currentFilename = "start level";
     editorMode = EditorMode::Stop;
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable docking
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
     //icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
 }
@@ -555,6 +556,7 @@ void LevelEditor::RenderMenuBar()
             ImGui::PushID(("scene_" + std::to_string(sceneIndex)).c_str());
             if (ImGui::Button(file.c_str(), ImVec2(200, 0)))
             {
+                CORE->GetImguiSystem()->ResetSelectedGameObject();
                 pendingSceneReload = true;
                 pendingScenePath = "../Assets/Scenes/" + file;
                 std::cout << "[LevelEditor] Scheduled scene reload: " << pendingScenePath << "\n";
