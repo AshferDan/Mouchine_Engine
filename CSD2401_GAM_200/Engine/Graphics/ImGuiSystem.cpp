@@ -2255,8 +2255,11 @@ void ImGuiSystem::RenderPropertyEditor()
         }
     }
 
-    // Add event into GameObjects
-    RenderEventComponent(obj); 
+    if (auto* events = obj->GetComponent<EventComponent>())
+    {
+        // Add event into GameObjects
+        RenderEventComponent(events, obj);
+    }
 
     // Add Component Button
     ImVec2 space = ImGui::GetContentRegionAvail();
@@ -2302,17 +2305,8 @@ void ImGuiSystem::RenderPropertyEditor()
     ImGui::End();
 }
 
-void ImGuiSystem::RenderEventComponent(GameObject* obj)
+void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
 {
-    auto* ec = obj->GetComponent<EventComponent>();
-
-    // Add component button
-    if (!ec)
-    {
-        if (ImGui::Button("Add Event Component"))
-            obj->AddComponent<EventComponent>();
-        return;
-    }
 
     // --- Begin UI ---
     if (ImGui::CollapsingHeader("Event Component", ImGuiTreeNodeFlags_DefaultOpen))
@@ -2320,7 +2314,19 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
         ImGui::Text("Rules: %zu", ec->rules.size());
         ImGui::Separator();
 
-        // Draw each rule
+        auto& allObjects = factory.GetAllGameObjects();
+        std::vector<const char*> objectNames;
+        std::vector<int> objectIds;
+
+        objectNames.push_back("Any GameObjects"); // Trigger by Any Objects
+        objectIds.push_back(-1);
+
+        for (auto& o : allObjects)
+        {
+            objectNames.push_back(o->GetName().c_str());
+            objectIds.push_back(o->GetID());
+        }
+
         int index = 0;
         for (auto& rule : ec->rules)
         {
@@ -2328,7 +2334,6 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
 
             if (ImGui::TreeNodeEx("Rule", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                // Event Type selection
                 static const char* eventNames[] = {
                     "None",
                     "OnStart",
@@ -2336,45 +2341,48 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
                     "OnDisable",
                     "OnDestroy",
                     "OnUpdate",
-                    "OnKeyPressed",
-                    "OnKeyReleased",
-                    "OnMousePressed",
-                    "OnMouseReleased",
-                    "OnMouseOver",
                     "OnCollisionEnter",
                     "OnCollisionStay",
                     "OnCollisionExit",
                     "OnTriggerEnter",
                     "OnTriggerStay",
                     "OnTriggerExit",
-                    "OnGoalReached",
-                    "OnFellOutOfMap"
+                    //"OnGoalReached",
+                    //"OnFellOutOfMap"
                 };
 
                 int evIndex = (int)rule.eventType;
                 if (ImGui::Combo("Event", &evIndex, eventNames, IM_ARRAYSIZE(eventNames)))
                     rule.eventType = (EventType)evIndex;
 
-                // Target filter
-                char buf[64];
-                strncpy(buf, rule.targetFilter.c_str(), sizeof(buf));
-                if (ImGui::InputText("Target Filter", buf, sizeof(buf)))
-                    rule.targetFilter = buf;
+                int currentIndex = -1;
 
-                // Action selection
+                // find index of current ID
+                for (int i = 0; i < (int)objectIds.size(); i++)
+                {
+                    if (objectIds[i] == rule.targetObjectId)
+                        currentIndex = i;
+                }
+
+                if (ImGui::Combo("Trigger By", &currentIndex,
+                    objectNames.data(), (int)objectNames.size()))
+                {
+                    rule.targetObjectId = objectIds[currentIndex];
+                }
+
                 static const char* actionNames[] = {
                     "None",
-                    "Shrink",
-                    "Grow",
-                    "ScaleTo",
-                    "MoveTo",
-                    "TeleportTo",
+                    //"Shrink",
+                    //"Grow",
+                    //"ScaleTo",
+                    //"MoveTo",
+                    //"TeleportTo",
                     "EnableObject",
                     "DisableObject",
                     "DestroyObject",
                     "PlaySound",
                     "StopSound",
-                    "LoadNextLevel",
+                    //"LoadNextLevel",
                     "Respawn",
                     "AddScore",
                     "TakeDamage",
@@ -2385,9 +2393,111 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
                 if (ImGui::Combo("Action", &acIndex, actionNames, IM_ARRAYSIZE(actionNames)))
                     rule.action = (ActionType)acIndex;
 
+                switch (rule.action)
+                {
+                    ImGui::DragFloat2("Position / Scale", &rule.vec2Value.x, 0.1f);
+                    break;
+
+                case ActionType::PlaySound:
+                {
+
+                    auto* audioMgr = CORE->GetAudioManager();
+
+                    // Fallback: If no sounds loaded, load global audio.json right now
+                    if (audioMgr->GetSoundDatabase().empty())
+                    {
+                        std::cout << "[ImGui] No audio loaded. Loading fallback audio.json...\n";
+
+                        std::string fallbackPath = "../Assets/Audio/audio.json";
+                        std::ifstream f(fallbackPath);
+
+                        if (f.is_open())
+                        {
+                            json audioRoot;
+                            f >> audioRoot;
+
+                            json wrapper;
+                            wrapper["AudioManager"] = audioRoot["AudioManager"];
+
+                            Serialization::DeserializeAudioManager(wrapper, audioMgr);
+
+                            std::cout << "[ImGui] Fallback audio.json loaded.\n";
+                        }
+                        else
+                        {
+                            ImGui::TextColored(ImVec4(1, 0.2f, 0.2f, 1),
+                                "ERROR: Could not open audio.json fallback.");
+                            break;
+                        }
+                    }
+
+                    // After fallback, soundDatabase MUST have entries
+                    auto& soundDB = audioMgr->GetSoundDatabase();
+
+                    if (soundDB.empty())
+                    {
+                        ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1),
+                            "No sounds loaded (even after fallback).");
+                        break;
+                    }
+
+                    // Draw dropdown normally
+                    std::vector<const char*> names;
+                    names.reserve(soundDB.size());
+
+                    for (auto& pair : soundDB)
+                        names.push_back(pair.first.c_str());
+
+                    // current selection
+                    int idx = 0;
+                    int i = 0;
+                    for (auto& p : soundDB)
+                    {
+                        if (p.first == rule.stringValue)
+                        {
+                            idx = i;
+                            break;
+                        }
+                        i++;
+                    }
+
+                    if (ImGui::Combo("Sound", &idx, names.data(), (int)names.size()))
+                    {
+                        int j = 0;
+                        for (auto& p : soundDB)
+                        {
+                            if (j == idx)
+                            {
+                                rule.stringValue = p.first;
+                                break;
+                            }
+                            j++;
+                        }
+                    }
+                }
+                
+                break;
+                
+                case ActionType::StopSound:
+                              
+                break;
+
+                case ActionType::AddScore:
+                case ActionType::TakeDamage:
+                    ImGui::DragFloat("Value", &rule.floatValue, 1.0f);
+                    break;
+
+                case ActionType::FlashColor:
+                    ImGui::ColorEdit4("Color", &rule.colorValue.x);
+                    ImGui::DragFloat("Duration", &rule.floatValue, 0.1f);
+                    break;
+
+                default:
+                    break;
+                }
+
                 ImGui::Spacing();
 
-                // Remove rule
                 if (ImGui::Button("Remove Rule"))
                 {
                     ec->rules.erase(ec->rules.begin() + index);
@@ -2405,7 +2515,6 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
 
         ImGui::Separator();
 
-        // Add new rule
         if (ImGui::Button("Add Rule"))
         {
             EventRule newRule;
@@ -2413,6 +2522,7 @@ void ImGuiSystem::RenderEventComponent(GameObject* obj)
         }
     }
 }
+
 
 /**
  * @brief HELLO PROFS THIS IS THE STRESS TEST FUNCTION. Spawns 1000 GOs
@@ -2862,6 +2972,9 @@ void PopulateComponentList()
     AllComponents.push_back({ ComponentType::Render, "Render Component"    , ImTextureID(icon_active_ui), [](GameObject* go){ 
             if (!go->GetComponent<RenderComponent>()) { 
                 go->AddComponent<RenderComponent>();    std::cout << "Added Render Component to " << go->GetName() << std::endl; } } });
+    AllComponents.push_back({ ComponentType::Event, "Event Component"    , ImTextureID(icon_active_ui), [](GameObject* go) {
+            if (!go->GetComponent<EventComponent>()) {
+                go->AddComponent<EventComponent>();    std::cout << "Added Event Component to " << go->GetName() << std::endl; } } });
 
     //AllComponents.push_back({ "Text Component"      , ImTextureID(icon_active_ui), [](GameObject* go) { go->AddComponent<TextComponent>(); } });
     //AllComponents.push_back({ "Animator Component"  , ImTextureID(icon_active_ui), [](GameObject* go) { go->AddComponent<Spritesheet>(); } });

@@ -117,7 +117,7 @@ void CoreEngine::InitSystems()
     menuLogicSystem = AddSystem<MenuLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
-    eventSystemRunner = AddSystem<EventSystemRunner>();
+    //eventSystem = AddSystem<EventSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
@@ -243,9 +243,6 @@ void CoreEngine::GameLoop()
         if (timerSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
 
-        if (eventSystemRunner)
-            g_systemTimings[eventSystemRunner->GetName()] = 0.0;
-
         // Start ImGui frame
         if (imguiSystem)
         {
@@ -342,22 +339,14 @@ void CoreEngine::GameLoop()
                 stepOnce = false; // Reset after processing one frame
             }
 
-            if (eventSystemRunner)
-            {
-                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                eventSystemRunner->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
-                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[eventSystemRunner->GetName()] = ms;
-                g_totalLoopTime += ms;
-            }
-
             // In step mode, only process ONE timestep then break
             if (stepMode)
                 break;
 
             accumulator -= fixed_dt;
         }
+
+        EventSystem::ProcessEvents();
 
         // VARIABLE TIMESTEP - Rendering and UI systems
         if (graphicsSystem)

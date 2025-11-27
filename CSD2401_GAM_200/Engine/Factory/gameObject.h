@@ -44,6 +44,9 @@ Technology is prohibited.
 
 #pragma once
 #include "Component.h"
+#include "GameManager.h"
+#include "logic.h"
+
 #include <vector>
 #include <memory>
 #include <typeindex>
@@ -52,6 +55,7 @@ Technology is prohibited.
 
 using EntityID = std::uint32_t;
 enum class EventType;
+struct EventRule;
 
 class GameObject {
 public:
@@ -268,6 +272,7 @@ public:
 
     void ReorderChildren(const std::vector<EntityID>& order);
 
+    void ExecuteAction(const EventRule& rule, GameObject* other);
     virtual void OnEventTriggered(EventType event, GameObject* other);
 
 private:

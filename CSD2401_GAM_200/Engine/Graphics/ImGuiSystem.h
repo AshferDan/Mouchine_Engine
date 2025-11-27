@@ -197,7 +197,7 @@ public:
 
     void Viewport_HighlightGO();
 
-    void RenderEventComponent(GameObject* obj);
+    void RenderEventComponent(EventComponent* ec,GameObject* obj);
 
 private:
     /**
@@ -241,6 +241,7 @@ enum ComponentType {
     Transform = 0,
     Render,
     Camera,
+    Event,
     Misc
 };
 extern std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;

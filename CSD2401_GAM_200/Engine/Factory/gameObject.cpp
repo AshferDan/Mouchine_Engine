@@ -15,7 +15,7 @@ Technology is prohibited.
 
 #include "GameObject.h"
 #include "factory.h"
-#include "logic.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -194,79 +194,73 @@ void GameObject::ReorderChildren(const std::vector<EntityID>& newOrder) {
     children = reordered;
 }
 
-void GameObject::OnEventTriggered(EventType eventType, GameObject* other)
-{
-    std::cout << "[OnEventTriggered] object=" << GetName()
-        << " | event=" << EventTypeToString(eventType)
-        << "\n";
+void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
+    switch (rule.action)
+    {
+    case ActionType::EnableObject:
+        SetActive(true);
+        break;
 
+    case ActionType::DisableObject:
+        SetActive(false);
+        break;
+
+    case ActionType::DestroyObject:
+        Destroy();
+        break;
+
+    case ActionType::PlaySound:
+        CORE->GetAudioManager()->PlaySound(rule.stringValue, "");
+        //CORE->GetMessageBus()->Publish(PlaySoundMessage(rule.stringValue));
+        break;
+
+    case ActionType::StopSound:
+        //CORE->GetMessageBus()->Publish(PauseSoundMessage(rule.stringValue, true));
+        break;
+
+    //case ActionType::LoadNextLevel:
+    //    GameManager::ChangeState;
+    //    break;
+
+    case ActionType::Respawn:
+    {
+        auto* tc = GetComponent<TransformComponent>();
+        if (tc) {
+            // Respawn here
+        }
+        break;
+    }
+
+    case ActionType::AddScore:
+       
+        break;
+
+    case ActionType::TakeDamage:
+        break;
+
+    case ActionType::FlashColor:
+        // Example: flash system can animate colorValue for duration = floatValue
+        break;
+
+    default:
+        break;
+    }
+}
+
+void GameObject::OnEventTriggered(EventType type, GameObject* other) {
+    // Get this object's eventComponent
     auto* ec = GetComponent<EventComponent>();
-
-    std::cout << "[EventComponent] Rules count = " << ec->rules.size() << "\n";
-
     if (!ec) return;
 
-    for (auto& rule : ec->rules)
-    {
-        std::cout << "Comparing: rule="
-            << EventTypeToString(rule.eventType)
-            << " vs event="
-            << EventTypeToString(eventType)
-            << "\n";
+    for (auto& rule : ec->rules) {
+        if (rule.eventType != type) continue;
 
-        // EVENT TYPE MATCH?
-        if (rule.eventType != eventType)
-            continue;
-
-        // TARGET FILTER MATCH?
-        if (!rule.targetFilter.empty())
+        if (rule.targetObjectId != -1)
         {
             if (!other) continue;
-            if (other->GetName() != rule.targetFilter)
+            if (other->GetID() != rule.targetObjectId)
                 continue;
         }
-
-        // Execute Action
-        std::cout << "Action = " << (int)rule.action << std::endl;
-        std::cout << "Action = " << ActionTypeToString(rule.action) << std::endl;
-
-        auto* t = GetComponent<TransformComponent>();
-
-        switch (rule.action)
-        {
-        case ActionType::Shrink:        
-            break;
-
-        case ActionType::Grow:
-            break;
-
-        case ActionType::DestroyObject:
-            SetActive(false);
-            break;
-
-        case ActionType::DisableObject:
-            SetActive(false);
-            break;
-
-        case ActionType::EnableObject:
-            SetActive(true);
-            break;
-
-        case ActionType::PlaySound:
-            //CORE->GetAudioManager()->PlaySound("");
-            break;
-
-        case ActionType::LoadNextLevel:
-     
-            break;
-
-        case ActionType::Respawn:
-            if (t)
-                t->SetPosition(0, 0);
-            break;
-
-        default:
-            break;
-        }
+        ExecuteAction(rule, other);
     }
 }

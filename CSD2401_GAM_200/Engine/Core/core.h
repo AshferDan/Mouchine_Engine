@@ -322,8 +322,6 @@ private:
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
 
-    EventSystemRunner *eventSystemRunner = nullptr;
-
     unsigned LastTime;
     bool GameActive;
     static double fps;

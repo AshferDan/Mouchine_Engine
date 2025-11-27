@@ -190,7 +190,7 @@ void ComponentSerialization::SerializeEvent(json &j, EventComponent *ec)
     {
         json r;
         r["eventType"] = EventTypeToString(rule.eventType);
-        r["targetFilter"] = rule.targetFilter;
+        r["targetObjectId"] = rule.targetObjectId;
         r["action"] = ActionTypeToString(rule.action);
 
         rulesJson.push_back(r);
@@ -573,7 +573,7 @@ void ComponentSerialization::DeserializeEvent(const json &j, GameObject *go)
     {
         EventRule rule;
         rule.eventType = StringToEventType(item.value("eventType", "None"));
-        rule.targetFilter = item.value("targetFilter", "");
+        rule.targetObjectId = item.value("targetFilter", -1);
         rule.action = StringToActionType(item.value("action", "None"));
 
         ec->rules.push_back(rule);
