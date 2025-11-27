@@ -91,6 +91,8 @@ public:
 
     void SetSize(float w, float h);
 
+    vec2 GetSize() const { return vec2(width, height); }
+
  /*   void SetRotation(float r);*/
 
 private:

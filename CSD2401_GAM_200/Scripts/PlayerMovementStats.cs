@@ -130,7 +130,7 @@ namespace GameScripts
 
         //[Header("Wall Jump")]
         //[Tooltip("Force applied when wall jumping. X = away from wall, Y = up.")]
-        public Vector2 WallJumpForce = new Vector2(20f, 25f);
+        //public Vector2 WallJumpForce = new Vector2(20f, 25f);
         //[Tooltip("Time after leaving a wall that you can still wall jump (Coyote Time).")]
         public float WallCoyoteTime = 0.1f;
 
@@ -157,7 +157,7 @@ namespace GameScripts
         //[Tooltip("How long the launch boost lasts after leaving the zipline.")]
         public float ZiplineLaunchDuration = 0.25f;
         //[Tooltip("The initial force applied when launching. X is forward, Y is upward.")]
-        public Vector2 ZiplineLaunchForce = new Vector2(15f, 12f);
+        //public Vector2 ZiplineLaunchForce = new Vector2(15f, 12f);
         //[Tooltip("Controls the launch force over its duration. A curve that starts at 1 and ends at 0 is recommended.")]
         //public AnimationCurve ZiplineLaunchCurve;
         //[Tooltip("How long player can still activate a zipline after leaving its trigger (coyote time)")]
