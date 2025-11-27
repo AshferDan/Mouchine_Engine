@@ -628,51 +628,49 @@ void GraphicsSystem::Update(float)
         }
 
         auto* rend = obj->GetComponent<RenderComponent>();
-        if (!rend)
+        if (rend)
         {
-            continue;
-        }
-
-        // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
-        switch (rend->GetShapeType())
-        {
-        case RenderComponent::ShapeType::Line:
-        {
-            auto line = rend->GetLine();
-            DrawLine(line.start, line.end, line.color, vp);
-            break;
-        }
-        case RenderComponent::ShapeType::Point:
-        {
-            auto point = rend->GetPoint();
-            DrawPoint(point.pos, point.color, vp);
-            break;
-        }
-        default:
-            break; // Batched shapes (Square/Circle) are already drawn
-        }
-
-        // Draw debug outlines for ALL shapes
-        if (debugMode)
-        {
-            // std::cout << "went here" << std::endl;
-            auto* transform = obj->GetComponent<TransformComponent>();
-            if (transform)
+            // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
+            switch (rend->GetShapeType())
             {
-                float x, y, sx, sy;
-                transform->GetPosition(x, y);
-                transform->GetScale(sx, sy);
+            case RenderComponent::ShapeType::Line:
+            {
+                auto line = rend->GetLine();
+                DrawLine(line.start, line.end, line.color, vp);
+                break;
+            }
+            case RenderComponent::ShapeType::Point:
+            {
+                auto point = rend->GetPoint();
+                DrawPoint(point.pos, point.color, vp);
+                break;
+            }
+            default:
+                break; // Batched shapes (Square/Circle) are already drawn
+            }
 
-                // Draw outlines based on the shape type
-                if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
+            // Draw debug outlines for ALL shapes
+            if (debugMode)
+            {
+                // std::cout << "went here" << std::endl;
+                auto* transform = obj->GetComponent<TransformComponent>();
+                if (transform)
                 {
-                    // For circles, the scale is interpreted as diameter, so radius is scale*0.5
-                    DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
-                }
-                else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
-                {
-                    //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
-                    DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
+                    float x, y, sx, sy;
+                    transform->GetPosition(x, y);
+                    transform->GetScale(sx, sy);
+
+                    // Draw outlines based on the shape type
+                    if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
+                    {
+                        // For circles, the scale is interpreted as diameter, so radius is scale*0.5
+                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
+                    }
+                    else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
+                    {
+                        //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
+                        DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
+                    }
                 }
             }
         }
@@ -985,6 +983,7 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
 {
     textShader.Use();
     textShader.SetUniform("textColor", color);
+    textShader.SetUniform("text", 0);
 
     mat4 projection;
     float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);

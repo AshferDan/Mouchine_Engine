@@ -250,6 +250,22 @@ void AudioEngine::masterVolume(float volume) {
 }
 
 /**
+ * @brief Toggles mute for all audio (master channel group)
+ */
+void AudioEngine::masterMute() {
+	if (system) {
+		FMOD::ChannelGroup* masterGroup = nullptr;
+		system->getMasterChannelGroup(&masterGroup);
+		if (masterGroup) {
+			bool muted = false;
+			masterGroup->getMute(&muted);
+			masterGroup->setMute(!muted);
+			std::cout << "[AudioEngine] All audio " << (muted ? "unmuted" : "muted") << std::endl;
+		}
+	}
+}
+
+/**
  * @brief Checks if a specific channel is currently playing
  */
 bool AudioEngine::isPlaying(const std::string& channelName) {

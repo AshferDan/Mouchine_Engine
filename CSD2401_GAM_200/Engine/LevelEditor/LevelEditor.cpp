@@ -818,6 +818,16 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         std::cout << "Level loaded from: " << filepath << "\n";
         std::cout << "Loaded " << factory.GetAllGameObjects().size() << " game objects\n";
 
+        // Update pause menu with current scene path for restart functionality
+        if (CORE)
+        {
+            PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+            if (pauseMenu)
+            {
+                pauseMenu->SetCurrentScene(filepath);
+            }
+        }
+
         // any fresh load invalidates the previous save-state snapshot
         hasValidSaveState = false;
         return true;

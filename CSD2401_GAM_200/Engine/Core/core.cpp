@@ -115,8 +115,10 @@ void CoreEngine::InitSystems()
     scriptSystem = AddSystem<ScriptSystem>();
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
+    pauseMenuLogicSystem = AddSystem<PauseMenuLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
+    gameTimerSystem =AddSystem<GameTimerSystem>();
     eventSystemRunner = AddSystem<EventSystemRunner>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
@@ -240,8 +242,12 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = 0.0;
         if (menuLogicSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if (pauseMenuLogicSystem)
+            g_systemTimings[pauseMenuLogicSystem->GetName()] = 0.0;
         if (timerSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if (gameTimerSystem)
+            g_systemTimings[gameTimerSystem->GetName()] = 0.0;
 
         if (eventSystemRunner)
             g_systemTimings[eventSystemRunner->GetName()] = 0.0;
@@ -398,6 +404,20 @@ void CoreEngine::GameLoop()
         if (timerSystem)
         {
             timerSystem->Update(static_cast<float>(delta_time));
+        }
+
+        if (gameTimerSystem)
+        {
+            std::chrono::high_resolution_clock::time_point sysStart =
+                std::chrono::high_resolution_clock::now();
+
+            gameTimerSystem->Update(static_cast<float>(delta_time));
+
+            std::chrono::high_resolution_clock::time_point sysEnd =
+                std::chrono::high_resolution_clock::now();
+            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+            g_systemTimings[gameTimerSystem->GetName()] = ms;
+            g_totalLoopTime += ms;
         }
 
         if (imguiSystem)

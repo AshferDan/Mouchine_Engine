@@ -30,7 +30,7 @@ AudioManager::AudioManager(AudioEngine* engine) : audioEngine(engine)
     categoryVolumes["ambient"] = 1.0f;
 }
 
-AudioManager::~AudioManager() 
+AudioManager::~AudioManager()
 {
     StopAllSounds();
 }
@@ -188,11 +188,19 @@ void AudioManager::StopSound(const std::string& channelName)
     }
 }
 
-void AudioManager::StopAllSounds() 
+void AudioManager::StopAllSounds()
 {
-    if (audioEngine) 
+    if (audioEngine)
     {
         audioEngine->stopAllSound();
+    }
+}
+
+void AudioManager::ToggleMute()
+{
+    if (audioEngine)
+    {
+        audioEngine->masterMute();
     }
 }
 
@@ -211,7 +219,7 @@ void AudioManager::ReloadSound(const std::string& soundName)
  
     const SoundData& sound = it->second;
 
-    // stop the default channel for this sound if it’s playing
+    // stop the default channel for this sound if itâ€™s playing
     std::string channelName = soundName + "_channel";
     audioEngine->stopSound(channelName);
 

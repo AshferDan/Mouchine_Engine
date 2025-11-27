@@ -3,7 +3,7 @@
     "sounds": [
       {
         "name": "bgm",
-        "filepath": "../Assets/audio/level_1.wav",
+        "filepath": "../Assets/audio/sneaky_bgm.wav",
         "loop": true,
         "volume": 0.20000000298023224,
         "pitch": 1.0,
@@ -478,6 +478,29 @@
         ],
         "rotation": 0.0
       },
+      "children": []
+    },
+    {
+      "name": "LevelTimerText",
+      "localID": 9,
+      "parentID": -1,
+      "active": true,
+
+      "TextComponent": {
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize":48,
+        "text": "00:00",
+        "color": [0.0, 0.0, 0.0, 1.0],
+        "scale": 1.0,
+        "screenSpace": true
+      },
+
+      "TransformComponent": {
+        "pos": [50, 630],
+        "scale": [1, 1],
+        "rotation": 0.0
+      },
+
       "children": []
     }
   ]

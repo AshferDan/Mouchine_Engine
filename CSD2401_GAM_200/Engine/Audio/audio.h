@@ -143,6 +143,11 @@ public:
 	void masterVolume(float volume);
 
 	/**
+	 * @brief Toggles mute for all audio (master channel group)
+	 */
+	void masterMute();
+
+	/**
 	 * @brief Checks if a channel is currently playing
 	 * @param channelName Name of the channel to check
 	 * @return True if the channel is playing, false otherwise
