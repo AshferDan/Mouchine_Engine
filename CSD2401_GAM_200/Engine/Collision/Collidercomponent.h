@@ -21,8 +21,7 @@ class TransformComponent;
 // Collision layers enum
 enum class CollisionLayer {
     Player,
-    Ground,
-    Wall,    // Actually this one should go because ground is also wall technically
+    Ground,    // Ground/Wall - used for all static terrain
     Enemy,
     Platform,
     Default  // For objects without a specific layer
@@ -33,14 +32,14 @@ public:
     enum class Type { Square, Circle };
 
     ColliderComponent(GameObject* own);
-     /**
-     * @brief Constructs a ColliderComponent
-     * @param owner GameObject that owns this component
-     * @param type Shape type (Square or Circle)
-     * @param w Width for squares or diameter for circles
-     * @param h Height for squares (ignored for circles)
-     * @param layer Collision layer for filtering
-     */
+    /**
+    * @brief Constructs a ColliderComponent
+    * @param owner GameObject that owns this component
+    * @param type Shape type (Square or Circle)
+    * @param w Width for squares or diameter for circles
+    * @param h Height for squares (ignored for circles)
+    * @param layer Collision layer for filtering
+    */
     ColliderComponent(GameObject* owner, Type type, float w, float h = 0.0f,
         CollisionLayer layer = CollisionLayer::Default);
 
@@ -91,7 +90,7 @@ public:
 
     void SetSize(float w, float h);
 
- /*   void SetRotation(float r);*/
+    /*   void SetRotation(float r);*/
 
 private:
     Type type;
