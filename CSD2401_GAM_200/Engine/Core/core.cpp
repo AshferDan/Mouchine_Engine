@@ -188,6 +188,20 @@ void CoreEngine::GameLoop()
             level->LoadLevel(m_pendingScene);
             std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
+            // Reset pause menu system (UI was destroyed during scene load)
+            if (pauseMenuLogicSystem)
+            {
+                pauseMenuLogicSystem->Initialize();
+                std::cout << "[CoreEngine] Pause menu system reset" << std::endl;
+            }
+
+            // Reset game timer system
+            if (gameTimerSystem)
+            {
+                gameTimerSystem->Initialize();
+                std::cout << "[CoreEngine] Game timer system reset" << std::endl;
+            }
+
             // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
             if (m_autoPlayAfterLoad)
             {
@@ -355,6 +369,17 @@ void CoreEngine::GameLoop()
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[eventSystemRunner->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
+
+            // Pause menu must update even when game is paused to handle button clicks
+            if (pauseMenuLogicSystem)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                pauseMenuLogicSystem->Update(static_cast<float>(fixed_dt));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[pauseMenuLogicSystem->GetName()] = ms;
                 g_totalLoopTime += ms;
             }
 

@@ -35,7 +35,7 @@ void GameTimerSystem::Update(float dt)
     }
 
     // keep timer frozen
-    if (mode == EditorMode::Pause)
+    if (mode == EditorMode::Pause || CORE->IsGamePaused())
     {
         return;
     }

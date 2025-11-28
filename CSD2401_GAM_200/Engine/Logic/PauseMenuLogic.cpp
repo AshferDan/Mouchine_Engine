@@ -25,6 +25,46 @@ void PauseMenuLogicSystem::Update(float dt)
         return;
     }
 
+    // Update pause menu position to follow camera (so it stays fixed on screen)
+    if (isPauseMenuActive || hasCreatedUI)
+    {
+        vec2 camPos = CameraManager::Instance().GetCameraPosition();
+        auto& factory = GameObjectFactory::Instance();
+
+        // Update all pause menu elements to follow camera
+        std::vector<std::string> uiElements = {
+            "PauseOverlay",
+            "PauseBoard",
+            "PauseTitle",
+            "PauseResumeButton",
+            "PauseRestartButton",
+            "PauseSettingsButton",
+            "PauseMainMenuButton"
+        };
+
+        for (const auto& name : uiElements)
+        {
+            GameObject* obj = factory.FindGameObject(name);
+            if (obj)
+            {
+                auto* transform = obj->GetComponent<TransformComponent>();
+                if (transform)
+                {
+                    // Store the original local position if not already stored
+                    static std::map<std::string, vec2> originalPositions;
+                    if (originalPositions.find(name) == originalPositions.end())
+                    {
+                        originalPositions[name] = vec2(transform->posX, transform->posY);
+                    }
+
+                    // Set position to camera position + original offset
+                    transform->posX = camPos.x + originalPositions[name].x;
+                    transform->posY = camPos.y + originalPositions[name].y;
+                }
+            }
+        }
+    }
+
     // handle pending scene change
     if (pendingSceneChange)
     {
@@ -170,82 +210,82 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     overlayRender->SetColor(vec4(0.0f, 0.0f, 0.0f, 0.7f)); // dark semi-transparent
     overlayRender->SetLayer(100);
 
+    // pause board background
+    GameObject* board = factory.CreateGameObject("PauseBoard");
+    auto* boardTransform = board->AddComponent<TransformComponent>();
+    boardTransform->posX = 0.0f;
+    boardTransform->posY = -20.0f;
+    boardTransform->scaleX = 1500.0f;
+    boardTransform->scaleY = 1000.0f;
+    auto* boardRender = board->AddComponent<RenderComponent>();
+    boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/pause_board.png"));
+    boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    boardRender->SetLayer(101);
+
     // pause title text
     GameObject* title = factory.CreateGameObject("PauseTitle");
     auto* titleTransform = title->AddComponent<TransformComponent>();
     titleTransform->posX = 0.0f;
-    titleTransform->posY = 300.0f;
+    titleTransform->posY = 110.0f;
     titleTransform->scaleX = 400.0f;
-    titleTransform->scaleY = 100.0f;
-    auto* titleText = title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 48, "PAUSED", vec4(1.0f, 1.0f, 1.0f, 1.0f), true);
+    titleTransform->scaleY = 0.0f;
+    auto* titleText = title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // resume button
     GameObject* resumeBtn = factory.CreateGameObject("PauseResumeButton");
     auto* resumeTransform = resumeBtn->AddComponent<TransformComponent>();
     resumeTransform->posX = 0.0f;
-    resumeTransform->posY = 100.0f;
-    resumeTransform->scaleX = 300.0f;
+    resumeTransform->posY = 0.0f;
+    resumeTransform->scaleX = 350.0f;
     resumeTransform->scaleY = 80.0f;
     auto* resumeRender = resumeBtn->AddComponent<RenderComponent>();
-    resumeRender->SetColor(vec4(0.2f, 0.6f, 0.2f, 1.0f)); // Green
-    resumeRender->SetLayer(101);
+    resumeRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
+    resumeRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
+    resumeRender->SetLayer(102);
     auto* resumeText = resumeBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf",
-        32,
-        "Resume",
-        vec4(1.0f, 1.0f, 1.0f, 1.0f),
-        true);
+        "../Assets/FrederickatheGreat-Regular.ttf", 32, "Resume", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // restart button
     GameObject* restartBtn = factory.CreateGameObject("PauseRestartButton");
     auto* restartTransform = restartBtn->AddComponent<TransformComponent>();
     restartTransform->posX = 0.0f;
-    restartTransform->posY = 0.0f;
-    restartTransform->scaleX = 300.0f;
+    restartTransform->posY = -100.0f;
+    restartTransform->scaleX = 350.0f;
     restartTransform->scaleY = 80.0f;
     auto* restartRender = restartBtn->AddComponent<RenderComponent>();
-    restartRender->SetColor(vec4(0.6f, 0.6f, 0.2f, 1.0f)); // Yellow
-    restartRender->SetLayer(101);
+    restartRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
+    restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
+    restartRender->SetLayer(102);
     auto* restartText = restartBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf",
-        32,
-        "Restart",
-        vec4(1.0f, 1.0f, 1.0f, 1.0f),
-        true);
+        "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // settings button
     GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
     auto* settingsTransform = settingsBtn->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
-    settingsTransform->posY = -100.0f;
-    settingsTransform->scaleX = 300.0f;
+    settingsTransform->posY = -200.0f;
+    settingsTransform->scaleX = 350.0f;
     settingsTransform->scaleY = 80.0f;
     auto* settingsRender = settingsBtn->AddComponent<RenderComponent>();
-    settingsRender->SetColor(vec4(0.4f, 0.4f, 0.6f, 1.0f)); // blue
-    settingsRender->SetLayer(101);
+    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
+    settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
+    settingsRender->SetLayer(102);
     auto* settingsText = settingsBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf",
-        32,
-        "Settings",
-        vec4(1.0f, 1.0f, 1.0f, 1.0f),
-        true);
+        "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // main menu button
     GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
     auto* mainMenuTransform = mainMenuBtn->AddComponent<TransformComponent>();
     mainMenuTransform->posX = 0.0f;
-    mainMenuTransform->posY = -200.0f;
-    mainMenuTransform->scaleX = 300.0f;
+    mainMenuTransform->posY = -300.0f;
+    mainMenuTransform->scaleX = 350.0f;
     mainMenuTransform->scaleY = 80.0f;
     auto* mainMenuRender = mainMenuBtn->AddComponent<RenderComponent>();
-    mainMenuRender->SetColor(vec4(0.6f, 0.2f, 0.2f, 1.0f)); // red
-    mainMenuRender->SetLayer(101);
+    mainMenuRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
+    mainMenuRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mainMenuRender->SetLayer(102);
     auto* mainMenuText = mainMenuBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf",
-        32,
-        "Main Menu",
-        vec4(1.0f, 1.0f, 1.0f, 1.0f),
-        true);
+        "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
     std::cout << "[PauseMenu] UI created" << std::endl;
@@ -264,6 +304,7 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
     // Destroy all pause menu UI elements
     std::vector<std::string> uiElements = {
         "PauseOverlay",
+        "PauseBoard",
         "PauseTitle",
         "PauseResumeButton",
         "PauseRestartButton",
@@ -290,6 +331,7 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
 
     std::vector<std::string> uiElements = {
         "PauseOverlay",
+        "PauseBoard",
         "PauseTitle",
         "PauseResumeButton",
         "PauseRestartButton",
@@ -345,33 +387,9 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHover
     auto* rc = btn->GetComponent<RenderComponent>();
     if (!rc) return;
 
-    // Change button brightness on hover
-    if (buttonName == "PauseResumeButton")
-    {
-        if (isHovered)
-            rc->SetColor(vec4(0.3f, 0.8f, 0.3f, 1.0f)); // Brighter green
-        else
-            rc->SetColor(vec4(0.2f, 0.6f, 0.2f, 1.0f)); // Normal green
-    }
-    else if (buttonName == "PauseRestartButton")
-    {
-        if (isHovered)
-            rc->SetColor(vec4(0.8f, 0.8f, 0.3f, 1.0f)); // brighter yellow
-        else
-            rc->SetColor(vec4(0.6f, 0.6f, 0.2f, 1.0f)); // Normal yellow
-    }
-    else if (buttonName == "PauseSettingsButton")
-    {
-        if (isHovered)
-            rc->SetColor(vec4(0.6f, 0.6f, 0.8f, 1.0f)); // brighter blue
-        else
-            rc->SetColor(vec4(0.4f, 0.4f, 0.6f, 1.0f)); // blue
-    }
-    else if (buttonName == "PauseMainMenuButton")
-    {
-        if (isHovered)
-            rc->SetColor(vec4(0.8f, 0.3f, 0.3f, 1.0f)); // brighter red
-        else
-            rc->SetColor(vec4(0.6f, 0.2f, 0.2f, 1.0f)); // red
-    }
+    // swap between normal and hover button textures
+    std::string texturePath = isHovered ? "../Assets/hoveringbtnL.png" : "../Assets/blankbtnL.png";
+
+    unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
+    rc->SetTextureID(newtex);
 }

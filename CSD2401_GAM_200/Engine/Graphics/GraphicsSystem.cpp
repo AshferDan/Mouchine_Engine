@@ -684,6 +684,22 @@ void GraphicsSystem::Update(float)
                 {
                     float x, y;
                     transform->GetPosition(x, y);
+
+                    // For screen-space text, position is fixed screen coordinates
+                    // Store the original position on first frame and always use it
+                    if (textComp->isScreenSpace())
+                    {
+                        static std::map<TextComponent*, vec2> screenSpacePositions;
+                        if (screenSpacePositions.find(textComp) == screenSpacePositions.end())
+                        {
+                            // Store the original position as screen coordinates
+                            screenSpacePositions[textComp] = vec2(x, y);
+                        }
+                        // Always use the stored screen position for screen-space text
+                        x = screenSpacePositions[textComp].x;
+                        y = screenSpacePositions[textComp].y;
+                    }
+
                     // Render text using the dedicated text rendering function
                     RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
                         textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
@@ -1002,6 +1018,47 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
         projection = vp;
     }
     textShader.SetUniform("projection", projection);
+
+    // Only center text if it's in world space (not screen space)
+    // Screen space text (like timers, FPS) should stay left-aligned
+    if (!screenSpace)
+    {
+        // Calculate total text width and height metrics for centering
+        float textWidth = 0.0f;
+        float maxAscent = 0.0f;  // highest point above baseline
+        float maxDescent = 0.0f; // lowest point below baseline
+
+        for (char c : text)
+        {
+            auto it = characters.find(c);
+            if (it != characters.end())
+            {
+                textWidth += (it->second.advance >> 6) * scale;
+
+                // bearing.y is the offset from baseline to top of glyph
+                float ascent = it->second.bearing.y * scale;
+                // descent is how far below the baseline the glyph goes
+                float descent = (it->second.size.y - it->second.bearing.y) * scale;
+
+                if (ascent > maxAscent)
+                {
+                    maxAscent = ascent;
+                }
+                if (descent > maxDescent)
+                {
+                    maxDescent = descent;
+                }
+            }
+        }
+
+        // Center the text horizontally by offsetting the starting x position
+        x -= textWidth / 2.0f;
+
+        // Center the text vertically
+        // The visual center of text is at: baseline + (maxAscent - maxDescent) / 2
+        // To center around y, we need: baseline = y - (maxAscent - maxDescent) / 2
+        y -= (maxAscent - maxDescent) / 2.0f;
+    }
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(textVAO);

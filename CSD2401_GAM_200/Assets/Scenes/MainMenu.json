@@ -1,28 +1,15 @@
 {
-      "AudioManager": {
-    "sounds": [
-      {
-        "name": "MainMenuBGM",
-        "filepath": "../Assets/audio/jazz_bgm.wav",
-        "loop": true,
-        "volume": 0.5,
-        "category": "music"
-      },
-      {
-        "name": "menu_hover",
-        "filepath": "../Assets/Audio/hovering_Button.wav",
-        "loop": false,
-        "volume": 0.8,
-        "category": "sfx"
-      },
-      {
-        "name": "menu_click",
-        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
-        "loop": false,
-        "volume": 1.0,
-        "category": "sfx"
-      }
-    ],
+  "SceneSettings": {
+    "backgroundMusic": {
+      "name": "bgm",
+      "path": "../Assets/audio/jazz_bgm.wav",
+      "looping": true,
+      "volume": 0.5,
+      "channel": "bgm_channel"
+    }
+  },
+  
+  "AudioManager": {
     "events": [
       {
         "event": "UI_Hover",
@@ -31,6 +18,32 @@
       {
         "event": "UI_Click",
         "sound": "menu_click"
+      }
+    ],
+    "sounds": [
+      {
+        "category": "music",
+        "filepath": "../Assets/audio/jazz_bgm.wav",
+        "loop": true,
+        "name": "bgm",
+        "pitch": 1.0,
+        "volume": 0.20000000298023224
+      },
+      {
+        "category": "sfx",
+        "filepath": "../Assets/Audio/hovering_Button.wav",
+        "loop": false,
+        "name": "menu_hover",
+        "pitch": 1.0,
+        "volume": 0.8
+      },
+      {
+        "category": "sfx",
+        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
+        "loop": false,
+        "name": "menu_click",
+        "pitch": 1.0,
+        "volume": 1.0
       }
     ]
   },
