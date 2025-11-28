@@ -1028,8 +1028,8 @@ GameObjectData LevelEditor::SerialiseGameObject(GameObject *obj)
     {
         data.hasPhysics = true;
         data.mass = physics->GetMass();
-        data.velocityX = physics->velocityX;
-        data.velocityY = physics->velocityY;
+        data.velocityX = physics->velocity.x;
+        data.velocityY = physics->velocity.y;
         data.isStatic = physics->IsStatic();
         data.hasGravity = physics->useGravity;
     }
