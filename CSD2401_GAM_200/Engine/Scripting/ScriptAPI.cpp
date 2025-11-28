@@ -619,10 +619,42 @@ namespace API
         return false;
     }
 
-    
+bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* selfName, MonoString** hitObjectName, float* hitDistance)
+{
+    CollisionSystem* collisionSystem = CORE->GetCollisionSystem();
+    if (!collisionSystem)
+    {
+        return false;
+    }
+
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* self = nullptr;
+    if (selfName)
+    {
+        self = factory.FindGameObject(mono_string_to_utf8(selfName));
+    }
+
+    RaycastHit hit;
+    vec2 origin(x, y);
+    vec2 direction(dx, dy);
+
+    if (collisionSystem->Raycast(origin, direction, distance, hit, self))
+    {
+        if (hit.gameObject)
+        {
+            // Convert the hit object's name to a MonoString
+            *hitObjectName = mono_string_new(mono_domain_get(), hit.gameObject->GetName().c_str());
+            *hitDistance = hit.distance;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 
 #pragma endregion
-
 #pragma region Camera
     vec2 GetCameraPosition()
     {
@@ -938,6 +970,22 @@ namespace API
     }
 #pragma endregion
 
+#pragma region Scripting
+    bool AttachScript(const std::string& objectName, const std::string& scriptClassName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            ScriptSystem* scriptSystem = CORE->GetScriptSystem();
+            if (scriptSystem)
+            {
+                return scriptSystem->AttachScript(obj, scriptClassName);
+            }
+        }
+        return false;
+    }
+#pragma endregion
 
 #pragma region Input
     bool IsKeyDown(int key)
