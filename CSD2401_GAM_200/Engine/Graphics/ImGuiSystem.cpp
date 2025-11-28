@@ -999,6 +999,9 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         // TODO - block out the deleting of main camera - crashes the game
 
         // Record Undo Entries - Undo Delete
+        if (factory.GetGameObject(deleteID)->GetName() == "MainCamera")
+            return;
+
         LevelEditor* editor = CORE->GetLevelEditor();
         GameObject* obj = factory.GetGameObject(deleteID);
 
