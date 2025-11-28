@@ -304,7 +304,7 @@ namespace API
             auto* physics = obj->GetComponent<PhysicsComponent>();
             if (physics)
             {
-                return vec2(physics->velocityX, physics->velocityY);
+                return vec2(physics->velocity.x, physics->velocity.y);
             }
         }
         return vec2(0.0f, 0.0f); // Return a default value if not found
