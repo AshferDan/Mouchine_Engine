@@ -465,7 +465,7 @@ void GraphicsSystem::Update(float)
         auto* textFPS = textObj->GetComponent<TextComponent>();
         if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
             textFPS->SetEnabled(true);
-            textFPS->SetText(std::to_string(static_cast<int>(CORE->GetFPS())));
+            textFPS->SetText("FPS: "+std::to_string(static_cast<int>(CORE->GetFPS())));
         }
         else {
             textFPS->SetText("FPS");
