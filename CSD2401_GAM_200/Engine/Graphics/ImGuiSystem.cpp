@@ -771,6 +771,8 @@ void ImGuiSystem::Hierarchy_Render()
         {
             EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
             GameObject* go = factory.GetGameObject(deliveredID);
+
+            if (!go) return;
             GameObject* goParent = go->GetParent();
             if (goParent)
             {
@@ -800,7 +802,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     // Just commented this out in case want to revert, but now we can show inactive GOs but greyed out
     //if (!obj->IsActive())
     //    return;
-
+    if (!obj) return;
     EntityID id = obj->GetID();
 
     // Set tree node flags

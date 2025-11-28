@@ -620,6 +620,7 @@ bool LevelEditor::SaveLevel(const std::string &filepath)
                 continue;
 
             GameObject* obj = objPtr.get();
+            if (!obj) continue;
             if (obj->GetParent() == nullptr)   // <-- ROOT OBJECT ONLY
                 roots.push_back(obj);
         }
