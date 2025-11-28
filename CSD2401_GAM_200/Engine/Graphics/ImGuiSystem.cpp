@@ -772,6 +772,8 @@ void ImGuiSystem::Hierarchy_Render()
         {
             EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
             GameObject* go = factory.GetGameObject(deliveredID);
+
+            if (!go) return;
             GameObject* goParent = go->GetParent();
             if (goParent)
             {
@@ -801,7 +803,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     // Just commented this out in case want to revert, but now we can show inactive GOs but greyed out
     //if (!obj->IsActive())
     //    return;
-
+    if (!obj) return;
     EntityID id = obj->GetID();
 
     // Set tree node flags
@@ -1329,7 +1331,8 @@ void ImGuiSystem::PrefabMenu_Reinstantiate()
     Serialization::SavePrefab(*selectedGO);                                 // Properly overrides the old prefab
 
     std::vector<EntityID> prefabReiterationList = prefabInstances[selectedPrefabName];          // make a copy because we will be deleting things from the active list
-    for (auto& p : prefabReiterationList)
+
+    for (EntityID p : prefabReiterationList)
     {
         GameObject* currPrefab = factory.GetGameObject(p);                                      // get GO
         if (!currPrefab || !currPrefab->GetComponent<TransformComponent>())
@@ -1615,7 +1618,7 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().generic_string(), fileName.c_str());            // For Audio files
                 }
-                else if (iter.path().parent_path().filename() == "Sprites")
+                else if (iter.path().parent_path().filename() == "Sprites" || iter.path().parent_path().filename() == "Icons")
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().generic_string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
@@ -2085,6 +2088,13 @@ void ImGuiSystem::RenderPropertyEditor()
                 };
 
             // sliders for position, scale, rotation etc
+
+            static bool isTransformEnabled = transform->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled ##Transform", &isTransformEnabled))
+            {
+                transform->SetEnabled(isTransformEnabled);
+            }
+
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
             if (ImGui::DragFloat2("Position", pos, 0.5f))
@@ -2145,6 +2155,12 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
         {
+            static bool isRenderEnabled = render->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled ##Render", &isRenderEnabled))
+            {
+                render->SetEnabled(isRenderEnabled);
+            }
+
             ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
             static bool showTextureDND = false;
 
@@ -2221,6 +2237,12 @@ void ImGuiSystem::RenderPropertyEditor()
         if (ImGui::CollapsingHeader("Physics"))
         {
             // Physics sliders with respective functions
+            static bool isPhysEnabled = physics->IsEnabled();
+            if (ImGui::Checkbox("Phsyics Enabled##Physics", &isPhysEnabled))
+            {
+                physics->SetEnabled(isPhysEnabled);
+            }
+
             float vel[2] = { 0.0f, 0.0f };
             physics->GetVelocity(vel[0], vel[1]);
             if (ImGui::DragFloat2("Velocity", vel, 0.1f))
@@ -2252,6 +2274,12 @@ void ImGuiSystem::RenderPropertyEditor()
         if (ImGui::CollapsingHeader("Collider"))
         {
             // Editable Collider Type Dropdown
+            static bool isColEnabled = collider->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled##Collider", &isColEnabled))
+            {
+                collider->SetEnabled(isColEnabled);
+            }
+
             const char* colliderTypes[] = { "Square", "Circle" };
             int currentType = (collider->GetType() == ColliderComponent::Type::Circle) ? 1 : 0;
 
@@ -2288,7 +2316,7 @@ void ImGuiSystem::RenderPropertyEditor()
                 float height = aabb.max.y - aabb.min.y;
 
                 float newSize[2] = { width, height };
-                if (ImGui::DragFloat2("Size", newSize, 1.0f, 1.0f, 500.0f))
+                if (ImGui::DragFloat2("Size", newSize, 1.0f, 1.0f, 5000.0f))
                 {
                     collider->SetSize(newSize[0], newSize[1]);
                     std::cout << "[Property Editor] Changed collider size to "
@@ -2300,7 +2328,7 @@ void ImGuiSystem::RenderPropertyEditor()
                 Circle circle = collider->GetCircle();
                 float radius = circle.radius;
 
-                if (ImGui::DragFloat("Radius", &radius, 1.0f, 1.0f, 250.0f))
+                if (ImGui::DragFloat("Radius", &radius, 1.0f, 1.0f, 5000.0f))
                 {
                     collider->SetSize(radius * 2.0f, radius * 2.0f);
                     std::cout << "[Property Editor] Changed circle radius to "

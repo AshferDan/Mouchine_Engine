@@ -21,7 +21,7 @@ namespace
     }
 }
 
-AudioManager::AudioManager(AudioEngine* engine) : audioEngine(engine) 
+AudioManager::AudioManager(AudioEngine* engine) : audioEngine(engine), m_isMuted(false)
 {
     // default category volumes
     categoryVolumes["music"] = 1.0f;
@@ -33,6 +33,11 @@ AudioManager::AudioManager(AudioEngine* engine) : audioEngine(engine)
 AudioManager::~AudioManager()
 {
     StopAllSounds();
+}
+
+bool AudioManager::IsMuted() const
+{
+    return m_isMuted;
 }
 
 bool AudioManager::LoadSound(const SoundData& sound) 
@@ -157,8 +162,70 @@ void AudioManager::SetSoundVolume(const std::string& soundName, float volume)
 
 void AudioManager::SetCategoryVolume(const std::string& category, float volume) 
 {
-    categoryVolumes[category] = std::max(0.0f, std::min(1.0f, volume));
-    std::cout << "Set " << category << " volume to " << volume << std::endl;
+    float clampedVolume = std::max(0.0f, std::min(1.0f, volume));
+
+    categoryVolumes[category] = clampedVolume;
+    std::cout << "Set " << category << " volume to " << clampedVolume << std::endl;
+
+    // If the user changes a volume while not muted, we should update our pre-mute reference.
+    if (!m_isMuted) {
+        m_preMuteCategoryVolumes = categoryVolumes;
+    }
+
+    if (!audioEngine)
+    {
+        return;
+    }
+
+    // Update volume for all sounds in this category
+    for (const auto& pair : soundDatabase)
+    {
+        const SoundData& sound = pair.second;
+        if (sound.category == category)
+        {
+            float finalVolume = sound.volume * categoryVolumes[category];
+            std::string channelName = sound.name + "_channel";
+            audioEngine->setVolume(channelName, finalVolume);
+        }
+    }
+}
+
+void AudioManager::ToggleMasterMute()
+{
+    m_isMuted = !m_isMuted;
+
+    std::map<std::string, float> targetVolumes;
+
+    if (m_isMuted)
+    {
+        // Muting: store current volumes and set target to 0
+        m_preMuteCategoryVolumes = categoryVolumes;
+        for (auto const& [category, vol] : categoryVolumes)
+        {
+            targetVolumes[category] = 0.0f;
+        }
+    }
+    else
+    {
+        // Un-muting: target is the stored pre-mute volumes
+        if (!m_preMuteCategoryVolumes.empty())
+        {
+            targetVolumes = m_preMuteCategoryVolumes;
+        }
+        else // Fallback
+        {
+            targetVolumes["music"] = 1.0f;
+            targetVolumes["sfx"] = 1.0f;
+            targetVolumes["voice"] = 1.0f;
+            targetVolumes["ambient"] = 1.0f;
+        }
+    }
+
+    // Now apply the target volumes
+    for (auto const& [category, vol] : targetVolumes)
+    {
+        SetCategoryVolume(category, vol);
+    }
 }
 
 void AudioManager::SetSoundPitch(const std::string& soundName, float pitch)
@@ -179,6 +246,19 @@ void AudioManager::SetSoundPitch(const std::string& soundName, float pitch)
     std::string channel = soundName + "_channel";
     audioEngine->setPitch(channel, pitch);
 }
+
+void AudioManager::ReapplyMuteState()
+{
+    if (m_isMuted)
+    {
+        // This will set all category volumes to 0 and update playing sounds
+        for (auto const& [category, vol] : categoryVolumes)
+        {
+            SetCategoryVolume(category, 0.0f);
+        }
+    }
+}
+
 
 void AudioManager::StopSound(const std::string& channelName) 
 {
@@ -227,7 +307,7 @@ void AudioManager::ReloadSound(const std::string& soundName)
  
     const SoundData& sound = it->second;
 
-    // stop the default channel for this sound if it’s playing
+    // stop the default channel for this sound if it�s playing
     std::string channelName = soundName + "_channel";
     audioEngine->stopSound(channelName);
 

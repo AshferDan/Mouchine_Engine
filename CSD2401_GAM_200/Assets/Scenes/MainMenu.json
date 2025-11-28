@@ -1,131 +1,390 @@
 {
-  "SceneSettings": {
-    "backgroundMusic": {
-      "name": "bgm",
-      "path": "../Assets/audio/jazz_bgm.wav",
-      "looping": true,
-      "volume": 0.5,
-      "channel": "bgm_channel"
-    }
-  },
-  
-  "AudioManager": {
-    "events": [
-      {
-        "event": "UI_Hover",
-        "sound": "menu_hover"
-      },
-      {
-        "event": "UI_Click",
-        "sound": "menu_click"
-      }
-    ],
-    "sounds": [
-      {
-        "category": "music",
-        "filepath": "../Assets/audio/jazz_bgm.wav",
-        "loop": true,
-        "name": "bgm",
-        "pitch": 1.0,
-        "volume": 0.20000000298023224
-      },
-      {
-        "category": "sfx",
-        "filepath": "../Assets/Audio/hovering_Button.wav",
-        "loop": false,
-        "name": "menu_hover",
-        "pitch": 1.0,
-        "volume": 0.8
-      },
-      {
-        "category": "sfx",
-        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
-        "loop": false,
-        "name": "menu_click",
-        "pitch": 1.0,
-        "volume": 1.0
-      }
-    ]
-  },
   "GameObjects": [
     {
       "name": "Title",
       "localID": 1,
-      "parentID": -1,
+      "parentID": 4294967295,
       "active": true,
-
       "TransformComponent": {
-        "pos": [0, 0],
-        "scale": [1920, 1080],
-        "rotation": 0
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1920.0,
+          1080.0
+        ],
+        "rotation": 0.0
       },
-
       "RenderComponent": {
         "shapeType": "Square",
-        "texturePath": "../Assets/MenuBackground.png"
+        "texturePath": "../Assets/MenuBackground.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
       },
-
-      "children": [
-            {
-      "name": "PlayButton",
+      "children": []
+    },
+    {
+      "name": "MainCamera",
       "localID": 2,
-      "parentID": -1,
+      "parentID": 4294967295,
       "active": true,
-
       "TransformComponent": {
-        "pos": [0, 50],
-        "scale": [300, 160],
-        "rotation": 0
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
       },
-
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "../Assets/Menu_Play.png"
-      },
-
       "children": []
     },
-
     {
-      "name": "SettingsButton",
+      "name": "Screen_TitleButtons",
       "localID": 3,
-      "parentID": -1,
+      "parentID": 4294967295,
       "active": true,
-
       "TransformComponent": {
-        "pos": [0, -75],
-        "scale": [300, 60],
-        "rotation": 0
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1920.0,
+          1080.0
+        ],
+        "rotation": 0.0
       },
-
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "../Assets/Menu_Settings.png"
+      "PhysicsComponent": {
+        "mass": 0.0,
+        "isStatic": true,
+        "useGravity": false,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
       },
-
-      "children": []
+      "children": [
+        {
+          "name": "PlayButton",
+          "localID": 4,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              0.0,
+              50.0
+            ],
+            "scale": [
+              300.0,
+              160.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Menu_Play.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "SettingsButton",
+          "localID": 5,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              0.0,
+              -75.0
+            ],
+            "scale": [
+              300.0,
+              60.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Menu_Settings.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "QuitButton",
+          "localID": 6,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              0.0,
+              -150.0
+            ],
+            "scale": [
+              300.0,
+              60.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Menu_Quit.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        }
+      ]
     },
-
     {
-      "name": "QuitButton",
-      "localID": 4,
-      "parentID": -1,
+      "name": "Screen_Settings",
+      "localID": 7,
+      "parentID": 4294967295,
       "active": true,
-
       "TransformComponent": {
-        "pos": [0, -150],
-        "scale": [300, 60],
-        "rotation": 0
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1920.0,
+          1080.0
+        ],
+        "rotation": 0.0
       },
-
       "RenderComponent": {
         "shapeType": "Square",
-        "texturePath": "../Assets/Menu_Quit.png"
+        "texturePath": "../Assets/Sprites/Menu_Settings.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ]
       },
-
-      "children": []
-    }
+      "PhysicsComponent": {
+        "mass": 0.0,
+        "isStatic": true,
+        "useGravity": false,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "children": [
+        {
+          "name": "Slider_Bar",
+          "localID": 8,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              25.0,
+              50.0
+            ],
+            "scale": [
+              670.0,
+              110.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Slider_Bar_Back",
+          "localID": 9,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              25.0,
+              50.0
+            ],
+            "scale": [
+              670.0,
+              110.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Slider_Knob",
+          "localID": 10,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              25.0,
+              50.0
+            ],
+            "scale": [
+              670.0,
+              110.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "MuteButton",
+          "localID": 11,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              0.0,
+              -62.5
+            ],
+            "scale": [
+              175.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Volume_Mute.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "mass": 0.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": true,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "BackButton",
+          "localID": 12,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              -675.0,
+              275.0
+            ],
+            "scale": [
+              200.0,
+              180.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Button_Back.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        }
       ]
     }
-  ]
+  ],
+  "AudioManager": {
+    "sounds": [
+      {
+        "name": "MainMenuBGM",
+        "filepath": "../Assets/audio/menu_loop.wav",
+        "loop": true,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "bgm_channel"
+      },
+      {
+        "name": "menu_click",
+        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_hover",
+        "filepath": "../Assets/Audio/hovering_Button.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "sfx"
+      }
+    ],
+    "events": [
+      {
+        "event": "UI_Click",
+        "sound": "menu_click"
+      },
+      {
+        "event": "UI_Hover",
+        "sound": "menu_hover"
+      }
+    ]
+  }
 }

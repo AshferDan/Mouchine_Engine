@@ -33,6 +33,10 @@ private:
     // category volumes (music, sfx, voice, etc.)
     std::map<std::string, float> categoryVolumes;
 
+    // Mute state
+    bool m_isMuted;
+    std::map<std::string, float> m_preMuteCategoryVolumes;
+
 public:
     AudioManager(AudioEngine* engine);
     ~AudioManager();
@@ -49,6 +53,11 @@ public:
     void PauseAllSounds(bool pause); // Pause or resume all sounds
     void ToggleMute(); // Toggle mute for all audio
     void ReloadSound(const std::string& soundName);
+
+    void ToggleMasterMute();
+    bool IsMuted() const;
+
+    void ReapplyMuteState();
 
     void HandleMessage(const PlaySoundMessage& msg) override;
     void HandleMessage(const PauseSoundMessage& msg) override;
