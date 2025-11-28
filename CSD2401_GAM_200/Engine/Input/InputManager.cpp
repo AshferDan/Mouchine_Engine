@@ -519,11 +519,6 @@ void InputManager::Update(float dt)
         physics->velocity.y = -50.0f;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        KeyStateQuit = true;
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
     /**
      * @brief Toggle on and off imgui
      */

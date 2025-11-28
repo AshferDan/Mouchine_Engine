@@ -196,6 +196,14 @@ void AudioManager::StopAllSounds()
     }
 }
 
+void AudioManager::PauseAllSounds(bool pause)
+{
+    if (audioEngine)
+    {
+        audioEngine->pauseAllSound(pause);
+    }
+}
+
 void AudioManager::ToggleMute()
 {
     if (audioEngine)

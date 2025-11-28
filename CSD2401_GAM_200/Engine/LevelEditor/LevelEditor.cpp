@@ -327,9 +327,8 @@ void LevelEditor::TogglePause()
 
         if (audioManager)
         {
-            std::cout << "[LevelEditor] Pausing music" << std::endl;
-            // stop the sound, to implement proper pause in audio manager
-            audioManager->StopSound("bgm_channel");
+            std::cout << "[LevelEditor] Pausing all audio" << std::endl;
+            audioManager->PauseAllSounds(true);
         }
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
@@ -339,8 +338,8 @@ void LevelEditor::TogglePause()
 
         if (audioManager)
         {
-            std::cout << "[LevelEditor] Resuming music" << std::endl;
-            audioManager->PlaySound("bgm", "bgm_channel");
+            std::cout << "[LevelEditor] Resuming all audio" << std::endl;
+            audioManager->PauseAllSounds(false);
         }
 
         if (CORE)

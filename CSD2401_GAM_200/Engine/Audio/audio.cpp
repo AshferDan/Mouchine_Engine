@@ -222,6 +222,18 @@ void AudioEngine::pauseSound(const std::string& channelName, bool pause) {
 	}
 }
 
+/**
+ * @brief Pauses or resumes all active channels
+ */
+void AudioEngine::pauseAllSound(bool pause) {
+	for (auto& pair : channels) {
+		if (pair.second) {
+			pair.second->setPaused(pause);
+		}
+	}
+	std::cout << (pause ? "Paused" : "Resumed") << " all sounds" << std::endl;
+}
+
 // Volume and effects controls
 /**
  * @brief Sets the volume for a specific channel (clamped between 0.0 and 1.0)

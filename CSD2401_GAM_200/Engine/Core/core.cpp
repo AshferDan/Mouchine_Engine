@@ -540,7 +540,7 @@ void CoreEngine::update_time(double fps_calc_interval)
 
 void CoreEngine::SetGamePaused(bool paused)
 {
-    std::cout << (m_gamePause ? "Game is paused\n" : "Game is resuming\n");
+    std::cout << (paused ? "Game is paused\n" : "Game is resuming\n");
     if (m_gamePause == paused)
     {
         return;
@@ -548,8 +548,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    if (audioEngine)
+    if (audioManager)
     {
-        audioEngine->stopAllSound();
+        audioManager->PauseAllSounds(paused);
     }
 }
