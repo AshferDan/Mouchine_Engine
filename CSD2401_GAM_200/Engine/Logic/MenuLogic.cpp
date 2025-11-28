@@ -21,6 +21,7 @@ enum MenuScreens {
     Settings
 };
 MenuScreens currScreen = MenuScreens::Home;
+static bool toggleMute = false;
 
 void MenuLogicSystem::Update(float dt)
 {
@@ -28,11 +29,10 @@ void MenuLogicSystem::Update(float dt)
     if (pendingSceneChange)
     {
         pendingTimer -= dt;
-        if (pendingTimer <= 0.0f)
+        if (pendingTimer <= 0.0f)                       // timer delay to play the sound effect before loading into scene
         {
-            switch (currScreen)
+            if (currScreen == MenuScreens::Home)
             {
-            case MenuScreens::Home:
                 if (hoveredButtonName == "PlayButton")
                 {
                     std::cout << "PlayButton Clicked!" << std::endl;
@@ -43,28 +43,44 @@ void MenuLogicSystem::Update(float dt)
                 else if (hoveredButtonName == "SettingsButton")
                 {
                     std::cout << "SettingsButton Clicked!" << std::endl;
-                    CORE->RequestSceneLoad("../Assets/Scenes/Scene2.json", true);
+
+                    currScreen = MenuScreens::Settings;
+                    //CORE->RequestSceneLoad("../Assets/Scenes/Scene2.json", true);
                 }
                 else if (hoveredButtonName == "QuitButton")
                 {
                     std::cout << "QuitButton Clicked!" << std::endl;
                     CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
                 }
-                break;
-            case MenuScreens::Settings:
-                // do settings stuff here
-                break;
-            default:
-                currScreen = MenuScreens::Home;
-                break;
             }
-            
 
+            // clear 
             pendingSceneChange = false;
             hoveredButtonName.clear();
         }
 
         return;
+    }
+
+    if (currScreen == MenuScreens::Home)
+    {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
+        {
+            GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
+        }
+    }
+    else if (currScreen == MenuScreens::Settings)
+    {
+        //hoveredButtonName.clear();
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
+        {
+            GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(true);
+        }
+        if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
+        {
+            GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
+        }
+        //return;
     }
 
     double mouseX = InputManager::GetMouseWorldX();
@@ -74,10 +90,10 @@ void MenuLogicSystem::Update(float dt)
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
 
+    // Depending on scene, check for which buttons have been pressed
     switch (currScreen)
     {
     case MenuScreens::Home:
-        // Check all buttons for intersection
         if (IsMouseOver(factory.FindGameObject("PlayButton"), mouseX, mouseY))
         {
             currentHover = "PlayButton";
@@ -93,6 +109,10 @@ void MenuLogicSystem::Update(float dt)
         break;
     case MenuScreens::Settings:
         // do settings stuff here
+        if (IsMouseOver(factory.FindGameObject("MuteButton"), mouseX, mouseY))
+        {
+            currentHover = "MuteButton";
+        }
         break;
     default:
         break;
@@ -112,7 +132,6 @@ void MenuLogicSystem::Update(float dt)
         {
             SetButtonTexture(currentHover, true);
             // Play hover sound once when entering the button
-  
 
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
@@ -137,8 +156,23 @@ void MenuLogicSystem::Update(float dt)
         }
 
         // Start small delay before loading scene
-        pendingSceneChange = true;
-        pendingTimer = 0.75f; // 400(changed to 750)ms delay to let click sound play
+        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton")
+        {
+            pendingSceneChange = true;
+            pendingTimer = 0.75f;                       // 400(changed to 750)ms delay to let click sound play (only not for settings)
+        }
+        else
+        {
+            if (hoveredButtonName == "MuteButton")
+            {
+                toggleMute = !toggleMute;
+                SetButtonTexture("MuteButton", true);
+            }
+            else
+            {
+                currScreen = MenuScreens::Settings;
+            }
+        }
     }
 }
 
@@ -172,7 +206,9 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
     else if (buttonName == "QuitButton") {
         texturePath = isHovered ? "../Assets/Menu_Quit_Hover.png" : "../Assets/Menu_Quit.png";
     }
-
+    else if (buttonName == "MuteButton") {
+        texturePath = toggleMute ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
+    }
   
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);
