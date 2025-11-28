@@ -254,7 +254,6 @@ void LevelEditor::EnterPlayMode()
     AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
     if (audioManager)
     {
-        audioManager->ReapplyMuteState();
         std::cout << "[LevelEditor] Play button clicked - starting BGM\n";
 
         // Check what sounds are available and play the appropriate BGM
