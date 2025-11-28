@@ -459,6 +459,23 @@ namespace CSharpScript
     public static class Components
     {
         /// <summary>
+        /// Sets the active state of a component on a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="componentName">The name of the component.</param>
+        /// <param name="active">The new active state.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetComponentActive(string objectName, string componentName, bool active);
+
+        /// <summary>
+        /// Removes a component from a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="componentName">The name of the component to remove.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void RemoveComponent(string objectName, string componentName);
+
+        /// <summary>
         /// Adds a Transform component to a GameObject.
         /// </summary>
         /// <param name="objectName">The name of the GameObject.</param>

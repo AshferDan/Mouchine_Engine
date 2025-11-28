@@ -520,6 +520,64 @@ namespace API
             }
         }
     }
+
+    void SetComponentActive(const std::string& objectName, const std::string& componentName, bool active)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            if (componentName == "Transform")
+            {
+                if (auto* comp = obj->GetComponent<TransformComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Render")
+            {
+                if (auto* comp = obj->GetComponent<RenderComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Physics")
+            {
+                if (auto* comp = obj->GetComponent<PhysicsComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Collider")
+            {
+                if (auto* comp = obj->GetComponent<ColliderComponent>()) comp->SetEnabled(active);
+            }
+            else
+            {
+                throw std::runtime_error("Attempted to set active state for unknown component: " + componentName);
+            }
+        }
+    }
+
+    void RemoveComponent(const std::string& objectName, const std::string& componentName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            if (componentName == "Transform")
+            {
+                obj->RemoveComponent<TransformComponent>();
+            }
+            else if (componentName == "Render")
+            {
+                obj->RemoveComponent<RenderComponent>();
+            }
+            else if (componentName == "Physics")
+            {
+                obj->RemoveComponent<PhysicsComponent>();
+            }
+            else if (componentName == "Collider")
+            {
+                obj->RemoveComponent<ColliderComponent>();
+            }
+            else
+            {
+                throw std::runtime_error("Attempted to remove unknown component: " + componentName);
+            }
+        }
+    }
 #pragma endregion
 
 #pragma region Collision

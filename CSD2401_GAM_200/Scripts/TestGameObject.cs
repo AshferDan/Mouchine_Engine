@@ -47,7 +47,7 @@ namespace GameScripts
 
         public void OnUpdate(float deltaTime)
         {
-            // The logic is now in RaycastTest.cs
+            
         }
 
         public void OnDestroy()

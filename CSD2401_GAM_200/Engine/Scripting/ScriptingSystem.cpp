@@ -242,6 +242,24 @@ static bool Internal_AttachScript(MonoString* objectName, MonoString* scriptClas
     return result;
 }
 
+static void Internal_SetComponentActive(MonoString* objectName, MonoString* componentName, bool active)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* compName = mono_string_to_utf8(componentName);
+    API::SetComponentActive(objName, compName, active);
+    mono_free(objName);
+    mono_free(compName);
+}
+
+static void Internal_RemoveComponent(MonoString* objectName, MonoString* componentName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* compName = mono_string_to_utf8(componentName);
+    API::RemoveComponent(objName, compName);
+    mono_free(objName);
+    mono_free(compName);
+}
+
 static void Internal_AddTransformComponent(MonoString *objectName)
 {
     char *name = mono_string_to_utf8(objectName);
@@ -598,6 +616,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Scripting::AttachScript", (void*)Internal_AttachScript);
 
     // === Components ===
+    mono_add_internal_call("CSharpScript.Components::SetComponentActive", (void*)Internal_SetComponentActive);
+    mono_add_internal_call("CSharpScript.Components::RemoveComponent", (void*)Internal_RemoveComponent);
     mono_add_internal_call("CSharpScript.Components::AddTransformComponent", (void *)Internal_AddTransformComponent);
     mono_add_internal_call("CSharpScript.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
     mono_add_internal_call("CSharpScript.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
