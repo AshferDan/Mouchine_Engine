@@ -21,7 +21,6 @@ enum MenuScreens {
     Settings
 };
 MenuScreens currScreen = MenuScreens::Home;
-static bool toggleMute = false;
 
 void MenuLogicSystem::Update(float dt)
 {
@@ -68,6 +67,10 @@ void MenuLogicSystem::Update(float dt)
         {
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
         }
+        if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
+        {
+            GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(true);
+        }
     }
     else if (currScreen == MenuScreens::Settings)
     {
@@ -113,6 +116,10 @@ void MenuLogicSystem::Update(float dt)
         {
             currentHover = "MuteButton";
         }
+        else if (IsMouseOver(factory.FindGameObject("BackButton"), mouseX, mouseY))
+        {
+            currentHover = "BackButton";
+        }
         break;
     default:
         break;
@@ -156,7 +163,7 @@ void MenuLogicSystem::Update(float dt)
         }
 
         // Start small delay before loading scene
-        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton")
+        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton" && hoveredButtonName != "BackButton")
         {
             pendingSceneChange = true;
             pendingTimer = 0.75f;                       // 400(changed to 750)ms delay to let click sound play (only not for settings)
@@ -165,8 +172,16 @@ void MenuLogicSystem::Update(float dt)
         {
             if (hoveredButtonName == "MuteButton")
             {
-                toggleMute = !toggleMute;
-                SetButtonTexture("MuteButton", true);
+                AudioManager* audioManager = CORE->GetAudioManager();
+                if (audioManager)
+                {
+                    audioManager->ToggleMasterMute();
+                }
+                SetButtonTexture("MuteButton", true); // Update texture after toggling
+            }
+            else if (hoveredButtonName == "BackButton")
+            {
+                currScreen = MenuScreens::Home;
             }
             else
             {
@@ -207,9 +222,23 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
         texturePath = isHovered ? "../Assets/Menu_Quit_Hover.png" : "../Assets/Menu_Quit.png";
     }
     else if (buttonName == "MuteButton") {
-        texturePath = toggleMute ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
+        bool isMuted = false;
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            isMuted = audioManager->IsMuted();
+        }
+        texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
+    }
+    else if (buttonName == "BackButton") {
+        texturePath = isHovered ? "../Assets/Sprites/Icons/Button_Back_Dark.png" : "../Assets/Sprites/Icons/Button_Back.png";
     }
   
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);
+}
+
+void MenuLogicSystem::Reset()
+{
+    currScreen = MenuScreens::Home;
 }

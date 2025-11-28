@@ -317,6 +317,34 @@
             ]
           },
           "children": []
+        },
+        {
+          "name": "BackButton",
+          "localID": 12,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              -675.0,
+              275.0
+            ],
+            "scale": [
+              200.0,
+              180.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Button_Back.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
         }
       ]
     }
@@ -329,7 +357,7 @@
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,
-        "category": "music"
+        "category": "bgm_channel"
       },
       {
         "name": "menu_click",
