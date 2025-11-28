@@ -685,19 +685,34 @@ void GraphicsSystem::Update(float)
                     float x, y;
                     transform->GetPosition(x, y);
 
-                    // For screen-space text, position is fixed screen coordinates
-                    // Store the original position on first frame and always use it
+                    // for screen-space text, position is fixed screen coordinates
+                    // but for objects like timers that should stay at top-left, adjust for viewport height
                     if (textComp->isScreenSpace())
                     {
                         static std::map<TextComponent*, vec2> screenSpacePositions;
+                        static std::map<TextComponent*, bool> needsTopAlignment;
+
                         if (screenSpacePositions.find(textComp) == screenSpacePositions.end())
                         {
-                            // Store the original position as screen coordinates
+                            // store the original position as screen coordinates
                             screenSpacePositions[textComp] = vec2(x, y);
+                            // if y > 500 suggests top positioning)
+                            needsTopAlignment[textComp] = (y > 500.0f);
                         }
-                        // Always use the stored screen position for screen-space text
+
                         x = screenSpacePositions[textComp].x;
-                        y = screenSpacePositions[textComp].y;
+
+                        // calculate y relative to viewport height
+                        if (needsTopAlignment[textComp])
+                        {
+                            float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+                            float offsetFromTop = 110.0f; // distance from top edge
+                            y = renderHeight - offsetFromTop;
+                        }
+                        else
+                        {
+                            y = screenSpacePositions[textComp].y;
+                        }
                     }
 
                     // Render text using the dedicated text rendering function

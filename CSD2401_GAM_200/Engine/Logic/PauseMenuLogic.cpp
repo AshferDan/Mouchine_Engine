@@ -214,7 +214,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     GameObject* board = factory.CreateGameObject("PauseBoard");
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = 0.0f;
-    boardTransform->posY = -20.0f;
+    boardTransform->posY = 0.0f;
     boardTransform->scaleX = 1500.0f;
     boardTransform->scaleY = 1000.0f;
     auto* boardRender = board->AddComponent<RenderComponent>();
@@ -288,7 +288,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
-    std::cout << "[PauseMenu] UI created" << std::endl;
+    //std::cout << "[PauseMenu] UI created" << std::endl;
 
     // Initially hide the UI
     SetPauseMenuVisible(false);
