@@ -1047,7 +1047,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     if (nodeOpen)
     {
         // repeats loop again
-        for (auto &childPtr : gameObj->GetAllChildren())
+        for (auto &childPtr : obj->GetAllChildren())
         {
             Hierarchy_GameObjectTree_Renderer(childPtr, depth+1, selectedGOID, p_factory);
         }
