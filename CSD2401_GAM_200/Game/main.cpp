@@ -84,7 +84,7 @@ int main()
         if (scriptSys && squareSpawner)
         {
             // 1. Attach the first script (Red Square, Ground, Animation)
-            if (scriptSys->AttachScript(squareSpawner, "PlayerMovement"))
+            if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
             {
                 std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
             }

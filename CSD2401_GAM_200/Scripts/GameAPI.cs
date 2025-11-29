@@ -81,15 +81,12 @@ namespace CSharpScript
     /// </summary>
     public enum CollisionLayer
     {
-        /// <summary>Default collision layer.</summary>
-        Default = 0,
-        /// <summary>Player collision layer.</summary>
-        Player = 1,
-        /// <summary>Enemy collision layer.</summary>
+        Player = 0,
+        Ground = 1,
         Enemy = 2,
-        /// <summary>Ground collision layer.</summary>
-        Ground = 3
-        // Add more layers as defined in your C++ Collision.h
+        Platform = 3,
+        Default = 4
+        // Values must match the C++ enum in ColliderComponent.h
     }
 
     /// <summary>
@@ -669,11 +666,13 @@ namespace CSharpScript
         public static vec2 Movement()
         {
             float x = 0;
+            if (GetKeyHeld(KeyCode.D)) x += 1;
+            if (GetKeyHeld(KeyCode.A)) x -= 1;
+
             float y = 0;
-            x = (GetKeyPressed(KeyCode.A)) ? -1 : 0;
-            x = (GetKeyPressed(KeyCode.D)) ? 1 : 0;
-            y = (GetKeyPressed(KeyCode.W)) ? 1 : 0;
-            y = (GetKeyPressed(KeyCode.S)) ? -1 : 0;
+            if (GetKeyHeld(KeyCode.W)) y += 1;
+            if (GetKeyHeld(KeyCode.S)) y -= 1;
+            
             return new vec2(x, y);
         }
 

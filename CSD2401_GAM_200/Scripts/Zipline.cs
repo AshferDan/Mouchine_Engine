@@ -1,80 +1,50 @@
-using CSharpScript;
-using System;
-using System.Drawing;
 using System.Numerics;
-using System.Threading;
-using static System.Math;
 
 namespace GameScripts
 {
+    /// <summary>
+    /// A simple data class representing a Zipline in the game world.
+    /// In the current engine architecture, the start and end points must be defined
+    /// directly in world space, as there is no API to convert local-to-world coordinates.
+    /// </summary>
     public class Zipline
     {
-        //[Tooltip("The BoxCollider2D used to define the zipline's path.")]
-        //[SerializeField] private BoxCollider2D ziplineCollider;
+        /// <summary>
+        /// The name of the GameObject this Zipline is associated with.
+        /// </summary>
+        public string GameObjectName;
 
-        //[Header("Visuals")]
-        //[SerializeField] private ParticleSystem debrisEffectPrefab;
+        /// <summary>
+        /// The starting point of the zipline in world coordinates.
+        /// </summary>
+        public Vector2 WorldStartPoint;
 
-        //private ParticleSystem debrisEffectInstance;
+        /// <summary>
+        /// The ending point of the zipline in world coordinates.
+        /// </summary>
+        public Vector2 WorldEndPoint;
 
-        // public properties to get the world-space start and end points of the zipline
-        public string objectName;
-        public vec2 colliderOffset;
-        public float colliderWidth;
-
-        public vec2 WorldStartPoint(string objectName, vec2 colliderOffset, float colliderWidth)
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public Zipline()
         {
-            vec2 localpos = new vec2(colliderOffset.x - colliderWidth * 0.5f, colliderOffset.y);
-
-            // world space
-            return Transform.TransformPoint(objectName, localpos);
-        }
-        public vec2 WorldEndPoint(string objectName, vec2 colliderOffset, float colliderWidth)
-        {
-            vec2 localpos = new vec2(colliderOffset.x + colliderWidth * 0.5f, colliderOffset.y);
-
-            return Transform.TransformPoint(objectName, localpos);
+            GameObjectName = "";
+            WorldStartPoint = Vector2.Zero;
+            WorldEndPoint = Vector2.Zero;
         }
 
-        private void OnValidate()
+        /// <summary>
+        /// Constructor to create a Zipline with defined points.
+        /// </summary>
+        /// <param name="name">The name of the associated GameObject.</param>
+        /// <param name="start">The world-space start point.</param>
+        /// <param name="end">The world-space end point.</param>
+        public Zipline(string name, Vector2 start, Vector2 end)
         {
-            // automatically get the collider if not assigned
-            //if (ziplineCollider == null)
-            {
-                //ziplineCollider = GetComponent<BoxCollider2D>();
-            }
+            GameObjectName = name;
+            WorldStartPoint = start;
+            WorldEndPoint = end;
         }
-
-        // particle effects
-        //public void PlayDebrisEffect()
-        //{
-        //    // Do nothing if no prefab is assigned
-        //    if (debrisEffectPrefab == null) return;
-
-        //    // Create an instance of the effect if it doesn't exist yet
-        //    if (debrisEffectInstance == null)
-        //    {
-        //        debrisEffectInstance = Instantiate(debrisEffectPrefab, transform.position, Quaternion.identity);
-        //    }
-
-        //    // Play the effect
-        //    debrisEffectInstance.Play();
-        //}
-
-        //public void UpdateDebrisEffectPosition(Vector2 position)
-        //{
-        //    if (debrisEffectInstance != null)
-        //    {
-        //        debrisEffectInstance.transform.position = position;
-        //    }
-        //}
-
-        //public void StopDebrisEffect()
-        //{
-        //    if (debrisEffectInstance != null)
-        //    {
-        //        debrisEffectInstance.Stop();
-        //    }
-        //}
     }
 }
