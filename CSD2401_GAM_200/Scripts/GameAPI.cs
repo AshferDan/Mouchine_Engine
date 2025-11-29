@@ -670,10 +670,10 @@ namespace CSharpScript
         {
             float x = 0;
             float y = 0;
-            x = (GetKey(KeyCode.A)) ? -1 : 0;
-            x = (GetKey(KeyCode.D)) ? 1 : 0;
-            y = (GetKey(KeyCode.W)) ? 1 : 0;
-            y = (GetKey(KeyCode.S)) ? -1 : 0;
+            x = (GetKeyPressed(KeyCode.A)) ? -1 : 0;
+            x = (GetKeyPressed(KeyCode.D)) ? 1 : 0;
+            y = (GetKeyPressed(KeyCode.W)) ? 1 : 0;
+            y = (GetKeyPressed(KeyCode.S)) ? -1 : 0;
             return new vec2(x, y);
         }
 
