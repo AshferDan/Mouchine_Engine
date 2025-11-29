@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameAPI.cs
-\author     Jonathan Fam Qian Wei [100% - 125 lines]
+\author     Jonathan Fam Qian Wei [100% - 372 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 

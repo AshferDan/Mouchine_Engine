@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptAPI.cpp
-\author     Jonathan Fam Qian Wei [100% - 386 lines]
+\author     Jonathan Fam Qian Wei [100% - 1,153 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 

@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptingSystem.cpp
-\author     Jonathan Fam Qian Wei [100% - 420 lines]
+\author     Jonathan Fam Qian Wei [100% - 825 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
