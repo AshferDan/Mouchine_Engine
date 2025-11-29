@@ -52,9 +52,13 @@ void GameTimerSystem::Update(float dt)
             UpdateText(0);
             hasTriggeredTimeUp = true;
 
-            // LOSE CONDITION for now return to main menu
-            std::cout << "TIME'S UP! Returning to main menu..." << std::endl;
-            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+            // LOSE CONDITION - trigger lose screen
+            std::cout << "TIME'S UP! Triggering lose screen..." << std::endl;
+            WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
+            if (winLoseLogic)
+            {
+                winLoseLogic->TriggerLose();
+            }
             return;
         }
 

@@ -382,7 +382,7 @@
     "sounds": [
       {
         "name": "MainMenuBGM",
-        "filepath": "../Assets/audio/menu_loop.wav",
+        "filepath": "../Assets/audio/jazz_bgm.wav",
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,

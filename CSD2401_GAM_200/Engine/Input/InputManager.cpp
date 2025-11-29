@@ -251,10 +251,15 @@ void InputManager::Update(float dt)
     // Handle ESC key
     if (isPlayMode)
     {
-        // In play mode: ESC toggles pause menu
+        // Check if win or lose screen is active - if so, disable ESC key
+        WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+        bool winScreenActive = winZone && winZone->IsWinScreenActive();
+        bool loseScreenActive = winZone && winZone->IsLoseScreenActive();
+
+        // In play mode: ESC toggles pause menu (unless win/lose screen is active)
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE]) {
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive) {
                 PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
                 if (pauseMenu)
                 {

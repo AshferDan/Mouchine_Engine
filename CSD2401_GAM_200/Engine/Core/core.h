@@ -41,6 +41,7 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "MenuLogic.h"
 #include "PauseMenuLogic.h"
+#include "WinLoseLogic.h"
 #include "AudioManager.h"
 
 #include "GameManager.h"
@@ -65,6 +66,7 @@ class ScriptSystem;
 class LevelEditor;
 class MenuLogicSystem;
 class PauseMenuLogicSystem;
+class WinLoseLogicSystem;
 class AudioManager;
 class GameTimerSystem;
 class CoreEngine : public IMessageHandler
@@ -239,6 +241,15 @@ public:
     }
 
     /**
+     * @brief Gets a pointer to the WinLoseLogicSystem.
+     * @return A pointer to the WinLoseLogicSystem.
+     */
+    WinLoseLogicSystem *GetWinLoseLogic() const
+    {
+        return winLoseLogicSystem;
+    }
+
+    /**
      * @brief Gets a pointer to the AudioEngine.
      * @return A pointer to the AudioEngine.
      */
@@ -342,6 +353,7 @@ private:
     LevelEditor *levelEditor = nullptr;
     MenuLogicSystem *menuLogicSystem = nullptr;
     PauseMenuLogicSystem *pauseMenuLogicSystem = nullptr;
+    WinLoseLogicSystem * winLoseLogicSystem = nullptr;
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
     GameTimerSystem * gameTimerSystem = nullptr;

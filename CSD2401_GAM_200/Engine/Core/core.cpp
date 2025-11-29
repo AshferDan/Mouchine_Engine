@@ -116,6 +116,7 @@ void CoreEngine::InitSystems()
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
     pauseMenuLogicSystem = AddSystem<PauseMenuLogicSystem>();
+    winLoseLogicSystem = AddSystem<WinLoseLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
     gameTimerSystem =AddSystem<GameTimerSystem>();
@@ -202,6 +203,13 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Game timer system reset" << std::endl;
             }
 
+            // Reset win zone logic system
+            if (winLoseLogicSystem)
+            {
+                winLoseLogicSystem->Initialize();
+                std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
+            }
+
             // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
             if (m_autoPlayAfterLoad)
             {
@@ -212,6 +220,13 @@ void CoreEngine::GameLoop()
             else
             {
                 std::cout << "[CoreEngine] Auto-play flag is FALSE - NOT entering play mode\n";
+            }
+
+            // Unpause the game after scene load completes
+            if (m_gamePause)
+            {
+                std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
+                SetGamePaused(false);
             }
 
             m_pendingScene = "";
@@ -380,6 +395,17 @@ void CoreEngine::GameLoop()
                 std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
                 double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
                 g_systemTimings[pauseMenuLogicSystem->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
+
+            // Win lone logic system
+            if (winLoseLogicSystem)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                winLoseLogicSystem->Update(static_cast<float>(fixed_dt));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[winLoseLogicSystem->GetName()] = ms;
                 g_totalLoopTime += ms;
             }
 

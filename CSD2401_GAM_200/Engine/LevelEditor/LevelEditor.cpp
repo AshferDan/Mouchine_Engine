@@ -926,6 +926,12 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             {
                 pauseMenu->SetCurrentScene(filepath);
             }
+
+            WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+            if (winZone)
+            {
+                winZone->SetCurrentScene(filepath);
+            }
         }
         currentTilemapPath = "";  // Clear any existing tilemap first
 

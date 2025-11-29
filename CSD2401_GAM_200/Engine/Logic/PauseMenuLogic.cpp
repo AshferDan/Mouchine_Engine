@@ -25,13 +25,12 @@ void PauseMenuLogicSystem::Update(float dt)
         return;
     }
 
-    // Update pause menu position to follow camera (so it stays fixed on screen)
+    // update pause menu position to follow camera
     if (isPauseMenuActive || hasCreatedUI)
     {
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
         auto& factory = GameObjectFactory::Instance();
 
-        // Update all pause menu elements to follow camera
         std::vector<std::string> uiElements = {
             "PauseOverlay",
             "PauseBoard",
@@ -50,14 +49,12 @@ void PauseMenuLogicSystem::Update(float dt)
                 auto* transform = obj->GetComponent<TransformComponent>();
                 if (transform)
                 {
-                    // Store the original local position if not already stored
                     static std::map<std::string, vec2> originalPositions;
                     if (originalPositions.find(name) == originalPositions.end())
                     {
                         originalPositions[name] = vec2(transform->posX, transform->posY);
                     }
 
-                    // Set position to camera position + original offset
                     transform->posX = camPos.x + originalPositions[name].x;
                     transform->posY = camPos.y + originalPositions[name].y;
                 }
@@ -86,7 +83,7 @@ void PauseMenuLogicSystem::Update(float dt)
                     isPauseMenuActive = false;
                     CORE->SetGamePaused(false);
                 }
-                // Restart the current level
+                // restart the current level
                 if (!currentScenePath.empty())
                 {
                     CORE->RequestSceneLoad(currentScenePath, true);
@@ -95,19 +92,19 @@ void PauseMenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "PauseSettingsButton")
             {
                 std::cout << "[PauseMenu] Settings clicked (not implemented yet)" << std::endl;
-                // Settings not implemented yet
+                // settings go here
             }
             else if (hoveredButtonName == "PauseMainMenuButton")
             {
                 std::cout << "[PauseMenu] Main Menu clicked" << std::endl;
-                // Close menu first
+                // close menu first
                 if (isPauseMenuActive)
                 {
                     SetPauseMenuVisible(false);
                     isPauseMenuActive = false;
                     CORE->SetGamePaused(false);
                 }
-                // Go back to main menu
+                // back to main menu
                 CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
             }
 
@@ -117,15 +114,12 @@ void PauseMenuLogicSystem::Update(float dt)
         return;
     }
 
-
-
-    // Only process menu interactions if pause menu is active
+    // only process menu interactions if pause menu is active
     if (!isPauseMenuActive)
     {
         return;
     }
 
-    // Get mouse input
     double mouseX = InputManager::GetMouseWorldX();
     double mouseY = InputManager::GetMouseWorldY();
     bool isClicked = InputManager::IsMouseLeftClicked();
@@ -133,7 +127,6 @@ void PauseMenuLogicSystem::Update(float dt)
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
 
-    // Check all pause menu buttons for hover
     if (IsMouseOver(factory.FindGameObject("PauseResumeButton"), mouseX, mouseY))
     {
         currentHover = "PauseResumeButton";
@@ -151,10 +144,8 @@ void PauseMenuLogicSystem::Update(float dt)
         currentHover = "PauseMainMenuButton";
     }
 
-    // if the hovered button has changed since last frame
     if (currentHover != hoveredButtonName)
     {
-        // Rrvert the PREVIOUS button texture to normal
         if (!hoveredButtonName.empty())
         {
             SetButtonTexture(hoveredButtonName, false);
@@ -163,7 +154,6 @@ void PauseMenuLogicSystem::Update(float dt)
         if (!currentHover.empty())
         {
             SetButtonTexture(currentHover, true);
-            // Play hover sound
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
@@ -171,7 +161,6 @@ void PauseMenuLogicSystem::Update(float dt)
             }
         }
 
-        // Update tracked state
         hoveredButtonName = currentHover;
     }
 
@@ -183,7 +172,6 @@ void PauseMenuLogicSystem::Update(float dt)
         if (audioManager)
         {
             audioManager->TriggerEvent("UI_Click");
-            std::cout << "[PauseMenu] Button click sound triggered" << std::endl;
         }
 
         // start delay before executing action
@@ -254,7 +242,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     restartTransform->scaleY = 80.0f;
     auto* restartRender = restartBtn->AddComponent<RenderComponent>();
     restartRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
-    restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
+    restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     restartRender->SetLayer(102);
     auto* restartText = restartBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
@@ -268,7 +256,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     settingsTransform->scaleY = 80.0f;
     auto* settingsRender = settingsBtn->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
-    settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
+    settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(102);
     auto* settingsText = settingsBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
@@ -288,9 +276,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
-    //std::cout << "[PauseMenu] UI created" << std::endl;
 
-    // Initially hide the UI
+    // initially hide the UI
     SetPauseMenuVisible(false);
 }
 
@@ -301,7 +288,7 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
 
     auto& factory = GameObjectFactory::Instance();
 
-    // Destroy all pause menu UI elements
+    // xestroy all ui elements on pause menu
     std::vector<std::string> uiElements = {
         "PauseOverlay",
         "PauseBoard",
@@ -351,7 +338,7 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
 
 void PauseMenuLogicSystem::TogglePauseMenu()
 {
-    // create UI on first toggle if not created
+    // create ui on first toggle if not created
     if (!hasCreatedUI)
     {
         CreatePauseMenuUI();
@@ -360,7 +347,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
-    // Pause/unpause the game
+    // pause/unpause the game
     CORE->SetGamePaused(isPauseMenuActive);
     //CORE->GameTimerSystem();
 
@@ -370,7 +357,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
 bool PauseMenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mouseY)
 {
     if (!button) return false;
-    if (!button->IsActive()) return false; // Don't interact with inactive buttons
+    if (!button->IsActive()) return false;
 
     auto* tx = button->GetComponent<TransformComponent>();
     if (!tx) return false;
