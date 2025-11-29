@@ -169,13 +169,14 @@ namespace GameScripts
         //private KnockBack knockback;
 
         // CONTROL SCHEME
-        bool DashWasPressed = Input.GetKey(Input.KeyCode.J);
-        bool WallKickWasPressed = Input.GetKey(Input.KeyCode.L);
-        bool GroundPoundWasPressed = Input.GetKey(Input.KeyCode.S);
-        bool RollWasPressed = Input.GetKey(Input.KeyCode.K);
-        bool JumpWasPressed = Input.GetKey(Input.KeyCode.Space);
-        bool ZiplineWasPressed = Input.GetKey(Input.KeyCode.W);
-        bool GlideIsHeld = Input.GetKey(Input.KeyCode.W);
+        bool DashWasPressed = Input.GetKeyPressed(Input.KeyCode.J);
+        bool WallKickWasPressed = Input.GetKeyPressed(Input.KeyCode.L);
+        bool GroundPoundWasPressed = Input.GetKeyPressed(Input.KeyCode.S);
+        bool RollWasPressed = Input.GetKeyPressed(Input.KeyCode.K);
+        bool JumpWasPressed = Input.GetKeyPressed(Input.KeyCode.Space);
+        bool JumpWasReleased = Input.GetKeyReleased(Input.KeyCode.Space);
+        bool ZiplineWasPressed = Input.GetKeyPressed(Input.KeyCode.W);
+        bool GlideIsHeld = Input.GetKeyPressed(Input.KeyCode.W);
 
         private float deltaTime => Utils.GetDelta_Time();
         private float fixedDeltaTime => Utils.GetFixed_Delta_Time();
@@ -188,7 +189,7 @@ namespace GameScripts
 
         public void OnStart()
         {
-            GameObject.CreateAnimatedImage("C#_Player", 0, 0,
+            GameObject.CreateAnimatedImage(playerName, 0, 0,
                 300, 300,
                 "../Assets/spritesheet_R.png",
                 13, 10,     // rows n cols
@@ -232,27 +233,27 @@ namespace GameScripts
             // check for dash input
             if (DashWasPressed && _dashCooldownTimer <= 0)
             {
-                //InitiateDash();
+                InitiateDash();
             }
             if (WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
             {
-                //InitiateWallKick();
+                InitiateWallKick();
             }
             if (GroundPoundWasPressed && !_isGrounded)
             {
-                //InitiateGroundPound();
+                InitiateGroundPound();
             }
             if (RollWasPressed)
             {
-                //InitiateRoll();
+                InitiateRoll();
             }
             if (GlideIsHeld && !_isGrounded)
             {
-                //InitiateGlide();
+                InitiateGlide();
             }
             else if (_isGliding)                 // if key was let go but still in gliding state, cancel gliding action
             {
-                //StopGlide();
+                StopGlide();
             }
 
             if (_ziplineCoyoteTimer > 0)
@@ -264,31 +265,32 @@ namespace GameScripts
             // [ ALL OF THIS TO MOVE INTO FIXEDUPDATE ]
             //if (GameManager.instance.CurrentState != GameState.Playing) return;
 
-            //CollisionChecks();
+            CollisionChecks();
 
             //if (!_isZiplining && !knockback.IsBeingKnockedBack && !_isBeingLaunched)
-            //{
-            //    Jump();
-            //    Dash();
-            //    WallKick();
-            //    GroundPound();
-            //    Roll();
-            //    Glide();
-            //    WallSlide();
+            if (!_isZiplining && !_isBeingLaunched)
+            {
+                Jump();
+                Dash();
+                WallKick();
+                GroundPound();
+                Roll();
+                Glide();
+                WallSlide();
 
-            //    // only allow regular movement if not dashing
-            //    if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
-            //    {
-            //        if (_isGrounded)
-            //        {
-            //            Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement);
-            //        }
-            //        else
-            //        {
-            //            Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement);
-            //        }
-            //    }
-            //}
+                // only allow regular movement if not dashing
+                if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
+                {
+                    if (_isGrounded)
+                    {
+                        Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, new Vector2(Input.Movement().x, Input.Movement().y));
+                    }
+                    else
+                    {
+                        Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, new Vector2(Input.Movement().x, Input.Movement().y));
+                    }
+                }
+            }
         }
         public void OnDestroy()
         {
@@ -339,7 +341,6 @@ namespace GameScripts
                 _wallJumpTimer -= deltaTime;
             }
 
-            //canWallKick = _isTouchingWall && !_isGrounded;
             canWallKick = _isTouchingWall;
         }
 
@@ -373,10 +374,6 @@ namespace GameScripts
                 {
                     rayColor = Color.Red;
                 }
-
-                //Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y), Vector2.down * MoveStats.GroundDetectionRayLength, rayColor);
-                //Debug.DrawRay(new Vector2(boxCastOrigin.x + boxCastSize.x / 2, boxCastOrigin.y), Vector2.down * MoveStats.GroundDetectionRayLength, rayColor);
-                //Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2, boxCastOrigin.y - MoveStats.GroundDetectionRayLength), Vector2.right * boxCastSize.x, rayColor);
             }
             #endregion
         }
@@ -413,10 +410,6 @@ namespace GameScripts
                 {
                     rayColor = Color.Red;
                 }
-
-                //Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2 * headWidth, boxCastOrigin.y), Vector2.up * MoveStats.HeadDetectionRayLength, rayColor);
-                //Debug.DrawRay(new Vector2(boxCastOrigin.x + (boxCastSize.x / 2) * headWidth, boxCastOrigin.y), Vector2.up * MoveStats.HeadDetectionRayLength, rayColor);
-                //Debug.DrawRay(new Vector2(boxCastOrigin.x - boxCastSize.x / 2 * headWidth, boxCastOrigin.y + MoveStats.HeadDetectionRayLength), Vector2.right * boxCastSize.x * headWidth, rayColor);
             }
 
             #endregion
@@ -447,7 +440,7 @@ namespace GameScripts
             // check if in air
             if (!_isGrounded)
             {
-                //currState = PlayerState.Jumping;
+                currState = PlayerState.Jumping;
                 if (_isWallJumping)
                 {
                     currState = PlayerState.WallJumping;
@@ -460,13 +453,11 @@ namespace GameScripts
             else
             {
                 // horizontal input = moving - trigger run animation
-                //if (InputManager.Movement.x != 0)
-                // if player is moving horizontally
                 if (Input.Movement().x != 0)
                 {
                     currState = PlayerState.Running;
                 }
-                //else
+                else
                 {
                     currState = PlayerState.Idle;
                 }
@@ -496,16 +487,14 @@ namespace GameScripts
 
                 if (!(_isRolling && _rollTimer >= 0))               // did this so it would continously move forward in roll state
                 {
-                    //_moveVelocity = Vector2.Lerp(_moveVelocity, targetVelocity, acceleration * Time.fixedDeltaTime);
+                    _moveVelocity = Vector2.Lerp(_moveVelocity, targetVelocity, acceleration * deltaTime);
                 }
 
-                //_rb.linearVelocity = new Vector2(_moveVelocity.x, _rb.linearVelocity.y);
                 Physics.SetVelocity(playerName, _moveVelocity.X, Physics.GetVelocity(playerName).y);
             }
             else
             {
-                //_moveVelocity = Vector2.Lerp(_moveVelocity, Vector2.Zero, deceleration * Time.fixedDeltaTime);
-                //_rb.linearVelocity = new Vector2(_moveVelocity.x, _rb.linearVelocity.y);
+                _moveVelocity = Vector2.Lerp(_moveVelocity, Vector2.Zero, deceleration * deltaTime);
                 Physics.SetVelocity(playerName, _moveVelocity.X, Physics.GetVelocity(playerName).y);
             }
 
@@ -513,7 +502,6 @@ namespace GameScripts
 
         private void TurnCheck(Vector2 moveInput)
         {
-
             if (_isFacingRight && moveInput.X < 0)
             {
                 Turn(false);
@@ -564,8 +552,8 @@ namespace GameScripts
                 if (VerticalVelocity >= 0f)
                 {
                     // apex controls
-                    //_apexPoint = Mathf.InverseLerp(MoveStats.InitialJumpVelocity, 0f, VerticalVelocity);
-
+                    _apexPoint = Utils.MathfInverseLerp(MoveStats.InitialJumpVelocity, 0f, VerticalVelocity);
+                    
                     if (_apexPoint > MoveStats.ApexThreshold)
                     {
                         if (!_isPastApexThreshold)
@@ -576,7 +564,6 @@ namespace GameScripts
 
                         if (_isPastApexThreshold)
                         {
-                            //_timePastApexThreshold += Time.fixedDeltaTime;
                             _timePastApexThreshold += deltaTime;
 
                             if (_timePastApexThreshold < MoveStats.ApexHangTime)
@@ -625,7 +612,7 @@ namespace GameScripts
                 }
                 else if (_fastFallTime < MoveStats.TimeForUpwardsCancel)
                 {
-                    //VerticalVelocity = Mathf.Lerp(_fastFallReleaseSpeed, 0f, (_fastFallTime / MoveStats.TimeForUpwardsCancel));
+                    VerticalVelocity = Utils.MathfLerp(_fastFallReleaseSpeed, 0f, (_fastFallTime / MoveStats.TimeForUpwardsCancel));
                 }
 
                 _fastFallTime += fixedDeltaTime;
@@ -643,9 +630,7 @@ namespace GameScripts
             }
 
             // clamp fall speed
-            //VerticalVelocity = Mathf.Clamp(VerticalVelocity, -MoveStats.MaxFallSpeed, 80f);
-
-            //_rb.linearVelocity = new Vector2(_rb.linearVelocity.x, VerticalVelocity);
+            VerticalVelocity = Utils.MathfClamp(VerticalVelocity, -MoveStats.MaxFallSpeed, 80f);
             Physics.SetVelocity(playerName, Physics.GetVelocity(playerName).x, VerticalVelocity);
         }
 
@@ -661,7 +646,7 @@ namespace GameScripts
             // when jump is released - with hold to jump enabled
             if (MoveStats.EnableVariableJumpHeight)
             {
-                if (InputManager.JumpWasReleased)
+                if (JumpWasReleased)
                 {
                     if (_jumpBufferTimer > 0f)
                     {
@@ -804,7 +789,6 @@ namespace GameScripts
             VerticalVelocity = MoveStats.WallJumpForce.y;
             float horizontalDirection = _isFacingRight ? -1f : 1f;
             _moveVelocity.X = MoveStats.WallJumpForce.x * horizontalDirection;
-            //_rb.linearVelocity = new Vector2(_moveVelocity.x, _rb.linearVelocity.y);
             Physics.SetVelocity(playerName, _moveVelocity.X, Physics.GetVelocity(playerName).y);
 
             // turn the player
@@ -845,7 +829,6 @@ namespace GameScripts
             VerticalVelocity = 0f;
 
             // ensure jump velocity does not interfere
-            //_rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0);
             Physics.SetVelocity(playerName, Physics.GetVelocity(playerName).x, 0.0f);
         }
 
@@ -855,7 +838,6 @@ namespace GameScripts
             {
                 // maintain dash speed and zero vertical velocity while dashing
                 VerticalVelocity = 0f;
-                //_rb.linearVelocity = new Vector2(_moveVelocity.x, 0f);
                 Physics.SetVelocity(playerName, Physics.GetVelocity(playerName).x, 0.0f);
 
                 _dashTimer -= fixedDeltaTime;
@@ -871,8 +853,7 @@ namespace GameScripts
         private void StopDash()
         {
             _isDashing = false;
-            //_rb.linearVelocity = new Vector2(_moveVelocity.x, 0f);
-            Physics.SetVelocity(playerName, Physics.GetVelocity(playerName).x, 0.0f);
+            Physics.SetVelocity(playerName, _moveVelocity.X, 0.0f);
         }
 
         #endregion
@@ -917,8 +898,7 @@ namespace GameScripts
 
                 blockMovement = true;
                 _isJumping = false;
-                //_wallKickTimer -= Time.fixedDeltaTime;
-                _wallKickTimer -= deltaTime;
+                _wallKickTimer -= fixedDeltaTime;
 
                 // calculate progress through the kick (from 0.0 @ start to 1.0 @ end)
                 float progress = 1f - (_wallKickTimer / _wallKickTotalDuration);
@@ -935,7 +915,7 @@ namespace GameScripts
                 // apply new eased speed
                 // to fix the jank vert momentum, we just ignore gravity for now, and give back control to the grav after wall kicks
                 // can change this to a var!
-                //_rb.linearVelocity = new Vector2(currentSpeed, verticalGain);
+
                 Physics.SetVelocity(playerName, currentSpeed, verticalGain);
 
                 // check if the kick's duration has finished
@@ -953,11 +933,8 @@ namespace GameScripts
             blockMovement = false;
 
             // reset horizontal velocity so player can stop / move normally
-            //_rb.linearVelocity += new Vector2(0, _rb.linearVelocity.y); // stop horizontal movement immediately
-            //_rb.linearVelocity = new Vector2(0, _rb.linearVelocity.y);
             Physics.SetVelocity(playerName, 0.0f, Physics.GetVelocity(playerName).y);
 
-            //_moveVelocity = _rb.linearVelocity;
             _moveVelocity = new Vector2(Physics.GetVelocity(playerName).x, Physics.GetVelocity(playerName).y);
             wallKickFrameCounter = 0;                       // [WIP] for cayote time upon leaving wall
         }
@@ -968,20 +945,20 @@ namespace GameScripts
         private void WallSlide()
         {
             // Guard clauses to ensure we are not grounded or being knocked back.
-            //if (_isGrounded || (knockback != null && knockback.IsBeingKnockedBack))
-            //{
-            //    // If we were sliding, make sure to stop all related sounds.
-            //    if (_isWallSliding)
-            //    {
-            //        _isWallSliding = false;
-            //        AudioManager.instance.StopLoopingPlayerSFX();
-            //        if (_wallSoundCoroutine != null)
-            //        {
-            //            StopCoroutine(_wallSoundCoroutine);
-            //        }
-            //    }
-            //    return;
-            //}
+            if (_isGrounded) // || (knockback != null && knockback.IsBeingKnockedBack))
+            {
+                // If we were sliding, make sure to stop all related sounds.
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                    //AudioManager.instance.StopLoopingPlayerSFX();
+                    //if (_wallSoundCoroutine != null)
+                    //{
+                    //    StopCoroutine(_wallSoundCoroutine);
+                    //}
+                }
+                return;
+            }
 
             // --- The rest of the logic ---
             // inputmanager.movement is just a way to check if any movement key is being pressed. W(0,1), A(-1,0), S(0,-1), D(1,0)
@@ -1004,7 +981,6 @@ namespace GameScripts
                 }
 
                 // Apply the physics effect every frame we are sliding
-                //_rb.linearVelocity = new Vector2(_rb.linearVelocity.x, Mathf.Max(_rb.linearVelocity.y, -MoveStats.WallSlidingSpeed));
                 Physics.SetVelocity(playerName, Physics.GetVelocity(playerName).x, Math.Max(Physics.GetVelocity(playerName).y, -MoveStats.WallSlidingSpeed));
             }
             else // If we are no longer meeting the conditions to slide
@@ -1041,12 +1017,8 @@ namespace GameScripts
 
             _groundPoundPauseTimer = MoveStats.GroundPoundPauseTime;
 
-            // can maybe do a -= until <= 0, so smoother stop to midair, but for demo we just instant stop and pause in midair before groundpound
             _moveVelocity.X = 0;
             _moveVelocity.Y = -MoveStats.GroundPoundFallSpeed;
-
-            // --- USING STATS.CS CHANGE ---
-            //_moveVelocity.y = -20f;             // [WIP] was just demoing here, if you happy with the feel of this value then can move to movestats!
 
             Physics.SetVelocity(playerName,0,0);
             lastPos = new Vector2 (Transform.GetPosition(playerName).x, Transform.GetPosition(playerName).y);             // store position where groundpound initiated - used for calculating horizontal distance to convert
@@ -1059,9 +1031,7 @@ namespace GameScripts
                 if (_groundPoundPauseTimer > 0)                         // Timer for how long the player stays in air for before moving downwards
                 {
                     _groundPoundPauseTimer -= deltaTime;
-                    //_rb.linearVelocity = new Vector2(0f, 0f);
                     Physics.SetVelocity(playerName, 0,0);
-                    //_rb.position = lastPos;
                     Transform.SetPosition(playerName, lastPos.X, lastPos.Y);
                 }
                 else
@@ -1074,7 +1044,6 @@ namespace GameScripts
                     }
                     else
                     {
-                        /// _rb.linearVelocity += new Vector2(0, _moveVelocity.y);          // zoom down!
                         float newY = Physics.GetVelocity(playerName).y;
                         newY += _moveVelocity.Y;
                         Physics.SetVelocity(playerName, 0, newY);
@@ -1110,15 +1079,14 @@ namespace GameScripts
             fRoll = true;                                   // time deduction
             _isRolling = true;
 
-            _rollTimer = (!_isGroundPounding) ? MoveStats.BaseRollDuration : MoveStats.BaseRollDuration + (lastPos.y - Transform.GetPosition(playerName).y) / MoveStats.RollHeightToDurationDivisor;
-            //Mathf.Clamp(_rollTimer, 0f, 2.0f);
+            _rollTimer = (!_isGroundPounding) ? MoveStats.BaseRollDuration : MoveStats.BaseRollDuration + (lastPos.Y - Transform.GetPosition(playerName).y) / MoveStats.RollHeightToDurationDivisor;
+            Utils.MathfClamp(_rollTimer, 0f, 2.0f);
             _isGroundPounding = false;
             blockMovement = false;
 
             _moveVelocity.X = (_isFacingRight) ? MoveStats.RollSpeed : -MoveStats.RollSpeed;
             _moveVelocity.Y = 0;
 
-            //_rb.linearVelocity = new Vector2(0, 0);
             Physics.SetVelocity(playerName, 0, 0);
         }
 
@@ -1180,8 +1148,7 @@ namespace GameScripts
             // if cooldown ready + input pressed
             if (_isGliding)
             {
-                // cooldown ready
-                // cancel if hit ground or dash
+                // cooldown ready  |  cancel if hit ground or dash
                 if (_isGrounded || _isDashing)
                 {
                     StopGlide();
@@ -1192,8 +1159,8 @@ namespace GameScripts
                     _timeSinceLastGlideDeduction += fixedDeltaTime;
                     if (_timeSinceLastGlideDeduction >= MoveStats.GlideDeductionInterval)
                     {
-                        fGlide = true; // Set the flag for the TimerManager
-                        _timeSinceLastGlideDeduction = 0f; // Reset the timer
+                        fGlide = true;                          // Set the flag for the TimerManager
+                        _timeSinceLastGlideDeduction = 0f;      // Reset the timer
                     }
 
                     // only apply the glide effect when falling
