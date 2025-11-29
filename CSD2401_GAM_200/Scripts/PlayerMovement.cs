@@ -14,6 +14,7 @@ Technology is prohibited.
 
 using CSharpScript;
 using System;
+using System.Numerics;
 
 namespace GameScripts
 {
@@ -41,7 +42,7 @@ namespace GameScripts
 
         #region Variables
         // This property should be set by the C++ engine after the script is attached.
-        public string gameObjectName { get; set; }
+        public string gameObjectName = "Hero";
 
         // movement variables
         private vec2 _moveVelocity;
@@ -166,15 +167,17 @@ namespace GameScripts
             JumpChecks();
             // Handle Inputs
             HandleGeneralInput();
+            OnFixedUpdate(deltaTime);
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
         {
+            Debug.Log("aaaa");
             if (gameObjectName == null) return;
-            
             CollisionChecks();
+                Debug.Log("jump done");
 
-            if (!_isZiplining &&/*!knockback.IsBeingKnockedBack &&*/ !_isBeingLaunched)
+            if (!_isZiplining) //&& !knockback.IsBeingKnockedBack && !_isBeingLaunched)
             {
                 Jump(fixedDeltaTime);
                 Dash(fixedDeltaTime);
@@ -187,6 +190,7 @@ namespace GameScripts
                 // only allow regular movement if not dashing
                 if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
                 {
+                    //Debug.Log(Input.Movement().x.ToString() + " " + Input.Movement().y.ToString());
                     if (_isGrounded)
                     {
                         Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement, fixedDeltaTime);
@@ -196,6 +200,7 @@ namespace GameScripts
                         Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement, fixedDeltaTime);
                     }
                 }
+                else Debug.Log("aaaa");
             }
         }
 
@@ -713,7 +718,13 @@ namespace GameScripts
             {
                 // maintain dash speed and zero vertical velocity while dashing
                 VerticalVelocity = 0f;
-                Physics.SetVelocity(gameObjectName, _moveVelocity.x, 0f);
+                float direction = _isFacingRight ? 1 : -1;
+                float move = MoveStats.DashSpeed * deltaTime;
+
+                // Move manually instead of overriding physics velocity
+                Vector2 newVec = new Vector2(Transform.GetPosition(gameObjectName).x, Transform.GetPosition(gameObjectName).y);
+                newVec += new Vector2(move * direction, 0);
+                Transform.SetPosition(gameObjectName, newVec.X, newVec.Y);
 
                 _dashTimer -= deltaTime;
 
