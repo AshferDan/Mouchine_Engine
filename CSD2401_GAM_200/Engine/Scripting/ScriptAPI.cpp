@@ -310,7 +310,7 @@ namespace API
         return vec2(0.0f, 0.0f); // Return a default value if not found
     }
 
-    void SetFiction(const std::string& objectName, float val)
+    void SetFriction(const std::string& objectName, float val)
     {
         auto& factory = GameObjectFactory::Instance();
 
