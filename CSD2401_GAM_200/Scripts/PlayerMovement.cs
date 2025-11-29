@@ -167,7 +167,7 @@ namespace GameScripts
             JumpChecks();
             // Handle Inputs
             HandleGeneralInput();
-            OnFixedUpdate(deltaTime);
+            //OnFixedUpdate(deltaTime);
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
