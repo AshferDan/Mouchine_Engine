@@ -57,8 +57,6 @@ public:
     void ToggleMasterMute();
     bool IsMuted() const;
 
-    void ReapplyMuteState();
-
     void HandleMessage(const PlaySoundMessage& msg) override;
     void HandleMessage(const PauseSoundMessage& msg) override;
 

@@ -463,8 +463,29 @@
       "children": []
     },
     {
-      "name": "MainCamera",
+      "name": "WinZone",
       "localID": 11,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [-300.0, 400.0],
+        "scale": [150.0, 150.0],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [0.0, 1.0, 0.0, 1.0]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default"
+      },
+      "children": []
+    },
+    {
+      "name": "MainCamera",
+      "localID": 12,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -482,7 +503,7 @@
     },
     {
       "name": "LevelTimerText",
-      "localID": 9,
+      "localID": 13,
       "parentID": -1,
       "active": true,
 
@@ -502,6 +523,25 @@
       },
 
       "children": []
+    },
+    {
+      "name": "Text FPS",
+      "TransformComponent": {
+        "pos": [100, 100],
+        "scale": [1, 1],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square"
+      },
+      "TextComponent": {
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 50,
+        "text": "FPS",
+        "color": [1.0, 1.0, 1.0, 1.0],
+        "scale": 1.0,
+        "screenSpace": true
+      }
     }
   ]
 }

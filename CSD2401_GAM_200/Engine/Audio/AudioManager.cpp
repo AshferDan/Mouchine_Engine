@@ -136,6 +136,11 @@ void AudioManager::PlaySound(const std::string& soundName, const std::string& ch
         finalVolume *= categoryIt->second;
     }
 
+    // Enforce master mute
+    if (m_isMuted) {
+        finalVolume = 0.0f;
+    }
+
     audioEngine->setVolume(channel, finalVolume);
     audioEngine->setPitch(channel, sound.pitch <= 0.0f ? 1.0f : sound.pitch);
 }
@@ -226,6 +231,16 @@ void AudioManager::ToggleMasterMute()
     {
         SetCategoryVolume(category, vol);
     }
+
+    // --- Direct Patch ---
+    // Force-update the BGM channels just in case the SetCategoryVolume loop missed them.
+    if (audioEngine && categoryVolumes.count("music"))
+    {
+        float musicVol = categoryVolumes["music"];
+        audioEngine->setVolume("bgm_channel", musicVol);
+        audioEngine->setVolume("menu_bgm_channel", musicVol);
+        std::cout << "Forcing BGM channel volumes to " << musicVol << std::endl;
+    }
 }
 
 void AudioManager::SetSoundPitch(const std::string& soundName, float pitch)
@@ -247,17 +262,6 @@ void AudioManager::SetSoundPitch(const std::string& soundName, float pitch)
     audioEngine->setPitch(channel, pitch);
 }
 
-void AudioManager::ReapplyMuteState()
-{
-    if (m_isMuted)
-    {
-        // This will set all category volumes to 0 and update playing sounds
-        for (auto const& [category, vol] : categoryVolumes)
-        {
-            SetCategoryVolume(category, 0.0f);
-        }
-    }
-}
 
 
 void AudioManager::StopSound(const std::string& channelName) 

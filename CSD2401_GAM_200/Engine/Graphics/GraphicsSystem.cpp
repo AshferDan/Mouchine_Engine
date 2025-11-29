@@ -241,26 +241,6 @@ void GraphicsSystem::Initialize()
             else
             {
                 CORE->SetGamePaused(false);
-                auto* audioManager = CORE->GetAudioManager();
-
-                const auto& sounds = audioManager->GetSoundDatabase();
-
-                if (sounds.find("bgm") != sounds.end())
-                {
-                    // Game scene - play game BGM
-                    std::cout << "Playing game BGM\n";
-                    audioManager->PlaySound("bgm", "bgm_channel");
-                }
-                else if (sounds.find("MainMenuBGM") != sounds.end())
-                {
-                    // Main menu scene - play menu BGM
-                    std::cout << "Playing main menu BGM\n";
-                    audioManager->PlaySound("MainMenuBGM", "menu_bgm_channel");
-                }
-                else
-                {
-                    std::cout << "No BGM found in AudioManager\n";
-                }
             }
         });
 
@@ -485,7 +465,7 @@ void GraphicsSystem::Update(float)
         auto* textFPS = textObj->GetComponent<TextComponent>();
         if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
             textFPS->SetEnabled(true);
-            textFPS->SetText(std::to_string(static_cast<int>(CORE->GetFPS())));
+            textFPS->SetText("FPS: "+std::to_string(static_cast<int>(CORE->GetFPS())));
         }
         else {
             textFPS->SetText("FPS");
@@ -532,13 +512,21 @@ void GraphicsSystem::Update(float)
         bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
         int layer = rend->GetLayer(); // For draw order sorting
 
-        // Gather UV data for spritesheets/animation
+        // Gather UV data for spritesheets/animation/tiles
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
+
         if (auto* animator = obj->GetComponent<Spritesheet>())
         {
+            // Animator takes priority (for animated sprites)
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
+        }
+        else if (auto* renderComp = obj->GetComponent<RenderComponent>())
+        {
+            // Use RenderComponent UV (for tiles/static sprites)
+            uvScale = renderComp->GetUVScale();
+            uvOffset = renderComp->GetUVOffset();
         }
 
         // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
