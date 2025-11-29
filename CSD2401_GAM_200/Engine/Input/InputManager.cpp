@@ -410,6 +410,8 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
+    physics->SetFrictionCoefficient(HERO_FRICTION_COEFFICIENT);
+
     /**
      * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
      */
@@ -473,7 +475,7 @@ void InputManager::Update(float dt)
         // Add friction to slow down (only if not already present)
         if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
         {
-            forcesManager.AddForce(ForceType::Friction, HERO_FRICTION_COEFFICIENT, -1.0f, 0.0f, 0.0f, &physics->isGrounded);
+            forcesManager.AddForce(ForceType::Friction, -1.0f, -1.0f, 0.0f, 0.0f, &physics->isGrounded);
         }
 
         // Reset footstep timer when not moving
