@@ -383,10 +383,16 @@ namespace API {
 
 
 #pragma region Misc
-    int RandomNumberGen(int, int);
     float GetDelta_Time();
     float GetFixedDelta_time();
     float GetFramePerSecond();
+
+    int RandomNumberGen(int, int);
+    float lerping();
+    float inverseLerping();
+    float floatClamp();
+    int intClamp();
+
 #pragma endregion
 
 #pragma region Scripting
@@ -394,8 +400,12 @@ namespace API {
 #pragma endregion
 
 #pragma region Input
-    bool IsKeyDown(int key);
-    bool IsMouseButtonDown(int button);
+    bool IsKeyPressed(int key);
+    bool IsKeyReleased(int key);
+    bool IsKeyHeld(int key);
+    bool IsMouseButtonPressed(int button);
+    bool IsMouseButtonReleased(int button);
+    bool IsMouseButtonHeld(int button);
     float GetMouseX();
     float GetMouseY();
     float GetMouseWorldX();

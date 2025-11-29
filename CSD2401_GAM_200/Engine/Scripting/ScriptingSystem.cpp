@@ -473,14 +473,30 @@ static float Internal_GetFramesPerSecond() {
 
 
 // === Input ===
-static bool Internal_IsKeyDown(int key)
+static bool Internal_IsKeyPressed(int key)
 {
-    return API::IsKeyDown(key);
+    return API::IsKeyPressed(key);
+}
+static bool Internal_IsKeyReleased(int key)
+{
+    return API::IsKeyReleased(key);
+}
+static bool Internal_IsKeyHeld(int key)
+{
+    return API::IsKeyHeld(key);
 }
 
-static bool Internal_IsMouseButtonDown(int button)
+static bool Internal_IsMouseButtonPressed(int button)
 {
-    return API::IsMouseButtonDown(button);
+    return API::IsMouseButtonPressed(button);
+}
+static bool Internal_IsMouseButtonReleased(int button)
+{
+    return API::IsMouseButtonReleased(button);
+}
+static bool Internal_IsMouseButtonHeld(int button)
+{
+    return API::IsMouseButtonHeld(button);
 }
 
 static float Internal_GetMouseX()
@@ -663,8 +679,13 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Utils::GetFramesPerSecond", (void*)Internal_GetFramesPerSecond);
 
     // === Input ===
-    mono_add_internal_call("CSharpScript.Input::IsKeyDown", (void*)Internal_IsKeyDown);
-    mono_add_internal_call("CSharpScript.Input::IsMouseButtonDown", (void*)Internal_IsMouseButtonDown);
+    mono_add_internal_call("CSharpScript.Input::IsKeyPressed", (void*)Internal_IsKeyPressed);
+    mono_add_internal_call("CSharpScript.Input::IsKeyReleased", (void*)Internal_IsKeyReleased);
+    mono_add_internal_call("CSharpScript.Input::IsKeyHeld", (void*)Internal_IsKeyHeld);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonPressed", (void*)Internal_IsMouseButtonPressed);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonReleased", (void*)Internal_IsMouseButtonReleased);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonHeld", (void*)Internal_IsMouseButtonHeld);
+
     mono_add_internal_call("CSharpScript.Input::GetMouseX", (void*)Internal_GetMouseX);
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);

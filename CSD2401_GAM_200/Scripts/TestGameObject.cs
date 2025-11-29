@@ -13,6 +13,8 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
+using CSharpScript;
+
 namespace GameScripts
 {
     public class TestGameObject
@@ -47,7 +49,18 @@ namespace GameScripts
 
         public void OnUpdate(float deltaTime)
         {
-            
+            if (Input.GetKeyPressed(Input.KeyCode.K))
+            {
+                CSharpScript.Debug.Log("button Pressed");
+            }
+            else if (Input.GetKeyReleased(Input.KeyCode.K))
+            {
+                CSharpScript.Debug.Log("Key Have Been Released");
+            }
+            else if (Input.GetKeyHeld(Input.KeyCode.K))
+            {
+                CSharpScript.Debug.Log("Key Have Been holding");
+            }
         }
 
         public void OnDestroy()

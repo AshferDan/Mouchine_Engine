@@ -713,6 +713,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
 
 
 #pragma endregion
+
 #pragma region Camera
     vec2 GetCameraPosition()
     {
@@ -1046,22 +1047,62 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
 #pragma endregion
 
 #pragma region Input
-    bool IsKeyDown(int key)
+    bool IsKeyPressed(int key)
     {
-        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
-        if (window)
+        InputManager* input = CORE->GetInputManager();
+        if (input)
         {
-            return glfwGetKey(window, key) == GLFW_PRESS;
+            return input->IsKeyPressed(key);
         }
         return false;
     }
 
-    bool IsMouseButtonDown(int button)
+    bool IsKeyReleased(int key)
     {
-        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
-        if (window)
+        InputManager* input = CORE->GetInputManager();
+        if (input)
         {
-            return glfwGetMouseButton(window, button) == GLFW_PRESS;
+            return input->IsKeyReleased(key);
+        }
+        return false;
+    }
+
+    bool IsKeyHeld(int key)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsKeyHeld(key);
+        }
+        return false;
+    }
+
+    bool IsMouseButtonPressed(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsMouseButtonPressed(button);
+        }
+        return false;
+    }
+
+    bool IsMouseButtonReleased(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsMouseButtonReleased(button);
+        }
+        return false;
+    }
+
+    bool IsMouseButtonHeld(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsMouseButtonHeld(button);
         }
         return false;
     }
