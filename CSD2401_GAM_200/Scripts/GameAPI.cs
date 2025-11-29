@@ -596,6 +596,14 @@ namespace CSharpScript
         public static extern float GetFixed_Delta_Time();
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float GetFramesPerSecond();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float MathfLerp(float a, float b, float t);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float MathfInverseLerp(float a, float b, float value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float MathfClamp(float value, float min, float max);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int MathiClamp(int value, int min, int max);
     }
 
     public static class Input

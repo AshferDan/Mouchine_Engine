@@ -677,6 +677,10 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Utils::GetDelta_Time", (void*)Internal_GetDelta_Time);
     mono_add_internal_call("CSharpScript.Utils::GetFixed_Delta_Time", (void*)Internal_GetFixed_Delta_Time);
     mono_add_internal_call("CSharpScript.Utils::GetFramesPerSecond", (void*)Internal_GetFramesPerSecond);
+	mono_add_internal_call("CSharpScript.Utils::MathfLerp", (void*)API::fLerp);
+	mono_add_internal_call("CSharpScript.Utils::MathfInverseLerp", (void*)API::fInverseLerp);
+	mono_add_internal_call("CSharpScript.Utils::MathfClamp", (void*)API::fClamp);
+	mono_add_internal_call("CSharpScript.Utils::MathiClamp", (void*)API::iClamp);
 
     // === Input ===
     mono_add_internal_call("CSharpScript.Input::IsKeyPressed", (void*)Internal_IsKeyPressed);

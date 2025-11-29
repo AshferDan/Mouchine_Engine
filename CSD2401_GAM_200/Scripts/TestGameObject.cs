@@ -61,6 +61,20 @@ namespace GameScripts
             {
                 CSharpScript.Debug.Log("Key Have Been holding");
             }
+            if (Input.GetKeyPressed(Input.KeyCode.J))
+            {
+				float lerpResult = Utils.MathfLerp(0.0f, 10.0f, 0.5f);
+				CSharpScript.Debug.Log("Lerp(0, 10, 0.5) = " + lerpResult);
+
+				float inverseLerpResult = Utils.MathfInverseLerp(0.0f, 10.0f, 5.0f);
+				CSharpScript.Debug.Log("InverseLerp(0, 10, 5) = " + inverseLerpResult);
+
+				float floatClampResult = Utils.MathfClamp(15.0f, 0.0f, 10.0f);
+				CSharpScript.Debug.Log("FloatClamp(15, 0, 10) = " + floatClampResult);
+
+				int intClampResult = Utils.MathiClamp(15, 0, 10);
+				CSharpScript.Debug.Log("IntClamp(15, 0, 10) = " + intClampResult);
+			}
         }
 
         public void OnDestroy()

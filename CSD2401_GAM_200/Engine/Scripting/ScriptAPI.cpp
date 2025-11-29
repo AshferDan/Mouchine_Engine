@@ -859,17 +859,33 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         int result = rand() % range + min;
         return result;
     }
-    float GetDelta_Time()
+    double GetDelta_Time()
     {
         return CORE->GetDeltaTime();
     }
-    float GetFixedDelta_time()
+    double GetFixedDelta_time()
     {
         return CORE->GetFixedDeltaTime();
     }
-    float GetFramePerSecond() {
+    double GetFramePerSecond() {
         return CORE->GetFPS();
     }
+    float fLerp(float a, float b, float t)
+    {
+		return (a, b, t);
+	}
+    float fInverseLerp(float a, float b, float value)
+    {
+		return MathfInverseLerp(a, b, value);
+	}
+    float fClamp(float value, float min, float max)
+    {
+		return MathfClamp(value, min, max);
+	}
+    int iClamp(int value, int min, int max)
+    {
+		return MathiClamp(value, min, max);
+	}
 #pragma endregion
 
 #pragma region Audio
