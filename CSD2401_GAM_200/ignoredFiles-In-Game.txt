@@ -1,13 +1,20 @@
-./Scripts/nothing.txt:  listed in $Not_Code_Extension{txt}
+./Scripts/bin/x64/Debug/net48/GameScripts.dll:  binary file
+./Scripts/bin/x64/Debug/net48/GameScripts.pdb:  binary file
+./Scripts/obj/Debug/.NETFramework,Version=v4.8.AssemblyAttributes.cs:  duplicate of ./Scripts/obj/x64/Debug/net48/.NETFramework,Version=v4.8.AssemblyAttributes.cs
+./Scripts/obj/Debug/GameScript.AssemblyInfo.cs:  duplicate of ./Scripts/obj/Debug/net48/GameScript.AssemblyInfo.cs
+./Scripts/obj/Debug/GameScript.AssemblyInfoInputs.cache:  language unknown (#3)
+./Scripts/obj/Debug/GameScript.GeneratedMSBuildEditorConfig.editorconfig:  duplicate of ./Scripts/obj/x64/Debug/net48/GameScript.GeneratedMSBuildEditorConfig.editorconfig
+./Scripts/obj/Debug/GameScript.assets.cache:  binary file
+./Scripts/obj/Debug/GameScript.csproj.AssemblyReference.cache:  binary file
+./Scripts/obj/Debug/net48/.NETFramework,Version=v4.8.AssemblyAttributes.cs:  duplicate of ./Scripts/obj/x64/Debug/net48/.NETFramework,Version=v4.8.AssemblyAttributes.cs
+./Scripts/obj/Debug/net48/GameScript.AssemblyInfoInputs.cache:  language unknown (#3)
+./Scripts/obj/Debug/net48/GameScript.GeneratedMSBuildEditorConfig.editorconfig:  duplicate of ./Scripts/obj/x64/Debug/net48/GameScript.GeneratedMSBuildEditorConfig.editorconfig
+./Scripts/obj/Debug/net48/GameScript.assets.cache:  binary file
+./Scripts/obj/Debug/net48/GameScript.csproj.AssemblyReference.cache:  binary file
 ./Scripts/obj/project.nuget.cache:  language unknown (#3)
-./Scripts/obj/x64/Debug/net48/.NETFramework,Version=v4.8.AssemblyAttributes.cs:  duplicate of ./Scripts/obj/x64/Release/net48/.NETFramework,Version=v4.8.AssemblyAttributes.cs
 ./Scripts/obj/x64/Debug/net48/GameScript.AssemblyInfoInputs.cache:  language unknown (#3)
-./Scripts/obj/x64/Debug/net48/GameScript.GeneratedMSBuildEditorConfig.editorconfig:  language unknown (#3)
-./Scripts/obj/x64/Debug/net48/GameScript.csproj.BuildWithSkipAnalyzers:  zero sized file
+./Scripts/obj/x64/Debug/net48/GameScript.assets.cache:  binary file
+./Scripts/obj/x64/Debug/net48/GameScript.csproj.AssemblyReference.cache:  binary file
 ./Scripts/obj/x64/Debug/net48/GameScript.csproj.CoreCompileInputs.cache:  language unknown (#3)
-./Scripts/obj/x64/Debug/net48/GameScript.csproj.FileListAbsolute.txt:  listed in $Not_Code_Extension{txt}
-./Scripts/obj/x64/Release/net48/GameScript.AssemblyInfoInputs.cache:  language unknown (#3)
-./Scripts/obj/x64/Release/net48/GameScript.GeneratedMSBuildEditorConfig.editorconfig:  duplicate of ./Scripts/obj/x64/Debug/net48/GameScript.GeneratedMSBuildEditorConfig.editorconfig
-./Scripts/obj/x64/Release/net48/GameScript.csproj.BuildWithSkipAnalyzers:  zero sized file
-./Scripts/obj/x64/Release/net48/GameScript.csproj.CoreCompileInputs.cache:  language unknown (#3)
-./Scripts/obj/x64/Release/net48/GameScript.csproj.FileListAbsolute.txt:  listed in $Not_Code_Extension{txt}
+./Scripts/obj/x64/Debug/net48/GameScripts.dll:  binary file
+./Scripts/obj/x64/Debug/net48/GameScripts.pdb:  binary file
