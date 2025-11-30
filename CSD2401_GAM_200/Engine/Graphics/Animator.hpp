@@ -1,8 +1,10 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Animator.hpp
-\author     Muhammad Ashfer [100% - 40 lines]
+\author     Muhammad Ashfer [51% - 40 lines]
+			Jonathan Fam [49% - 39 lines]
 \par        m.binafzalkhan@digipen.edu
+			Fam.q@digipen.edu
 \date       October, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -21,6 +23,7 @@ Technology is prohibited.
 #include <iostream>
 #include <cctype>
 #include <map>
+#include <queue>
 #include <string>
 
 struct AnimationData {
@@ -80,6 +83,8 @@ public:
 	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps);
 
 	void PlayAnimation(const std::string& name);
+
+	void AddToQueue(const std::string& animationName);
 	/**
 	 * @brief Loads a new spritesheet file within the same object.
 	 * @param textureFile Filepath for spritesheet
@@ -154,6 +159,7 @@ private:
 
 	std::map<std::string, AnimationData> animation_mList;
 	std::string currentAnimName;
+    std::queue<std::string> animationQueue;
 
 	const char *SpriteFile; // File path for spritesheet
 	GLuint textureID;		// Personalised ID for the texture

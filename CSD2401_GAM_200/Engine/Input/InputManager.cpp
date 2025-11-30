@@ -18,11 +18,15 @@ Technology is prohibited.
 #include "core.h"
 #include "Serialization.h"
 #include "IMessageHandler.h"
+#include "GameTimerSystem.h"
+#include "PauseMenuLogic.h"
+#include "LevelEditor.h"
 
 bool InputManager::KeyStateImgui = true;
 double InputManager::MouseWorldX = 0.0;
 double InputManager::MouseWorldY = 0.0;
 bool InputManager::MouseLeftClicked = false;
+bool InputManager::ShowFPS = false;
 
 /**
  * @brief Constructs an InputManager with specified parameters.
@@ -41,6 +45,12 @@ InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(wind
     {
         std::cout << "InputManager: WARNING - AudioEngine is NULL!" << std::endl;
     }
+	for (int i = 0; i < GLFW_KEY_LAST; ++i) {
+		m_keyStates[i] = KEY_STATE_RELEASE;
+	}
+	for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; ++i) {
+		m_mouseButtonStates[i] = KEY_STATE_RELEASE;
+	}
 }
 
 /**
@@ -65,6 +75,37 @@ std::string InputManager::GetName()
     return "InputSystem";
 }
 
+bool InputManager::IsKeyPressed(int key)
+{
+	return m_keyStates[key] == KEY_STATE_PRESS;
+}
+
+bool InputManager::IsKeyReleased(int key)
+{
+	return m_keyStates[key] == KEY_STATE_RELEASE;
+}
+
+bool InputManager::IsKeyHeld(int key)
+{
+	return m_keyStates[key] == KEY_STATE_HOLD;
+}
+
+bool InputManager::IsMouseButtonPressed(int button)
+{
+	return m_mouseButtonStates[button] == KEY_STATE_PRESS;
+}
+
+bool InputManager::IsMouseButtonReleased(int button)
+{
+	return m_mouseButtonStates[button] == KEY_STATE_RELEASE;
+}
+
+bool InputManager::IsMouseButtonHeld(int button)
+{
+	return m_mouseButtonStates[button] == KEY_STATE_HOLD;
+}
+
+
 /**
  * @brief Updates input handling, including key presses, mouse events,
  *        player movement, jumping, animations, and quitting logic.
@@ -72,6 +113,33 @@ std::string InputManager::GetName()
  */
 void InputManager::Update(float dt)
 {
+	for (auto& it : m_keyStates) {
+		if (glfwGetKey(window, it.first) == GLFW_PRESS) {
+			if (it.second == KEY_STATE_RELEASE) {
+				it.second = KEY_STATE_PRESS;
+			}
+			else {
+				it.second = KEY_STATE_HOLD;
+			}
+		}
+		else {
+			it.second = KEY_STATE_RELEASE;
+		}
+	}
+	for (auto& it : m_mouseButtonStates) {
+		if (glfwGetMouseButton(window, it.first) == GLFW_PRESS) {
+			if (it.second == KEY_STATE_RELEASE) {
+				it.second = KEY_STATE_PRESS;
+			}
+			else {
+				it.second = KEY_STATE_HOLD;
+			}
+		}
+		else {
+			it.second = KEY_STATE_RELEASE;
+		}
+	}
+
     glfwGetWindowSize(window, &width, &height);
     static bool wasLeftMousePressed = false;
     bool isLeftMousePressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
@@ -137,7 +205,9 @@ void InputManager::Update(float dt)
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
-        {GLFW_KEY_ENTER, false}, // ADD THIS for Alt+Enter detection
+        {GLFW_KEY_ENTER, false},
+        {GLFW_KEY_ESCAPE,false},
+        {GLFW_KEY_P, false}
     };
 
     static bool altEnterPressed = false;
@@ -161,8 +231,6 @@ void InputManager::Update(float dt)
 
 
     // handle M key for pausing and resuming background music
-    static bool bgmPaused = false;
-
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
     {
         if (!singleTriggerKeys[GLFW_KEY_M])
@@ -170,11 +238,78 @@ void InputManager::Update(float dt)
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
-                bgmPaused = !bgmPaused;
-                audioManager->StopSound("bgm_channel");
-                std::cout << "BGM " << (bgmPaused ? "paused" : "resumed") << std::endl;
+                audioManager->ToggleMute();
             }
             singleTriggerKeys[GLFW_KEY_M] = true;
+        }
+    }
+
+    // Check if in play mode for pause menu 
+    LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
+    bool isPlayMode = (editor && editor->GetEditorMode() == EditorMode::Play);
+
+    // Handle ESC key
+    if (isPlayMode)
+    {
+        // Check if win or lose screen is active - if so, disable ESC key
+        WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+        bool winScreenActive = winZone && winZone->IsWinScreenActive();
+        bool loseScreenActive = winZone && winZone->IsLoseScreenActive();
+
+        // In play mode: ESC toggles pause menu (unless win/lose screen is active)
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive) {
+                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+                if (pauseMenu)
+                {
+                    pauseMenu->TogglePauseMenu();
+                }
+                singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+            }
+        }
+        else
+        {
+            singleTriggerKeys[GLFW_KEY_ESCAPE] = false;
+        }
+    }
+    else
+    {
+        // Not in play mode: ESC quits the game
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            KeyStateQuit = true;
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+    }
+
+    // Handle P key
+    if (isPlayMode)
+    {
+        // In play mode: P toggles pause menu
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            if (!singleTriggerKeys[GLFW_KEY_P])
+            {
+                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+                if (pauseMenu)
+                {
+                    pauseMenu->TogglePauseMenu();
+                }
+                singleTriggerKeys[GLFW_KEY_P] = true;
+            }
+        }
+        else
+        {
+            singleTriggerKeys[GLFW_KEY_P] = false;
+        }
+    }
+    else
+    {
+        // Not in play mode: P toggles ImGui
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            InputManager::KeyStateImgui = true;
         }
     }
 
@@ -210,8 +345,11 @@ void InputManager::Update(float dt)
                 }
                 else if (key == GLFW_KEY_F4)
                 {
-                    CORE->GetGraphicsSystem()->SetEditorMode(!CORE->GetGraphicsSystem()->IsEditorMode());
-                    std::cout << "Editor Mode Toggled" << CORE->GetGraphicsSystem()->IsEditorMode() << std::endl;
+                    ShowFPS = !ShowFPS;
+                    std::cout << "FPS display " << (ShowFPS ? "ENABLED" : "DISABLED") << std::endl;
+                }
+                else if (key == GLFW_KEY_P) {
+
                 }
             }
             wasPressed = true;
@@ -221,6 +359,17 @@ void InputManager::Update(float dt)
             wasPressed = false;
         }
     }
+    // ===== HERO MOVEMENT CONSTANTS (Customizable) =====
+    static float HERO_GRAVITY = -381.0f;
+    static float HERO_MOVE_FORCE = 200.0f;
+    static float HERO_JUMP_FORCE = 1000.0f;
+    static float HERO_JUMP_DURATION = 0.4f;
+    static float HERO_FRICTION_COEFFICIENT = 5.0f;
+    static float HERO_KNOCKBACK_FORCE = 800.0f;         // Sustained push force
+    static float HERO_KNOCKBACK_DURATION = 0.2f;
+    static float HERO_KNOCKBACK_IMPULSE_X = 300.0f;     // Instant horizontal velocity change
+    static float HERO_KNOCKBACK_IMPULSE_Y = 100.0f;     // Instant vertical velocity change
+
     GameObject* player = nullptr;
 
 
@@ -250,20 +399,18 @@ void InputManager::Update(float dt)
     TransformComponent* transform = player->GetComponent<TransformComponent>();
     if (!transform) return;
 
-
-  
-
-    //// Ensure player has drag force for smooth stopping (add once)
-    // static bool dragInitialized = false;
-    // if (!dragInitialized && physics)
-    //{
-    //     auto& forcesManager = physics->GetForcesManager();
-    //     forcesManager.AddDrag();
-    //     dragInitialized = true;
-    // }
+    // =====KINEMATIC SETUP=====
+    static bool kinematicInitialized = false;
+    if (!kinematicInitialized) {
+        physics->SetKinematic(true);
+        physics->SetGravityValue(HERO_GRAVITY);
+        kinematicInitialized = true;
+    }
 
     float vx, vy;
     physics->GetVelocity(vx, vy);
+
+    physics->SetFrictionCoefficient(HERO_FRICTION_COEFFICIENT);
 
     /**
      * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
@@ -285,23 +432,35 @@ void InputManager::Update(float dt)
     {
         moveDirectionX = -1.0f;
 
-        // Remove friction when actively moving
-        forcesManager.RemoveForcesByType(ForceType::Friction);
-        // Add left movement force using helper
-        forcesManager.AddForce(ForceType::MoveLeft);
-        // Remove right movement if present
-        forcesManager.RemoveForcesByType(ForceType::MoveRight);
+        // Only apply movement if not blocked by wall
+        bool blockedByWall = physics->isCollidingLeft &&
+            physics->leftCollisionLayer == CollisionLayer::Ground;
+
+        if (!blockedByWall) {
+            // Remove friction when actively moving
+            forcesManager.RemoveForcesByType(ForceType::Friction);
+            // Remove existing movement force
+            forcesManager.RemoveForcesByType(ForceType::Move);
+            // Add movement force with left direction
+            forcesManager.AddForce(ForceType::Move, HERO_MOVE_FORCE, -1.0f, -1.0f, 0.0f);
+        }
     }
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         moveDirectionX = 1.0f;
 
-        // Remove friction when actively moving
-        forcesManager.RemoveForcesByType(ForceType::Friction);
-        // Add right movement force using helper
-        forcesManager.AddForce(ForceType::MoveRight);
-        // Remove left movement if present
-        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
+        // Only apply movement if not blocked by wall
+        bool blockedByWall = physics->isCollidingRight &&
+            physics->rightCollisionLayer == CollisionLayer::Ground;
+
+        if (!blockedByWall) {
+            // Remove friction when actively moving
+            forcesManager.RemoveForcesByType(ForceType::Friction);
+            // Remove existing movement force
+            forcesManager.RemoveForcesByType(ForceType::Move);
+            // Add movement force with right direction
+            forcesManager.AddForce(ForceType::Move, HERO_MOVE_FORCE, -1.0f, 1.0f, 0.0f);
+        }
     }
     else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
         CameraManager::Instance().AddCameraTrauma(1.f);
@@ -310,14 +469,13 @@ void InputManager::Update(float dt)
     }
     else
     {
-        // No movement keys pressed - remove all movement forces
-        forcesManager.RemoveForcesByType(ForceType::MoveLeft);
-        forcesManager.RemoveForcesByType(ForceType::MoveRight);
+        // No movement keys pressed - remove movement force
+        forcesManager.RemoveForcesByType(ForceType::Move);
 
         // Add friction to slow down (only if not already present)
         if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
         {
-            forcesManager.AddFriction(&physics->isGrounded);
+            forcesManager.AddForce(ForceType::Friction, -1.0f, -1.0f, 0.0f, 0.0f, &physics->isGrounded);
         }
 
         // Reset footstep timer when not moving
@@ -356,18 +514,89 @@ void InputManager::Update(float dt)
         physics->SetVelocity(clampedVx, vy);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        KeyStateQuit = true;
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    // Get current velocity for collision checks
+    physics->GetVelocity(vx, vy);
+
+    // ===== ENEMY COLLISION HANDLING ===== //
+    // Check if colliding with enemies and apply knockback (impulse + force)
+    if (physics->isCollidingLeft && physics->leftCollisionLayer == CollisionLayer::Enemy) {
+        // Enemy on left, push player right
+
+        // Apply instant impulse
+        physics->velocity.x += HERO_KNOCKBACK_IMPULSE_X;
+        physics->velocity.y += HERO_KNOCKBACK_IMPULSE_Y;
+
+        // Apply knockback force
+        forcesManager.ApplyKnockback(1.0f, 0.2f, HERO_KNOCKBACK_FORCE);
+
+        // Can add other things besides knockback like damage
     }
+
+    if (physics->isCollidingRight && physics->rightCollisionLayer == CollisionLayer::Enemy) {
+        // Enemy on right, push player left
+
+        // Apply instant impulse
+        physics->velocity.x -= HERO_KNOCKBACK_IMPULSE_X;
+        physics->velocity.y += HERO_KNOCKBACK_IMPULSE_Y;
+
+        // Apply knockback force
+        forcesManager.ApplyKnockback(-1.0f, 0.2f, HERO_KNOCKBACK_FORCE);
+    }
+
+    // ===== WALL/GROUND COLLISION HANDLING =====
+    // Stop horizontal movement when hitting walls
+    if (physics->isCollidingLeft &&
+        physics->leftCollisionLayer == CollisionLayer::Ground) {
+        if (physics->velocity.x < 0) {
+            physics->velocity.x = 0.0f;
+            forcesManager.RemoveForcesByType(ForceType::Move);
+        }
+    }
+
+    if (physics->isCollidingRight &&
+        physics->rightCollisionLayer == CollisionLayer::Ground) {
+        if (physics->velocity.x > 0) {
+            physics->velocity.x = 0.0f;
+            forcesManager.RemoveForcesByType(ForceType::Move);
+        }
+    }
+
+    // Stop vertical movement when hitting ceiling
+    if (physics->isCollidingTop &&
+        physics->topCollisionLayer == CollisionLayer::Ground) {
+        if (physics->velocity.y > 0) {
+            physics->velocity.y = 0.0f;
+        }
+    }
+
+    // Stop downward movement when hitting ground
+    if (physics->isCollidingBottom &&
+        physics->bottomCollisionLayer == CollisionLayer::Ground) {
+        if (physics->velocity.y < 0) {
+            physics->velocity.y = 0.0f;
+        }
+    }
+
+    // Wall slide effect (pretty cool ngl)
+    bool touchingLeftWall = physics->isCollidingLeft &&
+        physics->leftCollisionLayer == CollisionLayer::Ground;
+    bool touchingRightWall = physics->isCollidingRight &&
+        physics->rightCollisionLayer == CollisionLayer::Ground;
+
+    if ((touchingLeftWall || touchingRightWall) &&
+        !physics->IsGrounded() &&
+        physics->velocity.y < -50.0f) {
+        // Slow down fall when sliding on wall
+        physics->velocity.y = -50.0f;
+    }
+
     /**
      * @brief Toggle on and off imgui
      */
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-    {
-        InputManager::KeyStateImgui = true;
-    }
+    //if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+    //{
+    //    InputManager::KeyStateImgui = true;
+    //}
     // Jump
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
     {
@@ -376,8 +605,17 @@ void InputManager::Update(float dt)
         if (physics->IsGrounded())
         {
             is_jumping = false;
-            physics->GetForcesManager().AddForce(ForceType::Jump);
+            // Apply jump
+            physics->GetForcesManager().AddForce(ForceType::Jump, HERO_JUMP_FORCE, HERO_JUMP_DURATION);
             physics->GetVelocity(vx, vy); // Get updated VY after jump
+
+            // Decrease timer on jump
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem)
+            {
+                timerSystem->DecreaseTime(1.0f); // Decrease by 1 second per jump
+            }
+
             // Play jump sound effect
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
@@ -387,7 +625,7 @@ void InputManager::Update(float dt)
                 std::cout << "[InputManager] CORE pointer = " << CORE << std::endl;
                 //PlaySoundMessage msg("jump_sfx");
                 //CORE->GetMessageBus().Publish(msg);
-                 audioEngine->playSound("jump_sfx", "jump_channel");
+                 audioManager->PlaySound("jump_sfx", "jump_channel");
             }
         }
     }
@@ -411,7 +649,6 @@ void InputManager::Update(float dt)
         // Can dash if: not already dashing AND (grounded OR has air dash available)
         if (!isDashing && (isGrounded || !hasUsedAirDash))
         {
-            // Determine dash direction using moveDirectionX if available, otherwise use velocityX
             float dashDirection = 1.0f;  // Default right
 
             if (std::abs(moveDirectionX) > 0.01f) {
@@ -419,7 +656,6 @@ void InputManager::Update(float dt)
                 dashDirection = moveDirectionX;
             }
             else if (vx < -0.1f) {
-                // Fallback to velocity direction if not pressing movement keys
                 dashDirection = -1.0f;
             }
             else if (vx > 0.1f) {
@@ -433,19 +669,17 @@ void InputManager::Update(float dt)
             // Disable gravity during dash
             physics->SetGravity(false);
 
+            // Decrease timer on dash
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem)
+            {
+                timerSystem->DecreaseTime(1.0f); // Decrease by 1 second per dash
+            }
+
             // Mark air dash as used if in air
             if (!isGrounded) {
                 hasUsedAirDash = true;
-                std::cout << "[Dash] Air dash used!" << std::endl;
             }
-
-            std::cout << "[Dash] Started! Direction: " << (dashDirection > 0 ? "Right" : "Left") << std::endl;
-        }
-        else if (isDashing) {
-            std::cout << "[Dash] Already dashing!" << std::endl;
-        }
-        else if (!isGrounded && hasUsedAirDash) {
-            std::cout << "[Dash] Air dash already used!" << std::endl;
         }
     }
     else if (!dashKeyDown) {
@@ -455,7 +689,7 @@ void InputManager::Update(float dt)
     // Check if dash just ended and restore gravity
     bool isDashing = physics->GetForcesManager().HasForceType(ForceType::Dash);
     if (wasDashing && !isDashing) {
-        // Dash just ended - restore gravity
+        // Dash just ended, restore gravity
         physics->SetGravity(true);
         std::cout << "[Dash] Ended, gravity restored" << std::endl;
     }
@@ -466,7 +700,6 @@ void InputManager::Update(float dt)
         hasUsedAirDash = false;
         std::cout << "[Dash] Air dash restored (grounded)" << std::endl;
     }
-    // ===== END DASH SYSTEM =====
 
     auto* anim = player->GetComponent<Spritesheet>();
         if (transform && anim)
@@ -474,51 +707,38 @@ void InputManager::Update(float dt)
             float absWidth = std::abs(transform->scaleX);
             transform->SetScale(absWidth, transform->scaleY);
 
-      
-            static bool isFacingRight = true;
 
-            if (moveDirectionX > 0.0f) isFacingRight = true;
-            if (moveDirectionX < 0.0f) isFacingRight = false;
+        static bool isFacingRight = true;
 
-            // 3. Determine Animation Name based on State AND Direction
-            std::string requestedState = "";
+        if (moveDirectionX > 0.0f) isFacingRight = true;
+        if (moveDirectionX < 0.0f) isFacingRight = false;
 
-            if (is_jumping)
-            {
-                requestedState = isFacingRight ? "Jump_R" : "Jump_L";
-            }
-            else if (std::abs(vx) > 1.0f)
-            {
-                requestedState = isFacingRight ? "Run_R" : "Run_L";
-            }
-            else
-            {
-                // If stopped, use the last known direction
-                requestedState = isFacingRight ? "Idle_R" : "Idle_L";
-            }
+        // 3. Determine Animation Name based on State AND Direction
+        std::string requestedState = "";
 
-            // 4. Play the specific Left/Right animation
-            anim->PlayAnimation(requestedState);
+        if (is_jumping)
+        {
+            requestedState = isFacingRight ? "Jump_R" : "Jump_L";
+        }
+        else if (std::abs(vx) > 1.0f)
+        {
+            requestedState = isFacingRight ? "Run_R" : "Run_L";
+        }
+        else
+        {
+            // If stopped, use the last known direction
+            requestedState = isFacingRight ? "Idle_R" : "Idle_L";
         }
 
-    // Note: Don't call SetVelocity anymore - forces handle movement
-    // The Integrate() method will update velocity based on forces
-
-    // Mouse
-    //if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-    //{
-    //    std::cout << "Left Mouse Press, X:" << mouseX << " Y:" << mouseY << std::endl;
-    //}
-    //if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-    //{
-    //    std::cout << "Right Mouse Press" << mouseX << " Y:" << mouseY << std::endl;
-    //}
+        // 4. Play the specific Left/Right animation
+        anim->PlayAnimation(requestedState);
+    }
 
     }
 
     void InputManager::ResetState()
     {
- 
+
         MouseLeftClicked = false;
 
         mouseX = 0.0;
@@ -532,4 +752,3 @@ void InputManager::Update(float dt)
         cachedPlayerID = 0;
         std::cout << "[InputManager] State reset." << std::endl;
     }
-

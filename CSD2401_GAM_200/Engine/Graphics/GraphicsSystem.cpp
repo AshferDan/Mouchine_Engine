@@ -72,7 +72,7 @@ GraphicsSystem::GraphicsSystem()
                 }
 
             } });
-
+    
             // Make OpenGL context current for this window.
             glfwMakeContextCurrent(window);
 
@@ -97,9 +97,8 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
     frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
     frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
-{
     // Same as default constructor, but allows user to specify window size.
-
+{
     if (!glfwInit())
     {
         std::cerr << "Failed to initialize GLFW\n";
@@ -151,8 +150,21 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
  */
 GraphicsSystem::~GraphicsSystem()
 {
+    if (window) {
+        glfwSetCursor(window, nullptr); // Reset to default cursor
+    }
+
     // Clean up Frame Buffer resources
     DeleteFrameBuffer();
+
+    if (normalCursor) {
+        glfwDestroyCursor(normalCursor);
+        normalCursor = nullptr;
+    }
+    if (clickCursor) {
+        glfwDestroyCursor(clickCursor);
+        clickCursor = nullptr;
+    }
 
     // Clean up resources on destruction.
     if (window)
@@ -173,6 +185,64 @@ void GraphicsSystem::Initialize()
         std::cerr << "Failed to initialize GLEW\n";
         return;
     }
+    LoadDefaultCursor("../Assets/Mouse.png");
+    clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+
+    // Initialize cursors with null checks
+    //normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    //clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+
+    //std::cout << "Normal cursor created: " << (normalCursor ? "SUCCESS" : "FAILED") << std::endl;
+    //std::cout << "Click cursor created: " << (clickCursor ? "SUCCESS" : "FAILED") << std::endl;
+
+    // Set initial cursor - only if creation was successful
+    //if (normalCursor) {
+    //    glfwSetCursor(window, clickCursor);
+    //}
+    //else {
+    //    std::cerr << "WARNING: Failed to create normal cursor, using default" << std::endl;
+    //}
+
+    // Improved mouse button callback with better error handling
+    //glfwSetMouseButtonCallback(window, [](GLFWwindow* win, int button, int action, int mods) {
+    //    auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
+    //    if (!gs) {
+    //        return;
+    //    }
+
+    //    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+    //        if (action == GLFW_PRESS) {
+    //            // Safe cursor switching
+    //            GLFWcursor* clickCursor = gs->GetClickCursor();
+    //            if (clickCursor) {
+    //                glfwSetCursor(win, clickCursor);
+    //            }
+    //        }
+    //        else if (action == GLFW_RELEASE) {
+    //            // Safe cursor switching back to normal
+    //            GLFWcursor* normalCursor = gs->GetNormalCursor();
+    //            if (normalCursor) {
+    //                glfwSetCursor(win, normalCursor);
+    //            }
+    //            else {
+    //                // Fallback to default cursor if custom normal cursor is unavailable
+    //                glfwSetCursor(win, nullptr);
+    //            }
+    //        }
+    //    }
+    //    });
+
+    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
+        {
+            if (focused == GLFW_FALSE)
+            {
+                CORE->SetGamePaused(true);
+            }
+            else
+            {
+                CORE->SetGamePaused(false);
+            }
+        });
 
     // Enable blending (allows transparency in textures and colors).
     glEnable(GL_BLEND);
@@ -340,18 +410,6 @@ void GraphicsSystem::Update(float)
     if (!window)
         return; // Skip if no valid window.
 
-    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
-        {
-            if (focused == GLFW_FALSE)
-            {
-                CORE->SetGamePaused(true);
-            }
-            else
-            {
-                CORE->SetGamePaused(false);
-            }
-        });
-
     // === Framebuffer and Viewport Setup ===
     if (editorMode)
     {
@@ -402,6 +460,19 @@ void GraphicsSystem::Update(float)
     // Accumulate all geometry into batches
     batches.clear();
 
+    auto* textObj = GameObjectFactory::Instance().FindGameObject("Text FPS");
+    if (textObj) {
+        auto* textFPS = textObj->GetComponent<TextComponent>();
+        if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
+            textFPS->SetEnabled(true);
+            textFPS->SetText("FPS: "+std::to_string(static_cast<int>(CORE->GetFPS())));
+        }
+        else {
+            textFPS->SetText("FPS");
+            textFPS->SetEnabled(false);
+        }
+    }
+
     auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
     // === Batch Accumulation Loop ===
     for (auto& obj : gameObjects)
@@ -441,13 +512,21 @@ void GraphicsSystem::Update(float)
         bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
         int layer = rend->GetLayer(); // For draw order sorting
 
-        // Gather UV data for spritesheets/animation
+        // Gather UV data for spritesheets/animation/tiles
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
+
         if (auto* animator = obj->GetComponent<Spritesheet>())
         {
+            // Animator takes priority (for animated sprites)
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
+        }
+        else if (auto* renderComp = obj->GetComponent<RenderComponent>())
+        {
+            // Use RenderComponent UV (for tiles/static sprites)
+            uvScale = renderComp->GetUVScale();
+            uvOffset = renderComp->GetUVOffset();
         }
 
         // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
@@ -537,51 +616,49 @@ void GraphicsSystem::Update(float)
         }
 
         auto* rend = obj->GetComponent<RenderComponent>();
-        if (!rend)
+        if (rend)
         {
-            continue;
-        }
-
-        // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
-        switch (rend->GetShapeType())
-        {
-        case RenderComponent::ShapeType::Line:
-        {
-            auto line = rend->GetLine();
-            DrawLine(line.start, line.end, line.color, vp);
-            break;
-        }
-        case RenderComponent::ShapeType::Point:
-        {
-            auto point = rend->GetPoint();
-            DrawPoint(point.pos, point.color, vp);
-            break;
-        }
-        default:
-            break; // Batched shapes (Square/Circle) are already drawn
-        }
-
-        // Draw debug outlines for ALL shapes
-        if (debugMode)
-        {
-            // std::cout << "went here" << std::endl;
-            auto* transform = obj->GetComponent<TransformComponent>();
-            if (transform)
+            // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
+            switch (rend->GetShapeType())
             {
-                float x, y, sx, sy;
-                transform->GetPosition(x, y);
-                transform->GetScale(sx, sy);
+            case RenderComponent::ShapeType::Line:
+            {
+                auto line = rend->GetLine();
+                DrawLine(line.start, line.end, line.color, vp);
+                break;
+            }
+            case RenderComponent::ShapeType::Point:
+            {
+                auto point = rend->GetPoint();
+                DrawPoint(point.pos, point.color, vp);
+                break;
+            }
+            default:
+                break; // Batched shapes (Square/Circle) are already drawn
+            }
 
-                // Draw outlines based on the shape type
-                if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
+            // Draw debug outlines for ALL shapes
+            if (debugMode)
+            {
+                // std::cout << "went here" << std::endl;
+                auto* transform = obj->GetComponent<TransformComponent>();
+                if (transform)
                 {
-                    // For circles, the scale is interpreted as diameter, so radius is scale*0.5
-                    DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
-                }
-                else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
-                {
-                    //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
-                    DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
+                    float x, y, sx, sy;
+                    transform->GetPosition(x, y);
+                    transform->GetScale(sx, sy);
+
+                    // Draw outlines based on the shape type
+                    if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
+                    {
+                        // For circles, the scale is interpreted as diameter, so radius is scale*0.5
+                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
+                    }
+                    else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
+                    {
+                        //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
+                        DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
+                    }
                 }
             }
         }
@@ -595,6 +672,37 @@ void GraphicsSystem::Update(float)
                 {
                     float x, y;
                     transform->GetPosition(x, y);
+
+                    // for screen-space text, position is fixed screen coordinates
+                    // but for objects like timers that should stay at top-left, adjust for viewport height
+                    if (textComp->isScreenSpace())
+                    {
+                        static std::map<TextComponent*, vec2> screenSpacePositions;
+                        static std::map<TextComponent*, bool> needsTopAlignment;
+
+                        if (screenSpacePositions.find(textComp) == screenSpacePositions.end())
+                        {
+                            // store the original position as screen coordinates
+                            screenSpacePositions[textComp] = vec2(x, y);
+                            // if y > 500 suggests top positioning)
+                            needsTopAlignment[textComp] = (y > 500.0f);
+                        }
+
+                        x = screenSpacePositions[textComp].x;
+
+                        // calculate y relative to viewport height
+                        if (needsTopAlignment[textComp])
+                        {
+                            float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+                            float offsetFromTop = 110.0f; // distance from top edge
+                            y = renderHeight - offsetFromTop;
+                        }
+                        else
+                        {
+                            y = screenSpacePositions[textComp].y;
+                        }
+                    }
+
                     // Render text using the dedicated text rendering function
                     RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
                         textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
@@ -643,8 +751,11 @@ void GraphicsSystem::Update(float)
         }
     }
 
+    if (currentSelection_ColliderOnly.exist) {
+        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, { 1,1,0.4,1 }, vp);       // draw yellow outline
+    }
     if (currentSelection.exist) {
-        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 0,1,0,1 }, vp);
+        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 1,1,1,1 }, vp);         // draw white outline
     }
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
@@ -894,6 +1005,7 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
 {
     textShader.Use();
     textShader.SetUniform("textColor", color);
+    textShader.SetUniform("text", 0);
 
     mat4 projection;
     float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
@@ -909,6 +1021,47 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
         projection = vp;
     }
     textShader.SetUniform("projection", projection);
+
+    // Only center text if it's in world space (not screen space)
+    // Screen space text (like timers, FPS) should stay left-aligned
+    if (!screenSpace)
+    {
+        // Calculate total text width and height metrics for centering
+        float textWidth = 0.0f;
+        float maxAscent = 0.0f;  // highest point above baseline
+        float maxDescent = 0.0f; // lowest point below baseline
+
+        for (char c : text)
+        {
+            auto it = characters.find(c);
+            if (it != characters.end())
+            {
+                textWidth += (it->second.advance >> 6) * scale;
+
+                // bearing.y is the offset from baseline to top of glyph
+                float ascent = it->second.bearing.y * scale;
+                // descent is how far below the baseline the glyph goes
+                float descent = (it->second.size.y - it->second.bearing.y) * scale;
+
+                if (ascent > maxAscent)
+                {
+                    maxAscent = ascent;
+                }
+                if (descent > maxDescent)
+                {
+                    maxDescent = descent;
+                }
+            }
+        }
+
+        // Center the text horizontally by offsetting the starting x position
+        x -= textWidth / 2.0f;
+
+        // Center the text vertically
+        // The visual center of text is at: baseline + (maxAscent - maxDescent) / 2
+        // To center around y, we need: baseline = y - (maxAscent - maxDescent) / 2
+        y -= (maxAscent - maxDescent) / 2.0f;
+    }
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(textVAO);
@@ -1105,6 +1258,91 @@ void GraphicsSystem::ToggleFullScreen() {
         isFullscreen = false;
 
         std::cout << "[GraphicsSytem] Switched to windowed " << Wwidth << "x" << Wheight << std::endl;
+    }
+}
+
+void GraphicsSystem::LoadClickCursors(const char* normalPath, const char* clickPath, int normalHotX, int normalHotY, int clickHotX, int clickHotY) {
+    if (window) {
+        glfwSetCursor(window, nullptr);
+    }
+
+    if (normalCursor) {
+        glfwDestroyCursor(normalCursor);
+        normalCursor = nullptr;
+    }
+
+    if (clickCursor) {
+        glfwDestroyCursor(clickCursor);
+        clickCursor = nullptr;
+    }
+
+    int width, height, channels;
+    unsigned char* pixels = stbi_load(normalPath, &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        normalCursor = glfwCreateCursor(&image, normalHotX, normalHotY);
+        stbi_image_free(pixels);
+        std::cout << "Loaded normal cursor: " << normalPath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load normal cursor: " << normalPath << std::endl;
+        normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    }
+
+    pixels = stbi_load(clickPath, &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        clickCursor = glfwCreateCursor(&image, clickHotX, clickHotY);
+        std::cout << "Loaded click cursor: " << clickPath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load click cursor: " << clickPath << std::endl;
+        clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+    }
+
+    if (normalCursor) {
+        glfwSetCursor(window, normalCursor);
+    }
+}
+
+void GraphicsSystem::LoadDefaultCursor(const char* cursorPath, int hotX, int hotY) {
+    // Reset to default cursor before changing
+    if (window) {
+        glfwSetCursor(window, nullptr);
+    }
+
+    // Destroy old cursor if it exists
+    if (normalCursor) {
+        glfwDestroyCursor(normalCursor);
+        normalCursor = nullptr;
+    }
+
+    int width, height, channels;
+    unsigned char* pixels = stbi_load(cursorPath, &width, &height, &channels, 4);
+    if (pixels) {
+        GLFWimage image;
+        image.width = width;
+        image.height = height;
+        image.pixels = pixels;
+        normalCursor = glfwCreateCursor(&image, hotX, hotY);
+        stbi_image_free(pixels);
+        std::cout << "Loaded custom cursor: " << cursorPath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load custom cursor: " << cursorPath
+            << " - Using default arrow cursor" << std::endl;
+        normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    }
+
+    // Set the new cursor
+    if (normalCursor && window) {
+        glfwSetCursor(window, normalCursor);
     }
 }
 

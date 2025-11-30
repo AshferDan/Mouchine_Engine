@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptingSystem.cpp
-\author     Jonathan Fam Qian Wei [100% - 420 lines]
+\author     Jonathan Fam Qian Wei [100% - 825 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -53,13 +53,13 @@ static void Internal_CreateImage(MonoString *name, int type, float x, float y,
 
 static void Internal_CreateAnimatedImage(MonoString *name, float x, float y,
                                          float width, float height, MonoString *texturePath,
-                                         int rows, int columns, int startFrame, int endFrame, float fps,
+                                         int rows, int columns, int startRow, int startCol, int endRow, int endCol, float fps,
                                          int layer, bool hasPhysics, bool isStatic, bool hasGravity)
 {
     char *objName = mono_string_to_utf8(name);
     char *texPath = mono_string_to_utf8(texturePath);
     API::CreateAnimatedImage(objName, x, y, width, height, texPath,
-                             rows, columns, startFrame, endFrame, fps,
+                             rows, columns, startRow, startCol, endRow, endCol, fps,
                              (CollisionLayer)layer, hasPhysics, isStatic, hasGravity);
     mono_free(objName);
     mono_free(texPath);
@@ -94,10 +94,32 @@ static void Internal_SetScale_Single(MonoString *objectName, float scale)
     mono_free(name);
 }
 
-static void Internal_SetScale_XY(MonoString *objectName, float x, float y)
+static void Internal_SetScale_XY(MonoString* objectName, float x, float y)
 {
-    char *name = mono_string_to_utf8(objectName);
+    char* name = mono_string_to_utf8(objectName);
     API::SetScale(name, x, y);
+    mono_free(name);
+}
+
+static float Internal_GetRotation(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    float result = API::GetRotation(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_GetPosition(MonoString* objectName, float* x, float* y)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::GetPosition(name, x, y);
+    mono_free(name);
+}
+
+static void Internal_GetScale(MonoString* objectName, float* x, float* y)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::GetScale(name, x, y);
     mono_free(name);
 }
 
@@ -124,6 +146,14 @@ static void Internal_SetColor(MonoString *objectName, float r, float g, float b,
     vec4 color = {r, g, b, a};
     API::setColor(name, color);
     mono_free(name);
+}
+
+static vec4 Internal_GetColor(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    vec4 result = API::GetColor(name);
+    mono_free(name);
+    return result;
 }
 
 static void Internal_SetAlpha(MonoString *objectName, float alpha)
@@ -156,6 +186,29 @@ static void Internal_SetGravity(MonoString *objectName, bool enabled)
 }
 
 
+static vec2 Internal_GetVelocity(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    vec2 result = API::GetVelocity(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetMass(MonoString* objectName, float mass)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetMass(name, mass);
+    mono_free(name);
+}
+
+static void Internal_SetFriction(MonoString* objectName, float friction)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetFiction(name, friction);
+    mono_free(name);
+}
+
+// === Collision ===
 static void Internal_SetStatic(MonoString *objectName, bool isStatic)
 {
     char *name = mono_string_to_utf8(objectName);
@@ -171,14 +224,56 @@ static void Internal_SetCollisionShape(MonoString *objectName, int shape)
     mono_free(name);
 }
 
-static void Internal_SetCollisionLayer(MonoString *objectName, int layer)
+static void Internal_SetCollisionLayer(MonoString* objectName, int layer)
 {
-    char *name = mono_string_to_utf8(objectName);
+    char* name = mono_string_to_utf8(objectName);
     API::SetCollisionLayer(name, (CollisionLayer)layer);
+}
+static int Internal_GetCollisionLayer(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    int result = API::GetCollisionLayer(name);
     mono_free(name);
+    return result;
+}
+
+static int Internal_GetCollisionShape(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    int result = API::GetCollisionShape(name);
+    mono_free(name);
+    return result;
 }
 
 // === Components ===
+static bool Internal_AttachScript(MonoString* objectName, MonoString* scriptClassName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* scriptName = mono_string_to_utf8(scriptClassName);
+    bool result = API::AttachScript(objName, scriptName);
+    mono_free(objName);
+    mono_free(scriptName);
+    return result;
+}
+
+static void Internal_SetComponentActive(MonoString* objectName, MonoString* componentName, bool active)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* compName = mono_string_to_utf8(componentName);
+    API::SetComponentActive(objName, compName, active);
+    mono_free(objName);
+    mono_free(compName);
+}
+
+static void Internal_RemoveComponent(MonoString* objectName, MonoString* componentName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* compName = mono_string_to_utf8(componentName);
+    API::RemoveComponent(objName, compName);
+    mono_free(objName);
+    mono_free(compName);
+}
+
 static void Internal_AddTransformComponent(MonoString *objectName)
 {
     char *name = mono_string_to_utf8(objectName);
@@ -205,6 +300,82 @@ static void Internal_AddPhysicsComponent(MonoString *objectName)
     char *name = mono_string_to_utf8(objectName);
     API::AddPhysicComponent(name);
     mono_free(name);
+}
+
+static void Internal_AddTextComponent(MonoString* objectName, MonoString* fontPath, unsigned int fontSize, MonoString* text, float r, float g, float b, float a, bool screenSpace)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* font = mono_string_to_utf8(fontPath);
+    char* txt = mono_string_to_utf8(text);
+    vec4 color = {r, g, b, a};
+    API::AddTextComponent(objName, font, fontSize, txt, color, screenSpace);
+    mono_free(objName);
+    mono_free(font);
+    mono_free(txt);
+}
+
+// === Text ===
+static void Internal_SetText(MonoString* objectName, MonoString* text)
+{
+    char* name = mono_string_to_utf8(objectName);
+    char* txt = mono_string_to_utf8(text);
+    API::SetText(name, txt);
+    mono_free(name);
+    mono_free(txt);
+}
+
+static MonoString* Internal_GetText(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    std::string result = API::GetText(name);
+    mono_free(name);
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+
+static void Internal_SetTextColor(MonoString* objectName, float r, float g, float b, float a)
+{
+    char* name = mono_string_to_utf8(objectName);
+    vec4 color = {r, g, b, a};
+    API::SetTextColor(name, color);
+    mono_free(name);
+}
+
+static vec4 Internal_GetTextColor(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    vec4 result = API::GetTextColor(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetTextScale(MonoString* objectName, float scale)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetTextScale(name, scale);
+    mono_free(name);
+}
+
+static float Internal_GetTextScale(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    float result = API::GetTextScale(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetTextScreenSpace(MonoString* objectName, bool screenSpace)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetTextScreenSpace(name, screenSpace);
+    mono_free(name);
+}
+
+static bool Internal_GetTextScreenSpace(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    bool result = API::GetTextScreenSpace(name);
+    mono_free(name);
+    return result;
 }
 
 static void Internal_AddSound(MonoString* name, MonoString* filepath, bool loop, float volume, float pitch,MonoString* category) {
@@ -279,8 +450,28 @@ static void Internal_SetCameraZoom(float zoom) {
     API::setCameraZoom(zoom);
 }
 
+static vec2 Internal_GetCameraPosition()
+{
+    return API::GetCameraPosition();
+}
+
+static float Internal_GetCameraZoom()
+{
+    return API::GetCameraZoom();
+}
+
+static int Internal_GetCameraMode()
+{
+    return API::GetCameraMode();
+}
+
 static void Internal_SetCameraMode(int mode) {
     API::setCameraMode((CameraComponent::CameraMode)mode);
+}
+
+static bool Internal_Raycast(MonoString* selfName, float x, float y, float dx, float dy, float distance, MonoString** hitObjectName, float* hitDistance)
+{
+    return API::Raycast(x, y, dx, dy, distance, selfName, hitObjectName, hitDistance);
 }
 
 // === Collision Queries ===
@@ -311,6 +502,50 @@ static bool Internal_OnTriggerStay(MonoString* obj1, MonoString* obj2) {
     return result;
 }
 
+static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* animName = mono_string_to_utf8(animationName);
+    API::PlayAnimation(objName, animName);
+    mono_free(objName);
+    mono_free(animName);
+}
+
+static void Internal_AddAnimationToQueue(MonoString* objectName, MonoString* animationName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* animName = mono_string_to_utf8(animationName);
+    API::AddAnimationToQueue(objName, animName);
+    mono_free(objName);
+    mono_free(animName);
+}
+
+static void Internal_RegisterAnimation(MonoString* objectName, MonoString* animationName, MonoString* texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* animName = mono_string_to_utf8(animationName);
+    char* texPath = mono_string_to_utf8(texturePath);
+    API::RegisterAnimation(objName, animName, texPath, rows, cols, startRow, startCol, endRow, endCol, fps);
+    mono_free(objName);
+    mono_free(animName);
+    mono_free(texPath);
+}
+
+static void Internal_SetAnimation(MonoString* objectName, int startFrame, int endFrame, float fps)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    API::SetAnimation(objName, startFrame, endFrame, fps);
+    mono_free(objName);
+}
+
+static MonoString* Internal_GetCurrentAnimationName(MonoString* objectName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    std::string animName = API::GetCurrentAnimationName(objName);
+    mono_free(objName);
+    return mono_string_new(mono_domain_get(), animName.c_str());
+}
+
 // === Misc ===
 static int Internal_RandomRange(int min, int max) {
     return API::RandomNumberGen(max, min); // Note: API args are (max, min)
@@ -328,14 +563,30 @@ static float Internal_GetFramesPerSecond() {
 
 
 // === Input ===
-static bool Internal_IsKeyDown(int key)
+static bool Internal_IsKeyPressed(int key)
 {
-    return API::IsKeyDown(key);
+    return API::IsKeyPressed(key);
+}
+static bool Internal_IsKeyReleased(int key)
+{
+    return API::IsKeyReleased(key);
+}
+static bool Internal_IsKeyHeld(int key)
+{
+    return API::IsKeyHeld(key);
 }
 
-static bool Internal_IsMouseButtonDown(int button)
+static bool Internal_IsMouseButtonPressed(int button)
 {
-    return API::IsMouseButtonDown(button);
+    return API::IsMouseButtonPressed(button);
+}
+static bool Internal_IsMouseButtonReleased(int button)
+{
+    return API::IsMouseButtonReleased(button);
+}
+static bool Internal_IsMouseButtonHeld(int button)
+{
+    return API::IsMouseButtonHeld(button);
 }
 
 static float Internal_GetMouseX()
@@ -443,29 +694,54 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Transform::AddRotation", (void *)Internal_AddRotation);
     mono_add_internal_call("CSharpScript.Transform::SetScale_Single", (void *)Internal_SetScale_Single);
     mono_add_internal_call("CSharpScript.Transform::SetScale_XY", (void *)Internal_SetScale_XY);
+    mono_add_internal_call("CSharpScript.Transform::GetPosition_Internal", (void*)Internal_GetPosition);
+    mono_add_internal_call("CSharpScript.Transform::GetRotation", (void*)Internal_GetRotation);
+    mono_add_internal_call("CSharpScript.Transform::GetScale_Internal", (void*)Internal_GetScale);
 
     // === Graphics ===
     mono_add_internal_call("CSharpScript.Graphics::SetShapeType", (void *)Internal_SetShapeType);
     mono_add_internal_call("CSharpScript.Graphics::SetTexture", (void *)Internal_SetTexture);
     mono_add_internal_call("CSharpScript.Graphics::SetColor", (void *)Internal_SetColor);
     mono_add_internal_call("CSharpScript.Graphics::SetAlpha", (void *)Internal_SetAlpha);
+    mono_add_internal_call("CSharpScript.Graphics::GetColor", (void*)Internal_GetColor);
 
     // === Physics ===
     mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);
     mono_add_internal_call("CSharpScript.Physics::SetJumpValue", (void *)Internal_SetJumpValue);
     mono_add_internal_call("CSharpScript.Physics::SetGravity", (void *)Internal_SetGravity);
     mono_add_internal_call("CSharpScript.Physics::SetStatic", (void *)Internal_SetStatic);
+    mono_add_internal_call("CSharpScript.Physics::GetVelocity", (void*)Internal_GetVelocity);
+    mono_add_internal_call("CSharpScript.Physics::SetMass", (void*)Internal_SetMass);
+    mono_add_internal_call("CSharpScript.Physics::SetFriction", (void*)Internal_SetFriction);
 
     // === Collision ===
     mono_add_internal_call("CSharpScript.Collision::SetCollisionShape", (void *)Internal_SetCollisionShape);
     mono_add_internal_call("CSharpScript.Collision::SetCollisionLayer", (void *)Internal_SetCollisionLayer);
+    mono_add_internal_call("CSharpScript.Collision::GetCollisionLayer", (void*)Internal_GetCollisionLayer);
+    mono_add_internal_call("CSharpScript.Collision::GetCollisionShape", (void*)Internal_GetCollisionShape);
+
+    // === Scripting ===
+    mono_add_internal_call("CSharpScript.Scripting::AttachScript", (void*)Internal_AttachScript);
 
     // === Components ===
+    mono_add_internal_call("CSharpScript.Components::SetComponentActive", (void*)Internal_SetComponentActive);
+    mono_add_internal_call("CSharpScript.Components::RemoveComponent", (void*)Internal_RemoveComponent);
     mono_add_internal_call("CSharpScript.Components::AddTransformComponent", (void *)Internal_AddTransformComponent);
     mono_add_internal_call("CSharpScript.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
     mono_add_internal_call("CSharpScript.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
     mono_add_internal_call("CSharpScript.Components::AddPhysicsComponent", (void *)Internal_AddPhysicsComponent);
-    
+    mono_add_internal_call("CSharpScript.Components::AddTextComponent", (void*)Internal_AddTextComponent);
+
+    // === Text ===
+    mono_add_internal_call("CSharpScript.Text::SetText", (void*)Internal_SetText);
+    mono_add_internal_call("CSharpScript.Text::GetText", (void*)Internal_GetText);
+    mono_add_internal_call("CSharpScript.Text::SetTextColor", (void*)Internal_SetTextColor);
+    mono_add_internal_call("CSharpScript.Text::GetTextColor", (void*)Internal_GetTextColor);
+    mono_add_internal_call("CSharpScript.Text::SetTextScale", (void*)Internal_SetTextScale);
+    mono_add_internal_call("CSharpScript.Text::GetTextScale", (void*)Internal_GetTextScale);
+    mono_add_internal_call("CSharpScript.Text::SetTextScreenSpace", (void*)Internal_SetTextScreenSpace);
+    mono_add_internal_call("CSharpScript.Text::GetTextScreenSpace", (void*)Internal_GetTextScreenSpace);
+
     // === Audio ===
     mono_add_internal_call("CSharpScript.Audio::AddSound", (void*)Internal_AddSound);
     mono_add_internal_call("CSharpScript.Audio::PlaySound", (void*)Internal_PlaySound);
@@ -477,12 +753,24 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Audio::SetVolume", (void*)Internal_SetVolume);
     mono_add_internal_call("CSharpScript.Audio::SetCategoryVolume", (void*)Internal_SetCategoryVolume);
 
+    // === Animation ===
+    mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);
+    mono_add_internal_call("CSharpScript.Animation::AddToQueue", (void*)Internal_AddAnimationToQueue);
+    mono_add_internal_call("CSharpScript.Animation::RegisterAnimation", (void*)Internal_RegisterAnimation);
+    mono_add_internal_call("CSharpScript.Animation::SetAnimation", (void*)Internal_SetAnimation);
+    mono_add_internal_call("CSharpScript.Animation::GetCurrentAnimationName", (void*)Internal_GetCurrentAnimationName);
+
+
     // === Camera ===
     mono_add_internal_call("CSharpScript.Camera::SetPosition", (void*)Internal_SetCameraPosition);
     mono_add_internal_call("CSharpScript.Camera::SetZoom", (void*)Internal_SetCameraZoom);
     mono_add_internal_call("CSharpScript.Camera::SetMode", (void*)Internal_SetCameraMode);
+    mono_add_internal_call("CSharpScript.Camera::GetPosition", (void*)Internal_GetCameraPosition);
+    mono_add_internal_call("CSharpScript.Camera::GetZoom", (void*)Internal_GetCameraZoom);
+    mono_add_internal_call("CSharpScript.Camera::GetMode", (void*)Internal_GetCameraMode);
 
     // === Collision Queries ===
+    mono_add_internal_call("CSharpScript.Collision::Raycast_Internal", (void*)Internal_Raycast);
     mono_add_internal_call("CSharpScript.Collision::OnTriggerEnter", (void*)Internal_OnTriggerEnter);
     mono_add_internal_call("CSharpScript.Collision::OnTriggerExit", (void*)Internal_OnTriggerExit);
     mono_add_internal_call("CSharpScript.Collision::OnTriggerStay", (void*)Internal_OnTriggerStay);
@@ -492,10 +780,19 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Utils::GetDelta_Time", (void*)Internal_GetDelta_Time);
     mono_add_internal_call("CSharpScript.Utils::GetFixed_Delta_Time", (void*)Internal_GetFixed_Delta_Time);
     mono_add_internal_call("CSharpScript.Utils::GetFramesPerSecond", (void*)Internal_GetFramesPerSecond);
+	mono_add_internal_call("CSharpScript.Utils::MathfLerp", (void*)API::fLerp);
+	mono_add_internal_call("CSharpScript.Utils::MathfInverseLerp", (void*)API::fInverseLerp);
+	mono_add_internal_call("CSharpScript.Utils::MathfClamp", (void*)API::fClamp);
+	mono_add_internal_call("CSharpScript.Utils::MathiClamp", (void*)API::iClamp);
 
     // === Input ===
-    mono_add_internal_call("CSharpScript.Input::IsKeyDown", (void*)Internal_IsKeyDown);
-    mono_add_internal_call("CSharpScript.Input::IsMouseButtonDown", (void*)Internal_IsMouseButtonDown);
+    mono_add_internal_call("CSharpScript.Input::IsKeyPressed", (void*)Internal_IsKeyPressed);
+    mono_add_internal_call("CSharpScript.Input::IsKeyReleased", (void*)Internal_IsKeyReleased);
+    mono_add_internal_call("CSharpScript.Input::IsKeyHeld", (void*)Internal_IsKeyHeld);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonPressed", (void*)Internal_IsMouseButtonPressed);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonReleased", (void*)Internal_IsMouseButtonReleased);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonHeld", (void*)Internal_IsMouseButtonHeld);
+
     mono_add_internal_call("CSharpScript.Input::GetMouseX", (void*)Internal_GetMouseX);
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);

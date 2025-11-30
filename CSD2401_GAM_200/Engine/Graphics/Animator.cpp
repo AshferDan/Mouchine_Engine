@@ -1,8 +1,10 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Animator.cpp
-\author     Muhammad Ashfer [100% - 117 lines]
+\author     Muhammad Ashfer [51% - 117 lines]
+			Jonathan Fam [49% - 109 lines]
 \par        m.binafzalkhan@digipen.edu
+			Fam.q@digipen.edu
 \date       October, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -103,11 +105,25 @@ void Spritesheet::Update(float dt)
 
 		if (nextFrameIndex > endFrame)
 		{
-			nextFrameIndex = startFrame;
+            if (!animationQueue.empty())
+            {
+                std::string nextAnimation = animationQueue.front();
+                animationQueue.pop();
+                PlayAnimation(nextAnimation);
+            }
+            else
+            {
+                nextFrameIndex = startFrame;
+            }
 		}
 		currRow = nextFrameIndex / cols; // Reassign new rows and cols, showing the next frame of animation
 		currCol = nextFrameIndex % cols;
 	}
+}
+
+void Spritesheet::AddToQueue(const std::string& animationName)
+{
+    animationQueue.push(animationName);
 }
 
 /**

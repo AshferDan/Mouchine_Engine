@@ -16,8 +16,6 @@ Technology is prohibited.
 
 #include "transformSystem.h"
 
-float dt = CoreEngine::GetDeltaTime();
-float fps = CoreEngine::GetFPS();
 TransformSystem::TransformSystem() {
 
 }
@@ -43,5 +41,5 @@ void TransformSystem::Update(float dt) {
 * @brief Updates position based on velocity (logic moved from PhysicsSystem)
 */
 void TransformSystem::IntegrateVelocity(PhysicsComponent* physics, TransformComponent* transform, float deltaTime) {
-	transform->Move(physics->velocityX * deltaTime, physics->velocityY * deltaTime);
+	transform->Move(physics->velocity.x * deltaTime, physics->velocity.y * deltaTime);
 }

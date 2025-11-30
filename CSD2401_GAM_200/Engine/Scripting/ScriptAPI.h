@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptAPI.h
-\author     Jonathan Fam Qian Wei [100% - 94 lines]
+\author     Jonathan Fam Qian Wei [100% - 184 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -29,6 +29,7 @@ Technology is prohibited.
 #include "CollisionSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
+#include "TextComponent.h"
 #include "Animator.hpp"
 #include "ResourceManager.h"
 #include "audio.h"
@@ -38,6 +39,8 @@ Technology is prohibited.
 #include "CameraComponent.h"
 #include "CameraManager.h"
 #include <functional>
+#include "MathLib.h"
+#include "InputManager.h"
 
     using TimerCallback = std::function<void()>;
     using TimerID = unsigned int;
@@ -137,7 +140,7 @@ namespace API {
         float width, float height,
         const std::string& texturePath,
         int rows, int columns,
-        int startFrame, int endFrame,
+        int startRow, int startCol, int endRow, int endCol,
         float fps,
         CollisionLayer layer = CollisionLayer::Default,
         bool hasPhysics = false,
@@ -147,6 +150,8 @@ namespace API {
 #pragma endregion
 
 #pragma region Graphics
+    vec4 GetColor(const std::string& objectName);
+
     /**
      * @brief Sets the shape type for a GameObject's render component.
      * @param objectName The name of the GameObject.
@@ -193,7 +198,7 @@ namespace API {
      * @brief Gets the velocity of a GameObject.
      * @param objectName The name of the GameObject.
      */
-    void GetVelocity(const std::string&);
+    vec2 GetVelocity(const std::string&);
     
     /**
      * @brief Sets the velocity of a GameObject.
@@ -224,6 +229,8 @@ namespace API {
      */
     void SetGravBool(const std::string&,bool);
 
+    void SetFiction(const std::string&, float);
+    void SetMass(const std::string&, float);
 #pragma endregion
 
 #pragma region Transform
@@ -268,23 +275,76 @@ namespace API {
      * @brief Gets the rotation of a GameObject.
      * @param objectName The name of the GameObject.
      */
-    void GetRot(const std::string&);
-    
+        void GetPosition(const std::string&, float* x, float* y);
+        
+        /**
+         * @brief Gets the scale of a GameObject.
+         * @param objectName The name of the GameObject.
+         */
+        void GetScale(const std::string&, float* x, float* y);
+    float GetRotation(const std::string&);
+
+#pragma endregion
+
+#pragma region Text
     /**
-     * @brief Gets the position of a GameObject.
+     * @brief Sets the text content of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     * @param text The text content to set.
+     */
+    void SetText(const std::string&, const std::string&);
+
+    /**
+     * @brief Gets the text content of a GameObject's TextComponent.
      * @param objectName The name of the GameObject.
      */
-    void GetPos(const std::string&);
-    
+    std::string GetText(const std::string&);
+
     /**
-     * @brief Gets the scale of a GameObject.
+     * @brief Sets the text color of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     * @param color The color (RGBA).
+     */
+    void SetTextColor(const std::string&, vec4);
+
+    /**
+     * @brief Gets the text color of a GameObject's TextComponent.
      * @param objectName The name of the GameObject.
      */
-    void GetScale(const std::string&);
+    vec4 GetTextColor(const std::string&);
+
+    /**
+     * @brief Sets the text scale of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     * @param scale The scale factor.
+     */
+    void SetTextScale(const std::string&, float);
+
+    /**
+     * @brief Gets the text scale of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     */
+    float GetTextScale(const std::string&);
+
+    /**
+     * @brief Sets whether the text is rendered in screen space.
+     * @param objectName The name of the GameObject.
+     * @param screenSpace True for screen space, false for world space.
+     */
+    void SetTextScreenSpace(const std::string&, bool);
+
+    /**
+     * @brief Gets whether the text is rendered in screen space.
+     * @param objectName The name of the GameObject.
+     */
+    bool GetTextScreenSpace(const std::string&);
 
 #pragma endregion
 
 #pragma region Components
+    void SetComponentActive(const std::string& objectName, const std::string& componentName, bool active);
+    void RemoveComponent(const std::string& objectName, const std::string& componentName);
+
     /**
      * @brief Adds a Transform component to a GameObject.
      * @param objectName The name of the GameObject.
@@ -309,9 +369,24 @@ namespace API {
      */
     void AddPhysicComponent(const std::string&);
 
+    /**
+     * @brief Adds a Text component to a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param fontPath The file path to the font.
+     * @param fontSize The size of the font.
+     * @param text The initial text content.
+     * @param color The text color (RGBA).
+     * @param screenSpace Whether to render in screen space.
+     */
+    void AddTextComponent(const std::string&, const std::string&, unsigned int, const std::string&, vec4, bool);
+
 #pragma endregion
 
 #pragma region Collision
+    bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* selfName, MonoString** hitObjectName, float* hitDistance);
+    int GetCollisionLayer(const std::string& objectName);
+    int GetCollisionShape(const std::string& objectName);
+
     /**
      * @brief Sets the collision shape type for a GameObject.
      * @param objectName The name of the GameObject.
@@ -360,6 +435,9 @@ namespace API {
 #pragma endregion
 
 #pragma region Camera
+    vec2 GetCameraPosition();
+    float GetCameraZoom();
+    int GetCameraMode();
     void setCameraPos(vec2);
     void setCameraZoom(float);
     void setCameraMode(CameraComponent::CameraMode);
@@ -367,22 +445,38 @@ namespace API {
 #pragma endregion
 
 #pragma region Animator
-    void setAnimation();
-    void playAnimation();
+    void PlayAnimation(const std::string& objectName, const std::string& animationName);
+    void AddAnimationToQueue(const std::string& objectName, const std::string& animationName);
+    void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps);
+    void SetAnimation(const std::string& objectName, int startFrame, int endFrame, float fps);
+    std::string GetCurrentAnimationName(const std::string& objectName);
 #pragma endregion
+
 
 #pragma region Misc
+    double GetDelta_Time();
+    double GetFixedDelta_time();
+    double GetFramePerSecond();
+
     int RandomNumberGen(int, int);
-    float GetDelta_Time();
-    float GetFixedDelta_time();
-    float GetFramePerSecond();
+    float fLerp(float a, float b, float t);
+    float fInverseLerp(float a, float b, float value);
+    float fClamp(float value, float min, float max);
+    int iClamp(int value, int min, int max);
+
 #pragma endregion
 
-
+#pragma region Scripting
+    bool AttachScript(const std::string& objectName, const std::string& scriptClassName);
+#pragma endregion
 
 #pragma region Input
-    bool IsKeyDown(int key);
-    bool IsMouseButtonDown(int button);
+    bool IsKeyPressed(int key);
+    bool IsKeyReleased(int key);
+    bool IsKeyHeld(int key);
+    bool IsMouseButtonPressed(int button);
+    bool IsMouseButtonReleased(int button);
+    bool IsMouseButtonHeld(int button);
     float GetMouseX();
     float GetMouseY();
     float GetMouseWorldX();

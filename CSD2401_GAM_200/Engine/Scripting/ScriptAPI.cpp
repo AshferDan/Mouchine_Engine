@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptAPI.cpp
-\author     Jonathan Fam Qian Wei [100% - 386 lines]
+\author     Jonathan Fam Qian Wei [100% - 1,153 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -108,7 +108,7 @@ namespace API
                              float width, float height,
                              const std::string &texturePath,
                              int rows, int columns,
-                             int startFrame, int endFrame,
+                             int startRow, int startCol, int endRow, int endCol,
                              float fps,
                              CollisionLayer layer,
                              bool hasPhysics,
@@ -116,6 +116,8 @@ namespace API
                              bool hasGravity)
     {
         auto &factory = GameObjectFactory::Instance();
+        int startFrame = startRow * columns + startCol;
+        int endFrame = endRow * columns + endCol;
         GameObject *obj = factory.CreateAnimatedImage(name, x, y, width, height, texturePath.c_str(),
                                                       rows, columns, startFrame, endFrame, fps, layer);
 
@@ -134,6 +136,21 @@ namespace API
 #pragma endregion
 
 #pragma region Graphics
+    vec4 GetColor(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                return render->GetColor();
+            }
+        }
+        return vec4(0.0f, 0.0f, 0.0f, 1.0f); // Return black if not found
+    }
+
     void SetShapeType(const std::string &objectName, RenderComponent::ShapeType newShape)
     {
         auto &factory = GameObjectFactory::Instance();
@@ -278,6 +295,54 @@ namespace API
         }
     }
 
+    vec2 GetVelocity(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* physics = obj->GetComponent<PhysicsComponent>();
+            if (physics)
+            {
+                return vec2(physics->velocity.x, physics->velocity.y);
+            }
+        }
+        return vec2(0.0f, 0.0f); // Return a default value if not found
+    }
+
+    void SetFriction(const std::string& objectName, float val)
+    {
+        auto& factory = GameObjectFactory::Instance();
+
+        GameObject* obj = factory.FindGameObject(objectName);
+
+        if (obj)
+        {
+            auto* physics = obj->GetComponent<PhysicsComponent>();
+            if (physics)
+            {
+                physics->SetFrictionCoefficient(val);
+            }
+        }
+    }
+
+    void SetMass(const std::string&objectName, float val)
+    {
+        auto& factory = GameObjectFactory::Instance();
+
+        GameObject* obj = factory.FindGameObject(objectName);
+
+        if (obj)
+        {
+            auto* physics = obj->GetComponent<PhysicsComponent>();
+            if (physics)
+            {
+                physics->SetMass(val);
+            }
+        }
+    }
+
+
 #pragma endregion
 
 #pragma region Transform
@@ -291,6 +356,34 @@ namespace API
             if (transform)
             {
                 transform->SetPosition(x, y);
+            }
+        }
+    }
+
+    void SetScale(const std::string& objectName, float x, float y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* transform = obj->GetComponent<TransformComponent>();
+            if (transform)
+            {
+                transform->SetScale(x, y);
+            }
+        }
+    }
+
+    void SetScale(const std::string& objectName, float val)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* transform = obj->GetComponent<TransformComponent>();
+            if (transform)
+            {
+                transform->SetScale(val);
             }
         }
     }
@@ -322,34 +415,178 @@ namespace API
         }
     }
 
-    void SetScale(const std::string &objectName, float val)
+
+
+    void GetPosition(const std::string& objectName, float* x, float* y)
     {
-        auto &factory = GameObjectFactory::Instance();
-        GameObject *obj = factory.FindGameObject(objectName);
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
         if (obj)
         {
-            auto *transform = obj->GetComponent<TransformComponent>();
+            auto* transform = obj->GetComponent<TransformComponent>();
             if (transform)
             {
-                transform->SetScale(val);
+                *x = transform->posX;
+                *y = transform->posY;
+                return;
+            }
+        }
+        *x = 0.0f;
+        *y = 0.0f;
+    }
+
+    float GetRotation(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* transform = obj->GetComponent<TransformComponent>();
+            if (transform)
+            {
+                return transform->rotation;
+            }
+        }
+        return 0.0f; // Return a default value if not found
+    }
+
+    void GetScale(const std::string& objectName, float* x, float* y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* transform = obj->GetComponent<TransformComponent>();
+            if (transform)
+            {
+                *x = transform->scaleX;
+                *y = transform->scaleY;
+                return;
+            }
+        }
+        *x = 0.0f;
+        *y = 0.0f;
+    }
+
+
+#pragma endregion
+
+#pragma region Text
+    void SetText(const std::string& objectName, const std::string& text)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                textComp->SetText(text);
             }
         }
     }
 
-    void SetScale(const std::string &objectName, float x, float y)
+    std::string GetText(const std::string& objectName)
     {
-        auto &factory = GameObjectFactory::Instance();
-        GameObject *obj = factory.FindGameObject(objectName);
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
         if (obj)
         {
-            auto *transform = obj->GetComponent<TransformComponent>();
-            if (transform)
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
             {
-                transform->SetScale(x, y);
+                return textComp->GetText();
+            }
+        }
+        return "";
+    }
+
+    void SetTextColor(const std::string& objectName, vec4 color)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                textComp->SetColor(color);
             }
         }
     }
 
+    vec4 GetTextColor(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                return textComp->GetColor();
+            }
+        }
+        return vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    void SetTextScale(const std::string& objectName, float scale)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                textComp->SetScale(scale);
+            }
+        }
+    }
+
+    float GetTextScale(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                return textComp->GetScale();
+            }
+        }
+        return 1.0f;
+    }
+
+    void SetTextScreenSpace(const std::string& objectName, bool screenSpace)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                textComp->SetScreenSpace(screenSpace);
+            }
+        }
+    }
+
+    bool GetTextScreenSpace(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp)
+            {
+                return textComp->isScreenSpace();
+            }
+        }
+        return true;
+    }
 #pragma endregion
 
 #pragma region Components
@@ -433,9 +670,122 @@ namespace API
             }
         }
     }
+
+    void AddTextComponent(const std::string& objectName, const std::string& fontPath, unsigned int fontSize, const std::string& text, vec4 color, bool screenSpace)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            if (!obj->GetComponent<TextComponent>())
+            {
+                obj->AddComponent<TextComponent>(fontPath.c_str(), fontSize, text, color, screenSpace);
+            }
+            else
+            {
+                throw std::runtime_error("Attempted to add duplicate TextComponent to GameObject: " + objectName);
+            }
+        }
+    }
+
+    void SetComponentActive(const std::string& objectName, const std::string& componentName, bool active)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            if (componentName == "Transform")
+            {
+                if (auto* comp = obj->GetComponent<TransformComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Render")
+            {
+                if (auto* comp = obj->GetComponent<RenderComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Physics")
+            {
+                if (auto* comp = obj->GetComponent<PhysicsComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Collider")
+            {
+                if (auto* comp = obj->GetComponent<ColliderComponent>()) comp->SetEnabled(active);
+            }
+            else if (componentName == "Text")
+            {
+                if (auto* comp = obj->GetComponent<TextComponent>()) comp->SetEnabled(active);
+            }
+            else
+            {
+                throw std::runtime_error("Attempted to set active state for unknown component: " + componentName);
+            }
+        }
+    }
+
+    void RemoveComponent(const std::string& objectName, const std::string& componentName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            if (componentName == "Transform")
+            {
+                obj->RemoveComponent<TransformComponent>();
+            }
+            else if (componentName == "Render")
+            {
+                obj->RemoveComponent<RenderComponent>();
+            }
+            else if (componentName == "Physics")
+            {
+                obj->RemoveComponent<PhysicsComponent>();
+            }
+            else if (componentName == "Collider")
+            {
+                obj->RemoveComponent<ColliderComponent>();
+            }
+            else if (componentName == "Text")
+            {
+                obj->RemoveComponent<TextComponent>();
+            }
+            else
+            {
+                throw std::runtime_error("Attempted to remove unknown component: " + componentName);
+            }
+        }
+    }
 #pragma endregion
 
 #pragma region Collision
+    int GetCollisionLayer(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* collider = obj->GetComponent<ColliderComponent>();
+            if (collider)
+            {
+                return static_cast<int>(collider->GetLayer());
+            }
+        }
+        return -1; // Return -1 if not found
+    }
+
+    int GetCollisionShape(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* collider = obj->GetComponent<ColliderComponent>();
+            if (collider)
+            {
+                return static_cast<int>(collider->GetType());
+            }
+        }
+        return -1; // Return -1 if not found
+    }
+
     void SetColisionShape(const std::string &objectName, ColliderComponent::Type newShape)
     {
         auto &factory = GameObjectFactory::Instance();
@@ -502,11 +852,74 @@ namespace API
         return false;
     }
 
-    
+bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* selfName, MonoString** hitObjectName, float* hitDistance)
+{
+    CollisionSystem* collisionSystem = CORE->GetCollisionSystem();
+    if (!collisionSystem)
+    {
+        return false;
+    }
+
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* self = nullptr;
+    if (selfName)
+    {
+        self = factory.FindGameObject(mono_string_to_utf8(selfName));
+    }
+
+    RaycastHit hit;
+    vec2 origin(x, y);
+    vec2 direction(dx, dy);
+
+    if (collisionSystem->Raycast(origin, direction, distance, hit, self))
+    {
+        if (hit.gameObject)
+        {
+            // Convert the hit object's name to a MonoString
+            *hitObjectName = mono_string_new(mono_domain_get(), hit.gameObject->GetName().c_str());
+            *hitDistance = hit.distance;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 
 #pragma endregion
 
 #pragma region Camera
+    vec2 GetCameraPosition()
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) {
+            return vec2(0.0f, 0.0f);
+        }
+        return camtemp->GetPosition();
+    }
+
+    float GetCameraZoom()
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) {
+            return 0.0f;
+        }
+        return camtemp->getZoom();
+    }
+
+    int GetCameraMode()
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) {
+            return -1;
+        }
+        return static_cast<int>(camtemp->GetMode());
+    }
+
 
     void setCameraPos(vec2 pos)
     {
@@ -541,6 +954,79 @@ namespace API
     }
 #pragma endregion
 
+#pragma region Animator
+    void PlayAnimation(const std::string& objectName, const std::string& animationName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->PlayAnimation(animationName);
+            }
+        }
+    }
+
+    void AddAnimationToQueue(const std::string& objectName, const std::string& animationName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->AddToQueue(animationName);
+            }
+        }
+    }
+
+    void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->RegisterAnimation(animationName, texturePath, rows, cols, startRow, startCol, endRow, endCol, fps);
+            }
+        }
+    }
+
+    void SetAnimation(const std::string& objectName, int startFrame, int endFrame, float fps)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->SetAnimation(startFrame, endFrame, fps);
+            }
+        }
+    }
+
+    std::string GetCurrentAnimationName(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                return spritesheet->GetCurrentAnimationName();
+            }
+        }
+        return ""; // Return empty string if not found
+    }
+#pragma endregion
+
 #pragma region Misc
     int RandomNumberGen(int max, int min)
     {
@@ -548,17 +1034,33 @@ namespace API
         int result = rand() % range + min;
         return result;
     }
-    float GetDelta_Time()
+    double GetDelta_Time()
     {
         return CORE->GetDeltaTime();
     }
-    float GetFixedDelta_time()
+    double GetFixedDelta_time()
     {
         return CORE->GetFixedDeltaTime();
     }
-    float GetFramePerSecond() {
+    double GetFramePerSecond() {
         return CORE->GetFPS();
     }
+    float fLerp(float a, float b, float t)
+    {
+		return (a, b, t);
+	}
+    float fInverseLerp(float a, float b, float value)
+    {
+		return MathfInverseLerp(a, b, value);
+	}
+    float fClamp(float value, float min, float max)
+    {
+		return MathfClamp(value, min, max);
+	}
+    int iClamp(int value, int min, int max)
+    {
+		return MathiClamp(value, min, max);
+	}
 #pragma endregion
 
 #pragma region Audio
@@ -718,24 +1220,80 @@ namespace API
     }
 #pragma endregion
 
+#pragma region Scripting
+    bool AttachScript(const std::string& objectName, const std::string& scriptClassName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            ScriptSystem* scriptSystem = CORE->GetScriptSystem();
+            if (scriptSystem)
+            {
+                return scriptSystem->AttachScript(obj, scriptClassName);
+            }
+        }
+        return false;
+    }
+#pragma endregion
 
 #pragma region Input
-    bool IsKeyDown(int key)
+    bool IsKeyPressed(int key)
     {
-        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
-        if (window)
+        InputManager* input = CORE->GetInputManager();
+        if (input)
         {
-            return glfwGetKey(window, key) == GLFW_PRESS;
+            return input->IsKeyPressed(key);
         }
         return false;
     }
 
-    bool IsMouseButtonDown(int button)
+    bool IsKeyReleased(int key)
     {
-        GLFWwindow* window = CORE->GetGraphicsSystem()->getWindow();
-        if (window)
+        InputManager* input = CORE->GetInputManager();
+        if (input)
         {
-            return glfwGetMouseButton(window, button) == GLFW_PRESS;
+            return input->IsKeyReleased(key);
+        }
+        return false;
+    }
+
+    bool IsKeyHeld(int key)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsKeyHeld(key);
+        }
+        return false;
+    }
+
+    bool IsMouseButtonPressed(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsMouseButtonPressed(button);
+        }
+        return false;
+    }
+
+    bool IsMouseButtonReleased(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsMouseButtonReleased(button);
+        }
+        return false;
+    }
+
+    bool IsMouseButtonHeld(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input)
+        {
+            return input->IsMouseButtonHeld(button);
         }
         return false;
     }

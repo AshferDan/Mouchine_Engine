@@ -109,6 +109,9 @@ int gizmo_type = -1;
 ImVec2 viewportSize;
 ImVec2 viewportPos;
 
+// PROPERTIES
+char draggedSprite_str[128]{"<Drag Image Here>"};
+
 // IMGUI COLOURS
 ImVec4 color_icon_highlighted{ 0.5f, 0.5f, 0.5f, .7f };
 ImVec4 color_icon_normal{ 1.f, 1.f, 1.f, .7f };
@@ -169,6 +172,7 @@ void ImGuiSystem::Initialize()
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);                 // Initialize GLFW backend
     ImGui_ImplOpenGL3_Init("#version 450");                       // Initialize OpenGL backend
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable docking
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
     // ReloadPrefabsList();
 
@@ -178,7 +182,8 @@ void ImGuiSystem::Initialize()
     // TODO make this serialisable, so it remembers which one to load
     std::string layoutPath = LayoutsFilePath + "DefaultLayout.ini";
     ImGuiIO &io = ImGui::GetIO();
-    io.IniFilename = layoutPath.c_str();
+    //io.IniFilename = layoutPath.c_str();
+    io.IniFilename = nullptr;
     ImGui::LoadIniSettingsFromDisk(layoutPath.c_str());
 
     // Imgui flags
@@ -513,7 +518,7 @@ void ImGuiSystem::Viewport_ClickToSelect()
         {
             // if GO does NOT have a collider
             // Find general distance between object and cursor
-            float distance = std::sqrt(std::pow(viewportCursorPos.x - pos.x, 2) + std::pow(viewportCursorPos.y - pos.y, 2));
+            float distance = static_cast<float>(std::sqrt(std::pow(viewportCursorPos.x - pos.x, 2) + std::pow(viewportCursorPos.y - pos.y, 2)));
 
             if (distance < 50.f)                // if object is within 50 units (within general area)
             {
@@ -767,6 +772,8 @@ void ImGuiSystem::Hierarchy_Render()
         {
             EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
             GameObject* go = factory.GetGameObject(deliveredID);
+
+            if (!go) return;
             GameObject* goParent = go->GetParent();
             if (goParent)
             {
@@ -791,17 +798,17 @@ void ImGuiSystem::Hierarchy_Render()
     }
 }
 
-void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, EntityID &selectedGameObjectID, GameObjectFactory &factory)
+void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, EntityID &selectedGOID, GameObjectFactory &p_factory)
 {
     // Just commented this out in case want to revert, but now we can show inactive GOs but greyed out
     //if (!obj->IsActive())
     //    return;
-
+    if (!obj) return;
     EntityID id = obj->GetID();
 
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-    if (selectedGameObjectID == id)
+    if (selectedGOID == id)
         flags |= ImGuiTreeNodeFlags_Selected;
 
     // Apply indentation based on depth
@@ -839,7 +846,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
     ImGui::AlignTextToFramePadding();
     // if renaming, set the name of the tree node as an input text field
-    if (hierarchy_renameIndex == id)
+    if (hierarchy_renameIndex == (int)id)
     {
         ImGui::PushID(id);
         ImGuiTreeNodeFlags nameFlags = flags | ImGuiTreeNodeFlags_Leaf;
@@ -888,7 +895,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         flags |= ImGuiTreeNodeFlags_Leaf;
     }
 
-    if (selectedGameObjectID == id)
+    if (selectedGOID == id)
     {
         flags |= ImGuiTreeNodeFlags_Selected;
     }
@@ -912,19 +919,19 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
             /*std::cout <<  obj->GetName() <<"'s GetFamilyTree() has: \n";
             for (auto const &r : familyTree)
             {
-                std::cout << factory.GetGameObject(r)->GetName() << std::endl;
+                std::cout << p_factory.GetGameObject(r)->GetName() << std::endl;
             }*/
 
             EntityID deliveredID = EntityID(std::stoi(draggedID));       // Convert payload data to EntityID
             auto check = std::find(familyTree.begin(), familyTree.end(), deliveredID);
 
             std::vector<EntityID> selfParentingTree{};
-            GetFamilyTree(factory.GetGameObject(deliveredID), selfParentingTree);
+            GetFamilyTree(p_factory.GetGameObject(deliveredID), selfParentingTree);
             auto checkSelfParenting = std::find(selfParentingTree.begin(), selfParentingTree.end(), obj->GetID());
 
             if (check == familyTree.end() && checkSelfParenting == selfParentingTree.end())
             {
-                GameObject *deliveredGO = factory.GetGameObject(deliveredID);
+                GameObject *deliveredGO = p_factory.GetGameObject(deliveredID);
                 std::cout << "[Hierarchy] Setting " << deliveredGO->GetName() << " to be child of " << obj->GetName() << std::endl;
                 deliveredGO->SetParent(obj);                                        // Set Dragged GO to be parent of receiver GO
 
@@ -970,7 +977,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         }
         if (ImGui::MenuItem("Clone"))
         {
-            factory.CloneGameObject(id);
+            p_factory.CloneGameObject(id);
         }
         // find way to unparent by drag and drop in the future
         if (obj->GetParent() && ImGui::MenuItem("Make Root"))
@@ -984,21 +991,21 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
 
             // Record Undo Entries - Undo Delete
             LevelEditor* editor = CORE->GetLevelEditor();
-            GameObject* obj = factory.GetGameObject(id);
+            GameObject* Gameobj = p_factory.GetGameObject(id);
 
             {
-                GameObject* p = obj->GetParent();              
+                GameObject* p = Gameobj->GetParent();
                 if (p) {
                     auto kids = p->GetAllChildren();                  
                 }
             }
-            if (obj)
+            if (Gameobj)
             {             
                 EditorUndoCommand undocmd;
                 undocmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
                 undocmd.entityID = id;
                 //cmd.beforeState = editor->SerialiseGameObject(obj);
-                undocmd.beforeJson = Serialization::SerializeGameObject(obj);
+                undocmd.beforeJson = Serialization::SerializeGameObject(Gameobj);
 
                 // Store Parent
                 GameObject* parent = obj->GetParent();
@@ -1017,15 +1024,15 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
                 }
 
                 // Store Children
-                for (GameObject* c : obj->GetAllChildren())
+                for (GameObject* c : Gameobj->GetAllChildren())
                     undocmd.childIDs.push_back(c->GetID());
 
                 editor->RecordUndo(undocmd);
 
-                factory.DestroyAllRelatedGameObjects(id);  // handles cases for both individual GOs and parented GOs
+                p_factory.DestroyAllRelatedGameObjects(id);  // handles cases for both individual GOs and parented GOs
 
                 // Clear selection if it was selected
-                if (selectedGameObjectID == id)
+                if (selectedGOID == id)
                     ResetSelectedGameObject();
             }
         }
@@ -1038,7 +1045,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         // repeats loop again
         for (auto &childPtr : obj->GetAllChildren())
         {
-            Hierarchy_GameObjectTree_Renderer(childPtr, depth+1, selectedGameObjectID, factory);
+            Hierarchy_GameObjectTree_Renderer(childPtr, depth+1, selectedGOID, p_factory);
         }
         ImGui::TreePop();
     }
@@ -1092,6 +1099,7 @@ void GOCreationMenu_Spawn()
 void ImGuiSystem::SetSelectedGameObject(EntityID id)
 {
     selectedGameObjectID = id;
+    CORE->GetGraphicsSystem()->ClearEditorSelection();              // need to clear after resassigning so newly selected GO can have the correct outlines drawn
 }
 
 void ImGuiSystem::ResetSelectedGameObject()
@@ -1323,7 +1331,8 @@ void ImGuiSystem::PrefabMenu_Reinstantiate()
     Serialization::SavePrefab(*selectedGO);                                 // Properly overrides the old prefab
 
     std::vector<EntityID> prefabReiterationList = prefabInstances[selectedPrefabName];          // make a copy because we will be deleting things from the active list
-    for (auto& p : prefabReiterationList)
+
+    for (EntityID p : prefabReiterationList)
     {
         GameObject* currPrefab = factory.GetGameObject(p);                                      // get GO
         if (!currPrefab || !currPrefab->GetComponent<TransformComponent>())
@@ -1414,7 +1423,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
             editor->RecordUndo(cmd);
         }
 
-        if (ImGuizmo::IsUsing)
+        if (ImGuizmo::IsUsing())
         {
             vec3 trans{}, scale{}, rot{};
             DecomposeMatrix(mtx, trans.x, trans.y, scale.x, scale.y, rot.x);
@@ -1436,7 +1445,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
 void ImGuiSystem::Viewport_RenderGizmoToolbar()
 {
     // On screen GUI settings
-    ImVec2 viewportPos = ImGui::GetWindowPos();
+    viewportPos = ImGui::GetWindowPos();
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
 
     ImGui::SetNextWindowBgAlpha(0.75f);
@@ -1446,35 +1455,35 @@ void ImGuiSystem::Viewport_RenderGizmoToolbar()
     ImGui::Begin("##Toolbar", nullptr, flags);
 
     if (ImGui::ImageButton("##Gizmo_Select", ImTextureID(icon_giz_select_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q))
+        (gizmo_type == -1) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_Q) && isHoveringOverViewport)
     {
         gizmo_type = -1;
     }
     CreateHintText("(Q) Select");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Translate", ImTextureID(icon_giz_translate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W))
+        (gizmo_type == int(ImGuizmo::OPERATION::TRANSLATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_W) && isHoveringOverViewport)
     {
         gizmo_type = int(ImGuizmo::OPERATION::TRANSLATE);
     }
     CreateHintText("(W) Move");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Scale", ImTextureID(icon_giz_scale_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E))
+        (gizmo_type == int(ImGuizmo::OPERATION::SCALE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_E) && isHoveringOverViewport)
     {
         gizmo_type = int(ImGuizmo::OPERATION::SCALE);
     }
     CreateHintText("(E) Scale");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Rotate", ImTextureID(icon_giz_rotate_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R))
+        (gizmo_type == int(ImGuizmo::OPERATION::ROTATE)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_R) && isHoveringOverViewport)
     {
         gizmo_type = int(ImGuizmo::OPERATION::ROTATE);
     }
     CreateHintText("(R) Rotate");
     ImGui::Separator();
     if (ImGui::ImageButton("##Gizmo_Resize", ImTextureID(icon_giz_resize_ui), icon_size_medium, { 0, 1 }, { 1, 0 },
-        (gizmo_type == int(ImGuizmo::OPERATION::BOUNDS)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_T))
+        (gizmo_type == int(ImGuizmo::OPERATION::BOUNDS)) ? color_icon_highlighted : color_icon_normal, color_icon_bg) || ImGui::IsKeyPressed(ImGuiKey_T) && isHoveringOverViewport)
     {
         gizmo_type = int(ImGuizmo::OPERATION::BOUNDS);
     }
@@ -1488,19 +1497,29 @@ void ImGuiSystem::Viewport_HighlightGO()
     // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
     if (!selectedGameObjectID) return;
     auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
-    //CORE->GetLevelEditor()->GetEditorViewProjection()
+    auto* collider = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<ColliderComponent>();
+
     if (transform)
     {
         float x, y, sx, sy;
 
-        //CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         transform->GetPosition(x, y);
         transform->GetScale(sx, sy);
         if (CORE->GetGraphicsSystem())
         {
             CORE->GetGraphicsSystem()->SetEditorSelection(x, y, sx, sy);
         }
+        if (collider)
+        {
+            vec2 colliderScale{ collider->GetSize() };
+
+            if (CORE->GetGraphicsSystem())
+            {
+                CORE->GetGraphicsSystem()->SetEditorSelection_ColliderOnly(x, y, colliderScale.x, colliderScale.y);
+            }
+        }
     }
+
 }
 #pragma endregion
 
@@ -1599,7 +1618,7 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().generic_string(), fileName.c_str());            // For Audio files
                 }
-                else if (iter.path().parent_path().filename() == "Sprites")
+                else if (iter.path().parent_path().filename() == "Sprites" || iter.path().parent_path().filename() == "Icons")
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().generic_string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
@@ -2069,6 +2088,13 @@ void ImGuiSystem::RenderPropertyEditor()
                 };
 
             // sliders for position, scale, rotation etc
+
+            static bool isTransformEnabled = transform->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled ##Transform", &isTransformEnabled))
+            {
+                transform->SetEnabled(isTransformEnabled);
+            }
+
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
             if (ImGui::DragFloat2("Position", pos, 0.5f))
@@ -2129,7 +2155,14 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
         {
+            static bool isRenderEnabled = render->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled ##Render", &isRenderEnabled))
+            {
+                render->SetEnabled(isRenderEnabled);
+            }
+
             ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
+            static bool showTextureDND = false;
 
             // Show colour picker for GO colour (only if no texture id for custom texture/ sprite)
             if (render->GetTextureID() == 0)
@@ -2140,11 +2173,61 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     render->SetColor(vec4(colorArray[0], colorArray[1], colorArray[2], colorArray[3]));
                 }
+                
+                if (showTextureDND)
+                {
+                    std::string draggedSprite{};
+                    ImGui::InputText("##DragImageHere", draggedSprite_str, sizeof(draggedSprite_str));
+                    if (ImGui::IsItemFocused() && ImGui::IsKeyPressed(ImGuiKey_Enter))
+                    {
+                        draggedSprite = draggedSprite_str;
+                    }
+
+                    ReceiveDragAndDrop(SpritePayloadID, draggedSprite);
+                    if (!draggedSprite.empty())
+                    {
+                        std::cout << draggedSprite << std::endl;
+                        render->SetTexturePath(draggedSprite);
+                        GLuint newTexID =  CORE->GetGraphicsSystem()->LoadTexture(draggedSprite.c_str());
+                        if (newTexID)
+                        {
+                            render->SetColor(1.0f);                                 // removes colour and makes way for loading image
+                            render->SetTextureID(newTexID);
+                            strcpy(draggedSprite_str, "<Drag Image Here>");                   // reset
+                            std::cout << "[Properties] New Texture loaded successfully!" << std::endl;
+                        }
+                        else
+                        {
+                            std::cout << "[Properties] Failed to load texture!" << std::endl;
+                        }
+                    }
+                }
+
+                // placed below here for cleaner transition when pressing the button
+                if (!showTextureDND && ImGui::Button("Add Texture"))                        
+                {
+                    render->SetTextureID(GLuint{});
+                    showTextureDND = true;
+                }
             }
             else
             {
                 ImGui::Text("Texture ID: %u", render->GetTextureID());
+                showTextureDND = false;
+                if (ImGui::Button("Remove Existing Texture"))
+                {
+                    render->SetTextureID(GLuint{});
+                    render->SetColor({1,0,1,1});                    // set to pink to make it obvious if texture missing
+                }
             }
+            int goRenderLayer{ render->GetLayer() };
+            ImGui::Text("Rendering Layer");
+            ImGui::SetNextItemWidth(100.0f);
+            if (ImGui::InputInt("##Rendering Layer", &goRenderLayer))
+            {
+                render->SetLayer(goRenderLayer);
+            }
+            CreateHintText("Ascending order for topmost rendering position");
         }
     }
 
@@ -2154,6 +2237,12 @@ void ImGuiSystem::RenderPropertyEditor()
         if (ImGui::CollapsingHeader("Physics"))
         {
             // Physics sliders with respective functions
+            static bool isPhysEnabled = physics->IsEnabled();
+            if (ImGui::Checkbox("Phsyics Enabled##Physics", &isPhysEnabled))
+            {
+                physics->SetEnabled(isPhysEnabled);
+            }
+
             float vel[2] = { 0.0f, 0.0f };
             physics->GetVelocity(vel[0], vel[1]);
             if (ImGui::DragFloat2("Velocity", vel, 0.1f))
@@ -2185,6 +2274,12 @@ void ImGuiSystem::RenderPropertyEditor()
         if (ImGui::CollapsingHeader("Collider"))
         {
             // Editable Collider Type Dropdown
+            static bool isColEnabled = collider->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled##Collider", &isColEnabled))
+            {
+                collider->SetEnabled(isColEnabled);
+            }
+
             const char* colliderTypes[] = { "Square", "Circle" };
             int currentType = (collider->GetType() == ColliderComponent::Type::Circle) ? 1 : 0;
 
@@ -2221,7 +2316,7 @@ void ImGuiSystem::RenderPropertyEditor()
                 float height = aabb.max.y - aabb.min.y;
 
                 float newSize[2] = { width, height };
-                if (ImGui::DragFloat2("Size", newSize, 1.0f, 1.0f, 500.0f))
+                if (ImGui::DragFloat2("Size", newSize, 1.0f, 1.0f, 5000.0f))
                 {
                     collider->SetSize(newSize[0], newSize[1]);
                     std::cout << "[Property Editor] Changed collider size to "
@@ -2233,7 +2328,7 @@ void ImGuiSystem::RenderPropertyEditor()
                 Circle circle = collider->GetCircle();
                 float radius = circle.radius;
 
-                if (ImGui::DragFloat("Radius", &radius, 1.0f, 1.0f, 250.0f))
+                if (ImGui::DragFloat("Radius", &radius, 1.0f, 1.0f, 5000.0f))
                 {
                     collider->SetSize(radius * 2.0f, radius * 2.0f);
                     std::cout << "[Property Editor] Changed circle radius to "
@@ -2275,7 +2370,7 @@ void ImGuiSystem::RenderPropertyEditor()
             for (auto& comp : AllComponents)
             {
                 // can use to sort by component type in the future when we got more components, and can add explanation text
-                ComponentType type      { std::get<0>(comp) };
+                //ComponentType type      { std::get<0>(comp) };
                 std::string& name       { std::get<1>(comp) };
                 ImTextureID& textureID  { std::get<2>(comp) };
                 auto& onclick           { std::get<3>(comp) };

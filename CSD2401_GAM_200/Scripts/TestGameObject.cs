@@ -14,75 +14,72 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 using CSharpScript;
-using System;
-using System.Threading;
 
 namespace GameScripts
 {
     public class TestGameObject
     {
-        private float redSquareX = -200.0f;
-        private const float redSquareY = 300.0f;
-        private const float moveSpeed = 100.0f;
-
         public void OnStart()
         {
-            GameObject.CreateShape(
-                "RedSquare",                     // name
-                (int)ShapeType.Square,           // type: square (fixed from Circle)
-                -200, 300,                        // x, y position
-                200, 200,                        // width, height
-                1.0f, 0.0f, 0.0f, 1.0f,          // r, g, b, a (red color)
-                (int)CollisionLayer.Default,     // collision layer
-                false,                           // hasPhysics = false (no physics)
-                false,                           // isStatic (doesn't matter if no physics)
-                false                            // hasGravity = false (no gravity)
-            );  
-
-            GameObject.CreateAnimatedImage("C#_AniImage",0,0,
-                300, 300,
-                "../Assets/spritesheet_R.png",
-                13,10,//size of the spritesheet
-                114,115,//start and end frames
-                8,(int)CollisionLayer.Default,
-                false,false,
-                false);
-
-            // Create second square - Blue, on the right
-            GameObject.CreateShape(
-                "Ground",                    // name
-                (int)ShapeType.Square,           // type: square
-                0, -500,                        // x, y position
-                3000, 500,                        // width, height
-                0.0f, 0.0f, 0.0f, 1.0f,          // r, g, b, a (blue color)
-                (int)CollisionLayer.Ground,     // collision layer
-                true,                           // hasPhysics = false (no physics)
-                true,                           // isStatic
-                false                            // hasGravity = false (no gravity)
+            // Create the red square
+            CSharpScript.GameObject.CreateShape(
+                "RedSquare",
+                (int)CSharpScript.ShapeType.Square,
+                500, 300,
+                50, 50,
+                1.0f, 0.0f, 0.0f, 1.0f,
+                (int)CSharpScript.CollisionLayer.Default,
+                false, false, false
             );
 
-            
-        }
+            // Create the green square
+            CSharpScript.GameObject.CreateShape(
+                "GreenSquare",
+                (int)CSharpScript.ShapeType.Square,
+                -300, 300,
+                50, 50,
+                0.0f, 1.0f, 0.0f, 1.0f,
+                (int)CSharpScript.CollisionLayer.Default,
+                false, false, false
+            );
 
-        
+            // Attach the RaycastTest script to the RedSquare
+            CSharpScript.Scripting.AttachScript("RedSquare", "RaycastTest");
+        }
 
         public void OnUpdate(float deltaTime)
         {
-            redSquareX -= moveSpeed * deltaTime;
-
-            // 3. Apply the updated position to the game object
-            Transform.SetPosition("RedSquare", redSquareX, redSquareY);
-
-            if (redSquareX < -800)
+            if (Input.GetKeyPressed(Input.KeyCode.K))
             {
-                redSquareX = 500;
+                CSharpScript.Debug.Log("button Pressed");
             }
-            Console.WriteLine(Utils.GetDelta_Time());
-         }
+            else if (Input.GetKeyReleased(Input.KeyCode.K))
+            {
+                CSharpScript.Debug.Log("Key Have Been Released");
+            }
+            else if (Input.GetKeyHeld(Input.KeyCode.K))
+            {
+                CSharpScript.Debug.Log("Key Have Been holding");
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.J))
+            {
+				float lerpResult = Utils.MathfLerp(0.0f, 10.0f, 0.5f);
+				CSharpScript.Debug.Log("Lerp(0, 10, 0.5) = " + lerpResult);
+
+				float inverseLerpResult = Utils.MathfInverseLerp(0.0f, 10.0f, 5.0f);
+				CSharpScript.Debug.Log("InverseLerp(0, 10, 5) = " + inverseLerpResult);
+
+				float floatClampResult = Utils.MathfClamp(15.0f, 0.0f, 10.0f);
+				CSharpScript.Debug.Log("FloatClamp(15, 0, 10) = " + floatClampResult);
+
+				int intClampResult = Utils.MathiClamp(15, 0, 10);
+				CSharpScript.Debug.Log("IntClamp(15, 0, 10) = " + intClampResult);
+			}
+        }
 
         public void OnDestroy()
         {
-            Debug.Log("TestGameObject: Cleaning up...");
+            CSharpScript.Debug.Log("TestGameObject: Cleaning up...");
         }
     }
 }

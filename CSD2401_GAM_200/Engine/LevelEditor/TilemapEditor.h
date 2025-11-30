@@ -49,7 +49,7 @@ struct TilesetData {
     int totalTiles;          // Total number of tiles
 
     TilesetData()
-        : textureID(0), tileWidth(32), tileHeight(32),
+        : textureID(0), tileWidth(64), tileHeight(64),
         tilesPerRow(8), tilesPerColumn(8), totalTiles(64) {
     }
 };
@@ -142,6 +142,19 @@ public:
      */
     void ClearTilemap();
 
+    /**
+         * @brief Load a tilemap file and create GameObjects for rendering in the game
+         * This is a static helper function that can be called from anywhere to render a tilemap
+         * @param filepath Path to .tilemap file
+         * @param tilemapPosition World position where tilemap should be placed
+         * @param namePrefix Prefix for created GameObject names
+         * @return Vector of created GameObject pointers
+         */
+    static std::vector<class GameObject*> LoadAndCreateTilemapGameObjects(
+        const std::string& filepath,
+        const vec2& tilemapPosition = vec2(0.0f, 0.0f),
+        const std::string& namePrefix = "Tilemap");
+
 private:
     // Rendering functions
     void RenderTilesetPanel();
@@ -219,8 +232,6 @@ private:
     // Tileset loading
     char tilesetPath[256] = "";
     bool showTilesetLoadDialog;
-    int tempTileWidth;
-    int tempTileHeight;
 
     // New tilemap dialog
     bool showNewTilemapDialog;

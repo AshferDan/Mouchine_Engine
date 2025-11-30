@@ -115,6 +115,8 @@ void CoreEngine::InitSystems()
     scriptSystem = AddSystem<ScriptSystem>();
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
+    pauseMenuLogicSystem = AddSystem<PauseMenuLogicSystem>();
+    winLoseLogicSystem = AddSystem<WinLoseLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
     //eventSystem = AddSystem<EventSystem>();
@@ -186,6 +188,27 @@ void CoreEngine::GameLoop()
             level->LoadLevel(m_pendingScene);
             std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
+            // Reset pause menu system (UI was destroyed during scene load)
+            if (pauseMenuLogicSystem)
+            {
+                pauseMenuLogicSystem->Initialize();
+                std::cout << "[CoreEngine] Pause menu system reset" << std::endl;
+            }
+
+            // Reset game timer system
+            if (gameTimerSystem)
+            {
+                gameTimerSystem->Initialize();
+                std::cout << "[CoreEngine] Game timer system reset" << std::endl;
+            }
+
+            // Reset win zone logic system
+            if (winLoseLogicSystem)
+            {
+                winLoseLogicSystem->Initialize();
+                std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
+            }
+
             // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
             if (m_autoPlayAfterLoad)
             {
@@ -196,6 +219,13 @@ void CoreEngine::GameLoop()
             else
             {
                 std::cout << "[CoreEngine] Auto-play flag is FALSE - NOT entering play mode\n";
+            }
+
+            // Unpause the game after scene load completes
+            if (m_gamePause)
+            {
+                std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
+                SetGamePaused(false);
             }
 
             m_pendingScene = "";
@@ -240,8 +270,12 @@ void CoreEngine::GameLoop()
             g_systemTimings[imguiSystem->GetName()] = 0.0;
         if (menuLogicSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if (pauseMenuLogicSystem)
+            g_systemTimings[pauseMenuLogicSystem->GetName()] = 0.0;
         if (timerSystem)
             g_systemTimings[menuLogicSystem->GetName()] = 0.0;
+        if (gameTimerSystem)
+            g_systemTimings[gameTimerSystem->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
@@ -339,6 +373,27 @@ void CoreEngine::GameLoop()
                 stepOnce = false; // Reset after processing one frame
             }
 
+            // Pause menu must update even when game is paused to handle button clicks
+            if (pauseMenuLogicSystem)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                pauseMenuLogicSystem->Update(static_cast<float>(fixed_dt));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[pauseMenuLogicSystem->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
+
+            // Win lone logic system
+            if (winLoseLogicSystem)
+            {
+                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                winLoseLogicSystem->Update(static_cast<float>(fixed_dt));
+                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                g_systemTimings[winLoseLogicSystem->GetName()] = ms;
+                g_totalLoopTime += ms;
+            }
             // In step mode, only process ONE timestep then break
             if (stepMode)
                 break;
@@ -387,6 +442,20 @@ void CoreEngine::GameLoop()
         if (timerSystem)
         {
             timerSystem->Update(static_cast<float>(delta_time));
+        }
+
+        if (gameTimerSystem)
+        {
+            std::chrono::high_resolution_clock::time_point sysStart =
+                std::chrono::high_resolution_clock::now();
+
+            gameTimerSystem->Update(static_cast<float>(delta_time));
+
+            std::chrono::high_resolution_clock::time_point sysEnd =
+                std::chrono::high_resolution_clock::now();
+            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+            g_systemTimings[gameTimerSystem->GetName()] = ms;
+            g_totalLoopTime += ms;
         }
 
         if (imguiSystem)
@@ -484,7 +553,7 @@ void CoreEngine::update_time(double fps_calc_interval)
 
 void CoreEngine::SetGamePaused(bool paused)
 {
-    std::cout << (m_gamePause ? "Game is paused\n" : "Game is resuming\n");
+    std::cout << (paused ? "Game is paused\n" : "Game is resuming\n");
     if (m_gamePause == paused)
     {
         return;
@@ -492,12 +561,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    if (audioEngine && levelEditor)
+    if (audioManager)
     {
-        std::string bgmChannel = levelEditor->GetCurrentBGMChannel();
-        if (!bgmChannel.empty())
-        {
-            audioEngine->pauseSound(bgmChannel, paused);
-        }
+        audioManager->PauseAllSounds(paused);
     }
 }
