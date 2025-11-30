@@ -229,7 +229,7 @@ namespace API {
      */
     void SetGravBool(const std::string&,bool);
 
-    void SetFiction(const std::string&, float);
+    void SetFriction(const std::string&, float);
     void SetMass(const std::string&, float);
 #pragma endregion
 

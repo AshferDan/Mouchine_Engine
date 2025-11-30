@@ -204,7 +204,7 @@ static void Internal_SetMass(MonoString* objectName, float mass)
 static void Internal_SetFriction(MonoString* objectName, float friction)
 {
     char* name = mono_string_to_utf8(objectName);
-    API::SetFiction(name, friction);
+    API::SetFriction(name, friction);
     mono_free(name);
 }
 
