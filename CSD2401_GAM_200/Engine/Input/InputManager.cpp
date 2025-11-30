@@ -382,10 +382,10 @@ void InputManager::Update(float dt)
     static float HERO_JUMP_FORCE = 1000.0f;
     static float HERO_JUMP_DURATION = 0.4f;
     static float HERO_FRICTION_COEFFICIENT = 5.0f;
-    static float HERO_KNOCKBACK_FORCE = 800.0f;         // Sustained push force
+    static float HERO_KNOCKBACK_FORCE = 800.0f;
     static float HERO_KNOCKBACK_DURATION = 0.2f;
-    static float HERO_KNOCKBACK_IMPULSE_X = 300.0f;     // Instant horizontal velocity change
-    static float HERO_KNOCKBACK_IMPULSE_Y = 100.0f;     // Instant vertical velocity change
+    static float HERO_KNOCKBACK_IMPULSE_X = 300.0f;
+    static float HERO_KNOCKBACK_IMPULSE_Y = 100.0f;
 
     GameObject* player = nullptr;
 
@@ -513,7 +513,7 @@ void InputManager::Update(float dt)
     }
     else
     {
-        // No movement keys pressed - remove movement force
+        // No movement keys pressed remove movement force
         forcesManager.RemoveForcesByType(ForceType::Move);
 
         // Add friction to slow down (only if not already present)
@@ -562,7 +562,7 @@ void InputManager::Update(float dt)
     physics->GetVelocity(vx, vy);
 
     // ===== ENEMY COLLISION HANDLING ===== //
-    // Check if colliding with enemies and apply knockback (impulse + force)
+    // Check if colliding with enemies and apply knockback
     if (physics->isCollidingLeft && physics->leftCollisionLayer == CollisionLayer::Enemy) {
         // Enemy on left, push player right
 
