@@ -145,6 +145,94 @@
             "endRow": 11,
             "endCol": 5,
             "fps": 12.0
+          },
+          {
+            "name": "Glide_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 0,
+            "endRow": 2,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Glide_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 0,
+            "endRow": 2,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Roll_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 5,
+            "fps": 12.0
+          },
+          {
+            "name": "Roll_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 5,
+            "fps": 12.0
+          },
+          {
+            "name": "GroundPound_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 10,
+            "startCol": 4,
+            "endRow": 10,
+            "endCol": 9,
+            "fps": 10.0
+          },
+          {
+            "name": "GroundPound_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 10,
+            "startCol": 4,
+            "endRow": 10,
+            "endCol": 9,
+            "fps": 10.0
+          },
+          {
+            "name": "Dash_L",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Dash_R",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 10.0
           }
         ]
       },
