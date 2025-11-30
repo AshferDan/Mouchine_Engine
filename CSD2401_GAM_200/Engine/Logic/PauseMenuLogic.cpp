@@ -1,8 +1,25 @@
+/* Start Header ************************************************************************/
+/*!
+\file       PauseMenuLogic.cpp
+\author     Leck Xin Yee [100% - 309 lines]
+\par        xinyee.leck@digipen.edu
+\date       November, 28, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "PauseMenuLogic.h"
 #include "core.h"
 #include "LevelEditor.h"
 #include <iostream>
 
+/**
+ * @brief Initializes all pause menu state variables.
+ */
 void PauseMenuLogicSystem::Initialize()
 {
     isPauseMenuActive = false;
@@ -11,6 +28,9 @@ void PauseMenuLogicSystem::Initialize()
     pendingSceneChange = false;
 }
 
+/**
+ * @brief Main update loop handling pause menu activation, UI movement, hover/click logic, and delayed scene actions.
+ */
 void PauseMenuLogicSystem::Update(float dt)
 {
     // check if we're in play mode
@@ -180,6 +200,9 @@ void PauseMenuLogicSystem::Update(float dt)
     }
 }
 
+/**
+ * @brief Creates all UI elements for the pause menu.
+ */
 void PauseMenuLogicSystem::CreatePauseMenuUI()
 {
     if (hasCreatedUI)
@@ -217,7 +240,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     titleTransform->posY = 110.0f;
     titleTransform->scaleX = 400.0f;
     titleTransform->scaleY = 0.0f;
-    auto* titleText = title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* titleText = title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // resume button
     GameObject* resumeBtn = factory.CreateGameObject("PauseResumeButton");
@@ -230,8 +254,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     resumeRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     resumeRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
     resumeRender->SetLayer(102);
-    auto* resumeText = resumeBtn->AddComponent<TextComponent>(
+    resumeBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Resume", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* resumeText = resumeBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Resume", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // restart button
     GameObject* restartBtn = factory.CreateGameObject("PauseRestartButton");
@@ -244,8 +270,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     restartRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     restartRender->SetLayer(102);
-    auto* restartText = restartBtn->AddComponent<TextComponent>(
+    restartBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* restartText = restartBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // settings button
     GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
@@ -258,8 +286,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(102);
-    auto* settingsText = settingsBtn->AddComponent<TextComponent>(
+    settingsBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* settingsText = settingsBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // main menu button
     GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
@@ -272,8 +302,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     mainMenuRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     mainMenuRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     mainMenuRender->SetLayer(102);
-    auto* mainMenuText = mainMenuBtn->AddComponent<TextComponent>(
+    mainMenuBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* mainMenuText = mainMenuBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
 
@@ -281,6 +313,9 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     SetPauseMenuVisible(false);
 }
 
+/**
+ * @brief Destroys all pause menu UI elements.
+ */
 void PauseMenuLogicSystem::DestroyPauseMenuUI()
 {
     if (!hasCreatedUI)
@@ -312,6 +347,9 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
     std::cout << "[PauseMenu] UI destroyed" << std::endl;
 }
 
+/**
+ * @brief Shows or hides pause menu UI elements.
+ */
 void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
 {
     auto& factory = GameObjectFactory::Instance();
@@ -336,6 +374,9 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
     }
 }
 
+/**
+ * @brief Toggles the pause menu open or closed and pauses/unpauses the game.
+ */
 void PauseMenuLogicSystem::TogglePauseMenu()
 {
     // create ui on first toggle if not created
@@ -354,6 +395,9 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     std::cout << "[PauseMenu] Pause menu " << (isPauseMenuActive ? "opened" : "closed") << std::endl;
 }
 
+/**
+ * @brief Checks whether the mouse overlaps a UI button area.
+ */
 bool PauseMenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mouseY)
 {
     if (!button) return false;
@@ -362,9 +406,12 @@ bool PauseMenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double
     auto* tx = button->GetComponent<TransformComponent>();
     if (!tx) return false;
 
-    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, mouseX, mouseY);
+    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
+/**
+ * @brief Updates button texture based on hover state.
+ */
 void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
 {
     auto& factory = GameObjectFactory::Instance();

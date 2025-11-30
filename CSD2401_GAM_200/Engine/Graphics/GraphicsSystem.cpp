@@ -234,6 +234,7 @@ void GraphicsSystem::Initialize()
 
     glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
         {
+            (void)win;
             if (focused == GLFW_FALSE)
             {
                 CORE->SetGamePaused(true);
@@ -693,9 +694,10 @@ void GraphicsSystem::Update(float)
                         // calculate y relative to viewport height
                         if (needsTopAlignment[textComp])
                         {
-                            float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+                            float rHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+                            //float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
                             float offsetFromTop = 110.0f; // distance from top edge
-                            y = renderHeight - offsetFromTop;
+                            y = rHeight - offsetFromTop;
                         }
                         else
                         {
@@ -752,7 +754,7 @@ void GraphicsSystem::Update(float)
     }
 
     if (currentSelection_ColliderOnly.exist) {
-        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, { 1,1,0.4,1 }, vp);       // draw yellow outline
+        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, { 1.0f,1.0f,0.4f,1.0f }, vp);       // draw yellow outline
     }
     if (currentSelection.exist) {
         DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 1,1,1,1 }, vp);         // draw white outline

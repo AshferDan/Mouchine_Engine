@@ -197,7 +197,7 @@ public:
 
     void Viewport_HighlightGO();
 
-    void RenderEventComponent(GameObject* obj);
+    void RenderEventComponent(EventComponent* ec,GameObject* obj);
 
 private:
     /**
@@ -241,6 +241,7 @@ enum ComponentType {
     Transform = 0,
     Render,
     Camera,
+    Event,
     Misc
 };
 extern std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;
@@ -266,8 +267,6 @@ void GOCreationMenu_Render();
  * @brief Spawns specified GO in menu ^
  */
 void GOCreationMenu_Spawn();
-
-void StressTest_Spawn();
 
 /**
   * @brief 1/2 functions for drag and drop operations within asset browser. This one is for sending. Sends a payload with data + leaves a trailing text for users to see what file is being moved.
@@ -322,11 +321,6 @@ void EditorLayout_LoadPopUp();
  * @param displayText     text to display when hovering
  */
 void CreateHintText(std::string const& displayText);
-
-/**
- * @brief Handles the management of the spawning 1000 Gos
- */
-void M2_RenderStressTest();
 
 void AudioAssetsPanel_Render();
 
