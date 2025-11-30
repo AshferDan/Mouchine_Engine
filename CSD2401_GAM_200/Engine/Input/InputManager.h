@@ -26,6 +26,13 @@ Technology is prohibited.
 #include "imgui.h"
 #include <imgui_impl_glfw.h>
 #include "audio.h"
+#include <map>
+
+enum KEY_STATE {
+	KEY_STATE_RELEASE,
+	KEY_STATE_PRESS,
+	KEY_STATE_HOLD,
+};
 
 /**
  * @class InputManager
@@ -67,7 +74,15 @@ public:
      * @return "Input System"
      */
     std::string GetName() override;
+	// Keyboard Input
+	bool IsKeyPressed(int key);
+	bool IsKeyReleased(int key);
+	bool IsKeyHeld(int key);
 
+	// Mouse Input
+	bool IsMouseButtonPressed(int button);
+	bool IsMouseButtonReleased(int button);
+	bool IsMouseButtonHeld(int button);
     // ------------------- Getters -------------------
 
     /**
@@ -139,6 +154,9 @@ private:
     double mouseX, mouseY;
     double scrollX, scrollY;
 
+	std::map<int, KEY_STATE> m_keyStates;
+	std::map<int, KEY_STATE> m_mouseButtonStates;
+
     // Movement and jump
     double movementspeed = 300.f;
     bool isJumping = false;
@@ -150,6 +168,35 @@ private:
     float footstepTimer = 0.0f;
     float footstepInterval = 0.4f; // time between footstep sounds
     EntityID cachedPlayerID = 0;
+
+    // ===== ABILITY SYSTEM VARIABLES =====
+    // Wall Kick
+    bool isWallKicking = false;
+    float wallKickTimer = 0.0f;
+    float wallKickCooldownTimer = 0.0f;
+    bool wallKickKeyPressed = false;
+
+    // Ground Pound
+    bool isGroundPounding = false;
+    float groundPoundPauseTimer = 0.0f;
+    bool groundPoundKeyPressed = false;
+
+    // Roll
+    bool isRolling = false;
+    float rollTimer = 0.0f;
+    bool rollKeyPressed = false;
+
+    // Glide
+    bool isGliding = false;
+    float glideCooldownTimer = 0.0f;
+    bool glideKeyPressed = false;
+
+    // Wall Slide
+    bool isWallSliding = false;
+
+    // Double Jump
+    int numberOfJumpsUsed = 0;
+    int maxJumps = 2; // Allow double jump
 };
 
 #endif

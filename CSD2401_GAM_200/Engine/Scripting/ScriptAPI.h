@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptAPI.h
-\author     Jonathan Fam Qian Wei [100% - 94 lines]
+\author     Jonathan Fam Qian Wei [100% - 184 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -29,6 +29,7 @@ Technology is prohibited.
 #include "CollisionSystem.h"
 #include "Physics.h"
 #include "RenderComponent.h"
+#include "TextComponent.h"
 #include "Animator.hpp"
 #include "ResourceManager.h"
 #include "audio.h"
@@ -38,6 +39,8 @@ Technology is prohibited.
 #include "CameraComponent.h"
 #include "CameraManager.h"
 #include <functional>
+#include "MathLib.h"
+#include "InputManager.h"
 
     using TimerCallback = std::function<void()>;
     using TimerID = unsigned int;
@@ -226,6 +229,8 @@ namespace API {
      */
     void SetGravBool(const std::string&,bool);
 
+    void SetFriction(const std::string&, float);
+    void SetMass(const std::string&, float);
 #pragma endregion
 
 #pragma region Transform
@@ -281,6 +286,61 @@ namespace API {
 
 #pragma endregion
 
+#pragma region Text
+    /**
+     * @brief Sets the text content of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     * @param text The text content to set.
+     */
+    void SetText(const std::string&, const std::string&);
+
+    /**
+     * @brief Gets the text content of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     */
+    std::string GetText(const std::string&);
+
+    /**
+     * @brief Sets the text color of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     * @param color The color (RGBA).
+     */
+    void SetTextColor(const std::string&, vec4);
+
+    /**
+     * @brief Gets the text color of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     */
+    vec4 GetTextColor(const std::string&);
+
+    /**
+     * @brief Sets the text scale of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     * @param scale The scale factor.
+     */
+    void SetTextScale(const std::string&, float);
+
+    /**
+     * @brief Gets the text scale of a GameObject's TextComponent.
+     * @param objectName The name of the GameObject.
+     */
+    float GetTextScale(const std::string&);
+
+    /**
+     * @brief Sets whether the text is rendered in screen space.
+     * @param objectName The name of the GameObject.
+     * @param screenSpace True for screen space, false for world space.
+     */
+    void SetTextScreenSpace(const std::string&, bool);
+
+    /**
+     * @brief Gets whether the text is rendered in screen space.
+     * @param objectName The name of the GameObject.
+     */
+    bool GetTextScreenSpace(const std::string&);
+
+#pragma endregion
+
 #pragma region Components
     void SetComponentActive(const std::string& objectName, const std::string& componentName, bool active);
     void RemoveComponent(const std::string& objectName, const std::string& componentName);
@@ -308,6 +368,17 @@ namespace API {
      * @param objectName The name of the GameObject.
      */
     void AddPhysicComponent(const std::string&);
+
+    /**
+     * @brief Adds a Text component to a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param fontPath The file path to the font.
+     * @param fontSize The size of the font.
+     * @param text The initial text content.
+     * @param color The text color (RGBA).
+     * @param screenSpace Whether to render in screen space.
+     */
+    void AddTextComponent(const std::string&, const std::string&, unsigned int, const std::string&, vec4, bool);
 
 #pragma endregion
 
@@ -383,10 +454,16 @@ namespace API {
 
 
 #pragma region Misc
+    double GetDelta_Time();
+    double GetFixedDelta_time();
+    double GetFramePerSecond();
+
     int RandomNumberGen(int, int);
-    float GetDelta_Time();
-    float GetFixedDelta_time();
-    float GetFramePerSecond();
+    float fLerp(float a, float b, float t);
+    float fInverseLerp(float a, float b, float value);
+    float fClamp(float value, float min, float max);
+    int iClamp(int value, int min, int max);
+
 #pragma endregion
 
 #pragma region Scripting
@@ -394,8 +471,12 @@ namespace API {
 #pragma endregion
 
 #pragma region Input
-    bool IsKeyDown(int key);
-    bool IsMouseButtonDown(int button);
+    bool IsKeyPressed(int key);
+    bool IsKeyReleased(int key);
+    bool IsKeyHeld(int key);
+    bool IsMouseButtonPressed(int button);
+    bool IsMouseButtonReleased(int button);
+    bool IsMouseButtonHeld(int button);
     float GetMouseX();
     float GetMouseY();
     float GetMouseWorldX();

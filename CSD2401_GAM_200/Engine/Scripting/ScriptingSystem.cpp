@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ScriptingSystem.cpp
-\author     Jonathan Fam Qian Wei [100% - 420 lines]
+\author     Jonathan Fam Qian Wei [100% - 825 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -194,6 +194,20 @@ static vec2 Internal_GetVelocity(MonoString* objectName)
     return result;
 }
 
+static void Internal_SetMass(MonoString* objectName, float mass)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetMass(name, mass);
+    mono_free(name);
+}
+
+static void Internal_SetFriction(MonoString* objectName, float friction)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetFriction(name, friction);
+    mono_free(name);
+}
+
 // === Collision ===
 static void Internal_SetStatic(MonoString *objectName, bool isStatic)
 {
@@ -286,6 +300,82 @@ static void Internal_AddPhysicsComponent(MonoString *objectName)
     char *name = mono_string_to_utf8(objectName);
     API::AddPhysicComponent(name);
     mono_free(name);
+}
+
+static void Internal_AddTextComponent(MonoString* objectName, MonoString* fontPath, unsigned int fontSize, MonoString* text, float r, float g, float b, float a, bool screenSpace)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* font = mono_string_to_utf8(fontPath);
+    char* txt = mono_string_to_utf8(text);
+    vec4 color = {r, g, b, a};
+    API::AddTextComponent(objName, font, fontSize, txt, color, screenSpace);
+    mono_free(objName);
+    mono_free(font);
+    mono_free(txt);
+}
+
+// === Text ===
+static void Internal_SetText(MonoString* objectName, MonoString* text)
+{
+    char* name = mono_string_to_utf8(objectName);
+    char* txt = mono_string_to_utf8(text);
+    API::SetText(name, txt);
+    mono_free(name);
+    mono_free(txt);
+}
+
+static MonoString* Internal_GetText(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    std::string result = API::GetText(name);
+    mono_free(name);
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+
+static void Internal_SetTextColor(MonoString* objectName, float r, float g, float b, float a)
+{
+    char* name = mono_string_to_utf8(objectName);
+    vec4 color = {r, g, b, a};
+    API::SetTextColor(name, color);
+    mono_free(name);
+}
+
+static vec4 Internal_GetTextColor(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    vec4 result = API::GetTextColor(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetTextScale(MonoString* objectName, float scale)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetTextScale(name, scale);
+    mono_free(name);
+}
+
+static float Internal_GetTextScale(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    float result = API::GetTextScale(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetTextScreenSpace(MonoString* objectName, bool screenSpace)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::SetTextScreenSpace(name, screenSpace);
+    mono_free(name);
+}
+
+static bool Internal_GetTextScreenSpace(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    bool result = API::GetTextScreenSpace(name);
+    mono_free(name);
+    return result;
 }
 
 static void Internal_AddSound(MonoString* name, MonoString* filepath, bool loop, float volume, float pitch,MonoString* category) {
@@ -473,14 +563,30 @@ static float Internal_GetFramesPerSecond() {
 
 
 // === Input ===
-static bool Internal_IsKeyDown(int key)
+static bool Internal_IsKeyPressed(int key)
 {
-    return API::IsKeyDown(key);
+    return API::IsKeyPressed(key);
+}
+static bool Internal_IsKeyReleased(int key)
+{
+    return API::IsKeyReleased(key);
+}
+static bool Internal_IsKeyHeld(int key)
+{
+    return API::IsKeyHeld(key);
 }
 
-static bool Internal_IsMouseButtonDown(int button)
+static bool Internal_IsMouseButtonPressed(int button)
 {
-    return API::IsMouseButtonDown(button);
+    return API::IsMouseButtonPressed(button);
+}
+static bool Internal_IsMouseButtonReleased(int button)
+{
+    return API::IsMouseButtonReleased(button);
+}
+static bool Internal_IsMouseButtonHeld(int button)
+{
+    return API::IsMouseButtonHeld(button);
 }
 
 static float Internal_GetMouseX()
@@ -605,6 +711,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Physics::SetGravity", (void *)Internal_SetGravity);
     mono_add_internal_call("CSharpScript.Physics::SetStatic", (void *)Internal_SetStatic);
     mono_add_internal_call("CSharpScript.Physics::GetVelocity", (void*)Internal_GetVelocity);
+    mono_add_internal_call("CSharpScript.Physics::SetMass", (void*)Internal_SetMass);
+    mono_add_internal_call("CSharpScript.Physics::SetFriction", (void*)Internal_SetFriction);
 
     // === Collision ===
     mono_add_internal_call("CSharpScript.Collision::SetCollisionShape", (void *)Internal_SetCollisionShape);
@@ -622,7 +730,18 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Components::AddRenderComponent", (void *)Internal_AddRenderComponent);
     mono_add_internal_call("CSharpScript.Components::AddCollisionComponent", (void *)Internal_AddCollisionComponent);
     mono_add_internal_call("CSharpScript.Components::AddPhysicsComponent", (void *)Internal_AddPhysicsComponent);
-    
+    mono_add_internal_call("CSharpScript.Components::AddTextComponent", (void*)Internal_AddTextComponent);
+
+    // === Text ===
+    mono_add_internal_call("CSharpScript.Text::SetText", (void*)Internal_SetText);
+    mono_add_internal_call("CSharpScript.Text::GetText", (void*)Internal_GetText);
+    mono_add_internal_call("CSharpScript.Text::SetTextColor", (void*)Internal_SetTextColor);
+    mono_add_internal_call("CSharpScript.Text::GetTextColor", (void*)Internal_GetTextColor);
+    mono_add_internal_call("CSharpScript.Text::SetTextScale", (void*)Internal_SetTextScale);
+    mono_add_internal_call("CSharpScript.Text::GetTextScale", (void*)Internal_GetTextScale);
+    mono_add_internal_call("CSharpScript.Text::SetTextScreenSpace", (void*)Internal_SetTextScreenSpace);
+    mono_add_internal_call("CSharpScript.Text::GetTextScreenSpace", (void*)Internal_GetTextScreenSpace);
+
     // === Audio ===
     mono_add_internal_call("CSharpScript.Audio::AddSound", (void*)Internal_AddSound);
     mono_add_internal_call("CSharpScript.Audio::PlaySound", (void*)Internal_PlaySound);
@@ -661,10 +780,19 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Utils::GetDelta_Time", (void*)Internal_GetDelta_Time);
     mono_add_internal_call("CSharpScript.Utils::GetFixed_Delta_Time", (void*)Internal_GetFixed_Delta_Time);
     mono_add_internal_call("CSharpScript.Utils::GetFramesPerSecond", (void*)Internal_GetFramesPerSecond);
+	mono_add_internal_call("CSharpScript.Utils::MathfLerp", (void*)API::fLerp);
+	mono_add_internal_call("CSharpScript.Utils::MathfInverseLerp", (void*)API::fInverseLerp);
+	mono_add_internal_call("CSharpScript.Utils::MathfClamp", (void*)API::fClamp);
+	mono_add_internal_call("CSharpScript.Utils::MathiClamp", (void*)API::iClamp);
 
     // === Input ===
-    mono_add_internal_call("CSharpScript.Input::IsKeyDown", (void*)Internal_IsKeyDown);
-    mono_add_internal_call("CSharpScript.Input::IsMouseButtonDown", (void*)Internal_IsMouseButtonDown);
+    mono_add_internal_call("CSharpScript.Input::IsKeyPressed", (void*)Internal_IsKeyPressed);
+    mono_add_internal_call("CSharpScript.Input::IsKeyReleased", (void*)Internal_IsKeyReleased);
+    mono_add_internal_call("CSharpScript.Input::IsKeyHeld", (void*)Internal_IsKeyHeld);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonPressed", (void*)Internal_IsMouseButtonPressed);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonReleased", (void*)Internal_IsMouseButtonReleased);
+    mono_add_internal_call("CSharpScript.Input::IsMouseButtonHeld", (void*)Internal_IsMouseButtonHeld);
+
     mono_add_internal_call("CSharpScript.Input::GetMouseX", (void*)Internal_GetMouseX);
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);

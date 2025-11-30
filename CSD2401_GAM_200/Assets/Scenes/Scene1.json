@@ -2,7 +2,7 @@
   "SceneSettings": {
     "backgroundMusic": {
       "name": "bgm",
-      "path": "../Assets/audio/level_1.wav",
+      "path": "../Assets/audio/sneaky_bgm.wav",
       "looping": true,
       "volume": 0.5,
       "channel": "bgm_channel"
@@ -18,12 +18,20 @@
       {
         "event": "PlayerLand",
         "sound": "footstep_sfx"
+      },
+      {
+        "event": "UI_Click",
+        "sound": "menu_click"
+      },
+      {
+        "event": "UI_Hover",
+        "sound": "menu_hover"
       }
     ],
     "sounds": [
       {
         "category": "music",
-        "filepath": "../Assets/audio/level_1.wav",
+        "filepath": "../Assets/audio/sneaky_bgm.wav",
         "loop": true,
         "name": "bgm",
         "pitch": 1.0,
@@ -44,6 +52,22 @@
         "name": "jump_sfx",
         "pitch": 1.0,
         "volume": 0.800000011920929
+      },
+      {
+        "name": "menu_click",
+        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_hover",
+        "filepath": "../Assets/Audio/hovering_Button.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "sfx"
       }
     ]
   },
@@ -325,8 +349,30 @@
     },
 
     {
-      "name": "MainCamera",
+      "name": "WinZone",
       "localID": 8,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [-800.0, 0.0],
+        "scale": [150.0, 150.0],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [0.0, 1.0, 0.0, 1.0]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default"
+      },
+      "children": []
+    },
+    
+    {
+      "name": "MainCamera",
+      "localID": 9,
       "parentID": -1,
       "active": true,
 
@@ -344,23 +390,27 @@
       "children": []
     },
     {
-      "name": "Text FPS",
+      "name": "LevelTimerText",
+      "localID": 10,
+      "parentID": -1,
+      "active": true,
+
+      "TextComponent": {
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize":48,
+        "text": "00:00",
+        "color": [0.0, 0.0, 0.0, 1.0],
+        "scale": 1.0,
+        "screenSpace": true
+      },
+
       "TransformComponent": {
-        "pos": [100, 100],
+        "pos": [50, 630],
         "scale": [1, 1],
         "rotation": 0.0
       },
-      "RenderComponent": {
-        "shapeType": "Square"
-      },
-      "TextComponent": {
-        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-        "fontSize": 50,
-        "text": "FPS",
-        "color": [1.0, 1.0, 1.0, 1.0],
-        "scale": 1.0,
-        "screenSpace": true
-      }
+
+      "children": []
     }
   ]
 }

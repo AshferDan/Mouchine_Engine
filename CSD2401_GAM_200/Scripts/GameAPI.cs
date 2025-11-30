@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameAPI.cs
-\author     Jonathan Fam Qian Wei [100% - 125 lines]
+\author     Jonathan Fam Qian Wei [100% - 372 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -12,6 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
@@ -80,15 +81,12 @@ namespace CSharpScript
     /// </summary>
     public enum CollisionLayer
     {
-        /// <summary>Default collision layer.</summary>
-        Default = 0,
-        /// <summary>Player collision layer.</summary>
-        Player = 1,
-        /// <summary>Enemy collision layer.</summary>
+        Player = 0,
+        Ground = 1,
         Enemy = 2,
-        /// <summary>Ground collision layer.</summary>
-        Ground = 3
-        // Add more layers as defined in your C++ Collision.h
+        Platform = 3,
+        Default = 4
+        // Values must match the C++ enum in ColliderComponent.h
     }
 
     /// <summary>
@@ -291,6 +289,24 @@ namespace CSharpScript
             GetScale_Internal(objectName, out float x, out float y);
             return new vec2(x, y);
         }
+
+        // world to screen nonsense, based off unity's TransformPoint
+        public static vec2 TransformPoint(string objectName, vec2 localPoint)
+        {
+            vec2 pos = Transform.GetPosition(objectName);
+            vec2 scale = Transform.GetScale(objectName);
+            float rot = Transform.GetRotation(objectName);
+
+            // local pos
+            float localx = localPoint.x * scale.x;
+            float localy = localPoint.y * scale.y;
+
+            // world pos (takes int account rotation MATRIX NIGHTMARENIGHTMARENIGHTMARE
+            float worldx = pos.x + (localx * (float)Math.Sin(rot) - localy * (float)Math.Sin(rot));
+            float worldy = pos.y + (localx * (float)Math.Sin(rot) + localy * (float)Math.Cos(rot));
+
+            return new vec2(worldx, worldy);
+        }
     }
 
     /// <summary>
@@ -384,8 +400,26 @@ namespace CSharpScript
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetStatic(string objectName, bool isStatic);
 
+        /// <summary>
+        /// Sets the mass of a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="mass">The mass value to set.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetMass(string objectName, float mass);
+
+        /// <summary>
+        /// Sets the friction coefficient of a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="friction">The friction coefficient value to set.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFriction(string objectName, float friction);
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern vec2 GetVelocity(string objectName);
+
+        public static vec2 gravity = new vec2(0.0f, -9.81f);
     }
 
     /// <summary>
@@ -502,6 +536,94 @@ namespace CSharpScript
         /// <param name="objectName">The name of the GameObject.</param>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AddPhysicsComponent(string objectName);
+
+        /// <summary>
+        /// Adds a Text component to a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="fontPath">The file path to the font.</param>
+        /// <param name="fontSize">The size of the font.</param>
+        /// <param name="text">The initial text content.</param>
+        /// <param name="r">Red component (0.0 to 1.0).</param>
+        /// <param name="g">Green component (0.0 to 1.0).</param>
+        /// <param name="b">Blue component (0.0 to 1.0).</param>
+        /// <param name="a">Alpha component (0.0 to 1.0).</param>
+        /// <param name="screenSpace">Whether to render in screen space.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddTextComponent(string objectName, string fontPath, uint fontSize, string text, float r, float g, float b, float a, bool screenSpace);
+    }
+
+    /// <summary>
+    /// Text component functions for managing text display.
+    /// </summary>
+    public static class Text
+    {
+        /// <summary>
+        /// Sets the text content of a GameObject's TextComponent.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="text">The text content to set.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetText(string objectName, string text);
+
+        /// <summary>
+        /// Gets the text content of a GameObject's TextComponent.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>The text content.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string GetText(string objectName);
+
+        /// <summary>
+        /// Sets the color of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="r">Red component (0.0 to 1.0).</param>
+        /// <param name="g">Green component (0.0 to 1.0).</param>
+        /// <param name="b">Blue component (0.0 to 1.0).</param>
+        /// <param name="a">Alpha component (0.0 to 1.0).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTextColor(string objectName, float r, float g, float b, float a);
+
+        /// <summary>
+        /// Gets the color of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>The text color as vec4.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern vec4 GetTextColor(string objectName);
+
+        /// <summary>
+        /// Sets the scale of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="scale">The scale factor.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTextScale(string objectName, float scale);
+
+        /// <summary>
+        /// Gets the scale of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>The scale factor.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetTextScale(string objectName);
+
+        /// <summary>
+        /// Sets whether the text is rendered in screen space.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="screenSpace">True for screen space, false for world space.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTextScreenSpace(string objectName, bool screenSpace);
+
+        /// <summary>
+        /// Gets whether the text is rendered in screen space.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>True if in screen space, false if in world space.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool GetTextScreenSpace(string objectName);
     }
 
 
@@ -596,6 +718,14 @@ namespace CSharpScript
         public static extern float GetFixed_Delta_Time();
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float GetFramesPerSecond();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float MathfLerp(float a, float b, float t);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float MathfInverseLerp(float a, float b, float value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float MathfClamp(float value, float min, float max);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int MathiClamp(int value, int min, int max);
     }
 
     public static class Input
@@ -635,11 +765,39 @@ namespace CSharpScript
             Menu = 348
         }
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsKeyPressed(int key);
+        public static vec2 Movement()
+        {
+            float x = 0;
+            if (GetKeyHeld(KeyCode.D)) x += 1;
+            if (GetKeyHeld(KeyCode.A)) x -= 1;
+
+            float y = 0;
+            if (GetKeyHeld(KeyCode.W)) y += 1;
+            if (GetKeyHeld(KeyCode.S)) y -= 1;
+            
+            return new vec2(x, y);
+        }
+
             [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool IsKeyDown(int key);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool IsMouseButtonDown(int button);
+        private static extern bool IsKeyReleased(int key);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsKeyHeld(int key);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsMouseButtonPressed(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsMouseButtonReleased(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsMouseButtonHeld(int button);
+
 
         /// <summary>
         /// Gets the mouse X position in screen coordinates.
@@ -667,22 +825,60 @@ namespace CSharpScript
 
 
         /// <summary>
+        /// Checks if a specific key was pressed in the current frame.
+        /// </summary>
+        /// <param name="key">The KeyCode to check.</param>
+        /// <returns>True if the key was pressed in the current frame.</returns>
+        public static bool GetKeyPressed(KeyCode key)
+        {
+            return IsKeyPressed((int)key);
+        }
+
+        /// <summary>
+        /// Checks if a specific key was released in the current frame.
+        /// </summary>
+        /// <param name="key">The KeyCode to check.</param>
+        /// <returns>True if the key was released in the current frame.</returns>
+        public static bool GetKeyReleased(KeyCode key)
+        {
+            return IsKeyReleased((int)key);
+        }
+
+        /// <summary>
         /// Checks if a specific key is currently held down.
         /// </summary>
         /// <param name="key">The KeyCode to check.</param>
         /// <returns>True if the key is pressed.</returns>
-        public static bool GetKey(KeyCode key)
+        public static bool GetKeyHeld(KeyCode key)
         {
-            return IsKeyDown((int)key);
+            return IsKeyHeld((int)key);
+        }
+
+        /// <summary>
+        /// Checks if a mouse button was pressed in the current frame.
+        /// 0 = Left, 1 = Right, 2 = Middle.
+        /// </summary>
+        public static bool GetMouseButtonPressed(int button)
+        {
+            return IsMouseButtonPressed(button);
+        }
+
+        /// <summary>
+        /// Checks if a mouse button was released in the current frame.
+        /// 0 = Left, 1 = Right, 2 = Middle.
+        /// </summary>
+        public static bool GetMouseButtonReleased(int button)
+        {
+            return IsMouseButtonReleased(button);
         }
 
         /// <summary>
         /// Checks if a mouse button is held down.
         /// 0 = Left, 1 = Right, 2 = Middle.
         /// </summary>
-        public static bool GetMouseButton(int button)
+        public static bool GetMouseButtonHeld(int button)
         {
-            return IsMouseButtonDown(button);
+            return IsMouseButtonHeld(button);
         }
     }
 
