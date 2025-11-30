@@ -15,6 +15,7 @@ Technology is prohibited.
 using CSharpScript;
 using System;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace GameScripts
 {
@@ -60,6 +61,7 @@ namespace GameScripts
         // collision check variables
         private bool _isGrounded = false;
         private bool _bumpedHead = false;
+        private bool _islanding = false;
 
         // jump variables
         public float VerticalVelocity { get; private set; } = 0;
@@ -194,7 +196,8 @@ namespace GameScripts
                     Animation.PlayAnimation(gameObjectName, "Falling");
                     break;
                 case PlayerState.Land:
-                    Animation.PlayAnimation(gameObjectName, "Land");
+                    // commented out because landing is buggy
+                    //Animation.PlayAnimation(gameObjectName, "Land");
                     break;
                 case PlayerState.Dashing:
                     Animation.PlayAnimation(gameObjectName, "Dash");
@@ -290,6 +293,8 @@ namespace GameScripts
             if (_isWallKicking) currState = PlayerState.WallKicking;
             if (_isZiplining) currState = PlayerState.Ziplining;
             if (_isWallSliding) currState = PlayerState.WallSliding;
+            // landing is bugged
+            //if (_islanding) { currState = PlayerState.Land; }
         }
 
         private void HandleGeneralInput()
@@ -365,8 +370,8 @@ namespace GameScripts
 
         private void IsGrounded()
         {
-            _isGrounded = false;
             bool oldIsGrounded = _isGrounded;
+            _isGrounded = false;
             vec2 position = Transform.GetPosition(gameObjectName);
             vec2 scale = Transform.GetScale(gameObjectName);
             float halfWidth = Math.Abs(scale.x) / 2;
@@ -384,7 +389,7 @@ namespace GameScripts
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
-                if (oldIsGrounded)
+                if (!oldIsGrounded)
                 {
                     Audio.PlaySound("land_sfx", "sfx");
                     currState = PlayerState.Land;
@@ -398,7 +403,11 @@ namespace GameScripts
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
-                if (oldIsGrounded) Audio.PlaySound("land_sfx", "sfx");
+                if (!oldIsGrounded)
+                {
+                    //Audio.PlaySound("land_sfx", "sfx");
+                    currState = PlayerState.Land;
+                }
                 return;
             }
 
@@ -408,7 +417,11 @@ namespace GameScripts
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
-                if (oldIsGrounded) Audio.PlaySound("land_sfx", "sfx");
+                if (!oldIsGrounded)
+                {
+                    //Audio.PlaySound("land_sfx", "sfx");
+                    currState = PlayerState.Land;
+                }
                 return;
             }
         }
@@ -690,6 +703,10 @@ namespace GameScripts
             // landing
             if ((_isJumping || _isFalling) && _isGrounded && VerticalVelocity <= 0f)
             {
+                //_islanding = true;
+                if (!_islanding) _islanding = true;
+
+
                 if (_isWallKicking)
                 {
                     StopWallKick();

@@ -43,7 +43,7 @@ namespace GameScripts
             Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.2f, 1.0f, "sfx");
             Audio.AddSound("dash_sfx", "../Assets/audio/Player/Dash.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
 
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png"       , 13, 10, 7, 0, 7, 2, 4.0f);
             Animation.RegisterAnimation("Hero", "Run", "../Assets/spritesheet_R.png"        , 13, 10, 12, 0, 12, 7, 16.0f);

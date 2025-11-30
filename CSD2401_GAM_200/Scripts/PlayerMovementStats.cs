@@ -49,6 +49,9 @@ namespace GameScripts
         // Jump Cut
         public float TimeForUpwardsCancel = 0.02f;
 
+        // land timer
+        public float LandAnimationLength = 0.2f;
+
         // Jump Apex
         public float ApexThreshold = 0.97f;
         public float ApexHangTime = 0.04f;
