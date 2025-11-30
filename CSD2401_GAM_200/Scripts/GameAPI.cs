@@ -12,6 +12,7 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
@@ -80,15 +81,12 @@ namespace CSharpScript
     /// </summary>
     public enum CollisionLayer
     {
-        /// <summary>Default collision layer.</summary>
-        Default = 0,
-        /// <summary>Player collision layer.</summary>
-        Player = 1,
-        /// <summary>Enemy collision layer.</summary>
+        Player = 0,
+        Ground = 1,
         Enemy = 2,
-        /// <summary>Ground collision layer.</summary>
-        Ground = 3
-        // Add more layers as defined in your C++ Collision.h
+        Platform = 3,
+        Default = 4
+        // Values must match the C++ enum in ColliderComponent.h
     }
 
     /// <summary>
@@ -291,6 +289,24 @@ namespace CSharpScript
             GetScale_Internal(objectName, out float x, out float y);
             return new vec2(x, y);
         }
+
+        // world to screen nonsense, based off unity's TransformPoint
+        public static vec2 TransformPoint(string objectName, vec2 localPoint)
+        {
+            vec2 pos = Transform.GetPosition(objectName);
+            vec2 scale = Transform.GetScale(objectName);
+            float rot = Transform.GetRotation(objectName);
+
+            // local pos
+            float localx = localPoint.x * scale.x;
+            float localy = localPoint.y * scale.y;
+
+            // world pos (takes int account rotation MATRIX NIGHTMARENIGHTMARENIGHTMARE
+            float worldx = pos.x + (localx * (float)Math.Sin(rot) - localy * (float)Math.Sin(rot));
+            float worldy = pos.y + (localx * (float)Math.Sin(rot) + localy * (float)Math.Cos(rot));
+
+            return new vec2(worldx, worldy);
+        }
     }
 
     /// <summary>
@@ -402,6 +418,8 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern vec2 GetVelocity(string objectName);
+
+        public static vec2 gravity = new vec2(0.0f, -9.81f);
     }
 
     /// <summary>
@@ -749,6 +767,21 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool IsKeyPressed(int key);
+        public static vec2 Movement()
+        {
+            float x = 0;
+            if (GetKeyHeld(KeyCode.D)) x += 1;
+            if (GetKeyHeld(KeyCode.A)) x -= 1;
+
+            float y = 0;
+            if (GetKeyHeld(KeyCode.W)) y += 1;
+            if (GetKeyHeld(KeyCode.S)) y -= 1;
+            
+            return new vec2(x, y);
+        }
+
+            [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsKeyDown(int key);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool IsKeyReleased(int key);

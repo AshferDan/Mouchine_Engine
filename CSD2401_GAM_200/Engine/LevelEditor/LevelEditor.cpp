@@ -557,7 +557,7 @@ void LevelEditor::RenderMenuBar()
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(250, 350), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Editor Menu##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Scene Manager##LevelEditor", nullptr, ImGuiWindowFlags_NoCollapse))
     {
         ImGui::End();
         return;
