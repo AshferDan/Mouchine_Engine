@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameTimerSystem.cpp
-\author     Leck Xin Yee [100% - ??? lines]
+\author     Leck Xin Yee [100% - 118 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 26, 2025
 
@@ -18,6 +18,9 @@ Technology is prohibited.
 #include <cstdio>
 #include <iostream>
 
+/**
+ * @brief Initializes the countdown timer and updates initial display.
+ */
 void GameTimerSystem::Initialize()
 {
     remainingTime = 30.0f;
@@ -26,6 +29,10 @@ void GameTimerSystem::Initialize()
     UpdateText(30);
 }
 
+/**
+ * @brief Updates timer logic, handles editor/pause conditions, hides timer during win/lose,
+ *        and triggers lose state when time reaches zero.
+ */
 void GameTimerSystem::Update(float dt)
 {
     LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
@@ -106,6 +113,9 @@ void GameTimerSystem::Update(float dt)
     }
 }
 
+/**
+ * @brief Resets timer and updates displayed text.
+ */
 void GameTimerSystem::ResetTimer()
 {
     remainingTime = 30.0f;
@@ -114,6 +124,9 @@ void GameTimerSystem::ResetTimer()
     UpdateText(30);
 }
 
+/**
+ * @brief Decreases the remaining timer value by a given amount.
+ */
 void GameTimerSystem::DecreaseTime(float amount)
 {
     remainingTime -= amount;
@@ -123,6 +136,9 @@ void GameTimerSystem::DecreaseTime(float amount)
     }
 }
 
+/**
+ * @brief Updates the formatted timer text (mm:ss) on the assigned TextComponent.
+ */
 void GameTimerSystem::UpdateText(int totalSeconds)
 {
     // find timer by name
