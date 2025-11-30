@@ -45,7 +45,6 @@ Technology is prohibited.
 #pragma once
 #include "Component.h"
 #include "GameManager.h"
-#include "logic.h"
 
 #include <vector>
 #include <memory>
@@ -56,6 +55,9 @@ Technology is prohibited.
 using EntityID = std::uint32_t;
 enum class EventType;
 struct EventRule;
+
+class EventSystem;
+class EventComponent;
 
 class GameObject {
 public:
@@ -270,9 +272,19 @@ public:
 
     std::vector<GameObject*> GetAllChildren() const;
 
+    /**
+     * @brief Reordering of children - undo
+     */
     void ReorderChildren(const std::vector<EntityID>& order);
 
+    /**
+     * @brief Execute a gameplay action defined by an EventRule.
+     */
     void ExecuteAction(const EventRule& rule, GameObject* other);
+
+    /**
+     * @brief Called by the EventSystem when this GameObject receives an event.
+     */
     virtual void OnEventTriggered(EventType event, GameObject* other);
 
 private:
@@ -282,6 +294,8 @@ private:
     GameObject* parent;
     std::vector<GameObject*> children;                  
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;
+
+    std::string currentlyPlayingSound = "";
 };
 
 void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree);

@@ -1,6 +1,19 @@
+/* Start Header ************************************************************************/
+/*!
+\file       logic.h
+\author     Lee Hwee Min [100% - 54 lines]
+\par        l.hweemin@digipen.edu
+\date       November, 29, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "Component.h"
-#include "gameObject.h"
 #include "MathLib.h"
 
 #include <string>
@@ -8,36 +21,43 @@
 #include <memory>
 
 class GameObject;
+class GameObjectFactory;
 
+/**
+ * @brief All event types that a GameObject may react to.
+ */
 enum class EventType {
     None = 0,
-    OnStart, OnEnable, OnDisable, OnDestroy,                // Lifecycle Events
-    OnUpdate,                                               // Frame Events
-    //OnKeyPressed, OnKeyReleased,                            // Input Events
-    //OnMousePressed, OnMouseReleased, OnMouseOver,           // Mouse Events
-    OnCollisionEnter, OnCollisionStay, OnCollisionExit,     // Physics Events
-    OnTriggerEnter, OnTriggerStay, OnTriggerExit,           //
-    //OnGoalReached, OnFellOutOfMap                           // Gameplay Events
-};
+    OnEnable, OnDisable, OnDestroy,                          // Lifecycle Events
+    OnCollisionEnter, OnCollisionStay, OnCollisionExit,      // Physics Events
+    //OnGoalReached                                          // Gameplay Events
+};  
 
+/**
+ * @brief Actions executed when an EventRule triggers.
+ */
 enum class ActionType {
     None = 0,
-    //Shrink, Grow, ScaleTo, MoveTo, TeleportTo,              // Transform Action
     EnableObject, DisableObject, DestroyObject,             // Object State Action
-    PlaySound, StopSound,                                   // Audio Action
-    //LoadNextLevel, 
-    Respawn, AddScore, TakeDamage,           // Gameplay Action
-    FlashColor                                              // Visual Action
+    PlaySound, StopSound,                                   // Audio Action 
+    Respawn,
 };
 
-// String Conversion
+/**
+ * @brief Convert EventType to string for JSON serialization.
+ */
 const char* EventTypeToString(EventType e);
 EventType StringToEventType(const std::string& s);
 
+/**
+ * @brief Convert ActionType to string for JSON serialization.
+ */
 const char* ActionTypeToString(ActionType a);;
 ActionType StringToActionType(const std::string& s);
 
-// Event Rule
+/**
+ * @brief Each GameObject with an EventComponent holds multiple rules.
+ */
 struct EventRule {
     EventType eventType = EventType::None;
 
@@ -56,6 +76,11 @@ struct EventRule {
     vec4 colorValue = { 1, 1, 1, 1 };
 };
 
+/**
+ * @brief This component stores a list of controlled rules.
+ * Whenever a GameObject receives an event, it checks these rules
+ * to determine which actions to perform.
+ */
 class EventComponent : public IComponent {
 public:
     std::vector<EventRule> rules;
@@ -67,19 +92,23 @@ public:
     
     std::string GetName() const override { return "EventComponent"; }
 };
-
-// Event Payload
-struct Event {
+/**
+ * @brief A queued gameplay event waiting to be processed.
+ */
+struct QueuedEvent {
     EventType type;
     GameObject* target;
     GameObject* other;
 };
 
+/**
+ * @brief The EventSystem acts as a dispatcher
+ */
 class EventSystem {
 public:
-    static std::vector<Event> events;
+    static std::vector<QueuedEvent> events;
 
     static void Raise(EventType type, GameObject* target, GameObject* other = nullptr);
     static void ProcessEvents();
-
+    static void Clear();
 };

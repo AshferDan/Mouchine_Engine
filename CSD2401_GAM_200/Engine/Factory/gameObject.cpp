@@ -1,8 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
 \file       gameObject.cpp
-\author     Jonathan Fam Qian Wei [73% - 68 lines]
-\co-author	Muhammad Ashfer [27% - 25 lines]
+\author     Jonathan Fam Qian Wei [44% - 68 lines]
+\co-author	Muhammad Ashfer [16% - 25 lines]
+\co-author  Lee Hwee Min [39% - 60 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 
@@ -92,6 +93,8 @@ void GameObject::Update(float deltaTime) {
 
    */
 void GameObject::Destroy() {
+    EventSystem::Raise(EventType::OnDestroy, this, nullptr);
+
     for (auto& [type, component] : components) {
         component->Destroy();
     }
@@ -100,7 +103,19 @@ void GameObject::Destroy() {
 
 void GameObject::SetActive(bool active)
 {
+    if (isActive == active)
+        return;
+
     isActive = active; 
+
+    if (active)
+    {
+        EventSystem::Raise(EventType::OnEnable, this, nullptr);
+    }
+    else
+    {
+        EventSystem::Raise(EventType::OnDisable, this, nullptr);
+    }
 
     std::vector<EntityID> familyTree{};
     GetFamilyTree(this, familyTree);
@@ -168,6 +183,9 @@ void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree)
     }
 }
 
+/**
+ * @brief Reorders this GameObject's children based on a new ordering of IDs.
+ */
 void GameObject::ReorderChildren(const std::vector<EntityID>& newOrder) {
     if (children.empty()) return;
 
@@ -194,6 +212,9 @@ void GameObject::ReorderChildren(const std::vector<EntityID>& newOrder) {
     children = reordered;
 }
 
+/**
+ * @brief Execute a gameplay action defined by an EventRule.
+ */
 void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
     switch (rule.action)
     {
@@ -210,43 +231,60 @@ void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
         break;
 
     case ActionType::PlaySound:
-        CORE->GetAudioManager()->PlaySound(rule.stringValue, "");
-        //CORE->GetMessageBus()->Publish(PlaySoundMessage(rule.stringValue));
+        {
+            auto* audioMgr = CORE->GetAudioManager();
+            if (!audioMgr) break;
+
+            // rule.stringValue contains the sound name
+            if (!rule.stringValue.empty())
+            {
+                audioMgr->PlaySound(rule.stringValue, "sfx");
+                std::string currentlyPlayingSound = rule.stringValue;
+
+            }
+        }
         break;
 
     case ActionType::StopSound:
-        //CORE->GetMessageBus()->Publish(PauseSoundMessage(rule.stringValue, true));
-        break;
+        {
+            auto* audio = CORE->GetAudioManager();
+            if (!audio) break;
 
-    //case ActionType::LoadNextLevel:
-    //    GameManager::ChangeState;
-    //    break;
+            // Stop specific sound defined in Event Rule
+            if (!rule.stringValue.empty())
+            {
+                audio->StopSound(rule.stringValue);
+                break;
+            }
+
+            // Stop sound this object is currently playing
+            if (!currentlyPlayingSound.empty())
+            {
+                audio->StopSound(currentlyPlayingSound);
+                currentlyPlayingSound.clear();
+                break;
+            }
+        }
+        break;
 
     case ActionType::Respawn:
     {
         auto* tc = GetComponent<TransformComponent>();
         if (tc) {
             // Respawn here
+            tc->SetPosition(0,0);
         }
         break;
     }
-
-    case ActionType::AddScore:
-       
-        break;
-
-    case ActionType::TakeDamage:
-        break;
-
-    case ActionType::FlashColor:
-        // Example: flash system can animate colorValue for duration = floatValue
-        break;
 
     default:
         break;
     }
 }
 
+/**
+ * @brief Called by the EventSystem when this GameObject receives an event.
+ */
 void GameObject::OnEventTriggered(EventType type, GameObject* other) {
     // Get this object's eventComponent
     auto* ec = GetComponent<EventComponent>();

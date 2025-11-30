@@ -645,6 +645,20 @@ void GameObjectFactory::ReorderRootObjects(const std::vector<EntityID>& order) {
     }
 }
 
+// Check if there is dangling pointers
+bool GameObjectFactory::IsAlive(GameObject* ptr) const
+{
+    auto& gameObjects = GameObjectFactory::GetAllGameObjects();
+    // Loop through all alive game objects
+    for (const auto& obj : gameObjects)
+    {
+        if (obj.get() == ptr)
+            return true;   // pointer is valid and alive
+    }
+
+    return false; // pointer not found = invalid/destroyed
+}
+
 #pragma region M1 Showcase - 2500 GOs Test
 
 // Vector to store all GOs made by test function

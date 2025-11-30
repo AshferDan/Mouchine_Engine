@@ -1,7 +1,7 @@
 /* Start Header************************************************************************ /
 /*!
 \file       ComponentSerialization.cpp
-\author     Lee Hwee Min [100% - 245 lines]
+\author     Lee Hwee Min [100% - 427 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.

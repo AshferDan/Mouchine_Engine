@@ -694,9 +694,10 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             if (ps)
             {
                 ps->ClearCollisionQueue();
-            }
+            }   
         }
-    
+        // Clear event system (for gameObjects)
+        EventSystem::Clear();
 
         // stop/unload audio (if any)
         auto& resourceMgr = ResourceManager::Instance();
@@ -1446,6 +1447,9 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+/**
+ * @brief Record a new undo command into the undo history.
+ */
 void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     
     // Check if undo exceed 20
@@ -1460,6 +1464,9 @@ void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     
 }
 
+/**
+ * @brief Undo the most recent editor action.
+ */
 void LevelEditor::PerformUndo() {
     if (undoStack.empty()) return;
 
@@ -1533,6 +1540,10 @@ void LevelEditor::PerformUndo() {
     //redoStack.push_back(undocmd);
 }
 
+/**
+ * @brief Clears the entire undo history.
+ * Primarily used when loading a new scene or resetting editor state.
+ */
 void LevelEditor::ClearUndoStack() {
     undoStack.clear();
 }

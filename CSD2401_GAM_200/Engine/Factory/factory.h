@@ -306,9 +306,20 @@ public:
 
     GameObject* FindByName(const std::string& name);
 
+    /**
+     * @brief Reorder all current GameObjects.
+     */
     void ReorderRootObjects(const std::vector<EntityID>& order);
 
+    /**
+     * @brief Get the next smallest EntityID
+     */
     EntityID GetSmallestAvailableID() const;
+
+    /**
+     * @brief Check if gameObject is alive
+     */
+    bool IsAlive(GameObject* ptr) const;
 
 private:
     GameObjectFactory() : nextEntityID(1), cloneCounter(0) {}

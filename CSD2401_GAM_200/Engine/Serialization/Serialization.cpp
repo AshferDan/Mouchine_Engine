@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Serialization.cpp
-\author     Lee Hwee Min [100% - ? lines]
+\author     Lee Hwee Min [100% - 402 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 3, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.

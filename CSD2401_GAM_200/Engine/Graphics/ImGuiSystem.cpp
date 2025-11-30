@@ -1,9 +1,9 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ImGuiSystem.cpp
-\author     Guan Shao Jun [17% - 200 lines]
-\co-author	Muhammad Ashfer [76% - 1049 lines]
-            Hwee Min [7% - 82 lines]
+\author     Guan Shao Jun [14% - 200 lines]
+\co-author	Muhammad Ashfer [74% - 1049 lines]
+\co-author  Lee Hwee Min [12% - 181 lines]
 \par        shaojun.g@digipen.edu,
 \date       October 02 2025
 
@@ -2336,19 +2336,12 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
             {
                 static const char* eventNames[] = {
                     "None",
-                    "OnStart",
                     "OnEnable",
                     "OnDisable",
                     "OnDestroy",
-                    "OnUpdate",
                     "OnCollisionEnter",
                     "OnCollisionStay",
                     "OnCollisionExit",
-                    "OnTriggerEnter",
-                    "OnTriggerStay",
-                    "OnTriggerExit",
-                    //"OnGoalReached",
-                    //"OnFellOutOfMap"
                 };
 
                 int evIndex = (int)rule.eventType;
@@ -2372,21 +2365,12 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
 
                 static const char* actionNames[] = {
                     "None",
-                    //"Shrink",
-                    //"Grow",
-                    //"ScaleTo",
-                    //"MoveTo",
-                    //"TeleportTo",
                     "EnableObject",
                     "DisableObject",
                     "DestroyObject",
                     "PlaySound",
                     "StopSound",
-                    //"LoadNextLevel",
                     "Respawn",
-                    "AddScore",
-                    "TakeDamage",
-                    "FlashColor",
                 };
 
                 int acIndex = (int)rule.action;
@@ -2395,19 +2379,13 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
 
                 switch (rule.action)
                 {
-                    ImGui::DragFloat2("Position / Scale", &rule.vec2Value.x, 0.1f);
-                    break;
-
                 case ActionType::PlaySound:
                 {
-
                     auto* audioMgr = CORE->GetAudioManager();
 
                     // Fallback: If no sounds loaded, load global audio.json right now
                     if (audioMgr->GetSoundDatabase().empty())
                     {
-                        std::cout << "[ImGui] No audio loaded. Loading fallback audio.json...\n";
-
                         std::string fallbackPath = "../Assets/Audio/audio.json";
                         std::ifstream f(fallbackPath);
 
@@ -2420,8 +2398,6 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
                             wrapper["AudioManager"] = audioRoot["AudioManager"];
 
                             Serialization::DeserializeAudioManager(wrapper, audioMgr);
-
-                            std::cout << "[ImGui] Fallback audio.json loaded.\n";
                         }
                         else
                         {
@@ -2441,19 +2417,18 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
                         break;
                     }
 
-                    // Draw dropdown normally
                     std::vector<const char*> names;
                     names.reserve(soundDB.size());
 
-                    for (auto& pair : soundDB)
-                        names.push_back(pair.first.c_str());
+                    for (auto& entry : soundDB)
+                        names.push_back(entry.first.c_str());
 
                     // current selection
                     int idx = 0;
                     int i = 0;
-                    for (auto& p : soundDB)
+                    for (auto& pair : soundDB)
                     {
-                        if (p.first == rule.stringValue)
+                        if (pair.first == rule.stringValue)
                         {
                             idx = i;
                             break;
@@ -2461,36 +2436,24 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
                         i++;
                     }
 
-                    if (ImGui::Combo("Sound", &idx, names.data(), (int)names.size()))
+                    if (ImGui::Combo("Sound", &idx, names.data(), names.size()))
                     {
                         int j = 0;
-                        for (auto& p : soundDB)
+                        for (auto& pair : soundDB)
                         {
                             if (j == idx)
                             {
-                                rule.stringValue = p.first;
+                                rule.stringValue = pair.first;   // ONLY save name
                                 break;
                             }
                             j++;
                         }
                     }
                 }
-                
                 break;
-                
+               
                 case ActionType::StopSound:
-                              
                 break;
-
-                case ActionType::AddScore:
-                case ActionType::TakeDamage:
-                    ImGui::DragFloat("Value", &rule.floatValue, 1.0f);
-                    break;
-
-                case ActionType::FlashColor:
-                    ImGui::ColorEdit4("Color", &rule.colorValue.x);
-                    ImGui::DragFloat("Duration", &rule.floatValue, 0.1f);
-                    break;
 
                 default:
                     break;
