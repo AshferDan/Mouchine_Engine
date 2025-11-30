@@ -147,6 +147,9 @@ GLuint icon_inactive_ui;
 // selected game object for editing
 static EntityID selectedGameObjectID = 0;
 
+// stress test 
+static bool stressTestActive = false;
+
 /**
  * @brief Ctor - Inits window variable
  */
@@ -708,10 +711,23 @@ void ImGuiSystem::Hierarchy_Render()
     CreateHintText("Toggle Audio Assets panel");
 
     // dear god help us all
-    if (ImGui::Button("Stress Test - 1000 GOs"))
+    if (!stressTestActive)
     {
-        M2_RenderStressTest();
+        if (ImGui::Button("Run Stress Test"))
+        {
+            stressTestActive = true;
+            SpawnStressObjects();   // your spawn function
+        }
     }
+    else
+    {
+        if (ImGui::Button("Delete Stress Test"))
+        {
+            stressTestActive = false;
+            DestroyStressTestGameObjects();
+        }
+    }
+
     // Undo Feature
     LevelEditor* editor = CORE->GetLevelEditor();
     bool canUndo = !editor->undoStack.empty();
@@ -2548,7 +2564,18 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
                 }
                 break;
                
-                case ActionType::StopSound:
+                case ActionType::StopSound: {                
+
+                    ImGui::Text("Stop this GameObject Sound.");
+
+                    const std::string& cur = obj->GetCurrentlyPlayingSound();
+
+                    if (cur.empty())
+                    {
+                        ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1),
+                            "No sound currently playing.");
+                    }
+                }
                 break;
 
                 default:
@@ -2578,125 +2605,6 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
         {
             EventRule newRule;
             ec->rules.push_back(newRule);
-        }
-    }
-}
-
-
-/**
- * @brief HELLO PROFS THIS IS THE STRESS TEST FUNCTION. Spawns 1000 GOs
- */
-void M2_RenderStressTest()
-{
-    // Stress Test:
-    auto& factory = GameObjectFactory::Instance();
-    auto& resourceMgr = ResourceManager::Instance();
-
-    static std::vector<GameObject*> stressObjects;
-    stressObjects.reserve(1000);
-
-    const int totalObjects = 1000;
-    const float spawnW = 32.f;
-    const float spawnH = 32.f;
-
-    // Load the texture once, reuse for all obj
-    const std::string spritePath = "../Assets/protosprite.png";
-    const std::string textureKey = "stress_shared";
-
-    TextureResource* texRes = resourceMgr.GetTexture(textureKey);
-    if (!texRes)
-    {
-        if (!resourceMgr.LoadTexture(textureKey, spritePath))
-        {
-            std::cerr << "[STRESS TEST] Failed to load shared texture at: " << spritePath << std::endl;
-            return;
-        }
-        texRes = resourceMgr.GetTexture(textureKey);
-    }
-
-    if (!texRes || !texRes->IsLoaded())
-    {
-        std::cerr << "[STRESS TEST] Texture not loaded. Aborting stress test.\n";
-        return;
-    }
-
-    GLuint sharedTexID = texRes->GetTextureID();
-
-    // --- Spawn 1000 objects ---
-    for (int i = 0; i < totalObjects; ++i)
-    {
-        std::string objName = "StressObj_" + std::to_string(i);
-        GameObject* go = factory.CreateGameObject(objName);
-        stressObjects.push_back(go);
-
-        // --- Transform: random position ---
-        if (auto* t = go->AddComponent<TransformComponent>())
-        {
-            float x = static_cast<float>(rand() % 1280) - 640;
-            float y = static_cast<float>(rand() % 720) - 360 - (i * 0.1f); // small offset to avoid stacking
-            t->SetPosition(x, y);
-            t->SetScale(spawnW, spawnH);
-        }
-
-        // --- RenderComponent (visiblility) ---
-        if (auto* render = go->AddComponent<RenderComponent>())
-        {
-            render->SetTextureID(sharedTexID);
-            render->SetTexturePath(spritePath);
-            render->SetShapeType(RenderComponent::ShapeType::Circle);
-            render->SetColor({ 1.f, 1.f, 1.f, 1.f });
-        }
-    }
-
-    std::cout << "[STRESS TEST] Spawned " << totalObjects
-        << " objects with Transform + Render.\n";
-
-    // --- Add Collider & Physics gradually to avoid frame freeze ---
-    static bool addCollidersLater = true;
-    static int colliderIndex = 0;
-    const int batchPerFrame = 50; // smaller batch = smoother
-
-    //--- Collider ---
-    if (addCollidersLater)
-    {
-        for (int i = 0; i < batchPerFrame && colliderIndex < totalObjects; ++i, ++colliderIndex)
-        {
-            GameObject* go = stressObjects[colliderIndex];
-
-            if (!go) continue;
-
-            // Collider
-            if (!go->GetComponent<ColliderComponent>())
-            {
-                go->AddComponent<ColliderComponent>(
-                    ColliderComponent::Type::Square,
-                    spawnW, spawnH,
-                    CollisionLayer::Enemy
-                );
-            }
-
-            // --- Physics: random velocity ---
-            if (auto* p = go->AddComponent<PhysicsComponent>())
-            {
-                float vx = static_cast<float>((rand() % 200) - 100);
-                float vy = static_cast<float>((rand() % 200) - 100);
-                if (vx == 0 && vy == 0)
-                    vx = (rand() % 2 == 0 ? 50.f : -50.f); // ensure nonzero
-
-                p->SetVelocity(vx, vy + 100.f); // small upward bias
-                p->SetMass(1.0f);
-                p->SetGrounded(false);
-                p->SetGravity(true);
-            }
-
-        }
-
-        if (colliderIndex >= totalObjects)
-        {
-            addCollidersLater = false;
-            colliderIndex = 0;
-            stressObjects.clear(); // clear tracking list
-            std::cout << "[STRESS TEST] All stress-test colliders added.\n";
         }
     }
 }
