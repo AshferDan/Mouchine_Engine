@@ -48,7 +48,7 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(1.0f, false);
     player->AddComponent<RenderComponent>(shape, color);
     transform->SetScale(w, h);
-    physics->SetVelocity(0, 0);
+    physics->SetVelocity(0.f, 0.f);
 
     // No gravity for this player variant
 
@@ -64,10 +64,10 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(1.0f, false);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     ResourceManager::Instance().PrintLoadedResources();
-    auto render = player->AddComponent<RenderComponent>(texID);
+    player->AddComponent<RenderComponent>(texID);
     physics->SetStatic(false);
     transform->SetScale(w, h);
-    physics->SetVelocity(0, 0);
+    physics->SetVelocity(0.f, 0.f);
 
     // Enable gravity
     physics->SetGravity(true);
@@ -97,7 +97,8 @@ GameObject *GameObjectFactory::CreateEmptyGO(const std::string &name, float x, f
     GameObject *obj = CreateGameObject(name);
 
     auto *transform = obj->AddComponent<TransformComponent>(x, y);
-    auto *physics = obj->AddComponent<PhysicsComponent>(0.0f, false);
+    transform->SetScale(w, h);
+    obj->AddComponent<PhysicsComponent>(0.0f, false);
 
     return obj;
 }
@@ -238,7 +239,7 @@ GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderCompon
 
 GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, float x, float y, float w, float h,
                                                    char const *filename, int numRows, int numCols,
-                                                   int startFrame, int endFrame, float fps, CollisionLayer layer)
+                                                   int startFrame, int endFrame, float fps, CollisionLayer)
 {
     GameObject *obj = CreateGameObject(name);
 
@@ -254,10 +255,9 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
     GLuint textureID = spritesheetComp->GetTextureID();
 
     obj->AddComponent<RenderComponent>(textureID);
-
     Spritesheet *anim = spritesheetComp.get();
     obj->AddComponent(std::move(spritesheetComp));
-
+    
     anim->SetAnimation(startFrame, endFrame, fps);
 
     return obj;
@@ -680,11 +680,11 @@ void DemoM1_SpawnGameObjects()
             static_cast<float>(intX),
             static_cast<float>(intY));
         auto *transform = newGO->GetComponent<TransformComponent>();
-        auto *physics = newGO->AddComponent<PhysicsComponent>(0, 0);
+        auto *physics = newGO->AddComponent<PhysicsComponent>(0.f, false);
         physics->SetGravity(true); // Enable/Disable gravity
         physics->SetStatic(false);
         transform->SetScale(40.f, 40.f);
-        physics->SetVelocity(0, 0);
+        physics->SetVelocity(0.f, 0.f);
         newGO->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, 5.f, 5.f, CollisionLayer::Ground);
 
         auto *render = newGO->AddComponent<RenderComponent>(sharedTextureID);
