@@ -358,8 +358,6 @@ private:
     TimerSystem *timerSystem = nullptr;
     GameTimerSystem * gameTimerSystem = nullptr;
 
-    EventSystemRunner *eventSystemRunner = nullptr;
-
     unsigned LastTime;
     bool GameActive;
     static double fps;

@@ -113,6 +113,12 @@ bool InputManager::IsMouseButtonHeld(int button)
  */
 void InputManager::Update(float dt)
 {
+	static bool firstUpdate = true;
+	if (firstUpdate) {
+		std::cout << "[InputManager] Update function is running!" << std::endl;
+		firstUpdate = false;
+	}
+
 	for (auto& it : m_keyStates) {
 		if (glfwGetKey(window, it.first) == GLFW_PRESS) {
 			if (it.second == KEY_STATE_RELEASE) {
@@ -162,12 +168,23 @@ void InputManager::Update(float dt)
     LevelEditor *levelEditor = CORE->GetLevelEditor();
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
     {
+        static bool editorModeWarning = true;
+        if (editorModeWarning) {
+            std::cout << "[InputManager] Not in Play/Stop mode - input disabled" << std::endl;
+            editorModeWarning = false;
+        }
         // still allow escape key, but ignore player movement inputs
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        mouseX = xpos;
-        mouseY = ypos;
+        double xposition, yposition;
+        glfwGetCursorPos(window, &xposition, &yposition);
+        mouseX = xposition;
+        mouseY = yposition;
         return;
+    }
+
+    static bool playModeConfirmed = false;
+    if (!playModeConfirmed) {
+        std::cout << "[InputManager] In Play mode - input enabled" << std::endl;
+        playModeConfirmed = true;
     }
 
     // ------------------- UNDO: Ctrl + Z -------------------//
@@ -372,24 +389,41 @@ void InputManager::Update(float dt)
 
     GameObject* player = nullptr;
 
-
+    // Try to get cached player first
     if (cachedPlayerID != 0)
     {
         player = GameObjectFactory::Instance().GetGameObject(cachedPlayerID);
+        if (!player)
+        {
+            // Cached player no longer exists (scene changed), clear cache
+            std::cout << "[InputManager] Cached player no longer exists, clearing cache" << std::endl;
+            cachedPlayerID = 0;
+        }
     }
 
+    // If no cached player, try to find Hero
     if (!player)
     {
-        player = GameObjectFactory::Instance().FindGameObject("Hero2");
+        player = GameObjectFactory::Instance().FindGameObject("Hero");
         if (player)
         {
             cachedPlayerID = player->GetID();
+            std::cout << "[InputManager] Found Hero with ID: " << cachedPlayerID << std::endl;
+        }
+        else
+        {
+            // Only print warning occasionally to avoid spam
+            static int warningCounter = 0;
+            if (warningCounter++ % 60 == 0)
+            {
+                std::cout << "[InputManager] WARNING: Hero not found in scene!" << std::endl;
+            }
         }
     }
 
     if (!player)
     {
-        return;
+        return; // No player to control
     }
 
 
@@ -431,6 +465,11 @@ void InputManager::Update(float dt)
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
         moveDirectionX = -1.0f;
+        static bool aDebugPrinted = false;
+        if (!aDebugPrinted) {
+            std::cout << "[InputManager] A key pressed - moving left" << std::endl;
+            aDebugPrinted = true;
+        }
 
         // Only apply movement if not blocked by wall
         bool blockedByWall = physics->isCollidingLeft &&
@@ -448,6 +487,11 @@ void InputManager::Update(float dt)
     else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         moveDirectionX = 1.0f;
+        static bool dDebugPrinted = false;
+        if (!dDebugPrinted) {
+            std::cout << "[InputManager] D key pressed - moving right" << std::endl;
+            dDebugPrinted = true;
+        }
 
         // Only apply movement if not blocked by wall
         bool blockedByWall = physics->isCollidingRight &&
@@ -464,7 +508,7 @@ void InputManager::Update(float dt)
     }
     else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
         CameraManager::Instance().AddCameraTrauma(1.f);
-        CameraManager::Instance().FlashActiveCamera(0.3, vec4(1.f, 0.f, 0.f, 0.7f));
+        CameraManager::Instance().FlashActiveCamera(0.3f, vec4(1.f, 0.f, 0.f, 0.7f));
         //CORE->SetGamePaused(!CORE->IsGamePaused());
     }
     else
@@ -863,7 +907,7 @@ void InputManager::Update(float dt)
         rollTimer -= dt;
 
         // Apply roll velocity (maintain direction)
-        float rollDirection = (moveDirectionX != 0) ? moveDirectionX : 1.0f;
+        float rollDirection = isFacingRight ? 1.0f : -1.0f;
         physics->SetVelocity(rollDirection * ROLL_SPEED, physics->velocity.y);
 
         // Stop rolling when hitting a wall
@@ -967,16 +1011,31 @@ void InputManager::Update(float dt)
             float absWidth = std::abs(transform->scaleX);
             transform->SetScale(absWidth, transform->scaleY);
 
-
-        static bool isFacingRight = true;
-
+        // Update facing direction based on movement
         if (moveDirectionX > 0.0f) isFacingRight = true;
         if (moveDirectionX < 0.0f) isFacingRight = false;
 
-        // 3. Determine Animation Name based on State AND Direction
+        // Determine Animation Name based on State AND Direction
+        // Priority: GroundPound > Dash > Roll > Glide > Jump (in air) > Run > Idle
         std::string requestedState = "";
 
-        if (is_jumping)
+        if (isGroundPounding)
+        {
+            requestedState = isFacingRight ? "GroundPound_R" : "GroundPound_L";
+        }
+        else if (isDashing)
+        {
+            requestedState = isFacingRight ? "Dash_R" : "Dash_L";
+        }
+        else if (isRolling)
+        {
+            requestedState = isFacingRight ? "Roll_R" : "Roll_L";
+        }
+        else if (isGliding)
+        {
+            requestedState = isFacingRight ? "Glide_R" : "Glide_L";
+        }
+        else if (!physics->IsGrounded())  // Player is in the air
         {
             requestedState = isFacingRight ? "Jump_R" : "Jump_L";
         }
@@ -990,7 +1049,7 @@ void InputManager::Update(float dt)
             requestedState = isFacingRight ? "Idle_R" : "Idle_L";
         }
 
-        // 4. Play the specific Left/Right animation
+        // Play the specific Left/Right animation
         anim->PlayAnimation(requestedState);
     }
 
@@ -1032,6 +1091,8 @@ void InputManager::Update(float dt)
         isWallSliding = false;
 
         numberOfJumpsUsed = 0;
+
+        isFacingRight = true;
 
         std::cout << "[InputManager] State reset (including all abilities)." << std::endl;
     }

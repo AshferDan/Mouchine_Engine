@@ -49,7 +49,8 @@ void MenuLogicSystem::Update(float dt)
                 else if (hoveredButtonName == "QuitButton")
                 {
                     std::cout << "QuitButton Clicked!" << std::endl;
-                    CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
+                    CORE->GetLevelEditor()->StopPlayMode();
+                    //CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
                 }
             }
 
@@ -172,7 +173,7 @@ void MenuLogicSystem::Update(float dt)
         {
             if (hoveredButtonName == "MuteButton")
             {
-                AudioManager* audioManager = CORE->GetAudioManager();
+                //AudioManager* audioManager = CORE->GetAudioManager();
                 if (audioManager)
                 {
                     audioManager->ToggleMasterMute();
@@ -197,7 +198,7 @@ bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mous
     auto* tx = button->GetComponent<TransformComponent>();
     if (!tx) return false;
 
-    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, mouseX, mouseY);
+    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
 //  swap textures

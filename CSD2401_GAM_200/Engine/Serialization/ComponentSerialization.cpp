@@ -1,7 +1,7 @@
 /* Start Header************************************************************************ /
 /*!
 \file       ComponentSerialization.cpp
-\author     Lee Hwee Min [100% - 245 lines]
+\author     Lee Hwee Min [100% - 427 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -191,7 +191,7 @@ void ComponentSerialization::SerializeEvent(json &j, EventComponent *ec)
     {
         json r;
         r["eventType"] = EventTypeToString(rule.eventType);
-        r["targetFilter"] = rule.targetFilter;
+        r["targetObjectId"] = rule.targetObjectId;
         r["action"] = ActionTypeToString(rule.action);
 
         rulesJson.push_back(r);
@@ -216,6 +216,13 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
 
     float jsonX = t["pos"][0];
     float jsonY = t["pos"][1];
+
+    if (tc && !go->originalSaved)
+    {
+        go->originalPos.x = jsonX;
+        go->originalPos.y = jsonY;
+        go->originalSaved = true;
+    }
 
     if (Serialization::Prefab_DragAndDropped)
     {
@@ -477,7 +484,7 @@ void ComponentSerialization::DeserializeCollider(const json &j, GameObject *go)
         }
     }
 
-    auto *collider = go->AddComponent<ColliderComponent>(type, width, height, layer);
+    go->AddComponent<ColliderComponent>(type, width, height, layer);
 }
 
 /**
@@ -578,7 +585,7 @@ void ComponentSerialization::DeserializeEvent(const json &j, GameObject *go)
     {
         EventRule rule;
         rule.eventType = StringToEventType(item.value("eventType", "None"));
-        rule.targetFilter = item.value("targetFilter", "");
+        rule.targetObjectId = item.value("targetFilter", -1);
         rule.action = StringToActionType(item.value("action", "None"));
 
         ec->rules.push_back(rule);

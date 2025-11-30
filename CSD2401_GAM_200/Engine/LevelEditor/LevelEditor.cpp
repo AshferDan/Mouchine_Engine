@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       LevelEditor.cpp
-\author     Leck Xin Yee [100% - 1062 lines]
+\author     Leck Xin Yee [95% - 1223 lines]
+            Hwee Min [5% - 44 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 7, 2025
 
@@ -566,6 +567,7 @@ void LevelEditor::RenderMenuBar()
     // new lvl
     if (ImGui::Button("New Level", ImVec2(200, 0)))
     {
+        CORE->GetImguiSystem()->ResetSelectedGameObject();
         NewLevel();
     }
 
@@ -795,9 +797,10 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             if (ps)
             {
                 ps->ClearCollisionQueue();
-            }
+            }   
         }
-    
+        // Clear event system (for gameObjects)
+        EventSystem::Clear();
 
         // stop/unload audio (if any)
         auto& resourceMgr = ResourceManager::Instance();
@@ -1252,6 +1255,15 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
         auto *transform = obj->AddComponent<TransformComponent>(data.posX, data.posY);
         transform->SetScale(data.scaleX, data.scaleY);
         transform->SetRotation(data.rotation);
+
+        if (!obj->originalSaved)
+        {
+            transform->GetPosition(transform->posX, transform->posY);
+            obj->originalPos.x = transform->posX;
+            obj->originalPos.y = transform->posY;
+            obj->originalSaved = true;
+        }
+
     }
 
     // add render component
@@ -1596,6 +1608,9 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+/**
+ * @brief Record a new undo command into the undo history.
+ */
 void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     
     // Check if undo exceed 20
@@ -1610,6 +1625,9 @@ void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     
 }
 
+/**
+ * @brief Undo the most recent editor action.
+ */
 void LevelEditor::PerformUndo() {
     if (undoStack.empty()) return;
 
@@ -1683,6 +1701,10 @@ void LevelEditor::PerformUndo() {
     //redoStack.push_back(undocmd);
 }
 
+/**
+ * @brief Clears the entire undo history.
+ * Primarily used when loading a new scene or resetting editor state.
+ */
 void LevelEditor::ClearUndoStack() {
     undoStack.clear();
 }
@@ -1749,38 +1771,3 @@ void LevelEditor::ClearTilemap()
         std::cout << "[LevelEditor] Tilemap reference cleared." << std::endl;
     }
 }
-
-/*  Audio Management */
-/**
- * @brief Play loaded background music
- */
-//void LevelEditor::PlayLoadedBGM()
-//{
-//    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-//
-//    if (audioEngine && !currentBGMName.empty())
-//    {
-//        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
-//            << " on channel: " << currentBGMChannel << std::endl;
-//
-//        // stop any existing sound on this channel first
-//        audioEngine->stopSound(currentBGMChannel);
-//
-//        // play the BGM
-//        audioEngine->playSound(currentBGMName, currentBGMChannel);
-//        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
-//
-//        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
-//    }
-//    else
-//    {
-//        if (!audioEngine)
-//        {
-//            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
-//        }
-//        else if (currentBGMName.empty())
-//        {
-//            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
-//        }
-//    }
-//}

@@ -197,6 +197,9 @@ private:
     // Double Jump
     int numberOfJumpsUsed = 0;
     int maxJumps = 2; // Allow double jump
+
+    // Facing Direction
+    bool isFacingRight = true; // Track which way player is facing
 };
 
 #endif

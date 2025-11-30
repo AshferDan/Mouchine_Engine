@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Component.h
-\author     Jonathan Fam Qian Wei [100% - 19 lines]
+\author     Jonathan Fam Qian Wei [27% - 17 lines]
+\co-author	Muhammad Ashfer [73% - 45 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 
