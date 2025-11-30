@@ -14,6 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 using CSharpScript;
+using System.Runtime.CompilerServices;
 
 namespace GameScripts
 {
@@ -75,6 +76,17 @@ namespace GameScripts
 
             // Attach the RaycastTest script to the RedSquare
             CSharpScript.Scripting.AttachScript("RedSquare", "RaycastTest");
+
+
+            GameObject.CreateShape(
+                "Debugline",
+                (int)ShapeType.Square,
+                1,1,
+                5, 10,
+                0.0f, 0.0f, 1.0f, 1.0f, // Blue
+                (int)CollisionLayer.Default,
+                false, false, false
+            );
         }
 
         public void OnUpdate(float deltaTime)

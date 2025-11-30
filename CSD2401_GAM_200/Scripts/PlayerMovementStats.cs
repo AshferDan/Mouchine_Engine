@@ -22,28 +22,28 @@ namespace GameScripts
     public class PlayerMovementStats
     {
         // Walk
-        public float MaxWalkSpeed = 20f;
-        public float GroundAcceleration = 7.5f;
+        public float MaxWalkSpeed = 250f;
+        public float GroundAcceleration = 30f;
         public float GroundDeceleration = 30f;
         public float AirAcceleration = 20f;
         public float AirDeceleration = 5f;
 
         // Grounded/Collision Checks
-        public float GroundDetectionRayLength = 0.02f;
+        public float GroundDetectionRayLength = 5.0f;
         public float HeadDetectionRayLength = 0.02f;
         public float HeadWidth = 0.75f;
 
         // Wall Checks
-        public float WallDetectionBoxLength = 0.05f;
+        public float WallDetectionBoxLength = 50.0f;
         public float WallSlidingSpeed = 2f;
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 5.7f;
+        public float JumpHeight = 100.7f;
         public float JumpHeightCompensationFactor = 1.054f;
         public float TimeTillJumpApex = 0.35f;
-        public float GravityOnReleaseMultiplier = 3f;
-        public float MaxFallSpeed = 40f;
+        public float GravityOnReleaseMultiplier = 1.4f;
+        public float MaxFallSpeed = 250f;
         public int NumberOfJumpsAllowed = 1;
 
         // Jump Cut
@@ -60,19 +60,19 @@ namespace GameScripts
         public float JumpCoyoteTime = 0.1f;
 
         // Dash
-        public float DashSpeed = 35f;
+        public float DashSpeed = 500f;
         public float DashDuration = 0.22f;
         public float DashCooldown = 0.5f;
 
         // Roll
-        public float BaseRollDuration = 0.3f;
-        public float RollSpeed = 30f;
-        public float RollHeightToDurationDivisor = 30f;
+        public float BaseRollDuration = 0.15f;
+        public float RollSpeed = 500f;
+        public float RollHeightToDurationDivisor = 1000f;
 
         // Wall Kick
-        public float WallKickSpeedModifier = 30f;
-        public float WallKickVerticalModifier = 5f;
-        public float WallKickDurationMultiplier = 0.75f;
+        public float WallKickSpeedModifier = 300f;
+        public float WallKickVerticalModifier = 50f;
+        public float WallKickDurationMultiplier = 1.25f;
 
         // Wall Jump
         public vec2 WallJumpForce = new vec2(20f, 25f);
@@ -80,7 +80,7 @@ namespace GameScripts
 
         // Ground Pound
         public float GroundPoundPauseTime = 0.3f;
-        public float GroundPoundFallSpeed = 20f;
+        public float GroundPoundFallSpeed = 300f;
 
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.6f;
@@ -116,7 +116,7 @@ namespace GameScripts
         // Debug
         public bool DebugShowIsGroundedBox;
         public bool DebugShowHeadBumpBox;
-        
+
         // Calculated values
         public float Gravity { get; private set; }
         public float InitialJumpVelocity { get; private set; }
