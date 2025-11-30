@@ -93,8 +93,8 @@ namespace GameScripts
         private bool blockMovement = false;         // Prevents player from controlling character
         private float _wallKickTimer;
         private float _wallKickCooldownTimer;
-        private bool _startedWallKickInAir = false;
-        private float _wallKickTotalDuration;
+        //private bool _startedWallKickInAir = false;
+        //private float _wallKickTotalDuration;
 
         // wall slide variables
         private bool _isTouchingWall;
@@ -103,7 +103,7 @@ namespace GameScripts
         // ground pound variables
         private bool _isGroundPounding = false;     // checks if player is currently in groundpound state
         vec2 lastPos;                            // stores pos of when the player initiated groundpound (for conversion to horizontal dist)
-        private float _groundPoundPauseTimer;
+        //private float _groundPoundPauseTimer;
 
         // roll variables
         private bool _isRolling = false;            // checks if player is in rolling state
@@ -116,9 +116,9 @@ namespace GameScripts
 
         // zipline variables
         private bool _isZiplining = false;
-        private bool _isBeingLaunched = false;
+        //private bool _isBeingLaunched = false;
         private float _ziplineCoyoteTimer;
-        private float _ziplineHeadOffset;
+        //private float _ziplineHeadOffset;
 
         // knockback
         // private KnockBack knockback; //

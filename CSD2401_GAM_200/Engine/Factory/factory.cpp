@@ -49,7 +49,7 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(1.0f, false);
     player->AddComponent<RenderComponent>(shape, color);
     transform->SetScale(w, h);
-    physics->SetVelocity(0, 0);
+    physics->SetVelocity(0.f, 0.f);
 
     // No gravity for this player variant
 
@@ -66,10 +66,9 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     ResourceManager::Instance().PrintLoadedResources();
     player->AddComponent<RenderComponent>(texID);
-    //auto render = player->AddComponent<RenderComponent>(texID);
     physics->SetStatic(false);
     transform->SetScale(w, h);
-    physics->SetVelocity(0, 0);
+    physics->SetVelocity(0.f, 0.f);
 
     // Enable gravity
     physics->SetGravity(true);
@@ -98,13 +97,12 @@ GameObject *GameObjectFactory::CreateEmptyGO(const std::string &name, float x, f
 {
     (void)w;
     (void)h;
-   
+
     GameObject *obj = CreateGameObject(name);
 
-    obj->AddComponent<TransformComponent>(x, y);
+    auto *transform = obj->AddComponent<TransformComponent>(x, y);
+    transform->SetScale(w, h);
     obj->AddComponent<PhysicsComponent>(0.0f, false);
-    //auto* transform = obj->AddComponent<TransformComponent>(x, y);
-    //auto* physics = obj->AddComponent<PhysicsComponent>(0.0f, false);
 
     return obj;
 }
@@ -245,7 +243,7 @@ GameObject *GameObjectFactory::CreateImage(const std::string &name, RenderCompon
 
 GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, float x, float y, float w, float h,
                                                    char const *filename, int numRows, int numCols,
-                                                   int startFrame, int endFrame, float fps, CollisionLayer layer)
+                                                   int startFrame, int endFrame, float fps, CollisionLayer)
 {
     (void)layer;
     GameObject *obj = CreateGameObject(name);
@@ -262,7 +260,6 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
     GLuint textureID = spritesheetComp->GetTextureID();
 
     obj->AddComponent<RenderComponent>(textureID);
-
     Spritesheet *anim = spritesheetComp.get();
     obj->AddComponent(std::move(spritesheetComp));
 
@@ -499,13 +496,15 @@ This is the function that calls the destroyGameObject to destroy/ delete/ set un
 void GameObjectFactory::DestroyGameObject(EntityID id)
 {
     auto it = entityToIndex.find(id);
-    if (it == entityToIndex.end()) return;
+    if (it == entityToIndex.end())
+        return;
 
-    GameObject* gameObject = GetGameObject(id);
-    if (!gameObject) return;
+    GameObject *gameObject = GetGameObject(id);
+    if (!gameObject)
+        return;
 
     // remove parenting
-    GameObject* goParent = gameObject->GetParent();
+    GameObject *goParent = gameObject->GetParent();
     if (goParent)
     {
         std::cout << goParent->GetName() << " is removing child: " << gameObject->GetName() << std::endl;
@@ -526,8 +525,8 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
 
 void GameObjectFactory::DestroyAllRelatedGameObjects(EntityID parentID)
 {
-    std::vector<EntityID> goDestroyList;                // vector to gather all items to destroy - cant use getfamilytree because we need the order 
-    std::queue<EntityID> queue;                         // queue to sort by which needs to go first (bottom to up)
+    std::vector<EntityID> goDestroyList; // vector to gather all items to destroy - cant use getfamilytree because we need the order
+    std::queue<EntityID> queue;          // queue to sort by which needs to go first (bottom to up)
     queue.push(parentID);
 
     // the gist - add everything to queue, then add items in queue to vector
@@ -535,14 +534,14 @@ void GameObjectFactory::DestroyAllRelatedGameObjects(EntityID parentID)
     while (!queue.empty())
     {
         EntityID currID = queue.front();
-        queue.pop();                                            // pop and add to the vector
+        queue.pop(); // pop and add to the vector
         goDestroyList.push_back(currID);
 
-        // if valid pointer, get all children, GET EVERYTHING 
+        // if valid pointer, get all children, GET EVERYTHING
         if (GetGameObject(currID))
         {
-            std::vector<GameObject*> children = GetGameObject(currID)->GetAllChildren();
-            for (auto const& child : children)
+            std::vector<GameObject *> children = GetGameObject(currID)->GetAllChildren();
+            for (auto const &child : children)
             {
                 queue.push(child->GetID());
             }
@@ -553,7 +552,7 @@ void GameObjectFactory::DestroyAllRelatedGameObjects(EntityID parentID)
     auto end = goDestroyList.rend();
     while (begin != end)
     {
-        DestroyGameObject(*begin);          // destroy one by one
+        DestroyGameObject(*begin); // destroy one by one
         begin++;
     }
 }
@@ -606,16 +605,15 @@ EntityID GameObjectFactory::GetSmallestAvailableID() const
 {
     EntityID candidate = 1;
 
-    while (const_cast<GameObjectFactory*>(this)->GetGameObject(candidate) != nullptr)
+    while (const_cast<GameObjectFactory *>(this)->GetGameObject(candidate) != nullptr)
         candidate++;
 
     return candidate;
 }
 
-
-GameObject* GameObjectFactory::FindByName(const std::string& name)
+GameObject *GameObjectFactory::FindByName(const std::string &name)
 {
-    for (auto& go : gameObjects)
+    for (auto &go : gameObjects)
     {
         if (go && go->GetName() == name)
             return go.get();
@@ -623,22 +621,27 @@ GameObject* GameObjectFactory::FindByName(const std::string& name)
     return nullptr;
 }
 
-void GameObjectFactory::ReorderRootObjects(const std::vector<EntityID>& order) {
-    if (order.empty()) return;
+void GameObjectFactory::ReorderRootObjects(const std::vector<EntityID> &order)
+{
+    if (order.empty())
+        return;
 
     std::unordered_map<EntityID, std::unique_ptr<GameObject>> moved;
     moved.reserve(gameObjects.size());
 
-    for (auto& u : gameObjects) {
+    for (auto &u : gameObjects)
+    {
         moved[u->GetID()] = std::move(u);
     }
 
     std::vector<std::unique_ptr<GameObject>> newList;
     newList.reserve(order.size());
 
-    for (EntityID id : order) {
+    for (EntityID id : order)
+    {
         auto it = moved.find(id);
-        if (it != moved.end()) {
+        if (it != moved.end())
+        {
             newList.push_back(std::move(it->second));
         }
     }
@@ -646,22 +649,24 @@ void GameObjectFactory::ReorderRootObjects(const std::vector<EntityID>& order) {
     gameObjects = std::move(newList);
 
     entityToIndex.clear();
-    for (size_t i = 0; i < gameObjects.size(); ++i) {
-        if (gameObjects[i]) {
+    for (size_t i = 0; i < gameObjects.size(); ++i)
+    {
+        if (gameObjects[i])
+        {
             entityToIndex[gameObjects[i]->GetID()] = i;
         }
     }
 }
 
 // Check if there is dangling pointers
-bool GameObjectFactory::IsAlive(GameObject* ptr) const
+bool GameObjectFactory::IsAlive(GameObject *ptr) const
 {
-    auto& allGOs = GameObjectFactory::GetAllGameObjects();
+    auto &allGOs = GameObjectFactory::GetAllGameObjects();
     // Loop through all alive game objects
-    for (const auto& obj : allGOs)
+    for (const auto &obj : allGOs)
     {
         if (obj.get() == ptr)
-            return true;   // pointer is valid and alive
+            return true; // pointer is valid and alive
     }
 
     return false; // pointer not found = invalid/destroyed
@@ -702,11 +707,11 @@ void DemoM1_SpawnGameObjects()
             static_cast<float>(intX),
             static_cast<float>(intY));
         auto *transform = newGO->GetComponent<TransformComponent>();
-        auto *physics = newGO->AddComponent<PhysicsComponent>();
+        auto *physics = newGO->AddComponent<PhysicsComponent>(0.f, false);
         physics->SetGravity(true); // Enable/Disable gravity
         physics->SetStatic(false);
         transform->SetScale(40.f, 40.f);
-        physics->SetVelocity(0, 0);
+        physics->SetVelocity(0.f, 0.f);
         newGO->AddComponent<ColliderComponent>(ColliderComponent::Type::Square, 5.f, 5.f, CollisionLayer::Ground);
 
         auto *render = newGO->AddComponent<RenderComponent>(sharedTextureID);
@@ -740,7 +745,7 @@ void DemoM1_DestroyGameObjects()
 
 #pragma region M2 Showcase - 1000 GOs Test
 
-static std::vector<GameObject*> stressObjects;
+static std::vector<GameObject *> stressObjects;
 static bool stressSpawned = false;
 static bool stressInitPhysics = false;
 static int stressIndex = 0;
@@ -751,8 +756,8 @@ void SpawnStressObjects()
         return;
     stressSpawned = true;
 
-    auto& factory = GameObjectFactory::Instance();
-    auto& resourceMgr = ResourceManager::Instance();
+    auto &factory = GameObjectFactory::Instance();
+    auto &resourceMgr = ResourceManager::Instance();
 
     stressObjects.clear();
     stressObjects.reserve(1000);
@@ -765,7 +770,7 @@ void SpawnStressObjects()
     const std::string spritePath = "../Assets/protosprite.png";
     const std::string textureKey = "stress_shared";
 
-    TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+    TextureResource *texRes = resourceMgr.GetTexture(textureKey);
     if (!texRes)
     {
         resourceMgr.LoadTexture(textureKey, spritePath);
@@ -783,7 +788,7 @@ void SpawnStressObjects()
     for (int i = 0; i < totalObjects; ++i)
     {
         std::string objName = "StressObj_" + std::to_string(i);
-        GameObject* go = factory.CreateGameObject(objName);
+        GameObject *go = factory.CreateGameObject(objName);
         stressObjects.push_back(go);
 
         static std::random_device rd;
@@ -791,7 +796,7 @@ void SpawnStressObjects()
         static std::uniform_int_distribution<int> distX(-960, 960);
         static std::uniform_int_distribution<int> distY(-540, 540);
 
-        if (auto* t = go->AddComponent<TransformComponent>())
+        if (auto *t = go->AddComponent<TransformComponent>())
         {
             float x = static_cast<float>(distX(gen));
             float y = static_cast<float>(distY(gen));
@@ -801,11 +806,11 @@ void SpawnStressObjects()
         }
 
         // Render
-        auto* render = go->AddComponent<RenderComponent>();
+        auto *render = go->AddComponent<RenderComponent>();
         render->SetTextureID(texID);
         render->SetTexturePath(spritePath);
         render->SetShapeType(RenderComponent::ShapeType::Square);
-        render->SetColor({ 1,1,1,1 });
+        render->SetColor({1, 1, 1, 1});
     }
 
     // Mark physics batching to begin next frame
@@ -824,19 +829,20 @@ void SpawnTest_Update()
 
     for (int i = 0; i < batch && stressIndex < stressObjects.size(); ++i, ++stressIndex)
     {
-        GameObject* go = stressObjects[stressIndex];
-        if (!go) continue;
+        GameObject *go = stressObjects[stressIndex];
+        if (!go)
+            continue;
 
-        //const float spawnW = 32.f;
-        //const float spawnH = 32.f;
+        // const float spawnW = 32.f;
+        // const float spawnH = 32.f;
 
         // Collider
         if (!go->GetComponent<ColliderComponent>())
         {
-            //go->AddComponent<ColliderComponent>(
-            //    ColliderComponent::Type::Circle,
-            //    spawnW, spawnH,
-            //    CollisionLayer::StressTest
+            // go->AddComponent<ColliderComponent>(
+            //     ColliderComponent::Type::Circle,
+            //     spawnW, spawnH,
+            //     CollisionLayer::StressTest
             //);
         }
 
@@ -845,7 +851,7 @@ void SpawnTest_Update()
         static std::mt19937 gen(rd());
         std::uniform_real_distribution<float> velDist(-350.f, 350.f);
 
-        auto* p = go->AddComponent<PhysicsComponent>();
+        auto *p = go->AddComponent<PhysicsComponent>();
         p->SetGravity(true);
         p->SetStatic(false);
 
@@ -865,9 +871,9 @@ void SpawnTest_Update()
 
 void DestroyStressTestGameObjects()
 {
-    auto& factory = GameObjectFactory::Instance();
+    auto &factory = GameObjectFactory::Instance();
 
-    for (GameObject*& GO : stressObjects)
+    for (GameObject *&GO : stressObjects)
     {
         factory.DestroyGameObject(GO->GetID());
     }
