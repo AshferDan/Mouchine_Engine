@@ -566,6 +566,7 @@ void LevelEditor::RenderMenuBar()
     // new lvl
     if (ImGui::Button("New Level", ImVec2(200, 0)))
     {
+        CORE->GetImguiSystem()->ResetSelectedGameObject();
         NewLevel();
     }
 
@@ -1253,6 +1254,15 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
         auto *transform = obj->AddComponent<TransformComponent>(data.posX, data.posY);
         transform->SetScale(data.scaleX, data.scaleY);
         transform->SetRotation(data.rotation);
+
+        if (!obj->originalSaved)
+        {
+            transform->GetPosition(transform->posX, transform->posY);
+            obj->originalPos.x = transform->posX;
+            obj->originalPos.y = transform->posY;
+            obj->originalSaved = true;
+        }
+
     }
 
     // add render component

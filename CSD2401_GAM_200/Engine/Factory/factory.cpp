@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       factory.cpp
-\author     Jonathan Fam Qian Wei [100% - 392 lines]
+\author     Jonathan Fam Qian Wei [80% - 392 lines]
+\co-author  Lee Hwee Min [ 20% - 100 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 
@@ -733,6 +734,146 @@ void DemoM1_DestroyGameObjects()
         factory.DestroyGameObject(GO->GetID());
     }
     vecGOs.clear();
+}
+
+#pragma endregion
+
+#pragma region M2 Showcase - 1000 GOs Test
+
+static std::vector<GameObject*> stressObjects;
+static bool stressSpawned = false;
+static bool stressInitPhysics = false;
+static int stressIndex = 0;
+
+void SpawnStressObjects()
+{
+    if (stressSpawned)
+        return;
+    stressSpawned = true;
+
+    auto& factory = GameObjectFactory::Instance();
+    auto& resourceMgr = ResourceManager::Instance();
+
+    stressObjects.clear();
+    stressObjects.reserve(1000);
+
+    const int totalObjects = 1000;
+    const float spawnW = 32.f;
+    const float spawnH = 32.f;
+
+    // Load shared texture once
+    const std::string spritePath = "../Assets/protosprite.png";
+    const std::string textureKey = "stress_shared";
+
+    TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+    if (!texRes)
+    {
+        resourceMgr.LoadTexture(textureKey, spritePath);
+        texRes = resourceMgr.GetTexture(textureKey);
+    }
+    if (!texRes || !texRes->IsLoaded())
+    {
+        std::cerr << "[STRESS] Texture load failed.\n";
+        return;
+    }
+
+    GLuint texID = texRes->GetTextureID();
+
+    // ---------------- Spawn only -----------------
+    for (int i = 0; i < totalObjects; ++i)
+    {
+        std::string objName = "StressObj_" + std::to_string(i);
+        GameObject* go = factory.CreateGameObject(objName);
+        stressObjects.push_back(go);
+
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        static std::uniform_int_distribution<int> distX(-960, 960);
+        static std::uniform_int_distribution<int> distY(-540, 540);
+
+        if (auto* t = go->AddComponent<TransformComponent>())
+        {
+            float x = static_cast<float>(distX(gen));
+            float y = static_cast<float>(distY(gen));
+
+            t->SetPosition(x, y);
+            t->SetScale(spawnW, spawnH);
+        }
+
+        // Render
+        auto* render = go->AddComponent<RenderComponent>();
+        render->SetTextureID(texID);
+        render->SetTexturePath(spritePath);
+        render->SetShapeType(RenderComponent::ShapeType::Square);
+        render->SetColor({ 1,1,1,1 });
+    }
+
+    // Mark physics batching to begin next frame
+    stressInitPhysics = true;
+    stressIndex = 0;
+
+    std::cout << "[STRESS TEST] Spawned 1000 objects.\n";
+}
+
+void SpawnTest_Update()
+{
+    if (!stressInitPhysics)
+        return;
+
+    const int batch = 50;
+
+    for (int i = 0; i < batch && stressIndex < stressObjects.size(); ++i, ++stressIndex)
+    {
+        GameObject* go = stressObjects[stressIndex];
+        if (!go) continue;
+
+        //const float spawnW = 32.f;
+        //const float spawnH = 32.f;
+
+        // Collider
+        if (!go->GetComponent<ColliderComponent>())
+        {
+            //go->AddComponent<ColliderComponent>(
+            //    ColliderComponent::Type::Circle,
+            //    spawnW, spawnH,
+            //    CollisionLayer::StressTest
+            //);
+        }
+
+        // Physics
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
+        std::uniform_real_distribution<float> velDist(-350.f, 350.f);
+
+        auto* p = go->AddComponent<PhysicsComponent>();
+        p->SetGravity(true);
+        p->SetStatic(false);
+
+        float vx = velDist(gen);
+        float vy = velDist(gen);
+
+        p->SetVelocity(vx, vy);
+        p->SetMass(1.f);
+    }
+
+    if (stressIndex >= stressObjects.size())
+    {
+        stressInitPhysics = false;
+        std::cout << "[STRESS TEST] Finished initializing physics.\n";
+    }
+}
+
+void DestroyStressTestGameObjects()
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    for (GameObject*& GO : stressObjects)
+    {
+        factory.DestroyGameObject(GO->GetID());
+    }
+
+    stressSpawned = false;
+    stressObjects.clear();
 }
 
 #pragma endregion

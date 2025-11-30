@@ -351,6 +351,8 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
+                SpawnTest_Update(); // Stress Test Update
+
                 if (scriptSystem)
                 {
                     std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();

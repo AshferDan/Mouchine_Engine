@@ -39,7 +39,7 @@ enum class EventType {
 enum class ActionType {
     None = 0,
     EnableObject, DisableObject, DestroyObject,             // Object State Action
-    PlaySound, StopSound,                                   // Audio Action 
+    PlaySound, StopSound,                                   // Audio Action                                 
     Respawn,
 };
 

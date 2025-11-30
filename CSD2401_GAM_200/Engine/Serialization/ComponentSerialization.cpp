@@ -217,6 +217,13 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
     float jsonX = t["pos"][0];
     float jsonY = t["pos"][1];
 
+    if (tc && !go->originalSaved)
+    {
+        go->originalPos.x = jsonX;
+        go->originalPos.y = jsonY;
+        go->originalSaved = true;
+    }
+
     if (Serialization::Prefab_DragAndDropped)
     {
         /*std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";

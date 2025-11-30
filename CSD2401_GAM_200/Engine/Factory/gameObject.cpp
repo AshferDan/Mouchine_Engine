@@ -245,7 +245,8 @@ void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
             if (!rule.stringValue.empty())
             {
                 audioMgr->PlaySound(rule.stringValue, "sfx");
-                currentlyPlayingSound = rule.stringValue;
+                //currentlyPlayingSound = rule.stringValue;
+                SetCurrentlyPlayingSound(rule.stringValue);
 
             }
         }
@@ -256,19 +257,17 @@ void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
             auto* audio = CORE->GetAudioManager();
             if (!audio) break;
 
-            // Stop specific sound defined in Event Rule
-            if (!rule.stringValue.empty())
-            {
-                audio->StopSound(rule.stringValue);
-                break;
-            }
+            const std::string& sound = this->GetCurrentlyPlayingSound();
 
-            // Stop sound this object is currently playing
-            if (!currentlyPlayingSound.empty())
+            if (!sound.empty())
             {
-                audio->StopSound(currentlyPlayingSound);
-                currentlyPlayingSound.clear();
-                break;
+                audio->StopSound(sound);
+
+                this->ClearCurrentlyPlayingSound();
+            }
+            else
+            {
+                std::cout << "[StopSound] Nothing to stop for this object\n";
             }
         }
         break;
@@ -278,7 +277,8 @@ void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
         auto* tc = GetComponent<TransformComponent>();
         if (tc) {
             // Respawn here
-            tc->SetPosition(0,0);
+            tc->SetPosition(this->originalPos.x, this->originalPos.y);
+            //tc->SetPosition(0,0);
         }
         break;
     }

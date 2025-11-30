@@ -340,3 +340,10 @@ void DemoM1_SpawnGameObjects();
          (Yes even if you chose to spawn more than 2500)
 */
 void DemoM1_DestroyGameObjects();
+
+/**
+ * @brief Handles the management of the spawning 1000 Gos
+ */
+void SpawnStressObjects();
+void SpawnTest_Update();
+void DestroyStressTestGameObjects();

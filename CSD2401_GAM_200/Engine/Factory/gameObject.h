@@ -45,6 +45,7 @@ Technology is prohibited.
 #pragma once
 #include "Component.h"
 #include "GameManager.h"
+#include "MathLib.h"
 
 #include <vector>
 #include <memory>
@@ -287,6 +288,19 @@ public:
      */
     virtual void OnEventTriggered(EventType event, GameObject* other);
 
+    /**
+     * @brief Get and Set Current Sound
+     */
+    const std::string& GetCurrentlyPlayingSound() const { return m_currentlyPlayingSound; }
+    void SetCurrentlyPlayingSound(const std::string& s) { m_currentlyPlayingSound = s; }
+    void ClearCurrentlyPlayingSound() { m_currentlyPlayingSound.clear(); }
+
+    /**
+     * @brief Get Original Postion of gameObject
+     */
+    vec2 originalPos{ 0, 0 };
+    bool originalSaved = false;
+
 private:
     EntityID entityID;
     std::string name;
@@ -295,7 +309,7 @@ private:
     std::vector<GameObject*> children;                  
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;
 
-    std::string currentlyPlayingSound = "";
+    std::string m_currentlyPlayingSound;
 };
 
 void GetFamilyTree(GameObject* parent, std::vector<EntityID>& familyTree);
