@@ -5,6 +5,17 @@
       "localID": 1,
       "parentID": 4294967295,
       "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
       "children": []
     },
     {
@@ -242,7 +253,7 @@
       },
       "ColliderComponent": {
         "shape": "Square",
-        "layer": "Default"
+        "layer": "Ground"
       },
       "children": []
     }

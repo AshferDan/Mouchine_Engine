@@ -26,6 +26,8 @@ namespace GameScripts
             Idle = 0,
             Running,
             Jumping,
+            Falling,
+            Land,
             Dashing,
             GroundPounding,
             Rolling,
@@ -162,6 +164,7 @@ namespace GameScripts
         {
             if (gameObjectName == null || gameObjectName == "") return;
 
+            currState = PlayerState.Idle;
             UpdatePlayerState();
 
             // Handle all timers
@@ -174,8 +177,50 @@ namespace GameScripts
             // Handle Inputs
             HandleGeneralInput();
             CollisionChecks();
-            //Jump(fixeddt);
             OnFixedUpdate(fixeddt);
+
+            switch(currState)
+            {
+                case PlayerState.Idle:
+                    Animation.PlayAnimation(gameObjectName, "Idle");
+                    break;
+                case PlayerState.Jumping:
+                    Animation.PlayAnimation(gameObjectName, "Jump");
+                    break;
+                case PlayerState.Running:
+                    Animation.PlayAnimation(gameObjectName, "Run");
+                    break;
+                case PlayerState.Falling:
+                    Animation.PlayAnimation(gameObjectName, "Falling");
+                    break;
+                case PlayerState.Land:
+                    Animation.PlayAnimation(gameObjectName, "Land");
+                    break;
+                case PlayerState.Dashing:
+                    Animation.PlayAnimation(gameObjectName, "Dash");
+                    break;
+                case PlayerState.GroundPounding:
+                    Animation.PlayAnimation(gameObjectName, "Groundpound");
+                    break;
+                case PlayerState.Rolling:
+                    Animation.PlayAnimation(gameObjectName, "Roll");
+                    break;
+                case PlayerState.WallKicking:
+                    Animation.PlayAnimation(gameObjectName, "Wallkick");
+                    break;
+                case PlayerState.Ziplining:
+                    Animation.PlayAnimation(gameObjectName, "Zipline");
+                    break;
+                case PlayerState.Gliding:
+                    Animation.PlayAnimation(gameObjectName, "Glide");
+                    break;
+                case PlayerState.WallSliding:
+                    Animation.PlayAnimation(gameObjectName, "Wallslide");
+                    break;
+                case PlayerState.WallJumping:
+                    Animation.PlayAnimation(gameObjectName, "Wallkick");
+                    break;
+            }
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
@@ -315,11 +360,13 @@ namespace GameScripts
             }
 
             canWallKick = _isTouchingWall;
+            if (_isTouchingWall && !_isGrounded) currState = PlayerState.WallSliding;
         }
 
         private void IsGrounded()
         {
             _isGrounded = false;
+            bool oldIsGrounded = _isGrounded;
             vec2 position = Transform.GetPosition(gameObjectName);
             vec2 scale = Transform.GetScale(gameObjectName);
             float halfWidth = Math.Abs(scale.x) / 2;
@@ -337,6 +384,11 @@ namespace GameScripts
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
+                if (oldIsGrounded)
+                {
+                    Audio.PlaySound("land_sfx", "sfx");
+                    currState = PlayerState.Land;
+                }
                 return;
             }
 
@@ -346,6 +398,7 @@ namespace GameScripts
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
+                if (oldIsGrounded) Audio.PlaySound("land_sfx", "sfx");
                 return;
             }
 
@@ -355,6 +408,7 @@ namespace GameScripts
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
+                if (oldIsGrounded) Audio.PlaySound("land_sfx", "sfx");
                 return;
             }
         }
@@ -391,7 +445,6 @@ namespace GameScripts
             if (RaycastForWall(centerRayOrigin, rayDirection, raycastLength))
             {
                 _isTouchingWall = true;
-                Debug.Log("TOUCHING");
                 return;
             }
 
@@ -468,6 +521,7 @@ namespace GameScripts
         {
             _isFacingRight = turnRight;
             vec2 currentScale = Transform.GetScale(gameObjectName);
+            // [WIP] to include left and right animations for accurate monocle, for now will just do a basic flip
             Transform.SetScale(gameObjectName, Math.Abs(currentScale.x) * (turnRight ? 1 : -1), currentScale.y);
         }
 
@@ -486,6 +540,8 @@ namespace GameScripts
             // apply gravity while jumping
             if (_isJumping)
             {
+                currState = PlayerState.Jumping;
+                if (_isTouchingWall) currState = PlayerState.WallSliding;
                 // Head bump detection – unchanged
                 if (_bumpedHead)
                 {
@@ -537,6 +593,7 @@ namespace GameScripts
             // jump cut
             if (_isFastFalling)
             {
+                currState = PlayerState.Falling;
                 if (_fastFallTime < MoveStats.TimeForUpwardsCancel)
                 {
                     VerticalVelocity = Utils.MathfLerp(_fastFallReleaseSpeed, 0f, _fastFallTime / MoveStats.TimeForUpwardsCancel);
@@ -723,12 +780,14 @@ namespace GameScripts
 
             // ensure jump velocity does not interfere
             Physics.SetVelocity(gameObjectName, _moveVelocity.x, 0);
+            Audio.PlaySound("dash_sfx", "sfx");
         }
 
         private void Dash(float deltaTime)
         {
             if (_isDashing)
             {
+                currState = PlayerState.Dashing;
                 // maintain dash speed and zero vertical velocity while dashing
                 VerticalVelocity = 0f;
                 float direction = _isFacingRight ? 1 : -1;
@@ -787,12 +846,14 @@ namespace GameScripts
             VerticalVelocity = 0f;
 
             Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
+            Audio.PlaySound("wallkick_sfx", "sfx");
         }
 
         private void WallKick(float deltaTime)
         {
             if (!_isWallKicking) return;
 
+            currState = PlayerState.WallKicking;
             blockMovement = true;
             _isJumping = false;
 
@@ -881,12 +942,14 @@ namespace GameScripts
 
             // Store starting position for midair pause
             lastPos = Transform.GetPosition(gameObjectName);
+            Audio.PlaySound("groundpound_sfx", "sfx");
         }
 
         private void GroundPound(float deltaTime)
         {
             if (!_isGroundPounding) return;
 
+            currState = PlayerState.GroundPounding;
             if (_groundPoundPauseTimer > 0f)
             {
                 // Pause in midair
@@ -919,6 +982,7 @@ namespace GameScripts
 
         private void StopGroundPound()
         {
+            Audio.StopSound("groundpound_sfx");
             if (_isGrounded)
             {
                 InitiateRoll();
@@ -958,12 +1022,14 @@ namespace GameScripts
             // Set roll velocity
             _moveVelocity.x = _isFacingRight ? MoveStats.RollSpeed : -MoveStats.RollSpeed;
             VerticalVelocity = 0f;
+            Audio.PlaySound("roll_sfx", "sfx");
         }
 
         private void Roll(float deltaTime)
         {
             if (!_isRolling) return;
 
+            currState = PlayerState.Rolling;
             // Cancel roll if touching wall in air
             if (canWallKick)
             {
@@ -1020,7 +1086,7 @@ namespace GameScripts
                 _glideCooldownTimer -= deltaTime;
 
             if (!_isGliding) return;
-
+            currState = PlayerState.Gliding;
             // Cancel glide if grounded or dashing
             if (_isGrounded || _isDashing)
             {
