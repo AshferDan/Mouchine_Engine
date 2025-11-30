@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file       GameTimerSystem.h
+\author     Leck Xin Yee [100% - ??? lines]
+\par        xinyee.leck@digipen.edu
+\date       November, 26, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 
 #include "core.h"

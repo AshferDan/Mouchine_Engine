@@ -1,4 +1,19 @@
+/* Start Header ************************************************************************/
+/*!
+\file       GameTimerSystem.cpp
+\author     Leck Xin Yee [100% - ??? lines]
+\par        xinyee.leck@digipen.edu
+\date       November, 26, 2025
+
+Copyright (C) 2025 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "GameTimerSystem.h"
+#include "WinLoseLogic.h"
 
 #include <cstdio>
 #include <iostream>
@@ -20,6 +35,26 @@ void GameTimerSystem::Update(float dt)
     }
 
     EditorMode mode = editor->GetEditorMode();
+
+    // check if timer object exists in current scene, if not don't run timer
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* timerGO = factory.FindGameObject(timerObjectName);
+    if (!timerGO)
+    {
+        // timer doesn't exist in this scene (e.g. main menu), don't run
+        return;
+    }
+
+    // hide timer if win or lose screen is active
+    WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
+    if (winLoseLogic && (winLoseLogic->IsWinScreenActive() || winLoseLogic->IsLoseScreenActive()))
+    {
+        if (timerGO->IsActive())
+        {
+            timerGO->SetActive(false);
+        }
+        return;
+    }
 
     // reset timer and text
     if (mode == EditorMode::Stop)
@@ -105,6 +140,21 @@ void GameTimerSystem::UpdateText(int totalSeconds)
     {
         //std::cout << "[GameTimerSystem] No TextComponent on \"" << timerObjectName << "\".\n";
         return;
+    }
+
+    // check if win or lose screen is active, if so hide the timer
+    WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
+    if (winLoseLogic && (winLoseLogic->IsWinScreenActive() || winLoseLogic->IsLoseScreenActive()))
+    {
+        textComp->SetText("");
+        timerGO->SetActive(false);
+        return;
+    }
+
+    // make sure timer is active when not on win/lose screen
+    if (!timerGO->IsActive())
+    {
+        timerGO->SetActive(true);
     }
 
     int minutes = totalSeconds / 60;
