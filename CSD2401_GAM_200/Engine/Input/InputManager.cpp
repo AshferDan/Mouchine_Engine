@@ -380,7 +380,7 @@ void InputManager::Update(float dt)
 
     if (!player)
     {
-        player = GameObjectFactory::Instance().FindGameObject("Hero");
+        player = GameObjectFactory::Instance().FindGameObject("Hero2");
         if (player)
         {
             cachedPlayerID = player->GetID();
