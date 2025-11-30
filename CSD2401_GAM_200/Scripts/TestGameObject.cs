@@ -14,6 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 using CSharpScript;
+using System.Runtime.CompilerServices;
 
 namespace GameScripts
 {
@@ -35,6 +36,26 @@ namespace GameScripts
                 false,
                 true
             );
+            // Add sounds
+            Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx", "../Assets/audio/Player/Footstep.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.2f, 1.0f, "sfx");
+            Audio.AddSound("dash_sfx", "../Assets/audio/Player/Dash.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
+
+            Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png"       , 13, 10, 7, 0, 7, 2, 4.0f);
+            Animation.RegisterAnimation("Hero", "Run", "../Assets/spritesheet_R.png"        , 13, 10, 12, 0, 12, 7, 16.0f);
+            Animation.RegisterAnimation("Hero", "Jump", "../Assets/spritesheet_R.png"       , 13, 10, 11, 4, 11, 5, 12.0f);
+            Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png"      , 13, 10, 1, 0, 1, 2, 8.0f);
+            Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png"       , 13, 10, 8, 0, 8, 5, 12.0f);
+            Animation.RegisterAnimation("Hero", "Groundpound", "../Assets/spritesheet_R.png", 13, 10, 9, 3, 9, 4, 10.0f);
+            Animation.RegisterAnimation("Hero", "Dash", "../Assets/spritesheet_R.png"       , 13, 10, 3, 0, 3, 2, 4.0f);
+            Animation.RegisterAnimation("Hero", "Wallkick", "../Assets/spritesheet_R.png"   , 13, 10, 4, 3, 4, 4, 4.0f);
+            Animation.RegisterAnimation("Hero", "Wallslide", "../Assets/spritesheet_L.png"  , 13, 10, 4, 0, 4, 1, 4.0f);
+            Animation.RegisterAnimation("Hero", "Falling", "../Assets/spritesheet_L.png"    , 13, 10, 10, 0, 10, 1, 4.0f);
+            Animation.RegisterAnimation("Hero", "Land", "../Assets/spritesheet_L.png"       , 13, 10, 10, 3, 10, 4, 4.0f);
 
             // Attach the player movement script to the Hero
             CSharpScript.Scripting.AttachScript("Hero", "PlayerMovement");

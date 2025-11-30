@@ -419,7 +419,7 @@ namespace CSharpScript
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern vec2 GetVelocity(string objectName);
 
-        public static vec2 gravity = new vec2(0.0f, -9.81f);
+        public static vec2 gravity => new vec2(0.0f, -9.81f);
     }
 
     /// <summary>
@@ -770,13 +770,12 @@ namespace CSharpScript
         public static vec2 Movement()
         {
             float x = 0;
-            if (GetKeyHeld(KeyCode.D)) x += 1;
-            if (GetKeyHeld(KeyCode.A)) x -= 1;
+            if (GetKeyHeld(KeyCode.D)) x = 1;
+            else if (GetKeyHeld(KeyCode.A)) x = -1;
 
             float y = 0;
-            if (GetKeyHeld(KeyCode.W)) y += 1;
-            if (GetKeyHeld(KeyCode.S)) y -= 1;
-            
+            if (GetKeyHeld(KeyCode.W)) y = 1;
+            else if (GetKeyHeld(KeyCode.S)) y = -1;
             return new vec2(x, y);
         }
 
