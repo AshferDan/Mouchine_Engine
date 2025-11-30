@@ -36,6 +36,7 @@ namespace GameScripts
                 false,
                 true
             );
+            Audio.AddSound("jump_sfx", "../Assets/audio/jump.wav", false, 0.8f, 1.0f, "sfx");
 
             // Attach the player movement script to the Hero
             CSharpScript.Scripting.AttachScript("Hero", "PlayerMovement");

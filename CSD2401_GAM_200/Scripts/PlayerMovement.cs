@@ -147,9 +147,8 @@ namespace GameScripts
 
             _isFacingRight = true;
 
-            Debug.Log("PlayerMovement Script OnStart for object: " + gameObjectName);
             Physics.SetGravity(gameObjectName, true);
-            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n\n\n\n\n");
+          
 
             vec2 scale = Transform.GetScale(gameObjectName);
             vec2 position = Transform.GetPosition(gameObjectName);
@@ -157,8 +156,6 @@ namespace GameScripts
             Physics.SetFriction(gameObjectName, 0f);
             Physics.SetMass(gameObjectName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
-
-            Audio.AddSound("jump", "..Assets/Audio/jump.wav", false, 1, 1, "sfx");
         }
 
         public void OnUpdate(float deltaTime)
@@ -672,7 +669,7 @@ namespace GameScripts
                 _isJumping = true;
             }
 
-            Audio.PlaySound("jump", "sfx");
+            Audio.PlaySound("jump_sfx", "sfx");
             _jumpBufferTimer = 0f;
             _numberOfJumpsUsed += numberOfJumpsUsed;
             VerticalVelocity = MoveStats.InitialJumpVelocity;
