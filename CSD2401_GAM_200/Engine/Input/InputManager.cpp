@@ -577,17 +577,38 @@ void InputManager::Update(float dt)
         }
     }
 
-    // Wall slide effect (pretty cool ngl)
+    // ===== WALL SLIDE SYSTEM =====
     bool touchingLeftWall = physics->isCollidingLeft &&
         physics->leftCollisionLayer == CollisionLayer::Ground;
     bool touchingRightWall = physics->isCollidingRight &&
         physics->rightCollisionLayer == CollisionLayer::Ground;
 
+    // Check if player is pushing towards wall
+    bool isPushingTowardsWall = (touchingRightWall && moveDirectionX > 0) ||
+                                 (touchingLeftWall && moveDirectionX < 0);
+
+    // Wall slide activates when: touching wall, pushing towards it, in air, and falling
     if ((touchingLeftWall || touchingRightWall) &&
+        isPushingTowardsWall &&
         !physics->IsGrounded() &&
-        physics->velocity.y < -50.0f) {
+        physics->velocity.y < 0) {
+
+        if (!isWallSliding) {
+            isWallSliding = true;
+            std::cout << "[Wall Slide] Started!" << std::endl;
+        }
+
         // Slow down fall when sliding on wall
-        physics->velocity.y = -50.0f;
+        static float WALL_SLIDE_SPEED = -50.0f;
+        if (physics->velocity.y < WALL_SLIDE_SPEED) {
+            physics->velocity.y = WALL_SLIDE_SPEED;
+        }
+    }
+    else {
+        if (isWallSliding) {
+            isWallSliding = false;
+            std::cout << "[Wall Slide] Stopped!" << std::endl;
+        }
     }
 
     /**
@@ -597,17 +618,33 @@ void InputManager::Update(float dt)
     //{
     //    InputManager::KeyStateImgui = true;
     //}
-    // Jump
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    // ===== JUMP & DOUBLE JUMP SYSTEM =====
+    // Reset jump count when grounded
+    if (physics->IsGrounded() && numberOfJumpsUsed > 0) {
+        numberOfJumpsUsed = 0;
+    }
+
+    static bool jumpKeyPressed = false;
+    bool jumpKeyDown = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+
+    if (jumpKeyDown && !jumpKeyPressed)
     {
-        // Only jump if grounded
+        jumpKeyPressed = true;
         is_jumping = true;
-        if (physics->IsGrounded())
+
+        // Can jump if: grounded OR in air but haven't used all jumps
+        bool canJump = physics->IsGrounded() || numberOfJumpsUsed < maxJumps;
+
+        if (canJump && !isGroundPounding && !isRolling)
         {
             is_jumping = false;
-            // Apply jump
+
+            // Apply jump force
             physics->GetForcesManager().AddForce(ForceType::Jump, HERO_JUMP_FORCE, HERO_JUMP_DURATION);
             physics->GetVelocity(vx, vy); // Get updated VY after jump
+
+            // Increment jump count
+            numberOfJumpsUsed++;
 
             // Decrease timer on jump
             auto* timerSystem = CORE->GetGameTimerSystem();
@@ -623,11 +660,20 @@ void InputManager::Update(float dt)
                 audioManager->TriggerEvent("PlayerJump");
                 std::cout << "[InputManager] SPACE pressed to sending PlaySoundMessage\n";
                 std::cout << "[InputManager] CORE pointer = " << CORE << std::endl;
-                //PlaySoundMessage msg("jump_sfx");
-                //CORE->GetMessageBus().Publish(msg);
-                 audioManager->PlaySound("jump_sfx", "jump_channel");
+                audioManager->PlaySound("jump_sfx", "jump_channel");
+            }
+
+            // Log jump type
+            if (numberOfJumpsUsed == 1) {
+                std::cout << "[Jump] First jump" << std::endl;
+            }
+            else if (numberOfJumpsUsed == 2) {
+                std::cout << "[Jump] Double jump!" << std::endl;
             }
         }
+    }
+    else if (!jumpKeyDown) {
+        jumpKeyPressed = false;
     }
 
     // ===== DASH SYSTEM =====
@@ -635,8 +681,8 @@ void InputManager::Update(float dt)
     static bool dashKeyPressed = false;
     static bool wasDashing = false;
 
-    // Dash input (LEFT SHIFT key)
-    bool dashKeyDown = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+    // Dash input (J key)
+    bool dashKeyDown = (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS);
 
     if (dashKeyDown && !dashKeyPressed)
     {
@@ -701,6 +747,220 @@ void InputManager::Update(float dt)
         std::cout << "[Dash] Air dash restored (grounded)" << std::endl;
     }
 
+    // ===== WALL KICK SYSTEM =====
+    static float WALL_KICK_SPEED = 400.0f;
+    static float WALL_KICK_VERTICAL = 300.0f;
+    static float WALL_KICK_DURATION = 0.15f;
+    static float WALL_KICK_COOLDOWN = 0.5f;
+
+    // Update cooldown timer
+    if (wallKickCooldownTimer > 0) {
+        wallKickCooldownTimer -= dt;
+    }
+
+    // Update wall kick timer
+    if (isWallKicking && wallKickTimer > 0) {
+        wallKickTimer -= dt;
+        if (wallKickTimer <= 0) {
+            isWallKicking = false;
+            std::cout << "[Wall Kick] Ended" << std::endl;
+        }
+    }
+
+    // Check if touching a wall
+    bool canWallKick = (touchingLeftWall || touchingRightWall) && !physics->IsGrounded();
+
+    // Wall Kick input (L key)
+    bool wallKickKeyDown = (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS);
+
+    if (wallKickKeyDown && !wallKickKeyPressed) {
+        wallKickKeyPressed = true;
+
+        // Can wall kick if touching wall, not grounded, and cooldown ready
+        if (canWallKick && wallKickCooldownTimer <= 0 && !isWallKicking) {
+            isWallKicking = true;
+            wallKickTimer = WALL_KICK_DURATION;
+            wallKickCooldownTimer = WALL_KICK_COOLDOWN;
+
+            // Determine kick direction (opposite of wall)
+            float kickDirectionX = touchingRightWall ? -1.0f : 1.0f;
+
+            // Apply wall kick velocity
+            physics->SetVelocity(kickDirectionX * WALL_KICK_SPEED, WALL_KICK_VERTICAL);
+
+            // Decrease timer on wall kick
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem) {
+                timerSystem->DecreaseTime(1.0f);
+            }
+
+            std::cout << "[Wall Kick] Initiated! Direction: " << (kickDirectionX > 0 ? "Right" : "Left") << std::endl;
+        }
+    }
+    else if (!wallKickKeyDown) {
+        wallKickKeyPressed = false;
+    }
+
+    // ===== GROUND POUND SYSTEM =====
+    static float GROUND_POUND_PAUSE_TIME = 0.2f;
+    static float GROUND_POUND_FALL_SPEED = 800.0f;
+
+    // Update ground pound pause timer
+    if (isGroundPounding && groundPoundPauseTimer > 0) {
+        groundPoundPauseTimer -= dt;
+        // Keep player stationary during pause
+        physics->SetVelocity(0.0f, 0.0f);
+    }
+
+    // Ground Pound input (S key when in air)
+    bool groundPoundKeyDown = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
+
+    if (groundPoundKeyDown && !groundPoundKeyPressed) {
+        groundPoundKeyPressed = true;
+
+        // Can ground pound if in air and not already ground pounding
+        if (!physics->IsGrounded() && !isGroundPounding) {
+            isGroundPounding = true;
+            groundPoundPauseTimer = GROUND_POUND_PAUSE_TIME;
+
+            // Cancel other abilities
+            isGliding = false;
+
+            // Decrease timer on ground pound
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem) {
+                timerSystem->DecreaseTime(1.0f);
+            }
+
+            std::cout << "[Ground Pound] Initiated!" << std::endl;
+        }
+    }
+    else if (!groundPoundKeyDown) {
+        groundPoundKeyPressed = false;
+    }
+
+    // Execute ground pound (after pause)
+    if (isGroundPounding && groundPoundPauseTimer <= 0) {
+        if (!physics->IsGrounded()) {
+            // Apply downward velocity
+            physics->SetVelocity(0.0f, -GROUND_POUND_FALL_SPEED);
+        }
+        else {
+            // Hit ground - convert to roll
+            isGroundPounding = false;
+            isRolling = true;
+            rollTimer = 0.6f; // Extended roll from ground pound
+            std::cout << "[Ground Pound] Landed! Converting to roll" << std::endl;
+        }
+    }
+
+    // ===== ROLL SYSTEM =====
+    static float ROLL_SPEED = 350.0f;
+    static float ROLL_DURATION = 0.4f;
+
+    // Update roll timer
+    if (isRolling && rollTimer > 0) {
+        rollTimer -= dt;
+
+        // Apply roll velocity (maintain direction)
+        float rollDirection = (moveDirectionX != 0) ? moveDirectionX : 1.0f;
+        physics->SetVelocity(rollDirection * ROLL_SPEED, physics->velocity.y);
+
+        // Stop rolling when hitting a wall
+        if ((touchingLeftWall && rollDirection < 0) || (touchingRightWall && rollDirection > 0)) {
+            isRolling = false;
+            rollTimer = 0.0f;
+            std::cout << "[Roll] Stopped by wall" << std::endl;
+        }
+
+        if (rollTimer <= 0) {
+            isRolling = false;
+            std::cout << "[Roll] Ended" << std::endl;
+        }
+    }
+
+    // Roll input (K key when grounded)
+    bool rollKeyDown = (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS);
+
+    if (rollKeyDown && !rollKeyPressed) {
+        rollKeyPressed = true;
+
+        // Can roll if grounded and not already rolling
+        if (physics->IsGrounded() && !isRolling) {
+            isRolling = true;
+            rollTimer = ROLL_DURATION;
+
+            // Decrease timer on roll
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem) {
+                timerSystem->DecreaseTime(1.0f);
+            }
+
+            std::cout << "[Roll] Initiated!" << std::endl;
+        }
+    }
+    else if (!rollKeyDown) {
+        rollKeyPressed = false;
+    }
+
+    // ===== GLIDE SYSTEM =====
+    static float GLIDE_FALL_SPEED = -80.0f; // Target fall speed while gliding (adjust as needed)
+    static float GLIDE_COOLDOWN = 2.0f;
+
+    // Update glide cooldown timer
+    if (glideCooldownTimer > 0) {
+        glideCooldownTimer -= dt;
+    }
+
+    // Glide input (W key held when in air)
+    bool glideKeyHeld = (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+
+    if (glideKeyHeld && !physics->IsGrounded() && glideCooldownTimer <= 0)
+    {
+        if (!isGliding) {
+            isGliding = true;
+            std::cout << "[Glide] Started!" << std::endl;
+        }
+
+        // Apply glide effect - clamp fall speed to glide speed
+        if (physics->velocity.y < GLIDE_FALL_SPEED) {
+            // Gradually slow down to glide speed
+            physics->velocity.y += 500.0f * dt; // Adjust deceleration rate as needed
+            if (physics->velocity.y > GLIDE_FALL_SPEED) {
+                physics->velocity.y = GLIDE_FALL_SPEED;
+            }
+        }
+        else if (physics->velocity.y > GLIDE_FALL_SPEED) {
+            // If falling slower than glide speed, set to glide speed
+            physics->velocity.y = GLIDE_FALL_SPEED;
+        }
+
+        // Decrease timer periodically while gliding
+        static float glideTimerAccumulator = 0.0f;
+        glideTimerAccumulator += dt;
+        if (glideTimerAccumulator >= 0.5f) {
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem) {
+                timerSystem->DecreaseTime(0.5f);
+            }
+            glideTimerAccumulator = 0.0f;
+        }
+    }
+    else {
+        // Stop gliding
+        if (isGliding) {
+            isGliding = false;
+            glideCooldownTimer = GLIDE_COOLDOWN;
+            std::cout << "[Glide] Stopped! Cooldown: " << GLIDE_COOLDOWN << "s" << std::endl;
+        }
+    }
+
+    // Cancel glide when grounded or dashing
+    if (isGliding && (physics->IsGrounded() || isDashing)) {
+        isGliding = false;
+        glideCooldownTimer = GLIDE_COOLDOWN;
+        std::cout << "[Glide] Cancelled!" << std::endl;
+    }
     auto* anim = player->GetComponent<Spritesheet>();
         if (transform && anim)
         {
@@ -750,5 +1010,28 @@ void InputManager::Update(float dt)
         jumpStartY = 0.0f;
         footstepTimer = 0.0f;
         cachedPlayerID = 0;
-        std::cout << "[InputManager] State reset." << std::endl;
+
+        // Reset all ability states
+        isWallKicking = false;
+        wallKickTimer = 0.0f;
+        wallKickCooldownTimer = 0.0f;
+        wallKickKeyPressed = false;
+
+        isGroundPounding = false;
+        groundPoundPauseTimer = 0.0f;
+        groundPoundKeyPressed = false;
+
+        isRolling = false;
+        rollTimer = 0.0f;
+        rollKeyPressed = false;
+
+        isGliding = false;
+        glideCooldownTimer = 0.0f;
+        glideKeyPressed = false;
+
+        isWallSliding = false;
+
+        numberOfJumpsUsed = 0;
+
+        std::cout << "[InputManager] State reset (including all abilities)." << std::endl;
     }
