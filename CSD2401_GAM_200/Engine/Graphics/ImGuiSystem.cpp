@@ -2267,7 +2267,6 @@ void ImGuiSystem::RenderPropertyEditor()
     }
 
     // Collider component
-    // Collider component
     if (auto* collider = obj->GetComponent<ColliderComponent>())
     {
         if (ImGui::CollapsingHeader("Collider"))
