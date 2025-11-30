@@ -245,7 +245,6 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
                                                    char const *filename, int numRows, int numCols,
                                                    int startFrame, int endFrame, float fps, CollisionLayer)
 {
-    (void)layer;
     GameObject *obj = CreateGameObject(name);
 
     auto *transform = obj->AddComponent<TransformComponent>(x, y);

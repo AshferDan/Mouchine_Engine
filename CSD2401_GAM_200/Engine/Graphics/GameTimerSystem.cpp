@@ -96,10 +96,10 @@ void GameTimerSystem::Update(float dt)
 
             // LOSE CONDITION - trigger lose screen
             std::cout << "TIME'S UP! Triggering lose screen..." << std::endl;
-            WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
-            if (winLoseLogic)
+            WinLoseLogicSystem* P_winLoseLogic = CORE->GetWinLoseLogic();
+            if (P_winLoseLogic)
             {
-                winLoseLogic->TriggerLose();
+                P_winLoseLogic->TriggerLose();
             }
             return;
         }
