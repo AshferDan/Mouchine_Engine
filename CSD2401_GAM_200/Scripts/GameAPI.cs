@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameAPI.cs
-\author     Jonathan Fam Qian Wei [100% - 125 lines]
+\author     Jonathan Fam Qian Wei [100% - 372 lines]
 \par        Fam.q@digipen.edu
 \date       Novenber, 7, 2025
 
@@ -400,6 +400,22 @@ namespace CSharpScript
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetStatic(string objectName, bool isStatic);
 
+        /// <summary>
+        /// Sets the mass of a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="mass">The mass value to set.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetMass(string objectName, float mass);
+
+        /// <summary>
+        /// Sets the friction coefficient of a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="friction">The friction coefficient value to set.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFriction(string objectName, float friction);
+
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern vec2 GetVelocity(string objectName);
 
@@ -520,6 +536,94 @@ namespace CSharpScript
         /// <param name="objectName">The name of the GameObject.</param>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AddPhysicsComponent(string objectName);
+
+        /// <summary>
+        /// Adds a Text component to a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="fontPath">The file path to the font.</param>
+        /// <param name="fontSize">The size of the font.</param>
+        /// <param name="text">The initial text content.</param>
+        /// <param name="r">Red component (0.0 to 1.0).</param>
+        /// <param name="g">Green component (0.0 to 1.0).</param>
+        /// <param name="b">Blue component (0.0 to 1.0).</param>
+        /// <param name="a">Alpha component (0.0 to 1.0).</param>
+        /// <param name="screenSpace">Whether to render in screen space.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddTextComponent(string objectName, string fontPath, uint fontSize, string text, float r, float g, float b, float a, bool screenSpace);
+    }
+
+    /// <summary>
+    /// Text component functions for managing text display.
+    /// </summary>
+    public static class Text
+    {
+        /// <summary>
+        /// Sets the text content of a GameObject's TextComponent.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="text">The text content to set.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetText(string objectName, string text);
+
+        /// <summary>
+        /// Gets the text content of a GameObject's TextComponent.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>The text content.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string GetText(string objectName);
+
+        /// <summary>
+        /// Sets the color of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="r">Red component (0.0 to 1.0).</param>
+        /// <param name="g">Green component (0.0 to 1.0).</param>
+        /// <param name="b">Blue component (0.0 to 1.0).</param>
+        /// <param name="a">Alpha component (0.0 to 1.0).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTextColor(string objectName, float r, float g, float b, float a);
+
+        /// <summary>
+        /// Gets the color of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>The text color as vec4.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern vec4 GetTextColor(string objectName);
+
+        /// <summary>
+        /// Sets the scale of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="scale">The scale factor.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTextScale(string objectName, float scale);
+
+        /// <summary>
+        /// Gets the scale of the text.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>The scale factor.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetTextScale(string objectName);
+
+        /// <summary>
+        /// Sets whether the text is rendered in screen space.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="screenSpace">True for screen space, false for world space.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTextScreenSpace(string objectName, bool screenSpace);
+
+        /// <summary>
+        /// Gets whether the text is rendered in screen space.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <returns>True if in screen space, false if in world space.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool GetTextScreenSpace(string objectName);
     }
 
 

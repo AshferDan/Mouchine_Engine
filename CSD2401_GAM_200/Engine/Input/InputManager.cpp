@@ -18,6 +18,9 @@ Technology is prohibited.
 #include "core.h"
 #include "Serialization.h"
 #include "IMessageHandler.h"
+#include "GameTimerSystem.h"
+#include "PauseMenuLogic.h"
+#include "LevelEditor.h"
 
 bool InputManager::KeyStateImgui = true;
 double InputManager::MouseWorldX = 0.0;
@@ -202,7 +205,8 @@ void InputManager::Update(float dt)
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
         {GLFW_KEY_M, false}, // toggle pause (for now)
-        {GLFW_KEY_ENTER, false}, 
+        {GLFW_KEY_ENTER, false},
+        {GLFW_KEY_ESCAPE,false},
         {GLFW_KEY_P, false}
     };
 
@@ -227,8 +231,6 @@ void InputManager::Update(float dt)
 
 
     // handle M key for pausing and resuming background music
-    static bool bgmPaused = false;
-
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
     {
         if (!singleTriggerKeys[GLFW_KEY_M])
@@ -236,11 +238,78 @@ void InputManager::Update(float dt)
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
-                bgmPaused = !bgmPaused;
-                audioManager->StopSound("bgm_channel");
-                std::cout << "BGM " << (bgmPaused ? "paused" : "resumed") << std::endl;
+                audioManager->ToggleMute();
             }
             singleTriggerKeys[GLFW_KEY_M] = true;
+        }
+    }
+
+    // Check if in play mode for pause menu 
+    LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
+    bool isPlayMode = (editor && editor->GetEditorMode() == EditorMode::Play);
+
+    // Handle ESC key
+    if (isPlayMode)
+    {
+        // Check if win or lose screen is active - if so, disable ESC key
+        WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+        bool winScreenActive = winZone && winZone->IsWinScreenActive();
+        bool loseScreenActive = winZone && winZone->IsLoseScreenActive();
+
+        // In play mode: ESC toggles pause menu (unless win/lose screen is active)
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive) {
+                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+                if (pauseMenu)
+                {
+                    pauseMenu->TogglePauseMenu();
+                }
+                singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+            }
+        }
+        else
+        {
+            singleTriggerKeys[GLFW_KEY_ESCAPE] = false;
+        }
+    }
+    else
+    {
+        // Not in play mode: ESC quits the game
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            KeyStateQuit = true;
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+    }
+
+    // Handle P key
+    if (isPlayMode)
+    {
+        // In play mode: P toggles pause menu
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            if (!singleTriggerKeys[GLFW_KEY_P])
+            {
+                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+                if (pauseMenu)
+                {
+                    pauseMenu->TogglePauseMenu();
+                }
+                singleTriggerKeys[GLFW_KEY_P] = true;
+            }
+        }
+        else
+        {
+            singleTriggerKeys[GLFW_KEY_P] = false;
+        }
+    }
+    else
+    {
+        // Not in play mode: P toggles ImGui
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        {
+            InputManager::KeyStateImgui = true;
         }
     }
 
@@ -341,6 +410,8 @@ void InputManager::Update(float dt)
     float vx, vy;
     physics->GetVelocity(vx, vy);
 
+    physics->SetFrictionCoefficient(HERO_FRICTION_COEFFICIENT);
+
     /**
      * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
      */
@@ -404,7 +475,7 @@ void InputManager::Update(float dt)
         // Add friction to slow down (only if not already present)
         if (!forcesManager.HasForceType(ForceType::Friction) && physics->IsGrounded())
         {
-            forcesManager.AddForce(ForceType::Friction, HERO_FRICTION_COEFFICIENT, -1.0f, 0.0f, 0.0f, &physics->isGrounded);
+            forcesManager.AddForce(ForceType::Friction, -1.0f, -1.0f, 0.0f, 0.0f, &physics->isGrounded);
         }
 
         // Reset footstep timer when not moving
@@ -519,11 +590,6 @@ void InputManager::Update(float dt)
         physics->velocity.y = -50.0f;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        KeyStateQuit = true;
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
     /**
      * @brief Toggle on and off imgui
      */
@@ -542,6 +608,14 @@ void InputManager::Update(float dt)
             // Apply jump
             physics->GetForcesManager().AddForce(ForceType::Jump, HERO_JUMP_FORCE, HERO_JUMP_DURATION);
             physics->GetVelocity(vx, vy); // Get updated VY after jump
+
+            // Decrease timer on jump
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem)
+            {
+                timerSystem->DecreaseTime(1.0f); // Decrease by 1 second per jump
+            }
+
             // Play jump sound effect
             AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
@@ -594,6 +668,13 @@ void InputManager::Update(float dt)
 
             // Disable gravity during dash
             physics->SetGravity(false);
+
+            // Decrease timer on dash
+            auto* timerSystem = CORE->GetGameTimerSystem();
+            if (timerSystem)
+            {
+                timerSystem->DecreaseTime(1.0f); // Decrease by 1 second per dash
+            }
 
             // Mark air dash as used if in air
             if (!isGrounded) {

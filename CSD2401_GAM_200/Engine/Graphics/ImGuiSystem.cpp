@@ -182,7 +182,8 @@ void ImGuiSystem::Initialize()
     // TODO make this serialisable, so it remembers which one to load
     std::string layoutPath = LayoutsFilePath + "DefaultLayout.ini";
     ImGuiIO &io = ImGui::GetIO();
-    io.IniFilename = layoutPath.c_str();
+    //io.IniFilename = layoutPath.c_str();
+    io.IniFilename = nullptr;
     ImGui::LoadIniSettingsFromDisk(layoutPath.c_str());
 
     // Imgui flags

@@ -388,9 +388,8 @@ void LevelEditor::TogglePause()
 
         if (audioManager)
         {
-            std::cout << "[LevelEditor] Pausing music" << std::endl;
-            // stop the sound, to implement proper pause in audio manager
-            audioManager->StopSound("bgm_channel");
+            std::cout << "[LevelEditor] Pausing all audio" << std::endl;
+            audioManager->PauseAllSounds(true);
         }
         std::cout << "[LevelEditor] Game paused." << std::endl;
     }
@@ -400,8 +399,8 @@ void LevelEditor::TogglePause()
 
         if (audioManager)
         {
-            std::cout << "[LevelEditor] Resuming music" << std::endl;
-            audioManager->PlaySound("bgm", "bgm_channel");
+            std::cout << "[LevelEditor] Resuming all audio" << std::endl;
+            audioManager->PauseAllSounds(false);
         }
 
         if (CORE)
@@ -919,6 +918,21 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         std::cout << "Level loaded from: " << filepath << "\n";
         std::cout << "Loaded " << factory.GetAllGameObjects().size() << " game objects\n";
 
+        // Update pause menu with current scene path for restart functionality
+        if (CORE)
+        {
+            PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+            if (pauseMenu)
+            {
+                pauseMenu->SetCurrentScene(filepath);
+            }
+
+            WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+            if (winZone)
+            {
+                winZone->SetCurrentScene(filepath);
+            }
+        }
         currentTilemapPath = "";  // Clear any existing tilemap first
 
         if (root.contains("TilemapFile"))
