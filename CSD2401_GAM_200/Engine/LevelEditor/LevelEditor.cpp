@@ -1,7 +1,8 @@
 /* Start Header ************************************************************************/
 /*!
 \file       LevelEditor.cpp
-\author     Leck Xin Yee [100% - 1062 lines]
+\author     Leck Xin Yee [95% - 1223 lines]
+            Hwee Min [5% - 44 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 7, 2025
 
@@ -1770,38 +1771,3 @@ void LevelEditor::ClearTilemap()
         std::cout << "[LevelEditor] Tilemap reference cleared." << std::endl;
     }
 }
-
-/*  Audio Management */
-/**
- * @brief Play loaded background music
- */
-//void LevelEditor::PlayLoadedBGM()
-//{
-//    AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
-//
-//    if (audioEngine && !currentBGMName.empty())
-//    {
-//        std::cout << "[LevelEditor::PlayLoadedBGM] Starting BGM: " << currentBGMName
-//            << " on channel: " << currentBGMChannel << std::endl;
-//
-//        // stop any existing sound on this channel first
-//        audioEngine->stopSound(currentBGMChannel);
-//
-//        // play the BGM
-//        audioEngine->playSound(currentBGMName, currentBGMChannel);
-//        audioEngine->setVolume(currentBGMChannel, currentBGMVolume);
-//
-//        std::cout << "[LevelEditor::PlayLoadedBGM] BGM playing successfully.\n";
-//    }
-//    else
-//    {
-//        if (!audioEngine)
-//        {
-//            std::cout << "[LevelEditor::PlayLoadedBGM] No audio engine available.\n";
-//        }
-//        else if (currentBGMName.empty())
-//        {
-//            std::cout << "[LevelEditor::PlayLoadedBGM] No BGM loaded for this scene.\n";
-//        }
-//    }
-//}
