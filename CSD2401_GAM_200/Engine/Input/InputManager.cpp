@@ -174,10 +174,10 @@ void InputManager::Update(float dt)
             editorModeWarning = false;
         }
         // still allow escape key, but ignore player movement inputs
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        mouseX = xpos;
-        mouseY = ypos;
+        double xposition, yposition;
+        glfwGetCursorPos(window, &xposition, &yposition);
+        mouseX = xposition;
+        mouseY = yposition;
         return;
     }
 
@@ -508,7 +508,7 @@ void InputManager::Update(float dt)
     }
     else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
         CameraManager::Instance().AddCameraTrauma(1.f);
-        CameraManager::Instance().FlashActiveCamera(0.3, vec4(1.f, 0.f, 0.f, 0.7f));
+        CameraManager::Instance().FlashActiveCamera(0.3f, vec4(1.f, 0.f, 0.f, 0.7f));
         //CORE->SetGamePaused(!CORE->IsGamePaused());
     }
     else

@@ -20,7 +20,7 @@ namespace GameScripts
 {
     public class TestGameObjects2
     {
-        private float rotationSpeed = 90.0f;
+        //private float rotationSpeed = 90.0f;
 
         public void OnStart()
         {

@@ -567,6 +567,7 @@ void LevelEditor::RenderMenuBar()
     // new lvl
     if (ImGui::Button("New Level", ImVec2(200, 0)))
     {
+        CORE->GetImguiSystem()->ResetSelectedGameObject();
         NewLevel();
     }
 
@@ -796,9 +797,10 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             if (ps)
             {
                 ps->ClearCollisionQueue();
-            }
+            }   
         }
-    
+        // Clear event system (for gameObjects)
+        EventSystem::Clear();
 
         // stop/unload audio (if any)
         auto& resourceMgr = ResourceManager::Instance();
@@ -1253,6 +1255,15 @@ GameObject *LevelEditor::DeserialiseGameObject(const GameObjectData &data)
         auto *transform = obj->AddComponent<TransformComponent>(data.posX, data.posY);
         transform->SetScale(data.scaleX, data.scaleY);
         transform->SetRotation(data.rotation);
+
+        if (!obj->originalSaved)
+        {
+            transform->GetPosition(transform->posX, transform->posY);
+            obj->originalPos.x = transform->posX;
+            obj->originalPos.y = transform->posY;
+            obj->originalSaved = true;
+        }
+
     }
 
     // add render component
@@ -1597,6 +1608,9 @@ void LevelEditor::PerformSceneReload()
     pendingScenePath.clear();
 }
 
+/**
+ * @brief Record a new undo command into the undo history.
+ */
 void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     
     // Check if undo exceed 20
@@ -1611,6 +1625,9 @@ void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     
 }
 
+/**
+ * @brief Undo the most recent editor action.
+ */
 void LevelEditor::PerformUndo() {
     if (undoStack.empty()) return;
 
@@ -1684,6 +1701,10 @@ void LevelEditor::PerformUndo() {
     //redoStack.push_back(undocmd);
 }
 
+/**
+ * @brief Clears the entire undo history.
+ * Primarily used when loading a new scene or resetting editor state.
+ */
 void LevelEditor::ClearUndoStack() {
     undoStack.clear();
 }

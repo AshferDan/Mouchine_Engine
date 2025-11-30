@@ -240,7 +240,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     titleTransform->posY = 110.0f;
     titleTransform->scaleX = 400.0f;
     titleTransform->scaleY = 0.0f;
-    auto* titleText = title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* titleText = title->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", 80, "PAUSED", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // resume button
     GameObject* resumeBtn = factory.CreateGameObject("PauseResumeButton");
@@ -253,8 +254,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     resumeRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     resumeRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f)); // white tint
     resumeRender->SetLayer(102);
-    auto* resumeText = resumeBtn->AddComponent<TextComponent>(
+    resumeBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Resume", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* resumeText = resumeBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Resume", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // restart button
     GameObject* restartBtn = factory.CreateGameObject("PauseRestartButton");
@@ -267,8 +270,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     restartRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     restartRender->SetLayer(102);
-    auto* restartText = restartBtn->AddComponent<TextComponent>(
+    restartBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* restartText = restartBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // settings button
     GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
@@ -281,8 +286,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(102);
-    auto* settingsText = settingsBtn->AddComponent<TextComponent>(
+    settingsBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* settingsText = settingsBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // main menu button
     GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
@@ -295,8 +302,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     mainMenuRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/blankbtnL.png"));
     mainMenuRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     mainMenuRender->SetLayer(102);
-    auto* mainMenuText = mainMenuBtn->AddComponent<TextComponent>(
+    mainMenuBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    //auto* mainMenuText = mainMenuBtn->AddComponent<TextComponent>(
+    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
 
@@ -397,7 +406,7 @@ bool PauseMenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double
     auto* tx = button->GetComponent<TransformComponent>();
     if (!tx) return false;
 
-    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, mouseX, mouseY);
+    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
 /**

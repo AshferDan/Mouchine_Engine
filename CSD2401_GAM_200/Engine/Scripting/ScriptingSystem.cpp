@@ -551,14 +551,14 @@ static int Internal_RandomRange(int min, int max) {
     return API::RandomNumberGen(max, min); // Note: API args are (max, min)
 }
 static float Internal_GetDelta_Time() {
-    return API::GetDelta_Time();
+    return static_cast<float>(API::GetDelta_Time());
 }
 static float Internal_GetFixed_Delta_Time()
 {
-    return API::GetFixedDelta_time();
+    return static_cast<float>(API::GetFixedDelta_time());
 }
 static float Internal_GetFramesPerSecond() {
-    return API::GetFramePerSecond();
+    return static_cast<float>(API::GetFramePerSecond());
 }
 
 

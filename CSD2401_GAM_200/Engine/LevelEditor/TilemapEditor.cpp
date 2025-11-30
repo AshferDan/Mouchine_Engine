@@ -248,6 +248,7 @@ void TilemapEditor::Render()
  */
 void TilemapEditor::Update(float dt)
 {
+    (void)dt;
     // Update logic if needed
 }
 
@@ -587,8 +588,8 @@ void TilemapEditor::RenderTilesetPanel()
         int tilesPerColumn = currentTileset.tilesPerColumn;
 
         // Calculate total size needed to display all tiles in their original grid
-        float totalWidth = tilesPerRow * (tileSize + padding);
-        float totalHeight = tilesPerColumn * (tileSize + padding);
+        float totalWidth = static_cast<float>(tilesPerRow) * (tileSize + padding);
+        float totalHeight = static_cast<float>(tilesPerColumn) * (tileSize + padding);
 
         // Reserve space for the entire tileset grid (enables scrolling)
         ImGui::Dummy(ImVec2(totalWidth, totalHeight));
@@ -994,21 +995,22 @@ bool TilemapEditor::LoadTilemap(const std::string& filepath)
     tilemapHeight = j["height"];
 
     // Load the tileset that was used for this tilemap
-    std::string tilesetPath = j["tileset"];
+    std::string tsPath = j["tileset"];
+    //std::string tilesetPath = j["tileset"];
     int tileWidth = j["tileWidth"];
     int tileHeight = j["tileHeight"];
 
-    std::cout << "[TilemapEditor] Loading tilemap's tileset: " << tilesetPath << std::endl;
+    std::cout << "[TilemapEditor] Loading tilemap's tileset: " << tsPath << std::endl;
 
     // Set tile size before loading tileset
     currentTileset.tileWidth = tileWidth;
     currentTileset.tileHeight = tileHeight;
 
     // Load the tileset
-    if (!LoadTileset(tilesetPath))
+    if (!LoadTileset(tsPath))
     {
         std::cerr << "[TilemapEditor] WARNING: Failed to load tileset. Tiles may appear incorrect!" << std::endl;
-        std::cerr << "[TilemapEditor]          Expected tileset: " << tilesetPath << std::endl;
+        std::cerr << "[TilemapEditor]          Expected tileset: " << tsPath << std::endl;
     }
 
     CreateNewTilemap(tilemapWidth, tilemapHeight);
@@ -1277,7 +1279,8 @@ std::vector<GameObject*> TilemapEditor::LoadAndCreateTilemapGameObjects(
             int y = tileJson["y"];
             int layer = tileJson.contains("layer") ? (int)tileJson["layer"] : 0;
             int tileID = tileJson["id"];
-            bool isCollidable = tileJson.contains("collision") ? (bool)tileJson["collision"] : false;
+            //bool isCollidable = tileJson.contains("collision") ? (bool)tileJson["collision"] : false;
+            tileJson.contains("collision") ? (bool)tileJson["collision"] : false;
 
             // Skip empty/invalid tiles
             if (tileID < 0)
