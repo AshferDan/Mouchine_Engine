@@ -477,7 +477,7 @@ void CoreEngine::GameLoop()
 
         if (g_UseGameStates)
         {
-            GameManager::Instance().GameStateLoop(delta_time);
+            GameManager::Instance().GameStateLoop(static_cast<float>(delta_time));
         }
 
         // Swap buffers and poll events

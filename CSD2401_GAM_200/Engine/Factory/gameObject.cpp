@@ -221,6 +221,7 @@ void GameObject::ReorderChildren(const std::vector<EntityID>& newOrder) {
  * @brief Execute a gameplay action defined by an EventRule.
  */
 void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
+    (void)other;
     switch (rule.action)
     {
     case ActionType::EnableObject:
@@ -244,7 +245,7 @@ void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
             if (!rule.stringValue.empty())
             {
                 audioMgr->PlaySound(rule.stringValue, "sfx");
-                std::string currentlyPlayingSound = rule.stringValue;
+                currentlyPlayingSound = rule.stringValue;
 
             }
         }
@@ -301,7 +302,7 @@ void GameObject::OnEventTriggered(EventType type, GameObject* other) {
         if (rule.targetObjectId != -1)
         {
             if (!other) continue;
-            if (other->GetID() != rule.targetObjectId)
+            if (other->GetID() != static_cast<unsigned int>(rule.targetObjectId))
                 continue;
         }
         ExecuteAction(rule, other);

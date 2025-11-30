@@ -64,7 +64,8 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
     auto *physics = player->AddComponent<PhysicsComponent>(1.0f, false);
     GLuint texID = GraphicsSystem::LoadTexture(filename);
     ResourceManager::Instance().PrintLoadedResources();
-    auto render = player->AddComponent<RenderComponent>(texID);
+    player->AddComponent<RenderComponent>(texID);
+    //auto render = player->AddComponent<RenderComponent>(texID);
     physics->SetStatic(false);
     transform->SetScale(w, h);
     physics->SetVelocity(0, 0);
@@ -94,10 +95,15 @@ GameObject *GameObjectFactory::CreatePlayer(const std::string &name, RenderCompo
 */
 GameObject *GameObjectFactory::CreateEmptyGO(const std::string &name, float x, float y, float w, float h)
 {
+    (void)w;
+    (void)h;
+   
     GameObject *obj = CreateGameObject(name);
 
-    auto *transform = obj->AddComponent<TransformComponent>(x, y);
-    auto *physics = obj->AddComponent<PhysicsComponent>(0.0f, false);
+    obj->AddComponent<TransformComponent>(x, y);
+    obj->AddComponent<PhysicsComponent>(0.0f, false);
+    //auto* transform = obj->AddComponent<TransformComponent>(x, y);
+    //auto* physics = obj->AddComponent<PhysicsComponent>(0.0f, false);
 
     return obj;
 }
@@ -240,6 +246,7 @@ GameObject *GameObjectFactory::CreateAnimatedImage(const std::string &name, floa
                                                    char const *filename, int numRows, int numCols,
                                                    int startFrame, int endFrame, float fps, CollisionLayer layer)
 {
+    (void)layer;
     GameObject *obj = CreateGameObject(name);
 
     auto *transform = obj->AddComponent<TransformComponent>(x, y);
@@ -648,9 +655,9 @@ void GameObjectFactory::ReorderRootObjects(const std::vector<EntityID>& order) {
 // Check if there is dangling pointers
 bool GameObjectFactory::IsAlive(GameObject* ptr) const
 {
-    auto& gameObjects = GameObjectFactory::GetAllGameObjects();
+    auto& allGOs = GameObjectFactory::GetAllGameObjects();
     // Loop through all alive game objects
-    for (const auto& obj : gameObjects)
+    for (const auto& obj : allGOs)
     {
         if (obj.get() == ptr)
             return true;   // pointer is valid and alive
@@ -694,7 +701,7 @@ void DemoM1_SpawnGameObjects()
             static_cast<float>(intX),
             static_cast<float>(intY));
         auto *transform = newGO->GetComponent<TransformComponent>();
-        auto *physics = newGO->AddComponent<PhysicsComponent>(0, 0);
+        auto *physics = newGO->AddComponent<PhysicsComponent>();
         physics->SetGravity(true); // Enable/Disable gravity
         physics->SetStatic(false);
         transform->SetScale(40.f, 40.f);

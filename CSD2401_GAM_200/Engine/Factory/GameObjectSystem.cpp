@@ -68,7 +68,7 @@ Technology is prohibited.
      std::cout << "[GameObjectSystem] Received CreateObjectMessage for "
          << msg.name << " (Type: " << static_cast<int>(msg.type) << ")\n";
 
-     GameObjectFactory& factory = GameObjectFactory::Instance();
+     //GameObjectFactory& factory = GameObjectFactory::Instance();
      GameObject* go = nullptr;
 
      switch (msg.type)

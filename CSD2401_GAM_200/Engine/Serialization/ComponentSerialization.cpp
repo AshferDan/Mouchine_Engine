@@ -477,7 +477,7 @@ void ComponentSerialization::DeserializeCollider(const json &j, GameObject *go)
         }
     }
 
-    auto *collider = go->AddComponent<ColliderComponent>(type, width, height, layer);
+    go->AddComponent<ColliderComponent>(type, width, height, layer);
 }
 
 /**

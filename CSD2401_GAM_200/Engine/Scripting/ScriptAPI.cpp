@@ -247,7 +247,7 @@ namespace API
 
     void SetJumpVal(const std::string &objectName, float val)
     {
-
+        (void)val;
         auto &factory = GameObjectFactory::Instance();
 
         GameObject *obj = factory.FindGameObject(objectName);

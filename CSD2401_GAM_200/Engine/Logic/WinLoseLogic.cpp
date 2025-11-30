@@ -380,7 +380,7 @@ bool WinLoseLogicSystem::IsMouseOver(GameObject* button, double mouseX, double m
     auto* tx = button->GetComponent<TransformComponent>();
     if (!tx) return false;
 
-    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, mouseX, mouseY);
+    return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
 
 void WinLoseLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)

@@ -25,16 +25,16 @@ TextureResource::~TextureResource()
 /**
  * @brief Loads a texture from file using GraphicsSystem
  */
-bool TextureResource::Load(const std::string &filepath)
+bool TextureResource::Load(const std::string &fpath)
 {
     if (loaded)
     {
-        std::cout << "Texture already loaded: " << filepath << std::endl;
+        std::cout << "Texture already loaded: " << fpath << std::endl;
         return true;
     }
 
 
-    this->filepath = filepath;
+    this->filepath = fpath;
 
     textureID = GraphicsSystem::LoadTexture(filepath.c_str());
 
@@ -73,11 +73,11 @@ AudioResource::~AudioResource()
 /**
  * @brief Loads an audio file through the AudioEngine
  */
-bool AudioResource::Load(const std::string &filepath)
+bool AudioResource::Load(const std::string &fpath)
 {
     if (loaded)
     {
-        std::cout << "Audio already loaded: " << filepath << std::endl;
+        std::cout << "Audio already loaded: " << fpath << std::endl;
         return true;
     }
 
@@ -87,7 +87,7 @@ bool AudioResource::Load(const std::string &filepath)
         return false;
     }
 
-    this->filepath = filepath;
+    this->filepath = fpath;
 
     // Use audio engine load sound
     bool success = audioEngine->loadSound(name, filepath, loop);
@@ -125,19 +125,19 @@ FontResource::~FontResource()
 /**
  * @brief Loads a font from file using default size
  */
-bool FontResource::Load(const std::string& filepath)
+bool FontResource::Load(const std::string& fpath)
 {
-    return Load(filepath, 48);
+    return Load(fpath, 48);
 }
 
 /**
  * @brief Loads a font from file with specified size
  */
-bool FontResource::Load(const std::string& filepath, GLuint size)
+bool FontResource::Load(const std::string& fpath, GLuint size)
 {
     if (loaded)
     {
-        std::cout << "Font already loaded: " << filepath << std::endl;
+        std::cout << "Font already loaded: " << fpath << std::endl;
         return true;
     }
 
@@ -148,7 +148,7 @@ bool FontResource::Load(const std::string& filepath, GLuint size)
         return false;
     }
 
-    this->filepath = filepath;
+    this->filepath = fpath;
     this->fontSize = size;
 
     FT_Face face;

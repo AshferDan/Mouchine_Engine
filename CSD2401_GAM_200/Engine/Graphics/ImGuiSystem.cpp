@@ -2402,6 +2402,7 @@ void ImGuiSystem::RenderPropertyEditor()
 
 void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
 {
+    (void)obj; // not used yet
 
     // --- Begin UI ---
     if (ImGui::CollapsingHeader("Event Component", ImGuiTreeNodeFlags_DefaultOpen))
@@ -2531,7 +2532,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
                         i++;
                     }
 
-                    if (ImGui::Combo("Sound", &idx, names.data(), names.size()))
+                    if (ImGui::Combo("Sound", &idx, names.data(), (int)names.size()))
                     {
                         int j = 0;
                         for (auto& pair : soundDB)

@@ -204,7 +204,7 @@ static void Internal_SetMass(MonoString* objectName, float mass)
 static void Internal_SetFriction(MonoString* objectName, float friction)
 {
     char* name = mono_string_to_utf8(objectName);
-    API::SetFiction(name, friction);
+    API::SetFriction(name, friction);
     mono_free(name);
 }
 
@@ -551,14 +551,14 @@ static int Internal_RandomRange(int min, int max) {
     return API::RandomNumberGen(max, min); // Note: API args are (max, min)
 }
 static float Internal_GetDelta_Time() {
-    return API::GetDelta_Time();
+    return static_cast<float>(API::GetDelta_Time());
 }
 static float Internal_GetFixed_Delta_Time()
 {
-    return API::GetFixedDelta_time();
+    return static_cast<float>(API::GetFixedDelta_time());
 }
 static float Internal_GetFramesPerSecond() {
-    return API::GetFramePerSecond();
+    return static_cast<float>(API::GetFramePerSecond());
 }
 
 
