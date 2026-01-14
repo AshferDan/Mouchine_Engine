@@ -45,6 +45,7 @@ const std::string TilesetPayloadID{ "Tileset_Name" };
 // Vars for ImGui::ImageButton
 inline const char* icon_folder = "../Assets/Editor_Icons/Folder.png";
 inline const char* icon_file = "../Assets/Editor_Icons/File_Generic.png";
+inline const char* icon_sprite = "../Assets/Editor_Icons/File_Sprite.png";
 inline const char* icon_plus = "../Assets/Editor_Icons/Plus.png";
 inline const char* icon_prefab = "../Assets/Editor_Icons/Cube.png";
 inline const char* icon_audio = "../Assets/Editor_Icons/File_Audio.png";
@@ -59,6 +60,7 @@ inline const char* icon_inactive = "../Assets/Editor_Icons/Eye-Inactive.png";
 
 extern GLuint icon_folder_ui;
 extern GLuint icon_file_ui;
+extern GLuint icon_sprite_ui;
 extern GLuint icon_plus_ui;
 extern GLuint icon_prefab_ui;
 extern GLuint icon_audio_ui;

@@ -132,6 +132,7 @@ std::string loadLayoutPath{};
 // TEXTURE IDS FOR ICONS
 GLuint icon_folder_ui;
 GLuint icon_file_ui;
+GLuint icon_sprite_ui;
 GLuint icon_plus_ui;
 GLuint icon_prefab_ui;
 GLuint icon_audio_ui;
@@ -198,6 +199,7 @@ void ImGuiSystem::Initialize()
     // Vars for ImGui::ImageButton
     icon_folder_ui = GraphicsSystem::LoadTexture(icon_folder);
     icon_file_ui = GraphicsSystem::LoadTexture(icon_file);
+    icon_sprite_ui = GraphicsSystem::LoadTexture(icon_sprite);
     icon_plus_ui = GraphicsSystem::LoadTexture(icon_plus);
     icon_prefab_ui = GraphicsSystem::LoadTexture(icon_prefab);
     icon_audio_ui = GraphicsSystem::LoadTexture(icon_audio);
@@ -433,21 +435,26 @@ void ImGuiSystem::Update(float dt)
             // toggle off other debug/ editor stuff.
             CORE->GetGraphicsSystem()->ClearEditorSelection();
         }
-        /**
-         * @brief Game Object Creator Menu IMGui Window
-         */
-        if (ShowCreateGOMenu)
-        {
-            GOCreationMenu_Render();
-        }
 
-        /**
-         * @brief Prefab Loader Menu IMGui Window
-         */
-        if (ShowLoadPrefabMenu)
+        if (CORE->GetLevelEditor()->GetEditorMode() != EditorMode::Play)
         {
-            PrefabMenu_Render();
+            /**
+             * @brief Game Object Creator Menu IMGui Window
+             */
+            if (ShowCreateGOMenu)
+            {
+                GOCreationMenu_Render();
+            }
+
+            /**
+                * @brief Prefab Loader Menu IMGui Window
+                */
+            if (ShowLoadPrefabMenu)
+            {
+                PrefabMenu_Render();
+            }
         }
+        
         // Flag with 1 frame delay on whether something is being drag and dropped, used for spawning prefabs via DND
         Serialization::Prefab_DragAndDropped = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
     }
@@ -1405,7 +1412,9 @@ void ImGuiSystem::Viewport_ManageGizmos()
         ImGuizmo::SetDrawlist();                                                                                                            // draws current window
         ImGuizmo::SetRect(vpPos.x, vpPos.y, vpSize.x, vpSize.y);             // set rect to viewport
 
-        mat4 view = camComp->GetViewMatrix();
+        //mat4 view = camComp->GetViewMatrixUnshaken();
+        mat4 view = mat4::identity();
+
         //mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());                                // replaced with getVp() bc this doesnt scale with cam zoom etc
         mat4 mtx = transform->GetMatrix();
         ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::WORLD, value_ptr(mtx));
@@ -1613,6 +1622,14 @@ void DirectoryNavigator::RenderImGui()
                     // do nothin for now
                 }
             }
+            // Sprite Files
+            else if (extension == ".png" || extension == ".jpg")
+            {
+                if (ImGui::ImageButton(fileName.c_str(), ImTextureID(icon_sprite_ui), icon_size, { 0, 1 }, { 1, 0 }))
+                {
+                    // do nothin for now
+                }
+            }
             // Generic file
             else
             {
@@ -1635,11 +1652,13 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(PrefabPayloadID, iter.path().stem().generic_string(), fileName);            // For prefab files
                 }
-                else if (iter.path().parent_path().filename() == "Audio" || iter.path().parent_path().filename() == "audio")
+                else if (iter.path().parent_path().filename() == "Audio" || iter.path().parent_path().filename() == "audio"
+                    || extension == ".wav" || extension == ".mp3" || extension == ".ogg" || extension == ".flac")
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().generic_string(), fileName.c_str());            // For Audio files
                 }
-                else if (iter.path().parent_path().filename() == "Sprites" || iter.path().parent_path().filename() == "Icons")
+                else if (iter.path().parent_path().filename() == "Sprites" || iter.path().parent_path().filename() == "Icons"
+                    || extension == ".png" || extension == ".jpg")
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().generic_string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
