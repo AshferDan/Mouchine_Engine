@@ -1657,14 +1657,10 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(AudioPayloadID, iter.path().generic_string(), fileName.c_str());            // For Audio files
                 }
-                else if (iter.path().parent_path().filename() == "Sprites" || iter.path().parent_path().filename() == "Icons"
+                else if (iter.path().parent_path().filename() == "Sprites" || iter.path().parent_path().filename() == "Icons" || iter.path().parent_path().filename() == "Tiles"
                     || extension == ".png" || extension == ".jpg")
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().generic_string(), fileName.c_str());            // For Sprites/ Spritesheets files
-                }
-                else if (iter.path().parent_path().filename() == "Tiles")
-                {
-                    SendDragAndDrop(TilesetPayloadID, iter.path().generic_string(), fileName.c_str());            // For Tilesets for tile editor
                 }
                 else
                 {

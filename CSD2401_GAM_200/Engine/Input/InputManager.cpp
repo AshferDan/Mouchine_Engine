@@ -376,6 +376,13 @@ void InputManager::Update(float dt)
             wasPressed = false;
         }
     }
+
+    // Handles Holding F1 for How To Play in playmode
+    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_KEY_DOWN && isPlayMode)
+    {
+        //show how to play and pause game as long as key held
+    }
+
     // ===== HERO MOVEMENT CONSTANTS (Customizable) =====
     static float HERO_GRAVITY = -381.0f;
     static float HERO_MOVE_FORCE = 200.0f;
@@ -506,7 +513,7 @@ void InputManager::Update(float dt)
             forcesManager.AddForce(ForceType::Move, HERO_MOVE_FORCE, -1.0f, 1.0f, 0.0f);
         }
     }
-    else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && editor->GetEditorMode() == EditorMode::Play) {
+    else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && isPlayMode) {
         CameraManager::Instance().AddCameraTrauma(1.f);
         CameraManager::Instance().FlashActiveCamera(0.3f, vec4(1.f, 0.f, 0.f, 0.7f));
         //CORE->SetGamePaused(!CORE->IsGamePaused());
