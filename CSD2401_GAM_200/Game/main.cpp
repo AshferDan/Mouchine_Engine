@@ -35,6 +35,53 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
+class MoveLeftRightComponent : public IComponent
+{
+public:
+    // Constructor
+    MoveLeftRightComponent(GameObject* owner) : IComponent(owner) {}
+
+    // Destructor
+    ~MoveLeftRightComponent() override = default;
+
+    // Movement Logic
+    void Update(float dt) override
+    {
+        // 1. Get the Transform Component
+        // Note: We use the owner pointer provided by IComponent
+        TransformComponent* transform = owner->GetComponent<TransformComponent>();
+
+        if (transform)
+        {
+            // 2. Get Current Position
+            float x, y;
+            transform->GetPosition(x, y);
+
+            // 3. Move Right (Speed = 200 units per second)
+            float speed = 200.0f;
+            x += speed * dt;
+
+            // 4. Screen Wrap (Assuming 1920 width, edges at +/- 960)
+            if (x > 960.0f)
+            {
+                x = -960.0f;
+            }
+
+            // 5. Apply New Position
+            transform->SetPosition(x, y);
+        }
+    }
+
+    // Required by IComponent: Name
+    std::string GetName() const override { return "MoveLeftRightComponent"; }
+
+    // Required by IComponent: Cloning logic
+    std::unique_ptr<IComponent> Clone(GameObject* NewClone) const override
+    {
+        return std::make_unique<MoveLeftRightComponent>(NewClone);
+    }
+};
+
 /**
  * @brief Main entry point of the program.
  *
@@ -75,35 +122,58 @@ int main()
 
         // CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
 
-        std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+        //std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
-        ScriptSystem *scriptSys = engine.GetScriptSystem();
+        //ScriptSystem *scriptSys = engine.GetScriptSystem();
 
-        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        //GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
 
-        if (scriptSys && squareSpawner)
+        //if (scriptSys && squareSpawner)
+        //{
+        //    // 1. Attach the first script (Red Square, Ground, Animation)
+        //    if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
+        //    {
+        //        std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
+        //    }
+        //    else
+        //    {
+        //        std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
+        //    }
+
+        //    // 2. Attach the second script (Blue Square, Green Rotating Square)
+        //    /*if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
+        //    {
+        //        std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
+        //    }
+        //    else
+        //    {
+        //        std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
+        //    }*/
+        //    std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
+        //    scriptSys->CallOnStart(squareSpawner);
+        //}
+
+        GameObject* testObj = GameObjectFactory::Instance().CreateShape(
+            "MyTestSquare",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            0.0f, 0.0f,                      // Center of screen
+            100.0f, 100.0f,                  // Size
+            vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
+        );
+
+        // 2. Add the ScriptComponent
+        if (testObj)
         {
-            // 1. Attach the first script (Red Square, Ground, Animation)
-            if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
-            {
-                std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
-            }
-            else
-            {
-                std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
-            }
+            ScriptComponent* scriptComp = testObj->AddComponent<ScriptComponent>();
 
-            // 2. Attach the second script (Blue Square, Green Rotating Square)
-            /*if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
+            if (scriptComp)
             {
-                std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
+                // 3. Attach the script "SpinningSquare"
+                // Ensure the namespace in C# is "GameScripts"
+                scriptComp->AddScript("SpinningSquare");
+
+                std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
             }
-            else
-            {
-                std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
-            }*/
-            std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
-            scriptSys->CallOnStart(squareSpawner);
         }
 
         // Initialise Game State Manager (Level1)

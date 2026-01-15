@@ -164,4 +164,22 @@ public:
      * @brief Reloads the script assembly, enabling hot reload functionality.
      */
     void ReloadScriptAssembly();
+
+    /**
+    * @brief Creates a C# script instance and injects the owner name
+    * @param scriptClassName The name of the C# class (e.g., "SpinningSquare")
+    * @param owner The GameObject that owns this script
+    * @return MonoObject* pointer to the created instance, or nullptr on failure
+    */
+    MonoObject* CreateScriptInstance(const std::string& scriptClassName, GameObject* owner);
+
+    /**
+     * @brief Gets the core assembly for direct class access
+     */
+    MonoAssembly* GetCoreAssembly() const { return coreAssembly; }
+
+    /**
+     * @brief Gets the core image for direct class access
+     */
+    MonoImage* GetCoreImage() const { return coreImage; }
 };
