@@ -354,13 +354,11 @@ void ImGuiSystem::Update(float dt)
 
                     if (newGO)
                     {
+                        float defaultVal{ 64.f };
+                        vec2 size{ defaultVal, defaultVal };           // default
                         // Add Transform at cursor position
                         auto* transform = newGO->AddComponent<TransformComponent>();
-                        if (transform)
-                        {
-                            transform->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
-                            transform->SetScale(64.0f, 64.0f); // Default size
-                        }
+                        // checks and adjustments below to let everything load before changing pos and scale
 
                         // Add Render with texture
                         auto* render = newGO->AddComponent<RenderComponent>();
@@ -379,15 +377,25 @@ void ImGuiSystem::Update(float dt)
                                     render->SetShapeType(RenderComponent::ShapeType::Square);
                                     render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
                                 }
+                                size = render->GetTextureResolution(3);
+                                if (!size.x && !size.y)                                         // If invalid value found, set back to default value of 64,64. Else keep the aspect ratio of texture
+                                    size = { defaultVal , defaultVal };
+                                //std::cout << "\nMIP LEVEL 3 res: " << size.x << ' ' << size.y << "\n";
                             }
+                        }
+
+                        if (transform)
+                        {
+                            transform->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
+                            transform->SetScale(size.x, size.y); // Default size
                         }
 
                         // Add Square Collider - CORRECTED CONSTRUCTOR CALL!
                         // Constructor: ColliderComponent(owner, type, width, height, layer)
                         newGO->AddComponent<ColliderComponent>(
                             ColliderComponent::Type::Square,
-                            64.0f,
-                            64.0f,
+                            size.x,
+                            size.y,
                             CollisionLayer::Default
                         );
 
@@ -2131,12 +2139,18 @@ void ImGuiSystem::RenderPropertyEditor()
                 transform->SetEnabled(isTransformEnabled);
             }
 
+            static bool lockTransform;      // check against serialisation
+            if (ImGui::Checkbox("Lock Transform", &lockTransform))
+            {
+                // set in serialisation
+            }
+            CreateHintText("Locks object's gizmos in place");
+
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
             if (ImGui::DragFloat2("Position", pos, 0.5f))
             {
                 transform->SetPosition(pos[0], pos[1]);
-                
             }
             BeginEdit();
             EndEdit();
@@ -2951,9 +2965,10 @@ void PopulateComponentList()
             if (!go->GetComponent<ColliderComponent>()) { 
                 go->AddComponent<ColliderComponent>();  std::cout << "Added Collider Component to " << go->GetName() << std::endl; } } });
 
-    AllComponents.push_back({ ComponentType::Camera, "Camera Component"    , ImTextureID(icon_active_ui), [](GameObject* go){ 
-            if (!go->GetComponent<CameraComponent>()) { 
-                go->AddComponent<CameraComponent>();    std::cout << "Added Camera Component to " << go->GetName() << std::endl; } } });
+    // Camera component doesnt work like that LMAO
+    //AllComponents.push_back({ ComponentType::Camera, "Camera Component"    , ImTextureID(icon_active_ui), [](GameObject* go){ 
+    //        if (!go->GetComponent<CameraComponent>()) { 
+    //            go->AddComponent<CameraComponent>();    std::cout << "Added Camera Component to " << go->GetName() << std::endl; } } });
 
     AllComponents.push_back({ ComponentType::Render, "Render Component"    , ImTextureID(icon_active_ui), [](GameObject* go){ 
             if (!go->GetComponent<RenderComponent>()) { 
