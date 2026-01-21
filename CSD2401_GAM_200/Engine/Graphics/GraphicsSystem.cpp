@@ -14,6 +14,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "GraphicsSystem.h"
+#include "ParticleEmitterComponent.h"
 #include "Animator.hpp"
 
 // Global constant for configuration file path (currently unused in this file)
@@ -597,6 +598,19 @@ void GraphicsSystem::Update(float)
         targetBatch->indices.push_back(baseIndex + 2);
         targetBatch->indices.push_back(baseIndex + 1);
         targetBatch->indices.push_back(baseIndex + 3);
+    }
+
+    //Draw Particle
+    for (auto& obj : gameObjects)
+    {
+        if (!obj->IsActive())
+            continue;
+
+        auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+        if (emitter && emitter->IsEnabled())
+        {
+            emitter->AddParticlesToBatch(batches, vp);
+        }
     }
 
     // Sort batches by rendering layer (lower layer draws first)
