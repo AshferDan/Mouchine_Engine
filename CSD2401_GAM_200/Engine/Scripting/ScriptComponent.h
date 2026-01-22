@@ -27,6 +27,8 @@ class ScriptComponent : public IComponent {
 	std::string idToName(ScriptID);
 	ScriptID nameToID(const std::string &script_Name);
 
+	const std::unordered_map<ScriptID, std::string>& GetScripts() const { return ActiveScript; }
+
 private:
 	std::string script_Name;
 	ScriptID script_ID = 0;

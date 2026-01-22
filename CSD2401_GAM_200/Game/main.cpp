@@ -13,6 +13,7 @@ Technology is prohibited.
 
 #include "main.h"
 
+
 namespace CrashHandler
 {
     std::string GetStackTrace();

@@ -33,6 +33,7 @@ Technology is prohibited.
 #include "physics.h"
 #include "AudioManager.h"
 #include "logic.h"
+#include "ScriptComponent.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -2374,6 +2375,25 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         // Add event into GameObjects
         RenderEventComponent(events, obj);
+    }
+
+    // Script component
+    if (auto* script = obj->GetComponent<ScriptComponent>())
+    {
+        if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            static bool isScriptEnabled = script->IsEnabled();
+            if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
+            {
+                script->SetEnabled(isScriptEnabled);
+            }
+
+            ImGui::Text("Attached Scripts:");
+            for (const auto& pair : script->GetScripts())
+            {
+                ImGui::Text("- %s", pair.second.c_str());
+            }
+        }
     }
 
     // Add Component Button

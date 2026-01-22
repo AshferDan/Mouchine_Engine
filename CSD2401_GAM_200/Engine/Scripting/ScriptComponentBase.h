@@ -1,6 +1,5 @@
 #pragma once
-#pragma once
-#include "IComponent.h"
+#include "Component.h"
 #include "GameObject.h"
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -38,7 +37,6 @@ protected:
 
     // State tracking
     bool isStarted;                 // Has OnStart been called?
-    bool isEnabled;                 // Is the component enabled?
 
 public:
     /**
@@ -74,17 +72,6 @@ public:
      * @brief Destroys the script by calling its OnDestroy method.
      */
     void Destroy() override;
-
-    /**
-     * @brief Sets whether this component is enabled.
-     * Disabled components don't call Update.
-     */
-    void SetEnabled(bool enabled) override;
-
-    /**
-     * @brief Gets whether this component is enabled.
-     */
-    bool IsEnabled() const override { return isEnabled; }
 
     /**
      * @brief Gets the Mono instance (for advanced use cases)

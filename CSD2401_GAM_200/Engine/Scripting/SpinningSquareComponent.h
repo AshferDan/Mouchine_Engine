@@ -22,6 +22,7 @@ public:
         return "SpinningSquare";
     }
 
+
     std::unique_ptr<IComponent> Clone(GameObject* newOwner) const override
     {
         auto cloned = std::make_unique<SpinningSquareComponent>(newOwner);
