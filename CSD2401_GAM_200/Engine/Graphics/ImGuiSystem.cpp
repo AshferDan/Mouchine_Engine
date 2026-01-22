@@ -1014,6 +1014,12 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         {
             p_factory.CloneGameObject(id);
         }
+        if (ImGui::MenuItem("Lock Gizmos"))
+        {
+            // disable gizmos for game object
+            
+            //CreateHintText("Locks object's gizmos in place");
+        }
         // find way to unparent by drag and drop in the future
         if (obj->GetParent() && ImGui::MenuItem("Make Root"))
         {
@@ -2132,19 +2138,12 @@ void ImGuiSystem::RenderPropertyEditor()
                 };
 
             // sliders for position, scale, rotation etc
-
-            static bool isTransformEnabled = transform->IsEnabled();
+            // Removed to prevent user error - there isnt rly a scenario where a GO doesnt have a transform
+            /*static bool isTransformEnabled = transform->IsEnabled();
             if (ImGui::Checkbox("Component Enabled ##Transform", &isTransformEnabled))
             {
                 transform->SetEnabled(isTransformEnabled);
-            }
-
-            static bool lockTransform;      // check against serialisation
-            if (ImGui::Checkbox("Lock Transform", &lockTransform))
-            {
-                // set in serialisation
-            }
-            CreateHintText("Locks object's gizmos in place");
+            }*/
 
             float pos[2] = { 0.0f, 0.0f };
             transform->GetPosition(pos[0], pos[1]);
