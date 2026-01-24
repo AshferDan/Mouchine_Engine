@@ -507,6 +507,8 @@ ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize)
 void ImGuiSystem::Viewport_ClickToSelect()
 {
     // Loop for all GOs in scene
+    int highestLayer = std::numeric_limits<int>::min();
+    GameObject* mostFrontGO = nullptr;
     for (auto& go : GameObjectFactory::Instance().GetAllGameObjects())
     {
         if (!go->IsActive()) continue;
@@ -518,35 +520,31 @@ void ImGuiSystem::Viewport_ClickToSelect()
         transform->GetPosition(pos.x, pos.y);
         transform->GetScale(scale.x, scale.y);
 
-        if (go->GetComponent<ColliderComponent>())
+        // if GO has a collider
+        // Calculates if cursor is within area of GO
+        // Updated post M3 to fix issues with layering
+        if (viewportCursorPos.x > pos.x - scale.x / 2 && viewportCursorPos.x < pos.x + scale.x / 2 && viewportCursorPos.y > pos.y - scale.y / 2 && viewportCursorPos.y < pos.y + scale.y / 2
+            && !ImGuizmo::IsUsing())
         {
-            // if GO has a collider
-            // Calculates if cursor is within area of GO
-            if (viewportCursorPos.x > pos.x - scale.x / 2 && viewportCursorPos.x < pos.x + scale.x / 2 && viewportCursorPos.y > pos.y - scale.y / 2 && viewportCursorPos.y < pos.y + scale.y / 2)
+            int currLayer{};
+            auto* render = go->GetComponent<RenderComponent>();
+            if (render)
             {
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))            // changed back to on mouse click, since we have gizmos, wont have accidental moving anymore
-                {
-                    SetSelectedGameObject(go->GetID());                         // Set GO to be selected
-                    
-                    std::cout << "[has collider]clicked on " << go->GetName() << std::endl;
-                }
+                currLayer = render->GetLayer();
+            }
+            if (currLayer > highestLayer)
+            {
+                highestLayer = currLayer;
+                mostFrontGO = go.get();
             }
         }
-        else
-        {
-            // if GO does NOT have a collider
-            // Find general distance between object and cursor
-            float distance = static_cast<float>(std::sqrt(std::pow(viewportCursorPos.x - pos.x, 2) + std::pow(viewportCursorPos.y - pos.y, 2)));
+    }
 
-            if (distance < 50.f)                // if object is within 50 units (within general area)
-            {
-                if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))                      // Click to select, after selecting drag to set flag to true
-                {
-                    SetSelectedGameObject(go->GetID());
-                    std::cout << "[no colider]clicked on " << go->GetName() << std::endl;
-                }
-            }
-        }
+    if (mostFrontGO && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsMouseDragging(ImGuiMouseButton_Left))            // changed back to on mouse click, since we have gizmos, wont have accidental moving anymore
+    {
+        SetSelectedGameObject(mostFrontGO->GetID());                         // Set GO to be selected
+
+        std::cout << "[has collider]clicked on " << mostFrontGO->GetName() << std::endl;
     }
 }
 
