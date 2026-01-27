@@ -224,9 +224,6 @@ namespace GameScripts
                     Animation.PlayAnimation(gameObjectName, "Wallkick");
                     break;
             }
-
-            vec2 currentScale = Transform.GetScale(gameObjectName);
-            Transform.SetScale(gameObjectName, Math.Abs(currentScale.x) * (_isFacingRight ? 1 : -1), currentScale.y);
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
@@ -525,12 +522,10 @@ namespace GameScripts
         {
             if (_isFacingRight && moveInput.x < 0)
             {
-                Debug.Log("Turning LEFT");
                 Turn(false);
             }
             else if (!_isFacingRight && moveInput.x > 0)
             {
-                Debug.Log("Turning RIGHT");
                 Turn(true);
             }
         }
@@ -538,6 +533,9 @@ namespace GameScripts
         private void Turn(bool turnRight)
         {
             _isFacingRight = turnRight;
+            vec2 currentScale = Transform.GetScale(gameObjectName);
+            // [WIP] to include left and right animations for accurate monocle, for now will just do a basic flip
+            Transform.SetScale(gameObjectName, Math.Abs(currentScale.x) * (turnRight ? 1 : -1), currentScale.y);
         }
 
         #endregion
