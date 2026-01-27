@@ -243,6 +243,7 @@ enum ComponentType {
     Render,
     Camera,
     Event,
+    Script,
     Misc
 };
 extern std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;
