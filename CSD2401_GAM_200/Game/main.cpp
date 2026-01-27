@@ -36,53 +36,6 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
-class MoveLeftRightComponent : public IComponent
-{
-public:
-    // Constructor
-    MoveLeftRightComponent(GameObject* owner) : IComponent(owner) {}
-
-    // Destructor
-    ~MoveLeftRightComponent() override = default;
-
-    // Movement Logic
-    void Update(float dt) override
-    {
-        // 1. Get the Transform Component
-        // Note: We use the owner pointer provided by IComponent
-        TransformComponent* transform = owner->GetComponent<TransformComponent>();
-
-        if (transform)
-        {
-            // 2. Get Current Position
-            float x, y;
-            transform->GetPosition(x, y);
-
-            // 3. Move Right (Speed = 200 units per second)
-            float speed = 200.0f;
-            x += speed * dt;
-
-            // 4. Screen Wrap (Assuming 1920 width, edges at +/- 960)
-            if (x > 960.0f)
-            {
-                x = -960.0f;
-            }
-
-            // 5. Apply New Position
-            transform->SetPosition(x, y);
-        }
-    }
-
-    // Required by IComponent: Name
-    std::string GetName() const override { return "MoveLeftRightComponent"; }
-
-    // Required by IComponent: Cloning logic
-    std::unique_ptr<IComponent> Clone(GameObject* NewClone) const override
-    {
-        return std::make_unique<MoveLeftRightComponent>(NewClone);
-    }
-};
-
 /**
  * @brief Main entry point of the program.
  *
@@ -171,7 +124,7 @@ int main()
             {
                 // 3. Attach the script "SpinningSquare"
                 // Ensure the namespace in C# is "GameScripts"
-                scriptComp->AddScript("SpinningSquare");
+                scriptComp->AddScript("DragDropTest");
 
                 std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
             }

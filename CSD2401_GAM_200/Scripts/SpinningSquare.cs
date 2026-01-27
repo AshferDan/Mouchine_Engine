@@ -5,7 +5,10 @@ namespace CSharpScript
 {
     public class SpinningSquare : GameScript
     {
-        private float rotationSpeed = 2.0f;
+        private float RotationSpeed = 2.0f; // Made public
+        public bool ShouldRotate = true;
+        public string Message = "Hello, Editor!";
+        public int LoopCount = 5;
 
         public override void OnStart()
         {
@@ -14,8 +17,11 @@ namespace CSharpScript
 
         public override void OnUpdate(float dt)
         {
-            Transform.AddRotation(OwnerName, rotationSpeed * dt);
-            Graphics.SetColor(OwnerName,0.0f, 0.0f, 0.0f, 1.0f);
+            if (ShouldRotate)
+            {
+                Transform.AddRotation(OwnerName, RotationSpeed * dt);
+                Graphics.SetColor(OwnerName,0.0f, 0.0f, 0.0f, 1.0f);
+            }
         }
 
         public override void OnDestroy()

@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "ScriptAPI.h"
 #include <iostream>
 #include <filesystem>
+#include <mono/metadata/attrdefs.h>
 
 // Internal call functions - these will be called from C#
 // === Debug ===
@@ -1192,4 +1193,85 @@ void ScriptSystem::ReloadScriptAssembly()
     LoadScriptAssembly("./Scripts/GameScripts.dll");
 
     std::cout << "Script assembly reloaded" << std::endl;
+}
+
+std::vector<ScriptField> ScriptSystem::GetPublicFields(ScriptInstance& instance) {
+    std::vector<ScriptField> fields;
+    MonoClass* klass = instance.scriptClass->monoClass;
+    void* iter = nullptr;
+    while (MonoClassField* field = mono_class_get_fields(klass, &iter)) {
+        if (mono_field_get_flags(field) & MONO_FIELD_ATTR_PUBLIC) {
+            ScriptField scriptField;
+            scriptField.name = mono_field_get_name(field);
+
+            MonoType* type = mono_field_get_type(field);
+            int monoType = mono_type_get_type(type);
+
+            MonoObject* value = mono_field_get_value_object(rootDomain, field, instance.instance);
+            if (!value) continue; // Skip if value is null
+
+            char* str = mono_string_to_utf8(mono_object_to_string(value, nullptr));
+
+            switch (monoType) {
+            case MONO_TYPE_R4:
+                scriptField.type = ScriptFieldType::Float;
+                scriptField.value = *(float*)mono_object_unbox(value);
+                break;
+            case MONO_TYPE_I4:
+                scriptField.type = ScriptFieldType::Int;
+                scriptField.value = *(int*)mono_object_unbox(value);
+                break;
+            case MONO_TYPE_BOOLEAN:
+                scriptField.type = ScriptFieldType::Bool;
+                scriptField.value = *(bool*)mono_object_unbox(value);
+                break;
+            case MONO_TYPE_STRING:
+                scriptField.type = ScriptFieldType::String;
+                scriptField.value = mono_string_to_utf8((MonoString*)value);
+                break;
+            default:
+                scriptField.type = ScriptFieldType::None;
+                break;
+            }
+
+            if (scriptField.type != ScriptFieldType::None) {
+                fields.push_back(scriptField);
+            }
+            mono_free(str);
+        }
+    }
+    return fields;
+}
+
+void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& fieldName, const float& value) {
+    MonoClass* klass = instance.scriptClass->monoClass;
+    MonoClassField* field = mono_class_get_field_from_name(klass, fieldName.c_str());
+    if (field) {
+        mono_field_set_value(instance.instance, field, (void*)&value);
+    }
+}
+
+void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& fieldName, const int& value) {
+    MonoClass* klass = instance.scriptClass->monoClass;
+    MonoClassField* field = mono_class_get_field_from_name(klass, fieldName.c_str());
+    if (field) {
+        mono_field_set_value(instance.instance, field, (void*)&value);
+    }
+}
+
+void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& fieldName, const bool& value) {
+    MonoClass* klass = instance.scriptClass->monoClass;
+    MonoClassField* field = mono_class_get_field_from_name(klass, fieldName.c_str());
+    if (field) {
+        mono_field_set_value(instance.instance, field, (void*)&value);
+    }
+}
+
+void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& fieldName, const std::string& value) {
+    MonoClass* klass = instance.scriptClass->monoClass;
+    MonoClassField* field = mono_class_get_field_from_name(klass, fieldName.c_str());
+    if (field) {
+        MonoString* monoStr = mono_string_new(appDomain, value.c_str());
+        mono_field_set_value(instance.instance, field, monoStr);
+    }
 }

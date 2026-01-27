@@ -1648,6 +1648,10 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(TilesetPayloadID, iter.path().generic_string(), fileName.c_str());            // For Tilesets for tile editor
                 }
+                else if (extension == ".cs")
+                {
+                    SendDragAndDrop(ScriptPayloadID, iter.path().generic_string(), fileName.c_str());
+                }
                 else
                 {
                     SendDragAndDrop(AssetPayloadID, iter.path().generic_string(), fileName.c_str());            // Anything else considered an general asset
@@ -2377,24 +2381,87 @@ void ImGuiSystem::RenderPropertyEditor()
         RenderEventComponent(events, obj);
     }
 
-    // Script component
-    if (auto* script = obj->GetComponent<ScriptComponent>())
+// Script component
+if (auto* script = obj->GetComponent<ScriptComponent>())
+{
+    if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen))
+        static bool isScriptEnabled = script->IsEnabled();
+        if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
         {
-            static bool isScriptEnabled = script->IsEnabled();
-            if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
-            {
-                script->SetEnabled(isScriptEnabled);
-            }
+            script->SetEnabled(isScriptEnabled);
+        }
+        if (ImGui::Button("Add Script Slot"))
+        {
+            script->AddDragDropSlot("Drag Script Here", ScriptPayloadID);
+        }
 
-            ImGui::Text("Attached Scripts:");
-            for (const auto& pair : script->GetScripts())
+        if (script->GetPropertySlots().size())
+        {
+            for (auto& slot : script->GetPropertySlots())
             {
-                ImGui::Text("- %s", pair.second.c_str());
+                slot.RenderImGui();
+            }
+        }
+        ImGui::Text("Attached Scripts:");
+
+        auto* scriptSystem = CORE->GetScriptSystem();
+        if (scriptSystem)
+        {
+            auto* instances = scriptSystem->GetScriptInstances(obj);
+            if (instances)
+            {
+                for (auto& instance : *instances)
+                {
+                    const char* className = mono_class_get_name(instance.scriptClass->monoClass);
+                    if (ImGui::TreeNode(className))
+                    {
+                        auto fields = scriptSystem->GetPublicFields(instance);
+                        for (auto& field : fields)
+                        {
+                            if (field.type == ScriptFieldType::Float)
+                            {
+                                float val = std::get<float>(field.value);
+                                if (ImGui::DragFloat(field.name.c_str(), &val, 0.1f))
+                                {
+                                    scriptSystem->SetPublicField(instance, field.name, val);
+                                }
+                            }
+                            else if (field.type == ScriptFieldType::Int)
+                            {
+                                int val = std::get<int>(field.value);
+                                if (ImGui::DragInt(field.name.c_str(), &val))
+                                {
+                                    scriptSystem->SetPublicField(instance, field.name, val);
+                                }
+                            }
+                            else if (field.type == ScriptFieldType::Bool)
+                            {
+                                bool val = std::get<bool>(field.value);
+                                if (ImGui::Checkbox(field.name.c_str(), &val))
+                                {
+                                    scriptSystem->SetPublicField(instance, field.name, val);
+                                }
+                            }
+                            else if (field.type == ScriptFieldType::String)
+                            {
+                                std::string val = std::get<std::string>(field.value);
+                                char buffer[256];
+                                strncpy(buffer, val.c_str(), sizeof(buffer));
+                                buffer[sizeof(buffer) - 1] = 0;
+                                if (ImGui::InputText(field.name.c_str(), buffer, sizeof(buffer)))
+                                {
+                                    scriptSystem->SetPublicField(instance, field.name, std::string(buffer));
+                                }
+                            }
+                        }
+                        ImGui::TreePop();
+                    }
+                }
             }
         }
     }
+}
 
     // Add Component Button
     ImVec2 space = ImGui::GetContentRegionAvail();

@@ -3,6 +3,9 @@
 #include "ScriptingSystem.h"
 #include "GameObject.h"
 #include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 ScriptComponent::ScriptComponent(GameObject* owner)
 	: IComponent(owner), NextScript_ID(0){}
@@ -28,6 +31,20 @@ void ScriptComponent::Initialize()
 void ScriptComponent::Update(float dt)
 {
 	(void)dt;
+
+	for (auto& slot : _propertySlot)
+	{
+		std::string data = slot.GetReceivedData();
+		if (!data.empty())
+		{
+			// Extract script name from path
+			fs::path scriptPath(data);
+			std::string scriptName = scriptPath.stem().string();
+
+			AddScript(scriptName);
+			slot.ClearReceivedData();
+		}
+	}
 }
 
 void ScriptComponent::Destroy()
