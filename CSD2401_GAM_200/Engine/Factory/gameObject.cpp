@@ -16,6 +16,14 @@ Technology is prohibited.
 
 #include "GameObject.h"
 #include "factory.h"
+#include "transform.h"
+#include "RenderComponent.h"
+#include "Physics.h"
+#include "ColliderComponent.h"
+#include "ScriptComponent.h"
+#include "CameraComponent.h"
+#include "logic.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -306,5 +314,23 @@ void GameObject::OnEventTriggered(EventType type, GameObject* other) {
                 continue;
         }
         ExecuteAction(rule, other);
+    }
+}
+
+void GameObject::RemoveComponent(const std::string& name) {
+    if (name == "TransformComponent") {
+        RemoveComponent<TransformComponent>();
+    } else if (name == "RenderComponent") {
+        RemoveComponent<RenderComponent>();
+    } else if (name == "PhysicsComponent") {
+        RemoveComponent<PhysicsComponent>();
+    } else if (name == "ColliderComponent") {
+        RemoveComponent<ColliderComponent>();
+    } else if (name == "ScriptComponent") {
+        RemoveComponent<ScriptComponent>();
+    } else if (name == "CameraComponent") {
+        RemoveComponent<CameraComponent>();
+    } else if (name == "EventComponent") {
+        RemoveComponent<EventComponent>();
     }
 }

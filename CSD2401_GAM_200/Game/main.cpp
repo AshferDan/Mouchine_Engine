@@ -13,6 +13,7 @@ Technology is prohibited.
 
 #include "main.h"
 
+
 namespace CrashHandler
 {
     std::string GetStackTrace();
@@ -75,35 +76,58 @@ int main()
 
         // CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
 
-        std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
+        //std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
 
-        ScriptSystem *scriptSys = engine.GetScriptSystem();
+        //ScriptSystem *scriptSys = engine.GetScriptSystem();
 
-        GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
+        //GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
 
-        if (scriptSys && squareSpawner)
+        //if (scriptSys && squareSpawner)
+        //{
+        //    // 1. Attach the first script (Red Square, Ground, Animation)
+        //    if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
+        //    {
+        //        std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
+        //    }
+        //    else
+        //    {
+        //        std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
+        //    }
+
+        //    // 2. Attach the second script (Blue Square, Green Rotating Square)
+        //    /*if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
+        //    {
+        //        std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
+        //    }
+        //    else
+        //    {
+        //        std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
+        //    }*/
+        //    std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
+        //    scriptSys->CallOnStart(squareSpawner);
+        //}
+
+        GameObject* testObj = GameObjectFactory::Instance().CreateShape(
+            "MyTestSquare",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            0.0f, 0.0f,                      // Center of screen
+            100.0f, 100.0f,                  // Size
+            vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
+        );
+
+        // 2. Add the ScriptComponent
+        if (testObj)
         {
-            // 1. Attach the first script (Red Square, Ground, Animation)
-            if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
-            {
-                std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
-            }
-            else
-            {
-                std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
-            }
+            ScriptComponent* scriptComp = testObj->AddComponent<ScriptComponent>();
 
-            // 2. Attach the second script (Blue Square, Green Rotating Square)
-            /*if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
+            if (scriptComp)
             {
-                std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
+                // 3. Attach the script "SpinningSquare"
+                // Ensure the namespace in C# is "GameScripts"
+                scriptComp->AddScript("DragDropTest");
+
+                std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
             }
-            else
-            {
-                std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
-            }*/
-            std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
-            scriptSys->CallOnStart(squareSpawner);
         }
 
         // Initialise Game State Manager (Level1)

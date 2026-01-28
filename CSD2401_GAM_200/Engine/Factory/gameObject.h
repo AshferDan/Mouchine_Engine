@@ -159,6 +159,8 @@ public:
         }
     }
 
+    void RemoveComponent(const std::string& name);
+
     /**
      * @brief Adds a pre-existing component to the GameObject, taking ownership.
      * @tparam T The type of the component to add.

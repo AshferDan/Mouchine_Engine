@@ -40,6 +40,7 @@ const std::string AudioPayloadID("Audio_Filepath");
 const std::string ScenePayloadID{ "Scene_Name" };
 const std::string SpritePayloadID{ "Sprite_Name" };
 const std::string TilesetPayloadID{ "Tileset_Name" };
+const std::string ScriptPayloadID{ "Script_Filepath" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton
@@ -244,6 +245,7 @@ enum ComponentType {
     Render,
     Camera,
     Event,
+    Script,
     Misc
 };
 extern std::vector < std::tuple<ComponentType, std::string, ImTextureID, std::function<void(GameObject*)>>>  AllComponents;
