@@ -67,6 +67,8 @@ public:
     unsigned int GetID() const { return _id; }
     std::string GetDisplayText() const { return _displayText; }
     std::string GetExpectedPayload() const { return _expectedPayload; }
+    std::string GetReceivedData() const { return _receivedData; }
+    void ClearReceivedData() { _receivedData.clear(); }
 private:
     unsigned int _id;
     std::string _displayText;

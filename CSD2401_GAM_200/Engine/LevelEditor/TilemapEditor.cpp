@@ -513,7 +513,7 @@ void TilemapEditor::RenderTilesetPanel()
                 draggedTiles = tilesetPath;
             }
 
-            ReceiveDragAndDrop(TilesetPayloadID, draggedTiles);
+            ReceiveDragAndDrop(SpritePayloadID, draggedTiles);
             if (!draggedTiles.empty())
             {
                 strcpy(tilesetPath, draggedTiles.c_str());
