@@ -12,21 +12,22 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-using CSharpScript;
 using System;
+using CSharpScript;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace GameScripts
+namespace CSharpScript
 {
-    public class PlayerMovement
+    public class PlayerMovement : GameScript
     {
         // basically assigns names to numbers that can be used to track states
         enum PlayerState
         {
             Idle = 0,
-            Running,
+            Walking,
             Jumping,
+            Running,
             Falling,
             Land,
             Dashing,
@@ -49,14 +50,21 @@ namespace GameScripts
 
         #region Variables
         // This property should be set by the C++ engine after the script is attached.
-        public string gameObjectName = "Hero";
+        // changed to using OwnerName
+        //public string OwnerName = "Hero";
 
         // movement variables
         private vec2 _moveVelocity = new vec2(0, 0);
         private bool _isFacingRight = true;
+        private bool _isRunning;
+        private bool _isRunToggleActive = false;     // internal state to track if player is running (used for Toggle Mode)
+        private float movespeed;
+        public float CurrentSpeed => movespeed;
 
         // public facing right for other scripts
-        public bool IsFacingRight => _isFacingRight;
+        public bool IsFacingRight => _isFacingRight;        // public facing right for other scripts
+        private int _queuedDirection = 0;                   // remembers input while airborne
+        private int _facingDirection = 1;                   // visual direction
 
         // collision check variables
         private bool _isGrounded = false;
@@ -130,6 +138,13 @@ namespace GameScripts
 
         // knockback
         // private KnockBack knockback; //
+
+        // movement penalties - bonk & skid
+        private float _bonkTimer = 0f;
+        private bool _isSkidding;
+        private int _skidTargetDirection;
+        private float _skidTimer = 0f;
+        private float _calculatedSkidDecel;
         #endregion
 
 
@@ -142,29 +157,69 @@ namespace GameScripts
 
         public void OnStart()
         {
-            // It's crucial that gameObjectName is set by the C++ engine before OnStart is called.
-            if (gameObjectName == null)
+            // It's crucial that OwnerName is set by the C++ engine before OnStart is called.
+            if (OwnerName == null)
             {
-                Debug.Log("ERROR: gameObjectName is not set in PlayerMovement script!");
+                Debug.Log("ERROR: OwnerName is not set in PlayerMovement script!");
                 return;
             }
 
+            // Add sounds
+            Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx", "../Assets/audio/Player/Footstep.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.2f, 1.0f, "sfx");
+            Audio.AddSound("dash_sfx", "../Assets/audio/Player/Dash.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
+
+            Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
+            Animation.RegisterAnimation("Hero", "Run", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 16.0f);
+            Animation.RegisterAnimation("Hero", "Jump", "../Assets/spritesheet_R.png", 13, 10, 11, 4, 11, 5, 12.0f);
+            Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png", 13, 10, 1, 0, 1, 2, 8.0f);
+            Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 12.0f);
+            Animation.RegisterAnimation("Hero", "Groundpound", "../Assets/spritesheet_R.png", 13, 10, 9, 3, 9, 4, 10.0f);
+            Animation.RegisterAnimation("Hero", "Dash", "../Assets/spritesheet_R.png", 13, 10, 3, 0, 3, 2, 4.0f);
+            Animation.RegisterAnimation("Hero", "Wallkick", "../Assets/spritesheet_R.png", 13, 10, 4, 3, 4, 4, 4.0f);
+            Animation.RegisterAnimation("Hero", "Wallslide", "../Assets/spritesheet_L.png", 13, 10, 4, 0, 4, 1, 4.0f);
+            Animation.RegisterAnimation("Hero", "Falling", "../Assets/spritesheet_L.png", 13, 10, 10, 0, 10, 1, 4.0f);
+            Animation.RegisterAnimation("Hero", "Land", "../Assets/spritesheet_L.png", 13, 10, 10, 3, 10, 4, 4.0f);
+
+            // Attach the player movement script to the Hero
+            CSharpScript.Scripting.AttachScript("Hero", "PlayerMovement");
+
             _isFacingRight = true;
 
-            Physics.SetGravity(gameObjectName, true);
-          
+            Physics.SetGravity(OwnerName, true);
 
-            vec2 scale = Transform.GetScale(gameObjectName);
-            vec2 position = Transform.GetPosition(gameObjectName);
+            // toggle run
+            if (MoveStats.UseToggleRun)
+            {
+                // toggle mode
+                if (InputManager.RunWasPressed)
+                {
+                    _isRunToggleActive = !_isRunToggleActive;
+                }
+            }
+            else
+            {
+                // hold mode
+                _isRunToggleActive = InputManager.RunIsHeld;
+            }
+
+            vec2 scale = Transform.GetScale(OwnerName);
+            vec2 position = Transform.GetPosition(OwnerName);
             //_ziplineHeadOffset = position.y + (scale.y / 2);
-            Physics.SetFriction(gameObjectName, 0f);
-            Physics.SetMass(gameObjectName, 0.0001f);
+            Physics.SetFriction(OwnerName, 0f);
+            Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
         }
 
         public void OnUpdate(float deltaTime)
         {
-            if (gameObjectName == null || gameObjectName == "") return;
+            if (OwnerName == null || OwnerName == "") return;
+
+            // additional checks here
 
             currState = PlayerState.Idle;
             UpdatePlayerState();
@@ -184,57 +239,56 @@ namespace GameScripts
             switch(currState)
             {
                 case PlayerState.Idle:
-                    Animation.PlayAnimation(gameObjectName, "Idle");
+                    Animation.PlayAnimation(OwnerName, "Idle");
                     break;
                 case PlayerState.Jumping:
-                    Animation.PlayAnimation(gameObjectName, "Jump");
+                    Animation.PlayAnimation(OwnerName, "Jump");
                     break;
                 case PlayerState.Running:
-                    Animation.PlayAnimation(gameObjectName, "Run");
+                    Animation.PlayAnimation(OwnerName, "Run");
                     break;
                 case PlayerState.Falling:
-                    Animation.PlayAnimation(gameObjectName, "Falling");
+                    Animation.PlayAnimation(OwnerName, "Falling");
                     break;
                 case PlayerState.Land:
                     // commented out because landing is buggy
-                    //Animation.PlayAnimation(gameObjectName, "Land");
+                    //Animation.PlayAnimation(OwnerName, "Land");
                     break;
                 case PlayerState.Dashing:
-                    Animation.PlayAnimation(gameObjectName, "Dash");
+                    Animation.PlayAnimation(OwnerName, "Dash");
                     break;
                 case PlayerState.GroundPounding:
-                    Animation.PlayAnimation(gameObjectName, "Groundpound");
+                    Animation.PlayAnimation(OwnerName, "Groundpound");
                     break;
                 case PlayerState.Rolling:
-                    Animation.PlayAnimation(gameObjectName, "Roll");
+                    Animation.PlayAnimation(OwnerName, "Roll");
                     break;
                 case PlayerState.WallKicking:
-                    Animation.PlayAnimation(gameObjectName, "Wallkick");
+                    Animation.PlayAnimation(OwnerName, "Wallkick");
                     break;
                 case PlayerState.Ziplining:
-                    Animation.PlayAnimation(gameObjectName, "Zipline");
+                    Animation.PlayAnimation(OwnerName, "Zipline");
                     break;
                 case PlayerState.Gliding:
-                    Animation.PlayAnimation(gameObjectName, "Glide");
+                    Animation.PlayAnimation(OwnerName, "Glide");
                     break;
                 case PlayerState.WallSliding:
-                    Animation.PlayAnimation(gameObjectName, "Wallslide");
+                    Animation.PlayAnimation(OwnerName, "Wallslide");
                     break;
                 case PlayerState.WallJumping:
-                    Animation.PlayAnimation(gameObjectName, "Wallkick");
+                    Animation.PlayAnimation(OwnerName, "Wallkick");
                     break;
             }
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
         {
-            if (gameObjectName == null) return;
+            if (OwnerName == null) return;
             CollisionChecks();
 
             if (!_isZiplining) //&& !knockback.IsBeingKnockedBack && !_isBeingLaunched)
             {
                 Jump(fixedDeltaTime);
-                Dash(fixedDeltaTime);
                 WallKick(fixedDeltaTime);
                 GroundPound(fixedDeltaTime);
                 Roll(fixedDeltaTime);
@@ -256,6 +310,222 @@ namespace GameScripts
                 //else Debug.Log("aaaa");
             }
         }
+
+        #region Movement
+        public void Move(float acceleration, float deceleration, vec2 moveInput, float deltaTime)
+        {
+            // OLD
+            //if (blockMovement) moveInput = new vec2(0, 0);
+
+            //if (moveInput.x != 0 || (_isRolling && _rollTimer >= 0))
+            //{
+            //    TurnCheck(moveInput);
+            //    vec2 targetVelocity = new vec2(moveInput.x * MoveStats.MaxWalkSpeed, 0f);
+
+            //    if (!(_isRolling && _rollTimer >= 0))
+            //    {
+            //        _moveVelocity = Lerp(_moveVelocity, targetVelocity, acceleration * deltaTime);
+            //    }
+
+            //    Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
+            //}
+            //else
+            //{
+            //    _moveVelocity = Lerp(_moveVelocity, new vec2(0, 0), deceleration * deltaTime);
+
+            //    Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
+            //}
+
+            float inputX = moveInput.x;
+            bool isRunHeld = _isRunToggleActive; // for run toggle option
+
+            int targetDirection = 0;
+            if (inputX != 0) targetDirection = (int)inputX;
+            else if (isRunHeld && _isGrounded) targetDirection = _facingDirection;
+
+            // landing skid check - for jump flip
+            // if hit groud + fast speed BUT facing opposite direction of movement = landing skid
+            //bool movingAgainstFacing = Mathf.Sign(_rb.linearVelocity.x) != _facingDirection;
+            bool movingAgainstFacing = Math.Sign(Physics.GetVelocity(OwnerName).x) != _facingDirection;
+            //bool isMovingFast = Mathf.Abs(_rb.linearVelocity.x) > 5f;            // small threshold (1f) to ignore tiny jitters when stopping
+            bool isMovingFast = Math.Abs(Physics.GetVelocity(OwnerName).x) > 5f;
+
+            if (_isGrounded && isMovingFast && movingAgainstFacing && !_isSkidding)
+            {
+                // direct skid trigger
+                _isSkidding = true;
+                _facingDirection = targetDirection != 0 ? targetDirection : _facingDirection;
+
+                // standard skid setup
+                int landingTier = GetCurrentTentacleLevel();
+                if (isRunHeld && landingTier == 0) landingTier = 1;
+
+                if (landingTier > 0)
+                {
+                    float duration = MoveStats.T1_SkidDuration;
+                    if (landingTier == 2) duration = MoveStats.T2_SkidDuration;
+                    if (landingTier == 3) duration = MoveStats.T3_SkidDuration;
+                    _skidTimer = duration;
+
+                    movespeed *= MoveStats.SkidSpeedRetained;
+                    _calculatedSkidDecel = (duration > 0) ? (movespeed / duration) : 0;
+
+                    return;
+                }
+            }
+            // determine max speed
+            float currentMaxSpeed = isRunHeld ? MoveStats.T3_MaxSpeed : MoveStats.T0_MaxSpeed;
+
+            // movement logic
+            if (targetDirection != 0)
+            {
+                bool isOpposite = (targetDirection > 0 && _facingDirection == -1) || (targetDirection < 0 && _facingDirection == 1);
+
+                // turn check
+                if (isOpposite)
+                {
+                    int tier = GetCurrentTentacleLevel();
+
+                    // air turn (visual flip only) - if in air + run held / toggled + moving fast
+                    if (!_isGrounded && isRunHeld && movespeed > MoveStats.T0_MaxSpeed)
+                    {
+                        // flip sprite
+                        Turn(targetDirection > 0);
+                        _facingDirection = targetDirection;
+                    }
+
+                    // ground skid
+                    else
+                    {
+                        // force skid if holding / toggling run
+                        if (isRunHeld && movespeed > 5f && tier == 0) tier = 1;
+
+                        if (tier == 0)
+                        {
+                            // nstant turn
+                            movespeed = MoveStats.TurnResetSpeed;
+                            _facingDirection = targetDirection;
+                            Turn(targetDirection > 0);
+                            _isSkidding = false;
+                        }
+                        else
+                        {
+                            _isSkidding = true;
+                            _facingDirection = targetDirection;
+                            Turn(targetDirection > 0);
+
+                            float duration = MoveStats.T1_SkidDuration;
+                            if (tier == 2) duration = MoveStats.T2_SkidDuration;
+                            if (tier == 3) duration = MoveStats.T3_SkidDuration;
+
+                            _skidTimer = duration;
+                            movespeed *= MoveStats.SkidSpeedRetained;
+
+
+                            // skid will stop at "exitspeed" so player doesnt drop down to 0
+                            float exitSpeed = 4f;
+
+                            if (movespeed > exitSpeed)
+                            {
+                                // cecelerate until hit 4
+                                _calculatedSkidDecel = (movespeed - exitSpeed) / duration;
+                            }
+                            else
+                            {
+                                // if already slow = stop normally
+                                _calculatedSkidDecel = movespeed / duration;
+                            }
+
+                            return;
+                        }
+                    }
+                }
+
+                _isSkidding = false;
+
+                // snap Logic
+                float startSnapSpeed = isRunHeld ? MoveStats.RunBaseSpeed : MoveStats.T0_BaseSpeed;
+                if (movespeed < startSnapSpeed) movespeed = startSnapSpeed;
+
+                // adjust speed
+                if (movespeed < currentMaxSpeed)
+                {
+                    float accel = isRunHeld ? MoveStats.TentAcceleration : MoveStats.GroundAcceleration;
+                    movespeed += accel * fixeddt;
+                }
+                else if (movespeed > currentMaxSpeed)
+                {
+                    // coasting - smooth decel to walk speed
+                    float coastDrag = _isGrounded ? MoveStats.RunCoastDeceleration : MoveStats.AirDeceleration;
+                    movespeed -= coastDrag * fixeddt;
+                    if (movespeed < currentMaxSpeed) movespeed = currentMaxSpeed;
+                }
+            }
+            else
+            {
+                _isSkidding = false;
+                float currDeceleration = _isGrounded ? MoveStats.GroundDeceleration : MoveStats.AirDeceleration;
+                movespeed -= currDeceleration * fixeddt;
+                if (movespeed < 0) movespeed = 0;
+            }
+
+            // physics application 
+            movespeed = Utils.MathfClamp(movespeed, 0, 50f);
+
+            // determine physics direction
+            int moveDir = _facingDirection;
+
+            // if in air + moving fast + turned in the opposite direction = flip the physics application
+            // use rb's current velocity to detect the "real movement" direction
+            if (!_isGrounded && isRunHeld && movespeed > MoveStats.T0_MaxSpeed)
+            {
+                // if facing right (1) but moving left (vel < -1) -> apply force left (-1)
+                if (_facingDirection == 1 && Physics.GetVelocity(OwnerName).x < -1f) moveDir = -1;
+
+                // if facing left (-1) but moving right (vel > 1) -> apply force right (1)
+                else if (_facingDirection == -1 && Physics.GetVelocity(OwnerName).x > 1f) moveDir = 1;
+            }
+
+            _moveVelocity.x = movespeed * moveDir;
+            //_rb.linearVelocity = new Vector2(_moveVelocity.x, Physics.GetVelocity(OwnerName).y);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
+
+            //if (_animator != null) _animator.SetBool("isSkidding", _isSkidding);
+        }
+
+        private void TurnCheck(vec2 moveInput)
+        {
+            if (_isFacingRight && moveInput.x < 0)
+            {
+                Turn(false);
+            }
+            else if (!_isFacingRight && moveInput.x > 0)
+            {
+                Turn(true);
+            }
+        }
+
+        private void Turn(bool turnRight)
+        {
+            _isFacingRight = turnRight;
+            vec2 currentScale = Transform.GetScale(OwnerName);
+            // [WIP] to include left and right animations for accurate monocle, for now will just do a basic flip
+            Transform.SetScale(OwnerName, Math.Abs(currentScale.x) * (turnRight ? 1 : -1), currentScale.y);
+            
+            // Unity ver
+            //if (turnRight)
+            //{
+            //    _isFacingRight = true;
+            //    transform.Rotate(0f, 180f, 0f);
+            //}
+            //else
+            //{
+            //    _isFacingRight = false;
+            //    transform.Rotate(0f, -180f, 0f);
+            //}
+        }
+
+        #endregion
 
         #region State & Input
         private void UpdatePlayerState()
@@ -286,7 +556,7 @@ namespace GameScripts
             }
 
             // placed after jump and run, so it can be overriden 
-            if (_isDashing) currState = PlayerState.Dashing;
+            if (_isRunning) currState = PlayerState.Running;
             if (_isRolling) currState = PlayerState.Rolling;
             if (_isGroundPounding) currState = PlayerState.GroundPounding;
             if (_isGliding) currState = PlayerState.Gliding;
@@ -314,10 +584,10 @@ namespace GameScripts
                 }
             }
 
-            if (InputManager.DashWasPressed && _dashCooldownTimer <= 0)
-            {
-                InitiateDash();
-            }
+            //if (InputManager.RunWasPressed && _dashCooldownTimer <= 0)
+            //{
+            //    InitiateDash();
+            //}
             if (InputManager.WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
             {
                 InitiateWallKick();
@@ -341,6 +611,56 @@ namespace GameScripts
         }
 
         #endregion
+
+        private void HandleLockedSkid()
+        {
+            // skid timer
+            _skidTimer -= fixeddt;
+
+            // friction
+            movespeed -= _calculatedSkidDecel * fixeddt;
+
+            // safety clamp to not go negative during skid
+            if (movespeed < 0) movespeed = 0;
+
+            // end check
+            if (_skidTimer <= 0)
+            {
+                //movespeed = 0;
+                _isSkidding = false;
+            }
+
+            // apply backwards velocity
+            // flipped _facingDirection to look where player wants to go but have momentum drag them in the opposite way (multiply by negative facing direction)
+            _moveVelocity.x = movespeed * -_facingDirection;
+            //_rb.linearVelocity = new Vector2(_moveVelocity.x, _rb.linearVelocity.y);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
+        }
+
+        private void HandleWallBonk()
+        {
+            //if (_animator != null) _animator.SetTrigger("Bump");
+
+            // force roll + ground pound states to end immediately
+            _isRolling = false;
+            _isGroundPounding = false;
+
+            // unlock movement block from roll / ground pound
+            blockMovement = false;
+
+            movespeed = 0;
+            _isSkidding = false;
+
+            // auto disable run toggle on crash
+            if (MoveStats.UseToggleRun) _isRunToggleActive = false;
+
+            // use T3 variable directly since bonk only happens at top speed
+            Vector2 force = MoveStats.T3_BonkForce;
+
+            //_rb.linearVelocity = new Vector2(-_facingDirection * force.x, force.y);
+            Physics.SetVelocity(OwnerName, -_facingDirection * force.X, force.Y);
+            _bonkTimer = MoveStats.T3_BonkDuration;
+        }
 
         #region Collison Checks
 
@@ -372,8 +692,8 @@ namespace GameScripts
         {
             bool oldIsGrounded = _isGrounded;
             _isGrounded = false;
-            vec2 position = Transform.GetPosition(gameObjectName);
-            vec2 scale = Transform.GetScale(gameObjectName);
+            vec2 position = Transform.GetPosition(OwnerName);
+            vec2 scale = Transform.GetScale(OwnerName);
             float halfWidth = Math.Abs(scale.x) / 2;
             float bottomY = position.y - (scale.y / 2.1f);
             float raycastLength = MoveStats.GroundDetectionRayLength;
@@ -428,7 +748,7 @@ namespace GameScripts
 
         private bool RaycastForGround(vec2 origin, vec2 direction, float length)
         {
-            if (Collision.Raycast(gameObjectName, origin, direction, length, out string hitObject, out float hitDistance))
+            if (Collision.Raycast(OwnerName, origin, direction, length, out string hitObject, out float hitDistance))
             {
                 if (Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Ground)
                 {
@@ -447,8 +767,8 @@ namespace GameScripts
         private void IsTouchingWall()
         {
             _isTouchingWall = false;
-            vec2 position = Transform.GetPosition(gameObjectName);
-            vec2 scale = Transform.GetScale(gameObjectName);
+            vec2 position = Transform.GetPosition(OwnerName);
+            vec2 scale = Transform.GetScale(OwnerName);
             float halfHeight = scale.y / 2;
             float raycastLength = MoveStats.WallDetectionBoxLength;
             vec2 rayDirection = new vec2(_isFacingRight ? 1 : -1, 0);
@@ -480,7 +800,7 @@ namespace GameScripts
 
         private bool RaycastForWall(vec2 origin, vec2 direction, float length)
         {
-            if (Collision.Raycast(gameObjectName, origin, direction, length, out string hitObject, out float hitDistance))
+            if (Collision.Raycast(OwnerName, origin, direction, length, out string hitObject, out float hitDistance))
             {
                 // Assuming walls are also on the Ground layer as per the C++ enum comment
                 if (Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Ground)
@@ -489,53 +809,6 @@ namespace GameScripts
                 }
             }
             return false;
-        }
-
-        #endregion
-
-        #region Movement
-        public void Move(float acceleration, float deceleration, vec2 moveInput, float deltaTime)
-        {
-            if (blockMovement) moveInput = new vec2(0, 0);
-
-            if (moveInput.x != 0 || (_isRolling && _rollTimer >= 0))
-            {
-                TurnCheck(moveInput);
-                vec2 targetVelocity = new vec2(moveInput.x * MoveStats.MaxWalkSpeed, 0f);
-
-                if (!(_isRolling && _rollTimer >= 0))
-                {
-                    _moveVelocity = Lerp(_moveVelocity, targetVelocity, acceleration * deltaTime);
-                }
-
-                Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
-            }
-            else
-            {
-                _moveVelocity = Lerp(_moveVelocity, new vec2(0, 0), deceleration * deltaTime);
-
-                Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
-            }
-        }
-
-        private void TurnCheck(vec2 moveInput)
-        {
-            if (_isFacingRight && moveInput.x < 0)
-            {
-                Turn(false);
-            }
-            else if (!_isFacingRight && moveInput.x > 0)
-            {
-                Turn(true);
-            }
-        }
-
-        private void Turn(bool turnRight)
-        {
-            _isFacingRight = turnRight;
-            vec2 currentScale = Transform.GetScale(gameObjectName);
-            // [WIP] to include left and right animations for accurate monocle, for now will just do a basic flip
-            Transform.SetScale(gameObjectName, Math.Abs(currentScale.x) * (turnRight ? 1 : -1), currentScale.y);
         }
 
         #endregion
@@ -630,7 +903,7 @@ namespace GameScripts
             // clamp fall speed
             VerticalVelocity = Utils.MathfClamp(VerticalVelocity, -MoveStats.MaxFallSpeed, MoveStats.InitialJumpVelocity);
 
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
         }
 
         private void JumpChecks()
@@ -731,6 +1004,54 @@ namespace GameScripts
             }
         }
 
+        #region Slide
+        private void WallSlide()
+        {
+            if (_isGrounded)// || (knockback != null && knockback.IsBeingKnockedBack))
+            {
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                    //AudioManager.instance.StopLoopingPlayerSFX();
+                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
+                }
+                return;
+            }
+
+            // check collision & falling speed
+            //if (_isTouchingWall && _rb.linearVelocity.y < 0)
+            if (_isTouchingWall && Physics.GetVelocity(OwnerName).y < 0)
+            {
+                // first frame logic
+                if (!_isWallSliding)
+                {
+                    _isWallSliding = true;
+
+                    // reset jumps if want wall sliding to refresh double jump
+                    _numberOfJumpsUsed = 0;
+
+                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
+                    //_wallSoundCoroutine = StartCoroutine(PlayWallSlideAudioSequence(sounds.wallLand, sounds.wallSlide));
+                }
+
+                // apply friction/slide speed
+                //_rb.linearVelocity = new Vector2(_rb.linearVelocity.x, Mathf.Max(_rb.linearVelocity.y, -MoveStats.WallSlidingSpeed));
+                Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
+            }
+            else
+            {
+                // exit wall slide logic
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                    //AudioManager.instance.StopLoopingPlayerSFX();
+                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
+                }
+            }
+        }
+
+        #endregion
+
         private void InitiateJump(int numberOfJumpsUsed)
         {
             if (_isRolling)
@@ -748,6 +1069,34 @@ namespace GameScripts
             _numberOfJumpsUsed += numberOfJumpsUsed;
             VerticalVelocity = MoveStats.InitialJumpVelocity;
         }
+        #endregion
+
+        #region Wall Slide + Jump + Kick
+
+        private void WallSlide(float deltaTime)
+        {
+            bool isPushingTowardsWall = (_isFacingRight && InputManager.Movement.x > 0) ||
+                                        (!_isFacingRight && InputManager.Movement.x < 0);
+
+            //vec2 currentVelocity = Physics.GetVelocity(OwnerName);
+
+            if (_isTouchingWall && !_isGrounded && isPushingTowardsWall)
+            {
+                if (_moveVelocity.y < 0)
+                {
+                    _isWallSliding = true;
+                    float newYVelocity = Utils.MathfClamp(_moveVelocity.y, -MoveStats.WallSlidingSpeed, 999f);
+                    Physics.SetVelocity(OwnerName, _moveVelocity.x, newYVelocity);
+                }
+            }
+            else
+            {
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                }
+            }
+        }
 
         private void InitiateWallJump()
         {
@@ -764,77 +1113,13 @@ namespace GameScripts
             float horizontalDirection = _isFacingRight ? -1f : 1f;
             _moveVelocity.x = MoveStats.WallJumpForce.x * horizontalDirection;
 
-            //vec2 currentVelocity = Physics.GetVelocity(gameObjectName);
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, _moveVelocity.y);
+            //vec2 currentVelocity = Physics.GetVelocity(OwnerName);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, _moveVelocity.y);
 
             // turn the player
             Turn(!_isFacingRight);
         }
-        #endregion
 
-        #region Dash
-
-        private void InitiateDash()
-        {
-            if (_isDashing) return;
-
-            _isWallSliding = false;
-            _isWallJumping = false;
-            blockMovement = false;
-
-            _isDashing = true;
-            _dashTimer = MoveStats.DashDuration;
-            _dashCooldownTimer = MoveStats.DashCooldown;
-
-            // determine dash direction
-            float dashDirection = _isFacingRight ? 1f : -1f;
-
-            // set horizontal velocity
-            _moveVelocity.x = dashDirection * MoveStats.DashSpeed;
-
-            // cancel vertical movement
-            VerticalVelocity = 0f;
-
-            // ensure jump velocity does not interfere
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, 0);
-            Audio.PlaySound("dash_sfx", "sfx");
-        }
-
-        private void Dash(float deltaTime)
-        {
-            if (_isDashing)
-            {
-                currState = PlayerState.Dashing;
-                // maintain dash speed and zero vertical velocity while dashing
-                VerticalVelocity = 0f;
-                float direction = _isFacingRight ? 1 : -1;
-                float move = MoveStats.DashSpeed * deltaTime;
-
-                // Move manually instead of overriding physics velocity
-                Vector2 newVec = new Vector2(Transform.GetPosition(gameObjectName).x, Transform.GetPosition(gameObjectName).y);
-                newVec += new Vector2(move * direction, 0);
-                Transform.SetPosition(gameObjectName, newVec.X, newVec.Y);
-
-                _dashTimer -= deltaTime;
-
-                // check if dash has finished
-                if (_dashTimer <= 0)
-                {
-                    StopDash();
-                }
-            }
-        }
-
-        private void StopDash()
-        {
-            _isDashing = false;
-            //vec2 currentVelocity = Physics.GetVelocity(gameObjectName);
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, 0f);
-        }
-
-        #endregion
-
-        #region Wall Kick
         private void InitiateWallKick()
         {
             if (_isWallKicking) return;
@@ -862,7 +1147,7 @@ namespace GameScripts
             _moveVelocity.x = wallKickDir * MoveStats.WallKickSpeedModifier;
             VerticalVelocity = 0f;
 
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
             Audio.PlaySound("wallkick_sfx", "sfx");
         }
 
@@ -887,7 +1172,7 @@ namespace GameScripts
             float verticalGain = MoveStats.WallKickVerticalModifier * 1;
 
             // Apply velocities directly
-            Physics.SetVelocity(gameObjectName, currentSpeedX, verticalGain);
+            Physics.SetVelocity(OwnerName, currentSpeedX, verticalGain);
 
             // End wall kick when timer finishes
             if (_wallKickTimer <= 0f)
@@ -905,37 +1190,108 @@ namespace GameScripts
             _moveVelocity.x = 0f;
 
             // Keep current vertical motion (gravity or jump will continue)
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
 
             wallKickFrameCounter = 0; // Reset wall coyote counter
         }
         #endregion
 
-        #region Wall Slide
-        private void WallSlide(float deltaTime)
+        #region Roll
+
+        private void InitiateRoll(float speedOverride = -1f, float durationOverride = -1f)
         {
-            bool isPushingTowardsWall = (_isFacingRight && InputManager.Movement.x > 0) ||
-                                        (!_isFacingRight && InputManager.Movement.x < 0);
+            if (_isRolling || !_isGrounded) return;
 
-            //vec2 currentVelocity = Physics.GetVelocity(gameObjectName);
+            // Play sound if assigned
+            //if (sounds != null && sounds.roll != null)
+            //    AudioManager.Instance.PlayPlayerSFX(sounds.roll);
 
-            if (_isTouchingWall && !_isGrounded && isPushingTowardsWall)
+            _isRolling = true;
+            blockMovement = true;
+
+            int tent = GetCurrentTentacleLevel();
+
+            // speed logic
+            if (speedOverride > 0)
             {
-                if (_moveVelocity.y < 0)
-                {
-                    _isWallSliding = true;
-                    float newYVelocity = Utils.MathfClamp(_moveVelocity.y, -MoveStats.WallSlidingSpeed, 999f);
-                    Physics.SetVelocity(gameObjectName, _moveVelocity.x, newYVelocity);
-                }
+                // ground pound force
+                movespeed = speedOverride;
             }
             else
             {
-                if (_isWallSliding)
+                // normal roll - tent speeds 0 to 3
+                if (tent == 3)
                 {
-                    _isWallSliding = false;
+                    movespeed = MoveStats.MaxRollSpeed;
+                }
+                else if (tent >= 1) // Tent 1 or 2
+                {
+                    movespeed = MoveStats.MidRollSpeed;
+                }
+                else // tent 0
+                {
+                    movespeed = MoveStats.BaseRollSpeed;
                 }
             }
+
+            // duration logic
+            if (durationOverride > 0)
+            {
+                _rollTimer = durationOverride;
+            }
+            else
+            {
+                if (tent == 3) _rollTimer = MoveStats.MaxRollDuration;
+                else if (tent >= 1) _rollTimer = MoveStats.MidRollDuration;
+                else _rollTimer = MoveStats.BaseRollDuration;
+            }
+
+            _isGroundPounding = false;
+
+            // Set roll velocity
+            _moveVelocity.x = movespeed * _facingDirection;
+            VerticalVelocity = 0f;
+            Audio.PlaySound("roll_sfx", "sfx");
         }
+
+        private void Roll(float deltaTime)
+        {
+            if (!_isRolling) return;
+
+            currState = PlayerState.Rolling;
+            // Cancel roll if touching wall in air
+            if (_isTouchingWall)
+            {
+                StopRoll();
+                return;
+            }
+
+            // End roll on timer or dash
+            if (_rollTimer <= 0f)
+            {
+                blockMovement = false;
+                StopRoll();
+            }
+            else
+            {
+                _rollTimer -= deltaTime;
+                // Keep horizontal roll speed
+                Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
+            }
+        }
+
+        private void StopRoll()
+        {
+            if (!_isRolling) return;
+
+            _isRolling = false;
+            blockMovement = false;
+
+            // Reset horizontal velocity
+            //_moveVelocity.x = 0f;
+            //Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
+        }
+
         #endregion
 
         #region Ground Pound
@@ -958,7 +1314,7 @@ namespace GameScripts
             VerticalVelocity = -MoveStats.GroundPoundFallSpeed;
 
             // Store starting position for midair pause
-            lastPos = Transform.GetPosition(gameObjectName);
+            lastPos = Transform.GetPosition(OwnerName);
             Audio.PlaySound("groundpound_sfx", "sfx");
         }
 
@@ -973,7 +1329,7 @@ namespace GameScripts
                 _groundPoundPauseTimer -= deltaTime;
 
                 // Keep player in same position
-                Transform.SetPosition(gameObjectName, lastPos.x, lastPos.y);
+                Transform.SetPosition(OwnerName, lastPos.x, lastPos.y);
 
                 // Stop vertical velocity while paused
                 VerticalVelocity = 0f;
@@ -994,7 +1350,7 @@ namespace GameScripts
             }
 
             // Always push velocity to physics
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
         }
 
         private void StopGroundPound()
@@ -1013,73 +1369,6 @@ namespace GameScripts
 
             // If grounded, can chain into roll
         }
-        #endregion
-
-        #region Roll
-
-        private void InitiateRoll()
-        {
-            if (_isRolling || !_isGrounded) return;
-
-            // Play sound if assigned
-            //if (sounds != null && sounds.roll != null)
-            //    AudioManager.Instance.PlayPlayerSFX(sounds.roll);
-
-            _isRolling = true;
-            blockMovement = true;
-
-            // Roll timer; longer if coming from ground pound
-            _rollTimer = (!_isGroundPounding) ? MoveStats.BaseRollDuration : MoveStats.BaseRollDuration + (lastPos.y - Transform.GetPosition(gameObjectName).y) / MoveStats.RollHeightToDurationDivisor;
-            _rollTimer = Utils.MathfClamp(_rollTimer, 0f, 2f);
-
-            Debug.Log(_rollTimer.ToString());
-
-            _isGroundPounding = false;
-
-            // Set roll velocity
-            _moveVelocity.x = _isFacingRight ? MoveStats.RollSpeed : -MoveStats.RollSpeed;
-            VerticalVelocity = 0f;
-            Audio.PlaySound("roll_sfx", "sfx");
-        }
-
-        private void Roll(float deltaTime)
-        {
-            if (!_isRolling) return;
-
-            currState = PlayerState.Rolling;
-            // Cancel roll if touching wall in air
-            if (canWallKick)
-            {
-                StopRoll();
-                return;
-            }
-
-            // End roll on timer or dash
-            if (_rollTimer <= 0f || _isDashing)
-            {
-                blockMovement = false;
-                StopRoll();
-            }
-            else
-            {
-                _rollTimer -= deltaTime;
-                // Keep horizontal roll speed
-                Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
-            }
-        }
-
-        private void StopRoll()
-        {
-            if (!_isRolling) return;
-
-            _isRolling = false;
-            blockMovement = false;
-
-            // Reset horizontal velocity
-            _moveVelocity.x = 0f;
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
-        }
-
         #endregion
 
         #region Air Glide
@@ -1122,7 +1411,7 @@ namespace GameScripts
             if (VerticalVelocity < 0f)
                 VerticalVelocity *= MoveStats.GlideFallSpeedMultiplier;
 
-            Physics.SetVelocity(gameObjectName, _moveVelocity.x, VerticalVelocity);
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
         }
 
         private void StopGlide()
@@ -1141,13 +1430,20 @@ namespace GameScripts
 
         public void OnDestroy()
         {
-            Debug.Log("PlayerMovement Script Destroyed for object: " + gameObjectName);
+            Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
         }
 
         private static vec2 Lerp(vec2 a, vec2 b, float t)
         {
             t = Utils.MathfClamp(t, 0, 1);
             return new vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+        }
+        private int GetCurrentTentacleLevel()
+        {
+            if (movespeed >= MoveStats.T3_Threshold) return 3;
+            if (movespeed >= MoveStats.T2_Threshold) return 2;
+            if (movespeed >= MoveStats.T1_Threshold) return 1;
+            return 0; // walk speed
         }
     }
 }

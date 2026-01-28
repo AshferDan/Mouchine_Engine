@@ -14,19 +14,56 @@ Technology is prohibited.
 
 using CSharpScript;
 using System;
+using System.Numerics;
 using static System.Math;
 
 // This file contains values that will be able to be adjusted via the editor.
-namespace GameScripts
+namespace CSharpScript
 {
-    public class PlayerMovementStats
+    public class PlayerMovementStats : GameScript
     {
-        // Walk
-        public float MaxWalkSpeed = 250f;
-        public float GroundAcceleration = 30f;
+        // walking tiers
+        public float T0_BaseSpeed = 2f;
+        public float T0_MaxSpeed = 12f;
+
+        // running tiers
+        public float T1_Threshold = 18f;
+        public float T2_Threshold = 24f;
+        public float T3_Threshold = 30f;
+        public float T3_MaxSpeed = 40f;
+
+        // Running
+        public bool UseToggleRun = false;
+        public float RunBaseSpeed = 15f;
+        public float RunCoastDeceleration = 12f;
+
+        // Accel/ Decel
+        public float GroundAcceleration = 20f;
         public float GroundDeceleration = 30f;
+        //[Range(0.25f, 50f)] 
         public float AirAcceleration = 20f;
+        //[Range(0.25f, 50f)] 
         public float AirDeceleration = 5f;
+        public float TurnResetSpeed = 2f;
+        public float TentAcceleration = 0.1f;
+
+        // Turn Skid
+        //[Range(0.1f, 1f)] 
+        public float SkidSpeedRetained = 0.25f;
+        public float T1_SkidDuration = 0.2f;
+        public float T2_SkidDuration = 0.4f;
+        public float T3_SkidDuration = 0.7f;
+
+        // Wall Bonk
+        public float T3_BonkDuration = 0.8f;
+        public Vector2 T3_BonkForce = new Vector2(10f, 18f);
+
+        // Walk [OLD]
+        //public float MaxWalkSpeed = 250f;
+        //public float GroundAcceleration = 30f;
+        //public float GroundDeceleration = 30f;
+        //public float AirAcceleration = 20f;
+        //public float AirDeceleration = 5f;
 
         // Grounded/Collision Checks
         public float GroundDetectionRayLength = 5.0f;
@@ -68,9 +105,14 @@ namespace GameScripts
         public float DashCooldown = 0.5f;
 
         // Roll
-        public float BaseRollDuration = 0.15f;
         public float RollSpeed = 500f;
         public float RollHeightToDurationDivisor = 1000f;
+        public float BaseRollDuration = 0.5f; // minimum time
+        public float MidRollDuration = 0.65f;
+        public float MaxRollDuration = 0.8f;
+        public float BaseRollSpeed = 15f;  // needs to be faster than walk speed to feel like a burst forward
+        public float MidRollSpeed = 30f;
+        public float MaxRollSpeed = 40f;
 
         // Wall Kick
         public float WallKickSpeedModifier = 300f;
