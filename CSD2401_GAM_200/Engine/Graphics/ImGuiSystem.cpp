@@ -1677,6 +1677,10 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(SpritePayloadID, iter.path().generic_string(), fileName.c_str());            // For Sprites/ Spritesheets files
                 }
+                else if (extension == ".cs")
+                {
+                    SendDragAndDrop(ScriptPayloadID, iter.path().generic_string(), fileName.c_str());
+                }
                 else
                 {
                     SendDragAndDrop(AssetPayloadID, iter.path().generic_string(), fileName.c_str());            // Anything else considered an general asset
