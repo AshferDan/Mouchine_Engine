@@ -658,6 +658,15 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetCategoryVolume(string categoryName, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeOutCategory(string category, float duration);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeInCategory(string category, float duration, float targetVolume = 1.0f);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeOutAll(float duration);
     }
 
     /// <summary>

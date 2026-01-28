@@ -33,6 +33,13 @@ void PauseMenuLogicSystem::Initialize()
  */
 void PauseMenuLogicSystem::Update(float dt)
 {
+    // Update audio fade
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->UpdateFade(dt);
+    }
+
     // check if we're in play mode
     LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
     if (!editor || editor->GetEditorMode() != EditorMode::Play)
@@ -117,6 +124,15 @@ void PauseMenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "PauseMainMenuButton")
             {
                 std::cout << "[PauseMenu] Main Menu clicked" << std::endl;
+
+                // Start audio fade out before going to main menu
+                AudioManager* audioManager = CORE->GetAudioManager();
+                if (audioManager)
+                {
+                    audioManager->FadeOutCategory("music", 0.5f);
+                    std::cout << "[PauseMenu] Started music fade out" << std::endl;
+                }
+
                 // close menu first
                 if (isPauseMenuActive)
                 {

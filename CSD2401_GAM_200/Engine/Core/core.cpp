@@ -210,6 +210,12 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
             }
 
+            // Reset audio manager fade states and restore volumes
+            if (audioManager)
+            {
+                audioManager->ResetFadeStates();
+            }
+
             // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
             if (m_autoPlayAfterLoad)
             {
