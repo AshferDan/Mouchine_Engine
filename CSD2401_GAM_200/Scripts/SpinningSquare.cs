@@ -5,7 +5,7 @@ namespace CSharpScript
 {
     public class SpinningSquare : GameScript
     {
-        private float RotationSpeed = 2.0f; // Made public
+        public float RotationSpeed = 2.0f; // Made public
         public bool ShouldRotate = true;
         public string Message = "Hello, Editor!";
         public int LoopCount = 5;

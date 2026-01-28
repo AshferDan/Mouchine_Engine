@@ -74,39 +74,6 @@ int main()
 
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
-        // CORE->GetGraphicsSystem()->DrawRectOutline(0, 0, -300, 300, { 0, 1, 0, 1 });
-
-        //std::cout << "\n--- Attaching C# Scripts ---" << std::endl;
-
-        //ScriptSystem *scriptSys = engine.GetScriptSystem();
-
-        //GameObject *squareSpawner = GameObjectFactory::Instance().CreateGameObject("SquareSpawner");
-
-        //if (scriptSys && squareSpawner)
-        //{
-        //    // 1. Attach the first script (Red Square, Ground, Animation)
-        //    if (scriptSys->AttachScript(squareSpawner, "TestGameObject"))
-        //    {
-        //        std::cout << "Attached 'TestGameObject' to SquareSpawner" << std::endl;
-        //    }
-        //    else
-        //    {
-        //        std::cerr << "ERROR: Failed to attach 'TestGameObject'!" << std::endl;
-        //    }
-
-        //    // 2. Attach the second script (Blue Square, Green Rotating Square)
-        //    /*if (scriptSys->AttachScript(squareSpawner, "TestGameObjects2"))
-        //    {
-        //        std::cout << "Attached 'TestGameObjects2' to SquareSpawner" << std::endl;
-        //    }
-        //    else
-        //    {
-        //        std::cerr << "ERROR: Failed to attach 'TestGameObjects2'!" << std::endl;
-        //    }*/
-        //    std::cout << "Calling OnStart for all scripts on SquareSpawner..." << std::endl;
-        //    scriptSys->CallOnStart(squareSpawner);
-        //}
-
         GameObject* testObj = GameObjectFactory::Instance().CreateShape(
             "MyTestSquare",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
@@ -124,7 +91,7 @@ int main()
             {
                 // 3. Attach the script "SpinningSquare"
                 // Ensure the namespace in C# is "GameScripts"
-                scriptComp->AddScript("DragDropTest");
+                scriptComp->AddScript("SpinningSquare");
 
                 std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
             }
