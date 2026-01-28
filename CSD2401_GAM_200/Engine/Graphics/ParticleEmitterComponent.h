@@ -18,7 +18,9 @@ Technology is prohibited.
 #include "MathLib.h"
 #include <vector>
 #include "GL/glew.h"
-#include "GraphicsSystem.h"
+#include "transform.h"
+#include "gameObject.h"
+//#include "GraphicsSystem.h"
 
 struct Particle {
 	vec2 position;
@@ -37,6 +39,9 @@ struct Particle {
 		lifetime(0.f), maxLifeTime(1.0f), active(false) {}
 };
 
+struct RenderBatch;
+struct BatchVertex;
+
 class ParticleEmitterComponent : public IComponent {
 	public:
 		ParticleEmitterComponent(GameObject* owner);
@@ -53,7 +58,7 @@ class ParticleEmitterComponent : public IComponent {
 
 		void StartEmission();
 
-		void StopSmission();
+		void StopEmission();
 
 		void Burst(int count);
 
@@ -128,7 +133,7 @@ class ParticleEmitterComponent : public IComponent {
 
 		int GetLayer() const { return layer; };
 
-		void AddParticlesToBatch(std::vector<GraphicsSystem::RenderBatch>& batches, const mat4& viewProj);
+		void AddParticlesToBatch(std::vector<RenderBatch>& batches, const mat4& viewProj);
 
 		void ConfigureDashTrail();
 

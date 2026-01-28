@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "ParticleEmitterComponent.h"
+#include "GraphicsSystem.h"
 #include <algorithm>
 #include <cmath>
 #include <random>
@@ -142,7 +143,7 @@ void ParticleEmitterComponent::StartEmission() {
 	emissionTimer = 0.0f;
 }
 
-void ParticleEmitterComponent::StopSmission() {
+void ParticleEmitterComponent::StopEmission() {
 	isEmitting = false;
 }
 
@@ -184,12 +185,17 @@ int ParticleEmitterComponent::GetActiveParticleCount() const {
 	return count;
 }
 
-void ParticleEmitterComponent::AddParticlesToBatch(std::vector<GraphicsSystem::RenderBatch>& batches, const mat4& viewProj) {
+void ParticleEmitterComponent::AddParticlesToBatch(std::vector<RenderBatch>& batches, const mat4& viewProj) {
 	if (!IsEnabled()) {
 		return;
 	}
 
-	GraphicsSystem::RenderBatch* targetBatch = nullptr;
+	//int activeCount = GetActiveParticleCount();
+	//if (activeCount > 0) {
+	//	std::cout << "Attempting to render " << activeCount << " particles." << std::endl;
+	//}
+
+	RenderBatch* targetBatch = nullptr;
 	for (auto& batch : batches) {
 		if (batch.textureID == textureID && batch.isCircle == false && batch.layer == layer) {
 			targetBatch = &batch;
@@ -226,7 +232,7 @@ void ParticleEmitterComponent::AddParticlesToBatch(std::vector<GraphicsSystem::R
 		GLuint baseIndex = (GLuint)targetBatch->vertices.size();
 
 		for (int i = 0;i < 4;i++) {
-			GraphicsSystem::BatchVertex vert;
+			BatchVertex vert;
 			vert.pos = localVerts[i];
 			vert.tex = texCoords[i];
 			vert.color = p.color;
@@ -290,8 +296,8 @@ Particle* ParticleEmitterComponent::GetInactiveParticle() {
 		if (!p.active) {
 			return &p;
 		}
-		return nullptr;
 	}
+	return nullptr;
 }
 
 float ParticleEmitterComponent::RandomRange(float min, float max) const {
@@ -361,9 +367,10 @@ std::unique_ptr<IComponent> ParticleEmitterComponent::Clone(GameObject* newOwner
 void ParticleEmitterComponent::ConfigureDashTrail() {
 	SetEmissionRate(80.0f);
 	SetMaxParticles(200);
-	SetLifetime(0.3f, 0.05f);
+	SetLifetime(1.0f, 0.05f);
 
 	SetSpawnRadius(5.0f);
+	SetSpawnOffset(vec2(0.0f, -60.0f));
 	SetVelocity(vec2(0, 0), 0.0f);  // stationary particles
 
 	SetStartColor(vec4(0.3f, 0.6f, 1.0f, 0.8f));  // bright blue
@@ -376,7 +383,7 @@ void ParticleEmitterComponent::ConfigureDashTrail() {
 	SetDrag(0.0f);
 
 	SetFadeOut(0.2f);
-	SetLayer(-1);  // behind player
+	SetLayer(-2);  // behind player
 }
 
 void ParticleEmitterComponent::ConfigureJumpDust() {
@@ -446,7 +453,7 @@ void ParticleEmitterComponent::ConfigureSpeedLines() {
 
 	SetStartRotation(0.0f);  // horizontal lines
 
-	SetLayer(-2);  // far behind
+	SetLayer(0);  // far behind
 }
 
 void ParticleEmitterComponent::ConfigureDeathExplosion() {

@@ -39,7 +39,42 @@ Technology is prohibited.
 #include "MathLib.h"
 #include "GameObjectSystem.h"
 #include "Message.h"
+#include "ParticleEmitterComponent.h"
 
+	// --- Batch Rendering Structures and Buffers ---
+	/**
+	 * @brief Structure for a single vertex in the batch buffer. Contains local position
+	 * and world transformation data to be processed in the vertex shader.
+	 */
+struct BatchVertex
+{
+	vec3 pos;		// Local position relative to the object's center (-0.5 to 0.5).
+	vec2 tex;		// Texture coordinates (UV).
+	vec4 color;		// Color tint (RGBA).
+	vec2 uvScale;	// UV tiling/scaling factor (for spritesheets).
+	vec2 uvOffset;	// UV offset (for spritesheets/animation frame selection).
+	vec3 transform;	// World Translation (x, y) and Rotation (z).
+	vec2 scale;		// World Scale (x, y).
+};
+
+
+/**
+ * @brief Represents a single group of GameObjects that can be drawn in one GL draw call.
+ * Grouped by Texture ID, Shape Type (Square/Circle), and Layer.
+ */
+struct RenderBatch
+{
+	GLuint textureID;				// The OpenGL texture ID bound for the entire batch.
+	bool isCircle;					// Flag indicating if the geometry should be rendered as a circle (uses specialized fragment shader logic).
+	std::vector<BatchVertex> vertices; // Vertex data for all quads in this batch.
+	std::vector<GLuint> indices;	// Index data (EBO) for all quads in this batch.
+	int layer;						// Rendering layer (for depth sorting, typically based on Z-position).
+
+	/**
+	 * @brief Constructor for RenderBatch.
+	 */
+	RenderBatch(GLuint texID, bool circle, int l) : textureID(texID), isCircle(circle), layer(l) {}
+};
 
 /**
  * @class GraphicsSystem
@@ -252,41 +287,6 @@ public:
 	GLFWcursor* GetNormalCursor() const { return normalCursor; }
 	GLFWcursor* GetClickCursor() const { return clickCursor; }
 
-	// --- Batch Rendering Structures and Buffers ---
-	/**
-	 * @brief Structure for a single vertex in the batch buffer. Contains local position
-	 * and world transformation data to be processed in the vertex shader.
-	 */
-	struct BatchVertex
-	{
-		vec3 pos;		// Local position relative to the object's center (-0.5 to 0.5).
-		vec2 tex;		// Texture coordinates (UV).
-		vec4 color;		// Color tint (RGBA).
-		vec2 uvScale;	// UV tiling/scaling factor (for spritesheets).
-		vec2 uvOffset;	// UV offset (for spritesheets/animation frame selection).
-		vec3 transform;	// World Translation (x, y) and Rotation (z).
-		vec2 scale;		// World Scale (x, y).
-	};
-
-
-	/**
-	 * @brief Represents a single group of GameObjects that can be drawn in one GL draw call.
-	 * Grouped by Texture ID, Shape Type (Square/Circle), and Layer.
-	 */
-	struct RenderBatch
-	{
-		GLuint textureID;				// The OpenGL texture ID bound for the entire batch.
-		bool isCircle;					// Flag indicating if the geometry should be rendered as a circle (uses specialized fragment shader logic).
-		std::vector<BatchVertex> vertices; // Vertex data for all quads in this batch.
-		std::vector<GLuint> indices;	// Index data (EBO) for all quads in this batch.
-		int layer;						// Rendering layer (for depth sorting, typically based on Z-position).
-
-		/**
-		 * @brief Constructor for RenderBatch.
-		 */
-		RenderBatch(GLuint texID, bool circle, int l) : textureID(texID), isCircle(circle), layer(l) {}
-	};
-
 private:
 	// --- Window and State ---
 	GLFWwindow* window;						// The handle to the GLFW window.
@@ -298,6 +298,7 @@ private:
 	bool debugMode = false;					// Flag to control rendering of debug shapes (lines, outlines).
 	bool editorMode;						// Flag to indicate if rendering should target the FBO (true) or the screen (false).
 	class LevelEditor* levelEditor = nullptr; // Pointer to the level editor for camera manipulation when in editor mode.
+	GameObject* cachedBackground = nullptr;
 
 	GLFWcursor* normalCursor = nullptr;
 	GLFWcursor* clickCursor = nullptr;

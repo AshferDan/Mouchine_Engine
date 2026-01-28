@@ -14,7 +14,6 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "GraphicsSystem.h"
-#include "ParticleEmitterComponent.h"
 #include "Animator.hpp"
 
 // Global constant for configuration file path (currently unused in this file)
@@ -408,6 +407,9 @@ void GraphicsSystem::Initialize()
 void GraphicsSystem::Update(float)
 {
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
+    if (!cachedBackground) {
+        cachedBackground = GameObjectFactory::Instance().FindGameObject("bgImage");
+    }
 
     if (!window)
         return; // Skip if no valid window.
@@ -479,6 +481,12 @@ void GraphicsSystem::Update(float)
     // === Batch Accumulation Loop ===
     for (auto& obj : gameObjects)
     {
+        if (obj.get() == cachedBackground) {
+            // You found it instantly via pointer comparison (extremely fast)
+            auto* rend = obj->GetComponent<RenderComponent>();
+            if (rend) rend->SetLayer(-10);
+        }
+
         if (!obj->IsActive())
         {
             continue;
@@ -489,7 +497,7 @@ void GraphicsSystem::Update(float)
         {
             continue;
         }
-
+        
         auto* rend = obj->GetComponent<RenderComponent>();
 
         if (!rend)
@@ -959,6 +967,10 @@ void GraphicsSystem::DrawBatches()
             continue;
         }
 
+
+        //std::cout << "Batch size: " << batch.vertices.size() << ".\n\n";
+        
+        
         // === ADD THIS SAFETY CHECK ===
         // Ensure batch size doesn't exceed pre-allocated buffer size
         if (batch.vertices.size() > MAX_BATCH_VERTICES)
