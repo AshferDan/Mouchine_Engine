@@ -120,6 +120,7 @@ int main()
                 // 3. Attach the script "SpinningSquare"
                 // Ensure the namespace in C# is "GameScripts"
                 scriptComp->AddScript("PlayerMovement");
+                scriptComp->AddScript("PlayerMovementStats");
 
                 std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
             }
@@ -130,7 +131,7 @@ int main()
             RenderComponent::ShapeType::Square,
             0.0f, -200.0f,                      // Center of screen
             1000.0f, 100.0f,                  // Size
-            vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
         );
 
         if (Platform)
@@ -142,6 +143,27 @@ int main()
             {
                 phyComp->SetStatic(true);
                 colComp->SetSize(1000.0f, 100.0f);
+                colComp->SetLayer(CollisionLayer::Ground);
+            }
+        }
+
+        GameObject* Wall = GameObjectFactory::Instance().CreateShape(
+            "Platform",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            -200.0f, 0.0f,                      // Center of screen
+            100.0f, 1000.0f,                  // Size
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
+
+        if (Wall)
+        {
+            ColliderComponent* colComp = Wall->AddComponent<ColliderComponent>();
+            PhysicsComponent* phyComp = Wall->AddComponent<PhysicsComponent>();
+
+            if (colComp && phyComp)
+            {
+                phyComp->SetStatic(true);
+                colComp->SetSize(100.0f, 1000.0f);
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }

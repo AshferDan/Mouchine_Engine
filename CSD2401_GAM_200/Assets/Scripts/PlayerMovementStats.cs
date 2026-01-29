@@ -23,14 +23,14 @@ namespace CSharpScript
     public class PlayerMovementStats : GameScript
     {
         // walking tiers
-        public float T0_BaseSpeed = 2f;
-        public float T0_MaxSpeed = 12f;
+        public float T0_BaseSpeed = 2f * 10;
+        public float T0_MaxSpeed = 12f * 10;
 
         // running tiers
-        public float T1_Threshold = 18f;
-        public float T2_Threshold = 24f;
-        public float T3_Threshold = 30f;
-        public float T3_MaxSpeed = 40f;
+        public float T1_Threshold = 18f * 10;
+        public float T2_Threshold = 24f * 10;
+        public float T3_Threshold = 30f * 10;
+        public float T3_MaxSpeed = 40f * 10;
 
         // Running
         public bool UseToggleRun = false;
