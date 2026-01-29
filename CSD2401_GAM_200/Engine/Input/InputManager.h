@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "transform.h"
 #include "physics.h"
 #include "GraphicsSystem.h"
+#include "ParticleEmitterComponent.h"
 #include "core.h"
 #include "imgui.h"
 #include <imgui_impl_glfw.h>
@@ -200,6 +201,9 @@ private:
 
     // Facing Direction
     bool isFacingRight = true; // Track which way player is facing
+
+    //For Particle System
+    bool isDashing = false;
 };
 
 #endif
