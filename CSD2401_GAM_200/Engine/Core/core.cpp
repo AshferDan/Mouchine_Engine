@@ -119,6 +119,7 @@ void CoreEngine::InitSystems()
     winLoseLogicSystem = AddSystem<WinLoseLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
+    gameTimerSystem = AddSystem<GameTimerSystem>();
     //eventSystem = AddSystem<EventSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
