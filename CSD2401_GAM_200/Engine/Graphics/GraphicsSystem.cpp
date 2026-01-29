@@ -461,6 +461,45 @@ void GraphicsSystem::Update(float)
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
+
+    // === Camera Bounds Debug Drawing ===
+// === Camera Bounds Debug Drawing ===
+    if (debugMode) {
+        auto* gameCamera = CameraManager::Instance().GetActiveCamera();
+
+        if (gameCamera) {
+            // 1. Get the camera's world position and current zoom level
+            vec2 camBasePos = gameCamera->GetPosition();
+            float currentZoom = gameCamera->getZoom();
+
+            // 2. ALWAYS use the main window size (Wwidth/Wheight) for the Game Area box.
+            // This ensures the box represents your "Target Resolution" even if the 
+            // editor window is currently small or a different shape.
+            float gameWidth = (float)Wwidth;
+            float gameHeight = (float)Wheight;
+
+            // 3. Replicate the projection math: (BaseResolution / 2.0f) / zoom
+            float halfWidth = (gameWidth / 2.0f) / currentZoom;
+            float halfHeight = (gameHeight / 2.0f) / currentZoom;
+            vec2 viewSize(halfWidth * 2.0f, halfHeight * 2.0f);
+
+            // 4. Calculate the "Shaken" position
+            // This makes the box stay at the window borders during Play Mode 
+            // and shows exactly where the camera is 'shaking' in Editor Mode.
+            vec2 shakenPos = camBasePos + gameCamera->GetTraumaOffset();
+
+            // 5. Draw the yellow Viewport Box (representing what the player sees)
+            CORE->GetDebugSystem()->DrawRect(shakenPos, viewSize, vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+            // 6. Draw a static Magenta cross or small box at the REAL center (camBasePos)
+            // This helps your teammate see the difference between the "Camera Center" 
+            // and the "Shake Offset" while paused.
+            if (gameCamera->GetTrauma() > 0.f) {
+                CORE->GetDebugSystem()->DrawPoint(camBasePos, vec4(1.0f, 0.0f, 1.0f, 1.0f));
+            }
+        }
+    }
+
     // Accumulate all geometry into batches
     batches.clear();
 
@@ -787,6 +826,8 @@ void GraphicsSystem::Update(float)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    CORE->GetDebugSystem()->Clear();
 }
 
 /**
