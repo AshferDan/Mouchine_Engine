@@ -17,6 +17,8 @@ namespace CSharpScript
 
         public override void OnUpdate(float dt)
         {
+            vec2 velocity = Physics.GetVelocity(OwnerName);
+            Debug.Log($"Velocity of {OwnerName}: {velocity.x}, {velocity.y}");
             if (ShouldRotate)
             {
                 Transform.AddRotation(OwnerName, RotationSpeed * dt);
