@@ -407,6 +407,9 @@ void GraphicsSystem::Initialize()
 void GraphicsSystem::Update(float)
 {
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
+    if (!cachedBackground) {
+        cachedBackground = GameObjectFactory::Instance().FindGameObject("bgImage");
+    }
 
     if (!window)
         return; // Skip if no valid window.
@@ -458,6 +461,45 @@ void GraphicsSystem::Update(float)
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
+
+    // === Camera Bounds Debug Drawing ===
+// === Camera Bounds Debug Drawing ===
+    if (debugMode) {
+        auto* gameCamera = CameraManager::Instance().GetActiveCamera();
+
+        if (gameCamera) {
+            // 1. Get the camera's world position and current zoom level
+            vec2 camBasePos = gameCamera->GetPosition();
+            float currentZoom = gameCamera->getZoom();
+
+            // 2. ALWAYS use the main window size (Wwidth/Wheight) for the Game Area box.
+            // This ensures the box represents your "Target Resolution" even if the 
+            // editor window is currently small or a different shape.
+            float gameWidth = (float)Wwidth;
+            float gameHeight = (float)Wheight;
+
+            // 3. Replicate the projection math: (BaseResolution / 2.0f) / zoom
+            float halfWidth = (gameWidth / 2.0f) / currentZoom;
+            float halfHeight = (gameHeight / 2.0f) / currentZoom;
+            vec2 viewSize(halfWidth * 2.0f, halfHeight * 2.0f);
+
+            // 4. Calculate the "Shaken" position
+            // This makes the box stay at the window borders during Play Mode 
+            // and shows exactly where the camera is 'shaking' in Editor Mode.
+            vec2 shakenPos = camBasePos + gameCamera->GetTraumaOffset();
+
+            // 5. Draw the yellow Viewport Box (representing what the player sees)
+            CORE->GetDebugSystem()->DrawRect(shakenPos, viewSize, vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+            // 6. Draw a static Magenta cross or small box at the REAL center (camBasePos)
+            // This helps your teammate see the difference between the "Camera Center" 
+            // and the "Shake Offset" while paused.
+            if (gameCamera->GetTrauma() > 0.f) {
+                CORE->GetDebugSystem()->DrawPoint(camBasePos, vec4(1.0f, 0.0f, 1.0f, 1.0f));
+            }
+        }
+    }
+
     // Accumulate all geometry into batches
     batches.clear();
 
@@ -478,6 +520,12 @@ void GraphicsSystem::Update(float)
     // === Batch Accumulation Loop ===
     for (auto& obj : gameObjects)
     {
+        if (obj.get() == cachedBackground) {
+            // You found it instantly via pointer comparison (extremely fast)
+            auto* rend = obj->GetComponent<RenderComponent>();
+            if (rend) rend->SetLayer(-10);
+        }
+
         if (!obj->IsActive())
         {
             continue;
@@ -488,7 +536,7 @@ void GraphicsSystem::Update(float)
         {
             continue;
         }
-
+        
         auto* rend = obj->GetComponent<RenderComponent>();
 
         if (!rend)
@@ -597,6 +645,19 @@ void GraphicsSystem::Update(float)
         targetBatch->indices.push_back(baseIndex + 2);
         targetBatch->indices.push_back(baseIndex + 1);
         targetBatch->indices.push_back(baseIndex + 3);
+    }
+
+    //Draw Particle
+    for (auto& obj : gameObjects)
+    {
+        if (!obj->IsActive())
+            continue;
+
+        auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+        if (emitter && emitter->IsEnabled())
+        {
+            emitter->AddParticlesToBatch(batches, vp);
+        }
     }
 
     // Sort batches by rendering layer (lower layer draws first)
@@ -765,6 +826,8 @@ void GraphicsSystem::Update(float)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    CORE->GetDebugSystem()->Clear();
 }
 
 /**
@@ -945,6 +1008,10 @@ void GraphicsSystem::DrawBatches()
             continue;
         }
 
+
+        //std::cout << "Batch size: " << batch.vertices.size() << ".\n\n";
+        
+        
         // === ADD THIS SAFETY CHECK ===
         // Ensure batch size doesn't exceed pre-allocated buffer size
         if (batch.vertices.size() > MAX_BATCH_VERTICES)
