@@ -24,7 +24,7 @@ Technology is prohibited.
 void GameTimerSystem::Initialize()
 {
     remainingTime = 30.0f;
-    lastDisplayedSeconds = -1;
+    lastDisplayedSeconds = 30;
     hasTriggeredTimeUp = false;
     UpdateText(30);
 }
@@ -69,7 +69,7 @@ void GameTimerSystem::Update(float dt)
         if (remainingTime != 30.0f || lastDisplayedSeconds != 30)
         {
             remainingTime = 30.0f;
-            lastDisplayedSeconds = -1;
+            lastDisplayedSeconds = 30;
             hasTriggeredTimeUp = false;
             UpdateText(30);
         }
@@ -119,7 +119,7 @@ void GameTimerSystem::Update(float dt)
 void GameTimerSystem::ResetTimer()
 {
     remainingTime = 30.0f;
-    lastDisplayedSeconds = -1;
+    lastDisplayedSeconds = 30;
     hasTriggeredTimeUp = false;
     UpdateText(30);
 }

@@ -24,6 +24,13 @@ MenuScreens currScreen = MenuScreens::Home;
 
 void MenuLogicSystem::Update(float dt)
 {
+    // Update audio fade
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->UpdateFade(dt);
+    }
+
     // if a scene change is pending, count down timer first so the click sound can be played
     if (pendingSceneChange)
     {
@@ -54,7 +61,7 @@ void MenuLogicSystem::Update(float dt)
                 }
             }
 
-            // clear 
+            // clear
             pendingSceneChange = false;
             hoveredButtonName.clear();
         }
@@ -166,8 +173,15 @@ void MenuLogicSystem::Update(float dt)
         // Start small delay before loading scene
         if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton" && hoveredButtonName != "BackButton")
         {
+            // Start audio fade out for scene transitions (specifically for PlayButton)
+            if (hoveredButtonName == "PlayButton" && audioManager)
+            {
+                audioManager->FadeOutCategory("music", 0.90f);  // Fade out music over 0.90 seconds
+                std::cout << "[MenuLogic] Started music fade out" << std::endl;
+            }
+
             pendingSceneChange = true;
-            pendingTimer = 0.75f;                       // 400(changed to 750)ms delay to let click sound play (only not for settings)
+            pendingTimer = 0.90f;                       // Match fade duration for smooth transition
         }
         else
         {

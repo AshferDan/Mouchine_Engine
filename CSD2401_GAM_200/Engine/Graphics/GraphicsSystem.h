@@ -304,9 +304,9 @@ private:
 	GLFWcursor* clickCursor = nullptr;
 
 	// --- Shaders ---
-	GLSLShader shader;		// Default shader for batched quads/circles.
-	GLSLShader textShader;	// Shader dedicated to rendering font glyphs.
-	GLSLShader debugShader; // Shader for drawing non-batched items like lines and points.
+	GLSLShader* shader;		// Default shader for batched quads/circles.
+	GLSLShader* textShader;	// Shader dedicated to rendering font glyphs.
+	GLSLShader* debugShader; // Shader for drawing non-batched items like lines and points.
 
 	// --- Single Quad Rendering (Legacy/Test) Buffers ---
 	GLuint vao = 0, vbo = 0, tex = 0;		// VAO/VBO for a simple quad/rectangle draw (used in older pipelines).
