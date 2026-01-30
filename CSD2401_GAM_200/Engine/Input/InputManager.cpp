@@ -442,20 +442,20 @@ void InputManager::Update(float dt)
 
     // ===== PARTICLE TESTING SETUP
     
-    auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
+    //auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
 
-    if (!dashTrail) {
-        // If it doesn't exist, add it and configure it once
-        dashTrail = player->AddComponent<ParticleEmitterComponent>();
-        if (dashTrail) {
-            dashTrail->ConfigureDashTrail();
-            dashTrail->SetTexture(0);
-            std::cout << "Particle Emitter initialized successfully\n";
-        }
-        else {
-            std::cerr << "particle not initialized properly\n";
-        }
-    }
+    //if (!dashTrail) {
+    //    // If it doesn't exist, add it and configure it once
+    //    dashTrail = player->AddComponent<ParticleEmitterComponent>();
+    //    if (dashTrail) {
+    //        dashTrail->ConfigureDashTrail();
+    //        dashTrail->SetTexture(0);
+    //        std::cout << "Particle Emitter initialized successfully\n";
+    //    }
+    //    else {
+    //        std::cerr << "particle not initialized properly\n";
+    //    }
+    //}
 
 
     // =====KINEMATIC SETUP=====
