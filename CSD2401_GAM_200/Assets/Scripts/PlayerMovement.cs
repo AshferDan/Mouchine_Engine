@@ -49,9 +49,7 @@ namespace CSharpScript
         public PlayerMovementStats MoveStats;
 
         #region Variables
-        // This property should be set by the C++ engine after the script is attached.
-        // changed to using OwnerName
-        //public string OwnerName = "Hero";
+        public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
 
         // movement variables
         private vec2 _moveVelocity = new vec2(0, 0);
@@ -70,6 +68,7 @@ namespace CSharpScript
         private bool _isGrounded = false;
         private bool _bumpedHead = false;
         private bool _islanding = false;
+        private float _groundedTimer;
 
         // jump variables
         public float VerticalVelocity { get; private set; } = 0;
@@ -283,36 +282,187 @@ namespace CSharpScript
 
         public void OnFixedUpdate(float fixedDeltaTime)
         {
-            if (OwnerName == null) return;
+            //if (OwnerName == null) return;
+            //CollisionChecks();
+
+            //if (!_isZiplining) //&& !knockback.IsBeingKnockedBack && !_isBeingLaunched)
+            //{
+            //    Jump();
+            //    WallKick();
+            //    GroundPound();
+            //    Roll();
+            //    Glide();
+            //    WallSlide();
+
+            //}
+
+            // check if player is dead
+            //if (_playerHealth != null && !_playerHealth.IsAlive) return;
+
+            // check if player is taking damage
+            bool isHurting = false; // = (_playerHealth != null && _playerHealth.IsHurting);
+
+            // wall bonk stun
+            if (_bonkTimer > 0)
+            {
+                _bonkTimer -= fixeddt;
+                CollisionChecks();
+                Jump();
+
+                // stop sliding if player hits the ground while stunned - apply massive friction
+                if (_isGrounded)
+                {
+                    float bonkFriction = 100f;
+                    float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, bonkFriction * fixeddt);
+                    Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
+                }
+                return;
+            }
+
             CollisionChecks();
 
-            if (!_isZiplining) //&& !knockback.IsBeingKnockedBack && !_isBeingLaunched)
-            {
-                Jump(fixedDeltaTime);
-                WallKick(fixedDeltaTime);
-                GroundPound(fixedDeltaTime);
-                Roll(fixedDeltaTime);
-                Glide(fixedDeltaTime);
-                WallSlide(fixedDeltaTime);
+            if (_isGrounded) _groundedTimer += fixeddt;
+            else _groundedTimer = 0f;
 
-                // only allow regular movement if not dashing
-                //if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
-                //{
-                //    if (_isGrounded)
-                //    {
-                //        Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement, fixedDeltaTime);
-                //    }
-                //    else
-                //    {
-                //        Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement, fixedDeltaTime);
-                //    }
-                //}
-                //else Debug.Log("aaaa");
+            if (!_isZiplining)// && !knockback.IsBeingKnockedBack && !_isBeingLaunched)
+            {
+                // gravity logic
+                Jump();
+
+                // hurt movement lock & friction
+                if (isHurting)
+                {
+                    // reset internal speed so player cannot instantly sprint after recovering
+                    movespeed = 0;
+
+                    // only apply friction on ground
+                    if (_isGrounded)
+                    {
+                        float hurtFriction = 60f;
+
+                        float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, hurtFriction * fixeddt);
+                        Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
+                    }
+
+                    return;
+                }
+
+                // wall bonk trigger
+                if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold)
+                {
+                    HandleWallBonk();
+                    return;
+                }
+
+                // skid lock
+                if (_isSkidding)
+                {
+                    HandleLockedSkid();
+                    return;
+                }
+
+                // normal abilities
+                WallKick();
+                GroundPound();
+                Roll();
+                Glide();
+                WallSlide();
+
+                // player movement
+                if (!_isRunning && !_isWallKicking && !_isWallJumping && !_isGroundPounding && !_isWallSliding && !_isRolling)
+                {
+                    Move(InputManager.Movement);
+                }
             }
         }
 
+        #region State & Input
+        private void UpdatePlayerState()
+        {
+            // check if in air
+            if (!_isGrounded)
+            {
+                if (_isWallJumping)
+                {
+                    currState = PlayerState.WallJumping;
+                }
+                else
+                {
+                    currState = PlayerState.Jumping;
+                }
+            }
+            else
+            {
+                // horizontal input = moving - trigger run animation
+                if (InputManager.Movement.x != 0)
+                {
+                    currState = PlayerState.Running;
+                }
+                else
+                {
+                    currState = PlayerState.Idle;
+                }
+            }
+
+            // placed after jump and run, so it can be overriden 
+            if (_isRunning) currState = PlayerState.Running;
+            if (_isRolling) currState = PlayerState.Rolling;
+            if (_isGroundPounding) currState = PlayerState.GroundPounding;
+            if (_isGliding) currState = PlayerState.Gliding;
+            if (_isWallKicking) currState = PlayerState.WallKicking;
+            if (_isZiplining) currState = PlayerState.Ziplining;
+            if (_isWallSliding) currState = PlayerState.WallSliding;
+            // landing is bugged
+            //if (_islanding) { currState = PlayerState.Land; }
+        }
+
+        private void HandleGeneralInput()
+        {
+            // check for dash input
+            //if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
+            //{
+            //    if (_isGrounded)
+            //    {
+            //        Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement, Utils.GetDelta_Time());
+            //        //Debug.Log("grounded");
+            //    }
+            //    else
+            //    {
+            //        Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement, Utils.GetDelta_Time());
+            //        //Debug.Log("air");
+            //    }
+            //}
+
+            //if (InputManager.RunWasPressed && _dashCooldownTimer <= 0)
+            //{
+            //    InitiateDash();
+            //}
+            if (InputManager.WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
+            {
+                InitiateWallKick();
+            }
+            if (InputManager.GroundPoundWasPressed && !_isGrounded)
+            {
+                InitiateGroundPound();
+            }
+            if (InputManager.RollWasPressed)
+            {
+                InitiateRoll();
+            }
+            if (InputManager.GlideIsHeld && !_isGrounded)
+            {
+                InitiateGlide();
+            }
+            else if (_isGliding) // if key was let go but still in gliding state, cancel gliding action
+            {
+                StopGlide();
+            }
+        }
+
+        #endregion
+
         #region Movement
-        public void Move(float acceleration, float deceleration, vec2 moveInput, float deltaTime)
+        public void Move(vec2 moveInput)
         {
             // OLD
             //if (blockMovement) moveInput = new vec2(0, 0);
@@ -345,10 +495,9 @@ namespace CSharpScript
 
             // landing skid check - for jump flip
             // if hit groud + fast speed BUT facing opposite direction of movement = landing skid
-            //bool movingAgainstFacing = Mathf.Sign(_rb.linearVelocity.x) != _facingDirection;
             bool movingAgainstFacing = Math.Sign(Physics.GetVelocity(OwnerName).x) != _facingDirection;
-            //bool isMovingFast = Mathf.Abs(_rb.linearVelocity.x) > 5f;            // small threshold (1f) to ignore tiny jitters when stopping
-            bool isMovingFast = Math.Abs(Physics.GetVelocity(OwnerName).x) > 5f;
+            bool isMovingFast = Math.Abs(Physics.GetVelocity(OwnerName).x) > 5f;            // small threshold (1f) to ignore tiny jitters when stopping
+
 
             if (_isGrounded && isMovingFast && movingAgainstFacing && !_isSkidding)
             {
@@ -470,7 +619,7 @@ namespace CSharpScript
             }
 
             // physics application 
-            movespeed = Utils.MathfClamp(movespeed, 0, 50f);
+            movespeed = Utils.MathfClamp(movespeed, 0, MoveStats.Clamp_MaxRunSpeed);
 
             // determine physics direction
             int moveDir = _facingDirection;
@@ -487,23 +636,23 @@ namespace CSharpScript
             }
 
             _moveVelocity.x = movespeed * moveDir;
-            //_rb.linearVelocity = new Vector2(_moveVelocity.x, Physics.GetVelocity(OwnerName).y);
             Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
 
             //if (_animator != null) _animator.SetBool("isSkidding", _isSkidding);
         }
 
-        private void TurnCheck(vec2 moveInput)
-        {
-            if (_isFacingRight && moveInput.x < 0)
-            {
-                Turn(false);
-            }
-            else if (!_isFacingRight && moveInput.x > 0)
-            {
-                Turn(true);
-            }
-        }
+        // OLD CODE
+        //private void TurnCheck(vec2 moveInput)
+        //{
+        //    if (_isFacingRight && moveInput.x < 0)
+        //    {
+        //        Turn(false);
+        //    }
+        //    else if (!_isFacingRight && moveInput.x > 0)
+        //    {
+        //        Turn(true);
+        //    }
+        //}
 
         private void Turn(bool turnRight)
         {
@@ -525,92 +674,13 @@ namespace CSharpScript
             //}
         }
 
-        #endregion
-
-        #region State & Input
-        private void UpdatePlayerState()
+        private int GetCurrentTentacleLevel()
         {
-            // check if in air
-            if (!_isGrounded)
-            {
-                if (_isWallJumping)
-                {
-                    currState = PlayerState.WallJumping;
-                }
-                else
-                {
-                    currState = PlayerState.Jumping;
-                }
-            }
-            else
-            {
-                // horizontal input = moving - trigger run animation
-                if (InputManager.Movement.x != 0)
-                {
-                    currState = PlayerState.Running;
-                }
-                else
-                {
-                    currState = PlayerState.Idle;
-                }
-            }
-
-            // placed after jump and run, so it can be overriden 
-            if (_isRunning) currState = PlayerState.Running;
-            if (_isRolling) currState = PlayerState.Rolling;
-            if (_isGroundPounding) currState = PlayerState.GroundPounding;
-            if (_isGliding) currState = PlayerState.Gliding;
-            if (_isWallKicking) currState = PlayerState.WallKicking;
-            if (_isZiplining) currState = PlayerState.Ziplining;
-            if (_isWallSliding) currState = PlayerState.WallSliding;
-            // landing is bugged
-            //if (_islanding) { currState = PlayerState.Land; }
+            if (movespeed >= MoveStats.T3_Threshold) return 3;
+            if (movespeed >= MoveStats.T2_Threshold) return 2;
+            if (movespeed >= MoveStats.T1_Threshold) return 1;
+            return 0; // walk speed
         }
-
-        private void HandleGeneralInput()
-        {
-            // check for dash input
-            if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
-            {
-                if (_isGrounded)
-                {
-                    Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement, Utils.GetDelta_Time());
-                    //Debug.Log("grounded");
-                }
-                else
-                {
-                    Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement, Utils.GetDelta_Time());
-                    //Debug.Log("air");
-                }
-            }
-
-            //if (InputManager.RunWasPressed && _dashCooldownTimer <= 0)
-            //{
-            //    InitiateDash();
-            //}
-            if (InputManager.WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
-            {
-                InitiateWallKick();
-            }
-            if (InputManager.GroundPoundWasPressed && !_isGrounded)
-            {
-                InitiateGroundPound();
-            }
-            if (InputManager.RollWasPressed)
-            {
-                InitiateRoll();
-            }
-            if (InputManager.GlideIsHeld && !_isGrounded)
-            {
-                InitiateGlide();
-            }
-            else if (_isGliding) // if key was let go but still in gliding state, cancel gliding action
-            {
-                StopGlide();
-            }
-        }
-
-        #endregion
 
         private void HandleLockedSkid()
         {
@@ -633,7 +703,6 @@ namespace CSharpScript
             // apply backwards velocity
             // flipped _facingDirection to look where player wants to go but have momentum drag them in the opposite way (multiply by negative facing direction)
             _moveVelocity.x = movespeed * -_facingDirection;
-            //_rb.linearVelocity = new Vector2(_moveVelocity.x, _rb.linearVelocity.y);
             Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
         }
 
@@ -657,9 +726,723 @@ namespace CSharpScript
             // use T3 variable directly since bonk only happens at top speed
             Vector2 force = MoveStats.T3_BonkForce;
 
-            //_rb.linearVelocity = new Vector2(-_facingDirection * force.x, force.y);
             Physics.SetVelocity(OwnerName, -_facingDirection * force.X, force.Y);
             _bonkTimer = MoveStats.T3_BonkDuration;
+        }
+
+        #endregion
+
+        #region Jump
+
+        private void Jump()
+        {
+            if (_isWallJumping && VerticalVelocity <= 0)
+            {
+                _isWallJumping = false;
+                blockMovement = false; // give back control
+            }
+
+            // apply gravity while jumping
+            if (_isJumping)
+            {
+                currState = PlayerState.Jumping;
+                if (_isTouchingWall) currState = PlayerState.WallSliding;
+                // Head bump detection – unchanged
+                if (_bumpedHead)
+                {
+                    _isFastFalling = true;
+                }
+
+                // gravity on ascending 
+                if (VerticalVelocity >= 0f)
+                {
+                    // apex controls
+                    _apexPoint = Utils.MathfInverseLerp(MoveStats.InitialJumpVelocity, 0f, VerticalVelocity);
+
+                    if (_apexPoint > MoveStats.ApexThreshold)
+                    {
+                        if (!_isPastApexThreshold)
+                        {
+                            _isPastApexThreshold = true;
+                            _timePastApexThreshold = 0f;
+                        }
+
+                        if (_isPastApexThreshold)
+                        {
+                            _timePastApexThreshold += fixeddt;
+
+                            if (_timePastApexThreshold < MoveStats.ApexHangTime)
+                            {
+                                VerticalVelocity = 0f;
+                            }
+                            else
+                            {
+                                VerticalVelocity = -0.01f;
+                            }
+                        }
+                    }
+
+                    // gravity on descending but not past apex threshold
+                    else
+                    {
+                        VerticalVelocity += MoveStats.Gravity * fixeddt;
+                        if (_isPastApexThreshold)
+                        {
+                            _isPastApexThreshold = false;
+                        }
+                    }
+                }
+
+                // gravity on descending
+                else if (!_isFastFalling)
+                {
+                    VerticalVelocity += MoveStats.Gravity * MoveStats.GravityOnReleaseMultiplier * fixeddt;
+                }
+
+                else if (VerticalVelocity < 0f)
+                {
+                    if (!_isFalling)
+                    {
+                        _isFalling = true;
+                    }
+                }
+            }
+
+            // jump cut
+            if (_isFastFalling)
+            {
+                if (_fastFallTime >= MoveStats.TimeForUpwardsCancel)
+                {
+                    VerticalVelocity += MoveStats.Gravity * MoveStats.GravityOnReleaseMultiplier * fixeddt;
+                }
+                else if (_fastFallTime < MoveStats.TimeForUpwardsCancel)
+                {
+                    VerticalVelocity = Utils.MathfLerp(_fastFallReleaseSpeed, 0f, (_fastFallTime / MoveStats.TimeForUpwardsCancel));
+                }
+
+                _fastFallTime += fixeddt;
+            }
+
+            // normal gravity while falling
+            if (!_isGrounded && !_isJumping)
+            {
+                if (!_isFalling)
+                {
+                    _isFalling = true;
+                }
+
+                VerticalVelocity += MoveStats.Gravity * fixeddt;
+            }
+
+            // clamp fall speed
+            VerticalVelocity = Utils.MathfClamp(VerticalVelocity, -MoveStats.MaxFallSpeed, MoveStats.Clamp_MaxJumpHeight);
+
+            Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, VerticalVelocity);
+        }
+
+        private void JumpChecks()
+        {
+            // button press buffer
+            if (InputManager.JumpWasPressed)
+            {
+                _jumpBufferTimer = MoveStats.JumpBufferTime;
+                _jumpReleasedDuringBuffer = false;
+            }
+
+            // variable jump height logic
+            if (MoveStats.EnableVariableJumpHeight && InputManager.JumpWasReleased)
+            {
+                if (_jumpBufferTimer > 0f) _jumpReleasedDuringBuffer = true;
+                if (_isJumping && VerticalVelocity > 0f)
+                {
+                    _isFastFalling = true;
+                    _fastFallReleaseSpeed = VerticalVelocity;
+                }
+            }
+
+            // wall logic - if buffered jump exists & within coyote time of wall
+            if (_jumpBufferTimer > 0f && _wallJumpTimer > 0f)
+            {
+                // determine if pressing opposite to current facing direction
+                // facing right (1) - input left (-1) = true
+                // facing right (1) - input neutral (0) = false
+                bool isPressingOpposite = (InputManager.Movement.x != 0) && (InputManager.Movement.x != _facingDirection);
+
+                if (isPressingOpposite)
+                {
+                    // input = away from wall = wall kick
+                    InitiateWallKick();
+                }
+                else
+                {
+                    // input = neutral / towards wall = wall jump
+                    InitiateWallJump();
+                }
+
+                _jumpBufferTimer = 0f; // consume input
+            }
+
+            // normal ground jump
+            else if (_jumpBufferTimer > 0f && !_isJumping && (_isGrounded || _coyoteTimer > 0f))
+            {
+                InitiateJump(1);
+                if (_jumpReleasedDuringBuffer)
+                {
+                    _isFastFalling = true;
+                    _fastFallReleaseSpeed = VerticalVelocity;
+                }
+            }
+
+            // double jump / fall jump logic
+            else if (_jumpBufferTimer > 0f && _isJumping && _numberOfJumpsUsed < MoveStats.NumberOfJumpsAllowed)
+            {
+                _isFastFalling = false;
+                InitiateJump(1);
+            }
+            else if (_jumpBufferTimer > 0f && _isFalling && _numberOfJumpsUsed < MoveStats.NumberOfJumpsAllowed - 1)
+            {
+                InitiateJump(2);
+                _isFastFalling = false;
+            }
+
+            // landing
+            if ((_isJumping || _isFalling) && _isGrounded && VerticalVelocity <= 0f)
+            {
+                //if (sounds != null && sounds.landSounds != null && sounds.landSounds.Length > 0)
+                //{
+                //    // call random SFX player with new array of land sounds
+                //    AudioManager.instance.PlayRandomPlayerSFX(sounds.landSounds);
+                //}
+
+                //// trigger Land animation
+                //if (_animator != null) _animator.SetTrigger("Land");
+                Audio.PlaySound("land_sfx", "sfx");
+                currState = PlayerState.Land;
+
+                // wallkick() grounded check
+                if (_isWallKicking) StopWallKick();
+
+                // consume buffered jump upon landing
+                _jumpBufferTimer = 0f;
+
+                _isJumping = false;
+                _isFalling = false;
+                _isFastFalling = false;
+                _fastFallTime = 0f;
+                _isPastApexThreshold = false;
+                _numberOfJumpsUsed = 0;
+
+                _isWallJumping = false;
+                blockMovement = false;
+
+                _ziplineCoyoteTimer = 0f;
+
+                VerticalVelocity = Physics.gravity.y;
+            }
+        }
+
+        private void InitiateJump(int numberOfJumpsUsed)
+        {
+            // trigger jump animation
+            //if (_animator != null)
+            //{
+            //    _animator.SetTrigger("Jump");
+            //}
+
+            //// play jump audio
+            //if (sounds != null && sounds.jump != null) AudioManager.instance.PlayPlayerSFX(sounds.jump);
+            Audio.PlaySound("jump_sfx", "sfx");
+            currState = PlayerState.Jumping;
+
+            if (_isRolling)
+            {
+                StopRoll();
+            }
+
+            if (!_isJumping)
+            {
+                fJump = true;
+                _isJumping = true;
+            }
+
+            _jumpBufferTimer = 0f;
+            _numberOfJumpsUsed += numberOfJumpsUsed;
+            VerticalVelocity = MoveStats.InitialJumpVelocity;
+        }
+
+        #endregion
+
+        #region Slide
+        private void WallSlide()
+        {
+            if (_isGrounded)// || (knockback != null && knockback.IsBeingKnockedBack))
+            {
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                    // [TODO] find out how to loop wall sliding sound
+                    //AudioManager.instance.StopLoopingPlayerSFX();
+                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
+                }
+                return;
+            }
+
+            // check collision & falling speed
+            if (_isTouchingWall && Physics.GetVelocity(OwnerName).y < 0)
+            {
+                // first frame logic
+                if (!_isWallSliding)
+                {
+                    _isWallSliding = true;
+
+                    // reset jumps if want wall sliding to refresh double jump
+                    _numberOfJumpsUsed = 0;
+
+                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
+                    //_wallSoundCoroutine = StartCoroutine(PlayWallSlideAudioSequence(sounds.wallLand, sounds.wallSlide));
+                }
+
+                // apply friction/slide speed
+                Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
+            }
+            else
+            {
+                // exit wall slide logic
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                    //AudioManager.instance.StopLoopingPlayerSFX();
+                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region Wall Slide + Jump + Kick
+
+        //old?
+        //private void WallSlide(float deltaTime)
+        //{
+        //    bool isPushingTowardsWall = (_isFacingRight && InputManager.Movement.x > 0) ||
+        //                                (!_isFacingRight && InputManager.Movement.x < 0);
+
+        //    //vec2 currentVelocity = Physics.GetVelocity(OwnerName);
+
+        //    if (_isTouchingWall && !_isGrounded && isPushingTowardsWall)
+        //    {
+        //        if (_moveVelocity.y < 0)
+        //        {
+        //            _isWallSliding = true;
+        //            float newYVelocity = Utils.MathfClamp(_moveVelocity.y, -MoveStats.WallSlidingSpeed, 999f);
+        //            Physics.SetVelocity(OwnerName, _moveVelocity.x, newYVelocity);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (_isWallSliding)
+        //        {
+        //            _isWallSliding = false;
+        //        }
+        //    }
+        //}
+
+        private void InitiateWallJump()
+        {
+            //play wall jump sound
+
+            _isWallJumping = true;
+            blockMovement = true;
+            _isWallSliding = false;
+            _isJumping = true;
+
+            // direction - calculate away from wall [facing right (1) - wall on right - jump left (-1)]
+            int jumpDir = _isFacingRight ? -1 : 1;
+
+            // flip to jump away from wall
+            Turn(jumpDir == 1);
+            _facingDirection = jumpDir;
+
+            // force - restore stats values
+            VerticalVelocity = MoveStats.WallJumpForce.y;
+
+            // momentum - set speed so Move() picks it up upon landing
+            movespeed = MoveStats.WallJumpForce.x;
+
+            // apply
+            _moveVelocity.x = movespeed * _facingDirection;
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
+        }
+
+        private void InitiateWallKick()
+        {
+            if (_isWallKicking) return;     // remove this if causing issues - not in unity
+
+            _isWallKicking = true;
+            Audio.PlaySound("wallkick_sfx", "sfx");
+
+            fWallKick = true;
+            blockMovement = true; // lock movement
+
+            // timers
+            _wallKickTotalDuration = MoveStats.WKBaseDuration * MoveStats.WKDurationMultiplier;
+            _wallKickTimer = _wallKickTotalDuration;
+            _wallKickCooldownTimer = MoveStats.WKCooldown;
+
+            // direction - kick away from wall
+            int kickDir = _isFacingRight ? -1 : 1;
+
+            // sync visuals with kick direction (immediate flip)
+            Turn(kickDir == 1);
+            _facingDirection = kickDir;
+
+            // set speed (high speed wall kick)
+            movespeed = MoveStats.WKSpeedModifier;
+
+            // apply velocity
+            _moveVelocity.x = movespeed * _facingDirection;
+
+            // add a little vertical hop
+            _moveVelocity.y = MoveStats.WKVerticalModifier;
+
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, _moveVelocity.y);
+        }
+
+        private void WallKick()
+        {
+            if (!_isWallKicking) return;            // remove if causing issues
+
+            blockMovement = true;
+            _isJumping = false;
+            _wallKickTimer -= fixeddt;
+
+            // calculate progress through the kick (from 0.0 @ start to 1.0 @ end)
+            float progress = 1f - (_wallKickTimer / _wallKickTotalDuration);
+
+            // we dont have this :(
+            // get speed multiplier from curve @ current progress point
+            //float curveMultiplier = MoveStats.WKEaseCurve.Evaluate(progress);
+            float curveMultiplier = 1.0f;
+
+            // actual speed is peak speed multiplied by curve's value
+            float currentSpeed = _moveVelocity.x * curveMultiplier;
+            float verticalGain = MoveStats.WKVerticalModifier * curveMultiplier;
+
+            // apply new eased speed
+            // to fix the jank vert momentum, we just ignore gravity for now, and give back control to the grav after wall kicks
+            // can change this to a var!
+            Physics.SetVelocity(OwnerName, currentSpeed, verticalGain);
+
+            // check if the kick's duration has finished
+            if (_wallKickTimer <= 0)
+            {
+                StopWallKick();
+            }
+        }
+
+        private void StopWallKick()
+        {
+            if (!_isWallKicking) return;        // remove if causing issues
+
+            _isWallKicking = false;
+            blockMovement = false; // allow movement
+
+            // reset Y velocity but keep X momentum
+            Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Physics.GetVelocity(OwnerName).y);
+
+            wallKickFrameCounter = 0;
+        }
+        #endregion
+
+        #region Roll
+
+        private void InitiateRoll(float speedOverride = -1f, float durationOverride = -1f)
+        {
+            if (_isRolling || !_isGrounded) return;         // remove if causing issue
+
+            // Play sound if assigned
+            //if (sounds != null && sounds.roll != null)
+            //    AudioManager.Instance.PlayPlayerSFX(sounds.roll);
+
+            Audio.PlaySound("roll_sfx", "sfx");
+            currState = PlayerState.Rolling;
+
+            fRoll = true;
+            _isRolling = true;
+            blockMovement = true;
+
+            int tent = GetCurrentTentacleLevel();
+
+            // speed logic
+            if (speedOverride > 0)
+            {
+                // ground pound force
+                movespeed = speedOverride;
+            }
+            else
+            {
+                // normal roll - tent speeds 0 to 3
+                if (tent == 3)
+                {
+                    movespeed = MoveStats.MaxRollSpeed;
+                }
+                else if (tent >= 1) // Tent 1 or 2
+                {
+                    movespeed = MoveStats.MidRollSpeed;
+                }
+                else // tent 0
+                {
+                    movespeed = MoveStats.BaseRollSpeed;
+                }
+            }
+
+            // duration logic
+            if (durationOverride > 0)
+            {
+                _rollTimer = durationOverride;
+            }
+            else
+            {
+                if (tent == 3) _rollTimer = MoveStats.MaxRollDuration;
+                else if (tent >= 1) _rollTimer = MoveStats.MidRollDuration;
+                else _rollTimer = MoveStats.BaseRollDuration;
+            }
+
+            //_isGroundPounding = false;            // wasnt inside unity so idk
+
+            // apply velocity
+            _moveVelocity.x = movespeed * _facingDirection;
+            _moveVelocity.y = 0;
+            Physics.SetVelocity(OwnerName, _moveVelocity.x, 0);
+        }
+
+        private void Roll()
+        {
+            // Cancel roll if touching wall in air
+            if (_isRolling)
+            {
+                currState = PlayerState.Rolling;
+                // hit wall = stop roll immediately
+                if (_isTouchingWall)
+                {
+                    StopRoll();
+                    return;
+                }
+
+                // timer logic
+                _rollTimer -= fixeddt;
+
+                if (_rollTimer <= 0)
+                {
+                    StopRoll();
+                    return;
+                }
+
+                // constant velocity (no friction) - just keep moving at set movespeed for whole duration
+                _moveVelocity.x = movespeed * _facingDirection;
+                Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
+            }
+        }
+
+        private void StopRoll()
+        {
+            if (!_isRolling) return;
+
+            _isRolling = false;
+            blockMovement = false; // allow movement
+        }
+
+        #endregion
+
+        #region Ground Pound
+        private void InitiateGroundPound()
+        {
+            if (_isGroundPounding || _isGliding) return;
+
+            // Play sound if assigned
+            //if (sounds != null && sounds.groundPound != null)
+            //{
+            //    AudioManager.Instance.PlayPlayerSFX(sounds.groundPound);
+            //}
+            Audio.PlaySound("groundpound_sfx", "sfx");
+            currState = PlayerState.GroundPounding;
+
+            fGroundPound = true; // time deduction
+            _isGroundPounding = true;
+
+            _groundPoundPauseTimer = MoveStats.GPPauseTime;
+
+            // kill all momentum for in air freeze
+            _moveVelocity.x = 0;
+            _moveVelocity.y = 0;
+
+            // set vel to vector.zero
+            Physics.SetVelocity(OwnerName, 0, 0);
+
+            // store position where groundpound initiated
+            lastPos = transform.position;
+        }
+
+        private void GroundPound()
+        {
+            currState = PlayerState.GroundPounding;
+            if (_isGroundPounding)
+            {
+                if (_groundPoundPauseTimer > 0)
+                {
+                    // freeze in air
+                    // maybe pause sound effect?
+                    _groundPoundPauseTimer -= dt;
+                    Physics.SetVelocity(OwnerName, 0,0);
+                    transform.position = lastPos;
+                }
+                else
+                {
+                    if (_isGrounded)
+                    {
+                        blockMovement = false;
+                        StopGroundPound();
+                    }
+                    else
+                    {
+                        _moveVelocity.y = -MoveStats.GPFallSpeed;
+                        Physics.SetVelocity(OwnerName, 0, _moveVelocity.y);
+                    }
+                }
+            }
+        }
+
+        private void StopGroundPound()
+        {
+            Audio.StopSound("groundpound_sfx");
+
+            // reset vertical velocity
+            _moveVelocity.y = 0;
+            Physics.SetVelocity(OwnerName, 0, 0);
+
+            // calculate height
+            float fallHeight = lastPos.y - transform.position.y;
+
+            // roll speed logic
+            float targetRollSpeed;
+
+            // exception: if falling from very high (no matter what tent speed), use max roll speed
+            if (fallHeight > MoveStats.GroundPoundMaxSpeedHeightThreshold)
+            {
+                targetRollSpeed = MoveStats.MaxRollSpeed;
+            }
+            else
+            {
+                // standard - use tent speed player had before ground pounding
+                int tier = GetCurrentTentacleLevel();
+
+                if (tier == 3)
+                {
+                    targetRollSpeed = MoveStats.MaxRollSpeed;
+                }
+                else if (tier >= 1) // tent 1 or 2
+                {
+                    targetRollSpeed = MoveStats.MidRollSpeed;
+                }
+                else // tent 0 (still / walk)
+                {
+                    // ensure player rolls forward a little @ base speed
+                    targetRollSpeed = MoveStats.BaseRollSpeed;
+                }
+            }
+
+            // duration logic - base time + (height / divisor)  
+            float targetDuration = MoveStats.BaseRollDuration + (fallHeight / MoveStats.RollHeightToDurationDivisor);
+
+            // direction - if pressing A/D = roll that way : if pressing nothing = roll facing direction
+            if (InputManager.Movement.x != 0)
+            {
+                int inputDir = (int)InputManager.Movement.x;
+                _facingDirection = inputDir;
+                Turn(inputDir > 0);
+            }
+
+            _isGroundPounding = false;
+
+            // trigger roll with calculated speed + duration
+            InitiateRoll(targetRollSpeed, targetDuration);
+        }
+        #endregion
+
+        #region Air Glide
+
+        private void InitiateGlide()
+        {
+            if (_isGliding || _glideCooldownTimer > 0) return;              // If cooldown not ended
+
+            // Play glide sound
+            //if (sounds != null && sounds.airGlide != null)
+            //    AudioManager.Instance.PlayPlayerSFX(sounds.airGlide);
+            _isGliding = true;
+        }
+
+        private void Glide()
+        {
+            if (_glideCooldownTimer > 0)
+            {
+                _glideCooldownTimer -= dt;
+            }
+
+            // if cooldown ready + input pressed
+            if (_isGliding)
+            {
+                currState = PlayerState.Gliding;
+                // play looping glide sound??
+
+                // cooldown ready
+                // cancel if hit ground or dash
+                if (_isGrounded || _isRunning)
+                {
+                    StopGlide();
+                }
+                else
+                {
+                    // Timer for periodic time deduction
+                    _timeSinceLastGlideDeduction += dt;
+                    if (_timeSinceLastGlideDeduction >= MoveStats.GlideDeductionInterval)
+                    {
+                        fGlide = true; // Set the flag for the TimerManager
+                        _timeSinceLastGlideDeduction = 0f; // Reset the timer
+                    }
+
+                    // only apply the glide effect when falling
+                    if (VerticalVelocity < 0)
+                    {
+                        VerticalVelocity *= MoveStats.GlideFallSpeedMultiplier;
+                    }
+                }
+            }
+        }
+
+        private void StopGlide()
+        {
+            _glideCooldownTimer = MoveStats.GlideCooldown;
+            _timeSinceLastGlideDeduction = 0f;
+            _isGliding = false;
+            blockMovement = false;
+        }
+
+        #endregion
+
+        #region Zipline
+        // Zipline logic is complex and will be ported later
+        #endregion
+
+        public void OnDestroy()
+        {
+            Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
+        }
+
+        private static vec2 Lerp(vec2 a, vec2 b, float t)
+        {
+            t = Utils.MathfClamp(t, 0, 1);
+            return new vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
         }
 
         #region Collison Checks
@@ -681,11 +1464,10 @@ namespace CSharpScript
             else
             {
                 // if not on wall - start counting down for coyote time
-                _wallJumpTimer -= Utils.GetDelta_Time(); // Assumes GetDeltaTime is accessible
+                _wallJumpTimer -= dt; // Assumes GetDeltaTime is accessible
             }
 
             canWallKick = _isTouchingWall;
-            if (_isTouchingWall && !_isGrounded) currState = PlayerState.WallSliding;
         }
 
         private void IsGrounded()
@@ -812,638 +1594,5 @@ namespace CSharpScript
         }
 
         #endregion
-
-        #region Jump
-
-        private void Jump(float deltaTime)
-        {
-            if (_isWallJumping && VerticalVelocity <= 0)
-            {
-                _isWallJumping = false;
-                blockMovement = false; // give back control
-            }
-
-            // apply gravity while jumping
-            if (_isJumping)
-            {
-                currState = PlayerState.Jumping;
-                if (_isTouchingWall) currState = PlayerState.WallSliding;
-                // Head bump detection – unchanged
-                if (_bumpedHead)
-                {
-                    _isFastFalling = true;
-                }
-
-                // gravity on ascending 
-                if (VerticalVelocity >= 0f)
-                {
-                    // apex controls
-                    _apexPoint = Utils.MathfInverseLerp(MoveStats.InitialJumpVelocity, 0f, VerticalVelocity);
-
-                    if (_apexPoint > MoveStats.ApexThreshold)
-                    {
-                        if (!_isPastApexThreshold)
-                        {
-                            _isPastApexThreshold = true;
-                            _timePastApexThreshold = 0f;
-                        }
-
-                        _timePastApexThreshold += deltaTime;
-
-                        if (_timePastApexThreshold < MoveStats.ApexHangTime)
-                        {
-                            VerticalVelocity = 0f;
-                        }
-                        else
-                        {
-                            VerticalVelocity = -0.01f;
-                        }
-                    }
-                    else
-                    {
-                        VerticalVelocity += MoveStats.Gravity * deltaTime;
-                        _isPastApexThreshold = false;
-                    }
-                }
-                else if (!_isFastFalling)
-                {
-                    // gravity on descending
-                    VerticalVelocity += MoveStats.Gravity * deltaTime;
-                }
-                else if (VerticalVelocity < 0f && !_isFalling)
-                {
-                    _isFalling = true;
-                }
-            }
-
-            // jump cut
-            if (_isFastFalling)
-            {
-                currState = PlayerState.Falling;
-                if (_fastFallTime < MoveStats.TimeForUpwardsCancel)
-                {
-                    VerticalVelocity = Utils.MathfLerp(_fastFallReleaseSpeed, 0f, _fastFallTime / MoveStats.TimeForUpwardsCancel);
-                }
-                else
-                {
-                    VerticalVelocity += MoveStats.Gravity * MoveStats.GravityOnReleaseMultiplier * deltaTime;
-                }
-
-                _fastFallTime += deltaTime;
-            }
-
-            if (!_isGrounded && !_isJumping && !_isFastFalling)
-            {
-                if (!_isFalling)
-                    _isFalling = true;
-
-                VerticalVelocity += MoveStats.Gravity * deltaTime;
-            }
-
-            // clamp fall speed
-            VerticalVelocity = Utils.MathfClamp(VerticalVelocity, -MoveStats.MaxFallSpeed, MoveStats.InitialJumpVelocity);
-
-            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-        }
-
-        private void JumpChecks()
-        {
-            // when jump is pressed
-            if (InputManager.JumpWasPressed)
-            {
-                _jumpBufferTimer = MoveStats.JumpBufferTime;
-                _jumpReleasedDuringBuffer = false;
-            }
-
-            // when jump is released - with hold to jump enabled
-            if (MoveStats.EnableVariableJumpHeight)
-            {
-                if (InputManager.JumpWasReleased)
-                {
-                    if (_jumpBufferTimer > 0f)
-                    {
-                        _jumpReleasedDuringBuffer = true;
-                    }
-
-                    if (_isJumping && VerticalVelocity > 0f)
-                    {
-                        if (_isPastApexThreshold)
-                        {
-                            _isPastApexThreshold = false;
-                            _isFastFalling = true;
-                            _fastFallTime = MoveStats.TimeForUpwardsCancel;
-                            VerticalVelocity = 0f;
-                        }
-                        else
-                        {
-                            _isFastFalling = true;
-                            _fastFallReleaseSpeed = VerticalVelocity;
-                        }
-                    }
-                }
-            }
-
-            // wall jump
-            if (_jumpBufferTimer > 0f && _wallJumpTimer > 0f)
-            {
-                InitiateWallJump();
-                _jumpBufferTimer = 0f; // consume buffer to prevent other jumps
-            }
-            // initiate jump with jump buffering and coyote time
-            else if (_jumpBufferTimer > 0f && !_isJumping && (_isGrounded || _coyoteTimer > 0f))
-            {
-                InitiateJump(1);
-
-                if (_jumpReleasedDuringBuffer)
-                {
-                    _isFastFalling = true;
-                    _fastFallReleaseSpeed = VerticalVelocity;
-                }
-            }
-            // double jump
-            else if (_jumpBufferTimer > 0f && _isJumping && _numberOfJumpsUsed < MoveStats.NumberOfJumpsAllowed)
-            {
-                _isFastFalling = false;
-                InitiateJump(1);
-            }
-            // handle air jump after the coyote time has lapsed (take off an extra jump so the player does not get a bonus jump)
-            else if (_jumpBufferTimer > 0f && _isFalling && _numberOfJumpsUsed < MoveStats.NumberOfJumpsAllowed - 1)
-            {
-                InitiateJump(2);
-                _isFastFalling = false;
-            }
-
-            // landing
-            if ((_isJumping || _isFalling) && _isGrounded && VerticalVelocity <= 0f)
-            {
-                //_islanding = true;
-                if (!_islanding) _islanding = true;
-
-
-                if (_isWallKicking)
-                {
-                    StopWallKick();
-                }
-
-                // consume buffered jump upon landing
-                _jumpBufferTimer = 0f;
-
-                _isJumping = false;
-                _isFalling = false;
-                _isFastFalling = false;
-                _fastFallTime = 0f;
-                _isPastApexThreshold = false;
-                _numberOfJumpsUsed = 0;
-
-                _isWallJumping = false;
-                blockMovement = false;
-
-                _ziplineCoyoteTimer = 0f;
-
-                VerticalVelocity = -0.5f; // small negative value to keep grounded
-            }
-        }
-
-        #region Slide
-        private void WallSlide()
-        {
-            if (_isGrounded)// || (knockback != null && knockback.IsBeingKnockedBack))
-            {
-                if (_isWallSliding)
-                {
-                    _isWallSliding = false;
-                    //AudioManager.instance.StopLoopingPlayerSFX();
-                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
-                }
-                return;
-            }
-
-            // check collision & falling speed
-            //if (_isTouchingWall && _rb.linearVelocity.y < 0)
-            if (_isTouchingWall && Physics.GetVelocity(OwnerName).y < 0)
-            {
-                // first frame logic
-                if (!_isWallSliding)
-                {
-                    _isWallSliding = true;
-
-                    // reset jumps if want wall sliding to refresh double jump
-                    _numberOfJumpsUsed = 0;
-
-                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
-                    //_wallSoundCoroutine = StartCoroutine(PlayWallSlideAudioSequence(sounds.wallLand, sounds.wallSlide));
-                }
-
-                // apply friction/slide speed
-                //_rb.linearVelocity = new Vector2(_rb.linearVelocity.x, Mathf.Max(_rb.linearVelocity.y, -MoveStats.WallSlidingSpeed));
-                Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
-            }
-            else
-            {
-                // exit wall slide logic
-                if (_isWallSliding)
-                {
-                    _isWallSliding = false;
-                    //AudioManager.instance.StopLoopingPlayerSFX();
-                    //if (_wallSoundCoroutine != null) StopCoroutine(_wallSoundCoroutine);
-                }
-            }
-        }
-
-        #endregion
-
-        private void InitiateJump(int numberOfJumpsUsed)
-        {
-            if (_isRolling)
-            {
-                StopRoll();
-            }
-
-            if (!_isJumping)
-            {
-                _isJumping = true;
-            }
-
-            Audio.PlaySound("jump_sfx", "sfx");
-            _jumpBufferTimer = 0f;
-            _numberOfJumpsUsed += numberOfJumpsUsed;
-            VerticalVelocity = MoveStats.InitialJumpVelocity;
-        }
-        #endregion
-
-        #region Wall Slide + Jump + Kick
-
-        private void WallSlide(float deltaTime)
-        {
-            bool isPushingTowardsWall = (_isFacingRight && InputManager.Movement.x > 0) ||
-                                        (!_isFacingRight && InputManager.Movement.x < 0);
-
-            //vec2 currentVelocity = Physics.GetVelocity(OwnerName);
-
-            if (_isTouchingWall && !_isGrounded && isPushingTowardsWall)
-            {
-                if (_moveVelocity.y < 0)
-                {
-                    _isWallSliding = true;
-                    float newYVelocity = Utils.MathfClamp(_moveVelocity.y, -MoveStats.WallSlidingSpeed, 999f);
-                    Physics.SetVelocity(OwnerName, _moveVelocity.x, newYVelocity);
-                }
-            }
-            else
-            {
-                if (_isWallSliding)
-                {
-                    _isWallSliding = false;
-                }
-            }
-        }
-
-        private void InitiateWallJump()
-        {
-            // state change
-            _isWallJumping = true;
-            blockMovement = true;
-
-            // stop previous state
-            _isWallSliding = false;
-            _isJumping = true;
-
-            // apply forces for wall jump
-            VerticalVelocity = MoveStats.WallJumpForce.y;
-            float horizontalDirection = _isFacingRight ? -1f : 1f;
-            _moveVelocity.x = MoveStats.WallJumpForce.x * horizontalDirection;
-
-            //vec2 currentVelocity = Physics.GetVelocity(OwnerName);
-            Physics.SetVelocity(OwnerName, _moveVelocity.x, _moveVelocity.y);
-
-            // turn the player
-            Turn(!_isFacingRight);
-        }
-
-        private void InitiateWallKick()
-        {
-            if (_isWallKicking) return;
-
-            _isWallKicking = true;
-            blockMovement = true;
-
-            // Play wall kick sound
-            //if (sounds != null && sounds.wallKick != null)
-            //    AudioManager.Instance.PlayPlayerSFX(sounds.wallKick);
-
-            //fWallKick = true; // Timer manager flag
-
-            _wallKickTotalDuration = MoveStats.DashDuration * MoveStats.WallKickDurationMultiplier;
-            _wallKickTimer = _wallKickTotalDuration;
-            _wallKickCooldownTimer = MoveStats.DashCooldown;
-
-            // Determine horizontal direction (opposite of facing)
-            float wallKickDir = _isFacingRight ? -1f : 1f;
-
-            // Flip player to face new direction
-            Turn(!_isFacingRight);
-
-            // Set initial horizontal velocity
-            _moveVelocity.x = wallKickDir * MoveStats.WallKickSpeedModifier;
-            VerticalVelocity = 0f;
-
-            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-            Audio.PlaySound("wallkick_sfx", "sfx");
-        }
-
-        private void WallKick(float deltaTime)
-        {
-            if (!_isWallKicking) return;
-
-            currState = PlayerState.WallKicking;
-            blockMovement = true;
-            _isJumping = false;
-
-            _wallKickTimer -= deltaTime;
-
-            // Progress: 0.0 at start → 1.0 at end
-            float progress = 1f - (_wallKickTimer / _wallKickTotalDuration);
-
-            // Curve multiplier (ease-in/out effect)
-            //float curveMultiplier = MoveStats.WallKickEaseCurve.Evaluate(progress);
-
-            // Calculate current horizontal and vertical speeds
-            float currentSpeedX = _moveVelocity.x * 1;
-            float verticalGain = MoveStats.WallKickVerticalModifier * 1;
-
-            // Apply velocities directly
-            Physics.SetVelocity(OwnerName, currentSpeedX, verticalGain);
-
-            // End wall kick when timer finishes
-            if (_wallKickTimer <= 0f)
-                StopWallKick();
-        }
-
-        private void StopWallKick()
-        {
-            if (!_isWallKicking) return;
-
-            _isWallKicking = false;
-            blockMovement = false;
-
-            // Stop horizontal motion after wall kick
-            _moveVelocity.x = 0f;
-
-            // Keep current vertical motion (gravity or jump will continue)
-            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-
-            wallKickFrameCounter = 0; // Reset wall coyote counter
-        }
-        #endregion
-
-        #region Roll
-
-        private void InitiateRoll(float speedOverride = -1f, float durationOverride = -1f)
-        {
-            if (_isRolling || !_isGrounded) return;
-
-            // Play sound if assigned
-            //if (sounds != null && sounds.roll != null)
-            //    AudioManager.Instance.PlayPlayerSFX(sounds.roll);
-
-            _isRolling = true;
-            blockMovement = true;
-
-            int tent = GetCurrentTentacleLevel();
-
-            // speed logic
-            if (speedOverride > 0)
-            {
-                // ground pound force
-                movespeed = speedOverride;
-            }
-            else
-            {
-                // normal roll - tent speeds 0 to 3
-                if (tent == 3)
-                {
-                    movespeed = MoveStats.MaxRollSpeed;
-                }
-                else if (tent >= 1) // Tent 1 or 2
-                {
-                    movespeed = MoveStats.MidRollSpeed;
-                }
-                else // tent 0
-                {
-                    movespeed = MoveStats.BaseRollSpeed;
-                }
-            }
-
-            // duration logic
-            if (durationOverride > 0)
-            {
-                _rollTimer = durationOverride;
-            }
-            else
-            {
-                if (tent == 3) _rollTimer = MoveStats.MaxRollDuration;
-                else if (tent >= 1) _rollTimer = MoveStats.MidRollDuration;
-                else _rollTimer = MoveStats.BaseRollDuration;
-            }
-
-            _isGroundPounding = false;
-
-            // Set roll velocity
-            _moveVelocity.x = movespeed * _facingDirection;
-            VerticalVelocity = 0f;
-            Audio.PlaySound("roll_sfx", "sfx");
-        }
-
-        private void Roll(float deltaTime)
-        {
-            if (!_isRolling) return;
-
-            currState = PlayerState.Rolling;
-            // Cancel roll if touching wall in air
-            if (_isTouchingWall)
-            {
-                StopRoll();
-                return;
-            }
-
-            // End roll on timer or dash
-            if (_rollTimer <= 0f)
-            {
-                blockMovement = false;
-                StopRoll();
-            }
-            else
-            {
-                _rollTimer -= deltaTime;
-                // Keep horizontal roll speed
-                Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-            }
-        }
-
-        private void StopRoll()
-        {
-            if (!_isRolling) return;
-
-            _isRolling = false;
-            blockMovement = false;
-
-            // Reset horizontal velocity
-            //_moveVelocity.x = 0f;
-            //Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-        }
-
-        #endregion
-
-        #region Ground Pound
-        private void InitiateGroundPound()
-        {
-            if (_isGroundPounding) return;
-
-            // Play sound if assigned
-            //if (sounds != null && sounds.groundPound != null)
-            //{
-            //    AudioManager.Instance.PlayPlayerSFX(sounds.groundPound);
-            //}
-
-            _isGroundPounding = true;
-            blockMovement = true;                   // Disable horizontal input during pause
-            _groundPoundPauseTimer = MoveStats.GroundPoundPauseTime;
-
-            // Stop horizontal movement, start downward velocity
-            _moveVelocity.x = 0f;
-            VerticalVelocity = -MoveStats.GroundPoundFallSpeed;
-
-            // Store starting position for midair pause
-            lastPos = Transform.GetPosition(OwnerName);
-            Audio.PlaySound("groundpound_sfx", "sfx");
-        }
-
-        private void GroundPound(float deltaTime)
-        {
-            if (!_isGroundPounding) return;
-
-            currState = PlayerState.GroundPounding;
-            if (_groundPoundPauseTimer > 0f)
-            {
-                // Pause in midair
-                _groundPoundPauseTimer -= deltaTime;
-
-                // Keep player in same position
-                Transform.SetPosition(OwnerName, lastPos.x, lastPos.y);
-
-                // Stop vertical velocity while paused
-                VerticalVelocity = 0f;
-            }
-            else
-            {
-                // If player is grounded or dashing, stop ground pound
-                if (_isGrounded || _isDashing)
-                {
-                    blockMovement = false;
-                    StopGroundPound();
-                }
-                else
-                {
-                    // Move downward by ground pound speed
-                    VerticalVelocity = -MoveStats.GroundPoundFallSpeed;
-                }
-            }
-
-            // Always push velocity to physics
-            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-        }
-
-        private void StopGroundPound()
-        {
-            Audio.StopSound("groundpound_sfx");
-            if (_isGrounded)
-            {
-                InitiateRoll();
-                return;
-            }
-            _isGroundPounding = false;
-            blockMovement = false;
-
-            // Reset vertical velocity (optional)
-            VerticalVelocity = 0f;
-
-            // If grounded, can chain into roll
-        }
-        #endregion
-
-        #region Air Glide
-
-        private void InitiateGlide()
-        {
-            if (_isGliding || _glideCooldownTimer > 0f) return;
-
-            // Play glide sound
-            //if (sounds != null && sounds.airGlide != null)
-            //    AudioManager.Instance.PlayPlayerSFX(sounds.airGlide);
-
-            _isGliding = true;
-            blockMovement = true;
-        }
-
-        private void Glide(float deltaTime)
-        {
-            // Update cooldown
-            if (_glideCooldownTimer > 0f)
-                _glideCooldownTimer -= deltaTime;
-
-            if (!_isGliding) return;
-            currState = PlayerState.Gliding;
-            // Cancel glide if grounded or dashing
-            if (_isGrounded || _isDashing)
-            {
-                StopGlide();
-                return;
-            }
-
-            // Periodic glide deductions for timer system
-            _timeSinceLastGlideDeduction += deltaTime;
-            if (_timeSinceLastGlideDeduction >= MoveStats.GlideDeductionInterval)
-            {
-                _timeSinceLastGlideDeduction = 0f;
-            }
-
-            // Slow vertical fall while gliding
-            if (VerticalVelocity < 0f)
-                VerticalVelocity *= MoveStats.GlideFallSpeedMultiplier;
-
-            Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
-        }
-
-        private void StopGlide()
-        {
-            _isGliding = false;
-            blockMovement = false;
-            _glideCooldownTimer = MoveStats.GlideCooldown;
-            _timeSinceLastGlideDeduction = 0f;
-        }
-
-        #endregion
-
-        #region Zipline
-        // Zipline logic is complex and will be ported later
-        #endregion
-
-        public void OnDestroy()
-        {
-            Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
-        }
-
-        private static vec2 Lerp(vec2 a, vec2 b, float t)
-        {
-            t = Utils.MathfClamp(t, 0, 1);
-            return new vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
-        }
-        private int GetCurrentTentacleLevel()
-        {
-            if (movespeed >= MoveStats.T3_Threshold) return 3;
-            if (movespeed >= MoveStats.T2_Threshold) return 2;
-            if (movespeed >= MoveStats.T1_Threshold) return 1;
-            return 0; // walk speed
-        }
     }
 }

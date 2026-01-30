@@ -22,15 +22,19 @@ namespace CSharpScript
 {
     public class PlayerMovementStats : GameScript
     {
+        // CLAMPS
+        public float Clamp_MaxRunSpeed = 1000f;
+        public float Clamp_MaxJumpHeight = 1000f;
+
         // walking tiers
-        public float T0_BaseSpeed = 2f * 10;
-        public float T0_MaxSpeed = 12f * 10;
+        public float T0_BaseSpeed = 2f * 100;
+        public float T0_MaxSpeed = 12f * 100;
 
         // running tiers
-        public float T1_Threshold = 18f * 10;
-        public float T2_Threshold = 24f * 10;
-        public float T3_Threshold = 30f * 10;
-        public float T3_MaxSpeed = 40f * 10;
+        public float T1_Threshold = 18f * 100;
+        public float T2_Threshold = 24f * 100;
+        public float T3_Threshold = 30f * 100;
+        public float T3_MaxSpeed = 40f * 100;
 
         // Running
         public bool UseToggleRun = false;
@@ -58,13 +62,6 @@ namespace CSharpScript
         public float T3_BonkDuration = 0.8f;
         public Vector2 T3_BonkForce = new Vector2(10f, 18f);
 
-        // Walk [OLD]
-        //public float MaxWalkSpeed = 250f;
-        //public float GroundAcceleration = 30f;
-        //public float GroundDeceleration = 30f;
-        //public float AirAcceleration = 20f;
-        //public float AirDeceleration = 5f;
-
         // Grounded/Collision Checks
         public float GroundDetectionRayLength = 5.0f;
         public float HeadDetectionRayLength = 0.02f;
@@ -76,7 +73,7 @@ namespace CSharpScript
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 100.7f;
+        public float JumpHeight = 100f;
         public float JumpHeightCompensationFactor = 1.054f;
         public float TimeTillJumpApex = 0.35f;
         public float GravityOnReleaseMultiplier = 1.4f;
@@ -106,7 +103,6 @@ namespace CSharpScript
 
         // Roll
         public float RollSpeed = 500f;
-        public float RollHeightToDurationDivisor = 1000f;
         public float BaseRollDuration = 0.5f; // minimum time
         public float MidRollDuration = 0.65f;
         public float MaxRollDuration = 0.8f;
@@ -115,17 +111,22 @@ namespace CSharpScript
         public float MaxRollSpeed = 40f;
 
         // Wall Kick
-        public float WallKickSpeedModifier = 300f;
-        public float WallKickVerticalModifier = 50f;
-        public float WallKickDurationMultiplier = 1.25f;
+        public float WKBaseDuration = 0.25f;
+        public float WKCooldown = 0.5f;
+        public float WKSpeedModifier = 30f;
+        public float WKVerticalModifier = 5f;
+        public float WKDurationMultiplier = 0.75f;
+        // dont have tht WKEase graph thing in unity
 
         // Wall Jump
         public vec2 WallJumpForce = new vec2(20f, 25f);
         public float WallCoyoteTime = 0.1f;
 
         // Ground Pound
-        public float GroundPoundPauseTime = 0.3f;
-        public float GroundPoundFallSpeed = 300f;
+        public float GPPauseTime = 0.3f;
+        public float GPFallSpeed = 50f;
+        public float RollHeightToDurationDivisor = 100f;
+        public float GroundPoundMaxSpeedHeightThreshold = 40f;
 
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.6f;

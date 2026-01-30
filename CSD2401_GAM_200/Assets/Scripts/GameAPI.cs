@@ -741,6 +741,15 @@ namespace CSharpScript
         public static extern float MathfClamp(float value, float min, float max);
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int MathiClamp(int value, int min, int max);
+
+        public static float MathfMoveTowards(float current, float target, float maxDelta)
+        {
+            if (Math.Abs(target - current) <= maxDelta)
+            {
+                return target;
+            }
+            return current + Math.Sign(target - current) * maxDelta;
+        }
     }
 
     public static class Input
