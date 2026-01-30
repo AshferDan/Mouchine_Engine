@@ -320,6 +320,9 @@ void LevelEditor::EnterPlayMode()
             // Game scene - play game BGM
             std::cout << "[LevelEditor] Playing game BGM\n";
             audioManager->PlaySound("bgm", "bgm_channel");
+            // Fade in the music over 5 seconds
+            audioManager->FadeInCategory("music", 5.0f);
+            std::cout << "[LevelEditor] Started music fade in over 5 seconds\n";
         }
         else if (sounds.find("MainMenuBGM") != sounds.end())
         {

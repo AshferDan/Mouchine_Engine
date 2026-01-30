@@ -15,6 +15,7 @@ Technology is prohibited.
 
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
+#include "ResourceManager.h"
 
 // Global constant for configuration file path (currently unused in this file)
 const char* configFile = "../Logs/config.txt";
@@ -250,15 +251,16 @@ void GraphicsSystem::Initialize()
     // Standard blend function for alpha transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Compile and link the default shader program for rendering.
+    // Load the default shader program for rendering through ResourceManager.
     // Requires "vertices.vert" (vertex shader) and "fragment.frag" (fragment shader).
-    shader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/vertices.vert"},
-                                {GL_FRAGMENT_SHADER, "../Shaders/fragment.frag"} });
+    ShaderResource* defaultShaderResource = ResourceManager::Instance().LoadShader(
+        "defaultShader", "../Shaders/vertices.vert", "../Shaders/fragment.frag");
+    shader = defaultShaderResource->GetShader();
 
-    // Compile and link the debug shader program for lines and points
-    debugShader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/debug.vert"},
-                                {GL_FRAGMENT_SHADER, "../Shaders/debug.frag"} });
-    std::cout << "Debug shader compiled successfully\n\n\n\n" << std::endl;
+    // Load the debug shader program for lines and points through ResourceManager
+    ShaderResource* debugShaderResource = ResourceManager::Instance().LoadShader(
+        "debugShader", "../Shaders/debug.vert", "../Shaders/debug.frag");
+    debugShader = debugShaderResource->GetShader();
 
     // Define vertex structure for a textured quad.
     struct Vertex
@@ -355,9 +357,10 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
     // === Text Rendering Buffers Setup ===
-    // Compile and link the text shader
-    textShader.CompileLinkValidate({ {GL_VERTEX_SHADER, "../Shaders/text.vert"},
-                                    {GL_FRAGMENT_SHADER, "../Shaders/text.frag"} });
+    // Load the text shader through ResourceManager
+    ShaderResource* textShaderResource = ResourceManager::Instance().LoadShader(
+        "textShader", "../Shaders/text.vert", "../Shaders/text.frag");
+    textShader = textShaderResource->GetShader();
 
     glGenVertexArrays(1, &textVAO);
     glGenBuffers(1, &textVBO);
@@ -407,6 +410,9 @@ void GraphicsSystem::Initialize()
 void GraphicsSystem::Update(float)
 {
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
+    if (!cachedBackground) {
+        cachedBackground = GameObjectFactory::Instance().FindGameObject("bgImage");
+    }
 
     if (!window)
         return; // Skip if no valid window.
@@ -441,7 +447,7 @@ void GraphicsSystem::Update(float)
     glPointSize(50.f);                                  // Set point size (for debug points)
 
     // Use main shader program
-    shader.Use();
+    shader->Use();
 
     // === View-Projection Matrix Calculation ===
     float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
@@ -458,6 +464,45 @@ void GraphicsSystem::Update(float)
         vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
+
+    // === Camera Bounds Debug Drawing ===
+// === Camera Bounds Debug Drawing ===
+    if (debugMode) {
+        auto* gameCamera = CameraManager::Instance().GetActiveCamera();
+
+        if (gameCamera) {
+            // 1. Get the camera's world position and current zoom level
+            vec2 camBasePos = gameCamera->GetPosition();
+            float currentZoom = gameCamera->getZoom();
+
+            // 2. ALWAYS use the main window size (Wwidth/Wheight) for the Game Area box.
+            // This ensures the box represents your "Target Resolution" even if the 
+            // editor window is currently small or a different shape.
+            float gameWidth = (float)Wwidth;
+            float gameHeight = (float)Wheight;
+
+            // 3. Replicate the projection math: (BaseResolution / 2.0f) / zoom
+            float halfWidth = (gameWidth / 2.0f) / currentZoom;
+            float halfHeight = (gameHeight / 2.0f) / currentZoom;
+            vec2 viewSize(halfWidth * 2.0f, halfHeight * 2.0f);
+
+            // 4. Calculate the "Shaken" position
+            // This makes the box stay at the window borders during Play Mode 
+            // and shows exactly where the camera is 'shaking' in Editor Mode.
+            vec2 shakenPos = camBasePos + gameCamera->GetTraumaOffset();
+
+            // 5. Draw the yellow Viewport Box (representing what the player sees)
+            CORE->GetDebugSystem()->DrawRect(shakenPos, viewSize, vec4(1.0f, 1.0f, 0.0f, 1.0f));
+
+            // 6. Draw a static Magenta cross or small box at the REAL center (camBasePos)
+            // This helps your teammate see the difference between the "Camera Center" 
+            // and the "Shake Offset" while paused.
+            if (gameCamera->GetTrauma() > 0.f) {
+                CORE->GetDebugSystem()->DrawPoint(camBasePos, vec4(1.0f, 0.0f, 1.0f, 1.0f));
+            }
+        }
+    }
+
     // Accumulate all geometry into batches
     batches.clear();
 
@@ -478,6 +523,12 @@ void GraphicsSystem::Update(float)
     // === Batch Accumulation Loop ===
     for (auto& obj : gameObjects)
     {
+        if (obj.get() == cachedBackground) {
+            // You found it instantly via pointer comparison (extremely fast)
+            auto* rend = obj->GetComponent<RenderComponent>();
+            if (rend) rend->SetLayer(-10);
+        }
+
         if (!obj->IsActive())
         {
             continue;
@@ -488,7 +539,7 @@ void GraphicsSystem::Update(float)
         {
             continue;
         }
-
+        
         auto* rend = obj->GetComponent<RenderComponent>();
 
         if (!rend)
@@ -577,7 +628,7 @@ void GraphicsSystem::Update(float)
         {
             // Instead of calculating the full model matrix and world position here,
             // we store the local vertex and the quad's transformation data in the BatchVertex struct.
-            // The transformation is applied in the vertex shader.
+            // The transformation is applied in the vertex shader->
             BatchVertex vert;
             vert.pos = localVerts[i]; // Local position
             vert.tex = texCoords[i]; // Texture UV
@@ -597,6 +648,19 @@ void GraphicsSystem::Update(float)
         targetBatch->indices.push_back(baseIndex + 2);
         targetBatch->indices.push_back(baseIndex + 1);
         targetBatch->indices.push_back(baseIndex + 3);
+    }
+
+    //Draw Particle
+    for (auto& obj : gameObjects)
+    {
+        if (!obj->IsActive())
+            continue;
+
+        auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+        if (emitter && emitter->IsEnabled())
+        {
+            emitter->AddParticlesToBatch(batches, vp);
+        }
     }
 
     // Sort batches by rendering layer (lower layer draws first)
@@ -765,11 +829,13 @@ void GraphicsSystem::Update(float)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+
+    CORE->GetDebugSystem()->Clear();
 }
 
 /**
  * \brief Draws a line segment between two points in world space.
- * Uses a temporary VAO/VBO with the debug shader.
+ * Uses a temporary VAO/VBO with the debug shader->
  * \param start The starting point of the line.
  * \param end The ending point of the line.
  * \param color The color of the line.
@@ -779,8 +845,8 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
     const vec4& color, const mat4& viewProjection)
 {
     // Tell shader this is a line draw
-    debugShader.Use();
-    debugShader.SetUniform("uColor", color);
+    debugShader->Use();
+    debugShader->SetUniform("uColor", color);
 
     // Define 2 vertices for the line
     vec3 verts[2] = {
@@ -801,7 +867,7 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 
     // Send MVP matrix
-    debugShader.SetUniform("uMVP", viewProjection);
+    debugShader->SetUniform("uMVP", viewProjection);
 
     // Draw the line
     glDrawArrays(GL_LINES, 0, 2);
@@ -813,7 +879,7 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
 
 /**
  * \brief Draws a single point in world space.
- * Uses a temporary VAO/VBO with the debug shader.
+ * Uses a temporary VAO/VBO with the debug shader->
  * \param ppos The position of the point.
  * \param color The color of the point.
  * \param viewProjection The combined view-projection matrix (MVP in shader).
@@ -822,8 +888,8 @@ void GraphicsSystem::DrawPoint(const vec2& ppos,
     const vec4& color, const mat4& viewProjection)
 {
     // Use the debug shader
-    debugShader.Use();
-    debugShader.SetUniform("uColor", color);
+    debugShader->Use();
+    debugShader->SetUniform("uColor", color);
 
     // Position of the point (use vec3 to match shader input = vec3)
     vec3 pos = { ppos.x, ppos.y, 0.0f };
@@ -842,7 +908,7 @@ void GraphicsSystem::DrawPoint(const vec2& ppos,
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 
     // Send MVP matrix
-    debugShader.SetUniform("uMVP", viewProjection);
+    debugShader->SetUniform("uMVP", viewProjection);
 
     // Make point visible (default = 1px, often too small)
     glPointSize(5.0f);
@@ -931,9 +997,9 @@ void GraphicsSystem::DrawBatches()
         return;
     }
 
-    shader.Use();
+    shader->Use();
     // Signal the shader to use the batch rendering pipeline (instance data)
-    shader.SetUniform("uUseBatching", 1);
+    shader->SetUniform("uUseBatching", 1);
 
     glBindVertexArray(batchVAO);
 
@@ -945,6 +1011,10 @@ void GraphicsSystem::DrawBatches()
             continue;
         }
 
+
+        //std::cout << "Batch size: " << batch.vertices.size() << ".\n\n";
+        
+        
         // === ADD THIS SAFETY CHECK ===
         // Ensure batch size doesn't exceed pre-allocated buffer size
         if (batch.vertices.size() > MAX_BATCH_VERTICES)
@@ -968,21 +1038,21 @@ void GraphicsSystem::DrawBatches()
         glNamedBufferSubData(batchEBO, 0, batch.indices.size() * sizeof(GLuint), batch.indices.data());
 
         // Set Uniforms that apply to the whole batch
-        shader.SetUniform("uMVP", vp);
-        shader.SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
+        shader->SetUniform("uMVP", vp);
+        shader->SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
 
         // Bind Texture
         if (batch.textureID > 0)
         {
-            shader.SetUniform("uHasTexture", 1);
+            shader->SetUniform("uHasTexture", 1);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, batch.textureID);
-            shader.SetUniform("uTexture", 0); // Set sampler to texture unit 0
+            shader->SetUniform("uTexture", 0); // Set sampler to texture unit 0
         }
         else
         {
             // Disable texturing if no texture is provided
-            shader.SetUniform("uHasTexture", 0);
+            shader->SetUniform("uHasTexture", 0);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
@@ -990,7 +1060,7 @@ void GraphicsSystem::DrawBatches()
         glDrawElements(GL_TRIANGLES, (GLsizei)batch.indices.size(), GL_UNSIGNED_INT, 0);
     }
     // Restore shader state to non-batching mode
-    shader.SetUniform("uUseBatching", 0);
+    shader->SetUniform("uUseBatching", 0);
 }
 
 /**
@@ -1005,9 +1075,9 @@ void GraphicsSystem::DrawBatches()
  */
 void GraphicsSystem::RenderText(const std::map<char, Character>& characters, const std::string& text, float x, float y, float scale, const vec4& color, bool screenSpace)
 {
-    textShader.Use();
-    textShader.SetUniform("textColor", color);
-    textShader.SetUniform("text", 0);
+    textShader->Use();
+    textShader->SetUniform("textColor", color);
+    textShader->SetUniform("text", 0);
 
     mat4 projection;
     float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
@@ -1022,7 +1092,7 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
         // World-space projection (use the camera VP matrix)
         projection = vp;
     }
-    textShader.SetUniform("projection", projection);
+    textShader->SetUniform("projection", projection);
 
     // Only center text if it's in world space (not screen space)
     // Screen space text (like timers, FPS) should stay left-aligned
@@ -1227,9 +1297,9 @@ void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewpo
 }
 
 void GraphicsSystem::DrawFlashOverlay(const vec4& color) {
-    debugShader.Use();
-    debugShader.SetUniform("uColor", color);
-    debugShader.SetUniform("uMVP", mat4::identity());
+    debugShader->Use();
+    debugShader->SetUniform("uColor", color);
+    debugShader->SetUniform("uMVP", mat4::identity());
 
     glBindVertexArray(flashVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

@@ -51,6 +51,13 @@ void WinLoseLogicSystem::Update(float dt)
 
     totalFrames++;
 
+    // Update audio fade
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->UpdateFade(dt);
+    }
+
     if (pendingSceneChange)
     {
         pendingSceneTimer -= dt;
@@ -363,7 +370,15 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         {
             std::cout << "[WinZone] No clicked - Going to main menu" << std::endl;
 
-            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+            // Start audio fade out before going to main menu
+            if (audioManager)
+            {
+                audioManager->FadeOutCategory("music", 0.5f);
+                std::cout << "[WinZone] Started music fade out" << std::endl;
+            }
+
+            pendingSceneTimer = 0.5f;  // Delay for fade
+            pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
     }
@@ -574,7 +589,16 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         {
             std::cout << "[WinLoseLogic] No clicked - Going to main menu" << std::endl;
 
-            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+            // Start audio fade out before going to main menu
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
+            {
+                audioManager->FadeOutCategory("music", 0.5f);
+                std::cout << "[WinLoseLogic] Started music fade out" << std::endl;
+            }
+
+            pendingSceneTimer = 0.5f;  // Delay for fade
+            pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
     }

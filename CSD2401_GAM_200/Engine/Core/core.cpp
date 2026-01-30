@@ -119,6 +119,7 @@ void CoreEngine::InitSystems()
     winLoseLogicSystem = AddSystem<WinLoseLogicSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
+    gameTimerSystem = AddSystem<GameTimerSystem>();
     //eventSystem = AddSystem<EventSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
@@ -207,6 +208,12 @@ void CoreEngine::GameLoop()
             {
                 winLoseLogicSystem->Initialize();
                 std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
+            }
+
+            // Reset audio manager fade states and restore volumes
+            if (audioManager)
+            {
+                audioManager->ResetFadeStates();
             }
 
             // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====

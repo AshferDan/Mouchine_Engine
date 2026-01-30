@@ -213,6 +213,8 @@ private:
     const char* GetShapeTypeName(int type);         // get shape type name
     const char* GetCollisionLayerName(int layer);   // get collision layer name
     GLFWwindow* m_window; ///< Pointer to the GLFW window
+
+    void RenderAnimationPreviewer();
 };
 
 
