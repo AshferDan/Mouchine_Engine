@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "Animator.hpp"
 #include "logic.h"
 #include "TilemapEditor.h"
+#include "ScriptComponent.h"
 
 std::unordered_map<GLuint, std::string> s_TexturePathByID;
 std::unordered_map<std::string, GLuint> s_IDByTexturePath;
@@ -199,6 +200,23 @@ void ComponentSerialization::SerializeEvent(json &j, EventComponent *ec)
     }
 
     j["EventComponent"] = rulesJson;
+}
+
+/**
+ * @brief Serializes the ScriptComponent into JSON.
+ * @param j JSON object to write into.
+ * @param sc Pointer to the ScriptComponent.
+ */
+void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc)
+{
+    if (!sc) return;
+
+    json scriptsArray = json::array();
+    for (const auto& pair : sc->GetScripts())
+    {
+        scriptsArray.push_back(pair.second);
+    }
+    j["ScriptComponent"] = { {"scripts", scriptsArray} };
 }
 
 // ------------------- Deserialize -------------------
@@ -619,6 +637,26 @@ void ComponentSerialization::DeserializeTilemap(const json& j, GameObject* go)
         tilemap->LoadTilemapFromFile(filepath);
     }
 }
+ /*
+ * @brief Deserializes the ScriptComponent from JSON.
+ * @param j JSON object to read from.
+ * @param go Pointer to the GameObject.
+ */
+void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
+{
+    if (!j.contains("ScriptComponent")) return;
+
+    const auto& scData = j["ScriptComponent"];
+    auto* sc = go->AddComponent<ScriptComponent>();
+
+    if (scData.contains("scripts"))
+    {
+        for (const auto& scriptName : scData["scripts"])
+        {
+            sc->AddScript(scriptName.get<std::string>());
+        }
+    }
+}
 
 // ------------------- Serialize / Deserialize All Componenents -------------------
 /**
@@ -628,23 +666,25 @@ void ComponentSerialization::DeserializeTilemap(const json& j, GameObject* go)
  */
 void ComponentSerialization::SerializeAllComponents(GameObject *go, json &j)
 {
-    if (const auto *t = go->GetComponent<TransformComponent>())
+    if (const auto *t = go->GetComponent<TransformComponent>()) 
         SerializeTransform(j, t);
-    if (auto *r = go->GetComponent<RenderComponent>())
+    if (auto *r = go->GetComponent<RenderComponent>()) 
         SerializeRender(j, r);
-    if (auto *s = go->GetComponent<Spritesheet>())
+    if (auto *s = go->GetComponent<Spritesheet>()) 
         SerializeSpritesheet(j, s);
-    if (auto *p = go->GetComponent<PhysicsComponent>())
+    if (auto *p = go->GetComponent<PhysicsComponent>()) 
         SerializePhysics(j, p);
-    if (auto *c = go->GetComponent<ColliderComponent>())
+    if (auto *c = go->GetComponent<ColliderComponent>()) 
         SerializeCollider(j, c);
-    if (auto *tc = go->GetComponent<TextComponent>())
+    if (auto *tc = go->GetComponent<TextComponent>()) 
         SerializeText(j, tc);
     // if (auto* cam = go->GetComponent<CameraComponent>())  SerializeCamera(j, cam);
-    if (auto *t = go->GetComponent<EventComponent>())
+    if (auto *t = go->GetComponent<EventComponent>()) 
         SerializeEvent(j, t);
     if (auto* tilemap = go->GetComponent<TilemapDataHolder>())
         SerializeTilemap(j, tilemap);
+    if (auto *sc = go->GetComponent<ScriptComponent>()) 
+        SerializeScript(j, sc);
 }
 
 /**
@@ -663,4 +703,5 @@ void ComponentSerialization::DeserializeAllComponents(GameObject *go, const json
     // DeserializeCamera(j, go);
     DeserializeEvent(j, go);
     DeserializeTilemap(j, go);
+    DeserializeScript(j, go);
 }
