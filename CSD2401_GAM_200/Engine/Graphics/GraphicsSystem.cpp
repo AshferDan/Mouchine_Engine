@@ -15,6 +15,7 @@ Technology is prohibited.
 
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
+#include "TilemapEditor.h"
 
 // Global constant for configuration file path (currently unused in this file)
 const char* configFile = "../Logs/config.txt";
@@ -481,6 +482,13 @@ void GraphicsSystem::Update(float)
         if (!obj->IsActive())
         {
             continue;
+        }
+
+        // CHECK FOR TILEMAP
+        if (obj->HasComponent<TilemapDataHolder>())
+        {
+            TilemapEditor::RenderTilemapGameObject(obj.get());
+            continue; // Skip normal rendering for tilemaps
         }
 
         auto* transform = obj->GetComponent<TransformComponent>();

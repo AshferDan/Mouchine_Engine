@@ -1201,182 +1201,286 @@ ImVec2 TilemapEditor::GetTileUV1(int tileID) const
 }
 
 /**
- * @brief Load a tilemap file and create GameObjects for rendering
+ * @brief Load tilemap data into TilemapDataHolder component
  */
-std::vector<GameObject*> TilemapEditor::LoadAndCreateTilemapGameObjects(
-    const std::string& filepath,
-    const vec2& tilemapPosition,
-    const std::string& namePrefix)
+void TilemapDataHolder::LoadTilemapFromFile(const std::string& filepath)
 {
-    std::vector<GameObject*> createdObjects;
-
     try
     {
-        std::cout << "[TilemapEditor] Loading tilemap for game rendering: " << filepath << std::endl;
-
-        // Open and parse the tilemap file
         std::ifstream file(filepath);
         if (!file.is_open())
         {
-            std::cerr << "[TilemapEditor] Failed to open tilemap file: " << filepath << std::endl;
-            return createdObjects;
+            std::cerr << "[TilemapDataHolder] Failed to open: " << filepath << std::endl;
+            return;
         }
 
         json j;
         file >> j;
         file.close();
 
-        // Validate tilemap structure
         if (!j.contains("width") || !j.contains("height") ||
             !j.contains("tileset") || !j.contains("tiles"))
         {
-            std::cerr << "[TilemapEditor] Invalid tilemap format! Missing required fields." << std::endl;
-            return createdObjects;
+            std::cerr << "[TilemapDataHolder] Invalid tilemap format!" << std::endl;
+            return;
         }
 
-        // Extract tilemap information
-        int width = j["width"];
-        int height = j["height"];
-        int numLayers = j.contains("numLayers") ? (int)j["numLayers"] : 1;
-        std::string tilesetPath = j["tileset"];
-        int tileWidth = j["tileWidth"];
-        int tileHeight = j["tileHeight"];
+        // Create data structure
+        data = new LoadedTilemapData();
+        data->filepath = filepath;
+        data->width = j["width"];
+        data->height = j["height"];
+        data->tileWidth = j["tileWidth"];
+        data->tileHeight = j["tileHeight"];
+        data->numLayers = j.contains("numLayers") ? (int)j["numLayers"] : 1;
+        data->tilesetPath = j["tileset"];
 
-        std::cout << "[TilemapEditor] Tilemap info:" << std::endl;
-        std::cout << "  Dimensions: " << width << "x" << height << std::endl;
-        std::cout << "  Tile size: " << tileWidth << "x" << tileHeight << std::endl;
-        std::cout << "  Layers: " << numLayers << std::endl;
-        std::cout << "  Tileset: " << tilesetPath << std::endl;
-
-        // Load the tileset texture
-        GLuint tilesetTexture = GraphicsSystem::LoadTexture(tilesetPath.c_str());
-        if (tilesetTexture == 0)
+        // Load tileset texture
+        data->tilesetTexture = GraphicsSystem::LoadTexture(data->tilesetPath.c_str());
+        if (data->tilesetTexture == 0)
         {
-            std::cerr << "[TilemapEditor] Failed to load tileset texture: " << tilesetPath << std::endl;
-            return createdObjects;
+            std::cerr << "[TilemapDataHolder] Failed to load tileset: " << data->tilesetPath << std::endl;
+            delete data;
+            data = nullptr;
+            return;
         }
 
-        // Get texture dimensions to calculate tiles per row/column
+        // Get tileset dimensions
         int texWidth, texHeight;
-        glBindTexture(GL_TEXTURE_2D, tilesetTexture);
+        glBindTexture(GL_TEXTURE_2D, data->tilesetTexture);
         glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &texWidth);
         glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &texHeight);
 
-        int tilesPerRow = texWidth / tileWidth;
-        int tilesPerColumn = texHeight / tileHeight;
+        data->tilesPerRow = texWidth / data->tileWidth;
+        data->tilesPerColumn = texHeight / data->tileHeight;
 
-        std::cout << "[TilemapEditor] Tileset texture: " << texWidth << "x" << texHeight
-            << " = " << tilesPerRow << "x" << tilesPerColumn << " tiles" << std::endl;
+        // Initialize tile grid
+        data->tiles.resize(data->numLayers);
+        for (int layer = 0; layer < data->numLayers; ++layer)
+        {
+            data->tiles[layer].resize(data->height);
+            for (int y = 0; y < data->height; ++y)
+            {
+                data->tiles[layer][y].resize(data->width);
+            }
+        }
 
-        // Get the factory to create GameObjects
-        auto& factory = GameObjectFactory::Instance();
-
-        // Create a GameObject for each tile
-        int tileCount = 0;
+        // Load tile data
         for (const auto& tileJson : j["tiles"])
         {
             int x = tileJson["x"];
             int y = tileJson["y"];
             int layer = tileJson.contains("layer") ? (int)tileJson["layer"] : 0;
             int tileID = tileJson["id"];
-            //bool isCollidable = tileJson.contains("collision") ? (bool)tileJson["collision"] : false;
-            tileJson.contains("collision") ? (bool)tileJson["collision"] : false;
+            bool collision = tileJson.contains("collision") ? (bool)tileJson["collision"] : false;
 
-            // Skip empty/invalid tiles
-            if (tileID < 0)
-                continue;
-
-            // Calculate world position for this tile
-            float worldX = tilemapPosition.x + (x * tileWidth);
-            float worldY = tilemapPosition.y + ((height - 1 - y) * tileHeight);
-
-            // Create a unique name for this tile GameObject
-            std::string tileName = namePrefix + "_L" + std::to_string(layer) +
-                "_" + std::to_string(x) + "_" + std::to_string(y);
-
-            // Create the GameObject
-            GameObject* tileObj = factory.CreateGameObject(tileName);
-            if (!tileObj)
+            if (x >= 0 && x < data->width &&
+                y >= 0 && y < data->height &&
+                layer >= 0 && layer < data->numLayers &&
+                tileID >= 0)
             {
-                std::cerr << "[TilemapEditor] Failed to create GameObject for tile!" << std::endl;
-                continue;
-            }
-
-            // Add or get TransformComponent
-            auto* transform = tileObj->GetComponent<TransformComponent>();
-            if (!transform)
-            {
-                // TransformComponent doesn't exist, create it with position
-                transform = tileObj->AddComponent<TransformComponent>(worldX, worldY);
-            }
-            else
-            {
-                // TransformComponent exists, just set position
-                transform->SetPosition(worldX, worldY);
-            }
-
-            // Set scale
-            if (transform)
-            {
-                transform->SetScale(static_cast<float>(tileWidth),
-                    static_cast<float>(tileHeight));
-            }
-
-            // Get or add RenderComponent
-            auto* render = tileObj->GetComponent<RenderComponent>();
-            if (!render)
-            {
-                // Create new RenderComponent first, then set texture
-                render = tileObj->AddComponent<RenderComponent>();
-            }
-
-            if (render)
-            {
-                render->SetTextureID(tilesetTexture);
-                render->SetShapeType(RenderComponent::ShapeType::Square);
-                render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-                // Calculate which tile in the tileset
-                int col = tileID % tilesPerRow;
-                int row = tileID / tilesPerRow;
-
-                // Calculate UV scale (size of one tile)
-                float uv_width = 1.0f / tilesPerRow;
-                float uv_height = 1.0f / tilesPerColumn;
-
-                // Flip row because OPENGL IS THE WORST THING EVER
-                row = (tilesPerColumn - 1) - row;
-
-                // Calculate UV offset - matches Spritesheet exactly
-                float uv_x = uv_width * col;
-                float uv_y = uv_height * row;
-
-                // Set UV coordinates
-                render->SetUVScale(vec2(uv_width, uv_height));
-                render->SetUVOffset(vec2(uv_x, uv_y));
-
-                int renderLayer = -100 + (layer * 25);
-                render->SetLayer(renderLayer);
-            }
-
-            // Add to created objects list
-            createdObjects.push_back(tileObj);
-            tileCount++;
-
-            // Progress indicator for large tilemaps
-            if (tileCount % 100 == 0)
-            {
-                std::cout << "[TilemapEditor] Created " << tileCount << " tiles..." << std::endl;
+                data->tiles[layer][y][x].tileID = tileID;
+                data->tiles[layer][y][x].isCollidable = collision;
             }
         }
 
-        std::cout << "[TilemapEditor] Successfully created " << tileCount
-            << " tile GameObjects!" << std::endl;
+        std::cout << "[TilemapDataHolder] Loaded: " << data->width << "x"
+            << data->height << " (" << data->numLayers << " layers)" << std::endl;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "[TilemapEditor] Error loading tilemap: " << e.what() << std::endl;
+        std::cerr << "[TilemapDataHolder] Error: " << e.what() << std::endl;
+        if (data)
+        {
+            delete data;
+            data = nullptr;
+        }
     }
+}
 
-    return createdObjects;
+/**
+ * @brief Load tilemap and create ONE GameObject with TilemapDataHolder
+ */
+GameObject* TilemapEditor::LoadTilemapAsGameObject(
+    const std::string& filepath,
+    const vec2& tilemapPosition,
+    const std::string& name)
+{
+    try
+    {
+        std::cout << "[TilemapEditor] Loading tilemap: " << filepath << std::endl;
+
+        // Create ONE GameObject
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* tilemapObj = factory.CreateGameObject(name);
+
+        if (!tilemapObj)
+        {
+            std::cerr << "[TilemapEditor] Failed to create GameObject!" << std::endl;
+            return nullptr;
+        }
+
+        // Add transform
+        auto* transform = tilemapObj->GetComponent<TransformComponent>();
+        if (!transform)
+        {
+            transform = tilemapObj->AddComponent<TransformComponent>(
+                tilemapPosition.x, tilemapPosition.y);
+        }
+        else
+        {
+            transform->SetPosition(tilemapPosition.x, tilemapPosition.y);
+        }
+
+        // Add TilemapDataHolder component
+        auto* holder = tilemapObj->AddComponent<TilemapDataHolder>();
+        if (!holder)
+        {
+            std::cerr << "[TilemapEditor] Failed to add TilemapDataHolder!" << std::endl;
+            factory.DestroyGameObject(tilemapObj->GetID());
+            return nullptr;
+        }
+
+        // Load the tilemap data
+        holder->LoadTilemapFromFile(filepath);
+
+        if (!holder->data)
+        {
+            std::cerr << "[TilemapEditor] Failed to load tilemap data!" << std::endl;
+            factory.DestroyGameObject(tilemapObj->GetID());
+            return nullptr;
+        }
+
+        std::cout << "[TilemapEditor] Created tilemap GameObject: "
+            << holder->data->width << "x" << holder->data->height << std::endl;
+
+        return tilemapObj;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "[TilemapEditor] Error: " << e.what() << std::endl;
+        return nullptr;
+    }
+}
+
+/**
+ * @brief Render a tilemap GameObject by adding tiles to the batch system
+ */
+void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
+{
+    if (!tilemapObj) return;
+
+    auto* holder = tilemapObj->GetComponent<TilemapDataHolder>();
+    if (!holder || !holder->data) return;
+
+    LoadedTilemapData* data = holder->data;
+
+    auto* transform = tilemapObj->GetComponent<TransformComponent>();
+    if (!transform) return;
+
+    vec2 position = vec2(transform->posX, transform->posY);
+    vec2 scale = vec2(transform->scaleX, transform->scaleY);
+    float rotation = transform->GetRotation();
+
+    // Get GraphicsSystem
+    auto* gs = CORE->GetGraphicsSystem();
+    if (!gs) return;
+
+    // Access batches
+    auto& batches = gs->batches;
+
+    // Render each layer
+    for (int layer = 0; layer < data->numLayers; ++layer)
+    {
+        int renderLayer = -100 + (layer * 25);
+
+        // Find existing batch index
+        int batchIndex = -1;
+        for (size_t i = 0; i < batches.size(); ++i)
+        {
+            if (batches[i].textureID == data->tilesetTexture &&
+                !batches[i].isCircle &&
+                batches[i].layer == renderLayer)
+            {
+                batchIndex = static_cast<int>(i);
+                break;
+            }
+        }
+
+        // Create new batch if needed
+        if (batchIndex == -1)
+        {
+            batches.emplace_back(data->tilesetTexture, false, renderLayer);
+            batchIndex = static_cast<int>(batches.size() - 1);
+        }
+
+        // NOW get the pointer (after all potential reallocations)
+        GraphicsSystem::RenderBatch* targetBatch = &batches[batchIndex];
+
+        // Add all tiles in this layer
+        for (int y = 0; y < data->height; ++y)
+        {
+            for (int x = 0; x < data->width; ++x)
+            {
+                const TileData& tile = data->tiles[layer][y][x];
+
+                if (tile.tileID < 0) continue;
+
+                // Calculate world position
+                float tileX = position.x + (x * data->tileWidth * scale.x);
+                float tileY = position.y + ((data->height - 1 - y) * data->tileHeight * scale.y);
+
+                float tileSX = static_cast<float>(data->tileWidth) * scale.x;
+                float tileSY = static_cast<float>(data->tileHeight) * scale.y;
+
+                // Calculate UV
+                int col = tile.tileID % data->tilesPerRow;
+                int row = tile.tileID / data->tilesPerRow;
+
+                float uv_width = 1.0f / data->tilesPerRow;
+                float uv_height = 1.0f / data->tilesPerColumn;
+
+                row = (data->tilesPerColumn - 1) - row;
+
+                float uv_x = uv_width * col;
+                float uv_y = uv_height * row;
+
+                // Add 4 vertices for this tile
+                GLuint startIndex = static_cast<GLuint>(targetBatch->vertices.size());
+
+                vec3 localPos[4] = {
+                    {-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f},
+                    {0.5f, 0.5f, 0.0f}, {-0.5f, 0.5f, 0.0f}
+                };
+
+                vec2 texCoords[4] = {
+                    {0.0f, 0.0f}, {1.0f, 0.0f},
+                    {1.0f, 1.0f}, {0.0f, 1.0f}
+                };
+
+                for (int i = 0; i < 4; ++i)
+                {
+                    GraphicsSystem::BatchVertex vertex;
+                    vertex.pos = localPos[i];
+                    vertex.tex = texCoords[i];
+                    vertex.color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+                    vertex.uvScale = vec2(uv_width, uv_height);
+                    vertex.uvOffset = vec2(uv_x, uv_y);
+                    vertex.transform = vec3(tileX, tileY, rotation);
+                    vertex.scale = vec2(tileSX, tileSY);
+
+                    targetBatch->vertices.push_back(vertex);
+                }
+
+                // Add 6 indices (2 triangles)
+                targetBatch->indices.push_back(startIndex + 0);
+                targetBatch->indices.push_back(startIndex + 1);
+                targetBatch->indices.push_back(startIndex + 2);
+
+                targetBatch->indices.push_back(startIndex + 2);
+                targetBatch->indices.push_back(startIndex + 3);
+                targetBatch->indices.push_back(startIndex + 0);
+            }
+        }
+    }
 }

@@ -143,17 +143,17 @@ public:
     void ClearTilemap();
 
     /**
-         * @brief Load a tilemap file and create GameObjects for rendering in the game
-         * This is a static helper function that can be called from anywhere to render a tilemap
-         * @param filepath Path to .tilemap file
-         * @param tilemapPosition World position where tilemap should be placed
-         * @param namePrefix Prefix for created GameObject names
-         * @return Vector of created GameObject pointers
-         */
-    static std::vector<class GameObject*> LoadAndCreateTilemapGameObjects(
+     * @brief Load a tilemap and create a SINGLE GameObject (not thousands)
+     */
+    static GameObject* LoadTilemapAsGameObject(
         const std::string& filepath,
         const vec2& tilemapPosition = vec2(0.0f, 0.0f),
-        const std::string& namePrefix = "Tilemap");
+        const std::string& name = "Tilemap");
+
+    /**
+     * @brief Render a tilemap GameObject
+     */
+    static void RenderTilemapGameObject(GameObject* tilemapObj);
 
 private:
     // Rendering functions
@@ -237,6 +237,80 @@ private:
     bool showNewTilemapDialog;
     int tempMapWidth;
     int tempMapHeight;
+};
+
+/**
+ * @struct LoadedTilemapData
+ * @brief Stores complete tilemap information for efficient rendering
+ */
+struct LoadedTilemapData {
+    std::string filepath;
+    int width;
+    int height;
+    int tileWidth;
+    int tileHeight;
+    int numLayers;
+
+    std::string tilesetPath;
+    GLuint tilesetTexture;
+    int tilesPerRow;
+    int tilesPerColumn;
+
+    // All tile data: [layer][y][x]
+    std::vector<std::vector<std::vector<TileData>>> tiles;
+
+    LoadedTilemapData()
+        : width(0), height(0), tileWidth(64), tileHeight(64),
+        numLayers(1), tilesetTexture(0), tilesPerRow(0), tilesPerColumn(0) {
+    }
+
+    ~LoadedTilemapData()
+    {
+    }
+};
+
+/**
+ * @class TilemapDataHolder
+ * @brief Component that holds tilemap data (inherits from IComponent)
+ */
+class TilemapDataHolder : public IComponent
+{
+public:
+    LoadedTilemapData* data;
+
+    TilemapDataHolder(GameObject* owner)
+        : IComponent(owner), data(nullptr) {
+    }
+
+    ~TilemapDataHolder()
+    {
+        if (data)
+        {
+            delete data;
+            data = nullptr;
+        }
+    }
+
+    // IComponent interface
+    std::string GetName() const override { return "TilemapDataHolder"; }
+
+    std::unique_ptr<IComponent> Clone(GameObject* newOwner) const override
+    {
+        auto clone = std::make_unique<TilemapDataHolder>(newOwner);
+        if (data && !data->filepath.empty())
+        {
+            clone->LoadTilemapFromFile(data->filepath);
+        }
+        return clone;
+    }
+
+    // Tilemap specific
+    std::string GetTilemapFilePath() const
+    {
+        return data ? data->filepath : "";
+    }
+
+    void LoadTilemapFromFile(const std::string& filepath);
 };
 
 extern bool isTileMapFocused;

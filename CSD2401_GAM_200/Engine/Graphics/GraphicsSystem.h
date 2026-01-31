@@ -50,6 +50,8 @@ Technology is prohibited.
 class GraphicsSystem : public ISystem
 {
 public:
+
+	friend class TilemapEditor;
 	/**
 	 * @brief Default constructor. Initializes GLFW and creates a default 800x600 window.
 	 */
