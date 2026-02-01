@@ -8,7 +8,7 @@ namespace CSharpScript
         public static bool JumpWasPressed => Input.GetKeyPressed(Input.KeyCode.Space);
         public static bool JumpWasReleased => Input.GetKeyReleased(Input.KeyCode.Space);
         public static bool RunWasPressed => Input.GetKeyPressed(Input.KeyCode.J);
-        public static bool RunIsHeld => Input.GetKeyPressed(Input.KeyCode.J);
+        public static bool RunIsHeld => Input.GetKeyHeld(Input.KeyCode.J);
         public static bool WallKickWasPressed => Input.GetKeyPressed(Input.KeyCode.L);
         public static bool GroundPoundWasPressed => Input.GetKeyPressed(Input.KeyCode.S);
         public static bool RollWasPressed => Input.GetKeyPressed(Input.KeyCode.K);

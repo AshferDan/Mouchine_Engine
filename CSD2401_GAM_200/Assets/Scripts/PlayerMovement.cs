@@ -162,6 +162,7 @@ namespace CSharpScript
                 Debug.Log("ERROR: OwnerName is not set in PlayerMovement script!");
                 return;
             }
+            ResetVars();
 
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
@@ -191,6 +192,33 @@ namespace CSharpScript
 
             Physics.SetGravity(OwnerName, true);
 
+            vec2 scale = Transform.GetScale(OwnerName);
+            vec2 position = Transform.GetPosition(OwnerName);
+            //_ziplineHeadOffset = position.y + (scale.y / 2);
+            Physics.SetFriction(OwnerName, 0f);
+            Physics.SetMass(OwnerName, 0.0001f);
+            _moveVelocity = new vec2(0, 0);
+
+            CSharpScript.GameObject.CreateShape(
+                "DebugLine",
+                (int)CSharpScript.ShapeType.Square,
+                0, -200,
+                5, 5,
+                0.0f, 0.0f, 1.0f, 1.0f,
+                (int)CSharpScript.CollisionLayer.Platform,
+                false, false, false
+            );
+        }
+
+        public void OnUpdate(float deltaTime)
+        {
+            if (OwnerName == null || OwnerName == "") return;
+
+            // additional checks here
+
+            currState = PlayerState.Idle;
+            UpdatePlayerState();
+
             // toggle run
             if (MoveStats.UseToggleRun)
             {
@@ -206,23 +234,6 @@ namespace CSharpScript
                 _isRunToggleActive = InputManager.RunIsHeld;
             }
 
-            vec2 scale = Transform.GetScale(OwnerName);
-            vec2 position = Transform.GetPosition(OwnerName);
-            //_ziplineHeadOffset = position.y + (scale.y / 2);
-            Physics.SetFriction(OwnerName, 0f);
-            Physics.SetMass(OwnerName, 0.0001f);
-            _moveVelocity = new vec2(0, 0);
-        }
-
-        public void OnUpdate(float deltaTime)
-        {
-            if (OwnerName == null || OwnerName == "") return;
-
-            // additional checks here
-
-            currState = PlayerState.Idle;
-            UpdatePlayerState();
-
             // Handle all timers
             _jumpBufferTimer -= deltaTime;
             _coyoteTimer -= deltaTime;
@@ -232,7 +243,6 @@ namespace CSharpScript
             JumpChecks();
             // Handle Inputs
             HandleGeneralInput();
-            CollisionChecks();
             OnFixedUpdate(fixeddt);
 
             switch(currState)
@@ -282,6 +292,8 @@ namespace CSharpScript
 
         public void OnFixedUpdate(float fixedDeltaTime)
         {
+            vec2 vel = Physics.GetVelocity(OwnerName);
+            //Debug.Log("Vel: " + vel.x.ToString() + " " + vel.y.ToString());
             //if (OwnerName == null) return;
             //CollisionChecks();
 
@@ -418,21 +430,6 @@ namespace CSharpScript
 
         private void HandleGeneralInput()
         {
-            // check for dash input
-            //if (!_isDashing && !_isWallKicking && !_isWallJumping && !_isGroundPounding)
-            //{
-            //    if (_isGrounded)
-            //    {
-            //        Move(MoveStats.GroundAcceleration, MoveStats.GroundDeceleration, InputManager.Movement, Utils.GetDelta_Time());
-            //        //Debug.Log("grounded");
-            //    }
-            //    else
-            //    {
-            //        Move(MoveStats.AirAcceleration, MoveStats.AirDeceleration, InputManager.Movement, Utils.GetDelta_Time());
-            //        //Debug.Log("air");
-            //    }
-            //}
-
             //if (InputManager.RunWasPressed && _dashCooldownTimer <= 0)
             //{
             //    InitiateDash();
@@ -536,7 +533,8 @@ namespace CSharpScript
                     int tier = GetCurrentTentacleLevel();
 
                     // air turn (visual flip only) - if in air + run held / toggled + moving fast
-                    if (!_isGrounded && isRunHeld && movespeed > MoveStats.T0_MaxSpeed)
+                    // CHANGE : if (!_isGrounded && isRunHeld && movespeed > MoveStats.T0_MaxSpeed)
+                    if (!_isGrounded && movespeed > MoveStats.T0_MaxSpeed)
                     {
                         // flip sprite
                         Turn(targetDirection > 0);
@@ -626,7 +624,9 @@ namespace CSharpScript
 
             // if in air + moving fast + turned in the opposite direction = flip the physics application
             // use rb's current velocity to detect the "real movement" direction
-            if (!_isGrounded && isRunHeld && movespeed > MoveStats.T0_MaxSpeed)
+
+            // CHANGE : if (!_isGrounded && isRunHeld && movespeed > MoveStats.T0_MaxSpeed)
+            if (!_isGrounded && movespeed > MoveStats.T0_MaxSpeed)
             {
                 // if facing right (1) but moving left (vel < -1) -> apply force left (-1)
                 if (_facingDirection == 1 && Physics.GetVelocity(OwnerName).x < -1f) moveDir = -1;
@@ -1056,6 +1056,7 @@ namespace CSharpScript
             blockMovement = true;
             _isWallSliding = false;
             _isJumping = true;
+            _numberOfJumpsUsed = 1; // CHANGE
 
             // direction - calculate away from wall [facing right (1) - wall on right - jump left (-1)]
             int jumpDir = _isFacingRight ? -1 : 1;
@@ -1308,6 +1309,7 @@ namespace CSharpScript
                     {
                         _moveVelocity.y = -MoveStats.GPFallSpeed;
                         Physics.SetVelocity(OwnerName, 0, _moveVelocity.y);
+                        CollisionChecks();
                     }
                 }
             }
@@ -1364,6 +1366,7 @@ namespace CSharpScript
             }
 
             _isGroundPounding = false;
+            Debug.Log("\n\ntargetRollSpeed: " + targetRollSpeed + "targetDuration: " + targetDuration + "\n\n");
 
             // trigger roll with calculated speed + duration
             InitiateRoll(targetRollSpeed, targetDuration);
@@ -1374,7 +1377,8 @@ namespace CSharpScript
 
         private void InitiateGlide()
         {
-            if (_isGliding || _glideCooldownTimer > 0) return;              // If cooldown not ended
+            // If cooldown not ended
+            if (_isGliding || _glideCooldownTimer > 0 || _isWallKicking) return;
 
             // Play glide sound
             //if (sounds != null && sounds.airGlide != null)
@@ -1473,7 +1477,6 @@ namespace CSharpScript
         private void IsGrounded()
         {
             bool oldIsGrounded = _isGrounded;
-            _isGrounded = false;
             vec2 position = Transform.GetPosition(OwnerName);
             vec2 scale = Transform.GetScale(OwnerName);
             float halfWidth = Math.Abs(scale.x) / 2;
@@ -1482,12 +1485,16 @@ namespace CSharpScript
             vec2 rayDirection = new vec2(0, -1);
 
             // Center raycast
+            vec2 leftRayOrigin = new vec2(position.x - halfWidth * 0.9f, bottomY);
             vec2 centerRayOrigin = new vec2(position.x, bottomY);
+            vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.9f, bottomY);
 
-            Transform.SetScale("Debugline", 5, raycastLength);
-            Transform.SetPosition("Debugline", position.x, bottomY);
+            Transform.SetScale("DebugLine", 5, raycastLength);
+            Transform.SetPosition("DebugLine", position.x, bottomY);
 
-            if (RaycastForGround(centerRayOrigin, rayDirection, raycastLength))
+            if (RaycastForGround(centerRayOrigin, rayDirection, raycastLength)
+                || RaycastForGround(leftRayOrigin, rayDirection, raycastLength)
+                || RaycastForGround(rightRayOrigin, rayDirection, raycastLength))
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
@@ -1496,35 +1503,13 @@ namespace CSharpScript
                     Audio.PlaySound("land_sfx", "sfx");
                     currState = PlayerState.Land;
                 }
+                Debug.Log("grounded");
                 return;
             }
-
-            // Left raycast
-            vec2 leftRayOrigin = new vec2(position.x - halfWidth * 0.9f, bottomY);
-            if (RaycastForGround(leftRayOrigin, rayDirection, raycastLength))
+            else
             {
-                _isGrounded = true;
-                _coyoteTimer = MoveStats.JumpCoyoteTime;
-                if (!oldIsGrounded)
-                {
-                    //Audio.PlaySound("land_sfx", "sfx");
-                    currState = PlayerState.Land;
-                }
-                return;
-            }
-
-            // Right raycast
-            vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.9f, bottomY);
-            if (RaycastForGround(rightRayOrigin, rayDirection, raycastLength))
-            {
-                _isGrounded = true;
-                _coyoteTimer = MoveStats.JumpCoyoteTime;
-                if (!oldIsGrounded)
-                {
-                    //Audio.PlaySound("land_sfx", "sfx");
-                    currState = PlayerState.Land;
-                }
-                return;
+                Debug.Log("NONONONO");
+                _isGrounded = false;
             }
         }
 
@@ -1594,5 +1579,99 @@ namespace CSharpScript
         }
 
         #endregion
+
+        public void ResetVars()
+        {
+            fRun = fJump = fIdle = fZipline = fGroundPound = fGlide = fRoll = fWallKick = false;
+
+            // movement variables
+            _moveVelocity = new vec2(0, 0);
+            _isFacingRight = true;
+            _isRunning = false;
+            _isRunToggleActive = false;
+            movespeed = 0;
+
+            // public facing right for other scripts
+            _queuedDirection = 0;
+            _facingDirection = 1;
+
+            // collision check variables
+            _isGrounded = false;
+            _bumpedHead = false;
+            _islanding = false;
+            _groundedTimer = 0;
+
+            // jump variables
+            VerticalVelocity = 0;
+            _isJumping = false;
+            _isFastFalling = false;
+            _isFalling = false;
+            _fastFallTime = 0;
+            _fastFallReleaseSpeed = 0;
+            _numberOfJumpsUsed = 0;
+
+            // wall jump variables
+            _isWallJumping = false;
+            _wallJumpTimer = 0;
+            _wallJumpDirection = 0;
+
+            // apex variables
+            _apexPoint = 0;
+            _timePastApexThreshold = 0;
+            _isPastApexThreshold = false;
+
+            // jump buffer variables
+            _jumpBufferTimer = 0;
+            _jumpReleasedDuringBuffer = false;
+
+            // coyote time variables
+            _coyoteTimer = 0;
+
+            // dash variables
+            _isDashing = false;
+            _dashTimer = 0;
+            _dashCooldownTimer = 0;
+
+            // wall kick variables
+            _isWallKicking = false;
+            wallKickFrameCounter = 0;
+            canWallKick = false;
+            blockMovement = false;
+            _wallKickTimer = 0;
+            _wallKickCooldownTimer = 0;
+            _startedWallKickInAir = false;
+            _wallKickTotalDuration = 0;
+
+            // wall slide variables
+            _isTouchingWall = false;
+            _isWallSliding = false;
+
+            // ground pound variables
+            _isGroundPounding = false;
+            _groundPoundPauseTimer = 0;
+
+            // roll variables
+            _isRolling = false;
+            _rollTimer = 0;
+
+            // glide variables
+            _isGliding = false;
+            _glideCooldownTimer = 0;
+            _timeSinceLastGlideDeduction = 0;
+
+            // zipline variables
+            _isZiplining = false;
+            _isBeingLaunched = false;
+            _ziplineCoyoteTimer = 0;
+            _ziplineHeadOffset = 0;
+
+            // movement penalties - bonk & skid
+            _bonkTimer = 0;
+            _isSkidding = false;
+            _skidTargetDirection = 0;
+            _skidTimer = 0;
+            _calculatedSkidDecel = 0;
+        }
+
     }
 }
