@@ -29,7 +29,7 @@ namespace CSharpScript
 
         // walking tiers
         public float T0_BaseSpeed = 1f * mod;       //2
-        public float T0_MaxSpeed = 2f * mod * 6;       //12
+        public float T0_MaxSpeed = 12f * mod;       //12
 
         // running tiers
         public float T1_Threshold = 18f * mod;       //18
@@ -61,7 +61,7 @@ namespace CSharpScript
 
         // Wall Bonk
         public float T3_BonkDuration = 0.8f;
-        public Vector2 T3_BonkForce = new Vector2(12f, 10f);
+        public Vector2 T3_BonkForce = new Vector2(12f * mod, 10f * mod);
 
         // Grounded/Collision Checks
         public float GroundDetectionRayLength = 10.0f;
@@ -70,18 +70,17 @@ namespace CSharpScript
 
         // Wall Checks
         public float WallDetectionBoxLength = 50.0f;            // unity is 0.05 - 0.02 (since our raycast is v diff)
-        public float WallSlidingSpeed = 4f * mod;                     // was 2
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 100f;                         // unity is 5.7f * mod
+        public float JumpHeight = 100f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
         public float T1_JumpMultiplier = 1.05f;
         public float T2_JumpMultiplier = 1.08f;
         public float T3_JumpMultiplier = 1.15f;
         public float JumpHeightCompensationFactor = 1.054f;
         public float TimeTillJumpApex = 0.35f;
         public float GravityOnReleaseMultiplier = 3.0f;         // was 1.4
-        public float MaxFallSpeed = 250f;
+        public float MaxFallSpeed = 40f * mod;
         public int NumberOfJumpsAllowed = 1;
 
         // Jump Cut
@@ -100,10 +99,18 @@ namespace CSharpScript
         // Jump Coyote Time
         public float JumpCoyoteTime = 0.1f;
 
-        // Dash
-        public float DashSpeed = 500f;
-        public float DashDuration = 0.22f;
-        public float DashCooldown = 0.5f;
+        // Wall Jump
+        public vec2 WallJumpForce = new vec2(20f * mod, 25f * mod);
+        public float WallCoyoteTime = 0.1f;
+
+        // Wall Kick
+        public float WallSlidingSpeed = 4f * mod;                     // was 2
+        public float WKBaseDuration = 0.25f;
+        public float WKCooldown = 0.5f;
+        public float WKSpeedModifier = 30f * mod;
+        public float WKVerticalModifier = 5f * mod;
+        public float WKDurationMultiplier = 0.75f;
+        // dont have tht WKEase graph thing in unity
 
         // Roll
         public float BaseRollDuration = 0.5f;       // minimum time
@@ -113,17 +120,6 @@ namespace CSharpScript
         public float MidRollSpeed = 30f * mod;
         public float MaxRollSpeed = 40f * mod;
 
-        // Wall Kick
-        public float WKBaseDuration = 0.25f;
-        public float WKCooldown = 0.5f;
-        public float WKSpeedModifier = 30f * mod;
-        public float WKVerticalModifier = 5f * mod;
-        public float WKDurationMultiplier = 0.75f;
-        // dont have tht WKEase graph thing in unity
-
-        // Wall Jump
-        public vec2 WallJumpForce = new vec2(20f * mod, 25f * mod);
-        public float WallCoyoteTime = 0.1f;
 
         // Ground Pound
         public float GPPauseTime = 0.3f;
@@ -141,7 +137,7 @@ namespace CSharpScript
 
         // Zipline Launch
         public float ZiplineLaunchDuration = 0.25f;
-        public vec2 ZiplineLaunchForce = new vec2(40f, 16f);
+        public vec2 ZiplineLaunchForce = new vec2(40f * mod, 16f * mod);
         public float ZiplineCoyoteTime = 0.2f;
         
         // Time Deduction Penalties
@@ -154,17 +150,6 @@ namespace CSharpScript
         public float GlideTimeDeduction = 1.0f;
         public float GlideDeductionInterval = 0.5f;
         public float WallKickTimeDeduction = 2.5f;
-
-        // Jump Visualization Tool
-        public bool ShowWalkJumpArc = false;
-        public bool StopOnCollision = true;
-        public bool DrawRight = true;
-        public int ArcResolution = 20;
-        public int VisualizationSteps = 90;
-
-        // Debug
-        public bool DebugShowIsGroundedBox;
-        public bool DebugShowHeadBumpBox;
 
         // Calculated values
         public float Gravity { get; private set; }

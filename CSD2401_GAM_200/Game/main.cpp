@@ -98,7 +98,7 @@ int main()
         }
 
         GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
-            "Hero_cs",
+            "Hero",
             0, 0,
             100, 100,
             "../Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Player);

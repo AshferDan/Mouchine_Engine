@@ -30,7 +30,6 @@ namespace CSharpScript
             Running,
             Falling,
             Land,
-            Dashing,
             GroundPounding,
             Rolling,
             WallKicking,
@@ -95,11 +94,6 @@ namespace CSharpScript
 
         // coyote time variables
         private float _coyoteTimer = 0;
-
-        // dash variables
-        private bool _isDashing = false;
-        private float _dashTimer = 0;
-        private float _dashCooldownTimer = 0;
 
         // wall kick variables
         private bool _isWallKicking = false;
@@ -169,7 +163,7 @@ namespace CSharpScript
             Audio.AddSound("footstep_sfx", "../Assets/audio/Player/Footstep.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.2f, 1.0f, "sfx");
-            Audio.AddSound("dash_sfx", "../Assets/audio/Player/Dash.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
 
@@ -185,9 +179,6 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero", "Falling", "../Assets/spritesheet_L.png", 13, 10, 10, 0, 10, 1, 4.0f);
             Animation.RegisterAnimation("Hero", "Land", "../Assets/spritesheet_L.png", 13, 10, 10, 3, 10, 4, 4.0f);
 
-            // Attach the player movement script to the Hero
-            CSharpScript.Scripting.AttachScript("Hero", "PlayerMovement");
-
             _isFacingRight = true;
 
             Physics.SetGravity(OwnerName, true);
@@ -199,15 +190,15 @@ namespace CSharpScript
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
 
-            CSharpScript.GameObject.CreateShape(
-                "DebugLine",
-                (int)CSharpScript.ShapeType.Square,
-                0, -200,
-                5, 5,
-                0.0f, 0.0f, 1.0f, 1.0f,
-                (int)CSharpScript.CollisionLayer.Platform,
-                false, false, false
-            );
+            //CSharpScript.GameObject.CreateShape(
+            //    "DebugLine",
+            //    (int)CSharpScript.ShapeType.Square,
+            //    0, -200,
+            //    5, 5,
+            //    0.0f, 0.0f, 1.0f, 1.0f,
+            //    (int)CSharpScript.CollisionLayer.Platform,
+            //    false, false, false
+            //);
         }
 
         public void OnUpdate(float deltaTime)
@@ -237,7 +228,6 @@ namespace CSharpScript
             // Handle all timers
             _jumpBufferTimer -= deltaTime;
             _coyoteTimer -= deltaTime;
-            _dashCooldownTimer -= deltaTime;
             _wallKickCooldownTimer -= deltaTime;
             _ziplineCoyoteTimer -= deltaTime;
             JumpChecks();
@@ -263,28 +253,32 @@ namespace CSharpScript
                     // commented out because landing is buggy
                     //Animation.PlayAnimation(OwnerName, "Land");
                     break;
-                case PlayerState.Dashing:
-                    Animation.PlayAnimation(OwnerName, "Dash");
-                    break;
                 case PlayerState.GroundPounding:
+                    Debug.Log("CurrState: " + "Groundpound");
                     Animation.PlayAnimation(OwnerName, "Groundpound");
                     break;
                 case PlayerState.Rolling:
+                    Debug.Log("CurrState: " + "Roll");
                     Animation.PlayAnimation(OwnerName, "Roll");
                     break;
                 case PlayerState.WallKicking:
+                    Debug.Log("CurrState: " + "Wallkick");
                     Animation.PlayAnimation(OwnerName, "Wallkick");
                     break;
                 case PlayerState.Ziplining:
+                    Debug.Log("CurrState: " + "Zipline");
                     Animation.PlayAnimation(OwnerName, "Zipline");
                     break;
                 case PlayerState.Gliding:
+                    Debug.Log("CurrState: " + "Glide");
                     Animation.PlayAnimation(OwnerName, "Glide");
                     break;
                 case PlayerState.WallSliding:
+                    Debug.Log("CurrState: " + "Wallslide");
                     Animation.PlayAnimation(OwnerName, "Wallslide");
                     break;
                 case PlayerState.WallJumping:
+                    Debug.Log("CurrState: " + "Wallkick");
                     Animation.PlayAnimation(OwnerName, "Wallkick");
                     break;
             }
@@ -430,10 +424,6 @@ namespace CSharpScript
 
         private void HandleGeneralInput()
         {
-            //if (InputManager.RunWasPressed && _dashCooldownTimer <= 0)
-            //{
-            //    InitiateDash();
-            //}
             if (InputManager.WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
             {
                 InitiateWallKick();
@@ -916,8 +906,9 @@ namespace CSharpScript
 
                 //// trigger Land animation
                 //if (_animator != null) _animator.SetTrigger("Land");
-                Audio.PlaySound("land_sfx", "sfx");
+                //Audio.PlaySound("land_sfx", "sfx");
                 currState = PlayerState.Land;
+                EnterState(currState);
 
                 // wallkick() grounded check
                 if (_isWallKicking) StopWallKick();
@@ -951,8 +942,15 @@ namespace CSharpScript
 
             //// play jump audio
             //if (sounds != null && sounds.jump != null) AudioManager.instance.PlayPlayerSFX(sounds.jump);
-            Audio.PlaySound("jump_sfx", "sfx");
+            //Audio.PlaySound("jump_sfx", "sfx");
+            if (!_isGrounded || numberOfJumpsUsed > MoveStats.NumberOfJumpsAllowed)
+            {
+                _isJumping = false;
+                return;
+            }
+
             currState = PlayerState.Jumping;
+            EnterState(currState);
 
             if (_isRolling)
             {
@@ -1080,6 +1078,10 @@ namespace CSharpScript
             _isJumping = true;
             _numberOfJumpsUsed = 1; // CHANGE
 
+            //Audio.PlaySound("wallkick_sfx", "sfx");
+            currState = PlayerState.WallJumping;
+            EnterState(currState);
+
             // direction - calculate away from wall [facing right (1) - wall on right - jump left (-1)]
             int jumpDir = _isFacingRight ? -1 : 1;
 
@@ -1103,7 +1105,9 @@ namespace CSharpScript
             if (_isWallKicking) return;     // remove this if causing issues - not in unity
 
             _isWallKicking = true;
-            Audio.PlaySound("wallkick_sfx", "sfx");
+            //Audio.PlaySound("wallkick_fast_sfx", "sfx");
+            currState = PlayerState.WallKicking;
+            EnterState(currState);
 
             fWallKick = true;
             blockMovement = true; // lock movement
@@ -1188,8 +1192,9 @@ namespace CSharpScript
             //if (sounds != null && sounds.roll != null)
             //    AudioManager.Instance.PlayPlayerSFX(sounds.roll);
 
-            Audio.PlaySound("roll_sfx", "sfx");
+            //Audio.PlaySound("roll_sfx", "sfx");
             currState = PlayerState.Rolling;
+            EnterState(currState);
 
             fRoll = true;
             _isRolling = true;
@@ -1281,15 +1286,16 @@ namespace CSharpScript
         #region Ground Pound
         private void InitiateGroundPound()
         {
-            if (_isGroundPounding || _isGliding) return;
+            if (_isGroundPounding || _isGliding || _isWallSliding) return;
 
             // Play sound if assigned
             //if (sounds != null && sounds.groundPound != null)
             //{
             //    AudioManager.Instance.PlayPlayerSFX(sounds.groundPound);
             //}
-            Audio.PlaySound("groundpound_sfx", "sfx");
+            //Audio.PlaySound("groundpound_sfx", "sfx");
             currState = PlayerState.GroundPounding;
+            EnterState(currState);
 
             fGroundPound = true; // time deduction
             _isGroundPounding = true;
@@ -1309,21 +1315,20 @@ namespace CSharpScript
 
         private void GroundPound()
         {
-            currState = PlayerState.GroundPounding;
             if (_isGroundPounding)
             {
-                if (_groundPoundPauseTimer > 0)
+                currState = PlayerState.GroundPounding;
+                if (_groundPoundPauseTimer > 0 && !_isWallSliding && !_isGrounded)
                 {
                     // freeze in air
                     // maybe pause sound effect?
-                    Debug.Log(_groundPoundPauseTimer.ToString());
                     _groundPoundPauseTimer -= fixeddt;
                     Physics.SetVelocity(OwnerName, 0,0);
                     transform.position = lastPos;
                 }
                 else
                 {
-                    if (_isGrounded)
+                    if (_isGrounded || _isWallSliding)
                     {
                         blockMovement = false;
                         StopGroundPound();
@@ -1472,6 +1477,56 @@ namespace CSharpScript
             return new vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
         }
 
+        private void EnterState(PlayerState state)
+        {
+            // handles playing of sound effects
+            switch (state)
+            {
+                case PlayerState.Idle:
+                    break;
+                case PlayerState.Jumping:
+                    Audio.PlaySound("jump_sfx", "sfx");
+                    break;
+                case PlayerState.Running:
+                    Audio.PlaySound("footstep_sfx", "sfx");
+                    break;
+                case PlayerState.Falling:
+                    // need find out how do looping sound till out of state
+                    break;
+                case PlayerState.Land:
+                    Audio.PlaySound("land_sfx", "sfx");
+                    break;
+                case PlayerState.GroundPounding:
+                    Debug.Log("CurrState: " + "Groundpound");
+                    Audio.PlaySound("groundpound_sfx", "sfx");
+                    break;
+                case PlayerState.Rolling:
+                    Debug.Log("CurrState: " + "Roll");
+                    Audio.PlaySound("roll_sfx", "sfx");
+                    break;
+                case PlayerState.WallJumping:
+                    Debug.Log("CurrState: " + "Wallkick");
+                    Audio.PlaySound("wallkick_sfx", "sfx");
+                    break;
+                case PlayerState.WallKicking:
+                    Debug.Log("CurrState: " + "Wallkick");
+                    Audio.PlaySound("wallkick_fast_sfx", "sfx");
+                    break;
+                case PlayerState.Ziplining:
+                    Debug.Log("CurrState: " + "Zipline");
+                    // need find out how do looping sound till out of state
+                    break;
+                case PlayerState.Gliding:
+                    Debug.Log("CurrState: " + "Glide");
+                    // need find out how do looping sound till out of state
+                    break;
+                case PlayerState.WallSliding:
+                    Debug.Log("CurrState: " + "Wallslide");
+                    // need find out how do looping sound till out of state
+                    break;
+            }
+        }
+
         #region Collison Checks
 
         private void CollisionChecks()
@@ -1512,8 +1567,9 @@ namespace CSharpScript
             vec2 centerRayOrigin = new vec2(position.x, bottomY);
             vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.9f, bottomY);
 
-            Transform.SetScale("DebugLine", 5, raycastLength);
-            Transform.SetPosition("DebugLine", position.x, bottomY - raycastLength/2);
+            // debug for ground check raycast
+            //Transform.SetScale("DebugLine", 5, raycastLength);
+            //Transform.SetPosition("DebugLine", position.x, bottomY - raycastLength/2);
 
             if (RaycastForGround(centerRayOrigin, rayDirection, raycastLength)
                 || RaycastForGround(leftRayOrigin, rayDirection, raycastLength)
@@ -1523,8 +1579,9 @@ namespace CSharpScript
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
                 if (!oldIsGrounded)
                 {
-                    Audio.PlaySound("land_sfx", "sfx");
+                    //Audio.PlaySound("land_sfx", "sfx");
                     currState = PlayerState.Land;
+                    EnterState(currState);
                 }
                 return;
             }
@@ -1647,11 +1704,6 @@ namespace CSharpScript
 
             // coyote time variables
             _coyoteTimer = 0;
-
-            // dash variables
-            _isDashing = false;
-            _dashTimer = 0;
-            _dashCooldownTimer = 0;
 
             // wall kick variables
             _isWallKicking = false;
