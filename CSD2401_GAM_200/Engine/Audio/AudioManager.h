@@ -251,8 +251,9 @@ public:
      */
     void ResetFadeStates();
 
-private:
-    // Fade state tracking
+    /**
+     * @brief Fade state tracking structure (public for UI access).
+     */
     struct FadeState {
         bool isFading = false;
         bool isFadeIn = false;  // true for fade in, false for fade out
@@ -261,5 +262,12 @@ private:
         float currentTime = 0.0f;
         float duration = 1.0f;
     };
+
+    /**
+     * @brief Gets the fade states for all categories (for UI display).
+     */
+    const std::map<std::string, FadeState>& GetFadeStates() const { return categoryFadeStates; }
+
+private:
     std::map<std::string, FadeState> categoryFadeStates;
 };

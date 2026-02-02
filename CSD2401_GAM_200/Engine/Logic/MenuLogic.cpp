@@ -173,15 +173,15 @@ void MenuLogicSystem::Update(float dt)
         // Start small delay before loading scene
         if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton" && hoveredButtonName != "BackButton")
         {
-            // Start audio fade out for scene transitions (specifically for PlayButton)
+            // Start audio fade out for scene transitions
             if (hoveredButtonName == "PlayButton" && audioManager)
             {
-                audioManager->FadeOutCategory("music", 0.90f);  // Fade out music over 0.90 seconds
+                audioManager->FadeOutCategory("music", 1.2f);  // Fade out over 1.2 secs
                 std::cout << "[MenuLogic] Started music fade out" << std::endl;
             }
 
             pendingSceneChange = true;
-            pendingTimer = 0.90f;                       // Match fade duration for smooth transition
+            pendingTimer = 1.2f;                       // Wait for fade to complete before loading scene
         }
         else
         {
