@@ -16,6 +16,7 @@ using System;
 using CSharpScript;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace CSharpScript
 {
@@ -31,6 +32,7 @@ namespace CSharpScript
             Falling,
             Land,
             GroundPounding,
+            GroundPounding_Falling,
             Rolling,
             WallKicking,
             Ziplining,
@@ -40,6 +42,7 @@ namespace CSharpScript
         };
 
         private PlayerState currState = PlayerState.Idle;
+        private PlayerState[] loopingSounds = { PlayerState.Walking, PlayerState.Falling, PlayerState.GroundPounding_Falling, PlayerState.Ziplining, PlayerState.Gliding, PlayerState.WallSliding };
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
@@ -161,9 +164,10 @@ namespace CSharpScript
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("footstep_sfx", "../Assets/audio/Player/Footstep.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.2f, 1.0f, "sfx");
-            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
+            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", true, 0.5f, 2.0f, "sfx");
+            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.1f, 1.25f, "sfx");
+            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.5f, 1.35f, "sfx");
             Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
 
@@ -422,6 +426,7 @@ namespace CSharpScript
             //if (_islanding) { currState = PlayerState.Land; }
         }
 
+        static bool jumpFullyReleased = false;
         private void HandleGeneralInput()
         {
             if (InputManager.WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
@@ -436,13 +441,30 @@ namespace CSharpScript
             {
                 InitiateRoll();
             }
-            if (InputManager.GlideIsHeld && !_isGrounded)
+
+            // oh my god gliding and jumping with space is so damn mafan
+            // sets flag to enable 1 input of InitGlide()
+            if (InputManager.JumpWasReleased && _numberOfJumpsUsed >= MoveStats.NumberOfJumpsAllowed)
+            {
+                jumpFullyReleased = true;
+            }
+
+            // only enable gliding when exhausted jumps
+            if (jumpFullyReleased && InputManager.JumpWasPressed && !_isGrounded && !_isGliding)
             {
                 InitiateGlide();
+                jumpFullyReleased = false; 
             }
-            else if (_isGliding) // if key was let go but still in gliding state, cancel gliding action
+
+            // release space - cancel glide
+            if (_isGliding && InputManager.JumpWasReleased)
             {
                 StopGlide();
+            }
+
+            if (_isGrounded)
+            {
+                jumpFullyReleased = false;
             }
         }
 
@@ -1286,7 +1308,7 @@ namespace CSharpScript
         #region Ground Pound
         private void InitiateGroundPound()
         {
-            if (_isGroundPounding || _isGliding || _isWallSliding) return;
+            if (_isGroundPounding || _isGliding || _isWallSliding || _isGrounded) return;
 
             // Play sound if assigned
             //if (sounds != null && sounds.groundPound != null)
@@ -1313,11 +1335,11 @@ namespace CSharpScript
             lastPos = transform.position;
         }
 
+        static bool gp_falling = false;
         private void GroundPound()
         {
             if (_isGroundPounding)
             {
-                currState = PlayerState.GroundPounding;
                 if (_groundPoundPauseTimer > 0 && !_isWallSliding && !_isGrounded)
                 {
                     // freeze in air
@@ -1325,16 +1347,24 @@ namespace CSharpScript
                     _groundPoundPauseTimer -= fixeddt;
                     Physics.SetVelocity(OwnerName, 0,0);
                     transform.position = lastPos;
+                    gp_falling = false;
                 }
                 else
                 {
                     if (_isGrounded || _isWallSliding)
                     {
                         blockMovement = false;
+                        gp_falling = false;
                         StopGroundPound();
                     }
                     else
                     {
+                        if (!gp_falling)
+                        {
+                            currState = PlayerState.GroundPounding_Falling;
+                            EnterState(currState);
+                        }
+                        gp_falling = true;
                         _moveVelocity.y = -MoveStats.GPFallSpeed;
                         Physics.SetVelocity(OwnerName, 0, _moveVelocity.y);
                         CollisionChecks();
@@ -1406,11 +1436,10 @@ namespace CSharpScript
         private void InitiateGlide()
         {
             // If cooldown not ended
-            if (_isGliding || _glideCooldownTimer > 0 || _isWallKicking) return;
+            if (_isGliding || _glideCooldownTimer > 0 || _isWallKicking || _isGroundPounding || _isGrounded || gp_falling) return;
 
-            // Play glide sound
-            //if (sounds != null && sounds.airGlide != null)
-            //    AudioManager.Instance.PlayPlayerSFX(sounds.airGlide);
+            currState = PlayerState.Gliding;
+            EnterState(currState);
             _isGliding = true;
         }
 
@@ -1479,27 +1508,44 @@ namespace CSharpScript
 
         private void EnterState(PlayerState state)
         {
+            Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
+
+            // doesnt work for some reason
+            //if (loopingSounds.Contains(state))
+            //{
+            //    Debug.Log("FOUD");
+            //    Audio.StopAllSounds();
+            //}
+
             // handles playing of sound effects
             switch (state)
             {
                 case PlayerState.Idle:
+                    Debug.Log("CurrState: " + "Idle");
                     break;
                 case PlayerState.Jumping:
+                    Debug.Log("CurrState: " + "Jumping");
                     Audio.PlaySound("jump_sfx", "sfx");
                     break;
                 case PlayerState.Running:
+                    Debug.Log("CurrState: " + "Running");
                     Audio.PlaySound("footstep_sfx", "sfx");
                     break;
                 case PlayerState.Falling:
                     // need find out how do looping sound till out of state
                     break;
                 case PlayerState.Land:
+                    Debug.Log("CurrState: " + "Landed");
                     Audio.PlaySound("land_sfx", "sfx");
                     break;
                 case PlayerState.GroundPounding:
                     Debug.Log("CurrState: " + "Groundpound");
                     Audio.PlaySound("groundpound_sfx", "sfx");
                     break;
+                case PlayerState.GroundPounding_Falling:
+                    Debug.Log("CurrState: " + "Groundpound_falling");
+                    Audio.PlaySound("groundpound_falling_sfx", "sfx");
+                break;
                 case PlayerState.Rolling:
                     Debug.Log("CurrState: " + "Roll");
                     Audio.PlaySound("roll_sfx", "sfx");
@@ -1518,7 +1564,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.Gliding:
                     Debug.Log("CurrState: " + "Glide");
-                    // need find out how do looping sound till out of state
+                    Audio.PlaySound("groundpound_falling_sfx", "sfx");
                     break;
                 case PlayerState.WallSliding:
                     Debug.Log("CurrState: " + "Wallslide");
