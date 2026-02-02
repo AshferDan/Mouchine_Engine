@@ -50,8 +50,9 @@ TilemapEditor::TilemapEditor()
     showLoadDialog(false),
     showTilesetLoadDialog(false),
     showNewTilemapDialog(false),
-    tempMapWidth(20),
-    tempMapHeight(15)
+    tempMapWidth(500),
+    tempMapHeight(500),
+    highlightCurrentLayer(true)
 {
     // Initialize filepath buffers
     std::memset(saveFilepath, 0, sizeof(saveFilepath));
@@ -215,12 +216,12 @@ void TilemapEditor::Render()
         ImGui::Text("Width (tiles):");
         ImGui::InputInt("##mapwidth", &tempMapWidth);
         if (tempMapWidth < 1) tempMapWidth = 1;
-        if (tempMapWidth > 200) tempMapWidth = 200;
+        if (tempMapWidth > 2000) tempMapWidth = 2000;
 
         ImGui::Text("Height (tiles):");
         ImGui::InputInt("##mapheight", &tempMapHeight);
         if (tempMapHeight < 1) tempMapHeight = 1;
-        if (tempMapHeight > 200) tempMapHeight = 200;
+        if (tempMapHeight > 2000) tempMapHeight = 2000;
 
         ImGui::Spacing();
         ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "Warning: This will clear the current tilemap!");
@@ -249,7 +250,23 @@ void TilemapEditor::Render()
 void TilemapEditor::Update(float dt)
 {
     (void)dt;
-    // Update logic if needed
+    if (!isVisible)
+        return;
+
+    // Handle undo/redo keyboard shortcuts
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Ctrl+Z for Undo
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z))
+    {
+        PerformUndo();
+    }
+
+    // Ctrl+Y for Redo
+    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y))
+    {
+        PerformRedo();
+    }
 }
 
 /**
@@ -292,6 +309,21 @@ void TilemapEditor::RenderMenuBar()
             {
                 ClearTilemap();
             }
+
+            if (ImGui::MenuItem("Undo", "Ctrl+Z", false, !undoStack.empty()))
+            {
+                PerformUndo();
+            }
+
+            if (ImGui::MenuItem("Redo", "Ctrl+Y", false, !redoStack.empty()))
+            {
+                PerformRedo();
+            }
+
+            ImGui::Separator();
+
+            ImGui::Text("Undo Stack: %zu", undoStack.size());
+            ImGui::Text("Redo Stack: %zu", redoStack.size());
 
             ImGui::EndMenu();
         }
@@ -402,6 +434,16 @@ void TilemapEditor::RenderTilemapCanvas()
                         255
                     );
                     drawList->AddRectFilled(tilePos, tileEnd, tileColor);
+                }
+
+                // HIGHLIGHT CURRENT LAYER TILES
+                if (highlightCurrentLayer && layer == currentLayer)
+                {
+                    // Draw a colored outline around tiles on the current layer
+                    ImU32 highlightColor = IM_COL32(255, 255, 0, 150); // Yellow with transparency
+                    float thickness = 2.0f;
+
+                    drawList->AddRect(tilePos, tileEnd, highlightColor, 0.0f, 0, thickness);
                 }
 
                 // Draw collision overlay
@@ -691,7 +733,7 @@ void TilemapEditor::RenderPropertiesPanel()
         if (ImGui::InputInt("Width (tiles)##mapwidth", &newWidth))
         {
             if (newWidth < 1) newWidth = 1;
-            if (newWidth > 200) newWidth = 200;
+            if (newWidth > 2000) newWidth = 2000;
             if (newWidth != tilemapWidth)
             {
                 ResizeTilemap(newWidth, tilemapHeight);
@@ -703,7 +745,7 @@ void TilemapEditor::RenderPropertiesPanel()
         if (ImGui::InputInt("Height (tiles)##mapheight", &newHeight))
         {
             if (newHeight < 1) newHeight = 1;
-            if (newHeight > 200) newHeight = 200;
+            if (newHeight > 2000) newHeight = 2000;
             if (newHeight != tilemapHeight)
             {
                 ResizeTilemap(tilemapWidth, newHeight);
@@ -730,6 +772,9 @@ void TilemapEditor::RenderLayersPanel()
     if (ImGui::CollapsingHeader("Layers", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Draw order: Bottom to Top");
+        ImGui::Separator();
+
+        ImGui::Checkbox("Highlight Current Layer", &highlightCurrentLayer);
         ImGui::Separator();
 
         // Draw layers in reverse order so they appear bottom-to-top visually
@@ -1058,8 +1103,18 @@ void TilemapEditor::PaintTile(int gridX, int gridY)
     if (!IsValidGridPos(gridX, gridY))
         return;
 
+    // RECORD OLD STATE
+    TileData oldTile = tilemap[currentLayer][gridY][gridX];
+
+    // Apply new tile
     tilemap[currentLayer][gridY][gridX].tileID = selectedTileID;
     tilemap[currentLayer][gridY][gridX].isCollidable = paintCollision;
+
+    // RECORD NEW STATE
+    TileData newTile = tilemap[currentLayer][gridY][gridX];
+
+    // RECORD FOR UNDO
+    RecordTileEdit(currentLayer, gridX, gridY, oldTile, newTile);
 }
 
 /**
@@ -1070,7 +1125,18 @@ void TilemapEditor::EraseTile(int gridX, int gridY)
     if (!IsValidGridPos(gridX, gridY))
         return;
 
+    // RECORD OLD STATE
+    TileData oldTile = tilemap[currentLayer][gridY][gridX];
+
+    // Erase tile
     tilemap[currentLayer][gridY][gridX].tileID = -1;
+    tilemap[currentLayer][gridY][gridX].isCollidable = false;
+
+    // RECORD NEW STATE
+    TileData newTile = tilemap[currentLayer][gridY][gridX];
+
+    // RECORD FOR UNDO
+    RecordTileEdit(currentLayer, gridX, gridY, oldTile, newTile);
 }
 
 /**
@@ -1483,4 +1549,88 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
             }
         }
     }
+}
+
+/**
+ * @brief Record a tile edit for undo/redo
+ */
+void TilemapEditor::RecordTileEdit(int layer, int x, int y, const TileData& oldTile, const TileData& newTile)
+{
+    // Don't record if nothing changed
+    if (oldTile.tileID == newTile.tileID && oldTile.isCollidable == newTile.isCollidable)
+        return;
+
+    TileEditAction action;
+    action.layer = layer;
+    action.x = x;
+    action.y = y;
+    action.oldTile = oldTile;
+    action.newTile = newTile;
+
+    undoStack.push_back(action);
+
+    // Limit stack size
+    if (undoStack.size() > MAX_UNDO_STACK_SIZE)
+    {
+        undoStack.erase(undoStack.begin());
+    }
+
+    // Clear redo stack when new edit is made
+    redoStack.clear();
+}
+
+/**
+ * @brief Undo the last tile edit
+ */
+void TilemapEditor::PerformUndo()
+{
+    if (undoStack.empty())
+    {
+        std::cout << "[TilemapEditor] Nothing to undo" << std::endl;
+        return;
+    }
+
+    TileEditAction action = undoStack.back();
+    undoStack.pop_back();
+
+    // Restore old tile state
+    if (action.layer >= 0 && action.layer < maxLayers &&
+        action.x >= 0 && action.x < tilemapWidth &&
+        action.y >= 0 && action.y < tilemapHeight)
+    {
+        tilemap[action.layer][action.y][action.x] = action.oldTile;
+    }
+
+    // Add to redo stack
+    redoStack.push_back(action);
+
+    std::cout << "[TilemapEditor] Undo performed" << std::endl;
+}
+
+/**
+ * @brief Redo the last undone tile edit
+ */
+void TilemapEditor::PerformRedo()
+{
+    if (redoStack.empty())
+    {
+        std::cout << "[TilemapEditor] Nothing to redo" << std::endl;
+        return;
+    }
+
+    TileEditAction action = redoStack.back();
+    redoStack.pop_back();
+
+    // Restore new tile state
+    if (action.layer >= 0 && action.layer < maxLayers &&
+        action.x >= 0 && action.x < tilemapWidth &&
+        action.y >= 0 && action.y < tilemapHeight)
+    {
+        tilemap[action.layer][action.y][action.x] = action.newTile;
+    }
+
+    // Add back to undo stack
+    undoStack.push_back(action);
+
+    std::cout << "[TilemapEditor] Redo performed" << std::endl;
 }

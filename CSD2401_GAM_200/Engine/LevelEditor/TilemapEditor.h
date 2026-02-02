@@ -179,6 +179,11 @@ private:
     ImVec2 GetTileUV0(int tileID) const;
     ImVec2 GetTileUV1(int tileID) const;
 
+    // Helper functions for undo/redo
+    void RecordTileEdit(int layer, int x, int y, const TileData& oldTile, const TileData& newTile);
+    void PerformUndo();
+    void PerformRedo();
+
 private:
     bool isVisible;
 
@@ -237,6 +242,23 @@ private:
     bool showNewTilemapDialog;
     int tempMapWidth;
     int tempMapHeight;
+
+    // Layer highlighting
+    bool highlightCurrentLayer;
+
+    // Undo/Redo system
+    struct TileEditAction
+    {
+        int layer;
+        int x;
+        int y;
+        TileData oldTile;  // Tile state before the edit
+        TileData newTile;  // Tile state after the edit
+    };
+
+    std::vector<TileEditAction> undoStack;
+    std::vector<TileEditAction> redoStack;
+    static constexpr int MAX_UNDO_STACK_SIZE = 100;
 };
 
 /**
