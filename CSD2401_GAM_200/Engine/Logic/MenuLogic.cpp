@@ -15,6 +15,8 @@ Technology is prohibited.
 #include "MenuLogic.h"
 #include <iostream>
 
+std::string introPath = "../Assets/Cutscene_M3.mpeg";
+
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens {
     Home = 0,       // Normal landing page
@@ -24,6 +26,13 @@ MenuScreens currScreen = MenuScreens::Home;
 
 void MenuLogicSystem::Update(float dt)
 {
+    // Update audio fade
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->UpdateFade(dt);
+    }
+
     // if a scene change is pending, count down timer first so the click sound can be played
     if (pendingSceneChange)
     {
@@ -35,9 +44,27 @@ void MenuLogicSystem::Update(float dt)
                 if (hoveredButtonName == "PlayButton")
                 {
                     std::cout << "PlayButton Clicked!" << std::endl;
-                    std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                    CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
-                    std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
+
+                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+                    if (!cutscene->HasFinished(introPath)) {    // FIRST CLICK: Play Cutscene
+                        if (!cutscene->IsPlaying()) {
+                            cutscene->PlayVideo(introPath);
+                        }
+                        // Stay in the menu, video plays on top. Fade music back in after the fade out.
+                        AudioManager* audioManager = CORE->GetAudioManager();
+                        if (audioManager)
+                        {
+                            audioManager->FadeInCategory("music", 1.0f);
+                            std::cout << "[MenuLogic] Fading music back in after cutscene trigger" << std::endl;
+                        }
+                    }
+                    else {                                      // SECOND CLICK: Video has finished, load the game
+                        std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                        std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
+                        CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
+                        std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
+                    }
+
                 }
                 else if (hoveredButtonName == "SettingsButton")
                 {
@@ -54,7 +81,7 @@ void MenuLogicSystem::Update(float dt)
                 }
             }
 
-            // clear 
+            // clear
             pendingSceneChange = false;
             hoveredButtonName.clear();
         }
@@ -166,8 +193,15 @@ void MenuLogicSystem::Update(float dt)
         // Start small delay before loading scene
         if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton" && hoveredButtonName != "BackButton")
         {
+            // Start audio fade out for scene transitions
+            if (hoveredButtonName == "PlayButton" && audioManager)
+            {
+                audioManager->FadeOutCategory("music", 1.2f);  // Fade out over 1.2 secs
+                std::cout << "[MenuLogic] Started music fade out" << std::endl;
+            }
+
             pendingSceneChange = true;
-            pendingTimer = 0.75f;                       // 400(changed to 750)ms delay to let click sound play (only not for settings)
+            pendingTimer = 1.5f;                       // Wait 1.5s so 1.2s fade completes before scene loads
         }
         else
         {

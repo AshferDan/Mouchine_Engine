@@ -440,6 +440,24 @@ void InputManager::Update(float dt)
     TransformComponent* transform = player->GetComponent<TransformComponent>();
     if (!transform) return;
 
+    // ===== PARTICLE TESTING SETUP
+    
+    //auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
+
+    //if (!dashTrail) {
+    //    // If it doesn't exist, add it and configure it once
+    //    dashTrail = player->AddComponent<ParticleEmitterComponent>();
+    //    if (dashTrail) {
+    //        dashTrail->ConfigureDashTrail();
+    //        dashTrail->SetTexture(0);
+    //        std::cout << "Particle Emitter initialized successfully\n";
+    //    }
+    //    else {
+    //        std::cerr << "particle not initialized properly\n";
+    //    }
+    //}
+
+
     // =====KINEMATIC SETUP=====
     static bool kinematicInitialized = false;
     if (!kinematicInitialized) {
@@ -476,6 +494,14 @@ void InputManager::Update(float dt)
         if (!aDebugPrinted) {
             std::cout << "[InputManager] A key pressed - moving left" << std::endl;
             aDebugPrinted = true;
+        }
+
+        //Particle Effect Testing
+        isDashing = true;
+        auto* emitter = player->GetComponent<ParticleEmitterComponent>();
+        if (emitter) {
+            emitter->StartEmission();
+            std::cout << "Particle is emitting \n\n";
         }
 
         // Only apply movement if not blocked by wall
