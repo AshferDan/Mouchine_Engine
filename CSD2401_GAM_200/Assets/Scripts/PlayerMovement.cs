@@ -967,7 +967,29 @@ namespace CSharpScript
 
             _jumpBufferTimer = 0f;
             _numberOfJumpsUsed += numberOfJumpsUsed;
-            VerticalVelocity = MoveStats.InitialJumpVelocity;
+
+            // calculate jump velocity based on tent speed
+            float jumpMultiplier = 1f; // default (walk / idle)
+            int tent = GetCurrentTentacleLevel();
+
+            if (tent == 1)
+            {
+                jumpMultiplier = MoveStats.T1_JumpMultiplier;
+            }
+            else if (tent == 2)
+            {
+                jumpMultiplier = MoveStats.T2_JumpMultiplier;
+            }
+            else if (tent == 3)
+            {
+                jumpMultiplier = MoveStats.T3_JumpMultiplier;
+            }
+
+            // apply base velocity * tent multiplier
+            VerticalVelocity = MoveStats.InitialJumpVelocity * jumpMultiplier;
+
+            // CHANGE - MAX SPEED = HIGHER JUMP VerticalVelocity = MoveStats.InitialJumpVelocity;
+
         }
 
         #endregion
@@ -1294,7 +1316,8 @@ namespace CSharpScript
                 {
                     // freeze in air
                     // maybe pause sound effect?
-                    _groundPoundPauseTimer -= dt;
+                    Debug.Log(_groundPoundPauseTimer.ToString());
+                    _groundPoundPauseTimer -= fixeddt;
                     Physics.SetVelocity(OwnerName, 0,0);
                     transform.position = lastPos;
                 }
@@ -1390,7 +1413,7 @@ namespace CSharpScript
         {
             if (_glideCooldownTimer > 0)
             {
-                _glideCooldownTimer -= dt;
+                _glideCooldownTimer -= fixeddt;
             }
 
             // if cooldown ready + input pressed
@@ -1408,7 +1431,7 @@ namespace CSharpScript
                 else
                 {
                     // Timer for periodic time deduction
-                    _timeSinceLastGlideDeduction += dt;
+                    _timeSinceLastGlideDeduction += fixeddt;
                     if (_timeSinceLastGlideDeduction >= MoveStats.GlideDeductionInterval)
                     {
                         fGlide = true; // Set the flag for the TimerManager
@@ -1468,7 +1491,7 @@ namespace CSharpScript
             else
             {
                 // if not on wall - start counting down for coyote time
-                _wallJumpTimer -= dt; // Assumes GetDeltaTime is accessible
+                _wallJumpTimer -= fixeddt; // Assumes GetDeltaTime is accessible
             }
 
             canWallKick = _isTouchingWall;
@@ -1480,8 +1503,8 @@ namespace CSharpScript
             vec2 position = Transform.GetPosition(OwnerName);
             vec2 scale = Transform.GetScale(OwnerName);
             float halfWidth = Math.Abs(scale.x) / 2;
-            float bottomY = position.y - (scale.y / 2.1f);
-            float raycastLength = MoveStats.GroundDetectionRayLength;
+            float bottomY = position.y;                         // need to start raycast from middle of player and add extra length for raycast bc of bug where player gets stuck in ground
+            float raycastLength = MoveStats.GroundDetectionRayLength + (scale.y / 2.1f);
             vec2 rayDirection = new vec2(0, -1);
 
             // Center raycast
@@ -1490,7 +1513,7 @@ namespace CSharpScript
             vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.9f, bottomY);
 
             Transform.SetScale("DebugLine", 5, raycastLength);
-            Transform.SetPosition("DebugLine", position.x, bottomY);
+            Transform.SetPosition("DebugLine", position.x, bottomY - raycastLength/2);
 
             if (RaycastForGround(centerRayOrigin, rayDirection, raycastLength)
                 || RaycastForGround(leftRayOrigin, rayDirection, raycastLength)
@@ -1503,12 +1526,10 @@ namespace CSharpScript
                     Audio.PlaySound("land_sfx", "sfx");
                     currState = PlayerState.Land;
                 }
-                Debug.Log("grounded");
                 return;
             }
             else
             {
-                Debug.Log("NONONONO");
                 _isGrounded = false;
             }
         }

@@ -77,7 +77,7 @@ int main()
         GameObject* testObj = GameObjectFactory::Instance().CreateShape(
             "MyTestSquare",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
-            -200.0f, 0.0f,                      // Center of screen
+            -200.0f, 400.0f,                      // Center of screen
             100.0f, 100.0f,                  // Size
             vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
         );
