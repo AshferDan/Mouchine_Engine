@@ -48,6 +48,7 @@ extern double g_totalLoopTime;
  * @param scale[2]	(Width, Height)
  * @param rot		Rotation of GO
  * @param color		Vec4 holding colour of GO
+ * @param collider
  */
 struct TempGOData
 {
@@ -58,6 +59,11 @@ struct TempGOData
     float scale[2]{50.f, 50.f};
     float rot{0.f}; // = transform->GetRotation();
     ImVec4 color{0.f, 0.f, 0.f, 1.f};
+
+    bool addCollider = false;
+    int colType = 0; // 0 for Square, 1 for Circle
+    float colSize[2] = { 100.0f, 100.0f };
+    int colLayer = 5; // Default index for "Default" layer
 };
 
 // GO CREATION MENU VARS
@@ -671,6 +677,26 @@ void GOCreationMenu_Render()
         {
         } // Slider for GO rot
 
+        ImGui::Separator();
+
+       // Game Object Collider
+        ImGui::Checkbox("Add Collider", &tempGO.addCollider);
+
+        if (tempGO.addCollider)
+        {
+            ImGui::Indent();
+
+            const char* colTypes[] = { "Square", "Circle" };
+            ImGui::Combo("Type", &tempGO.colType, colTypes, IM_ARRAYSIZE(colTypes));
+
+            ImGui::DragFloat2("Size", tempGO.colSize, 1.0f);
+
+            const char* layers[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+            ImGui::Combo("Layer", &tempGO.colLayer, layers, IM_ARRAYSIZE(layers));
+
+            ImGui::Unindent();
+        }
+
         // Generate Game Object
         ImGui::Text("  ");
         if (ImGui::Button("Generate")) // Button to create new GO
@@ -1116,6 +1142,8 @@ void GOCreationMenu_Spawn()
     float rot = tempGO.rot;
     vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
     std::string name = tempGO.name;
+    ColliderComponent::Type cType = (tempGO.colType == 0) ? ColliderComponent::Type::Square : ColliderComponent::Type::Circle;
+    CollisionLayer cLayer = static_cast<CollisionLayer>(tempGO.colLayer);
 
     // Construct message and send
     CreateObjectMessage msg(
@@ -1123,7 +1151,11 @@ void GOCreationMenu_Spawn()
         objType,                // Shape if is Empty or Basic
         shapeType,              // ShapeType
         pos, scale, rot,        // Transform
-        color                   // Colour
+        color,               // Colour
+        tempGO.addCollider,
+        cType,
+        tempGO.colSize[0], tempGO.colSize[1],
+        cLayer
     );
 
     std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;

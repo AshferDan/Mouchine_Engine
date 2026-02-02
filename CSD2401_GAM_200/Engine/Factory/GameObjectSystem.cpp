@@ -119,7 +119,13 @@ Technology is prohibited.
          //go->AddComponent<PhysicsComponent>();
 
          // --- Collider ---
-         go->AddComponent<ColliderComponent>();
+         auto* collider = go->AddComponent<ColliderComponent>();
+         if (collider) 
+         {
+             collider->setColliShape(msg.colType);
+             collider->SetSize(msg.colSize[0], msg.colSize[1]);
+             collider->SetLayer(msg.colLayer);
+         }
 
          break;
      }

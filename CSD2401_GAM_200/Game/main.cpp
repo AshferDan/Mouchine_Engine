@@ -77,7 +77,7 @@ int main()
         GameObject* testObj = GameObjectFactory::Instance().CreateShape(
             "MyTestSquare",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
-            0.0f, 0.0f,                      // Center of screen
+            -200.0f, 0.0f,                      // Center of screen
             100.0f, 100.0f,                  // Size
             vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
         );
@@ -94,6 +94,77 @@ int main()
                 scriptComp->AddScript("SpinningSquare");
 
                 std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
+            }
+        }
+
+        GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
+            "Hero_cs",
+            0, 0,
+            100, 100,
+            "../Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Player);
+
+        if (Hero)
+        {
+            ColliderComponent* colComp = Hero->AddComponent<ColliderComponent>();
+            PhysicsComponent* phyComp = Hero->AddComponent<PhysicsComponent>();
+
+            if (colComp && phyComp)
+            {
+                colComp->SetSize(100.0f, 100.0f);
+            }
+
+            ScriptComponent* scriptComp = Hero->AddComponent<ScriptComponent>();
+
+            if (scriptComp)
+            {
+                // 3. Attach the script "SpinningSquare"
+                // Ensure the namespace in C# is "GameScripts"
+                scriptComp->AddScript("PlayerMovement");
+                scriptComp->AddScript("PlayerMovementStats");
+
+                std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
+            }
+        }
+
+        GameObject* Platform = GameObjectFactory::Instance().CreateShape(
+            "Platform",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            0.0f, -200.0f,                      // Center of screen
+            1000.0f, 100.0f,                  // Size
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
+
+        if (Platform)
+        {
+            ColliderComponent* colComp = Platform->AddComponent<ColliderComponent>();
+            PhysicsComponent* phyComp = Platform->AddComponent<PhysicsComponent>();
+
+            if (colComp && phyComp)
+            {
+                phyComp->SetStatic(true);
+                colComp->SetSize(1000.0f, 100.0f);
+                colComp->SetLayer(CollisionLayer::Ground);
+            }
+        }
+
+        GameObject* Wall = GameObjectFactory::Instance().CreateShape(
+            "Platform",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            -200.0f, 0.0f,                      // Center of screen
+            100.0f, 1000.0f,                  // Size
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
+
+        if (Wall)
+        {
+            ColliderComponent* colComp = Wall->AddComponent<ColliderComponent>();
+            PhysicsComponent* phyComp = Wall->AddComponent<PhysicsComponent>();
+
+            if (colComp && phyComp)
+            {
+                phyComp->SetStatic(true);
+                colComp->SetSize(100.0f, 1000.0f);
+                colComp->SetLayer(CollisionLayer::Ground);
             }
         }
 

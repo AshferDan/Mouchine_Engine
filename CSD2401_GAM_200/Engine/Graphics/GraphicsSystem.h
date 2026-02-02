@@ -286,6 +286,7 @@ public:
 	void LoadDefaultCursor(const char* cursorPath, int hotX = 0, int hotY = 0);
 	GLFWcursor* GetNormalCursor() const { return normalCursor; }
 	GLFWcursor* GetClickCursor() const { return clickCursor; }
+	GLSLShader* GetDefaultShader() const { return shader; }
 
 private:
 	// --- Window and State ---
