@@ -417,6 +417,12 @@ void CoreEngine::GameLoop()
 
         EventSystem::ProcessEvents();
 
+        // Update audio fades
+        if (audioManager)
+        {
+            audioManager->UpdateFade(static_cast<float>(delta_time));
+        }
+
         // VARIABLE TIMESTEP - Rendering and UI systems
         if (graphicsSystem)
         {

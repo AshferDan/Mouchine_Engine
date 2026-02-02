@@ -211,7 +211,7 @@ void AudioManager::SetCategoryVolume(const std::string& category, float volume)
     float clampedVolume = std::max(0.0f, std::min(1.0f, volume));
 
     categoryVolumes[category] = clampedVolume;
-    std::cout << "Set " << category << " volume to " << clampedVolume << std::endl;
+    // std::cout << "Set " << category << " volume to " << clampedVolume << std::endl;
 
     // If the user changes a volume while not muted, we should update our pre-mute reference.
     if (!m_isMuted) {
@@ -569,6 +569,7 @@ void AudioManager::UpdateFade(float dt)
             // Linear interpolation from startVolume to targetVolume
             float newVolume = fadeState.startVolume + (fadeState.targetVolume - fadeState.startVolume) * t;
             SetCategoryVolume(category, newVolume);
+            //std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
         }
     }
 }
@@ -606,4 +607,19 @@ void AudioManager::ResetFadeStates()
     }
 
     std::cout << "[AudioManager] Fade states reset and volumes restored" << std::endl;
+}
+
+/**
+ * @brief Checks if any category is currently fading.
+ */
+bool AudioManager::IsAnyFadeActive() const
+{
+    for (const auto& pair : categoryFadeStates)
+    {
+        if (pair.second.isFading)
+        {
+            return true;
+        }
+    }
+    return false;
 }

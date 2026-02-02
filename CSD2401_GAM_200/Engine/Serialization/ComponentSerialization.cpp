@@ -14,6 +14,7 @@ Technology is prohibited.
 #include "ComponentSerialization.h"
 #include "Animator.hpp"
 #include "logic.h"
+#include "TilemapEditor.h"
 #include "ScriptComponent.h"
 
 std::unordered_map<GLuint, std::string> s_TexturePathByID;
@@ -611,6 +612,32 @@ void ComponentSerialization::DeserializeEvent(const json &j, GameObject *go)
 }
 
 /**
+ * @brief Serializes the TilemapDataHolder into JSON.
+ */
+void ComponentSerialization::SerializeTilemap(json& j, TilemapDataHolder* tilemap)
+{
+    j["TilemapDataHolder"] = {
+        {"filepath", tilemap->GetTilemapFilePath()}
+    };
+}
+
+/**
+ * @brief Deserializes the TilemapDataHolder from JSON.
+ */
+void ComponentSerialization::DeserializeTilemap(const json& j, GameObject* go)
+{
+    if (!j.contains("TilemapDataHolder"))
+        return;
+
+    auto* tilemap = go->AddComponent<TilemapDataHolder>();
+
+    std::string filepath = j["TilemapDataHolder"]["filepath"];
+    if (!filepath.empty())
+    {
+        tilemap->LoadTilemapFromFile(filepath);
+    }
+}
+ /*
  * @brief Deserializes the ScriptComponent from JSON.
  * @param j JSON object to read from.
  * @param go Pointer to the GameObject.
@@ -654,6 +681,8 @@ void ComponentSerialization::SerializeAllComponents(GameObject *go, json &j)
     // if (auto* cam = go->GetComponent<CameraComponent>())  SerializeCamera(j, cam);
     if (auto *t = go->GetComponent<EventComponent>()) 
         SerializeEvent(j, t);
+    if (auto* tilemap = go->GetComponent<TilemapDataHolder>())
+        SerializeTilemap(j, tilemap);
     if (auto *sc = go->GetComponent<ScriptComponent>()) 
         SerializeScript(j, sc);
 }
@@ -673,5 +702,6 @@ void ComponentSerialization::DeserializeAllComponents(GameObject *go, const json
     DeserializeText(j, go);
     // DeserializeCamera(j, go);
     DeserializeEvent(j, go);
+    DeserializeTilemap(j, go);
     DeserializeScript(j, go);
 }

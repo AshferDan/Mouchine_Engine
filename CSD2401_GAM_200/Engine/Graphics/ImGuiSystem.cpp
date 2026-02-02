@@ -2888,6 +2888,51 @@ void AudioAssetsPanel_Render()
         audioMgr->StopAllSounds();
     }
     ImGui::SameLine();
+
+    // Fade controls
+    static float fadeDuration = 1.0f;
+    static int selectedCategory = 0;
+    static const char* categories[] = { "music", "sfx", "voice", "ambient" };
+    static float fadeTargetVolume = 1.0f;
+
+    ImGui::Separator();
+    ImGui::Text("Fade Controls:");
+
+    ImGui::PushItemWidth(100.0f);
+    ImGui::InputFloat("Fade Duration (s)", &fadeDuration, 0.1f, 1.0f, "%.1f");
+    if (fadeDuration < 0.1f) fadeDuration = 0.1f;
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(100.0f);
+    ImGui::Combo("Category", &selectedCategory, categories, 4);
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(100.0f);
+    ImGui::SliderFloat("Target Volume", &fadeTargetVolume, 0.0f, 1.0f, "%.1f");
+    ImGui::PopItemWidth();
+
+    if (ImGui::Button("Fade In"))
+    {
+        audioMgr->FadeInCategory(categories[selectedCategory], fadeDuration, fadeTargetVolume);
+        std::cout << "[Audio] Fading in " << categories[selectedCategory]
+                  << " over " << fadeDuration << "s to volume " << fadeTargetVolume << std::endl;
+    }
+    ImGui::SameLine();
+
+    if (ImGui::Button("Fade Out"))
+    {
+        audioMgr->FadeOutCategory(categories[selectedCategory], fadeDuration);
+        std::cout << "[Audio] Fading out " << categories[selectedCategory]
+                  << " over " << fadeDuration << "s" << std::endl;
+    }
+    ImGui::SameLine();
+
+    if (ImGui::Button("Fade Out All"))
+    {
+        audioMgr->FadeOutAll(fadeDuration);
+        std::cout << "[Audio] Fading out all categories over " << fadeDuration << "s" << std::endl;
+    }
+
     ImGui::Separator();
     ImGui::Text("Drop zone:");
 

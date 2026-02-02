@@ -320,15 +320,16 @@ void LevelEditor::EnterPlayMode()
             // Game scene - play game BGM
             std::cout << "[LevelEditor] Playing game BGM\n";
             audioManager->PlaySound("bgm", "bgm_channel");
-            // Fade in the music over 5 seconds
-            audioManager->FadeInCategory("music", 5.0f);
-            std::cout << "[LevelEditor] Started music fade in over 5 seconds\n";
+            audioManager->FadeInCategory("music", 15.0f);
+            std::cout << "[LevelEditor] Started music fade in over 15 seconds\n";
         }
         else if (sounds.find("MainMenuBGM") != sounds.end())
         {
-            // Main menu scene - play menu BGM
+            // Main menu scene - play menu BGM with fade in 
             std::cout << "[LevelEditor] Playing main menu BGM\n";
             audioManager->PlaySound("MainMenuBGM", "menu_bgm_channel");
+            audioManager->FadeInCategory("music", 1.0f);  // Fade in menu music over 1 second
+            std::cout << "[LevelEditor] Started menu music fade in over 1 second\n";
         }
         else
         {
@@ -852,9 +853,16 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             if (audioManager)
             {
                 std::cout << "[LoadLevel] AudioManager pointer is valid\n";
+
+                // Reset fade states before loading new audio config
+                audioManager->ResetFadeStates();
+
                 Serialization::DeserializeAudioManager(root, audioManager);
                 std::cout << "[LoadLevel] AudioManager deserialization complete\n";
                 audioManager->PrintConfig();
+
+                // Fade-in will be handled in EnterPlayMode, not here
+                std::cout << "[LoadLevel] Audio loaded, fade-in will start when entering play mode\n";
             }
             else
             {
@@ -962,15 +970,30 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         }
         if (!currentTilemapPath.empty())
         {
-            std::cout << "[LoadLevel] Creating tilemap rendering..." << std::endl;
-
-            auto tiles = TilemapEditor::LoadAndCreateTilemapGameObjects(
+            std::cout << "[LoadLevel] Creating tilemap..." << std::endl;
+            GameObject* tilemapObj = TilemapEditor::LoadTilemapAsGameObject(
                 currentTilemapPath,
                 vec2(0.0f, 0.0f),
                 "Tilemap"
             );
 
-            std::cout << "[LoadLevel] Created " << tiles.size() << " tile objects" << std::endl;
+            if (tilemapObj)
+            {
+                auto* holder = tilemapObj->GetComponent<TilemapDataHolder>();
+                if (holder && holder->data)
+                {
+                    int totalTiles = holder->data->width * holder->data->height * holder->data->numLayers;
+                    std::cout << "[LoadLevel] Created tilemap GameObject with " << totalTiles << " tiles" << std::endl;
+                }
+                else
+                {
+                    std::cout << "[LoadLevel] Created tilemap GameObject" << std::endl;
+                }
+            }
+            else
+            {
+                std::cerr << "[LoadLevel] Failed to create tilemap!" << std::endl;
+            }
         }
 
         // any fresh load invalidates the previous save-state snapshot
@@ -1719,45 +1742,28 @@ bool LevelEditor::ImportTilemap(const std::string& filepath)
 {
     try
     {
-        // Open the tilemap file
-        std::ifstream file(filepath);
-        if (!file.is_open())
+        // Use new function that creates ONE GameObject
+        GameObject* tilemapObj = TilemapEditor::LoadTilemapAsGameObject(
+            filepath,
+            vec2(0.0f, 0.0f),
+            "Tilemap");
+
+        if (!tilemapObj)
         {
-            std::cerr << "[LevelEditor] Failed to open tilemap file: " << filepath << std::endl;
+            std::cerr << "[LevelEditor] Failed to create tilemap!" << std::endl;
             return false;
         }
 
-        // Parse JSON
-        json tilemapData;
-        file >> tilemapData;
-        file.close();
-
-        // Validate tilemap structure
-        if (!tilemapData.contains("width") ||
-            !tilemapData.contains("height") ||
-            !tilemapData.contains("tileset") ||
-            !tilemapData.contains("tiles"))
-        {
-            std::cerr << "[LevelEditor] Invalid tilemap format! Missing required fields." << std::endl;
-            return false;
-        }
-
-        // Store the tilemap reference
         currentTilemapPath = filepath;
-
-        std::cout << "[LevelEditor] Tilemap imported successfully:" << std::endl;
-        std::cout << "  File: " << filepath << std::endl;
-        std::cout << "  Dimensions: " << tilemapData["width"] << "x" << tilemapData["height"] << std::endl;
-        std::cout << "  Tileset: " << tilemapData["tileset"].get<std::string>() << std::endl;
-        std::cout << "  Tile count: " << tilemapData["tiles"].size() << std::endl;
-        std::cout << "  Layers: " << tilemapData["numLayers"] << std::endl;
-
         hasUnsavedChanges = true;
+        SetSelectedGameObject(tilemapObj->GetID());
+
+        std::cout << "[LevelEditor] Tilemap imported as single GameObject" << std::endl;
         return true;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "[LevelEditor] Error importing tilemap: " << e.what() << std::endl;
+        std::cerr << "[LevelEditor] Error: " << e.what() << std::endl;
         return false;
     }
 }
