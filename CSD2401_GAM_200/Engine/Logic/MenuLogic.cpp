@@ -15,6 +15,8 @@ Technology is prohibited.
 #include "MenuLogic.h"
 #include <iostream>
 
+std::string introPath = "../Assets/Cutscene_M3.mpeg";
+
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens {
     Home = 0,       // Normal landing page
@@ -42,9 +44,20 @@ void MenuLogicSystem::Update(float dt)
                 if (hoveredButtonName == "PlayButton")
                 {
                     std::cout << "PlayButton Clicked!" << std::endl;
-                    std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                    CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
-                    std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
+
+                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+                    if (!cutscene->HasFinished(introPath)) {    // FIRST CLICK: Play Cutscene
+                        if (!cutscene->IsPlaying()) {
+                            cutscene->PlayVideo(introPath);
+                        }
+                        // Stay in the menu, video plays on top.
+                    }                   
+                    else {                                      // SECOND CLICK: Video has finished, load the game
+                        std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                        CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
+                        std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
+                    }
+
                 }
                 else if (hoveredButtonName == "SettingsButton")
                 {
