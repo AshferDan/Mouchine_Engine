@@ -86,6 +86,8 @@ struct RenderBatch
 class GraphicsSystem : public ISystem
 {
 public:
+
+	friend class TilemapEditor;
 	/**
 	 * @brief Default constructor. Initializes GLFW and creates a default 800x600 window.
 	 */
@@ -286,6 +288,7 @@ public:
 	void LoadDefaultCursor(const char* cursorPath, int hotX = 0, int hotY = 0);
 	GLFWcursor* GetNormalCursor() const { return normalCursor; }
 	GLFWcursor* GetClickCursor() const { return clickCursor; }
+	GLSLShader* GetDefaultShader() const { return shader; }
 
 private:
 	// --- Window and State ---

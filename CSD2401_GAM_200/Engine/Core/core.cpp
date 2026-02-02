@@ -105,13 +105,16 @@ void CoreEngine::InitSystems()
     // 7. Camera System - Controls the cameras
     cameraSystem = AddSystem<CameraSystem>();
 
-    // 8. Level Editor - for editing levels
+    // 8. CutsceneSystem - Play/Stop videos
+    cutsceneSystem = AddSystem<CutsceneSystem>();
+
+    // 9. Level Editor - for editing levels
     levelEditor = AddSystem<LevelEditor>();
 
-    // Connect CollisionSystem to PhysicsSystem
+    // 10. Connect CollisionSystem to PhysicsSystem
     collisionSystem->SetPhysicsSystem(physicsSystem);
 
-    // 10. ScriptSystem - C# Script System
+    // 11. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
     menuLogicSystem = AddSystem<MenuLogicSystem>();
@@ -269,6 +272,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[graphicsSystem->GetName()] = 0.0;
         if (debugSystem)
             g_systemTimings[debugSystem->GetName()] = 0.0;
+        if (cutsceneSystem)
+            g_systemTimings[cutsceneSystem->GetName()] = 0.0;
         if (levelEditor)
             g_systemTimings[levelEditor->GetName()] = 0.0;
         if (scriptSystem)
@@ -412,6 +417,12 @@ void CoreEngine::GameLoop()
 
         EventSystem::ProcessEvents();
 
+        // Update audio fades
+        if (audioManager)
+        {
+            audioManager->UpdateFade(static_cast<float>(delta_time));
+        }
+
         // VARIABLE TIMESTEP - Rendering and UI systems
         if (graphicsSystem)
         {
@@ -487,6 +498,11 @@ void CoreEngine::GameLoop()
         if (g_UseGameStates)
         {
             GameManager::Instance().GameStateLoop(static_cast<float>(delta_time));
+        }
+
+        // Update cutscene
+        if (cutsceneSystem && cutsceneSystem->IsPlaying()) {
+            cutsceneSystem->Update(static_cast<float>(delta_time));         
         }
 
         // Swap buffers and poll events

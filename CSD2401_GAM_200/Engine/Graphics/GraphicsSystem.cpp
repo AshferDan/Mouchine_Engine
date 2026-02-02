@@ -15,10 +15,11 @@ Technology is prohibited.
 
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
+
 #include "ResourceManager.h"
 
 // Global constant for configuration file path (currently unused in this file)
-const char* configFile = "../Logs/config.txt";
+const char *configFile = "../Logs/config.txt";
 // Global constant for 2*Pi, used for circle approximation
 const double two_pi = 6.28318530717958647692528676655900576;
 
@@ -27,14 +28,14 @@ const double two_pi = 6.28318530717958647692528676655900576;
  * and the 2D batch rendering system.
  */
 
- /**
-  * \brief Default constructor for GraphicsSystem.
-  * Initializes GLFW, creates the main rendering window, and sets up window callbacks.
-  */
+/**
+ * \brief Default constructor for GraphicsSystem.
+ * Initializes GLFW, creates the main rendering window, and sets up window callbacks.
+ */
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
-    frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+      frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -58,8 +59,8 @@ GraphicsSystem::GraphicsSystem()
     glfwSetWindowUserPointer(window, this);
 
     // Set callback for window resizing (updates viewport + stored dimensions).
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height)
-        {
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *win, int width, int height)
+                                   {
             glViewport(0, 0, width, height);
 
             // Update stored window width/height in GraphicsSystem.
@@ -73,19 +74,19 @@ GraphicsSystem::GraphicsSystem()
                 }
 
             } });
-    
-            // Make OpenGL context current for this window.
-            glfwMakeContextCurrent(window);
 
-            // Query the framebuffer size (accounts for HiDPI displays).
-            int fbWidth, fbHeight;
-            glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-            // Set the initial OpenGL viewport to match the actual framebuffer size
-            glViewport(0, 0, fbWidth, fbHeight);
+    // Make OpenGL context current for this window.
+    glfwMakeContextCurrent(window);
 
-            // Store the actual framebuffer size.
-            Wwidth = fbWidth;
-            Wheight = fbHeight;
+    // Query the framebuffer size (accounts for HiDPI displays).
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    // Set the initial OpenGL viewport to match the actual framebuffer size
+    glViewport(0, 0, fbWidth, fbHeight);
+
+    // Store the actual framebuffer size.
+    Wwidth = fbWidth;
+    Wheight = fbHeight;
 }
 
 /**
@@ -96,9 +97,9 @@ GraphicsSystem::GraphicsSystem()
  */
 GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
-    frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-    frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
-    // Same as default constructor, but allows user to specify window size.
+      frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+// Same as default constructor, but allows user to specify window size.
 {
     if (!glfwInit())
     {
@@ -120,8 +121,8 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     glfwSetWindowUserPointer(window, this);
 
     // Set callback for window resizing (updates viewport + stored dimensions).
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int width, int height)
-        {
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *win, int width, int height)
+                                   {
             glViewport(0, 0, width, height);
 
             // Update stored window width/height in GraphicsSystem.
@@ -131,18 +132,18 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
                 gs->Wheight = height;
             } });
 
-            // Make OpenGL context current for this window.
-            glfwMakeContextCurrent(window);
+    // Make OpenGL context current for this window.
+    glfwMakeContextCurrent(window);
 
-            // Query the framebuffer size (accounts for HiDPI displays).
-            int fbWidth, fbHeight;
-            glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-            // Set the initial OpenGL viewport to match the actual framebuffer size
-            glViewport(0, 0, fbWidth, fbHeight);
+    // Query the framebuffer size (accounts for HiDPI displays).
+    int fbWidth, fbHeight;
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    // Set the initial OpenGL viewport to match the actual framebuffer size
+    glViewport(0, 0, fbWidth, fbHeight);
 
-            // Store the actual framebuffer size.
-            Wwidth = fbWidth;
-            Wheight = fbHeight;
+    // Store the actual framebuffer size.
+    Wwidth = fbWidth;
+    Wheight = fbHeight;
 }
 
 /**
@@ -151,18 +152,21 @@ GraphicsSystem::GraphicsSystem(GLint w, GLint h)
  */
 GraphicsSystem::~GraphicsSystem()
 {
-    if (window) {
+    if (window)
+    {
         glfwSetCursor(window, nullptr); // Reset to default cursor
     }
 
     // Clean up Frame Buffer resources
     DeleteFrameBuffer();
 
-    if (normalCursor) {
+    if (normalCursor)
+    {
         glfwDestroyCursor(normalCursor);
         normalCursor = nullptr;
     }
-    if (clickCursor) {
+    if (clickCursor)
+    {
         glfwDestroyCursor(clickCursor);
         clickCursor = nullptr;
     }
@@ -190,22 +194,22 @@ void GraphicsSystem::Initialize()
     clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 
     // Initialize cursors with null checks
-    //normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-    //clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+    // normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    // clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 
-    //std::cout << "Normal cursor created: " << (normalCursor ? "SUCCESS" : "FAILED") << std::endl;
-    //std::cout << "Click cursor created: " << (clickCursor ? "SUCCESS" : "FAILED") << std::endl;
+    // std::cout << "Normal cursor created: " << (normalCursor ? "SUCCESS" : "FAILED") << std::endl;
+    // std::cout << "Click cursor created: " << (clickCursor ? "SUCCESS" : "FAILED") << std::endl;
 
     // Set initial cursor - only if creation was successful
-    //if (normalCursor) {
+    // if (normalCursor) {
     //    glfwSetCursor(window, clickCursor);
     //}
-    //else {
+    // else {
     //    std::cerr << "WARNING: Failed to create normal cursor, using default" << std::endl;
     //}
 
     // Improved mouse button callback with better error handling
-    //glfwSetMouseButtonCallback(window, [](GLFWwindow* win, int button, int action, int mods) {
+    // glfwSetMouseButtonCallback(window, [](GLFWwindow* win, int button, int action, int mods) {
     //    auto* gs = static_cast<GraphicsSystem*>(glfwGetWindowUserPointer(win));
     //    if (!gs) {
     //        return;
@@ -233,8 +237,8 @@ void GraphicsSystem::Initialize()
     //    }
     //    });
 
-    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
-        {
+    glfwSetWindowFocusCallback(window, [](GLFWwindow *win, int focused)
+                               {
             (void)win;
             if (focused == GLFW_FALSE)
             {
@@ -243,8 +247,7 @@ void GraphicsSystem::Initialize()
             else
             {
                 CORE->SetGamePaused(false);
-            }
-        });
+            } });
 
     // Enable blending (allows transparency in textures and colors).
     glEnable(GL_BLEND);
@@ -253,12 +256,12 @@ void GraphicsSystem::Initialize()
 
     // Load the default shader program for rendering through ResourceManager.
     // Requires "vertices.vert" (vertex shader) and "fragment.frag" (fragment shader).
-    ShaderResource* defaultShaderResource = ResourceManager::Instance().LoadShader(
+    ShaderResource *defaultShaderResource = ResourceManager::Instance().LoadShader(
         "defaultShader", "../Shaders/vertices.vert", "../Shaders/fragment.frag");
     shader = defaultShaderResource->GetShader();
 
     // Load the debug shader program for lines and points through ResourceManager
-    ShaderResource* debugShaderResource = ResourceManager::Instance().LoadShader(
+    ShaderResource *debugShaderResource = ResourceManager::Instance().LoadShader(
         "debugShader", "../Shaders/debug.vert", "../Shaders/debug.frag");
     debugShader = debugShaderResource->GetShader();
 
@@ -358,7 +361,7 @@ void GraphicsSystem::Initialize()
 
     // === Text Rendering Buffers Setup ===
     // Load the text shader through ResourceManager
-    ShaderResource* textShaderResource = ResourceManager::Instance().LoadShader(
+    ShaderResource *textShaderResource = ResourceManager::Instance().LoadShader(
         "textShader", "../Shaders/text.vert", "../Shaders/text.frag");
     textShader = textShaderResource->GetShader();
 
@@ -382,8 +385,7 @@ void GraphicsSystem::Initialize()
         -1.f, -1.f,
         1.f, -1.f,
         -1.f, 1.f,
-        1.f, 1.f
-    };
+        1.f, 1.f};
 
     glGenVertexArrays(1, &flashVAO);
     glGenBuffers(1, &flashVBO);
@@ -393,7 +395,7 @@ void GraphicsSystem::Initialize()
     glBufferData(GL_ARRAY_BUFFER, sizeof(flashQuad), flashQuad, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
 
     glBindVertexArray(0);
 
@@ -410,7 +412,8 @@ void GraphicsSystem::Initialize()
 void GraphicsSystem::Update(float)
 {
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
-    if (!cachedBackground) {
+    if (!cachedBackground)
+    {
         cachedBackground = GameObjectFactory::Instance().FindGameObject("bgImage");
     }
 
@@ -466,17 +469,19 @@ void GraphicsSystem::Update(float)
     }
 
     // === Camera Bounds Debug Drawing ===
-// === Camera Bounds Debug Drawing ===
-    if (debugMode) {
-        auto* gameCamera = CameraManager::Instance().GetActiveCamera();
+    // === Camera Bounds Debug Drawing ===
+    if (debugMode)
+    {
+        auto *gameCamera = CameraManager::Instance().GetActiveCamera();
 
-        if (gameCamera) {
+        if (gameCamera)
+        {
             // 1. Get the camera's world position and current zoom level
             vec2 camBasePos = gameCamera->GetPosition();
             float currentZoom = gameCamera->getZoom();
 
             // 2. ALWAYS use the main window size (Wwidth/Wheight) for the Game Area box.
-            // This ensures the box represents your "Target Resolution" even if the 
+            // This ensures the box represents your "Target Resolution" even if the
             // editor window is currently small or a different shape.
             float gameWidth = (float)Wwidth;
             float gameHeight = (float)Wheight;
@@ -487,7 +492,7 @@ void GraphicsSystem::Update(float)
             vec2 viewSize(halfWidth * 2.0f, halfHeight * 2.0f);
 
             // 4. Calculate the "Shaken" position
-            // This makes the box stay at the window borders during Play Mode 
+            // This makes the box stay at the window borders during Play Mode
             // and shows exactly where the camera is 'shaking' in Editor Mode.
             vec2 shakenPos = camBasePos + gameCamera->GetTraumaOffset();
 
@@ -495,9 +500,10 @@ void GraphicsSystem::Update(float)
             CORE->GetDebugSystem()->DrawRect(shakenPos, viewSize, vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
             // 6. Draw a static Magenta cross or small box at the REAL center (camBasePos)
-            // This helps your teammate see the difference between the "Camera Center" 
+            // This helps your teammate see the difference between the "Camera Center"
             // and the "Shake Offset" while paused.
-            if (gameCamera->GetTrauma() > 0.f) {
+            if (gameCamera->GetTrauma() > 0.f)
+            {
                 CORE->GetDebugSystem()->DrawPoint(camBasePos, vec4(1.0f, 0.0f, 1.0f, 1.0f));
             }
         }
@@ -506,27 +512,32 @@ void GraphicsSystem::Update(float)
     // Accumulate all geometry into batches
     batches.clear();
 
-    auto* textObj = GameObjectFactory::Instance().FindGameObject("Text FPS");
-    if (textObj) {
-        auto* textFPS = textObj->GetComponent<TextComponent>();
-        if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play) {
+    auto *textObj = GameObjectFactory::Instance().FindGameObject("Text FPS");
+    if (textObj)
+    {
+        auto *textFPS = textObj->GetComponent<TextComponent>();
+        if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play)
+        {
             textFPS->SetEnabled(true);
-            textFPS->SetText("FPS: "+std::to_string(static_cast<int>(CORE->GetFPS())));
+            textFPS->SetText("FPS: " + std::to_string(static_cast<int>(CORE->GetFPS())));
         }
-        else {
+        else
+        {
             textFPS->SetText("FPS");
             textFPS->SetEnabled(false);
         }
     }
 
-    auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
+    auto &gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
     // === Batch Accumulation Loop ===
-    for (auto& obj : gameObjects)
+    for (auto &obj : gameObjects)
     {
-        if (obj.get() == cachedBackground) {
+        if (obj.get() == cachedBackground)
+        {
             // You found it instantly via pointer comparison (extremely fast)
-            auto* rend = obj->GetComponent<RenderComponent>();
-            if (rend) rend->SetLayer(-10);
+            auto *rend = obj->GetComponent<RenderComponent>();
+            if (rend)
+                rend->SetLayer(-10);
         }
 
         if (!obj->IsActive())
@@ -534,13 +545,20 @@ void GraphicsSystem::Update(float)
             continue;
         }
 
-        auto* transform = obj->GetComponent<TransformComponent>();
+        // CHECK FOR TILEMAP
+        if (obj->HasComponent<TilemapDataHolder>())
+        {
+            TilemapEditor::RenderTilemapGameObject(obj.get());
+            continue; // Skip normal rendering for tilemaps
+        }
+
+        auto *transform = obj->GetComponent<TransformComponent>();
         if (!transform)
         {
             continue;
         }
-        
-        auto* rend = obj->GetComponent<RenderComponent>();
+
+        auto *rend = obj->GetComponent<RenderComponent>();
 
         if (!rend)
         {
@@ -568,13 +586,13 @@ void GraphicsSystem::Update(float)
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
 
-        if (auto* animator = obj->GetComponent<Spritesheet>())
+        if (auto *animator = obj->GetComponent<Spritesheet>())
         {
             // Animator takes priority (for animated sprites)
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
         }
-        else if (auto* renderComp = obj->GetComponent<RenderComponent>())
+        else if (auto *renderComp = obj->GetComponent<RenderComponent>())
         {
             // Use RenderComponent UV (for tiles/static sprites)
             uvScale = renderComp->GetUVScale();
@@ -582,8 +600,8 @@ void GraphicsSystem::Update(float)
         }
 
         // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
-        RenderBatch* targetBatch = nullptr;
-        for (auto& batch : batches)
+        RenderBatch *targetBatch = nullptr;
+        for (auto &batch : batches)
         {
             if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer)
             {
@@ -612,14 +630,14 @@ void GraphicsSystem::Update(float)
             {-0.5f, -0.5f, 0.f},
             {0.5f, -0.5f, 0.f},
             {-0.5f, 0.5f, 0.f},
-            {0.5f, 0.5f, 0.f} };
+            {0.5f, 0.5f, 0.f}};
 
         // Texture coordinates for the unit quad
         vec2 texCoords[4] = {
             {0.f, 0.f},
             {1.f, 0.f},
             {0.f, 1.f},
-            {1.f, 1.f} };
+            {1.f, 1.f}};
 
         GLuint baseIndex = (GLuint)targetBatch->vertices.size(); // Starting index for the new quad
 
@@ -631,12 +649,12 @@ void GraphicsSystem::Update(float)
             // The transformation is applied in the vertex shader->
             BatchVertex vert;
             vert.pos = localVerts[i]; // Local position
-            vert.tex = texCoords[i]; // Texture UV
+            vert.tex = texCoords[i];  // Texture UV
             vert.color = color;
             vert.uvScale = uvScale;
             vert.uvOffset = uvOffset;
             vert.transform = vec3(x, y, rot); // Translation (x,y) and Rotation (rot)
-            vert.scale = vec2(sx, sy); // Scale (sx, sy)
+            vert.scale = vec2(sx, sy);        // Scale (sx, sy)
 
             targetBatch->vertices.push_back(vert);
         }
@@ -650,13 +668,13 @@ void GraphicsSystem::Update(float)
         targetBatch->indices.push_back(baseIndex + 3);
     }
 
-    //Draw Particle
-    for (auto& obj : gameObjects)
+    // Draw Particle
+    for (auto &obj : gameObjects)
     {
         if (!obj->IsActive())
             continue;
 
-        auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+        auto *emitter = obj->GetComponent<ParticleEmitterComponent>();
         if (emitter && emitter->IsEnabled())
         {
             emitter->AddParticlesToBatch(batches, vp);
@@ -664,8 +682,8 @@ void GraphicsSystem::Update(float)
     }
 
     // Sort batches by rendering layer (lower layer draws first)
-    std::sort(batches.begin(), batches.end(), [](const RenderBatch& a, const RenderBatch& b)
-        { return a.layer < b.layer; });
+    std::sort(batches.begin(), batches.end(), [](const RenderBatch &a, const RenderBatch &b)
+              { return a.layer < b.layer; });
     // auto afterSort = std::chrono::high_resolution_clock::now();
 
     // Draw all accumulated batches
@@ -673,14 +691,14 @@ void GraphicsSystem::Update(float)
     // auto afterDraw = std::chrono::high_resolution_clock::now();
 
     // Draw Non-batched shapes (Lines, Points)
-    for (auto& obj : gameObjects)
+    for (auto &obj : gameObjects)
     {
         if (!obj->IsActive())
         {
             continue;
         }
 
-        auto* rend = obj->GetComponent<RenderComponent>();
+        auto *rend = obj->GetComponent<RenderComponent>();
         if (rend)
         {
             // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
@@ -706,7 +724,7 @@ void GraphicsSystem::Update(float)
             if (debugMode)
             {
                 // std::cout << "went here" << std::endl;
-                auto* transform = obj->GetComponent<TransformComponent>();
+                auto *transform = obj->GetComponent<TransformComponent>();
                 if (transform)
                 {
                     float x, y, sx, sy;
@@ -717,23 +735,23 @@ void GraphicsSystem::Update(float)
                     if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
                     {
                         // For circles, the scale is interpreted as diameter, so radius is scale*0.5
-                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), { 0, 1, 0, 1 }, vp);
+                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), {0, 1, 0, 1}, vp);
                     }
                     else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
                     {
-                        //std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
-                        DrawRectOutline(x, y, sx, sy, { 0, 1, 0, 1 }, vp);
+                        // std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
+                        DrawRectOutline(x, y, sx, sy, {0, 1, 0, 1}, vp);
                     }
                 }
             }
         }
 
         // Text rendering
-        if (auto* textComp = obj->GetComponent<TextComponent>())
+        if (auto *textComp = obj->GetComponent<TextComponent>())
         {
             if (textComp->IsEnabled())
             {
-                if (auto* transform = obj->GetComponent<TransformComponent>())
+                if (auto *transform = obj->GetComponent<TransformComponent>())
                 {
                     float x, y;
                     transform->GetPosition(x, y);
@@ -742,8 +760,8 @@ void GraphicsSystem::Update(float)
                     // but for objects like timers that should stay at top-left, adjust for viewport height
                     if (textComp->isScreenSpace())
                     {
-                        static std::map<TextComponent*, vec2> screenSpacePositions;
-                        static std::map<TextComponent*, bool> needsTopAlignment;
+                        static std::map<TextComponent *, vec2> screenSpacePositions;
+                        static std::map<TextComponent *, bool> needsTopAlignment;
 
                         if (screenSpacePositions.find(textComp) == screenSpacePositions.end())
                         {
@@ -759,7 +777,7 @@ void GraphicsSystem::Update(float)
                         if (needsTopAlignment[textComp])
                         {
                             float rHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
-                            //float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+                            // float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
                             float offsetFromTop = 110.0f; // distance from top edge
                             y = rHeight - offsetFromTop;
                         }
@@ -771,7 +789,7 @@ void GraphicsSystem::Update(float)
 
                     // Render text using the dedicated text rendering function
                     RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
-                        textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
+                               textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
                 }
             }
         }
@@ -780,8 +798,8 @@ void GraphicsSystem::Update(float)
     // === Debug System Shapes Drawing ===
     if (debugMode)
     {
-        auto& debugShapes = CORE->GetDebugSystem()->GetShapes();
-        for (auto& shape : debugShapes)
+        auto &debugShapes = CORE->GetDebugSystem()->GetShapes();
+        for (auto &shape : debugShapes)
         {
             switch (shape.type)
             {
@@ -810,18 +828,22 @@ void GraphicsSystem::Update(float)
         }
     }
 
-    auto* activeCamera = CameraManager::Instance().GetActiveCamera();
-    if (activeCamera) {
-        if (activeCamera->IsFlashing()) {
+    auto *activeCamera = CameraManager::Instance().GetActiveCamera();
+    if (activeCamera)
+    {
+        if (activeCamera->IsFlashing())
+        {
             DrawFlashOverlay(activeCamera->GetFlashColor());
         }
     }
 
-    if (currentSelection_ColliderOnly.exist) {
-        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, { 1.0f,1.0f,0.4f,1.0f }, vp);       // draw yellow outline
+    if (currentSelection_ColliderOnly.exist)
+    {
+        DrawRectOutline(currentSelection_ColliderOnly.x, currentSelection_ColliderOnly.y, currentSelection_ColliderOnly.sx, currentSelection_ColliderOnly.sy, {1.0f, 1.0f, 0.4f, 1.0f}, vp); // draw yellow outline
     }
-    if (currentSelection.exist) {
-        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, { 1,1,1,1 }, vp);         // draw white outline
+    if (currentSelection.exist)
+    {
+        DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, {1, 1, 1, 1}, vp); // draw white outline
     }
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
@@ -841,8 +863,8 @@ void GraphicsSystem::Update(float)
  * \param color The color of the line.
  * \param viewProjection The combined view-projection matrix (MVP in shader).
  */
-void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
-    const vec4& color, const mat4& viewProjection)
+void GraphicsSystem::DrawLine(const vec2 &start, const vec2 &end,
+                              const vec4 &color, const mat4 &viewProjection)
 {
     // Tell shader this is a line draw
     debugShader->Use();
@@ -851,7 +873,7 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
     // Define 2 vertices for the line
     vec3 verts[2] = {
         {start.x, start.y, 0.0f},
-        {end.x, end.y, 0.0f} };
+        {end.x, end.y, 0.0f}};
 
     // Create temporary VAO/VBO for this line (immediate-mode like drawing)
     GLuint tempVBO, tempVAO;
@@ -864,7 +886,7 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
 
     // Attribute 0 = vertex position (vec3 in shader)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 
     // Send MVP matrix
     debugShader->SetUniform("uMVP", viewProjection);
@@ -884,15 +906,15 @@ void GraphicsSystem::DrawLine(const vec2& start, const vec2& end,
  * \param color The color of the point.
  * \param viewProjection The combined view-projection matrix (MVP in shader).
  */
-void GraphicsSystem::DrawPoint(const vec2& ppos,
-    const vec4& color, const mat4& viewProjection)
+void GraphicsSystem::DrawPoint(const vec2 &ppos,
+                               const vec4 &color, const mat4 &viewProjection)
 {
     // Use the debug shader
     debugShader->Use();
     debugShader->SetUniform("uColor", color);
 
     // Position of the point (use vec3 to match shader input = vec3)
-    vec3 pos = { ppos.x, ppos.y, 0.0f };
+    vec3 pos = {ppos.x, ppos.y, 0.0f};
 
     // Create temporary VAO/VBO for this point
     GLuint tempVBO, tempVAO;
@@ -905,7 +927,7 @@ void GraphicsSystem::DrawPoint(const vec2& ppos,
 
     // Attribute 0 = vertex position (vec3 in shader)
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 
     // Send MVP matrix
     debugShader->SetUniform("uMVP", viewProjection);
@@ -932,7 +954,7 @@ void GraphicsSystem::DrawPoint(const vec2& ppos,
  * \param viewProjection The combined view-projection matrix.
  */
 void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
-    const vec4& color, const mat4& viewProjection)
+                                     const vec4 &color, const mat4 &viewProjection)
 {
     // Half extents (distance from center to edge)
     float halfW = w / 2;
@@ -961,7 +983,7 @@ void GraphicsSystem::DrawRectOutline(float x, float y, float w, float h,
  * \param viewProjection The combined view-projection matrix.
  */
 void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments,
-    const vec4& color, const mat4& viewProjection)
+                                       const vec4 &color, const mat4 &viewProjection)
 {
     // Clamp to a minimum number of segments (otherwise circle looks too blocky)
     if (segments < 8)
@@ -977,8 +999,8 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
         float theta2 = step * (i + 1);
 
         // Two consecutive points on the circle’s circumference (using polar coordinates)
-        vec2 p1 = { cx + r * cos(theta1), cy + r * sin(theta1) };
-        vec2 p2 = { cx + r * cos(theta2), cy + r * sin(theta2) };
+        vec2 p1 = {cx + r * cos(theta1), cy + r * sin(theta1)};
+        vec2 p2 = {cx + r * cos(theta2), cy + r * sin(theta2)};
 
         // Draw line between them
         DrawLine(p1, p2, color, viewProjection);
@@ -1003,30 +1025,27 @@ void GraphicsSystem::DrawBatches()
 
     glBindVertexArray(batchVAO);
 
-
-    for (auto& batch : batches)
+    for (auto &batch : batches)
     {
         if (batch.vertices.empty())
         {
             continue;
         }
 
+        // std::cout << "Batch size: " << batch.vertices.size() << ".\n\n";
 
-        //std::cout << "Batch size: " << batch.vertices.size() << ".\n\n";
-        
-        
         // === ADD THIS SAFETY CHECK ===
         // Ensure batch size doesn't exceed pre-allocated buffer size
         if (batch.vertices.size() > MAX_BATCH_VERTICES)
         {
             std::cerr << "ERROR: Batch exceeds vertex buffer size! "
-                << batch.vertices.size() << " > " << MAX_BATCH_VERTICES << std::endl;
+                      << batch.vertices.size() << " > " << MAX_BATCH_VERTICES << std::endl;
             continue;
         }
         if (batch.indices.size() > MAX_BATCH_INDICES)
         {
             std::cerr << "ERROR: Batch exceeds index buffer size! "
-                << batch.indices.size() << " > " << MAX_BATCH_INDICES << std::endl;
+                      << batch.indices.size() << " > " << MAX_BATCH_INDICES << std::endl;
             continue;
         }
         // === END SAFETY CHECK ===
@@ -1073,7 +1092,7 @@ void GraphicsSystem::DrawBatches()
  * \param color Color of the text.
  * \param screenSpace True if projection should be orthographic screen-space, false for world-space.
  */
-void GraphicsSystem::RenderText(const std::map<char, Character>& characters, const std::string& text, float x, float y, float scale, const vec4& color, bool screenSpace)
+void GraphicsSystem::RenderText(const std::map<char, Character> &characters, const std::string &text, float x, float y, float scale, const vec4 &color, bool screenSpace)
 {
     textShader->Use();
     textShader->SetUniform("textColor", color);
@@ -1147,7 +1166,7 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
             continue; // Skip characters not found in the font atlas
         }
 
-        const Character& ch = it->second;
+        const Character &ch = it->second;
 
         // Calculate the quad position and size based on the character metrics (bearing, size) and scale
         float xpos = x + ch.bearing.x * scale;
@@ -1163,7 +1182,7 @@ void GraphicsSystem::RenderText(const std::map<char, Character>& characters, con
 
             {xpos, ypos + h, 0.f, 0.f},
             {xpos + w, ypos, 1.f, 1.f},
-            {xpos + w, ypos + h, 1.f, 0.f} };
+            {xpos + w, ypos + h, 1.f, 0.f}};
 
         // Render the glyph texture
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
@@ -1272,13 +1291,13 @@ void GraphicsSystem::ResizeFrameBuffer(int width, int height)
  * \param viewportSizeX Reference to the desired viewport width (updated if needed).
  * \param viewportSizeY Reference to the desired viewport height (updated if needed).
  */
- // apologies for messy code, used 2 float refs instead of ImVec2 because i didnt wanna include imgui.h here and slow compile time
-void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewportSizeY)
+// apologies for messy code, used 2 float refs instead of ImVec2 because i didnt wanna include imgui.h here and slow compile time
+void GraphicsSystem::RenderGameViewportImGui(float &viewportSizeX, float &viewportSizeY)
 {
-    //if (!editorMode)
+    // if (!editorMode)
     //{
-    //    return;
-    //}
+    //     return;
+    // }
 
     // Clamp minimum viewport size to prevent issues
     if (viewportSizeX < 100.0f)
@@ -1296,7 +1315,8 @@ void GraphicsSystem::RenderGameViewportImGui(float& viewportSizeX, float& viewpo
     }
 }
 
-void GraphicsSystem::DrawFlashOverlay(const vec4& color) {
+void GraphicsSystem::DrawFlashOverlay(const vec4 &color)
+{
     debugShader->Use();
     debugShader->SetUniform("uColor", color);
     debugShader->SetUniform("uMVP", mat4::identity());
@@ -1306,15 +1326,18 @@ void GraphicsSystem::DrawFlashOverlay(const vec4& color) {
     glBindVertexArray(0);
 }
 
-void GraphicsSystem::ToggleFullScreen() {
-    if (!window) {
+void GraphicsSystem::ToggleFullScreen()
+{
+    if (!window)
+    {
         return;
     }
 
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
 
-    if (!isFullscreen) {
+    if (!isFullscreen)
+    {
         glfwGetWindowPos(window, &windowedPosX, &windowedPosY);
         glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
 
@@ -1323,7 +1346,8 @@ void GraphicsSystem::ToggleFullScreen() {
 
         std::cout << "[GraphicsSystem] Switched to fullscreen: " << mode->width << "x" << mode->height << std::endl;
     }
-    else {
+    else
+    {
 
         glfwSetWindowMonitor(window, nullptr, windowedPosX, windowedPosY, windowedWidth, windowedHeight, GLFW_DONT_CARE);
 
@@ -1333,24 +1357,29 @@ void GraphicsSystem::ToggleFullScreen() {
     }
 }
 
-void GraphicsSystem::LoadClickCursors(const char* normalPath, const char* clickPath, int normalHotX, int normalHotY, int clickHotX, int clickHotY) {
-    if (window) {
+void GraphicsSystem::LoadClickCursors(const char *normalPath, const char *clickPath, int normalHotX, int normalHotY, int clickHotX, int clickHotY)
+{
+    if (window)
+    {
         glfwSetCursor(window, nullptr);
     }
 
-    if (normalCursor) {
+    if (normalCursor)
+    {
         glfwDestroyCursor(normalCursor);
         normalCursor = nullptr;
     }
 
-    if (clickCursor) {
+    if (clickCursor)
+    {
         glfwDestroyCursor(clickCursor);
         clickCursor = nullptr;
     }
 
     int width, height, channels;
-    unsigned char* pixels = stbi_load(normalPath, &width, &height, &channels, 4);
-    if (pixels) {
+    unsigned char *pixels = stbi_load(normalPath, &width, &height, &channels, 4);
+    if (pixels)
+    {
         GLFWimage image;
         image.width = width;
         image.height = height;
@@ -1359,13 +1388,15 @@ void GraphicsSystem::LoadClickCursors(const char* normalPath, const char* clickP
         stbi_image_free(pixels);
         std::cout << "Loaded normal cursor: " << normalPath << std::endl;
     }
-    else {
+    else
+    {
         std::cerr << "Failed to load normal cursor: " << normalPath << std::endl;
         normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
     }
 
     pixels = stbi_load(clickPath, &width, &height, &channels, 4);
-    if (pixels) {
+    if (pixels)
+    {
         GLFWimage image;
         image.width = width;
         image.height = height;
@@ -1373,31 +1404,37 @@ void GraphicsSystem::LoadClickCursors(const char* normalPath, const char* clickP
         clickCursor = glfwCreateCursor(&image, clickHotX, clickHotY);
         std::cout << "Loaded click cursor: " << clickPath << std::endl;
     }
-    else {
+    else
+    {
         std::cerr << "Failed to load click cursor: " << clickPath << std::endl;
         clickCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
     }
 
-    if (normalCursor) {
+    if (normalCursor)
+    {
         glfwSetCursor(window, normalCursor);
     }
 }
 
-void GraphicsSystem::LoadDefaultCursor(const char* cursorPath, int hotX, int hotY) {
+void GraphicsSystem::LoadDefaultCursor(const char *cursorPath, int hotX, int hotY)
+{
     // Reset to default cursor before changing
-    if (window) {
+    if (window)
+    {
         glfwSetCursor(window, nullptr);
     }
 
     // Destroy old cursor if it exists
-    if (normalCursor) {
+    if (normalCursor)
+    {
         glfwDestroyCursor(normalCursor);
         normalCursor = nullptr;
     }
 
     int width, height, channels;
-    unsigned char* pixels = stbi_load(cursorPath, &width, &height, &channels, 4);
-    if (pixels) {
+    unsigned char *pixels = stbi_load(cursorPath, &width, &height, &channels, 4);
+    if (pixels)
+    {
         GLFWimage image;
         image.width = width;
         image.height = height;
@@ -1406,14 +1443,16 @@ void GraphicsSystem::LoadDefaultCursor(const char* cursorPath, int hotX, int hot
         stbi_image_free(pixels);
         std::cout << "Loaded custom cursor: " << cursorPath << std::endl;
     }
-    else {
+    else
+    {
         std::cerr << "Failed to load custom cursor: " << cursorPath
-            << " - Using default arrow cursor" << std::endl;
+                  << " - Using default arrow cursor" << std::endl;
         normalCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
     }
 
     // Set the new cursor
-    if (normalCursor && window) {
+    if (normalCursor && window)
+    {
         glfwSetCursor(window, normalCursor);
     }
 }
@@ -1432,14 +1471,14 @@ std::string GraphicsSystem::GetName()
  * \param filepath Path to the image file.
  * \return The OpenGL texture ID (GLuint), or 0 if loading fails.
  */
-GLuint GraphicsSystem::LoadTexture(const char* filepath)
+GLuint GraphicsSystem::LoadTexture(const char *filepath)
 {
     // Tell stb_image to flip images vertically (so origin is bottom-left, like OpenGL expects)
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, channels;
     // Force load with 4 channels (RGBA) regardless of source image format
-    unsigned char* data = stbi_load(filepath, &width, &height, &channels, 4);
+    unsigned char *data = stbi_load(filepath, &width, &height, &channels, 4);
     if (!data)
     {
         std::cerr << "Failed to load texture: " << filepath << std::endl;
@@ -1453,7 +1492,7 @@ GLuint GraphicsSystem::LoadTexture(const char* filepath)
 
     // Upload pixel data to GPU (level 0, no border, RGBA format)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-        GL_RGBA, GL_UNSIGNED_BYTE, data);
+                 GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     // Generate mipmaps for scaling
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -1478,7 +1517,7 @@ GLuint GraphicsSystem::LoadTexture(const char* filepath)
  * \param NewClone The new GameObject that will own the cloned component.
  * \return A unique pointer to the newly cloned RenderComponent.
  */
-std::unique_ptr<IComponent> RenderComponent::Clone(GameObject* NewClone) const
+std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
 {
 
     // 1. Determine which constructor to use based on the original component's state.
@@ -1522,18 +1561,18 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject* NewClone) const
  * \brief Handles a message to create a new object with a RenderComponent.
  * \param msg The CreateObjectMessage containing object details.
  */
-void GraphicsSystem::HandleMessage(const CreateObjectMessage& msg)
+void GraphicsSystem::HandleMessage(const CreateObjectMessage &msg)
 {
     // Find the target GameObject by name
-    GameObject* go = GameObjectFactory::Instance().FindByName(msg.name);
+    GameObject *go = GameObjectFactory::Instance().FindByName(msg.name);
     if (!go)
         return;
 
     // Add a new RenderComponent to the object
-    RenderComponent* render = go->AddComponent<RenderComponent>();
+    RenderComponent *render = go->AddComponent<RenderComponent>();
     // Configure the component with data from the message
     render->SetShapeType(msg.shapeType);
-    render->SetColor({ msg.color.x, msg.color.y, msg.color.z, msg.color.w });
+    render->SetColor({msg.color.x, msg.color.y, msg.color.z, msg.color.w});
 
     std::cout << "[GraphicsSystem] Added RenderComponent to: " << msg.name << "\n";
 }
