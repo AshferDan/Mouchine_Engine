@@ -109,7 +109,7 @@ void CutsceneSystem::Update(float dt) {
 	RenderVideo();
 
 	// Check if Skip (Spacebar)
-	if (CORE->GetInputManager()->IsKeyPressed(GLFW_KEY_SPACE)) {
+	if (CORE->GetInputManager()->IsKeyPressed(GLFW_KEY_SPACE) || CORE->GetInputManager()->IsMouseLeftClicked()) {
 		StopCutscene();
 	}
 }
@@ -122,11 +122,13 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 	m_plm = plm_create_with_filename(videoPath.c_str());
 	if (!m_plm) return;
 
+	m_currentVideoPath = videoPath; // Store the name
 	m_isPlaying = true;
 	m_timeAccumulator = 0.0;
 
 	plm_set_audio_enabled(m_plm, 0); // Disable internal audio decoding (using AudioManager instead)
 	CORE->SetGamePaused(true);		 // Pause game loop
+
 	if (!audioName.empty()) {		 // Play Audio if provided
 		m_currentAudio = audioName;
 		CORE->GetAudioManager()->PlaySound(audioName);
@@ -138,6 +140,12 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
  */
 void CutsceneSystem::StopCutscene() {
 	if (!m_isPlaying) return;
+
+	if (!m_currentVideoPath.empty()) {
+		m_finishedVideos.insert(m_currentVideoPath);
+	}
+
+	m_isPlaying = false;
 
 	// Cleanup Decoder
 	if (m_plm) {
@@ -151,8 +159,10 @@ void CutsceneSystem::StopCutscene() {
 		m_currentAudio = "";
 	}
 
+	m_timeAccumulator = 0.0;
+
 	// Resume Game
-	m_isPlaying = false;
+	//m_currentVideoPath = ""; // Reset
 	CORE->SetGamePaused(false);
 }
 

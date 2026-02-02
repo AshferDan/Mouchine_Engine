@@ -494,21 +494,9 @@ void CoreEngine::GameLoop()
             GameManager::Instance().GameStateLoop(static_cast<float>(delta_time));
         }
 
-        // FOR CUT SCENE
-        auto* cutscene = GetCutsceneSystem();
-        auto* input = GetInputManager();    
-
-        // Trigger* 
-        if (input && input->IsKeyPressed(GLFW_KEY_L)) {
-            if (cutscene && !cutscene->IsPlaying()) {
-                std::cout << "[DEBUG] Manually starting cutscene..." << std::endl;
-                cutscene->PlayVideo("../Assets/Cutscene_M3.mpeg");
-            }
-        }
-
         // Update cutscene
-        if (cutscene && cutscene->IsPlaying()) {
-            cutscene->Update(static_cast<float>(delta_time));
+        if (cutsceneSystem && cutsceneSystem->IsPlaying()) {
+            cutsceneSystem->Update(static_cast<float>(delta_time));         
         }
 
         // Swap buffers and poll events

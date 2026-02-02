@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "System.h"
 #include <GL/glew.h>
 #include <string>
+#include <set>
 
 // Forward declaration of the PLM struct
 struct plm_t;
@@ -86,8 +87,22 @@ public:
 	 */
 	void UpdateVideoTexture(void* frame_ptr);
 
+	/**
+	 * @brief Returns true if this specific file has finished playing before
+	 * @param videoPath Path to the .mpeg file.
+	 */
+	bool HasFinished(const std::string& videoPath) const {
+		return m_finishedVideos.find(videoPath) != m_finishedVideos.end();
+	}
+
 private:
 	bool m_isPlaying;
+
+	std::string m_currentVideoPath;         // The file currently playing
+	std::set<std::string> m_finishedVideos; // List of all completed videos
+
+	// Audio syncing
+	std::string m_currentAudio;
 
 	// OpenGL handles
 	unsigned int m_videoTextureID;  // Texture ID used for rendering the video frame
@@ -102,8 +117,7 @@ private:
 	plm_t* m_plm;				// Pointer for the MPEG decoder
 	double m_timeAccumulator;	// To track decoding time
 
-	// Audio syncing
-	std::string m_currentAudio;
+
 
 	void RenderVideo();
 };
