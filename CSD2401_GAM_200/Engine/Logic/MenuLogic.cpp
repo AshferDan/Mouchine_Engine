@@ -194,7 +194,7 @@ void MenuLogicSystem::Update(float dt)
             }
 
             pendingSceneChange = true;
-            pendingTimer = 1.2f;                       // Wait for fade to complete before loading scene
+            pendingTimer = 1.5f;                       // Wait for fade to complete before loading scene
         }
         else
         {

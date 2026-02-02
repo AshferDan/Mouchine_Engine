@@ -443,7 +443,7 @@
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,
-        "category": "bgm_channel"
+        "category": "music"
       },
       {
         "name": "menu_click",

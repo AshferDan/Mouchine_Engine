@@ -319,15 +319,17 @@ void LevelEditor::EnterPlayMode()
         {
             // Game scene - play game BGM
             std::cout << "[LevelEditor] Playing game BGM\n";
-            audioManager->FadeInCategory("music", 15.0f);
             audioManager->PlaySound("bgm", "bgm_channel");
+            audioManager->FadeInCategory("music", 15.0f);
             std::cout << "[LevelEditor] Started music fade in over 15 seconds\n";
         }
         else if (sounds.find("MainMenuBGM") != sounds.end())
         {
-            // Main menu scene - play menu BGM
+            // Main menu scene - play menu BGM with fade in 
             std::cout << "[LevelEditor] Playing main menu BGM\n";
             audioManager->PlaySound("MainMenuBGM", "menu_bgm_channel");
+            audioManager->FadeInCategory("music", 1.0f);  // Fade in menu music over 1 second
+            std::cout << "[LevelEditor] Started menu music fade in over 1 second\n";
         }
         else
         {
@@ -851,13 +853,16 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             if (audioManager)
             {
                 std::cout << "[LoadLevel] AudioManager pointer is valid\n";
+
+                // Reset fade states before loading new audio config
+                audioManager->ResetFadeStates();
+
                 Serialization::DeserializeAudioManager(root, audioManager);
                 std::cout << "[LoadLevel] AudioManager deserialization complete\n";
                 audioManager->PrintConfig();
 
-                // Automatically fade in music when level loads
-                std::cout << "[LoadLevel] Starting automatic fade-in for music category...\n";
-                audioManager->FadeInCategory("music", 15.0f, 1.0f);  // 15 second fade-in to full volume so more obv
+                // Fade-in will be handled in EnterPlayMode, not here
+                std::cout << "[LoadLevel] Audio loaded, fade-in will start when entering play mode\n";
             }
             else
             {
