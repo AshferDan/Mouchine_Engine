@@ -15,7 +15,7 @@ Technology is prohibited.
 
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
-#include "TilemapEditor.h"
+
 #include "ResourceManager.h"
 
 // Global constant for configuration file path (currently unused in this file)

@@ -1481,7 +1481,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
         }
 
         // NOW get the pointer (after all potential reallocations)
-        GraphicsSystem::RenderBatch* targetBatch = &batches[batchIndex];
+       RenderBatch* targetBatch = &batches[batchIndex];
 
         // Add all tiles in this layer
         for (int y = 0; y < data->height; ++y)
@@ -1526,7 +1526,8 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 
                 for (int i = 0; i < 4; ++i)
                 {
-                    GraphicsSystem::BatchVertex vertex;
+                    
+                    BatchVertex vertex;
                     vertex.pos = localPos[i];
                     vertex.tex = texCoords[i];
                     vertex.color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
