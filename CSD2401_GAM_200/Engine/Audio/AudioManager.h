@@ -268,6 +268,12 @@ public:
      */
     const std::map<std::string, FadeState>& GetFadeStates() const { return categoryFadeStates; }
 
+    /**
+     * @brief Checks if any category is currently fading.
+     * @return True if any fade is in progress.
+     */
+    bool IsAnyFadeActive() const;
+
 private:
     std::map<std::string, FadeState> categoryFadeStates;
 };

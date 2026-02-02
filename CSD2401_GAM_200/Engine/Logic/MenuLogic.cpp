@@ -50,10 +50,17 @@ void MenuLogicSystem::Update(float dt)
                         if (!cutscene->IsPlaying()) {
                             cutscene->PlayVideo(introPath);
                         }
-                        // Stay in the menu, video plays on top.
-                    }                   
+                        // Stay in the menu, video plays on top. Fade music back in after the fade out.
+                        AudioManager* audioManager = CORE->GetAudioManager();
+                        if (audioManager)
+                        {
+                            audioManager->FadeInCategory("music", 1.0f);
+                            std::cout << "[MenuLogic] Fading music back in after cutscene trigger" << std::endl;
+                        }
+                    }
                     else {                                      // SECOND CLICK: Video has finished, load the game
                         std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                        std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
                         CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
                         std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                     }
@@ -194,7 +201,7 @@ void MenuLogicSystem::Update(float dt)
             }
 
             pendingSceneChange = true;
-            pendingTimer = 1.5f;                       // Wait for fade to complete before loading scene
+            pendingTimer = 1.5f;                       // Wait 1.5s so 1.2s fade completes before scene loads
         }
         else
         {
