@@ -50,10 +50,17 @@ void MenuLogicSystem::Update(float dt)
                         if (!cutscene->IsPlaying()) {
                             cutscene->PlayVideo(introPath);
                         }
-                        // Stay in the menu, video plays on top.
-                    }                   
+                        // Stay in the menu, video plays on top. Fade music back in after the fade out.
+                        AudioManager* audioManager = CORE->GetAudioManager();
+                        if (audioManager)
+                        {
+                            audioManager->FadeInCategory("music", 1.0f);
+                            std::cout << "[MenuLogic] Fading music back in after cutscene trigger" << std::endl;
+                        }
+                    }
                     else {                                      // SECOND CLICK: Video has finished, load the game
                         std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                        std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
                         CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
                         std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                     }
@@ -186,15 +193,15 @@ void MenuLogicSystem::Update(float dt)
         // Start small delay before loading scene
         if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton" && hoveredButtonName != "BackButton")
         {
-            // Start audio fade out for scene transitions (specifically for PlayButton)
+            // Start audio fade out for scene transitions
             if (hoveredButtonName == "PlayButton" && audioManager)
             {
-                audioManager->FadeOutCategory("music", 0.90f);  // Fade out music over 0.90 seconds
+                audioManager->FadeOutCategory("music", 1.2f);  // Fade out over 1.2 secs
                 std::cout << "[MenuLogic] Started music fade out" << std::endl;
             }
 
             pendingSceneChange = true;
-            pendingTimer = 0.90f;                       // Match fade duration for smooth transition
+            pendingTimer = 1.5f;                       // Wait 1.5s so 1.2s fade completes before scene loads
         }
         else
         {
