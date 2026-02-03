@@ -133,9 +133,14 @@ void ComponentSerialization::SerializePhysics(json &j, PhysicsComponent *p)
  */
 void ComponentSerialization::SerializeCollider(json &j, ColliderComponent *c)
 {
+    vec2 size = c->GetSize();
+
     j["ColliderComponent"] = {
         {"shape", EnumConverters::ToString(c->GetType())},
-        {"layer", EnumConverters::ToString(c->GetLayer())}};
+        {"layer", EnumConverters::ToString(c->GetLayer())},
+        { "size", { size.x, size.y }} 
+    };
+
 }
 
 /**
@@ -493,15 +498,27 @@ void ComponentSerialization::DeserializeCollider(const json &j, GameObject *go)
     CollisionLayer layer = EnumConverters::ToCollisionLayer(c.value("layer", "Default"));
 
     float width, height;
-    if (j.contains("TransformComponent"))
+    // read collider size directly
+    if (c.contains("size") && c["size"].is_array() && c["size"].size() >= 2)
     {
-        const auto &t = j["TransformComponent"];
-        if (t.contains("scale") && t["scale"].size() >= 2)
+        width = c["size"][0].get<float>();
+        height = c["size"][1].get<float>();
+    }
+
+    // backup: older saves only had transform scale
+    else if (j.contains("TransformComponent"))
+    {
+        const auto& t = j["TransformComponent"];
+        if (t.contains("scale") && t["scale"].is_array() && t["scale"].size() >= 2)
         {
             width = t["scale"][0].get<float>();
             height = t["scale"][1].get<float>();
         }
     }
+
+    // Safety: circles usually treat width as diameter
+    if (type == ColliderComponent::Type::Circle && height <= 0.0f)
+        height = width;
 
     go->AddComponent<ColliderComponent>(type, width, height, layer);
 }
