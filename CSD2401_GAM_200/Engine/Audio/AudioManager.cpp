@@ -490,6 +490,9 @@ void AudioManager::FadeOutCategory(const std::string& category, float duration)
         return;
     }
 
+    // Start from 1 volume
+    SetCategoryVolume(category, 1.0f);
+
     FadeState& fadeState = categoryFadeStates[category];
     fadeState.isFading = true;
     fadeState.isFadeIn = false;
@@ -566,19 +569,39 @@ void AudioManager::UpdateFade(float dt)
         }
         else
         {
-            // Linear interpolation from startVolume to targetVolume
-            float newVolume = fadeState.startVolume + (fadeState.targetVolume - fadeState.startVolume) * t;
+            // Use exponential curve for fade out, linear for fade in
+            float interpolatedValue;
+            if (fadeState.isFadeIn)
+            {
+                // Linear interpolation for fade in
+                interpolatedValue = t;
+            }
+            else
+            {
+                // Exponential curve for fade out
+                interpolatedValue = t * t * t;
+            }
+
+            float newVolume = fadeState.startVolume + (fadeState.targetVolume - fadeState.startVolume) * interpolatedValue;
             SetCategoryVolume(category, newVolume);
-            //std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
+            std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
         }
     }
 }
 
 /**
  * @brief Resets all fade states and restores default category volumes.
+ *        Only resets if no fade is currently active (to preserve transitions).
  */
 void AudioManager::ResetFadeStates()
 {
+    // Check if any fade is currently active
+    if (IsAnyFadeActive())
+    {
+        std::cout << "[AudioManager] Fade in progress - skipping reset to preserve transition" << std::endl;
+        return;
+    }
+
     categoryFadeStates.clear();
 
     // Restore default volumes

@@ -854,9 +854,6 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             {
                 std::cout << "[LoadLevel] AudioManager pointer is valid\n";
 
-                // Reset fade states before loading new audio config
-                audioManager->ResetFadeStates();
-
                 Serialization::DeserializeAudioManager(root, audioManager);
                 std::cout << "[LoadLevel] AudioManager deserialization complete\n";
                 audioManager->PrintConfig();

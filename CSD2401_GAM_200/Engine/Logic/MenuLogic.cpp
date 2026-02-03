@@ -49,13 +49,8 @@ void MenuLogicSystem::Update(float dt)
                     if (!cutscene->HasFinished(introPath)) {    // FIRST CLICK: Play Cutscene
                         if (!cutscene->IsPlaying()) {
                             cutscene->PlayVideo(introPath);
-                        }
-                        // Stay in the menu, video plays on top. Fade music back in after the fade out.
-                        AudioManager* audioManager = CORE->GetAudioManager();
-                        if (audioManager)
-                        {
-                            audioManager->FadeInCategory("music", 1.0f);
-                            std::cout << "[MenuLogic] Fading music back in after cutscene trigger" << std::endl;
+                            // Don't fade back in - let the fade out complete
+                            std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
                     }
                     else {                                      // SECOND CLICK: Video has finished, load the game
@@ -196,12 +191,12 @@ void MenuLogicSystem::Update(float dt)
             // Start audio fade out for scene transitions
             if (hoveredButtonName == "PlayButton" && audioManager)
             {
-                audioManager->FadeOutCategory("music", 1.2f);  // Fade out over 1.2 secs
+                audioManager->FadeOutCategory("music", 1.0f);  // Fade out over 1.0 sec
                 std::cout << "[MenuLogic] Started music fade out" << std::endl;
             }
 
             pendingSceneChange = true;
-            pendingTimer = 1.5f;                       // Wait 1.5s so 1.2s fade completes before scene loads
+            pendingTimer = 2.0f;                       // Wait 3.0s so 2.5s fade completes before scene loads
         }
         else
         {
@@ -211,6 +206,8 @@ void MenuLogicSystem::Update(float dt)
                 if (audioManager)
                 {
                     audioManager->ToggleMasterMute();
+
+
                 }
                 SetButtonTexture("MuteButton", true); // Update texture after toggling
             }
