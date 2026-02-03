@@ -170,6 +170,8 @@ namespace CSharpScript
             Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.5f, 1.35f, "sfx");
             Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
+            Audio.AddSound("AirGlide", "../Assets/audio/Player/AirGlide.wav", false, 1.0f, 1.5f, "sfx");
+            Audio.AddSound("TurnSkid", "../Assets/audio/Player/TurnSkid.wav", false, 1.0f, 1.5f, "sfx");
 
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
             Animation.RegisterAnimation("Hero", "Run", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 16.0f);
@@ -194,6 +196,7 @@ namespace CSharpScript
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
 
+            // uncomment to 'visualise' grounded raycast
             //CSharpScript.GameObject.CreateShape(
             //    "DebugLine",
             //    (int)CSharpScript.ShapeType.Square,
@@ -1564,7 +1567,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.Gliding:
                     Debug.Log("CurrState: " + "Glide");
-                    Audio.PlaySound("groundpound_falling_sfx", "sfx");
+                    Audio.PlaySound("AirGlide", "sfx");
                     break;
                 case PlayerState.WallSliding:
                     Debug.Log("CurrState: " + "Wallslide");
