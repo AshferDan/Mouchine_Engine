@@ -17,6 +17,8 @@ using CSharpScript;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace CSharpScript
 {
@@ -43,6 +45,8 @@ namespace CSharpScript
 
         private PlayerState currState = PlayerState.Idle;
         private PlayerState[] loopingSounds = { PlayerState.Walking, PlayerState.Falling, PlayerState.GroundPounding_Falling, PlayerState.Ziplining, PlayerState.Gliding, PlayerState.WallSliding };
+        private float[] footstepFrequencies = { 0.4f, 0.3f, 0.25f, 0.2f };       // walking - tier1 - tier2- tier3
+        private float minFootstepDistance = 5.0f;
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
@@ -163,7 +167,6 @@ namespace CSharpScript
 
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx", "../Assets/audio/Player/Footstep.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
             Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", true, 0.5f, 2.0f, "sfx");
             Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.1f, 1.25f, "sfx");
@@ -172,9 +175,22 @@ namespace CSharpScript
             Audio.AddSound("land_sfx", "../Assets/audio/Player/Land.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("AirGlide", "../Assets/audio/Player/AirGlide.wav", false, 1.0f, 1.5f, "sfx");
             Audio.AddSound("TurnSkid", "../Assets/audio/Player/TurnSkid.wav", false, 1.0f, 1.5f, "sfx");
+            //footsteps
+            Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx3", "../Assets/audio/Player/Footstep/Footstep3.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx4", "../Assets/audio/Player/Footstep/Footstep4.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx5", "../Assets/audio/Player/Footstep/Footstep5.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx6", "../Assets/audio/Player/Footstep/Footstep6.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx7", "../Assets/audio/Player/Footstep/Footstep7.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx8", "../Assets/audio/Player/Footstep/Footstep8.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx9", "../Assets/audio/Player/Footstep/Footstep9.wav", false, 0.8f, 1.0f, "sfx");
 
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
-            Animation.RegisterAnimation("Hero", "Run", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 16.0f);
+            Animation.RegisterAnimation("Hero", "Walk", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 10.0f);
+            Animation.RegisterAnimation("Hero", "Run1", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 12.0f);
+            Animation.RegisterAnimation("Hero", "Run2", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 15.0f);
+            Animation.RegisterAnimation("Hero", "Run3", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 20.0f);
             Animation.RegisterAnimation("Hero", "Jump", "../Assets/spritesheet_R.png", 13, 10, 11, 4, 11, 5, 12.0f);
             Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png", 13, 10, 1, 0, 1, 2, 8.0f);
             Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 12.0f);
@@ -232,12 +248,14 @@ namespace CSharpScript
                 _isRunToggleActive = InputManager.RunIsHeld;
             }
 
+
             // Handle all timers
             _jumpBufferTimer -= deltaTime;
             _coyoteTimer -= deltaTime;
             _wallKickCooldownTimer -= deltaTime;
             _ziplineCoyoteTimer -= deltaTime;
             JumpChecks();
+            PlayFootsteps();
             // Handle Inputs
             HandleGeneralInput();
             OnFixedUpdate(fixeddt);
@@ -250,8 +268,17 @@ namespace CSharpScript
                 case PlayerState.Jumping:
                     Animation.PlayAnimation(OwnerName, "Jump");
                     break;
+                case PlayerState.Walking:
+                    Animation.PlayAnimation(OwnerName, "Walk");
+                    break;
                 case PlayerState.Running:
-                    Animation.PlayAnimation(OwnerName, "Run");
+                    int index = GetCurrentTentacleLevel();
+                    if (index == 1)
+                        Animation.PlayAnimation(OwnerName, "Run1");
+                    else if (index == 2)
+                        Animation.PlayAnimation(OwnerName, "Run2");
+                    else if (index == 3)
+                        Animation.PlayAnimation(OwnerName, "Run3");
                     break;
                 case PlayerState.Falling:
                     Animation.PlayAnimation(OwnerName, "Falling");
@@ -409,7 +436,11 @@ namespace CSharpScript
                 // horizontal input = moving - trigger run animation
                 if (InputManager.Movement.x != 0)
                 {
-                    currState = PlayerState.Running;
+                    int index = GetCurrentTentacleLevel();
+                    if (index == 0)
+                        currState = PlayerState.Walking;
+                    else
+                        currState = PlayerState.Running;
                 }
                 else
                 {
@@ -1507,6 +1538,30 @@ namespace CSharpScript
         {
             t = Utils.MathfClamp(t, 0, 1);
             return new vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+        }
+
+        float footstepTimer = 0.0f;
+        // depending on running tiers, play randomised footsteps at different frequencies
+        private void PlayFootsteps()
+        {
+            if (_isGrounded && movespeed > minFootstepDistance)
+            {
+                footstepTimer += fixeddt;
+                int index = GetCurrentTentacleLevel();
+                Debug.Log(footstepTimer.ToString());
+                if (footstepTimer >= footstepFrequencies[index])
+                {
+                    //playfootstep
+                    Random rnd = new Random();
+                    int variation = rnd.Next(1, footstepFrequencies.Length);
+                    Audio.PlaySound("footstep_sfx" + variation.ToString(), "sfx");
+                    footstepTimer = 0.0f;
+                }
+            }
+            else
+            {
+                footstepTimer = 0.0f; // reset when stopping or airborne
+            }
         }
 
         private void EnterState(PlayerState state)
