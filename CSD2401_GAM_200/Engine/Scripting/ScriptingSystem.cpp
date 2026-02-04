@@ -18,6 +18,7 @@ Technology is prohibited.
 #include <iostream>
 #include <filesystem>
 #include <mono/metadata/attrdefs.h>
+#include "logic.h" // Include logic.h for EventSystem and EventType
 
 // Internal call functions - these will be called from C#
 // === Debug ===
@@ -1362,6 +1363,34 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
 void ScriptSystem::Update(float deltaTime)
 {
+    // Create a copy of events to iterate over, as events might be modified during processing
+    std::vector<QueuedEvent> eventsCopy = EventSystem::events;
+    EventSystem::Clear(); // Clear the static events queue as they are being processed now
+
+    for (auto& e : eventsCopy)
+    {
+        if (e.type == EventType::OnDestroy)
+        {
+            auto it = gameObjectScripts.find(e.target);
+            if (it != gameObjectScripts.end())
+            {
+                for (auto& scriptInstance : it->second)
+                {
+                    if (scriptInstance.gcHandle != 0)
+                    {
+                        mono_gchandle_free(scriptInstance.gcHandle);
+                    }
+                }
+                gameObjectScripts.erase(it);
+            }
+        }
+        else
+        {
+            // Re-raise events that are not OnDestroy for other systems to process
+            EventSystem::Raise(e.type, e.target, e.other);
+        }
+    }
+
     // Update all scripts attached to game objects
     for (auto &[gameObject, instances] : gameObjectScripts)
     {
@@ -1483,5 +1512,40 @@ void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& f
     if (field) {
         MonoString* monoStr = mono_string_new(appDomain, value.c_str());
         mono_field_set_value(instance.instance, field, monoStr);
+    }
+}
+
+void ScriptSystem::NotifyGameObjectDestroyed(GameObject* gameObject)
+{
+    if (!gameObject)
+    {
+        std::cerr << "[ScriptSystem] ERROR: NotifyGameObjectDestroyed called with null GameObject!\n";
+        return;
+    }
+
+    std::cout << "[ScriptSystem] Notifying destruction of GameObject: " << gameObject->GetName() << std::endl;
+
+    // 1. Call OnDestroy for all scripts attached to this GameObject
+    // This ensures C# cleanup logic runs before references are removed.
+    CallOnDestroy(gameObject);
+
+    // 2. Remove the GameObject's entry from gameObjectScripts map
+    auto it = gameObjectScripts.find(gameObject);
+    if (it != gameObjectScripts.end())
+    {
+        // Free Mono garbage collection handles for all script instances
+        for (auto& scriptInstance : it->second)
+        {
+            if (scriptInstance.gcHandle != 0)
+            {
+                mono_gchandle_free(scriptInstance.gcHandle);
+            }
+        }
+        gameObjectScripts.erase(it);
+        std::cout << "[ScriptSystem] Removed references for GameObject: " << gameObject->GetName() << std::endl;
+    }
+    else
+    {
+        std::cout << "[ScriptSystem] No script references found for GameObject: " << gameObject->GetName() << std::endl;
     }
 }

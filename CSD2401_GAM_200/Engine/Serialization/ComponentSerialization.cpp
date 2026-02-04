@@ -602,6 +602,10 @@ void ComponentSerialization::DeserializeCamera(const json &j, GameObject *go)
     bool smoothing = c.value("smoothing", true);
     float smoothingSpeed = c.value("smoothingSpeed", 2.f);
     cam->SetSmoothing(smoothing, smoothingSpeed);
+
+    // Deserialize and set zoom
+    float zoom = c.value("zoom", 1.0f); // Default to 1.0f if not specified
+    cam->SetZoom(zoom);
 }
 
 void ComponentSerialization::DeserializeEvent(const json &j, GameObject *go)
