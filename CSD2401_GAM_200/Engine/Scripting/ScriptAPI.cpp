@@ -1184,6 +1184,102 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             audioManager->SetCategoryVolume(CatName, vol);
         }
     }
+
+    void SetPitch(const std::string soundName, float pitch)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->SetSoundPitch(soundName, pitch);
+        }
+    }
+
+    void PauseSound(const std::string channelName, bool pause)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+            if (audioEngine)
+            {
+                audioEngine->pauseSound(channelName, pause);
+            }
+        }
+    }
+
+    void PauseAllSounds(bool pause)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->PauseAllSounds(pause);
+        }
+    }
+
+    void ToggleMasterMute()
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->ToggleMasterMute();
+        }
+    }
+
+    void ToggleCategoryMute(const std::string category)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->ToggleCategoryMute(category);
+        }
+    }
+
+    bool IsMasterMuted()
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            return audioManager->IsMuted();
+        }
+        return false;
+    }
+
+    bool IsCategoryMuted(const std::string category)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            return audioManager->IsCategoryMuted(category);
+        }
+        return false;
+    }
+
+    void FadeOutCategory(const std::string category, float duration)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeOutCategory(category, duration);
+        }
+    }
+
+    void FadeInCategory(const std::string category, float duration, float targetVolume)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeInCategory(category, duration, targetVolume);
+        }
+    }
+
+    void FadeOutAll(float duration)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeOutAll(duration);
+        }
+    }
 #pragma endregion
 
 #pragma region Timer

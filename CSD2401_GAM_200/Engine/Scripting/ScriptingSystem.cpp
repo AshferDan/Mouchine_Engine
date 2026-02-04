@@ -457,6 +457,59 @@ static void Internal_SetCategoryVolume(MonoString* catName, float volume) {
     mono_free(cName);
 }
 
+static void Internal_SetPitch(MonoString* soundName, float pitch) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::SetPitch(cName, pitch);
+    mono_free(cName);
+}
+
+static void Internal_PauseSound(MonoString* channelName, bool pause) {
+    char* cName = mono_string_to_utf8(channelName);
+    API::PauseSound(cName, pause);
+    mono_free(cName);
+}
+
+static void Internal_PauseAllSounds(bool pause) {
+    API::PauseAllSounds(pause);
+}
+
+static void Internal_ToggleMasterMute() {
+    API::ToggleMasterMute();
+}
+
+static void Internal_ToggleCategoryMute(MonoString* category) {
+    char* cName = mono_string_to_utf8(category);
+    API::ToggleCategoryMute(cName);
+    mono_free(cName);
+}
+
+static bool Internal_IsMasterMuted() {
+    return API::IsMasterMuted();
+}
+
+static bool Internal_IsCategoryMuted(MonoString* category) {
+    char* cName = mono_string_to_utf8(category);
+    bool result = API::IsCategoryMuted(cName);
+    mono_free(cName);
+    return result;
+}
+
+static void Internal_FadeOutCategory(MonoString* category, float duration) {
+    char* cName = mono_string_to_utf8(category);
+    API::FadeOutCategory(cName, duration);
+    mono_free(cName);
+}
+
+static void Internal_FadeInCategory(MonoString* category, float duration, float targetVolume) {
+    char* cName = mono_string_to_utf8(category);
+    API::FadeInCategory(cName, duration, targetVolume);
+    mono_free(cName);
+}
+
+static void Internal_FadeOutAll(float duration) {
+    API::FadeOutAll(duration);
+}
+
 // === Camera ===
 static void Internal_SetCameraPosition(float x, float y) {
     vec2 pos = { x, y };
@@ -857,6 +910,16 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Audio::AddEventSound", (void*)Internal_AddEventSound);
     mono_add_internal_call("CSharpScript.Audio::SetVolume", (void*)Internal_SetVolume);
     mono_add_internal_call("CSharpScript.Audio::SetCategoryVolume", (void*)Internal_SetCategoryVolume);
+    mono_add_internal_call("CSharpScript.Audio::SetPitch", (void*)Internal_SetPitch);
+    mono_add_internal_call("CSharpScript.Audio::PauseSound", (void*)Internal_PauseSound);
+    mono_add_internal_call("CSharpScript.Audio::PauseAllSounds", (void*)Internal_PauseAllSounds);
+    mono_add_internal_call("CSharpScript.Audio::ToggleMasterMute", (void*)Internal_ToggleMasterMute);
+    mono_add_internal_call("CSharpScript.Audio::ToggleCategoryMute", (void*)Internal_ToggleCategoryMute);
+    mono_add_internal_call("CSharpScript.Audio::IsMasterMuted", (void*)Internal_IsMasterMuted);
+    mono_add_internal_call("CSharpScript.Audio::IsCategoryMuted", (void*)Internal_IsCategoryMuted);
+    mono_add_internal_call("CSharpScript.Audio::FadeOutCategory", (void*)Internal_FadeOutCategory);
+    mono_add_internal_call("CSharpScript.Audio::FadeInCategory", (void*)Internal_FadeInCategory);
+    mono_add_internal_call("CSharpScript.Audio::FadeOutAll", (void*)Internal_FadeOutAll);
 
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);

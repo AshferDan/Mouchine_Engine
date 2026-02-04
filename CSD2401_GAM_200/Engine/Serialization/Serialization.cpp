@@ -276,11 +276,11 @@ void Serialization::SaveScene(const std::string &scenePath)
 
 	for (const auto &obj : objects)
 	{
-		if (obj && obj->IsActive())
+		if (obj)
 		{
-			if (obj->GetParent() == nullptr)  // Only save top-level objects
+			if (obj->GetParent() == nullptr)  // Only save top-level objects (children are saved recursively)
 			{
-				// Serialize and add to JSON array
+				// Serialize and add to JSON array (saves both active and inactive objects)
 				j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
 			}
 		}

@@ -417,9 +417,22 @@ namespace API {
 
     void TriggerEvent(const std::string);
     void AddEventSound(const std::string, const std::string);
-   
+
     void SetVolume(const std::string,float);
     void SetCategoryVolume(const std::string,float);
+    void SetPitch(const std::string, float);
+
+    void PauseSound(const std::string, bool);
+    void PauseAllSounds(bool);
+
+    void ToggleMasterMute();
+    void ToggleCategoryMute(const std::string);
+    bool IsMasterMuted();
+    bool IsCategoryMuted(const std::string);
+
+    void FadeOutCategory(const std::string, float);
+    void FadeInCategory(const std::string, float, float);
+    void FadeOutAll(float);
 #pragma endregion
 
 
