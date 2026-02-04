@@ -275,6 +275,18 @@ target_include_directories(Game PRIVATE ${Game_DIR})
 # Set Game as startup project for Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game)
 
+# ======================= Hide Console in Release Mode ===============
+# Use Windows subsystem (no console) in Release, Console subsystem in Debug
+if(WIN32)
+    set_target_properties(Game PROPERTIES
+        WIN32_EXECUTABLE $<CONFIG:Release>
+    )
+    # Allow using main() instead of WinMain() even with Windows subsystem
+    target_link_options(Game PRIVATE
+        $<$<CONFIG:Release>:/ENTRY:mainCRTStartup>
+    )
+endif()
+
 # ======================= Output Directories ========================
 # Set consistent output directories for all configurations (Debug and Release only)
 set_target_properties(Game PROPERTIES
