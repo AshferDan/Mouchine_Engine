@@ -24,7 +24,7 @@ Technology is prohibited.
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/mono-config.h>
-
+#include "ScriptComponent.h"
 class GameObject;
 
 // Forward declaration
