@@ -177,7 +177,7 @@ namespace CSharpScript
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
-            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", true, 0.5f, 2.0f, "sfx");
+            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", false, 0.5f, 2.0f, "sfx");
             Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.1f, 1.25f, "sfx");
             Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.1f, 0.9f, "sfx");
@@ -1560,6 +1560,8 @@ namespace CSharpScript
             Debug.Log(state.ToString());
             //Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
             // ^ im commenting this out for now cause its stopping the level bgm
+
+            Audio.StopSound("sfx");
 
             // doesnt work for some reason
             //if (loopingSounds.Contains(state))
