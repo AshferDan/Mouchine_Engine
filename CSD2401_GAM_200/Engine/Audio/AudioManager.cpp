@@ -673,7 +673,7 @@ void AudioManager::UpdateFade(float dt)
 
             float newVolume = fadeState.startVolume + (fadeState.targetVolume - fadeState.startVolume) * interpolatedValue;
             SetCategoryVolume(category, newVolume);
-            std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
+            //std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
         }
     }
 }

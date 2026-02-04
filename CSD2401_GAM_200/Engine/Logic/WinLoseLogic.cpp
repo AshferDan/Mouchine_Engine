@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "AudioManager.h"
 #include "GraphicsSystem.h"
 #include "MathLib.h"
+#include "ColliderComponent.h"
+#include "Collision.h"
 #include <iostream>
 
 /**
@@ -47,6 +49,12 @@ void WinLoseLogicSystem::Update(float dt)
     if (firstUpdate)
     {
         firstUpdate = false;
+        hasPlayerWon = false;
+        isWaitingForWin = false;
+        hasCreatedWinScreen = false;
+        hasCreatedLoseScreen = false;
+        winDelayTimer = 0.0f;
+        pendingSceneChange = false;
     }
 
     totalFrames++;
@@ -68,6 +76,12 @@ void WinLoseLogicSystem::Update(float dt)
             CORE->SetGamePaused(false);
             CORE->RequestSceneLoad(pendingScenePath, true);
             pendingScenePath = "";
+
+            hasPlayerWon = false;
+            isWaitingForWin = false;
+            hasCreatedWinScreen = false;
+            hasCreatedLoseScreen = false;
+            winDelayTimer = 0.0f;
         }
         return;
     }
@@ -76,16 +90,12 @@ void WinLoseLogicSystem::Update(float dt)
     LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
     if (!editor)
     {
-        if (totalFrames % 300 == 0)
-            std::cout << "[WinZone] No editor found!" << std::endl;
         return;
     }
 
     EditorMode mode = editor->GetEditorMode();
     if (mode != EditorMode::Play)
     {
-        if (totalFrames % 300 == 0)
-            std::cout << "[WinZone] Not in Play mode. Current mode: " << (int)mode << std::endl;
         return;
     }
 
@@ -170,80 +180,70 @@ void WinLoseLogicSystem::Update(float dt)
         return;
     }
 
-    CheckWinCondition();
+    CheckWinZoneCollision();
 }
 
 /**
- * @brief Checks whether the player has collided with the win zone.
+ * @brief Checks for WinZone collision using AABB every frame
  */
-void WinLoseLogicSystem::CheckWinCondition()
+void WinLoseLogicSystem::CheckWinZoneCollision()
 {
     auto& factory = GameObjectFactory::Instance();
-
-    // find the win zone
     GameObject* winZone = factory.FindGameObject("WinZone");
-    if (!winZone)
-    {
-        static bool warnedOnce = false;
-        if (!warnedOnce)
-        {
-            warnedOnce = true;
-        }
-        return;
-    }
-
-    if (!winZone->IsActive())
-    {
-        return;
-    }
-
-    // find player
     GameObject* player = factory.FindGameObject("Hero");
-    if (!player)
-    {
-        static bool warnedOnce = false;
-        if (!warnedOnce)
-        {
-            std::cout << "[WinZone] WARNING: Hero object not found in scene!" << std::endl;
-            warnedOnce = true;
-        }
-        return;
-    }
 
-    if (!player->IsActive())
+    if (!winZone || !player || !winZone->IsActive() || !player->IsActive())
     {
         return;
     }
 
     auto* winZoneTransform = winZone->GetComponent<TransformComponent>();
     auto* playerTransform = player->GetComponent<TransformComponent>();
+    auto* winZoneCollider = winZone->GetComponent<ColliderComponent>();
+    auto* playerCollider = player->GetComponent<ColliderComponent>();
 
-    if (!winZoneTransform || !playerTransform)
+    if (!winZoneTransform || !playerTransform || !winZoneCollider || !playerCollider)
     {
         return;
     }
 
-    // simple AABB collision check
-    float winX, winY, playerX, playerY;
-    winZoneTransform->GetPosition(winX, winY);
-    playerTransform->GetPosition(playerX, playerY);
+    // Use the ColliderComponent's AABB for accurate collision detection
+    AABB winAABB = winZoneCollider->GetAABB();
+    AABB playerAABB = playerCollider->GetAABB();
 
-    float winHalfWidth = winZoneTransform->scaleX / 2.0f;
-    float winHalfHeight = winZoneTransform->scaleY / 2.0f;
-    float playerHalfWidth = playerTransform->scaleX / 2.0f;
-    float playerHalfHeight = playerTransform->scaleY / 2.0f;
+    // Get center positions
+    float winX = (winAABB.min.x + winAABB.max.x) / 2.0f;
+    float winY = (winAABB.min.y + winAABB.max.y) / 2.0f;
+    float playerX = (playerAABB.min.x + playerAABB.max.x) / 2.0f;
+    float playerY = (playerAABB.min.y + playerAABB.max.y) / 2.0f;
 
-    // check AABB collision
-    bool colliding = (std::abs(playerX - winX) < (playerHalfWidth + winHalfWidth)) &&
-        (std::abs(playerY - winY) < (playerHalfHeight + winHalfHeight));
+    // Get half dimensions from AABB
+    float winHalfWidth = (winAABB.max.x - winAABB.min.x) / 2.0f;
+    float winHalfHeight = (winAABB.max.y - winAABB.min.y) / 2.0f;
+    float playerHalfWidth = (playerAABB.max.x - playerAABB.min.x) / 2.0f;
+    float playerHalfHeight = (playerAABB.max.y - playerAABB.min.y) / 2.0f;
 
-    if (colliding)
+    float distX = std::abs(playerX - winX);
+    float distY = std::abs(playerY - winY);
+    float thresholdX = playerHalfWidth + winHalfWidth;
+    float thresholdY = playerHalfHeight + winHalfHeight;
+
+    bool colliding = (distX < thresholdX) && (distY < thresholdY);
+
+    static bool lastFrameColliding = false;
+
+    if (colliding && !lastFrameColliding)
     {
-        std::cout << "[WinZone] Player reached the win zone!" << std::endl;
-        hasPlayerWon = true;
-        isWaitingForWin = true;
-        winDelayTimer = 0.5f; // 0.5 second delay before transitioning
+        if (!hasPlayerWon && !isWaitingForWin)
+        {
+            std::cout << "[WinZone] Player reached the win zone!" << std::endl;
+            hasPlayerWon = true;
+            isWaitingForWin = true;
+            winDelayTimer = 0.5f;
+        }
     }
+
+    lastFrameColliding = colliding;
 }
 
 // ============ WIN ============
@@ -481,13 +481,10 @@ void WinLoseLogicSystem::DestroyWinScreen()
         }
     }
 
-    // reset win state
     hasCreatedWinScreen = false;
     hasPlayerWon = false;
     isWaitingForWin = false;
     hoveredButtonName.clear();
-
-    std::cout << "[WinZone] Win screen destroyed and state reset" << std::endl;
 }
 
 /**
