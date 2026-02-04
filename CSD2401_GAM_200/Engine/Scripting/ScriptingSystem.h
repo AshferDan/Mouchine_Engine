@@ -201,6 +201,8 @@ public:
     void SetPublicField(ScriptInstance& instance, const std::string& fieldName, const bool& value);
     void SetPublicField(ScriptInstance& instance, const std::string& fieldName, const std::string& value);
 
+    void NotifyGameObjectDestroyed(GameObject* gameObject);
+    
     /**
      * @brief Gets the core assembly for direct class access
      */

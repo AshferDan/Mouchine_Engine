@@ -1485,3 +1485,38 @@ void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& f
         mono_field_set_value(instance.instance, field, monoStr);
     }
 }
+
+void ScriptSystem::NotifyGameObjectDestroyed(GameObject* gameObject)
+{
+    if (!gameObject)
+    {
+        std::cerr << "[ScriptSystem] ERROR: NotifyGameObjectDestroyed called with null GameObject!\n";
+        return;
+    }
+
+    std::cout << "[ScriptSystem] Notifying destruction of GameObject: " << gameObject->GetName() << std::endl;
+
+    // 1. Call OnDestroy for all scripts attached to this GameObject
+    // This ensures C# cleanup logic runs before references are removed.
+    CallOnDestroy(gameObject);
+
+    // 2. Remove the GameObject's entry from gameObjectScripts map
+    auto it = gameObjectScripts.find(gameObject);
+    if (it != gameObjectScripts.end())
+    {
+        // Free Mono garbage collection handles for all script instances
+        for (auto& scriptInstance : it->second)
+        {
+            if (scriptInstance.gcHandle != 0)
+            {
+                mono_gchandle_free(scriptInstance.gcHandle);
+            }
+        }
+        gameObjectScripts.erase(it);
+        std::cout << "[ScriptSystem] Removed references for GameObject: " << gameObject->GetName() << std::endl;
+    }
+    else
+    {
+        std::cout << "[ScriptSystem] No script references found for GameObject: " << gameObject->GetName() << std::endl;
+    }
+}
