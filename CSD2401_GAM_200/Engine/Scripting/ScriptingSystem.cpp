@@ -186,12 +186,29 @@ static void Internal_SetGravity(MonoString *objectName, bool enabled)
 }
 
 
-static vec2 Internal_GetVelocity(MonoString* objectName)
+static void Internal_GetVelocity(MonoString* objectName, float* x, float* y)
 {
+    if (!objectName)
+    {
+        std::cerr << "[ScriptSystem] ERROR: GetVelocity called with null objectName\n";
+        *x = 0.0f;
+        *y = 0.0f;
+        return;
+    }
+
     char* name = mono_string_to_utf8(objectName);
+    if (!name)
+    {
+        std::cerr << "[ScriptSystem] ERROR: mono_string_to_utf8 returned null\n";
+        *x = 0.0f;
+        *y = 0.0f;
+        return;
+    }
+
     vec2 result = API::GetVelocity(name);
+    *x = result.x;
+    *y = result.y;
     mono_free(name);
-    return result;
 }
 
 static void Internal_SetMass(MonoString* objectName, float mass)
@@ -798,7 +815,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Physics::SetJumpValue", (void *)Internal_SetJumpValue);
     mono_add_internal_call("CSharpScript.Physics::SetGravity", (void *)Internal_SetGravity);
     mono_add_internal_call("CSharpScript.Physics::SetStatic", (void *)Internal_SetStatic);
-    mono_add_internal_call("CSharpScript.Physics::GetVelocity", (void*)Internal_GetVelocity);
+    mono_add_internal_call("CSharpScript.Physics::GetVelocity_Internal", (void*)Internal_GetVelocity);
     mono_add_internal_call("CSharpScript.Physics::SetMass", (void*)Internal_SetMass);
     mono_add_internal_call("CSharpScript.Physics::SetFriction", (void*)Internal_SetFriction);
 
@@ -1046,7 +1063,7 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
     if (ownerNameField)
     {
         std::string goName = gameObject->GetName();
-        MonoString* monoName = mono_string_new(mono_domain_get(), goName.c_str());
+        MonoString* monoName = mono_string_new(appDomain, goName.c_str());
         mono_field_set_value(instance, ownerNameField, monoName);
 
         std::cout << "[ScriptSystem] Injected OwnerName: " << goName << std::endl;
@@ -1106,9 +1123,50 @@ void ScriptSystem::CallOnStart(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-        if (scriptInstance.scriptClass->onStart)
+        // Validate all pointers before calling mono_runtime_invoke
+        if (!scriptInstance.scriptClass)
         {
-            mono_runtime_invoke(scriptInstance.scriptClass->onStart, scriptInstance.instance, nullptr, nullptr);
+            std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
+            continue;
+        }
+
+        if (!scriptInstance.instance)
+        {
+            std::cerr << "[ScriptSystem] ERROR: script instance is null for " << gameObject->GetName() << std::endl;
+            continue;
+        }
+
+        if (!scriptInstance.scriptClass->onStart)
+        {
+            // OnStart method not found or doesn't exist - skip silently
+            continue;
+        }
+
+        MonoObject* exception = nullptr;
+        mono_runtime_invoke(scriptInstance.scriptClass->onStart, scriptInstance.instance, nullptr, &exception);
+
+        if (exception)
+        {
+            MonoClass* exceptionClass = mono_object_get_class(exception);
+            const char* exceptionName = mono_class_get_name(exceptionClass);
+
+            MonoProperty* messageProp = mono_class_get_property_from_name(exceptionClass, "Message");
+            if (messageProp)
+            {
+                MonoMethod* getter = mono_property_get_get_method(messageProp);
+                MonoString* messageStr = (MonoString*)mono_runtime_invoke(getter, exception, nullptr, nullptr);
+                char* message = mono_string_to_utf8(messageStr);
+
+                std::cerr << "[ScriptSystem] Exception in OnStart for " << gameObject->GetName()
+                          << ": " << exceptionName << " - " << message << std::endl;
+
+                mono_free(message);
+            }
+            else
+            {
+                std::cerr << "[ScriptSystem] Exception in OnStart for " << gameObject->GetName()
+                          << ": " << exceptionName << std::endl;
+            }
         }
     }
 }
@@ -1126,9 +1184,50 @@ void ScriptSystem::CallOnUpdate(GameObject *gameObject, float deltaTime)
 
     for (auto &scriptInstance : it->second)
     {
-        if (scriptInstance.scriptClass->onUpdate)
+        // Validate all pointers before calling mono_runtime_invoke
+        if (!scriptInstance.scriptClass)
         {
-            mono_runtime_invoke(scriptInstance.scriptClass->onUpdate, scriptInstance.instance, args, nullptr);
+            std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
+            continue;
+        }
+
+        if (!scriptInstance.instance)
+        {
+            std::cerr << "[ScriptSystem] ERROR: script instance is null for " << gameObject->GetName() << std::endl;
+            continue;
+        }
+
+        if (!scriptInstance.scriptClass->onUpdate)
+        {
+            // OnUpdate method not found or doesn't exist - this is normal, skip silently
+            continue;
+        }
+
+        MonoObject* exception = nullptr;
+        mono_runtime_invoke(scriptInstance.scriptClass->onUpdate, scriptInstance.instance, args, &exception);
+
+        if (exception)
+        {
+            MonoClass* exceptionClass = mono_object_get_class(exception);
+            const char* exceptionName = mono_class_get_name(exceptionClass);
+
+            MonoProperty* messageProp = mono_class_get_property_from_name(exceptionClass, "Message");
+            if (messageProp)
+            {
+                MonoMethod* getter = mono_property_get_get_method(messageProp);
+                MonoString* messageStr = (MonoString*)mono_runtime_invoke(getter, exception, nullptr, nullptr);
+                char* message = mono_string_to_utf8(messageStr);
+
+                std::cerr << "[ScriptSystem] Exception in OnUpdate for " << gameObject->GetName()
+                          << ": " << exceptionName << " - " << message << std::endl;
+
+                mono_free(message);
+            }
+            else
+            {
+                std::cerr << "[ScriptSystem] Exception in OnUpdate for " << gameObject->GetName()
+                          << ": " << exceptionName << std::endl;
+            }
         }
     }
 }
@@ -1143,9 +1242,50 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-        if (scriptInstance.scriptClass->onDestroy)
+        // Validate all pointers before calling mono_runtime_invoke
+        if (!scriptInstance.scriptClass)
         {
-            mono_runtime_invoke(scriptInstance.scriptClass->onDestroy, scriptInstance.instance, nullptr, nullptr);
+            std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
+            continue;
+        }
+
+        if (!scriptInstance.instance)
+        {
+            std::cerr << "[ScriptSystem] ERROR: script instance is null for " << gameObject->GetName() << std::endl;
+            continue;
+        }
+
+        if (!scriptInstance.scriptClass->onDestroy)
+        {
+            // OnDestroy method not found or doesn't exist - skip silently
+            continue;
+        }
+
+        MonoObject* exception = nullptr;
+        mono_runtime_invoke(scriptInstance.scriptClass->onDestroy, scriptInstance.instance, nullptr, &exception);
+
+        if (exception)
+        {
+            MonoClass* exceptionClass = mono_object_get_class(exception);
+            const char* exceptionName = mono_class_get_name(exceptionClass);
+
+            MonoProperty* messageProp = mono_class_get_property_from_name(exceptionClass, "Message");
+            if (messageProp)
+            {
+                MonoMethod* getter = mono_property_get_get_method(messageProp);
+                MonoString* messageStr = (MonoString*)mono_runtime_invoke(getter, exception, nullptr, nullptr);
+                char* message = mono_string_to_utf8(messageStr);
+
+                std::cerr << "[ScriptSystem] Exception in OnDestroy for " << gameObject->GetName()
+                          << ": " << exceptionName << " - " << message << std::endl;
+
+                mono_free(message);
+            }
+            else
+            {
+                std::cerr << "[ScriptSystem] Exception in OnDestroy for " << gameObject->GetName()
+                          << ": " << exceptionName << std::endl;
+            }
         }
     }
 }

@@ -417,7 +417,13 @@ namespace CSharpScript
         public static extern void SetFriction(string objectName, float friction);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern vec2 GetVelocity(string objectName);
+        private static extern void GetVelocity_Internal(string objectName, out float x, out float y);
+
+        public static vec2 GetVelocity(string objectName)
+        {
+            GetVelocity_Internal(objectName, out float x, out float y);
+            return new vec2(x, y);
+        }
 
         public static vec2 gravity => new vec2(0.0f, -9.81f);
     }
@@ -658,6 +664,15 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetCategoryVolume(string categoryName, float volume);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeOutCategory(string category, float duration);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeInCategory(string category, float duration, float targetVolume = 1.0f);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeOutAll(float duration);
     }
 
     /// <summary>

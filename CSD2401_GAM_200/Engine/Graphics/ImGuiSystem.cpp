@@ -48,6 +48,7 @@ extern double g_totalLoopTime;
  * @param scale[2]	(Width, Height)
  * @param rot		Rotation of GO
  * @param color		Vec4 holding colour of GO
+ * @param collider
  */
 struct TempGOData
 {
@@ -58,6 +59,11 @@ struct TempGOData
     float scale[2]{50.f, 50.f};
     float rot{0.f}; // = transform->GetRotation();
     ImVec4 color{0.f, 0.f, 0.f, 1.f};
+
+    bool addCollider = false;
+    int colType = 0; // 0 for Square, 1 for Circle
+    float colSize[2] = { 100.0f, 100.0f };
+    int colLayer = 5; // Default index for "Default" layer
 };
 
 // GO CREATION MENU VARS
@@ -438,6 +444,8 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
+
+            RenderAnimationPreviewer();
         }
         // if IS in play mode
         else
@@ -668,6 +676,26 @@ void GOCreationMenu_Render()
         if (ImGui::DragFloat("####", &tempGO.rot, 0.1f))
         {
         } // Slider for GO rot
+
+        ImGui::Separator();
+
+       // Game Object Collider
+        ImGui::Checkbox("Add Collider", &tempGO.addCollider);
+
+        if (tempGO.addCollider)
+        {
+            ImGui::Indent();
+
+            const char* colTypes[] = { "Square", "Circle" };
+            ImGui::Combo("Type", &tempGO.colType, colTypes, IM_ARRAYSIZE(colTypes));
+
+            ImGui::DragFloat2("Size", tempGO.colSize, 1.0f);
+
+            const char* layers[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+            ImGui::Combo("Layer", &tempGO.colLayer, layers, IM_ARRAYSIZE(layers));
+
+            ImGui::Unindent();
+        }
 
         // Generate Game Object
         ImGui::Text("  ");
@@ -1114,6 +1142,8 @@ void GOCreationMenu_Spawn()
     float rot = tempGO.rot;
     vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
     std::string name = tempGO.name;
+    ColliderComponent::Type cType = (tempGO.colType == 0) ? ColliderComponent::Type::Square : ColliderComponent::Type::Circle;
+    CollisionLayer cLayer = static_cast<CollisionLayer>(tempGO.colLayer);
 
     // Construct message and send
     CreateObjectMessage msg(
@@ -1121,7 +1151,11 @@ void GOCreationMenu_Spawn()
         objType,                // Shape if is Empty or Basic
         shapeType,              // ShapeType
         pos, scale, rot,        // Transform
-        color                   // Colour
+        color,               // Colour
+        tempGO.addCollider,
+        cType,
+        tempGO.colSize[0], tempGO.colSize[1],
+        cLayer
     );
 
     std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;
@@ -2849,6 +2883,51 @@ void AudioAssetsPanel_Render()
         audioMgr->StopAllSounds();
     }
     ImGui::SameLine();
+
+    // Fade controls
+    static float fadeDuration = 1.0f;
+    static int selectedCategory = 0;
+    static const char* categories[] = { "music", "sfx", "voice", "ambient" };
+    static float fadeTargetVolume = 1.0f;
+
+    ImGui::Separator();
+    ImGui::Text("Fade Controls:");
+
+    ImGui::PushItemWidth(100.0f);
+    ImGui::InputFloat("Fade Duration (s)", &fadeDuration, 0.1f, 1.0f, "%.1f");
+    if (fadeDuration < 0.1f) fadeDuration = 0.1f;
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(100.0f);
+    ImGui::Combo("Category", &selectedCategory, categories, 4);
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(100.0f);
+    ImGui::SliderFloat("Target Volume", &fadeTargetVolume, 0.0f, 1.0f, "%.1f");
+    ImGui::PopItemWidth();
+
+    if (ImGui::Button("Fade In"))
+    {
+        audioMgr->FadeInCategory(categories[selectedCategory], fadeDuration, fadeTargetVolume);
+        std::cout << "[Audio] Fading in " << categories[selectedCategory]
+                  << " over " << fadeDuration << "s to volume " << fadeTargetVolume << std::endl;
+    }
+    ImGui::SameLine();
+
+    if (ImGui::Button("Fade Out"))
+    {
+        audioMgr->FadeOutCategory(categories[selectedCategory], fadeDuration);
+        std::cout << "[Audio] Fading out " << categories[selectedCategory]
+                  << " over " << fadeDuration << "s" << std::endl;
+    }
+    ImGui::SameLine();
+
+    if (ImGui::Button("Fade Out All"))
+    {
+        audioMgr->FadeOutAll(fadeDuration);
+        std::cout << "[Audio] Fading out all categories over " << fadeDuration << "s" << std::endl;
+    }
+
     ImGui::Separator();
     ImGui::Text("Drop zone:");
 
@@ -3078,6 +3157,132 @@ void AudioAssetsPanel_Render()
     { 
         showAudioAssetsPanel = false;
     }
+}
+#pragma endregion
+
+#pragma region Animation Previewer ImGui
+
+void ImGuiSystem::RenderAnimationPreviewer()
+{
+    static int   previewMode = 0;
+    static bool  isPlaying = false;
+    static float timer = 0.0f;
+    static float previewFPS = 12.0f;
+
+    static int   uiRow = 0;
+    static int   uiCol = 0;
+
+    static GLuint fileTexID = 0;
+    static int fRows = 1, fCols = 1;
+    static std::string fPath = "";
+    static std::string dropStatus = "No file loaded.";
+
+    ImGui::Begin("Animation Previewer");
+
+    ImGui::RadioButton("Selected Object", &previewMode, 0); ImGui::SameLine();
+    ImGui::RadioButton("File Preview", &previewMode, 1);
+    ImGui::Separator();
+
+    GLuint activeTexture = 0;
+    int totalRows = 1, totalCols = 1;
+
+    if (previewMode == 0) // OBJECT MODE
+    {
+        GameObject* obj = factory.GetGameObject(selectedGameObjectID);
+
+
+        if (obj && obj->HasComponent<Spritesheet>()) {
+            Spritesheet* s = obj->GetComponent<Spritesheet>();
+            activeTexture = s->GetTextureID();
+            totalRows = s->GetRows();
+            totalCols = s->GetCols();
+
+            // jump to the row/col currently used by the component
+            if (!isPlaying) {
+                uiRow = s->GetCurrentRow();
+                uiCol = s->GetCurrentCol();
+            }
+
+            ImGui::Text("Linked to: %s", obj->GetName().c_str());
+            ImGui::Text("Component Grid: %d x %d", totalRows, totalCols);
+        }
+        else {
+            ImGui::TextColored(ImVec4(1, 1, 0, 1), "Select a GameObject with a Spritesheet.");
+        }
+    }
+    else // FILE PREVIEW MODE
+    {
+        ImGui::Text("Drop Target:");
+        ImGui::Button(fPath.empty() ? "DRAG SPRITESHEET HERE" : fPath.c_str(), ImVec2(-1, 40));
+
+        std::string dropped;
+        ReceiveDragAndDrop(SpritePayloadID, dropped);
+        if (!dropped.empty() && SupportedImageFile(dropped)) {
+            fPath = dropped;
+            fileTexID = GraphicsSystem::LoadTexture(dropped.c_str());
+            dropStatus = "Loaded: " + fs::path(dropped).filename().string();
+        }
+
+        ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "%s", dropStatus.c_str());
+
+        // Inputs to tell the previewer how to slice the raw file
+        ImGui::PushItemWidth(100);
+        ImGui::InputInt("Rows", &fRows); ImGui::SameLine();
+        ImGui::InputInt("Cols", &fCols);
+        ImGui::PopItemWidth();
+
+        activeTexture = fileTexID;
+        totalRows = (fRows > 0) ? fRows : 1;
+        totalCols = (fCols > 0) ? fCols : 1;
+    }
+
+    if (activeTexture != 0)
+    {
+        ImGui::Separator();
+
+        // Playback Controls
+        if (ImGui::Button(isPlaying ? "Stop" : "Play")) isPlaying = !isPlaying;
+        ImGui::SameLine();
+        ImGui::SliderFloat("FPS", &previewFPS, 1.0f, 60.0f);
+
+        if (isPlaying) {
+            timer += ImGui::GetIO().DeltaTime;
+            if (timer >= (1.0f / (previewFPS > 0 ? previewFPS : 1.0f))) {
+                timer = 0.0f;
+                uiCol = (uiCol + 1) % totalCols;
+            }
+        }
+
+        // Manual controls (Disabled during play to show the animation)
+        ImGui::SliderInt("Preview Row", &uiRow, 0, totalRows - 1);
+        if (!isPlaying) ImGui::SliderInt("Preview Col", &uiCol, 0, totalCols - 1);
+
+        // UV Slicing
+        float uWidth = 1.0f / (float)totalCols;
+        float vHeight = 1.0f / (float)totalRows;
+
+        float u0 = (float)uiCol * uWidth;
+        float v0 = (float)uiRow * vHeight;
+        float u1 = u0 + uWidth;
+        float v1 = v0 + vHeight;
+
+        ImGui::Spacing();
+        ImVec2 displaySize(160, 160);
+        float windowWidth = ImGui::GetWindowSize().x;
+        ImGui::SetCursorPosX((windowWidth - displaySize.x) * 0.5f);
+
+        // Render with border
+        ImGui::Image((void*)(intptr_t)activeTexture,
+            displaySize,
+            ImVec2(u0, v1),
+            ImVec2(u1, v0),
+            ImVec4(1, 1, 1, 1),
+            ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+
+        ImGui::TextDisabled("(Showing Row %d, Frame %d)", uiRow, uiCol);
+    }
+
+    ImGui::End();
 }
 #pragma endregion
 

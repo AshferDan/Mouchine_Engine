@@ -29,6 +29,16 @@
         "scripts": [
           "SpinningSquare"
         ]
+      },
+      "PhysicsComponent": {
+        "mass": 1.0,
+        "isStatic": false,
+        "useGravity": true
+      },
+      "ColliderComponent": {
+        "shape": "Box",
+        "size": [ 100.0, 100.0 ],
+        "layer": "Default"
       }
     }
   ]
