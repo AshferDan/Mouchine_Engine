@@ -350,11 +350,22 @@ void PauseMenuLogicSystem::Update(float dt)
     // only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        // play click sound
+        // play click sound based on button type
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            audioManager->TriggerEvent("UI_Click");
+            if (hoveredButtonName == "PauseRestartButton")
+            {
+                audioManager->TriggerEvent("UI_Restart");
+            }
+            else if (hoveredButtonName == "PauseMainMenuButton")
+            {
+                audioManager->TriggerEvent("UI_Quit");
+            }
+            else
+            {
+                audioManager->TriggerEvent("UI_Click");
+            }
         }
 
         // start delay before executing action

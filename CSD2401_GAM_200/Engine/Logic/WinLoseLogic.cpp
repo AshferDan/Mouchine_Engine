@@ -109,9 +109,10 @@ void WinLoseLogicSystem::Update(float dt)
         // update all win screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"WinScreen", vec2(0.0f, 0.0f)},
-            {"WinReplayLogo", vec2(550.0f, 50.0f)},
-            {"WinYesButton", vec2(550.0f, -100.0f)},
-            {"WinNoButton", vec2(550.0f, -220.0f)}
+            {"NextLevelLogo", vec2(550.0f, 275.0f)},
+            {"NextButton", vec2(550.0f, 50.0f)},
+            {"ReplayButton", vec2(550.0f, -100.0f)},
+            {"QuitButton", vec2(550.0f, -250.0f)}
         };
 
         for (const auto& element : uiElements)
@@ -141,9 +142,9 @@ void WinLoseLogicSystem::Update(float dt)
         // update all lose screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"LoseScreen", vec2(0.0f, 0.0f)},
-            {"LoseReplayLogo", vec2(550.0f, 50.0f)},
-            {"LoseYesButton", vec2(550.0f, -100.0f)},
-            {"LoseNoButton", vec2(550.0f, -220.0f)}
+            {"LoseReplayLogo", vec2(550.0f, 125.0f)},
+            {"YesButton", vec2(550.0f, -50.0f)},
+            {"LoseQuitButton", vec2(550.0f, -200.0f)}
         };
 
         for (const auto& element : uiElements)
@@ -255,6 +256,18 @@ void WinLoseLogicSystem::TriggerWin()
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
+    // pause game first
+    CORE->SetGamePaused(true);
+
+    // stop all music and play victory sound
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->SetCategoryVolume("music", 0.0f);
+        audioManager->StopSound("bgm");
+        audioManager->PlaySound("victory", "sfx");
+    }
+
     // win screen background
     GameObject* board = factory.CreateGameObject("WinScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
@@ -267,44 +280,63 @@ void WinLoseLogicSystem::TriggerWin()
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     boardRender->SetLayer(101);
 
-    // replay logo
-    GameObject* replayLogo = factory.CreateGameObject("WinReplayLogo");
-    auto* replayTransform = replayLogo->AddComponent<TransformComponent>();
+    // next level logo
+    GameObject* bigLogo = factory.CreateGameObject("NextLevelLogo");
+    auto* logoTransform = bigLogo->AddComponent<TransformComponent>();
+    logoTransform->posX = camPos.x + 550.0f;
+    logoTransform->posY = camPos.y + 275.0f;
+    logoTransform->scaleX = 550.0f;
+    logoTransform->scaleY = 175.0f;
+    auto* logoRender = bigLogo->AddComponent<RenderComponent>();
+    logoRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
+    logoRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    logoRender->SetLayer(102);
+    bigLogo->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 72, "Next Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // next button which goes to next level
+    GameObject* nextBtn = factory.CreateGameObject("NextButton");
+    auto* nextTransform = nextBtn->AddComponent<TransformComponent>();
+    nextTransform->posX = camPos.x + 550.0f;
+    nextTransform->posY = camPos.y + 50.0f;
+    nextTransform->scaleX = 550.0f;
+    nextTransform->scaleY = 140.0f;
+    auto* nextRender = nextBtn->AddComponent<RenderComponent>();
+    nextRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    nextRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    nextRender->SetLayer(102);
+    nextBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Next", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // replay button which restarts level
+    GameObject* replayBtn = factory.CreateGameObject("ReplayButton");
+    auto* replayTransform = replayBtn->AddComponent<TransformComponent>();
     replayTransform->posX = camPos.x + 550.0f;
-    replayTransform->posY = camPos.y + 50.0f;
-    replayTransform->scaleX = 500.0f;
-    replayTransform->scaleY = 150.0f;
-    auto* replayRender = replayLogo->AddComponent<RenderComponent>();
-    replayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Replay.png"));
+    replayTransform->posY = camPos.y + -100.0f;
+    replayTransform->scaleX = 550.0f;
+    replayTransform->scaleY = 140.0f;
+    auto* replayRender = replayBtn->AddComponent<RenderComponent>();
+    replayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     replayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     replayRender->SetLayer(102);
+    replayBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // yes button which restarts level
-    GameObject* yesBtn = factory.CreateGameObject("WinYesButton");
-    auto* yesTransform = yesBtn->AddComponent<TransformComponent>();
-    yesTransform->posX = camPos.x + 550.0f;
-    yesTransform->posY = camPos.y + -100.0f;  // below replay logo
-    yesTransform->scaleX = 400.0f;
-    yesTransform->scaleY = 100.0f;
-    auto* yesRender = yesBtn->AddComponent<RenderComponent>();
-    yesRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Yes_dark.png"));
-    yesRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    yesRender->SetLayer(102);
-
-    // no button which goes bk to main menu
-    GameObject* noBtn = factory.CreateGameObject("WinNoButton");
-    auto* noTransform = noBtn->AddComponent<TransformComponent>();
-    noTransform->posX = camPos.x + 550.0f;
-    noTransform->posY = camPos.y + -220.0f;
-    noTransform->scaleX = 400.0f;
-    noTransform->scaleY = 100.0f;
-    auto* noRender = noBtn->AddComponent<RenderComponent>();
-    noRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/No_dark.png"));
-    noRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    noRender->SetLayer(102);
+    // quit button which goes bk to main menu
+    GameObject* quitBtn = factory.CreateGameObject("QuitButton");
+    auto* quitTransform = quitBtn->AddComponent<TransformComponent>();
+    quitTransform->posX = camPos.x + 550.0f;
+    quitTransform->posY = camPos.y + -250.0f;
+    quitTransform->scaleX = 550.0f;
+    quitTransform->scaleY = 140.0f;
+    auto* quitRender = quitBtn->AddComponent<RenderComponent>();
+    quitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    quitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    quitRender->SetLayer(102);
+    quitBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedWinScreen = true;
-    CORE->SetGamePaused(true);
 }
 
 /**
@@ -319,13 +351,17 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
 
-    if (IsMouseOver(factory.FindGameObject("WinYesButton"), mouseX, mouseY))
+    if (IsMouseOver(factory.FindGameObject("NextButton"), mouseX, mouseY))
     {
-        currentHover = "WinYesButton";
+        currentHover = "NextButton";
     }
-    else if (IsMouseOver(factory.FindGameObject("WinNoButton"), mouseX, mouseY))
+    else if (IsMouseOver(factory.FindGameObject("ReplayButton"), mouseX, mouseY))
     {
-        currentHover = "WinNoButton";
+        currentHover = "ReplayButton";
+    }
+    else if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))
+    {
+        currentHover = "QuitButton";
     }
 
     if (currentHover != hoveredButtonName)
@@ -351,33 +387,67 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
     if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
-        if (audioManager)
-        {
-            audioManager->TriggerEvent("UI_Click");
-        }
 
-        if (hoveredButtonName == "WinYesButton")
+        if (hoveredButtonName == "NextButton")
         {
-            std::cout << "[WinZone] Yes clicked - Restarting level" << std::endl;
-
-            if (!currentScenePath.empty())
-            {
-                CORE->RequestSceneLoad(currentScenePath, true);
-            }
-            pendingSceneChange = true;
-        }
-        else if (hoveredButtonName == "WinNoButton")
-        {
-            std::cout << "[WinZone] No clicked - Going to main menu" << std::endl;
-
-            // Start audio fade out before going to main menu
+            std::cout << "[WinZone] Next clicked - Going to main menu for now (since no next level)" << std::endl;
             if (audioManager)
             {
-                audioManager->FadeOutCategory("music", 0.5f);
-                std::cout << "[WinZone] Started music fade out" << std::endl;
+                audioManager->TriggerEvent("UI_Press");
             }
 
-            pendingSceneTimer = 0.5f;  // Delay for fade
+            if (audioManager)
+            {
+                audioManager->SetCategoryVolume("music", 1.0f);
+            }
+
+            // TODO: Implement next level logic
+            DestroyWinScreen();
+            CORE->SetGamePaused(false);
+
+            pendingSceneTimer = 0.2f;  // delay for press sound to play
+            pendingScenePath = "../Assets/Scenes/MainMenu.json"; // i set this to main menu for now since no next level
+            pendingSceneChange = true;
+        }
+        else if (hoveredButtonName == "ReplayButton")
+        {
+            std::cout << "[WinZone] Replay clicked - Restarting level" << std::endl;
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Restart");
+            }
+
+            // restore music volume before restarting
+            if (audioManager)
+            {
+                audioManager->SetCategoryVolume("music", 1.0f);
+            }
+
+            DestroyWinScreen();
+            CORE->SetGamePaused(false);
+
+            pendingSceneTimer = 0.2f;  // Delay for sound to play
+            pendingScenePath = currentScenePath;
+            pendingSceneChange = true;
+        }
+        else if (hoveredButtonName == "QuitButton")
+        {
+            std::cout << "[WinZone] Quit clicked - Going to main menu" << std::endl;
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Quit");
+            }
+
+            // restore music volume before going to main menu
+            if (audioManager)
+            {
+                audioManager->SetCategoryVolume("music", 1.0f);
+            }
+
+            DestroyWinScreen();
+            pendingSceneTimer = 0.2f;  // Delay for sound to play
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -396,9 +466,10 @@ void WinLoseLogicSystem::DestroyWinScreen()
 
     std::vector<std::string> uiElements = {
         "WinScreen",
-        "WinReplayLogo",
-        "WinYesButton",
-        "WinNoButton"
+        "NextLevelLogo",
+        "NextButton",
+        "ReplayButton",
+        "QuitButton"
     };
 
     for (const auto& name : uiElements)
@@ -446,13 +517,10 @@ void WinLoseLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered
     if (!rc) return;
 
     std::string texturePath;
-    if (buttonName == "WinYesButton" || buttonName == "LoseYesButton")
+    if (buttonName == "NextButton" || buttonName == "ReplayButton" || buttonName == "QuitButton" ||
+        buttonName == "YesButton" || buttonName == "LoseQuitButton")
     {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/Yes_light.png" : "../Assets/Sprites/Icons/Yes_dark.png";
-    }
-    else if (buttonName == "WinNoButton" || buttonName == "LoseNoButton")
-    {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/No_light.png" : "../Assets/Sprites/Icons/No_dark.png";
+        texturePath = isHovered ? "../Assets/Sprites/Icons/win_lose_button.png" : "../Assets/Sprites/Icons/win_lose_button_dark.png";
     }
     else
     {
@@ -474,6 +542,19 @@ void WinLoseLogicSystem::TriggerLose()
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
+    // pause game first
+    CORE->SetGamePaused(true);
+
+    // stop all music and play game over sound
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->SetCategoryVolume("music", 0.0f);
+        audioManager->StopSound("bgm");
+        audioManager->PauseAllSounds(false);  // unpause audio so UI sounds work
+        audioManager->PlaySound("gameover", "sfx");
+    }
+
     // lose screen background
     GameObject* board = factory.CreateGameObject("LoseScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
@@ -486,44 +567,49 @@ void WinLoseLogicSystem::TriggerLose()
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     boardRender->SetLayer(101);
 
-    // replay logo
-    GameObject* replayLogo = factory.CreateGameObject("LoseReplayLogo");
-    auto* replayTransform = replayLogo->AddComponent<TransformComponent>();
-    replayTransform->posX = camPos.x + 550.0f;
-    replayTransform->posY = camPos.y + 50.0f;
-    replayTransform->scaleX = 500.0f;
-    replayTransform->scaleY = 150.0f;
-    auto* replayRender = replayLogo->AddComponent<RenderComponent>();
-    replayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Replay.png"));
-    replayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    replayRender->SetLayer(102);
+    // retry level logo
+    GameObject* loseLogo = factory.CreateGameObject("LoseReplayLogo");
+    auto* loseTransform = loseLogo->AddComponent<TransformComponent>();
+    loseTransform->posX = camPos.x + 550.0f;
+    loseTransform->posY = camPos.y + 125.0f;
+    loseTransform->scaleX = 550.0f;
+    loseTransform->scaleY = 175.0f;
+    auto* loseRender = loseLogo->AddComponent<RenderComponent>();
+    loseRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
+    loseRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    loseRender->SetLayer(102);
+    loseLogo->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 72, "Retry Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // yes button which restarts level
-    GameObject* yesBtn = factory.CreateGameObject("LoseYesButton");
+    GameObject* yesBtn = factory.CreateGameObject("YesButton");
     auto* yesTransform = yesBtn->AddComponent<TransformComponent>();
     yesTransform->posX = camPos.x + 550.0f;
-    yesTransform->posY = camPos.y + -100.0f;
-    yesTransform->scaleX = 400.0f;
-    yesTransform->scaleY = 100.0f;
+    yesTransform->posY = camPos.y + -500.0f;
+    yesTransform->scaleX = 550.0f;
+    yesTransform->scaleY = 140.0f;
     auto* yesRender = yesBtn->AddComponent<RenderComponent>();
-    yesRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Yes_dark.png"));
+    yesRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     yesRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     yesRender->SetLayer(102);
+    yesBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Yes", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // no button which goes back to main menu
-    GameObject* noBtn = factory.CreateGameObject("LoseNoButton");
-    auto* noTransform = noBtn->AddComponent<TransformComponent>();
-    noTransform->posX = camPos.x + 550.0f;
-    noTransform->posY = camPos.y + -220.0f;
-    noTransform->scaleX = 400.0f;
-    noTransform->scaleY = 100.0f;
-    auto* noRender = noBtn->AddComponent<RenderComponent>();
-    noRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/No_dark.png"));
-    noRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    noRender->SetLayer(102);
+    // quit button which goes back to main menu
+    GameObject* loseQuitBtn = factory.CreateGameObject("LoseQuitButton");
+    auto* loseQuitTransform = loseQuitBtn->AddComponent<TransformComponent>();
+    loseQuitTransform->posX = camPos.x + 550.0f;
+    loseQuitTransform->posY = camPos.y + -200.0f;
+    loseQuitTransform->scaleX = 550.0f;
+    loseQuitTransform->scaleY = 140.0f;
+    auto* loseQuitRender = loseQuitBtn->AddComponent<RenderComponent>();
+    loseQuitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    loseQuitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    loseQuitRender->SetLayer(102);
+    loseQuitBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedLoseScreen = true;
-    CORE->SetGamePaused(true);
 }
 
 /**
@@ -538,13 +624,13 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
 
-    if (IsMouseOver(factory.FindGameObject("LoseYesButton"), mouseX, mouseY))
+    if (IsMouseOver(factory.FindGameObject("YesButton"), mouseX, mouseY))
     {
-        currentHover = "LoseYesButton";
+        currentHover = "YesButton";
     }
-    else if (IsMouseOver(factory.FindGameObject("LoseNoButton"), mouseX, mouseY))
+    else if (IsMouseOver(factory.FindGameObject("LoseQuitButton"), mouseX, mouseY))
     {
-        currentHover = "LoseNoButton";
+        currentHover = "LoseQuitButton";
     }
 
     if (currentHover != hoveredButtonName)
@@ -570,34 +656,46 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
     if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
-        if (audioManager)
-        {
-            audioManager->TriggerEvent("UI_Click");
-        }
 
-        if (hoveredButtonName == "LoseYesButton")
+        if (hoveredButtonName == "YesButton")
         {
             std::cout << "[WinLoseLogic] Yes clicked - Restarting level" << std::endl;
 
-            if (!currentScenePath.empty())
-            {
-                CORE->RequestSceneLoad(currentScenePath, true);
-            }
-            pendingSceneChange = true;
-        }
-        else if (hoveredButtonName == "LoseNoButton")
-        {
-            std::cout << "[WinLoseLogic] No clicked - Going to main menu" << std::endl;
-
-            // Start audio fade out before going to main menu
-            AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
-                audioManager->FadeOutCategory("music", 0.5f);
-                std::cout << "[WinLoseLogic] Started music fade out" << std::endl;
+                audioManager->TriggerEvent("UI_Restart");
             }
 
-            pendingSceneTimer = 0.5f;  // Delay for fade
+            // Restore music volume before restarting
+            if (audioManager)
+            {
+                audioManager->SetCategoryVolume("music", 1.0f);
+            }
+
+            DestroyLoseScreen();
+            CORE->SetGamePaused(false);
+
+            pendingSceneTimer = 0.2f;  // Delay for sound to play
+            pendingScenePath = currentScenePath;
+            pendingSceneChange = true;
+        }
+        else if (hoveredButtonName == "LoseQuitButton")
+        {
+            std::cout << "[WinLoseLogic] Quit clicked - Going to main menu" << std::endl;
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Quit");
+            }
+
+            // Restore music volume before going to main menu
+            if (audioManager)
+            {
+                audioManager->SetCategoryVolume("music", 1.0f);
+            }
+
+            DestroyLoseScreen();
+            pendingSceneTimer = 0.2f;  // Delay for sound to play
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -617,8 +715,8 @@ void WinLoseLogicSystem::DestroyLoseScreen()
     std::vector<std::string> uiElements = {
         "LoseScreen",
         "LoseReplayLogo",
-        "LoseYesButton",
-        "LoseNoButton"
+        "YesButton",
+        "LoseQuitButton"
     };
 
     for (const auto& name : uiElements)

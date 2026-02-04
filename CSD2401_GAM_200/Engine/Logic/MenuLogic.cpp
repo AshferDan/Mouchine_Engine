@@ -211,17 +211,28 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        // Play Click Sound
+        // Play Click Sound based on button type
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            audioManager->TriggerEvent("UI_Click");
+            if (hoveredButtonName == "PlayButton")
+            {
+                audioManager->TriggerEvent("UI_Press");
+            }
+            else if (hoveredButtonName == "QuitButton")
+            {
+                audioManager->TriggerEvent("UI_Quit");
+            }
+            else
+            {
+                audioManager->TriggerEvent("UI_Click");
+            }
             std::cout << "menu button clicking sound is triggered" << std::endl;
         }
 
         // Start small delay before loading scene
-        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MasterMuteButton" && 
-            hoveredButtonName != "MusicMuteButton" && hoveredButtonName != "SFXMuteButton" && 
+        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MasterMuteButton" &&
+            hoveredButtonName != "MusicMuteButton" && hoveredButtonName != "SFXMuteButton" &&
             hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton")
         {
             // Start audio fade out for scene transitions

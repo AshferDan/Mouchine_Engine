@@ -894,7 +894,15 @@
       },
       {
         "name": "menu_click",
-        "filepath": "../Assets/Audio/Menu_Button_Press.wav",
+        "filepath": "../Assets/Audio/press_button.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_play",
+        "filepath": "../Assets/Audio/play_button.wav",
         "loop": false,
         "volume": 1.0,
         "pitch": 1.0,
@@ -902,7 +910,23 @@
       },
       {
         "name": "menu_hover",
-        "filepath": "../Assets/Audio/hovering_Button.wav",
+        "filepath": "../Assets/Audio/hover_button.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_restart",
+        "filepath": "../Assets/Audio/restart_button.wav",
+        "loop": false,
+        "volume": 0.3,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_quit",
+        "filepath": "../Assets/Audio/quit_button.wav",
         "loop": false,
         "volume": 0.800000011920929,
         "pitch": 1.0,
@@ -917,6 +941,18 @@
       {
         "event": "UI_Hover",
         "sound": "menu_hover"
+      },
+      {
+        "event": "UI_Press",
+        "sound": "menu_play"
+      },
+      {
+        "event": "UI_Restart",
+        "sound": "menu_restart"
+      },
+      {
+        "event": "UI_Quit",
+        "sound": "menu_quit"
       }
     ]
   }
