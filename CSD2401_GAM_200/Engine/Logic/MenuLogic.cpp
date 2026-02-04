@@ -16,6 +16,7 @@ Technology is prohibited.
 #include <iostream>
 
 std::string introPath = "../Assets/Cutscene_M3.mpeg";
+std::string creditsPath = "../Assets/AvidMoustache_Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens {
@@ -285,8 +286,11 @@ void MenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "CreditsButton")
             {
                 std::cout << "CreditsButton Clicked!" << std::endl;
-                // TODO: Add credits screen logic here
-                //CORE->RequestSceneLoad("../Assets/Scenes/Credits.json", true);
+  
+                CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+                if (!cutscene->IsPlaying()) {
+                    cutscene->PlayVideo(creditsPath);
+                }
             }
         }
     }
