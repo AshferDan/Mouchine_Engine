@@ -232,22 +232,25 @@ void AudioManager::TriggerEvent(const std::string& eventName)
 /**
  * @brief Plays a sound and applies category volume + pitch + mute rules.
  */
-void AudioManager::PlaySound(const std::string& soundName, const std::string& channelName) 
+void AudioManager::PlaySound(const std::string& soundName, const std::string& channelName)
 {
-    if (!audioEngine) 
+    std::cout << "[AudioManager] PlaySound called for: " << soundName << std::endl;
+
+    if (!audioEngine)
     {
         std::cerr << "AudioEngine not available" << std::endl;
         return;
     }
 
     auto it = soundDatabase.find(soundName);
-    if (it == soundDatabase.end()) 
+    if (it == soundDatabase.end())
     {
         std::cerr << "Sound not found in database: " << soundName << std::endl;
         return;
     }
 
     const SoundData& sound = it->second;
+    std::cout << "[AudioManager] Found sound in database, category: " << sound.category << ", base volume: " << sound.volume << std::endl;
 
     // Play the sound
     std::string channel = channelName.empty() ? soundName + "_channel" : channelName;
@@ -256,16 +259,25 @@ void AudioManager::PlaySound(const std::string& soundName, const std::string& ch
     // Apply volume (base volume * category volume)
     float finalVolume = sound.volume;
     auto categoryIt = categoryVolumes.find(sound.category);
-    if (categoryIt != categoryVolumes.end()) 
+    if (categoryIt != categoryVolumes.end())
     {
+        std::cout << "[AudioManager] Category '" << sound.category << "' volume: " << categoryIt->second << std::endl;
         finalVolume *= categoryIt->second;
+    }
+
+    // Check if category is muted
+    if (IsCategoryMuted(sound.category)) {
+        std::cout << "[AudioManager] Category '" << sound.category << "' is MUTED!" << std::endl;
+        finalVolume = 0.0f;
     }
 
     // Enforce master mute
     if (m_isMuted) {
+        std::cout << "[AudioManager] Master is MUTED!" << std::endl;
         finalVolume = 0.0f;
     }
 
+    std::cout << "[AudioManager] Final volume for " << soundName << ": " << finalVolume << std::endl;
     audioEngine->setVolume(channel, finalVolume);
     audioEngine->setPitch(channel, sound.pitch <= 0.0f ? 1.0f : sound.pitch);
 }

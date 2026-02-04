@@ -417,6 +417,12 @@ void CoreEngine::GameLoop()
             audioManager->UpdateFade(static_cast<float>(delta_time));
         }
 
+        // Update FMOD audio system (required every frame for audio playback)
+        if (audioEngine)
+        {
+            audioEngine->updateAudio();
+        }
+
         // VARIABLE TIMESTEP - Rendering and UI systems
         if (graphicsSystem)
         {
@@ -580,7 +586,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    if (audioManager)
+    // Don't pause audio if a cutscene is playing (cutscene has its own audio)
+    if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(paused);
     }
