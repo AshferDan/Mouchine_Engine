@@ -105,6 +105,7 @@ namespace CSharpScript
 
         // Wall Kick
         public float WallSlidingSpeed = 4f * mod;                     // was 2
+        public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
         public float WKBaseDuration = 0.25f;
         public float WKCooldown = 0.5f;
         public float WKSpeedModifier = 30f * mod;

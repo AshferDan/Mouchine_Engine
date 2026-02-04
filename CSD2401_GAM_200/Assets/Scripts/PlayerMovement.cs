@@ -179,11 +179,12 @@ namespace CSharpScript
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
             Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", true, 0.5f, 2.0f, "sfx");
             Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.1f, 1.25f, "sfx");
+            Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.1f, 0.9f, "sfx");
             Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.5f, 1.35f, "sfx");
-            Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("AirGlide", "../Assets/audio/Player/AirGlide.wav", false, 0.5f, 1.5f, "sfx");
-            Audio.AddSound("TurnSkid", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
-            Audio.AddSound("Bonk", "../Assets/audio/Player/WallBonk.wav", false, 0.05f, 1.1f, "sfx");
+            Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.5f, 1.5f, "sfx");
+            Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
+            Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.05f, 1.1f, "sfx");
             //footsteps
             Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.15f, 1.0f, "sfx");
             Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.15f, 1.0f, "sfx");
@@ -372,7 +373,6 @@ namespace CSharpScript
                     float bonkFriction = 100f;
                     float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, bonkFriction * fixeddt);
                     Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
-                    //playsound bonk
                 }
                 return;
             }
@@ -1026,6 +1026,8 @@ namespace CSharpScript
         #endregion
 
         #region Slide
+        static bool wallslideTrigger = false;
+        static float wallslideTime = 0f;
         private void WallSlide()
         {
             if (_isGrounded || IsBeingKnockedBack)
@@ -1033,7 +1035,6 @@ namespace CSharpScript
                 if (_isWallSliding)
                 {
                     _isWallSliding = false;
-                    // [TODO] find out how to loop wall sliding sound
                 }
                 return;
             }
@@ -1045,11 +1046,23 @@ namespace CSharpScript
                 if (!_isWallSliding)
                 {
                     _isWallSliding = true;
-                    Audio.PlaySound("wallkick_sfx", "sfx");
+
+                    currState = PlayerState.WallSliding;
+                    EnterState(currState);
 
                     // reset jumps if want wall sliding to refresh double jump
                     _numberOfJumpsUsed = 0;
                 }
+                Debug.Log(wallslideTrigger.ToString());
+                if (wallslideTime >= MoveStats.WallSlidingTimeToTriggerSound)         // magic number replace with a
+                {
+                    if (wallslideTrigger == false)
+                    {
+                        Audio.PlaySound("wallslide_sfx", "sfx");
+                        wallslideTrigger = true;
+                    }
+                }
+                wallslideTime += fixeddt;
 
                 // apply friction/slide speed
                 Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
@@ -1061,6 +1074,8 @@ namespace CSharpScript
                 {
                     _isWallSliding = false;
                 }
+                wallslideTrigger = false;
+                wallslideTime = 0;
             }
         }
 
@@ -1569,7 +1584,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.Skidding:
                     if (enableDebug) Debug.Log("CurrState: " + "Skidding");
-                    Audio.PlaySound("TurnSkid", "sfx");
+                    Audio.PlaySound("turnskid_sfx", "sfx");
                     break;
                 case PlayerState.Falling:
                     // need find out how do looping sound till out of state
@@ -1606,14 +1621,15 @@ namespace CSharpScript
                     break;
                 case PlayerState.Gliding:
                     if (enableDebug) Debug.Log("CurrState: " + "Glide");
-                    Audio.PlaySound("AirGlide", "sfx");
+                    Audio.PlaySound("airglide_sfx", "sfx");
                     break;
                 case PlayerState.Bonking:
                     if (enableDebug) Debug.Log("CurrState: " + "Bonking");
-                    Audio.PlaySound("Bonk", "sfx");
+                    Audio.PlaySound("bonk_sfx", "sfx");
                     break;
                 case PlayerState.WallSliding:
                     if (enableDebug) Debug.Log("CurrState: " + "Wallslide");
+                    Audio.PlaySound("wallslide_impact_sfx", "sfx");
                     // need find out how do looping sound till out of state
                     break;
             }
