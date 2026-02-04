@@ -459,6 +459,8 @@ public:
      */
     void Integrate(float dt);
 
+    virtual void SetEnabled(bool enable) override;
+
 public:
     // Linear motion (vec2 velocity)
     vec2 velocity;
@@ -490,4 +492,6 @@ public:
 private:
     // Forces manager
     ForcesManager forcesManager;
+    bool _previousUseGravity;
+    bool _previousIsStatic;
 };
