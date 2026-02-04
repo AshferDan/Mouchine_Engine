@@ -276,11 +276,11 @@ void Serialization::SaveScene(const std::string &scenePath)
 
 	for (const auto &obj : objects)
 	{
-		if (obj && obj->IsActive())
+		if (obj)
 		{
-			if (obj->GetParent() == nullptr)  // Only save top-level objects
+			if (obj->GetParent() == nullptr)  // Only save top-level objects (children are saved recursively)
 			{
-				// Serialize and add to JSON array
+				// Serialize and add to JSON array (saves both active and inactive objects)
 				j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
 			}
 		}
@@ -354,9 +354,7 @@ void Serialization::LoadScene(const std::string& scenePath)
 		return;
 	}
 
-	// Clear all existing GameObjects before loading new scene
-	std::cout << "[LoadScene] Clearing previous scene GameObjects...\n";
-	GameObjectFactory::Instance().Clear();
+
 
 	// Stop all currently playing audio and unload audio resources
 	std::cout << "[LoadScene] Stopping all audio and clearing audio resources...\n";

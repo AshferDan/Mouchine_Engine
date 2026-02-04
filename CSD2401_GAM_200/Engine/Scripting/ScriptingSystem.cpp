@@ -19,6 +19,7 @@ Technology is prohibited.
 #include <iostream>
 #include <filesystem>
 #include <mono/metadata/attrdefs.h>
+#include "logic.h" // Include logic.h for EventSystem and EventType
 
 // Internal call functions - these will be called from C#
 // === Debug ===
@@ -458,6 +459,59 @@ static void Internal_SetCategoryVolume(MonoString* catName, float volume) {
     mono_free(cName);
 }
 
+static void Internal_SetPitch(MonoString* soundName, float pitch) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::SetPitch(cName, pitch);
+    mono_free(cName);
+}
+
+static void Internal_PauseSound(MonoString* channelName, bool pause) {
+    char* cName = mono_string_to_utf8(channelName);
+    API::PauseSound(cName, pause);
+    mono_free(cName);
+}
+
+static void Internal_PauseAllSounds(bool pause) {
+    API::PauseAllSounds(pause);
+}
+
+static void Internal_ToggleMasterMute() {
+    API::ToggleMasterMute();
+}
+
+static void Internal_ToggleCategoryMute(MonoString* category) {
+    char* cName = mono_string_to_utf8(category);
+    API::ToggleCategoryMute(cName);
+    mono_free(cName);
+}
+
+static bool Internal_IsMasterMuted() {
+    return API::IsMasterMuted();
+}
+
+static bool Internal_IsCategoryMuted(MonoString* category) {
+    char* cName = mono_string_to_utf8(category);
+    bool result = API::IsCategoryMuted(cName);
+    mono_free(cName);
+    return result;
+}
+
+static void Internal_FadeOutCategory(MonoString* category, float duration) {
+    char* cName = mono_string_to_utf8(category);
+    API::FadeOutCategory(cName, duration);
+    mono_free(cName);
+}
+
+static void Internal_FadeInCategory(MonoString* category, float duration, float targetVolume) {
+    char* cName = mono_string_to_utf8(category);
+    API::FadeInCategory(cName, duration, targetVolume);
+    mono_free(cName);
+}
+
+static void Internal_FadeOutAll(float duration) {
+    API::FadeOutAll(duration);
+}
+
 // === Camera ===
 static void Internal_SetCameraPosition(float x, float y) {
     vec2 pos = { x, y };
@@ -885,6 +939,16 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Audio::AddEventSound", (void*)Internal_AddEventSound);
     mono_add_internal_call("CSharpScript.Audio::SetVolume", (void*)Internal_SetVolume);
     mono_add_internal_call("CSharpScript.Audio::SetCategoryVolume", (void*)Internal_SetCategoryVolume);
+    mono_add_internal_call("CSharpScript.Audio::SetPitch", (void*)Internal_SetPitch);
+    mono_add_internal_call("CSharpScript.Audio::PauseSound", (void*)Internal_PauseSound);
+    mono_add_internal_call("CSharpScript.Audio::PauseAllSounds", (void*)Internal_PauseAllSounds);
+    mono_add_internal_call("CSharpScript.Audio::ToggleMasterMute", (void*)Internal_ToggleMasterMute);
+    mono_add_internal_call("CSharpScript.Audio::ToggleCategoryMute", (void*)Internal_ToggleCategoryMute);
+    mono_add_internal_call("CSharpScript.Audio::IsMasterMuted", (void*)Internal_IsMasterMuted);
+    mono_add_internal_call("CSharpScript.Audio::IsCategoryMuted", (void*)Internal_IsCategoryMuted);
+    mono_add_internal_call("CSharpScript.Audio::FadeOutCategory", (void*)Internal_FadeOutCategory);
+    mono_add_internal_call("CSharpScript.Audio::FadeInCategory", (void*)Internal_FadeInCategory);
+    mono_add_internal_call("CSharpScript.Audio::FadeOutAll", (void*)Internal_FadeOutAll);
 
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);
@@ -1332,6 +1396,34 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
 void ScriptSystem::Update(float deltaTime)
 {
+    // Create a copy of events to iterate over, as events might be modified during processing
+    std::vector<QueuedEvent> eventsCopy = EventSystem::events;
+    EventSystem::Clear(); // Clear the static events queue as they are being processed now
+
+    for (auto& e : eventsCopy)
+    {
+        if (e.type == EventType::OnDestroy)
+        {
+            auto it = gameObjectScripts.find(e.target);
+            if (it != gameObjectScripts.end())
+            {
+                for (auto& scriptInstance : it->second)
+                {
+                    if (scriptInstance.gcHandle != 0)
+                    {
+                        mono_gchandle_free(scriptInstance.gcHandle);
+                    }
+                }
+                gameObjectScripts.erase(it);
+            }
+        }
+        else
+        {
+            // Re-raise events that are not OnDestroy for other systems to process
+            EventSystem::Raise(e.type, e.target, e.other);
+        }
+    }
+
     // Update all scripts attached to game objects
     for (auto &[gameObject, instances] : gameObjectScripts)
     {
@@ -1453,5 +1545,40 @@ void ScriptSystem::SetPublicField(ScriptInstance& instance, const std::string& f
     if (field) {
         MonoString* monoStr = mono_string_new(appDomain, value.c_str());
         mono_field_set_value(instance.instance, field, monoStr);
+    }
+}
+
+void ScriptSystem::NotifyGameObjectDestroyed(GameObject* gameObject)
+{
+    if (!gameObject)
+    {
+        std::cerr << "[ScriptSystem] ERROR: NotifyGameObjectDestroyed called with null GameObject!\n";
+        return;
+    }
+
+    std::cout << "[ScriptSystem] Notifying destruction of GameObject: " << gameObject->GetName() << std::endl;
+
+    // 1. Call OnDestroy for all scripts attached to this GameObject
+    // This ensures C# cleanup logic runs before references are removed.
+    CallOnDestroy(gameObject);
+
+    // 2. Remove the GameObject's entry from gameObjectScripts map
+    auto it = gameObjectScripts.find(gameObject);
+    if (it != gameObjectScripts.end())
+    {
+        // Free Mono garbage collection handles for all script instances
+        for (auto& scriptInstance : it->second)
+        {
+            if (scriptInstance.gcHandle != 0)
+            {
+                mono_gchandle_free(scriptInstance.gcHandle);
+            }
+        }
+        gameObjectScripts.erase(it);
+        std::cout << "[ScriptSystem] Removed references for GameObject: " << gameObject->GetName() << std::endl;
+    }
+    else
+    {
+        std::cout << "[ScriptSystem] No script references found for GameObject: " << gameObject->GetName() << std::endl;
     }
 }

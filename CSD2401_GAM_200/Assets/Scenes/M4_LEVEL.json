@@ -17,10 +17,13 @@
         "rotation": 0.0
       },
       "CameraComponent": {
-        "zoom": 0.1,
+        "zoom": 0.5,
         "mode": "FOLLOW_TARGET",
         "followTargetName": "Hero",
-        "followOffset": [ -100.0, 0 ]
+        "followOffset": [
+          -100.0,
+          0
+        ]
       },
       "children": []
     },

@@ -931,6 +931,14 @@
         "volume": 0.800000011920929,
         "pitch": 1.0,
         "category": "sfx"
+      },
+      {
+        "name": "CutsceneAudio",
+        "filepath": "../Assets/CutsceneAudio.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
       }
     ],
     "events": [

@@ -647,39 +647,117 @@ namespace CSharpScript
     /// </summary>
     public static class Audio
     {
+        /// <summary>
+        /// Adds and loads a new sound into the audio system.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void AddSound(string name, string filepath, bool loop, float volume,float pitch, string category);
+        public static extern void AddSound(string name, string filepath, bool loop, float volume, float pitch, string category);
 
+        /// <summary>
+        /// Plays a sound on the specified channel.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PlaySound(string soundName, string channel);
+        public static extern void PlaySound(string soundName, string channel = "");
 
+        /// <summary>
+        /// Stops a sound on the specified channel.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void StopSound(string soundName);
+        public static extern void StopSound(string channelName);
 
+        /// <summary>
+        /// Stops all currently playing sounds.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void StopAllSounds();
 
+        /// <summary>
+        /// Removes a sound from the audio system.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void RemoveSound(string soundName);
 
+        /// <summary>
+        /// Triggers an audio event by name.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void TriggerEvent(string eventName);
 
+        /// <summary>
+        /// Maps an event name to a sound name.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AddEventSound(string eventName, string soundName);
 
+        /// <summary>
+        /// Sets the volume of a specific sound.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetVolume(string soundName, float volume);
 
+        /// <summary>
+        /// Sets the volume for an entire category (music, sfx, voice, ambient).
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetCategoryVolume(string categoryName, float volume);
 
+        /// <summary>
+        /// Sets the pitch of a specific sound.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetPitch(string soundName, float pitch);
+
+        /// <summary>
+        /// Pauses or resumes a sound on a channel.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void PauseSound(string channelName, bool pause);
+
+        /// <summary>
+        /// Pauses or resumes all sounds.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void PauseAllSounds(bool pause);
+
+        /// <summary>
+        /// Toggles master mute on/off.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ToggleMasterMute();
+
+        /// <summary>
+        /// Toggles mute for a specific category.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ToggleCategoryMute(string category);
+
+        /// <summary>
+        /// Returns true if master audio is muted.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsMasterMuted();
+
+        /// <summary>
+        /// Returns true if a category is muted.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsCategoryMuted(string category);
+
+        /// <summary>
+        /// Fades out a category over the specified duration.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FadeOutCategory(string category, float duration);
 
+        /// <summary>
+        /// Fades in a category over the specified duration to target volume.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FadeInCategory(string category, float duration, float targetVolume = 1.0f);
 
+        /// <summary>
+        /// Fades out all audio categories over the specified duration.
+        /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FadeOutAll(float duration);
     }

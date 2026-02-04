@@ -49,7 +49,7 @@ void MenuLogicSystem::Update(float dt)
                     CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
                     if (!cutscene->HasFinished(introPath)) {    // FIRST CLICK: Play Cutscene
                         if (!cutscene->IsPlaying()) {
-                            cutscene->PlayVideo(introPath);
+                            cutscene->PlayVideo(introPath, "CutsceneAudio");
                             // Don't fade back in - let the fade out complete
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }

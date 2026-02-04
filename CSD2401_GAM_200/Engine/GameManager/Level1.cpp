@@ -62,5 +62,5 @@ void Level1::Free() {
 
 void Level1::Unload() {
     std::cout << "[LEVEL 1] Unload Assets\n";
-  
+    GameObjectFactory::Instance().DestroyAllGameObjects();
 }
