@@ -354,9 +354,7 @@ void Serialization::LoadScene(const std::string& scenePath)
 		return;
 	}
 
-	// Clear all existing GameObjects before loading new scene
-	std::cout << "[LoadScene] Clearing previous scene GameObjects...\n";
-	GameObjectFactory::Instance().Clear();
+
 
 	// Stop all currently playing audio and unload audio resources
 	std::cout << "[LoadScene] Stopping all audio and clearing audio resources...\n";

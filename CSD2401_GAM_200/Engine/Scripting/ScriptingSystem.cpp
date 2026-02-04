@@ -18,6 +18,7 @@ Technology is prohibited.
 #include <iostream>
 #include <filesystem>
 #include <mono/metadata/attrdefs.h>
+#include "logic.h" // Include logic.h for EventSystem and EventType
 
 // Internal call functions - these will be called from C#
 // === Debug ===
@@ -1362,6 +1363,34 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
 void ScriptSystem::Update(float deltaTime)
 {
+    // Create a copy of events to iterate over, as events might be modified during processing
+    std::vector<QueuedEvent> eventsCopy = EventSystem::events;
+    EventSystem::Clear(); // Clear the static events queue as they are being processed now
+
+    for (auto& e : eventsCopy)
+    {
+        if (e.type == EventType::OnDestroy)
+        {
+            auto it = gameObjectScripts.find(e.target);
+            if (it != gameObjectScripts.end())
+            {
+                for (auto& scriptInstance : it->second)
+                {
+                    if (scriptInstance.gcHandle != 0)
+                    {
+                        mono_gchandle_free(scriptInstance.gcHandle);
+                    }
+                }
+                gameObjectScripts.erase(it);
+            }
+        }
+        else
+        {
+            // Re-raise events that are not OnDestroy for other systems to process
+            EventSystem::Raise(e.type, e.target, e.other);
+        }
+    }
+
     // Update all scripts attached to game objects
     for (auto &[gameObject, instances] : gameObjectScripts)
     {
