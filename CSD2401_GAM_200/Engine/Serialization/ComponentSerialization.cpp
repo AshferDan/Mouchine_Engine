@@ -207,11 +207,6 @@ void ComponentSerialization::SerializeEvent(json &j, EventComponent *ec)
     j["EventComponent"] = rulesJson;
 }
 
-/**
- * @brief Serializes the ScriptComponent into JSON.
- * @param j JSON object to write into.
- * @param sc Pointer to the ScriptComponent.
- */
 void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc)
 {
     if (!sc) return;
@@ -654,11 +649,6 @@ void ComponentSerialization::DeserializeTilemap(const json& j, GameObject* go)
         tilemap->LoadTilemapFromFile(filepath);
     }
 }
- /*
- * @brief Deserializes the ScriptComponent from JSON.
- * @param j JSON object to read from.
- * @param go Pointer to the GameObject.
- */
 void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
 {
     if (!j.contains("ScriptComponent")) return;
@@ -693,10 +683,11 @@ void ComponentSerialization::SerializeAllComponents(GameObject *go, json &j)
         SerializePhysics(j, p);
     if (auto *c = go->GetComponent<ColliderComponent>()) 
         SerializeCollider(j, c);
-    if (auto *tc = go->GetComponent<TextComponent>()) 
+    if (auto *tc = go->GetComponent<TextComponent>())
         SerializeText(j, tc);
-    // if (auto* cam = go->GetComponent<CameraComponent>())  SerializeCamera(j, cam);
-    if (auto *t = go->GetComponent<EventComponent>()) 
+    if (auto* cam = go->GetComponent<CameraComponent>())
+        SerializeCamera(j, cam);
+    if (auto *t = go->GetComponent<EventComponent>())
         SerializeEvent(j, t);
     if (auto* tilemap = go->GetComponent<TilemapDataHolder>())
         SerializeTilemap(j, tilemap);
@@ -717,7 +708,7 @@ void ComponentSerialization::DeserializeAllComponents(GameObject *go, const json
     DeserializePhysics(j, go);
     DeserializeCollider(j, go);
     DeserializeText(j, go);
-    // DeserializeCamera(j, go);
+    DeserializeCamera(j, go);
     DeserializeEvent(j, go);
     DeserializeTilemap(j, go);
     DeserializeScript(j, go);
