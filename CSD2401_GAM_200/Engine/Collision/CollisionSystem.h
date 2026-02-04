@@ -67,6 +67,16 @@ public:
      */
     static bool ShouldCollide(CollisionLayer layer1, CollisionLayer layer2);
 
+    /**
+     * @brief Checks if an object is colliding with any object in a specific layer
+     * @param obj GameObject to check
+     * @param targetLayer Layer to check against
+     * @param outHitObject Optional: pointer to store the first object hit (can be nullptr)
+     * @return True if colliding with any object in the target layer
+     */
+    bool IsCollidingWithLayer(GameObject* obj, CollisionLayer targetLayer, GameObject** outHitObject = nullptr);
+
+
     // ===== Raycast Functions =====
 
     /**
