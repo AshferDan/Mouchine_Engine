@@ -131,6 +131,12 @@ namespace CSharpScript
         public float GlideFallSpeedMultiplier = 0.5f;
         public float GlideCooldown = 0.2f;
 
+        // Knockback
+        public vec2 KnockbackForce = new vec2(30f * mod, 40f * mod);
+        public vec2 KnockbackFriction = new vec2(85f * mod, 0f);
+        public float knockbackTime = 0.3f;
+        public float hurtStunDuration = 0.75f;
+
         // Zipline
         public float ZiplineSpeed = 30f * mod;
         public float ZiplineAttachDuration = 0.15f;
