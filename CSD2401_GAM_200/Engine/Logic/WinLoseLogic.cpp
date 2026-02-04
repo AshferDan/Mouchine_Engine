@@ -109,7 +109,7 @@ void WinLoseLogicSystem::Update(float dt)
         // update all win screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"WinScreen", vec2(0.0f, 0.0f)},
-            {"NextLevelLogo", vec2(550.0f, 275.0f)},
+            {"NextLevelLogo", vec2(550.0f, 250.0f)},
             {"NextButton", vec2(550.0f, 50.0f)},
             {"ReplayButton", vec2(550.0f, -100.0f)},
             {"QuitButton", vec2(550.0f, -250.0f)}
@@ -284,8 +284,8 @@ void WinLoseLogicSystem::TriggerWin()
     GameObject* bigLogo = factory.CreateGameObject("NextLevelLogo");
     auto* logoTransform = bigLogo->AddComponent<TransformComponent>();
     logoTransform->posX = camPos.x + 550.0f;
-    logoTransform->posY = camPos.y + 275.0f;
-    logoTransform->scaleX = 550.0f;
+    logoTransform->posY = camPos.y + 250.0f;
+    logoTransform->scaleX = 600.0f;
     logoTransform->scaleY = 175.0f;
     auto* logoRender = bigLogo->AddComponent<RenderComponent>();
     logoRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
@@ -572,7 +572,7 @@ void WinLoseLogicSystem::TriggerLose()
     auto* loseTransform = loseLogo->AddComponent<TransformComponent>();
     loseTransform->posX = camPos.x + 550.0f;
     loseTransform->posY = camPos.y + 125.0f;
-    loseTransform->scaleX = 550.0f;
+    loseTransform->scaleX = 600.0f;
     loseTransform->scaleY = 175.0f;
     auto* loseRender = loseLogo->AddComponent<RenderComponent>();
     loseRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
