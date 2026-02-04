@@ -117,6 +117,9 @@ ImVec2 viewportSize;
 ImVec2 viewportPos;
 std::unordered_set<EntityID> lockedGizmosGOs{};
 
+// Animator Preview
+bool isAnimPreviewFocused;
+
 // PROPERTIES
 char draggedSprite_str[128]{"<Drag Image Here>"};
 
@@ -281,6 +284,7 @@ void ImGuiSystem::Update(float dt)
             // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
             {
                 TileMap_Render(dt);                       // Rendering first so viewport shows first by default
+                RenderAnimationPreviewer();
 
                 ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
                 ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
@@ -293,7 +297,7 @@ void ImGuiSystem::Update(float dt)
                 ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport 
 
                 // Render gizmos on viewport
-                if (!isTileMapFocused)
+                if (!isTileMapFocused && !isAnimPreviewFocused)
                 {
                     // RENDER SECTION
                     Viewport_RenderGizmoToolbar();
@@ -444,8 +448,6 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
-
-            RenderAnimationPreviewer();
         }
         // if IS in play mode
         else
@@ -3210,7 +3212,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
     Spritesheet* ss = obj ? obj->GetComponent<Spritesheet>() : nullptr;
     bool hasExistingSS = (ss != nullptr);
 
-    ImGui::Begin("Animation Previewer");
+    ImGui::Begin("Animation Preview");
+    isAnimPreviewFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);// || ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
 
     // Mode switches (From File vs From Game Object)
     static bool fromFile = true;
