@@ -1558,7 +1558,8 @@ namespace CSharpScript
         private void EnterState(PlayerState state)
         {
             Debug.Log(state.ToString());
-            Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
+            //Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
+            // ^ im commenting this out for now cause its stopping the level bgm
 
             // doesnt work for some reason
             //if (loopingSounds.Contains(state))

@@ -101,6 +101,14 @@ void MenuLogicSystem::Update(float dt)
         {
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(true);
         }
+
+        // Hide settings text labels when not on settings screen
+        if (auto* masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
+            masterText->SetActive(false);
+        if (auto* musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
+            musicText->SetActive(false);
+        if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
+            sfxText->SetActive(false);
     }
     else if (currScreen == MenuScreens::Settings)
     {
@@ -113,6 +121,14 @@ void MenuLogicSystem::Update(float dt)
         {
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         }
+
+        // Show settings text labels when on settings screen
+        if (auto* masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
+            masterText->SetActive(true);
+        if (auto* musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
+            musicText->SetActive(true);
+        if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
+            sfxText->SetActive(true);
         //return;
     }
 
@@ -146,9 +162,17 @@ void MenuLogicSystem::Update(float dt)
         break;
     case MenuScreens::Settings:
         // do settings stuff here
-        if (IsMouseOver(factory.FindGameObject("MuteButton"), mouseX, mouseY))
+        if (IsMouseOver(factory.FindGameObject("MasterMuteButton"), mouseX, mouseY))
         {
-            currentHover = "MuteButton";
+            currentHover = "MasterMuteButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("MusicMuteButton"), mouseX, mouseY))
+        {
+            currentHover = "MusicMuteButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("SFXMuteButton"), mouseX, mouseY))
+        {
+            currentHover = "SFXMuteButton";
         }
         else if (IsMouseOver(factory.FindGameObject("BackButton"), mouseX, mouseY))
         {
@@ -188,16 +212,29 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        // Play Click Sound
+        // Play Click Sound based on button type
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            audioManager->TriggerEvent("UI_Click");
+            if (hoveredButtonName == "PlayButton")
+            {
+                audioManager->TriggerEvent("UI_Press");
+            }
+            else if (hoveredButtonName == "QuitButton")
+            {
+                audioManager->TriggerEvent("UI_Quit");
+            }
+            else
+            {
+                audioManager->TriggerEvent("UI_Click");
+            }
             std::cout << "menu button clicking sound is triggered" << std::endl;
         }
 
         // Start small delay before loading scene
-        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MuteButton" && hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton")
+        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MasterMuteButton" &&
+            hoveredButtonName != "MusicMuteButton" && hoveredButtonName != "SFXMuteButton" &&
+            hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton")
         {
             // Start audio fade out for scene transitions
             if (hoveredButtonName == "PlayButton" && audioManager)
@@ -211,7 +248,7 @@ void MenuLogicSystem::Update(float dt)
         }
         else
         {
-            if (hoveredButtonName == "MuteButton")
+            if (hoveredButtonName == "MasterMuteButton")
             {
                 //AudioManager* audioManager = CORE->GetAudioManager();
                 if (audioManager)
@@ -220,7 +257,23 @@ void MenuLogicSystem::Update(float dt)
 
 
                 }
-                SetButtonTexture("MuteButton", true); // Update texture after toggling
+                SetButtonTexture("MasterMuteButton", true); // Update texture after toggling
+            }
+            else if (hoveredButtonName == "MusicMuteButton")
+            {
+                if (audioManager)
+                {
+                    audioManager->ToggleCategoryMute("music");
+                }
+                SetButtonTexture("MusicMuteButton", true); // Update texture after toggling
+            }
+            else if (hoveredButtonName == "SFXMuteButton")
+            {
+                if (audioManager)
+                {
+                    audioManager->ToggleCategoryMute("sfx");
+                }
+                SetButtonTexture("SFXMuteButton", true); // Update texture after toggling
             }
             else if (hoveredButtonName == "BackButton")
             {
@@ -273,7 +326,7 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
     else if (buttonName == "QuitButton") {
         texturePath = isHovered ? "../Assets/Sprites/Icons/Menu_quit_NEW_HOVER.png" : "../Assets/Sprites/Icons/Menu_Quit.png";
     }
-    else if (buttonName == "MuteButton") {
+    else if (buttonName == "MasterMuteButton") {
         bool isMuted = false;
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
@@ -281,6 +334,24 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
             isMuted = audioManager->IsMuted();
         }
         texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
+    }
+    else if (buttonName == "MusicMuteButton") {
+        bool isMuted = false;
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            isMuted = audioManager->IsCategoryMuted("music");
+        }
+        texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
+    }
+    else if (buttonName == "SFXMuteButton") {
+        bool isMuted = false;
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            isMuted = audioManager->IsCategoryMuted("sfx");
+        }
+        texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Astsets/Sprites/Icons/Volume_Unmute.png";
     }
     else if (buttonName == "BackButton") {
         texturePath = isHovered ? "../Assets/Sprites/Icons/Back_button_dark.png" : "../Assets/Sprites/Icons/Back_button.png";

@@ -63,6 +63,8 @@ private:
     // Mute state
     bool m_isMuted;
     std::map<std::string, float> m_preMuteCategoryVolumes;
+    std::map<std::string, bool> m_categoryMuteStates;
+    std::map<std::string, float> m_preMuteIndividualCategoryVolumes;
 
 public:
     /**
@@ -160,6 +162,19 @@ public:
      * @return True if muted.
      */
     bool IsMuted() const;
+
+    /**
+     * @brief Toggles muting for a specific audio category.
+     * @param category The category to toggle (e.g., "music", "sfx").
+     */
+    void ToggleCategoryMute(const std::string& category);
+
+    /**
+     * @brief Checks whether a specific category is currently muted.
+     * @param category The category to check.
+     * @return True if the category is muted.
+     */
+    bool IsCategoryMuted(const std::string& category) const;
 
     /**
      * @brief Handles PlaySoundMessage from the message bus.

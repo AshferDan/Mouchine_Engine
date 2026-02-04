@@ -94,9 +94,9 @@ private:
     bool hasCreatedTransitionOverlay = false;
 
     /**
-     * @brief Checks if the player has entered the win zone.
+     * @brief Checks if the player has collided with the win zone using physics.
      */
-    void CheckWinCondition();
+    void CheckWinZoneCollision();
 
     /**
      * @brief Creates win screen UI objects and pauses the game.
