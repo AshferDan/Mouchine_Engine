@@ -1179,6 +1179,13 @@ void ScriptSystem::CallOnUpdate(GameObject *gameObject, float deltaTime)
         return;
     }
 
+    // Get the ScriptComponent from the GameObject and check its enabled state
+    ScriptComponent* scriptComponent = gameObject->GetComponent<ScriptComponent>();
+    if (!scriptComponent || !scriptComponent->IsEnabled())
+    {
+        return;
+    }
+
     void *args[1];
     args[0] = &deltaTime;
 

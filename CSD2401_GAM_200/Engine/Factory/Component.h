@@ -128,7 +128,7 @@ public:
      * @brief Sets the enabled state of the component.
      * @param enable If true, the component is enabled; otherwise, it's disabled.
      */
-    void SetEnabled(bool enable) { enabled = enable; }
+    virtual void SetEnabled(bool enable) { enabled = enable; }
 
     /**
      * @brief Add a new drag and drop slot on the component tab in the properties tab.

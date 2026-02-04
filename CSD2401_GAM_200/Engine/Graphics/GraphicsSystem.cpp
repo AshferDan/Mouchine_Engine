@@ -560,7 +560,7 @@ void GraphicsSystem::Update(float)
 
         auto *rend = obj->GetComponent<RenderComponent>();
 
-        if (!rend)
+        if (!rend || !rend->IsEnabled())
         {
             continue;
         }
@@ -699,7 +699,7 @@ void GraphicsSystem::Update(float)
         }
 
         auto *rend = obj->GetComponent<RenderComponent>();
-        if (rend)
+        if (rend && rend->IsEnabled())
         {
             // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
             switch (rend->GetShapeType())
