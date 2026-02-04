@@ -497,7 +497,7 @@ void ComponentSerialization::DeserializeCollider(const json &j, GameObject *go)
     ColliderComponent::Type type = EnumConverters::ToColliderType(c.value("shape", "Square"));
     CollisionLayer layer = EnumConverters::ToCollisionLayer(c.value("layer", "Default"));
 
-    float width, height;
+    float width = 100, height = 100;
     // read collider size directly
     if (c.contains("size") && c["size"].is_array() && c["size"].size() >= 2)
     {

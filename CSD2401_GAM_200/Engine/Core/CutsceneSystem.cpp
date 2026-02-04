@@ -93,9 +93,10 @@ void CutsceneSystem::Update(float dt) {
 	// Sync with the clock
 	while (m_timeAccumulator >= frameTime) {
 		plm_frame_t* frame = plm_decode_video(m_plm);
-
+		
 		if (frame) {
 			UpdateVideoTexture(frame);
+			m_hasFrame = true;
 			m_timeAccumulator -= frameTime; // one frame's time
 		}
 		else {
@@ -106,11 +107,18 @@ void CutsceneSystem::Update(float dt) {
 		if (m_timeAccumulator > frameTime) m_timeAccumulator = frameTime * 0.5;
 	}
 
-	RenderVideo();
+	if (m_hasFrame) { // only render if decoded
+		RenderVideo();
+	}
 
-	// Check if Skip (Spacebar)
-	if (CORE->GetInputManager()->IsKeyPressed(GLFW_KEY_SPACE) || CORE->GetInputManager()->IsMouseLeftClicked()) {
-		StopCutscene();
+	if (m_skipBlockTimer > 0.0f) m_skipBlockTimer -= dt;
+
+	// Check if Skip (Spacebar) or Left click
+	if (m_skipBlockTimer <= 0.0f) {
+		if (CORE->GetInputManager()->IsKeyPressed(GLFW_KEY_SPACE) || CORE->GetInputManager()->IsMouseLeftClicked()) {
+			StopCutscene();
+
+		}
 	}
 }
 
@@ -124,9 +132,12 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 
 	m_currentVideoPath = videoPath; // Store the name
 	m_isPlaying = true;
+	m_skipBlockTimer = 0.2f; // block skipping for 0.2s
+	m_hasFrame = false;
 	m_timeAccumulator = 0.0;
 
-	plm_set_audio_enabled(m_plm, 0); // Disable internal audio decoding (using AudioManager instead)
+	plm_set_audio_enabled(m_plm, 1); // Disable internal audio decoding (using AudioManager instead)
+
 	CORE->SetGamePaused(true);		 // Pause game loop
 
 	if (!audioName.empty()) {		 // Play Audio if provided
