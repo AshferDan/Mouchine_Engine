@@ -2146,15 +2146,7 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 30);
-            bool removed = ImGui::Button("X##RemoveTransform", ImVec2(20, 20));
-            if (removed) {
-                // commented out bc no case scenario for GO not having transform
-                //obj->RemoveComponent("TransformComponent");
-            }
-            else
-            {
-                bool isTransformEnabled = transform->IsEnabled();
+            bool isTransformEnabled = transform->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled ##Transform", &isTransformEnabled))
                 {
                     transform->SetEnabled(isTransformEnabled);
@@ -2255,26 +2247,28 @@ void ImGuiSystem::RenderPropertyEditor()
                         slot.RenderImGui();
                     }
                 }
-            }
         }
-
     }
-        
 
     // Render component for GO
     if (auto* render = obj->GetComponent<RenderComponent>())
     {
         if (ImGui::CollapsingHeader("Render", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 30);
-            bool renderRemove = ImGui::Button("X##RemoveRender", ImVec2(20, 20));
+            // Remove button aligned right
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+            float buttonWidth = 100.0f;
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
+            bool renderRemove = ImGui::Button("Remove##Render", ImVec2(buttonWidth, 22));
+            ImGui::PopStyleColor(3);
             if (renderRemove)
             {
                 obj->RemoveComponent("RenderComponent");
             }
             else
             {
-
                 bool isRenderEnabled = render->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled ##Render", &isRenderEnabled))
                 {
@@ -2357,8 +2351,14 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Physics"))
         {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 30);
-            bool physicsRemove = ImGui::Button("X##RemovePhysic", ImVec2(20, 20));
+            // Remove button aligned right
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+            float buttonWidth = 100.0f;
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
+            bool physicsRemove = ImGui::Button("Remove##Physics", ImVec2(buttonWidth, 22));
+            ImGui::PopStyleColor(3);
 
             if (physicsRemove)
             {
@@ -2403,15 +2403,21 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         if (ImGui::CollapsingHeader("Collider"))
         {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 30);
-            bool colliderRemove = ImGui::Button("X##RemoveCollider", ImVec2(20, 20));
+            // Remove button aligned right
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+            float buttonWidth = 100.0f;
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
+            bool colliderRemove = ImGui::Button("Remove##Collider", ImVec2(buttonWidth, 22));
+            ImGui::PopStyleColor(3);
+
             if (colliderRemove)
             {
                 obj->RemoveComponent("ColliderComponent");
             }
             else
             {
-                // Editable Collider Type Dropdown
                 bool isColEnabled = collider->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled##Collider", &isColEnabled))
                 {
@@ -2500,10 +2506,26 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
 {
     if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::SameLine(ImGui::GetWindowWidth() - 30);
-        bool colliderRemove = ImGui::Button("X##RemoveScript", ImVec2(20, 20));
-        if (colliderRemove)
+        // Remove button aligned right
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+        float buttonWidth = 100.0f;
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
+        bool scriptRemove = ImGui::Button("Remove##Script", ImVec2(buttonWidth, 22));
+        ImGui::PopStyleColor(3);
+        if (scriptRemove)
         {
+            // Remove all attached scripts from ScriptSystem before removing the component
+            auto* scriptSystem = CORE->GetScriptSystem();
+            if (scriptSystem)
+            {
+                const auto& activeScripts = script->GetScripts();
+                for (const auto& [id, scriptName] : activeScripts)
+                {
+                    scriptSystem->RemoveScript(obj, scriptName);
+                }
+            }
             obj->RemoveComponent("ScriptComponent");
         }
         else
@@ -2525,60 +2547,61 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
                     slot.RenderImGui();
                 }
             }
-        }
-        ImGui::Text("Attached Scripts:");
 
-        auto* scriptSystem = CORE->GetScriptSystem();
-        if (scriptSystem)
-        {
-            auto* instances = scriptSystem->GetScriptInstances(obj);
-            if (instances)
+            ImGui::Text("Attached Scripts:");
+
+            auto* scriptSystem = CORE->GetScriptSystem();
+            if (scriptSystem)
             {
-                for (auto& instance : *instances)
+                auto* instances = scriptSystem->GetScriptInstances(obj);
+                if (instances)
                 {
-                    const char* className = mono_class_get_name(instance.scriptClass->monoClass);
-                    if (ImGui::TreeNode(className))
+                    for (auto& instance : *instances)
                     {
-                        auto fields = scriptSystem->GetPublicFields(instance);
-                        for (auto& field : fields)
+                        const char* className = mono_class_get_name(instance.scriptClass->monoClass);
+                        if (ImGui::TreeNode(className))
                         {
-                            if (field.type == ScriptFieldType::Float)
+                            auto fields = scriptSystem->GetPublicFields(instance);
+                            for (auto& field : fields)
                             {
-                                float val = std::get<float>(field.value);
-                                if (ImGui::DragFloat(field.name.c_str(), &val, 0.1f))
+                                if (field.type == ScriptFieldType::Float)
                                 {
-                                    scriptSystem->SetPublicField(instance, field.name, val);
+                                    float val = std::get<float>(field.value);
+                                    if (ImGui::DragFloat(field.name.c_str(), &val, 0.1f))
+                                    {
+                                        scriptSystem->SetPublicField(instance, field.name, val);
+                                    }
+                                }
+                                else if (field.type == ScriptFieldType::Int)
+                                {
+                                    int val = std::get<int>(field.value);
+                                    if (ImGui::DragInt(field.name.c_str(), &val))
+                                    {
+                                        scriptSystem->SetPublicField(instance, field.name, val);
+                                    }
+                                }
+                                else if (field.type == ScriptFieldType::Bool)
+                                {
+                                    bool val = std::get<bool>(field.value);
+                                    if (ImGui::Checkbox(field.name.c_str(), &val))
+                                    {
+                                        scriptSystem->SetPublicField(instance, field.name, val);
+                                    }
+                                }
+                                else if (field.type == ScriptFieldType::String)
+                                {
+                                    std::string val = std::get<std::string>(field.value);
+                                    char buffer[256];
+                                    strncpy(buffer, val.c_str(), sizeof(buffer));
+                                    buffer[sizeof(buffer) - 1] = 0;
+                                    if (ImGui::InputText(field.name.c_str(), buffer, sizeof(buffer)))
+                                    {
+                                        scriptSystem->SetPublicField(instance, field.name, std::string(buffer));
+                                    }
                                 }
                             }
-                            else if (field.type == ScriptFieldType::Int)
-                            {
-                                int val = std::get<int>(field.value);
-                                if (ImGui::DragInt(field.name.c_str(), &val))
-                                {
-                                    scriptSystem->SetPublicField(instance, field.name, val);
-                                }
-                            }
-                            else if (field.type == ScriptFieldType::Bool)
-                            {
-                                bool val = std::get<bool>(field.value);
-                                if (ImGui::Checkbox(field.name.c_str(), &val))
-                                {
-                                    scriptSystem->SetPublicField(instance, field.name, val);
-                                }
-                            }
-                            else if (field.type == ScriptFieldType::String)
-                            {
-                                std::string val = std::get<std::string>(field.value);
-                                char buffer[256];
-                                strncpy(buffer, val.c_str(), sizeof(buffer));
-                                buffer[sizeof(buffer) - 1] = 0;
-                                if (ImGui::InputText(field.name.c_str(), buffer, sizeof(buffer)))
-                                {
-                                    scriptSystem->SetPublicField(instance, field.name, std::string(buffer));
-                                }
-                            }
+                            ImGui::TreePop();
                         }
-                        ImGui::TreePop();
                     }
                 }
             }
