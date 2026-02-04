@@ -117,6 +117,9 @@ ImVec2 viewportSize;
 ImVec2 viewportPos;
 std::unordered_set<EntityID> lockedGizmosGOs{};
 
+// Animator Preview
+bool isAnimPreviewFocused;
+
 // PROPERTIES
 char draggedSprite_str[128]{"<Drag Image Here>"};
 
@@ -281,6 +284,7 @@ void ImGuiSystem::Update(float dt)
             // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
             {
                 TileMap_Render(dt);                       // Rendering first so viewport shows first by default
+                RenderAnimationPreviewer();
 
                 ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
                 ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
@@ -293,7 +297,7 @@ void ImGuiSystem::Update(float dt)
                 ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport 
 
                 // Render gizmos on viewport
-                if (!isTileMapFocused)
+                if (!isTileMapFocused && !isAnimPreviewFocused)
                 {
                     // RENDER SECTION
                     Viewport_RenderGizmoToolbar();
@@ -444,8 +448,6 @@ void ImGuiSystem::Update(float dt)
             }
             // Render profiler! Make it toggleable?
             Profiler_Render();
-
-            RenderAnimationPreviewer();
         }
         // if IS in play mode
         else
@@ -2152,7 +2154,12 @@ void ImGuiSystem::RenderPropertyEditor()
             }
             else
             {
-                static bool isTransformEnabled = transform->IsEnabled();
+                bool isTransformEnabled = transform->IsEnabled();
+                if (ImGui::Checkbox("Component Enabled ##Transform", &isTransformEnabled))
+                {
+                    transform->SetEnabled(isTransformEnabled);
+                }
+
                 // Record Undo Entries - Undo Transform
                 LevelEditor* editor = CORE->GetLevelEditor();
 
@@ -2268,7 +2275,7 @@ void ImGuiSystem::RenderPropertyEditor()
             else
             {
 
-                static bool isRenderEnabled = render->IsEnabled();
+                bool isRenderEnabled = render->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled ##Render", &isRenderEnabled))
                 {
                     render->SetEnabled(isRenderEnabled);
@@ -2360,7 +2367,7 @@ void ImGuiSystem::RenderPropertyEditor()
             else
             {
                 // Physics sliders with respective functions
-                static bool isPhysEnabled = physics->IsEnabled();
+                bool isPhysEnabled = physics->IsEnabled();
                 if (ImGui::Checkbox("Phsyics Enabled##Physics", &isPhysEnabled))
                 {
                     physics->SetEnabled(isPhysEnabled);
@@ -2405,7 +2412,7 @@ void ImGuiSystem::RenderPropertyEditor()
             else
             {
                 // Editable Collider Type Dropdown
-                static bool isColEnabled = collider->IsEnabled();
+                bool isColEnabled = collider->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled##Collider", &isColEnabled))
                 {
                     collider->SetEnabled(isColEnabled);
@@ -2501,7 +2508,7 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
         }
         else
         {
-            static bool isScriptEnabled = script->IsEnabled();
+            bool isScriptEnabled = script->IsEnabled();
             if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
             {
                 script->SetEnabled(isScriptEnabled);
@@ -3205,7 +3212,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
     Spritesheet* ss = obj ? obj->GetComponent<Spritesheet>() : nullptr;
     bool hasExistingSS = (ss != nullptr);
 
-    ImGui::Begin("Animation Previewer");
+    ImGui::Begin("Animation Preview");
+    isAnimPreviewFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);// || ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows);
 
     // Mode switches (From File vs From Game Object)
     static bool fromFile = true;
