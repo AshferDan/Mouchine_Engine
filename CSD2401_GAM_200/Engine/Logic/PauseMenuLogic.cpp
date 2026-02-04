@@ -151,7 +151,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 std::cout << "[PauseMenu] Main Menu clicked" << std::endl;
 
                 // Start audio fade out before going to main menu
-                AudioManager* audioManager = CORE->GetAudioManager();
+                audioManager = CORE->GetAudioManager();
                 if (audioManager)
                 {
                     audioManager->FadeOutCategory("music", 0.5f);
@@ -248,7 +248,7 @@ void PauseMenuLogicSystem::Update(float dt)
         // Handle clicks
         if (isClicked && !hoveredButtonName.empty())
         {
-            AudioManager* audioManager = CORE->GetAudioManager();
+            audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Click");
@@ -337,7 +337,7 @@ void PauseMenuLogicSystem::Update(float dt)
         if (!currentHover.empty())
         {
             SetButtonTexture(currentHover, true);
-            AudioManager* audioManager = CORE->GetAudioManager();
+            audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Hover");
@@ -351,7 +351,7 @@ void PauseMenuLogicSystem::Update(float dt)
     if (isClicked && !hoveredButtonName.empty())
     {
         // play click sound based on button type
-        AudioManager* audioManager = CORE->GetAudioManager();
+        audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
             if (hoveredButtonName == "PauseRestartButton")

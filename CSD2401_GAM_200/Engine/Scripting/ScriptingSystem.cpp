@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "ScriptingSystem.h"
 #include "gameObject.h"
 #include "ScriptAPI.h"
+#include "WinLoseLogic.h"
 #include <iostream>
 #include <filesystem>
 #include <mono/metadata/attrdefs.h>
@@ -626,6 +627,33 @@ static float Internal_GetMouseWorldY()
     return API::GetMouseWorldY();
 }
 
+// === WinLose System ===
+static void Internal_TriggerLoseZone()
+{
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        CORE->GetWinLoseLogic()->TriggerLose();
+    }
+}
+
+static bool Internal_IsWinScreenActive()
+{
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        return CORE->GetWinLoseLogic()->IsWinScreenActive();
+    }
+    return false;
+}
+
+static bool Internal_IsLoseScreenActive()
+{
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        return CORE->GetWinLoseLogic()->IsLoseScreenActive();
+    }
+    return false;
+}
+
 MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassName, GameObject* owner)
 {
     if (!coreAssembly || !coreImage)
@@ -902,6 +930,11 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldY", (void*)Internal_GetMouseWorldY);
+
+    // === WinLose System ===
+    mono_add_internal_call("CSharpScript.WinLoseSystem::TriggerLose", (void*)Internal_TriggerLoseZone);
+    mono_add_internal_call("CSharpScript.WinLoseSystem::IsWinScreenActive", (void*)Internal_IsWinScreenActive);
+    mono_add_internal_call("CSharpScript.WinLoseSystem::IsLoseScreenActive", (void*)Internal_IsLoseScreenActive);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)

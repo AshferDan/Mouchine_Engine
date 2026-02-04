@@ -761,6 +761,33 @@ namespace CSharpScript
         }
     }
 
+    /// <summary>
+    /// Win/Lose system functions for triggering game state changes.
+    /// </summary>
+    public static class WinLoseSystem
+    {
+        /// <summary>
+        /// Triggers the lose sequence, displaying the lose screen and pausing the game.
+        /// This can be called from C# scripts to manually trigger a game over state.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void TriggerLose();
+
+        /// <summary>
+        /// Checks if the win screen is currently active and displayed.
+        /// </summary>
+        /// <returns>True if the win screen is currently shown, false otherwise.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsWinScreenActive();
+
+        /// <summary>
+        /// Checks if the lose screen is currently active and displayed.
+        /// </summary>
+        /// <returns>True if the lose screen is currently shown, false otherwise.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsLoseScreenActive();
+    }
+
     public static class Input
     {
         /// Key codes mapping to standard GLFW/ASCII constants.
