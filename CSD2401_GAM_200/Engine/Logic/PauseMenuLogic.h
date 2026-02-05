@@ -80,6 +80,8 @@ private:
     bool pendingSceneChange = false;       // whether a scene change is pending
     float pendingTimer = 0.0f;             // timer for scene change delay
     std::string currentScenePath = "";
+    bool isPauseSettingsOpen = false;      // whether pause settings screen is open
+    bool hasCreatedSettingsUI = false;     // whether settings UI has been created
 
     /**
      * @brief Creates all pause menu UI elements (overlay, buttons, title).
@@ -87,15 +89,31 @@ private:
     void CreatePauseMenuUI();
 
     /**
+     * @brief Creates settings screen UI elements for pause menu.
+     */
+    void CreatePauseSettingsUI();
+
+    /**
      * @brief Destroys all pause menu UI objects.
      */
     void DestroyPauseMenuUI();
+
+    /**
+     * @brief Destroys pause settings UI objects.
+     */
+    void DestroyPauseSettingsUI();
 
     /**
      * @brief Sets all pause menu UI objects active or inactive.
      * @param show Whether to enable or disable UI visibility.
      */
     void SetPauseMenuVisible(bool show);
+
+    /**
+     * @brief Sets all pause settings UI objects active or inactive.
+     * @param show Whether to enable or disable settings UI visibility.
+     */
+    void SetPauseSettingsVisible(bool show);
 
     /**
      * @brief Checks if the mouse cursor is within a button's area.

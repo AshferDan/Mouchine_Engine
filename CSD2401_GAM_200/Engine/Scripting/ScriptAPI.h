@@ -404,6 +404,7 @@ namespace API {
     bool OnTriggerEnter(const std::string, const std::string);
     bool OnTriggerExit(const std::string, const std::string);
     bool OnTriggerStay(const std::string, const std::string);
+    bool CheckColliderLayer(int, int);
 
 #pragma endregion
 
@@ -416,9 +417,22 @@ namespace API {
 
     void TriggerEvent(const std::string);
     void AddEventSound(const std::string, const std::string);
-   
+
     void SetVolume(const std::string,float);
     void SetCategoryVolume(const std::string,float);
+    void SetPitch(const std::string, float);
+
+    void PauseSound(const std::string, bool);
+    void PauseAllSounds(bool);
+
+    void ToggleMasterMute();
+    void ToggleCategoryMute(const std::string);
+    bool IsMasterMuted();
+    bool IsCategoryMuted(const std::string);
+
+    void FadeOutCategory(const std::string, float);
+    void FadeInCategory(const std::string, float, float);
+    void FadeOutAll(float);
 #pragma endregion
 
 
@@ -463,6 +477,9 @@ namespace API {
     float fInverseLerp(float a, float b, float value);
     float fClamp(float value, float min, float max);
     int iClamp(int value, int min, int max);
+
+    const char* FindGameObjectByName(const std::string& name);
+    const char* FindGameObjectByID(int id);
 
 #pragma endregion
 

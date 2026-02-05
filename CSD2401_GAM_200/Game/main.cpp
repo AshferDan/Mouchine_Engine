@@ -70,6 +70,7 @@ int main()
             cam->SetFollowTarget(player);
             cam->SetFollowOffset(vec2(0.f, 0.f));
             cam->SetSmoothing(true, 2.f);
+            cam->SetZoom(0.5f);         //doesnt rly work
         }
 
         CameraManager::Instance().SetActiveCamera(mainCamera);
@@ -100,7 +101,7 @@ int main()
         GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
             "Hero",
             0, 0,
-            100, 100,
+            192, 192,
             "../Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Player);
 
         if (Hero)
@@ -110,7 +111,7 @@ int main()
 
             if (colComp && phyComp)
             {
-                colComp->SetSize(100.0f, 100.0f);
+                colComp->SetSize(168.0f, 192.0f);
             }
 
             ScriptComponent* scriptComp = Hero->AddComponent<ScriptComponent>();
@@ -130,7 +131,7 @@ int main()
             "Platform",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             0.0f, -200.0f,                      // Center of screen
-            10000.0f, 100.0f,                  // Size
+            10000.0f, 200.0f,                  // Size
             vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
         );
 
@@ -142,7 +143,7 @@ int main()
             if (colComp && phyComp)
             {
                 phyComp->SetStatic(true);
-                colComp->SetSize(10000.0f, 100.0f);
+                colComp->SetSize(10000.0f, 200.0f);
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }

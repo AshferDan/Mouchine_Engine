@@ -24,7 +24,7 @@ Technology is prohibited.
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/mono-config.h>
-
+#include "ScriptComponent.h"
 class GameObject;
 
 // Forward declaration
@@ -201,6 +201,8 @@ public:
     void SetPublicField(ScriptInstance& instance, const std::string& fieldName, const bool& value);
     void SetPublicField(ScriptInstance& instance, const std::string& fieldName, const std::string& value);
 
+    void NotifyGameObjectDestroyed(GameObject* gameObject);
+    
     /**
      * @brief Gets the core assembly for direct class access
      */

@@ -59,6 +59,29 @@ std::unique_ptr<IComponent> PhysicsComponent::Clone(GameObject* NewClone) const
     return clonedComponent;
 }
 
+void PhysicsComponent::SetEnabled(bool enable)
+{
+    if (this->enabled == enable) return; // No change in state
+
+    if (!enable)
+    {
+        // Disabling component: store current states, then disable gravity and set to static
+        _previousUseGravity = useGravity;
+        _previousIsStatic = isStatic;
+        useGravity = false;
+        isStatic = true;
+    }
+    else
+    {
+        // Enabling component: restore previous states
+        useGravity = _previousUseGravity;
+        isStatic = _previousIsStatic;
+    }
+
+    // Call base class method to update the 'enabled' flag
+    IComponent::SetEnabled(enable);
+}
+
 /**
  * @brief Adds to the current velocity
  */

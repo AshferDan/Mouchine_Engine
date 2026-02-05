@@ -325,9 +325,9 @@ void LevelEditor::EnterPlayMode()
         }
         else if (sounds.find("MainMenuBGM") != sounds.end())
         {
-            // Main menu scene - play menu BGM with fade in 
+            // Main menu scene - play menu BGM with fade in
             std::cout << "[LevelEditor] Playing main menu BGM\n";
-            audioManager->PlaySound("MainMenuBGM", "menu_bgm_channel");
+            audioManager->PlaySound("MainMenuBGM", "bgm_channel");
             audioManager->FadeInCategory("music", 1.0f);  // Fade in menu music over 1 second
             std::cout << "[LevelEditor] Started menu music fade in over 1 second\n";
         }

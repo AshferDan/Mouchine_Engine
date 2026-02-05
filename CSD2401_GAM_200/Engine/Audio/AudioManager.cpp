@@ -64,6 +64,96 @@ bool AudioManager::IsMuted() const
 }
 
 /**
+ * @brief Toggles muting for a specific audio category.
+ */
+void AudioManager::ToggleCategoryMute(const std::string& category)
+{
+    auto it = categoryVolumes.find(category);
+    if (it == categoryVolumes.end())
+    {
+        std::cerr << "Category not found: " << category << std::endl;
+        return;
+    }
+
+    bool& isMuted = m_categoryMuteStates[category];
+    isMuted = !isMuted;
+
+    if (isMuted)
+    {
+        m_preMuteIndividualCategoryVolumes[category] = it->second;
+        //std::cout << "[AudioManager] Muting category: " << category << " (was at volume " << it->second << ")" << std::endl;
+        SetCategoryVolume(category, 0.0f);
+
+        // fprce update all channels in this category
+        if (audioEngine)
+        {
+            for (const auto& pair : soundDatabase)
+            {
+                const SoundData& sound = pair.second;
+                if (sound.category == category)
+                {
+                    std::string channelName = sound.name + "_channel";
+                    audioEngine->setVolume(channelName, 0.0f);
+                    //std::cout << "[AudioManager] Force muted channel: " << channelName << std::endl;
+                }
+            }
+
+            if (category == "music")
+            {
+                audioEngine->setVolume("bgm_channel", 0.0f);
+                //std::cout << "[AudioManager] Force muted bgm_channel" << std::endl;
+            }
+        }
+    }
+    else
+    {
+        // restore previous volume
+        float restoreVolume = 1.0f; // default
+        auto prevIt = m_preMuteIndividualCategoryVolumes.find(category);
+        if (prevIt != m_preMuteIndividualCategoryVolumes.end())
+        {
+            restoreVolume = prevIt->second;
+        }
+        //std::cout << "[AudioManager] Unmuting category: " << category << " to volume " << restoreVolume << std::endl;
+        SetCategoryVolume(category, restoreVolume);
+
+        if (audioEngine)
+        {
+            for (const auto& pair : soundDatabase)
+            {
+                const SoundData& sound = pair.second;
+                if (sound.category == category)
+                {
+                    float finalVolume = sound.volume * restoreVolume;
+                    std::string channelName = sound.name + "_channel";
+                    audioEngine->setVolume(channelName, finalVolume);
+                    std::cout << "[AudioManager] Force restored channel: " << channelName << " to volume " << finalVolume << std::endl;
+                }
+            }
+
+            if (category == "music")
+            {
+                audioEngine->setVolume("bgm_channel", restoreVolume);
+                //std::cout << "[AudioManager] Force restored bgm_channel to volume " << restoreVolume << std::endl;
+            }
+        }
+    }
+}
+
+/**
+ * @brief Checks whether a specific category is currently muted.
+ */
+bool AudioManager::IsCategoryMuted(const std::string& category) const
+{
+    auto it = m_categoryMuteStates.find(category);
+    if (it != m_categoryMuteStates.end())
+    {
+        return it->second;
+    }
+    return false;
+}
+
+/**
  * @brief Loads a single sound after validating extension.
  */
 bool AudioManager::LoadSound(const SoundData& sound) 
@@ -142,22 +232,25 @@ void AudioManager::TriggerEvent(const std::string& eventName)
 /**
  * @brief Plays a sound and applies category volume + pitch + mute rules.
  */
-void AudioManager::PlaySound(const std::string& soundName, const std::string& channelName) 
+void AudioManager::PlaySound(const std::string& soundName, const std::string& channelName)
 {
-    if (!audioEngine) 
+    std::cout << "[AudioManager] PlaySound called for: " << soundName << std::endl;
+
+    if (!audioEngine)
     {
         std::cerr << "AudioEngine not available" << std::endl;
         return;
     }
 
     auto it = soundDatabase.find(soundName);
-    if (it == soundDatabase.end()) 
+    if (it == soundDatabase.end())
     {
         std::cerr << "Sound not found in database: " << soundName << std::endl;
         return;
     }
 
     const SoundData& sound = it->second;
+    std::cout << "[AudioManager] Found sound in database, category: " << sound.category << ", base volume: " << sound.volume << std::endl;
 
     // Play the sound
     std::string channel = channelName.empty() ? soundName + "_channel" : channelName;
@@ -166,16 +259,25 @@ void AudioManager::PlaySound(const std::string& soundName, const std::string& ch
     // Apply volume (base volume * category volume)
     float finalVolume = sound.volume;
     auto categoryIt = categoryVolumes.find(sound.category);
-    if (categoryIt != categoryVolumes.end()) 
+    if (categoryIt != categoryVolumes.end())
     {
+        std::cout << "[AudioManager] Category '" << sound.category << "' volume: " << categoryIt->second << std::endl;
         finalVolume *= categoryIt->second;
+    }
+
+    // Check if category is muted
+    if (IsCategoryMuted(sound.category)) {
+        std::cout << "[AudioManager] Category '" << sound.category << "' is MUTED!" << std::endl;
+        finalVolume = 0.0f;
     }
 
     // Enforce master mute
     if (m_isMuted) {
+        std::cout << "[AudioManager] Master is MUTED!" << std::endl;
         finalVolume = 0.0f;
     }
 
+    std::cout << "[AudioManager] Final volume for " << soundName << ": " << finalVolume << std::endl;
     audioEngine->setVolume(channel, finalVolume);
     audioEngine->setPitch(channel, sound.pitch <= 0.0f ? 1.0f : sound.pitch);
 }
@@ -282,8 +384,7 @@ void AudioManager::ToggleMasterMute()
     {
         float musicVol = categoryVolumes["music"];
         audioEngine->setVolume("bgm_channel", musicVol);
-        audioEngine->setVolume("menu_bgm_channel", musicVol);
-        std::cout << "Forcing BGM channel volumes to " << musicVol << std::endl;
+        //std::cout << "Forcing BGM channel volume to " << musicVol << std::endl;
     }
 }
 
@@ -584,7 +685,7 @@ void AudioManager::UpdateFade(float dt)
 
             float newVolume = fadeState.startVolume + (fadeState.targetVolume - fadeState.startVolume) * interpolatedValue;
             SetCategoryVolume(category, newVolume);
-            std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
+            //std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
         }
     }
 }

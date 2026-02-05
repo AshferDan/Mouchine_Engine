@@ -859,6 +859,10 @@ namespace API
         }
         return false;
     }
+    bool CheckColliderLayer(int layer1, int layer2)
+    {
+		return CollisionSystem::ShouldCollide(static_cast<CollisionLayer>(layer1), static_cast<CollisionLayer>(layer2));
+	}
 
 bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* selfName, MonoString** hitObjectName, float* hitDistance)
 {
@@ -1069,6 +1073,27 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
 		return MathiClamp(value, min, max);
 	}
+    const char* FindGameObjectByName(const std::string& name)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj)
+        {
+            return obj->GetName().c_str();
+        }
+        return "";
+    }
+
+    const char* FindGameObjectByID(int id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            return obj->GetName().c_str();
+        }
+        return "";
+    }
 #pragma endregion
 
 #pragma region Audio
@@ -1079,12 +1104,10 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            std::cout << "aaa\n\n\n";
             audioManager->LoadSound({ "jump", "../Assets/Audio/jump.wav", false, 0.4f, 1.0f, "sfx" });
             audioManager->LoadSound(newSound);
             audioManager->AddSound(newSound);
         }
-        else std::cout << "asdasdasasdas\n\n\n";
     }
 
     void PlaySound(const std::string soundName, const std::string channel)
@@ -1157,6 +1180,102 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         if (audioManager)
         {
             audioManager->SetCategoryVolume(CatName, vol);
+        }
+    }
+
+    void SetPitch(const std::string soundName, float pitch)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->SetSoundPitch(soundName, pitch);
+        }
+    }
+
+    void PauseSound(const std::string channelName, bool pause)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            AudioEngine* audioEngine = ResourceManager::Instance().GetAudioEngine();
+            if (audioEngine)
+            {
+                audioEngine->pauseSound(channelName, pause);
+            }
+        }
+    }
+
+    void PauseAllSounds(bool pause)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->PauseAllSounds(pause);
+        }
+    }
+
+    void ToggleMasterMute()
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->ToggleMasterMute();
+        }
+    }
+
+    void ToggleCategoryMute(const std::string category)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->ToggleCategoryMute(category);
+        }
+    }
+
+    bool IsMasterMuted()
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            return audioManager->IsMuted();
+        }
+        return false;
+    }
+
+    bool IsCategoryMuted(const std::string category)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            return audioManager->IsCategoryMuted(category);
+        }
+        return false;
+    }
+
+    void FadeOutCategory(const std::string category, float duration)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeOutCategory(category, duration);
+        }
+    }
+
+    void FadeInCategory(const std::string category, float duration, float targetVolume)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeInCategory(category, duration, targetVolume);
+        }
+    }
+
+    void FadeOutAll(float duration)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeOutAll(duration);
         }
     }
 #pragma endregion

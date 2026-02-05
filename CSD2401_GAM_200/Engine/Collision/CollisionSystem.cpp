@@ -109,7 +109,7 @@ void CollisionSystem::Update(float deltaTime)
     for (const auto& obj : gameObjects)
     {
         auto* collider = obj->GetComponent<ColliderComponent>();
-        if (collider)
+        if (collider && collider->IsEnabled())
         {
             spatialGrid.Insert(obj.get(), collider);
         }
@@ -119,7 +119,7 @@ void CollisionSystem::Update(float deltaTime)
     for (const auto& obj1 : gameObjects)
     {
         auto* col1 = obj1->GetComponent<ColliderComponent>();
-        if (!col1)
+        if (!col1 || !col1->IsEnabled())
             continue;
 
         // Query nearby objects from spatial grid (MUCH FASTER than checking all)
@@ -129,7 +129,7 @@ void CollisionSystem::Update(float deltaTime)
         for (GameObject* obj2 : nearbyObjects)
         {
             auto* col2 = obj2->GetComponent<ColliderComponent>();
-            if (!col2)
+            if (!col2 || !col2->IsEnabled())
                 continue;
 
 

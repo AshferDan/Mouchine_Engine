@@ -37,6 +37,8 @@ namespace CSharpScript
             Land,
             GroundPounding,
             GroundPounding_Falling,
+            Hurting,
+            Bonking,
             Rolling,
             WallKicking,
             Ziplining,
@@ -140,7 +142,11 @@ namespace CSharpScript
         private float _ziplineHeadOffset = 0;
 
         // knockback
-        // private KnockBack knockback; //
+        bool IsBeingKnockedBack = false;
+        public float hitDirectionForce = 10f;
+        public float constForce = 5f;
+        public float inputForce = 7.5f;
+        public static bool isControlLocked { get; set; }
 
         // movement penalties - bonk & skid
         private float _bonkTimer = 0f;
@@ -171,12 +177,14 @@ namespace CSharpScript
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
-            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", true, 0.5f, 2.0f, "sfx");
+            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", false, 0.5f, 2.0f, "sfx");
             Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.1f, 1.25f, "sfx");
+            Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.1f, 0.9f, "sfx");
             Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.5f, 1.35f, "sfx");
-            Audio.AddSound("wallkick_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("AirGlide", "../Assets/audio/Player/AirGlide.wav", false, 0.5f, 1.5f, "sfx");
-            Audio.AddSound("TurnSkid", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
+            Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.5f, 1.5f, "sfx");
+            Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
+            Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.05f, 1.1f, "sfx");
             //footsteps
             Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.15f, 1.0f, "sfx");
             Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.15f, 1.0f, "sfx");
@@ -193,7 +201,7 @@ namespace CSharpScript
             Audio.AddSound("land_sfx3", "../Assets/audio/Player/Land/Land3.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx4", "../Assets/audio/Player/Land/Land4.wav", false, 0.3f, 1.0f, "sfx");
 
-            // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_L EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
+            // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_R EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
             Animation.RegisterAnimation("Hero", "Walk", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 8.0f);
             Animation.RegisterAnimation("Hero", "Run1", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 12.0f);
@@ -204,11 +212,13 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png", 13, 10, 1, 0, 1, 2, 8.0f);
             Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 12.0f);
             Animation.RegisterAnimation("Hero", "Groundpound", "../Assets/spritesheet_R.png", 13, 10, 9, 3, 9, 4, 10.0f);
-            Animation.RegisterAnimation("Hero", "Dash", "../Assets/spritesheet_R.png", 13, 10, 3, 0, 3, 2, 4.0f);
+            Animation.RegisterAnimation("Hero", "Dash", "../Assets/spritesheet_R.png", 13, 10, 0, 0, 0, 3, 4.0f);
             Animation.RegisterAnimation("Hero", "Wallkick", "../Assets/spritesheet_R.png", 13, 10, 4, 3, 4, 4, 4.0f);
             Animation.RegisterAnimation("Hero", "Wallslide", "../Assets/spritesheet_L.png", 13, 10, 4, 0, 4, 1, 4.0f);
             Animation.RegisterAnimation("Hero", "Falling", "../Assets/spritesheet_R.png", 13, 10, 10, 0, 10, 1, 4.0f);
             Animation.RegisterAnimation("Hero", "Land", "../Assets/spritesheet_R.png", 13, 10, 10, 3, 10, 4, 4.0f);
+            Animation.RegisterAnimation("Hero", "Hurt", "../Assets/spritesheet_R.png", 13, 10, 0, 0, 0, 2, 3.0f);
+            Animation.RegisterAnimation("Hero", "Bonk", "../Assets/spritesheet_R.png", 13, 10, 2, 0, 2, 2, 4.0f);
             landAnimationLength = 0.15f;         // can calculate roughly how long it shud be with fps * amnt of frames / 60fps. 4.0f * 2 / 60;
 
             _isFacingRight = true;
@@ -238,8 +248,13 @@ namespace CSharpScript
         {
             if (OwnerName == null || OwnerName == "") return;
 
-            // additional checks here
+            // Handle all timers
+            _jumpBufferTimer -= deltaTime;
+            _coyoteTimer -= deltaTime;
+            _wallKickCooldownTimer -= deltaTime;
+            _ziplineCoyoteTimer -= deltaTime;
 
+            // additional checks here
             UpdatePlayerState();
 
             // toggle run
@@ -257,11 +272,7 @@ namespace CSharpScript
                 _isRunToggleActive = InputManager.RunIsHeld;
             }
 
-            // Handle all timers
-            _jumpBufferTimer -= deltaTime;
-            _coyoteTimer -= deltaTime;
-            _wallKickCooldownTimer -= deltaTime;
-            _ziplineCoyoteTimer -= deltaTime;
+
             JumpChecks();
             PlayFootsteps();
             // Handle Inputs
@@ -326,19 +337,33 @@ namespace CSharpScript
                     Debug.Log("CurrState: " + "Wallkick");
                     Animation.PlayAnimation(OwnerName, "Wallkick");
                     break;
+                case PlayerState.Hurting:
+                    Debug.Log("CurrState: " + "Hurting");
+                    Animation.PlayAnimation(OwnerName, "Hurt");
+                    break;
+                case PlayerState.Bonking:
+                    Debug.Log("CurrState: " + "Bonking");
+                    Animation.PlayAnimation(OwnerName, "Bonk");
+                    break;
             }
         }
 
         static bool resetSkid = false;
         public void OnFixedUpdate(float fixedDeltaTime)
         {
+            if (Input.GetKeyHeld(Input.KeyCode.V))
+            {
+                IsBeingKnockedBack = true;
+            }
+
             // check if player is taking damage
-            bool isHurting = false; // = (_playerHealth != null && _playerHealth.IsHurting);
+            bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
 
             // wall bonk stun
             if (_bonkTimer > 0)
             {
                 _bonkTimer -= fixeddt;
+                currState = PlayerState.Bonking;
                 CollisionChecks();
                 Jump();
 
@@ -348,7 +373,6 @@ namespace CSharpScript
                     float bonkFriction = 100f;
                     float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, bonkFriction * fixeddt);
                     Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
-                    //playsound bonk
                 }
                 return;
             }
@@ -358,28 +382,10 @@ namespace CSharpScript
             if (_isGrounded) _groundedTimer += fixeddt;
             else _groundedTimer = 0f;
 
-            if (!_isZiplining)// && !knockback.IsBeingKnockedBack && !_isBeingLaunched)
+            if (!_isZiplining || !IsBeingKnockedBack) // && !_isBeingLaunched)
             {
                 // gravity logic
                 Jump();
-
-                // hurt movement lock & friction
-                if (isHurting)
-                {
-                    // reset internal speed so player cannot instantly sprint after recovering
-                    movespeed = 0;
-
-                    // only apply friction on ground
-                    if (_isGrounded)
-                    {
-                        float hurtFriction = 60f;
-
-                        float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, hurtFriction * fixeddt);
-                        Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
-                    }
-
-                    return;
-                }
 
                 // wall bonk trigger
                 if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold)
@@ -418,6 +424,22 @@ namespace CSharpScript
                 {
                     Move(InputManager.Movement);
                 }
+                HandleKnockback();
+                // hurt movement lock & friction
+                if (isHurting)
+                {
+                    // reset internal speed so player cannot instantly sprint after recovering
+                    movespeed = 0;
+
+                    // only apply friction on ground
+                    if (_isGrounded)
+                    {
+                        float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, MoveStats.KnockbackFriction.x * fixeddt);
+                        Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
+                    }
+
+                    return;
+                }
             }
         }
 
@@ -425,22 +447,6 @@ namespace CSharpScript
         #region State & Input
         private void UpdatePlayerState()
         {
-            // check if in air
-            if (!_isGrounded)
-            {
-                //if (_isWallJumping)
-                //{
-                //    currState = PlayerState.WallJumping;
-
-                //}
-                //else
-                //{
-                //    currState = PlayerState.Jumping;
-                //}
-                //EnterState(currState);
-                return;
-            }
-
             if (currState == PlayerState.Land)
             {
                 landAnimTimerBuffer -= fixeddt;
@@ -458,13 +464,17 @@ namespace CSharpScript
                 landAnimTimerBuffer = landAnimationLength;
             }
             // horizontal input = moving - trigger run animation
-            if (InputManager.Movement.x != 0)
+            if (InputManager.Movement.x != 0 || InputManager.RunIsHeld)
             {
                 int index = GetCurrentTentacleLevel();
                 if (index == 0)
+                {
                     currState = PlayerState.Walking;
+                }
                 else
+                {
                     currState = PlayerState.Running;
+                }
             }
             if (_isSkidding)
             {
@@ -476,6 +486,11 @@ namespace CSharpScript
         static bool jumpFullyReleased = false;
         private void HandleGeneralInput()
         {
+            bool isControlLocked = _bonkTimer > 0 || _isSkidding || currState == PlayerState.Hurting;
+            if (isControlLocked)
+            {
+                return;
+            }
             if (InputManager.WallKickWasPressed && _wallKickCooldownTimer <= 0 && canWallKick)
             {
                 InitiateWallKick();
@@ -520,6 +535,10 @@ namespace CSharpScript
         #region Movement
         public void Move(vec2 moveInput)
         {
+            if (IsBeingKnockedBack || currState == PlayerState.Bonking)
+            {
+                return;
+            }
             float inputX = moveInput.x;
             bool isRunHeld = _isRunToggleActive; // for run toggle option
 
@@ -552,7 +571,6 @@ namespace CSharpScript
 
                     movespeed *= MoveStats.SkidSpeedRetained;
                     _calculatedSkidDecel = (duration > 0) ? (movespeed / duration) : 0;
-
                     return;
                 }
             }
@@ -730,6 +748,9 @@ namespace CSharpScript
 
         private void HandleWallBonk()
         {
+            currState = PlayerState.Bonking;
+            EnterState(currState);
+
             // force roll + ground pound states to end immediately
             _isRolling = false;
             _isGroundPounding = false;
@@ -1005,14 +1026,15 @@ namespace CSharpScript
         #endregion
 
         #region Slide
+        static bool wallslideTrigger = false;
+        static float wallslideTime = 0f;
         private void WallSlide()
         {
-            if (_isGrounded)// || (knockback != null && knockback.IsBeingKnockedBack))
+            if (_isGrounded || IsBeingKnockedBack)
             {
                 if (_isWallSliding)
                 {
                     _isWallSliding = false;
-                    // [TODO] find out how to loop wall sliding sound
                 }
                 return;
             }
@@ -1025,9 +1047,22 @@ namespace CSharpScript
                 {
                     _isWallSliding = true;
 
+                    currState = PlayerState.WallSliding;
+                    EnterState(currState);
+
                     // reset jumps if want wall sliding to refresh double jump
                     _numberOfJumpsUsed = 0;
                 }
+                Debug.Log(wallslideTrigger.ToString());
+                if (wallslideTime >= MoveStats.WallSlidingTimeToTriggerSound)         // magic number replace with a
+                {
+                    if (wallslideTrigger == false)
+                    {
+                        Audio.PlaySound("wallslide_sfx", "sfx");
+                        wallslideTrigger = true;
+                    }
+                }
+                wallslideTime += fixeddt;
 
                 // apply friction/slide speed
                 Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
@@ -1039,6 +1074,8 @@ namespace CSharpScript
                 {
                     _isWallSliding = false;
                 }
+                wallslideTrigger = false;
+                wallslideTime = 0;
             }
         }
 
@@ -1439,6 +1476,51 @@ namespace CSharpScript
         // Zipline logic is complex and will be ported later
         #endregion
 
+        #region Knockback
+
+        static float elapsedTime = 0f;
+        static float stunTime = 0f;
+        static float currX = 50f;
+        static float currY = 100f;
+        private void HandleKnockback()
+        {
+            if (IsBeingKnockedBack)
+            {
+                currState = PlayerState.Hurting;
+
+                if (elapsedTime < MoveStats.knockbackTime)
+                {
+                    elapsedTime += fixeddt;
+                    currX = Utils.MathfMoveTowards(currX, MoveStats.KnockbackForce.x, 1500f * fixeddt);
+                    currY = Utils.MathfMoveTowards(currY, MoveStats.KnockbackForce.y, 2500f * fixeddt);
+                    float xDir = _isFacingRight ? -currX : currX;
+                    Physics.SetVelocity(OwnerName, xDir, currY);
+                    return;
+                }
+
+                if (stunTime < MoveStats.hurtStunDuration)
+                {
+                    stunTime += fixeddt;
+                }
+                else
+                {
+                    if (!_isGrounded)
+                    {
+                        _isFastFalling = true;
+                    }
+                    else
+                    {
+                        IsBeingKnockedBack = false;
+                        elapsedTime = stunTime = 0f;
+                        currX = currY = 0f;
+                        _isFastFalling = false;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         public void OnDestroy()
         {
             Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
@@ -1476,7 +1558,10 @@ namespace CSharpScript
         private void EnterState(PlayerState state)
         {
             Debug.Log(state.ToString());
-            Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
+            //Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
+            // ^ im commenting this out for now cause its stopping the level bgm
+
+            Audio.StopSound("sfx");
 
             // doesnt work for some reason
             //if (loopingSounds.Contains(state))
@@ -1499,11 +1584,10 @@ namespace CSharpScript
                     break;
                 case PlayerState.Running:
                     if (enableDebug) Debug.Log("CurrState: " + "Running");
-                    Audio.PlaySound("footstep_sfx", "sfx");
                     break;
                 case PlayerState.Skidding:
                     if (enableDebug) Debug.Log("CurrState: " + "Skidding");
-                    Audio.PlaySound("TurnSkid", "sfx");
+                    Audio.PlaySound("turnskid_sfx", "sfx");
                     break;
                 case PlayerState.Falling:
                     // need find out how do looping sound till out of state
@@ -1528,7 +1612,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.WallJumping:
                     if (enableDebug) Debug.Log("CurrState: " + "Wallkick");
-                    Audio.PlaySound("wallkick_sfx", "sfx");
+                    Audio.PlaySound("jump_sfx", "sfx");
                     break;
                 case PlayerState.WallKicking:
                     if (enableDebug) Debug.Log("CurrState: " + "Wallkick");
@@ -1540,10 +1624,15 @@ namespace CSharpScript
                     break;
                 case PlayerState.Gliding:
                     if (enableDebug) Debug.Log("CurrState: " + "Glide");
-                    Audio.PlaySound("AirGlide", "sfx");
+                    Audio.PlaySound("airglide_sfx", "sfx");
+                    break;
+                case PlayerState.Bonking:
+                    if (enableDebug) Debug.Log("CurrState: " + "Bonking");
+                    Audio.PlaySound("bonk_sfx", "sfx");
                     break;
                 case PlayerState.WallSliding:
                     if (enableDebug) Debug.Log("CurrState: " + "Wallslide");
+                    Audio.PlaySound("wallslide_impact_sfx", "sfx");
                     // need find out how do looping sound till out of state
                     break;
             }
