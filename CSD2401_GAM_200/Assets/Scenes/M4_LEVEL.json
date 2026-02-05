@@ -2141,33 +2141,122 @@
         ]
       },
       "children": []
-    },
+    }, 
     {
-      "name": "LevelTimerText",
-      "localID": 10,
-      "parentID": -1,
+      "name": "InGamePauseButton",
+      "localID": 56,
+      "parentID": 4294967295,
       "active": true,
-      "TextComponent": {
-        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-        "fontSize": 48,
-        "text": "01:00",
+      "TransformComponent": {
+        "pos": [
+          1800.0,
+          900.0
+        ],
+        "scale": [
+          125.0,
+          110.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/paused_button.png",
         "color": [
-          0.0,
-          0.0,
-          0.0,
+          1.0,
+          1.0,
+          1.0,
           1.0
         ],
-        "scale": 1.0,
+        "layer": 700,
+        "screenSpace": true
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarBackground",
+      "localID": 9,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 9,
         "screenSpace": true
       },
       "TransformComponent": {
         "pos": [
-          50,
-          630
+          550,
+          920
         ],
         "scale": [
-          1,
-          1
+          1050,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBar",
+      "localID": 10,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 10,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1000,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarFrame",
+      "localID": 11,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 11,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1050,
+          125
         ],
         "rotation": 0.0
       },

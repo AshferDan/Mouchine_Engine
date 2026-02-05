@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "System.h"
 #include "TextComponent.h"
+#include "RenderComponent.h"
 
 #include <string>
 
@@ -88,14 +89,20 @@ public:
 private:
     float       remainingTime = 30.0f;              // remaining time in 30 seconds for now
     int         lastDisplayedSeconds = -1;          // last whole second shown on HUD
-    std::string timerObjectName = "LevelTimerText";
+    std::string timerObjectName = "LevelTimerBar";
     bool        hasTriggeredTimeUp = false;         // prevent multiple scene loads
 
+    // Bar scaling variables
+    float       originalScaleX = 0.0f;              // original bar width
+    float       originalScaleY = 0.0f;              // original bar height
+    float       originalCenterX = 0.0f;             // original bar center X position
+    float       leftEdge = 0.0f;                    // left edge anchor point
+
     /**
-     * @brief Updates the timer's displayed UI text using mm:ss formatting.
+     * @brief Updates the timer's displayed UI bar fill amount.
      * @param totalSeconds Whole seconds to display.
      */
-    void UpdateText(int totalSeconds);
+    void UpdateBar(int totalSeconds);
 
     /**
      * @brief Checks if the player is currently inside the SafeZone.
