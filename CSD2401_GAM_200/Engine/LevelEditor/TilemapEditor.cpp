@@ -1588,7 +1588,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 
         if (batchIndex == -1)
         {
-            batches.emplace_back(data->tilesetTexture, false, renderLayer);
+            batches.emplace_back(data->tilesetTexture, false, renderLayer, false);
             batchIndex = static_cast<int>(batches.size() - 1);
         }
 
@@ -1604,7 +1604,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
                 // Check batch overflow
                 if (batches[batchIndex].vertices.size() + 4 > 11000)
                 {
-                    batches.emplace_back(data->tilesetTexture, false, renderLayer);
+                    batches.emplace_back(data->tilesetTexture, false, renderLayer, false);
                     batchIndex = static_cast<int>(batches.size() - 1);
                 }
 
