@@ -506,25 +506,31 @@ std::unique_ptr<IComponent> ParticleEmitterComponent::Clone(GameObject* newOwner
  * Particles spawn behind the player and fade out smoothly.
  */
 void ParticleEmitterComponent::ConfigureDashTrail() {
-	SetEmissionRate(80.0f);      // High emission for continuous trail
-	SetMaxParticles(200);        // Large pool for long trails
-	SetLifetime(1.0f, 0.05f);    // 1 second lifetime with slight variation
-
-	SetSpawnRadius(5.0f);        // Small spawn area
-	SetSpawnOffset(vec2(0.0f, -80.0f));  // Spawn behind player
-	SetVelocity(vec2(0, 0), 0.0f);  // Stationary particles (world-space motion from player)
-
-	SetStartColor(vec4(0.3f, 0.6f, 1.0f, 0.8f));  // Bright blue
-	SetEndColor(vec4(0.1f, 0.3f, 0.8f, 0.0f));    // Fade to transparent blue
-
-	SetStartSize(20.0f);         // Start medium size
-	SetEndSize(5.0f);            // Shrink over time
-
-	SetGravity(vec2(0, 0));      // No gravity (float in place)
-	SetDrag(0.0f);               // No drag
-
-	SetFadeOut(0.2f);            // Smooth fade out at end
-	SetLayer(-2);                // Render behind player
+    SetEmissionRate(25.0f);      // Lower rate for individual bubbles
+    SetMaxParticles(100);        // Moderate pool for visible bubbles
+    SetLifetime(1.2f, 0.3f);     // Bubbles rise for a bit, with variation
+    SetSpawnRadius(15.0f);       // Wider spawn area for kick disturbance
+    SetSpawnOffset(vec2(0.0f, -80.0f));  // Spawn behind/below player
+    
+    // Bubbles rise and drift slightly
+    SetVelocity(vec2(0, 1), 50.0f, 20.0f);  // Upward velocity with variation
+    SetAngleSpread(30.0f);       // Some horizontal spread
+    
+    SetStartColor(vec4(0.8f, 0.9f, 1.0f, 0.7f));  // Light blue-white bubbles
+    SetEndColor(vec4(0.9f, 0.95f, 1.0f, 0.0f));   // Fade to transparent at surface
+    SetStartSize(25.0f);         // Start smaller for individual bubbles
+    SetEndSize(50.0f);           // Grow as they rise (bubbles expand)
+    
+    SetGravity(vec2(0, -30.0f)); // Slight buoyancy (negative gravity)
+    SetDrag(0.5f);               // Water resistance
+    SetFadeOut(0.3f);            // Gentle fade as they dissipate
+    SetFadeIn(0.1f);             // Quick fade in
+    
+    // Optional: add rotation for realism
+    SetStartRotation(0.0f, 360.0f);  // Random rotation
+    SetAngularVelocity(45.0f, 30.0f); // Gentle spin
+    
+    SetLayer(-2);                // Render behind player
 }
 
 /**

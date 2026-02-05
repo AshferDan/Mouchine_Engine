@@ -411,6 +411,12 @@ void GraphicsSystem::Initialize()
  */
 void GraphicsSystem::Update(float)
 {
+    GLuint id = 0;
+    TextureResource* pTexture = ResourceManager::Instance().LoadTexture("bubble", "../Assets/Bubble_1.png");
+    if (pTexture) {
+        // Successfully loaded!
+        id = pTexture->GetTextureID();
+    }
 	auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
     if (player) {
         auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
@@ -419,7 +425,7 @@ void GraphicsSystem::Update(float)
             dashTrail = player->AddComponent<ParticleEmitterComponent>();
             if (dashTrail) {
                 dashTrail->ConfigureDashTrail();
-                dashTrail->SetTexture(0);
+                dashTrail->SetTexture(id);
                 dashTrail->StartEmission();
                 std::cout << "Particle Emitter initialized successfully\n";
             }
