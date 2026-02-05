@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "PauseMenuLogic.h"
 #include "core.h"
 #include "LevelEditor.h"
+#include "CameraManager.h"
 #include <iostream>
 
 /**
@@ -61,11 +62,108 @@ void PauseMenuLogicSystem::Update(float dt)
         return;
     }
 
+    // Declare factory once at the top
+    auto& factory = GameObjectFactory::Instance();
+
+    // Handle InGamePauseButton hover/click functionality (uses screen-space coordinates)
+    GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
+    if (pauseBtn && !isPauseMenuActive)
+    {
+        // Use screen-space mouse coordinates since button has screenSpace = true
+        InputManager* inputManager = CORE->GetInputManager();
+        if (!inputManager)
+        {
+            return;
+        }
+
+        double mouseX = inputManager->GetMouseX();
+        double mouseY = inputManager->GetMouseY();
+        bool isClicked = InputManager::IsMouseLeftClicked();
+
+        auto* transform = pauseBtn->GetComponent<TransformComponent>();
+        auto* rc = pauseBtn->GetComponent<RenderComponent>();
+
+        if (transform && rc)
+        {
+            // Screen-space Y-axis is inverted (Y=0 at top, increases downward)
+            // Button position assumes Y=0 at bottom, so we need to flip it
+            // Graphics system appears to render screenSpace UI with an additional offset
+            float screenHeight = 1080.0f;  // Assuming 1920x1080 resolution
+            float yOffset = 30.0f;  // Empirical adjustment for rendering offset (positive = hitbox moves down)
+
+            float btnX = transform->posX;
+            float btnY = screenHeight - transform->posY + yOffset;  // Flip Y-axis and add offset
+            float halfWidth = transform->scaleX / 2.0f;
+            float halfHeight = transform->scaleY / 2.0f;
+
+            bool isHoveringPauseBtn = (mouseX >= btnX - halfWidth && mouseX <= btnX + halfWidth &&
+                                       mouseY >= btnY - halfHeight && mouseY <= btnY + halfHeight);
+
+            // Debug logging
+            static int logCounter = 0;
+            if (logCounter++ % 60 == 0)  // Log once per second (assuming 60 FPS)
+            {
+                std::cout << "[InGamePauseButton] Mouse: (" << mouseX << ", " << mouseY << ") | "
+                          << "Button (flipped): (" << btnX << ", " << btnY << ") | "
+                          << "Bounds: [" << (btnX - halfWidth) << " to " << (btnX + halfWidth) << ", "
+                          << (btnY - halfHeight) << " to " << (btnY + halfHeight) << "] | "
+                          << "Hovering: " << isHoveringPauseBtn << std::endl;
+            }
+
+            static bool wasHoveringLastFrame = false;
+
+            if (isClicked && isHoveringPauseBtn)
+            {
+                // Pressed state (dark)
+                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_dark.png"));
+
+                // Play click sound
+                AudioManager* audioManager = CORE->GetAudioManager();
+                if (audioManager)
+                {
+                    audioManager->TriggerEvent("UI_Click");
+                }
+
+                // Toggle pause menu
+                TogglePauseMenu();
+                std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
+            }
+            else if (isHoveringPauseBtn)
+            {
+                // Hover state (light)
+                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_light.png"));
+
+                // Play hover sound only on hover state change
+                if (!wasHoveringLastFrame)
+                {
+                    AudioManager* audioManager = CORE->GetAudioManager();
+                    if (audioManager)
+                    {
+                        audioManager->TriggerEvent("UI_Hover");
+                    }
+                    std::cout << "[InGamePauseButton] HOVER START" << std::endl;
+                }
+                wasHoveringLastFrame = true;
+            }
+            else
+            {
+                // Normal state
+                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/paused_button.png"));
+                wasHoveringLastFrame = false;
+            }
+        }
+    }
+
+    // Hide InGamePauseButton when pause menu is active
+    if (pauseBtn)
+    {
+        pauseBtn->SetActive(!isPauseMenuActive);
+    }
+
     // update pause menu position to follow camera (only when menu is active)
     if (isPauseMenuActive)
     {
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
-        auto& factory = GameObjectFactory::Instance();
 
         std::vector<std::string> uiElements = {
             "PauseOverlay",
@@ -198,8 +296,6 @@ void PauseMenuLogicSystem::Update(float dt)
     {
         return;
     }
-
-    auto& factory = GameObjectFactory::Instance();
 
     // Handle pause settings screen visibility - ONLY update when state changes
     if (isPauseSettingsOpen != wasSettingsOpenLastFrame)
