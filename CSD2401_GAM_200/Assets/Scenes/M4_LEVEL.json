@@ -2141,6 +2141,36 @@
         ]
       },
       "children": []
+    }, 
+    {
+      "name": "InGamePauseButton",
+      "localID": 56,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          1800.0,
+          900.0
+        ],
+        "scale": [
+          125.0,
+          110.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/paused_button.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 700,
+        "screenSpace": true
+      },
+      "children": []
     },
     {
       "name": "LevelTimerText",

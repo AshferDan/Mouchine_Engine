@@ -85,14 +85,17 @@ void PauseMenuLogicSystem::Update(float dt)
 
         if (transform && rc)
         {
-            // Screen-space Y-axis is inverted (Y=0 at top, increases downward)
-            // Button position assumes Y=0 at bottom, so we need to flip it
-            // Graphics system appears to render screenSpace UI with an additional offset
-            float screenHeight = 1080.0f;  // Assuming 1920x1080 resolution
-            float yOffset = 30.0f;  // Empirical adjustment for rendering offset (positive = hitbox moves down)
+            // get actual window dimensions
+            GraphicsSystem* graphics = CORE->GetGraphicsSystem();
+            if (!graphics)
+            {
+                return;
+            }
 
-            float btnX = transform->posX;
-            float btnY = screenHeight - transform->posY + yOffset;  // Flip Y-axis and add offset
+            float screenHeight = static_cast<float>(graphics->GetWindowHeight());
+
+            float btnX = transform->posX -10.0f;
+            float btnY = screenHeight - transform->posY;
             float halfWidth = transform->scaleX / 2.0f;
             float halfHeight = transform->scaleY / 2.0f;
 
@@ -127,9 +130,9 @@ void PauseMenuLogicSystem::Update(float dt)
                 // Toggle pause menu
                 TogglePauseMenu();
                 std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
-            }
-            else if (isHoveringPauseBtn)
-            {
+                }
+                else if (isHoveringPauseBtn)
+                {
                 // Hover state (light)
                 rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_light.png"));
 
@@ -144,7 +147,7 @@ void PauseMenuLogicSystem::Update(float dt)
                     std::cout << "[InGamePauseButton] HOVER START" << std::endl;
                 }
                 wasHoveringLastFrame = true;
-            }
+                }
             else
             {
                 // Normal state

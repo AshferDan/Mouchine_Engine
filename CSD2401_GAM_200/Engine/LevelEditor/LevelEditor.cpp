@@ -261,6 +261,14 @@ void LevelEditor::EnterPlayMode()
     if (editorMode == EditorMode::Play)
         return;
 
+    // stop any existing sounds before entering play mode
+    AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
+    if (audioManager)
+    {
+        std::cout << "[LevelEditor] Stopping all sounds before entering play mode\n";
+        audioManager->StopAllSounds();
+    }
+
     if (!hasValidSaveState)
     {
         SaveSceneState();
@@ -308,7 +316,6 @@ void LevelEditor::EnterPlayMode()
     editorMode = EditorMode::Play;
 
     // start bgm when play is click
-    AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
     if (audioManager)
     {
         std::cout << "[LevelEditor] Play button clicked - starting BGM\n";
@@ -353,7 +360,7 @@ void LevelEditor::StopPlayMode()
     AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
     if (audioManager)
     {
-        std::cout << "[LevelEditor] Stopping background music through AudioManager\n";
+        std::cout << "[LevelEditor] Stopping all through AudioManager\n";
         audioManager->StopAllSounds();
     }
 
