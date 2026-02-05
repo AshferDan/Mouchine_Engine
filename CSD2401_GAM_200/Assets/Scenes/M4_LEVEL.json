@@ -2324,6 +2324,14 @@
   "TilemapFile": "../Assets/Tiles/M4_LEVEL.tilemap",
   "AudioManager": {
     "sounds": [
+            {
+        "name": "bgm",
+        "filepath": "../Assets/audio/Player/sneaky_bgm.wav",
+        "loop": false,
+        "volume": 0.75,
+        "pitch": 1.5,
+        "category": "bgm"
+      },
       {
         "name": "AirGlide",
         "filepath": "../Assets/audio/Player/AirGlide.wav",
