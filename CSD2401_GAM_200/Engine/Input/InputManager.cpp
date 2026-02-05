@@ -165,7 +165,7 @@ void InputManager::Update(float dt)
     MouseWorldY = static_cast<double>(height / 2.0 - ypos) + camPos.y; // Flip Y axis
 
     static bool keyPressed = false;
-    LevelEditor *levelEditor = CORE->GetLevelEditor();
+    LevelEditor *levelEditor = CORE ? CORE->GetLevelEditor() : nullptr;
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
     {
         static bool editorModeWarning = true;
@@ -189,7 +189,7 @@ void InputManager::Update(float dt)
 
     // ------------------- UNDO: Ctrl + Z -------------------//
     {
-        LevelEditor* editor = CORE->GetLevelEditor();
+        LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
         if (editor)
         {
             bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
@@ -252,7 +252,7 @@ void InputManager::Update(float dt)
     {
         if (!singleTriggerKeys[GLFW_KEY_M])
         {
-            AudioManager* audioManager = CORE->GetAudioManager();
+            AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
             if (audioManager)
             {
                 audioManager->ToggleMute();
@@ -261,23 +261,31 @@ void InputManager::Update(float dt)
         }
     }
 
-    // Check if in play mode for pause menu 
+    // Check if in play mode for pause menu
     LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
     bool isPlayMode = (editor && editor->GetEditorMode() == EditorMode::Play);
+
+    // Check if we're in the main menu
+    PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
+    bool isMainMenu = false;
+    if (pauseMenu)
+    {
+        std::string currentScene = pauseMenu->GetCurrentScene();
+        isMainMenu = (currentScene.find("MainMenu") != std::string::npos);
+    }
 
     // Handle ESC key
     if (isPlayMode)
     {
         // Check if win or lose screen is active - if so, disable ESC key
-        WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+        WinLoseLogicSystem* winZone = CORE ? CORE->GetWinLoseLogic() : nullptr;
         bool winScreenActive = winZone && winZone->IsWinScreenActive();
         bool loseScreenActive = winZone && winZone->IsLoseScreenActive();
 
-        // In play mode: ESC toggles pause menu (unless win/lose screen is active)
+        // In play mode: ESC toggles pause menu (unless win/lose screen is active or in main menu)
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive) {
-                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu) {
                 if (pauseMenu)
                 {
                     pauseMenu->TogglePauseMenu();
@@ -303,12 +311,11 @@ void InputManager::Update(float dt)
     // Handle P key
     if (isPlayMode)
     {
-        // In play mode: P toggles pause menu
+        // In play mode: P toggles pause menu (unless in main menu)
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
         {
-            if (!singleTriggerKeys[GLFW_KEY_P])
+            if (!singleTriggerKeys[GLFW_KEY_P] && !isMainMenu)
             {
-                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
                 if (pauseMenu)
                 {
                     pauseMenu->TogglePauseMenu();

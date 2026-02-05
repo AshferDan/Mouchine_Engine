@@ -499,10 +499,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 1920.0f;
-    settingsTransform->scaleY = 1080.0f;
+    settingsTransform->scaleX = 1755.0f;
+    settingsTransform->scaleY = 945.0f;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
-    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Menu_settings.png"));
+    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(601);
 

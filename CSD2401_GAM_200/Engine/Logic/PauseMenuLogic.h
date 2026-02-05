@@ -69,6 +69,12 @@ public:
     void SetCurrentScene(const std::string& scenePath) { currentScenePath = scenePath; }
 
     /**
+     * @brief Gets the current scene path.
+     * @return Current scene file path.
+     */
+    std::string GetCurrentScene() const { return currentScenePath; }
+
+    /**
      * @brief Toggles the pause menu on/off and pauses/unpauses the game.
      */
     void TogglePauseMenu();
