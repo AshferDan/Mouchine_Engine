@@ -180,7 +180,35 @@ namespace API {
      * @param alpha The alpha value (0.0 to 1.0).
      */
     void SetAlpha(const std::string& objectName,float);
-    
+
+    /**
+     * @brief Sets the render layer category for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @param layer The layer category (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).
+     */
+    void SetRenderLayer(const std::string& objectName, int layer);
+
+    /**
+     * @brief Gets the render layer category for a GameObject.
+     * @param objectName The name of the GameObject.
+     * @return The layer category as int.
+     */
+    int GetRenderLayer(const std::string& objectName);
+
+    /**
+     * @brief Sets visibility for an entire layer category.
+     * @param layer The layer category (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).
+     * @param visible True to show, false to hide all objects in this layer.
+     */
+    void SetLayerVisible(int layer, bool visible);
+
+    /**
+     * @brief Checks if a layer category is visible.
+     * @param layer The layer category.
+     * @return True if visible.
+     */
+    bool IsLayerVisible(int layer);
+
     /**
      * @brief Sets the background using a texture image.
      * @param filename The file path to the background texture.
@@ -456,7 +484,7 @@ namespace API {
     void setCameraPos(vec2);
     void setCameraZoom(float);
     void setCameraMode(CameraComponent::CameraMode);
-    void CameraFlash(float, const vec4&, bool);
+    void CameraFlash(float, const vec4&, bool, float camShakeStrength);
 
 #pragma endregion
 
