@@ -566,9 +566,9 @@ static void Internal_SetCameraMode(int mode) {
     API::setCameraMode((CameraComponent::CameraMode)mode);
 }
 
-static void Internal_CameraFlash(float duration, float r, float g, float b, float a, bool fadeout)
+static void Internal_CameraFlash(float duration, float r, float g, float b, float a, bool fadeout, float camShakeStrength)
 {
-    API::CameraFlash(duration, {r, g, b, a}, fadeout);
+    API::CameraFlash(duration, {r, g, b, a}, fadeout, camShakeStrength);
 }
 
 

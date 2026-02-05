@@ -60,8 +60,8 @@ namespace CSharpScript
         public float T3_SkidDuration = 1.0f;
 
         // Wall Bonk
-        public float T3_BonkDuration = 0.8f;
-        public Vector2 T3_BonkForce = new Vector2(12f * mod, 10f * mod);
+        public float T3_BonkDuration = 0.65f;
+        public Vector2 T3_BonkForce = new Vector2(18f * mod, 10f * mod);
 
         // Grounded/Collision Checks
         public float GroundDetectionRayLength = 10.0f;
@@ -73,7 +73,7 @@ namespace CSharpScript
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 175f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
+        public float JumpHeight = 185f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
         public float T1_JumpMultiplier = 1.05f;
         public float T2_JumpMultiplier = 1.08f;
         public float T3_JumpMultiplier = 1.15f;
@@ -100,7 +100,7 @@ namespace CSharpScript
         public float JumpCoyoteTime = 0.1f;
 
         // Wall Jump
-        public vec2 WallJumpForce = new vec2(20f * mod, 25f * mod);
+        public vec2 WallJumpForce = new vec2(20f * mod, 30f * mod);
         public float WallCoyoteTime = 0.1f;
 
         // Wall Kick
@@ -108,8 +108,8 @@ namespace CSharpScript
         public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
         public float WKBaseDuration = 0.25f;
         public float WKCooldown = 0.5f;
-        public float WKSpeedModifier = 30f * mod;
-        public float WKVerticalModifier = 5f * mod;
+        public float WKSpeedModifier = 35f * mod;
+        public float WKVerticalModifier = 7f * mod;
         public float WKDurationMultiplier = 0.75f;
         // dont have tht WKEase graph thing in unity
 
