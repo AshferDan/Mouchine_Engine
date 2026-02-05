@@ -110,10 +110,16 @@ void Spritesheet::Update(float dt)
                 std::string nextAnimation = animationQueue.front();
                 animationQueue.pop();
                 PlayAnimation(nextAnimation);
+                return; // Exit early since PlayAnimation resets the state
+            }
+            else if (looping)
+            {
+                nextFrameIndex = startFrame;
             }
             else
             {
-                nextFrameIndex = startFrame;
+                // Stay on the last frame if not looping
+                nextFrameIndex = endFrame;
             }
 		}
 		currRow = nextFrameIndex / cols; // Reassign new rows and cols, showing the next frame of animation
@@ -305,7 +311,7 @@ void Spritesheet::RegisterAnimation(const std::string& name, const std::string& 
 
 	animation_mList[name] = newState;
 }
-void Spritesheet::PlayAnimation(const std::string& name)
+void Spritesheet::PlayAnimation(const std::string& name, bool isLooping)
 {
 	if (currentAnimName == name) return;
 
@@ -318,13 +324,21 @@ void Spritesheet::PlayAnimation(const std::string& name)
 	// Get the data we stored earlier
 	const AnimationData& state = it->second;
 
-	
+
 	if (std::string(GetSpriteFile()) != state.filepath) {
 		LoadNewSpritesheet(state.filepath.c_str(), state.row, state.col);
 	}
 
 	SetAnimation(state.startframe, state.endframe, state.fps);
 
+	// Set looping state
+	looping = isLooping;
+
 	// Update current name
 	currentAnimName = name;
+}
+
+void Spritesheet::SetLooping(bool isLooping)
+{
+	looping = isLooping;
 }

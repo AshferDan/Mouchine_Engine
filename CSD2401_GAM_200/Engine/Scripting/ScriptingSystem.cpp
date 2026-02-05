@@ -580,13 +580,20 @@ static bool Internal_OnTriggerStay(MonoString* obj1, MonoString* obj2) {
     return result;
 }
 
-static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName)
+static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName, bool isLooping)
 {
     char* objName = mono_string_to_utf8(objectName);
     char* animName = mono_string_to_utf8(animationName);
-    API::PlayAnimation(objName, animName);
+    API::PlayAnimation(objName, animName, isLooping);
     mono_free(objName);
     mono_free(animName);
+}
+
+static void Internal_SetAnimationLooping(MonoString* objectName, bool isLooping)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    API::SetAnimationLooping(objName, isLooping);
+    mono_free(objName);
 }
 
 static void Internal_AddAnimationToQueue(MonoString* objectName, MonoString* animationName)
@@ -626,7 +633,7 @@ static MonoString* Internal_GetCurrentAnimationName(MonoString* objectName)
 
 // === Misc ===
 static int Internal_RandomRange(int min, int max) {
-    return API::RandomNumberGen(max, min); // Note: API args are (max, min)
+    return API::RandomNumberGen(max, min); 
 }
 static float Internal_GetDelta_Time() {
     return static_cast<float>(API::GetDelta_Time());
@@ -1209,6 +1216,7 @@ void ScriptSystem::RegisterInternalCalls()
 
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);
+    mono_add_internal_call("CSharpScript.Animation::SetLooping", (void*)Internal_SetAnimationLooping);
     mono_add_internal_call("CSharpScript.Animation::AddToQueue", (void*)Internal_AddAnimationToQueue);
     mono_add_internal_call("CSharpScript.Animation::RegisterAnimation", (void*)Internal_RegisterAnimation);
     mono_add_internal_call("CSharpScript.Animation::SetAnimation", (void*)Internal_SetAnimation);
@@ -1344,7 +1352,7 @@ bool ScriptSystem::LoadScriptAssembly(const std::string& filepath)
     // List all classes in the assembly for debugging (Alternative method)
     std::cout << "[ScriptSystem] Scanning for classes in 'CSharpScript' namespace...\n";
 
-    // Try to find some common classes to verify the assembly loaded correctly
+    
     const char* testClasses[] = {
         "GameScript",
         "SpinningSquare",
@@ -1434,10 +1442,10 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
         std::cout << "  OnDestroy: " << (scriptClass.onDestroy ? "Found" : "Not Found") << std::endl;
     }
 
-    // Get cached script class
+ 
     ScriptClass& scriptClass = scriptClasses[scriptClassName];
 
-    // Create instance
+
     MonoObject* instance = InstantiateClass(scriptClass.monoClass);
 
     if (!instance)
@@ -1466,7 +1474,7 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
             << scriptClassName << std::endl;
     }
 
-    // Create script instance and add to GameObject
+
     ScriptInstance scriptInstance;
     scriptInstance.instance = instance;
     scriptInstance.scriptClass = &scriptClass;
@@ -1515,7 +1523,13 @@ void ScriptSystem::CallOnStart(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-        // Validate all pointers before calling mono_runtime_invoke
+       
+        if (scriptInstance.isStarted)
+        {
+            continue;
+        }
+
+      
         if (!scriptInstance.scriptClass)
         {
             std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
@@ -1530,12 +1544,16 @@ void ScriptSystem::CallOnStart(GameObject *gameObject)
 
         if (!scriptInstance.scriptClass->onStart)
         {
-            // OnStart method not found or doesn't exist - skip silently
+
+            scriptInstance.isStarted = true;
             continue;
         }
 
         MonoObject* exception = nullptr;
         mono_runtime_invoke(scriptInstance.scriptClass->onStart, scriptInstance.instance, nullptr, &exception);
+
+        // Mark as started after calling OnStart
+        scriptInstance.isStarted = true;
 
         if (exception)
         {
@@ -1641,7 +1659,7 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-        // Validate all pointers before calling mono_runtime_invoke
+     
         if (!scriptInstance.scriptClass)
         {
             std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
@@ -1656,7 +1674,7 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
         if (!scriptInstance.scriptClass->onDestroy)
         {
-            // OnDestroy method not found or doesn't exist - skip silently
+           
             continue;
         }
 
@@ -1691,9 +1709,9 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
 void ScriptSystem::Update(float deltaTime)
 {
-    // Create a copy of events to iterate over, as events might be modified during processing
+   
     std::vector<QueuedEvent> eventsCopy = EventSystem::events;
-    EventSystem::Clear(); // Clear the static events queue as they are being processed now
+    EventSystem::Clear();
 
     for (auto& e : eventsCopy)
     {
@@ -1714,7 +1732,7 @@ void ScriptSystem::Update(float deltaTime)
         }
         else
         {
-            // Re-raise events that are not OnDestroy for other systems to process
+           
             EventSystem::Raise(e.type, e.target, e.other);
         }
     }
@@ -1740,23 +1758,22 @@ void ScriptSystem::ReloadScriptAssembly()
             }
         }
     }
-    // 2. Clear all cached data
     gameObjectScripts.clear();
     scriptClasses.clear();
 
-    // 3. Unload the old domain
+
     mono_domain_set(rootDomain, false);
     mono_domain_unload(appDomain);
 
-    // Create new domain
+
     char domainName[] = "GameScriptDomain";
     appDomain = mono_domain_create_appdomain(domainName, nullptr);
     mono_domain_set(appDomain, true);
 
-    // Re-register all C++ functions for the new domain
+
     RegisterInternalCalls();
 
-    // Reload the assembly
+ 
     LoadScriptAssembly("./Scripts/GameScripts.dll");
 
     std::cout << "Script assembly reloaded" << std::endl;
@@ -1775,7 +1792,7 @@ std::vector<ScriptField> ScriptSystem::GetPublicFields(ScriptInstance& instance)
             int monoType = mono_type_get_type(type);
 
             MonoObject* value = mono_field_get_value_object(rootDomain, field, instance.instance);
-            if (!value) continue; // Skip if value is null
+            if (!value) continue;
 
             char* str = mono_string_to_utf8(mono_object_to_string(value, nullptr));
 
@@ -1853,15 +1870,13 @@ void ScriptSystem::NotifyGameObjectDestroyed(GameObject* gameObject)
 
     std::cout << "[ScriptSystem] Notifying destruction of GameObject: " << gameObject->GetName() << std::endl;
 
-    // 1. Call OnDestroy for all scripts attached to this GameObject
-    // This ensures C# cleanup logic runs before references are removed.
+
     CallOnDestroy(gameObject);
 
-    // 2. Remove the GameObject's entry from gameObjectScripts map
     auto it = gameObjectScripts.find(gameObject);
     if (it != gameObjectScripts.end())
     {
-        // Free Mono garbage collection handles for all script instances
+       
         for (auto& scriptInstance : it->second)
         {
             if (scriptInstance.gcHandle != 0)

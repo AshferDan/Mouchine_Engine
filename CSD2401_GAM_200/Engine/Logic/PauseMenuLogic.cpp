@@ -402,10 +402,10 @@ void PauseMenuLogicSystem::Update(float dt)
             if (!currentHover.empty())
             {
                 SetButtonTexture(currentHover, ButtonState::Hover);
-                AudioManager* audioManager = CORE->GetAudioManager();
-                if (audioManager)
+                AudioManager* localAudioManager = CORE->GetAudioManager();
+                if (localAudioManager)
                 {
-                    audioManager->TriggerEvent("UI_Hover");
+                    localAudioManager->TriggerEvent("UI_Hover");
                 }
             }
 
