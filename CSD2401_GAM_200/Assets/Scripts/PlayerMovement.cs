@@ -223,12 +223,12 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
             Animation.RegisterAnimation("Hero", "Walk", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 8.0f);
             Animation.RegisterAnimation("Hero", "Run1", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 12.0f);
-            Animation.RegisterAnimation("Hero", "Run2", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 15.0f);
-            Animation.RegisterAnimation("Hero", "Run3", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 20.0f);
+            Animation.RegisterAnimation("Hero", "Run2", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 16.0f);
+            Animation.RegisterAnimation("Hero", "Run3", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 22.0f);
             Animation.RegisterAnimation("Hero", "Skidding", "../Assets/spritesheet_R.png", 13, 10, 3, 0, 3, 2, 4.0f);
             Animation.RegisterAnimation("Hero", "Jump", "../Assets/spritesheet_R.png", 13, 10, 11, 4, 11, 5, 12.0f);
             Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png", 13, 10, 1, 0, 1, 2, 8.0f);
-            Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 12.0f);
+            Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 14.0f);
             Animation.RegisterAnimation("Hero", "Groundpound", "../Assets/spritesheet_R.png", 13, 10, 9, 3, 9, 4, 10.0f);
             Animation.RegisterAnimation("Hero", "Dash", "../Assets/spritesheet_R.png", 13, 10, 0, 0, 0, 3, 4.0f);
             Animation.RegisterAnimation("Hero", "Wallkick", "../Assets/spritesheet_R.png", 13, 10, 4, 3, 4, 4, 4.0f);
@@ -245,11 +245,11 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero_vfx", "Walk", "../Assets/spritesheet_player_vfx.png",         15, 11, 10, 0, 10, 4, 8.0f);
             Animation.RegisterAnimation("Hero_vfx", "Run1", "../Assets/spritesheet_player_vfx.png",         15, 11, 9, 0, 9, 3, 8.0f);
             Animation.RegisterAnimation("Hero_vfx", "Run2", "../Assets/spritesheet_player_vfx.png",         15, 11, 9, 0, 9, 3, 12.0f); 
-            Animation.RegisterAnimation("Hero_vfx", "Run3", "../Assets/spritesheet_player_vfx.png",         15, 11, 9, 5, 9, 8, 12.0f);
-            Animation.RegisterAnimation("Hero_vfx", "Skidding", "../Assets/spritesheet_player_vfx.png",     15, 11, 0, 0, 0, 4, 4.0f);         // for other dir is 0,6,0,10
+            Animation.RegisterAnimation("Hero_vfx", "Run3", "../Assets/spritesheet_player_vfx.png",         15, 11, 9, 5, 9, 8, 16.0f);
+            Animation.RegisterAnimation("Hero_vfx", "Skidding", "../Assets/spritesheet_player_vfx.png",     15, 11, 0, 0, 0, 4, 6.0f);         // for other dir is 0,6,0,10
             Animation.RegisterAnimation("Hero_vfx", "Jump", "../Assets/spritesheet_player_vfx.png",         15, 11, 13, 0, 13, 4, 12.0f);
             Animation.RegisterAnimation("Hero_vfx", "Glide", "../Assets/spritesheet_player_vfx.png",        15, 11, 4, 0, 4, 2, 8.0f);
-            Animation.RegisterAnimation("Hero_vfx", "Roll", "../Assets/spritesheet_player_vfx.png",         15, 11, 11, 0, 11, 5, 12.0f);
+            Animation.RegisterAnimation("Hero_vfx", "Roll", "../Assets/spritesheet_player_vfx.png",         15, 11, 11, 0, 11, 5, 8.0f);
             Animation.RegisterAnimation("Hero_vfx", "Groundpound", "../Assets/spritesheet_player_vfx.png",  15, 11, 14, 0, 14, 2, 10.0f);
             Animation.RegisterAnimation("Hero_vfx", "Wallkick", "../Assets/spritesheet_player_vfx.png",     15, 11, 8, 0, 8, 3, 4.0f);
             Animation.RegisterAnimation("Hero_vfx", "Dash", "../Assets/spritesheet_player_vfx.png",         15, 11, 6, 0, 6, 2, 4.0f);
@@ -324,11 +324,11 @@ namespace CSharpScript
             {
                 case PlayerState.Idle:
                     Animation.PlayAnimation(OwnerName, "Idle");
-                    Animation.PlayAnimation(vfx, "Clear");
+                    Animation.PlayAnimation(vfx, "Clear", false);
                     break;
                 case PlayerState.Jumping:
                     Animation.PlayAnimation(OwnerName, "Jump");
-                    Animation.PlayAnimation(vfx, "Jump");
+                    Animation.PlayAnimation(vfx, "Jump", false);
                 break;
                 case PlayerState.Walking:
                     Animation.PlayAnimation(OwnerName, "Walk");
@@ -336,6 +336,7 @@ namespace CSharpScript
                 break;
                 case PlayerState.Running:
                     int index = GetCurrentTentacleLevel();
+                    Animation.PlayAnimation(OwnerName, "Run" + index.ToString());
                     Animation.PlayAnimation(vfx, "Run" + index.ToString());
                     break;
                 case PlayerState.Skidding:
@@ -349,7 +350,7 @@ namespace CSharpScript
                 case PlayerState.Land:
                     // commented out because landing is buggy
                     Animation.PlayAnimation(OwnerName, "Land");
-                    Animation.PlayAnimation(vfx, "Land");
+                    Animation.PlayAnimation(vfx, "Land", false);
                     break;
                 case PlayerState.GroundPounding:
                     Animation.PlayAnimation(OwnerName, "Groundpound");
@@ -357,11 +358,11 @@ namespace CSharpScript
                     break;
                 case PlayerState.Rolling:
                     Animation.PlayAnimation(OwnerName, "Roll");
-                    Animation.PlayAnimation(vfx, "Roll");
+                    Animation.PlayAnimation(vfx, "Roll", false);
                     break;
                 case PlayerState.WallKicking:
                     Animation.PlayAnimation(OwnerName, "Wallkick");
-                    Animation.PlayAnimation(vfx, "Wallkick");
+                    Animation.PlayAnimation(vfx, "Wallkick", false);
                     break;
                 case PlayerState.Ziplining:
                     Animation.PlayAnimation(OwnerName, "Zipline");
@@ -374,11 +375,11 @@ namespace CSharpScript
                 case PlayerState.WallSliding:
                     Animation.PlayAnimation(OwnerName, "Wallslide");
                     Animation.PlayAnimation(vfx, "Wallslide");
-                    Animation.PlayAnimation(vfx, "Clear");
+                    Animation.PlayAnimation(vfx, "Clear", false);
                     break;
                 case PlayerState.WallJumping:
                     Animation.PlayAnimation(OwnerName, "Wallkick");
-                    Animation.PlayAnimation(vfx, "Wallkick");
+                    Animation.PlayAnimation(vfx, "Wallkick", false);
                     break;
                 case PlayerState.Hurting:
                     Animation.PlayAnimation(OwnerName, "Hurt");
@@ -419,7 +420,7 @@ namespace CSharpScript
             }
 
             vec2 finalPos = vfxTracksPlayer ? pos : staticVfxPos;
-            if (currState == PlayerState.Running)
+            if (currState == PlayerState.Running || currState == PlayerState.Skidding)
                 finalPos.x -= 100f * _facingDirection;
             
 
@@ -1341,6 +1342,7 @@ namespace CSharpScript
             if (_isRolling)
             {
                 currState = PlayerState.Rolling;
+                //block input here
                 // hit wall = stop roll immediately
                 if (_isTouchingWall)
                 {
