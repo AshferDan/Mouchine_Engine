@@ -114,10 +114,7 @@ void CutsceneSystem::Update(float dt) {
 
 	// Check if Skip (Spacebar) or Left click - only after skip block timer expires
 	if (m_canSkip) {
-		bool spacePressed = CORE->GetInputManager()->IsKeyPressed(GLFW_KEY_SPACE);
-		bool mouseClicked = CORE->GetInputManager()->IsMouseLeftClicked();
-		if (spacePressed || mouseClicked) {
-			std::cout << "[Cutscene] Skip triggered! Space: " << spacePressed << ", Mouse: " << mouseClicked << std::endl;
+		if (CORE->GetInputManager()->IsAnyKeyPress()) {
 			StopCutscene();
 		}
 	}

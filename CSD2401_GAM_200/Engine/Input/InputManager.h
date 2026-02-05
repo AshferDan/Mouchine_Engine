@@ -79,11 +79,13 @@ public:
 	bool IsKeyPressed(int key);
 	bool IsKeyReleased(int key);
 	bool IsKeyHeld(int key);
+    bool IsAnyKeyPress();
 
 	// Mouse Input
 	bool IsMouseButtonPressed(int button);
 	bool IsMouseButtonReleased(int button);
 	bool IsMouseButtonHeld(int button);
+
     // ------------------- Getters -------------------
 
     /**
@@ -165,6 +167,8 @@ private:
 
     //For Particle System
     bool isDashing = false;
+
+    bool m_IsAnyKeyPress = false;
 };
 
 #endif
