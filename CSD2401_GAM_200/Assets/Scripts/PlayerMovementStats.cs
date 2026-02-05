@@ -22,7 +22,7 @@ namespace CSharpScript
 {
     public class PlayerMovementStats : GameScript
     {
-        private static float mod = 12.5f;
+        private static float mod = 12.5f * 2.5f;
         // CLAMPS - Max values 
         public float Clamp_MaxRunSpeed = 50f * mod;
         public float Clamp_MaxJumpHeight = 80f * mod;
@@ -69,11 +69,11 @@ namespace CSharpScript
         public float HeadWidth = 0.75f;
 
         // Wall Checks
-        public float WallDetectionBoxLength = 50.0f;            // unity is 0.05 - 0.02 (since our raycast is v diff)
+        public float WallDetectionBoxLength = 50.0f * 2f;            // unity is 0.05 - 0.02 (since our raycast is v diff)
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 100f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
+        public float JumpHeight = 175f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
         public float T1_JumpMultiplier = 1.05f;
         public float T2_JumpMultiplier = 1.08f;
         public float T3_JumpMultiplier = 1.15f;
