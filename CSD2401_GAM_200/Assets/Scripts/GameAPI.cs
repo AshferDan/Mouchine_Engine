@@ -825,7 +825,7 @@ namespace CSharpScript
         public static extern void GetMode();
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void CameraFlash(float duration, float r, float g, float b, float a, bool fadeout);
+        public static extern void CameraFlash(float duration, float r, float g, float b, float a, bool fadeout, float camShakeStrength);
     }
 
     public static class Animation

@@ -1012,8 +1012,9 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         camtemp->SetMode(val);
     }
 
-    void CameraFlash(float duration, const vec4& color, bool fadeout) {
+    void CameraFlash(float duration, const vec4& color, bool fadeout, float cameraShakeStrength) {
         auto& cam = CameraManager::Instance();
+        CameraManager::Instance().AddCameraTrauma(cameraShakeStrength);
         cam.FlashActiveCamera(duration, color, fadeout);
     }
 

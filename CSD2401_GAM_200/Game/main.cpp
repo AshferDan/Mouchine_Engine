@@ -112,7 +112,7 @@ int main()
             "Platform",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             0.0f, -200.0f,                      // Center of screen
-            10000.0f, 200.0f,                  // Size
+            100000.0f, 200.0f,                  // Size
             false,
             vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
         );
@@ -125,7 +125,7 @@ int main()
             if (colComp && phyComp)
             {
                 phyComp->SetStatic(true);
-                colComp->SetSize(10000.0f, 200.0f);
+                colComp->SetSize(100000.0f, 200.0f);
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }
