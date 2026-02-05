@@ -96,4 +96,10 @@ private:
      * @param totalSeconds Whole seconds to display.
      */
     void UpdateText(int totalSeconds);
+
+    /**
+     * @brief Checks if the player is currently inside the SafeZone.
+     * @return True if player is in SafeZone, false otherwise.
+     */
+    bool IsPlayerInSafeZone();
 };
