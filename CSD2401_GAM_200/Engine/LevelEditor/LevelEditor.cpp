@@ -988,25 +988,25 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         }
         currentTilemapPath = "";  // Clear any existing tilemap first
 
-        if (root.contains("TilemapFile"))
-        {
-            std::string tilemapPath = root["TilemapFile"];
-            std::cout << "[LoadLevel] Found tilemap reference: " << tilemapPath << std::endl;
+        //if (root.contains("TilemapFile"))
+        //{
+        //    std::string tilemapPath = root["TilemapFile"];
+        //    std::cout << "[LoadLevel] Found tilemap reference: " << tilemapPath << std::endl;
 
-            if (ImportTilemap(tilemapPath))
-            {
-                std::cout << "[LoadLevel] Tilemap loaded successfully" << std::endl;
-            }
-            else
-            {
-                std::cerr << "[LoadLevel] Warning: Failed to load referenced tilemap" << std::endl;
-                std::cerr << "[LoadLevel] Expected path: " << tilemapPath << std::endl;
-            }
-        }
-        else
-        {
-            std::cout << "[LoadLevel] No tilemap reference found in level file" << std::endl;
-        }
+        //    if (ImportTilemap(tilemapPath))
+        //    {
+        //        std::cout << "[LoadLevel] Tilemap loaded successfully" << std::endl;
+        //    }
+        //    else
+        //    {
+        //        std::cerr << "[LoadLevel] Warning: Failed to load referenced tilemap" << std::endl;
+        //        std::cerr << "[LoadLevel] Expected path: " << tilemapPath << std::endl;
+        //    }
+        //}
+        //else
+        //{
+        //    std::cout << "[LoadLevel] No tilemap reference found in level file" << std::endl;
+        //}
         if (!currentTilemapPath.empty())
         {
             std::cout << "[LoadLevel] Creating tilemap..." << std::endl;
