@@ -714,6 +714,257 @@ static bool Internal_IsLoseScreenActive()
     return false;
 }
 
+// === Particles ===
+static void Internal_AddParticleEmitterComponent(MonoString* objectName, int maxParticles)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::AddParticleEmitterComponent(name, maxParticles);
+    mono_free(name);
+}
+
+static void Internal_Particles_StartEmission(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_StartEmission(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_StopEmission(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_StopEmission(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_Burst(MonoString* objectName, int count)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_Burst(name, count);
+    mono_free(name);
+}
+
+static void Internal_Particles_Clear(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_Clear(name);
+    mono_free(name);
+}
+
+static bool Internal_Particles_IsEmitting(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    bool result = API::Particles_IsEmitting(name);
+    mono_free(name);
+    return result;
+}
+
+static int Internal_Particles_GetActiveCount(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    int result = API::Particles_GetActiveCount(name);
+    mono_free(name);
+    return result;
+}
+
+static int Internal_Particles_GetMaxParticles(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    int result = API::Particles_GetMaxParticles(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_Particles_SetEmissionRate(MonoString* objectName, float rate)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetEmissionRate(name, rate);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetMaxParticles(MonoString* objectName, int max)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetMaxParticles(name, max);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetDuration(MonoString* objectName, float seconds)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetDuration(name, seconds);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetLoop(MonoString* objectName, bool shouldLoop)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetLoop(name, shouldLoop);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetLifetime(MonoString* objectName, float seconds, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetLifetime(name, seconds, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetSpawnOffset(MonoString* objectName, float x, float y)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetSpawnOffset(name, x, y);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetSpawnRadius(MonoString* objectName, float radius)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetSpawnRadius(name, radius);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetSpawnBox(MonoString* objectName, float halfWidth, float halfHeight)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetSpawnBox(name, halfWidth, halfHeight);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetVelocity(MonoString* objectName, float dirX, float dirY, float magnitude, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetVelocity(name, dirX, dirY, magnitude, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetAngleSpread(MonoString* objectName, float degrees)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetAngleSpread(name, degrees);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetGravity(MonoString* objectName, float gravX, float gravY)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetGravity(name, gravX, gravY);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetDrag(MonoString* objectName, float drag)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetDrag(name, drag);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetStartColor(MonoString* objectName, float r, float g, float b, float a)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetStartColor(name, r, g, b, a);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetEndColor(MonoString* objectName, float r, float g, float b, float a)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetEndColor(name, r, g, b, a);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetStartSize(MonoString* objectName, float size)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetStartSize(name, size);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetEndSize(MonoString* objectName, float size)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetEndSize(name, size);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetLayer(MonoString* objectName, int layer)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetLayer(name, layer);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetFadeIn(MonoString* objectName, float duration)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetFadeIn(name, duration);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetFadeOut(MonoString* objectName, float duration)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetFadeOut(name, duration);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetStartRotation(MonoString* objectName, float degrees, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetStartRotation(name, degrees, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetAngularVelocity(MonoString* objectName, float degreesPerSec, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetAngularVelocity(name, degreesPerSec, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetTexture(MonoString* objectName, MonoString* texturePath)
+{
+    char* name = mono_string_to_utf8(objectName);
+    char* texPath = mono_string_to_utf8(texturePath);
+    API::Particles_SetTexture(name, texPath);
+    mono_free(name);
+    mono_free(texPath);
+}
+
+static void Internal_Particles_ConfigureDashTrail(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureDashTrail(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureJumpDust(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureJumpDust(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureWallSlideParticles(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureWallSlideParticles(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureSpeedLines(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureSpeedLines(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureDeathExplosion(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureDeathExplosion(name);
+    mono_free(name);
+}
+
 MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassName, GameObject* owner)
 {
     if (!coreAssembly || !coreImage)
@@ -1006,6 +1257,43 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.WinLoseSystem::TriggerLose", (void*)Internal_TriggerLoseZone);
     mono_add_internal_call("CSharpScript.WinLoseSystem::IsWinScreenActive", (void*)Internal_IsWinScreenActive);
     mono_add_internal_call("CSharpScript.WinLoseSystem::IsLoseScreenActive", (void*)Internal_IsLoseScreenActive);
+
+    // === Particles ===
+    mono_add_internal_call("CSharpScript.Particles::AddParticleEmitterComponent", (void*)Internal_AddParticleEmitterComponent);
+    mono_add_internal_call("CSharpScript.Particles::StartEmission", (void*)Internal_Particles_StartEmission);
+    mono_add_internal_call("CSharpScript.Particles::StopEmission", (void*)Internal_Particles_StopEmission);
+    mono_add_internal_call("CSharpScript.Particles::Burst", (void*)Internal_Particles_Burst);
+    mono_add_internal_call("CSharpScript.Particles::Clear", (void*)Internal_Particles_Clear);
+    mono_add_internal_call("CSharpScript.Particles::IsEmitting", (void*)Internal_Particles_IsEmitting);
+    mono_add_internal_call("CSharpScript.Particles::GetActiveParticleCount", (void*)Internal_Particles_GetActiveCount);
+    mono_add_internal_call("CSharpScript.Particles::GetMaxParticles", (void*)Internal_Particles_GetMaxParticles);
+    mono_add_internal_call("CSharpScript.Particles::SetEmissionRate", (void*)Internal_Particles_SetEmissionRate);
+    mono_add_internal_call("CSharpScript.Particles::SetMaxParticles", (void*)Internal_Particles_SetMaxParticles);
+    mono_add_internal_call("CSharpScript.Particles::SetDuration", (void*)Internal_Particles_SetDuration);
+    mono_add_internal_call("CSharpScript.Particles::SetLoop", (void*)Internal_Particles_SetLoop);
+    mono_add_internal_call("CSharpScript.Particles::SetLifetime", (void*)Internal_Particles_SetLifetime);
+    mono_add_internal_call("CSharpScript.Particles::SetSpawnOffset", (void*)Internal_Particles_SetSpawnOffset);
+    mono_add_internal_call("CSharpScript.Particles::SetSpawnRadius", (void*)Internal_Particles_SetSpawnRadius);
+    mono_add_internal_call("CSharpScript.Particles::SetSpawnBox", (void*)Internal_Particles_SetSpawnBox);
+    mono_add_internal_call("CSharpScript.Particles::SetVelocity", (void*)Internal_Particles_SetVelocity);
+    mono_add_internal_call("CSharpScript.Particles::SetAngleSpread", (void*)Internal_Particles_SetAngleSpread);
+    mono_add_internal_call("CSharpScript.Particles::SetGravity", (void*)Internal_Particles_SetGravity);
+    mono_add_internal_call("CSharpScript.Particles::SetDrag", (void*)Internal_Particles_SetDrag);
+    mono_add_internal_call("CSharpScript.Particles::SetStartColor", (void*)Internal_Particles_SetStartColor);
+    mono_add_internal_call("CSharpScript.Particles::SetEndColor", (void*)Internal_Particles_SetEndColor);
+    mono_add_internal_call("CSharpScript.Particles::SetStartSize", (void*)Internal_Particles_SetStartSize);
+    mono_add_internal_call("CSharpScript.Particles::SetEndSize", (void*)Internal_Particles_SetEndSize);
+    mono_add_internal_call("CSharpScript.Particles::SetLayer", (void*)Internal_Particles_SetLayer);
+    mono_add_internal_call("CSharpScript.Particles::SetFadeIn", (void*)Internal_Particles_SetFadeIn);
+    mono_add_internal_call("CSharpScript.Particles::SetFadeOut", (void*)Internal_Particles_SetFadeOut);
+    mono_add_internal_call("CSharpScript.Particles::SetStartRotation", (void*)Internal_Particles_SetStartRotation);
+    mono_add_internal_call("CSharpScript.Particles::SetAngularVelocity", (void*)Internal_Particles_SetAngularVelocity);
+    mono_add_internal_call("CSharpScript.Particles::SetTexture", (void*)Internal_Particles_SetTexture);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureDashTrail", (void*)Internal_Particles_ConfigureDashTrail);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureJumpDust", (void*)Internal_Particles_ConfigureJumpDust);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureWallSlideParticles", (void*)Internal_Particles_ConfigureWallSlideParticles);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureSpeedLines", (void*)Internal_Particles_ConfigureSpeedLines);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureDeathExplosion", (void*)Internal_Particles_ConfigureDeathExplosion);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)
