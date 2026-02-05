@@ -21,6 +21,7 @@ Technology is prohibited.
 #include "GameTimerSystem.h"
 #include "PauseMenuLogic.h"
 #include "LevelEditor.h"
+#include "CameraManager.h"
 
 bool InputManager::KeyStateImgui = true;
 double InputManager::MouseWorldX = 0.0;
@@ -169,8 +170,16 @@ void InputManager::Update(float dt)
 
     // Convert screen to world coordinates
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
-    MouseWorldX = static_cast<double>(xpos - width / 2.0) + camPos.x;
-    MouseWorldY = static_cast<double>(height / 2.0 - ypos) + camPos.y; // Flip Y axis
+
+    // Get camera zoom to properly scale mouse coordinates
+    float zoom = 1.0f;
+    CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
+    if (cam) {
+        zoom = cam->getZoom();
+    }
+
+    MouseWorldX = static_cast<double>((xpos - width / 2.0) / zoom) + camPos.x;
+    MouseWorldY = static_cast<double>((height / 2.0 - ypos) / zoom) + camPos.y; // Flip Y axis
 
     static bool keyPressed = false;
     LevelEditor *levelEditor = CORE ? CORE->GetLevelEditor() : nullptr;

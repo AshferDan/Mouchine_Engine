@@ -90,9 +90,9 @@
       },
       {
         "name": "menu_restart",
-        "filepath": "../Assets/Audio/restart_button.wav",
+        "filepath": "../Assets/Audio/press_button.wav",
         "loop": false,
-        "volume": 0.3,
+        "volume": 0.5,
         "pitch": 1.0,
         "category": "sfx"
       },
@@ -110,15 +110,15 @@
         "loop": false,
         "volume": 0.50,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "music"
       },
       {
         "name": "gameover",
         "filepath": "../Assets/Audio/gameover.wav",
-        "loop": false,
+        "loop": true,
         "volume": 0.40,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "music"
       }
     ]
   },

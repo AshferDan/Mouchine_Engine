@@ -135,9 +135,11 @@ void MenuLogicSystem::Update(float dt)
     double mouseX = InputManager::GetMouseWorldX();
     double mouseY = InputManager::GetMouseWorldY();
     bool isClicked = InputManager::IsMouseLeftClicked();
+    bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
+    std::string currentPressed = "";
 
     // Depending on scene, check for which buttons have been pressed
     switch (currScreen)
@@ -183,19 +185,41 @@ void MenuLogicSystem::Update(float dt)
         break;
     }
 
-   
+    // Check if mouse is being pressed on the hovered button
+    if (isMouseDown && !currentHover.empty())
+    {
+        currentPressed = currentHover;
+    }
+
+    // If the pressed button has changed since last frame
+    if (currentPressed != pressedButtonName)
+    {
+        // Revert the PREVIOUS pressed button texture
+        if (!pressedButtonName.empty())
+        {
+            // Check if still hovering the old pressed button
+            bool stillHovering = (pressedButtonName == hoveredButtonName);
+            SetButtonTexture(pressedButtonName, stillHovering, false);
+        }
+
+        // Update tracked pressed state
+        pressedButtonName = currentPressed;
+    }
+
     // If the hovered button has changed since last frame
     if (currentHover != hoveredButtonName)
     {
-        // Revert the PREVIOUS button texture to normal 
-        if (!hoveredButtonName.empty())
+        // Revert the PREVIOUS button texture to normal
+        if (!hoveredButtonName.empty() && hoveredButtonName != pressedButtonName)
         {
-            SetButtonTexture(hoveredButtonName, false);
+            SetButtonTexture(hoveredButtonName, false, false);
         }
 
         if (!currentHover.empty())
         {
-            SetButtonTexture(currentHover, true);
+            // If pressed, show pressed texture, otherwise show hover texture
+            bool isCurrentPressed = (isMouseDown && currentPressed == currentHover);
+            SetButtonTexture(currentHover, true, isCurrentPressed);
             // Play hover sound once when entering the button
 
             AudioManager* audioManager = CORE->GetAudioManager();
@@ -207,6 +231,16 @@ void MenuLogicSystem::Update(float dt)
 
         // Update tracked state
         hoveredButtonName = currentHover;
+    }
+    else if (!currentHover.empty())
+    {
+        // Even if hover didn't change, update texture if pressed state changed
+        bool isCurrentPressed = (isMouseDown && currentPressed == currentHover);
+        bool wasPressed = (!isCurrentPressed && pressedButtonName == currentHover);
+        if (isCurrentPressed != wasPressed)
+        {
+            SetButtonTexture(currentHover, true, isCurrentPressed);
+        }
     }
 
     // Only process clicks if we are actually hovering over a button
@@ -257,7 +291,7 @@ void MenuLogicSystem::Update(float dt)
 
 
                 }
-                SetButtonTexture("MasterMuteButton", true); // Update texture after toggling
+                SetButtonTexture("MasterMuteButton", true, false); // Update texture after toggling
             }
             else if (hoveredButtonName == "MusicMuteButton")
             {
@@ -265,7 +299,7 @@ void MenuLogicSystem::Update(float dt)
                 {
                     audioManager->ToggleCategoryMute("music");
                 }
-                SetButtonTexture("MusicMuteButton", true); // Update texture after toggling
+                SetButtonTexture("MusicMuteButton", true, false); // Update texture after toggling
             }
             else if (hoveredButtonName == "SFXMuteButton")
             {
@@ -273,7 +307,7 @@ void MenuLogicSystem::Update(float dt)
                 {
                     audioManager->ToggleCategoryMute("sfx");
                 }
-                SetButtonTexture("SFXMuteButton", true); // Update texture after toggling
+                SetButtonTexture("SFXMuteButton", true, false); // Update texture after toggling
             }
             else if (hoveredButtonName == "BackButton")
             {
@@ -306,7 +340,7 @@ bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mous
 }
 
 //  swap textures
-void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
+void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed)
 {
     auto& factory = GameObjectFactory::Instance();
     GameObject* btn = factory.FindGameObject(buttonName);
@@ -318,13 +352,40 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
     std::string texturePath;
 
     if (buttonName == "PlayButton") {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/Menu_play_NEW_HOVER.png" : "../Assets/Sprites/Icons/Menu_Play.png";
+        if (isPressed) {
+            texturePath = "../Assets/Sprites/Icons/Menu_play_NEW_HOVER.png";
+        } else if (isHovered) {
+            texturePath = "../Assets/Sprites/Icons/Menu_play_NEW_bright.png";
+        } else {
+            texturePath = "../Assets/Sprites/Icons/Menu_play.png";
+        }
     }
     else if (buttonName == "SettingsButton") {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/Menu_settings_NEW_HOVER.png" : "../Assets/Sprites/Icons/Menu_settings.png";
+        if (isPressed) {
+            texturePath = "../Assets/Sprites/Icons/Menu_settings_NEW_HOVER.png";
+        } else if (isHovered) {
+            texturePath = "../Assets/Sprites/Icons/Menu_settings_NEW_bright.png";
+        } else {
+            texturePath = "../Assets/Sprites/Icons/Menu_settings.png";
+        }
     }
     else if (buttonName == "QuitButton") {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/Menu_quit_NEW_HOVER.png" : "../Assets/Sprites/Icons/Menu_Quit.png";
+        if (isPressed) {
+            texturePath = "../Assets/Sprites/Icons/Menu_quit_NEW_HOVER.png";
+        } else if (isHovered) {
+            texturePath = "../Assets/Sprites/Icons/Menu_quit_NEW_bright.png";
+        } else {
+            texturePath = "../Assets/Sprites/Icons/Menu_quit.png";
+        }
+    }
+    else if (buttonName == "CreditsButton") {
+        if (isPressed) {
+            texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW_HOVER.png";
+        } else if (isHovered) {
+            texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW_bright.png";
+        } else {
+            texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW.png";
+        }
     }
     else if (buttonName == "MasterMuteButton") {
         bool isMuted = false;
@@ -356,10 +417,7 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
     else if (buttonName == "BackButton") {
         texturePath = isHovered ? "../Assets/Sprites/Icons/Back_button_dark.png" : "../Assets/Sprites/Icons/Back_button.png";
     }
-    else if (buttonName == "CreditsButton") {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/Menu_credits_NEW_HOVER.png" : "../Assets/Sprites/Icons/Menu_credits_NEW.png";
-    }
-  
+
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);
 }
