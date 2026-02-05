@@ -357,6 +357,42 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern vec4 GetColor(string objectName);
+
+        /// <summary>
+        /// Sets the render layer category for a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="layer">The layer (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetRenderLayer(string objectName, int layer);
+
+        /// <summary>
+        /// Gets the render layer category for a GameObject.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetRenderLayer(string objectName);
+
+        /// <summary>
+        /// Sets visibility for an entire layer category. All objects in this layer will be shown/hidden.
+        /// </summary>
+        /// <param name="layer">The layer (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).</param>
+        /// <param name="visible">True to show, false to hide.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLayerVisible(int layer, bool visible);
+
+        /// <summary>
+        /// Checks if a layer category is visible.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsLayerVisible(int layer);
+
+        // Layer constants for convenience
+        public const int LayerBackground = 0;
+        public const int LayerWalls = 1;
+        public const int LayerPlayer = 2;
+        public const int LayerEnemies = 3;
+        public const int LayerForeground = 4;
+        public const int LayerUI = 5;
     }
 
     /// <summary>

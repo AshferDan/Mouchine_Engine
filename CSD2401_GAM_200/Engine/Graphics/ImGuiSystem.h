@@ -330,4 +330,6 @@ void CreateHintText(std::string const& displayText);
 
 void AudioAssetsPanel_Render();
 
+void LayerPanel_Render();
+
 void TileMap_Render(float dt);

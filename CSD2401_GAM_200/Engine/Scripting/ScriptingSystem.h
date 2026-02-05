@@ -64,6 +64,7 @@ struct ScriptInstance {
     MonoObject* instance = nullptr;
     ScriptClass* scriptClass = nullptr;
     uint32_t gcHandle = 0;
+    bool isStarted = false;  // Track if OnStart has been called
 };
 
 /**
