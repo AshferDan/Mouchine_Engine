@@ -217,8 +217,9 @@ public:
     * @brief Returns the script instances for a given GameObject
     */
     std::vector<ScriptInstance>* GetScriptInstances(GameObject* gameObject) {
-        if (gameObjectScripts.find(gameObject) != gameObjectScripts.end()) {
-            return &gameObjectScripts[gameObject];
+        auto it = gameObjectScripts.find(gameObject);
+        if (it != gameObjectScripts.end()) {
+            return &it->second;
         }
         return nullptr;
     }

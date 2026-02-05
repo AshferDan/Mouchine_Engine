@@ -116,8 +116,8 @@ private:
 	// Video decoder state
 	plm_t* m_plm;				// Pointer for the MPEG decoder
 	double m_timeAccumulator;	// To track decoding time
-	float m_skipBlockTimer = 0.0f;
 	bool m_hasFrame = false;	// Check if frame has been decoded
+	bool m_canSkip = false;		// canSkip after frame is decoded
 
 
 	void RenderVideo();

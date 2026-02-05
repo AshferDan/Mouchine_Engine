@@ -105,6 +105,14 @@ bool InputManager::IsMouseButtonHeld(int button)
 	return m_mouseButtonStates[button] == KEY_STATE_HOLD;
 }
 
+bool InputManager::IsAnyKeyPress() {
+    for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; ++key)
+    {
+        if (glfwGetKey(window, key) == GLFW_PRESS)
+            return true;
+    }
+    return false;
+}
 
 /**
  * @brief Updates input handling, including key presses, mouse events,

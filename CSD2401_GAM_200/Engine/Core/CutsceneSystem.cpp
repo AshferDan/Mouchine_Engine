@@ -109,20 +109,12 @@ void CutsceneSystem::Update(float dt) {
 
 	if (m_hasFrame) { // only render if decoded
 		RenderVideo();
-	}
-
-	if (m_skipBlockTimer > 0.0f) {
-		m_skipBlockTimer -= dt;
-		// Debug: show timer countdown
-		// std::cout << "[Cutscene] Skip block timer: " << m_skipBlockTimer << std::endl;
+		m_canSkip = true;
 	}
 
 	// Check if Skip (Spacebar) or Left click - only after skip block timer expires
-	if (m_skipBlockTimer <= 0.0f) {
-		bool spacePressed = CORE->GetInputManager()->IsKeyPressed(GLFW_KEY_SPACE);
-		bool mouseClicked = CORE->GetInputManager()->IsMouseLeftClicked();
-		if (spacePressed || mouseClicked) {
-			std::cout << "[Cutscene] Skip triggered! Space: " << spacePressed << ", Mouse: " << mouseClicked << std::endl;
+	if (m_canSkip) {
+		if (CORE->GetInputManager()->IsAnyKeyPress()) {
 			StopCutscene();
 		}
 	}
@@ -138,7 +130,6 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 
 	m_currentVideoPath = videoPath; // Store the name
 	m_isPlaying = true;
-	m_skipBlockTimer = 1.0f; // block skipping for 1.0s to prevent accidental skip from initial click
 	m_hasFrame = false;
 	m_timeAccumulator = 0.0;
 
@@ -146,7 +137,7 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 
 	// Pause ALL audio before playing cutscene audio (will resume when cutscene ends)
 	AudioManager* audioMgr = CORE->GetAudioManager();
-	if (audioMgr) {
+	if (audioMgr && !audioName.empty()) {
 		audioMgr->PauseAllSounds(true);
 		std::cout << "[CutsceneSystem] Paused all sounds for cutscene" << std::endl;
 	}
@@ -164,6 +155,7 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 		}
 	} else {
 		std::cout << "[CutsceneSystem] No audio name provided for cutscene" << std::endl;
+
 	}
 
 	CORE->SetGamePaused(true);		 // Pause game loop
@@ -207,6 +199,7 @@ void CutsceneSystem::StopCutscene() {
 	// Resume Game
 	//m_currentVideoPath = ""; // Reset
 	CORE->SetGamePaused(false);
+	m_canSkip = false;
 }
 
 /**
