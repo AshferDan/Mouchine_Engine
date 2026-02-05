@@ -82,7 +82,10 @@ public:
 
 	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps);
 
-	void PlayAnimation(const std::string& name);
+	void PlayAnimation(const std::string& name, bool isLooping = true);
+
+	void SetLooping(bool isLooping);
+	bool GetLooping() const { return looping; }
 
 	void AddToQueue(const std::string& animationName);
 	/**
@@ -160,6 +163,7 @@ private:
 	std::map<std::string, AnimationData> animation_mList;
 	std::string currentAnimName;
     std::queue<std::string> animationQueue;
+	bool looping = true; // Whether the current animation should loop
 
 	const char *SpriteFile; // File path for spritesheet
 	GLuint textureID;		// Personalised ID for the texture

@@ -461,7 +461,8 @@ namespace API {
 #pragma endregion
 
 #pragma region Animator
-    void PlayAnimation(const std::string& objectName, const std::string& animationName);
+    void PlayAnimation(const std::string& objectName, const std::string& animationName, bool isLooping = true);
+    void SetAnimationLooping(const std::string& objectName, bool isLooping);
     void AddAnimationToQueue(const std::string& objectName, const std::string& animationName);
     void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps);
     void SetAnimation(const std::string& objectName, int startFrame, int endFrame, float fps);

@@ -973,7 +973,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     #pragma endregion
 
 #pragma region Animator
-    void PlayAnimation(const std::string& objectName, const std::string& animationName)
+    void PlayAnimation(const std::string& objectName, const std::string& animationName, bool isLooping)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.FindGameObject(objectName);
@@ -982,7 +982,21 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             auto* spritesheet = obj->GetComponent<Spritesheet>();
             if (spritesheet)
             {
-                spritesheet->PlayAnimation(animationName);
+                spritesheet->PlayAnimation(animationName, isLooping);
+            }
+        }
+    }
+
+    void SetAnimationLooping(const std::string& objectName, bool isLooping)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->SetLooping(isLooping);
             }
         }
     }

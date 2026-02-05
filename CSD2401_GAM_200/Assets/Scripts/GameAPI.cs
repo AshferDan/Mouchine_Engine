@@ -795,7 +795,10 @@ namespace CSharpScript
     public static class Animation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PlayAnimation(string objectName, string animationName);
+        public static extern void PlayAnimation(string objectName, string animationName, bool isLooping = true);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLooping(string objectName, bool isLooping);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AddToQueue(string objectName, string animationName);

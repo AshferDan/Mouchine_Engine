@@ -580,13 +580,20 @@ static bool Internal_OnTriggerStay(MonoString* obj1, MonoString* obj2) {
     return result;
 }
 
-static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName)
+static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName, bool isLooping)
 {
     char* objName = mono_string_to_utf8(objectName);
     char* animName = mono_string_to_utf8(animationName);
-    API::PlayAnimation(objName, animName);
+    API::PlayAnimation(objName, animName, isLooping);
     mono_free(objName);
     mono_free(animName);
+}
+
+static void Internal_SetAnimationLooping(MonoString* objectName, bool isLooping)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    API::SetAnimationLooping(objName, isLooping);
+    mono_free(objName);
 }
 
 static void Internal_AddAnimationToQueue(MonoString* objectName, MonoString* animationName)
@@ -1209,6 +1216,7 @@ void ScriptSystem::RegisterInternalCalls()
 
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);
+    mono_add_internal_call("CSharpScript.Animation::SetLooping", (void*)Internal_SetAnimationLooping);
     mono_add_internal_call("CSharpScript.Animation::AddToQueue", (void*)Internal_AddAnimationToQueue);
     mono_add_internal_call("CSharpScript.Animation::RegisterAnimation", (void*)Internal_RegisterAnimation);
     mono_add_internal_call("CSharpScript.Animation::SetAnimation", (void*)Internal_SetAnimation);
