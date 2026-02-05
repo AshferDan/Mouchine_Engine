@@ -211,7 +211,7 @@ void CutsceneSystem::UpdateVideoTexture(void* frame_ptr) {
 	plm_frame_t* frame = static_cast<plm_frame_t*>(frame_ptr);
 
 	// Reallocate RGB buffer if video dimensions change
-	if (!m_rgbBuffer || m_bufferWidth != frame->width || m_bufferHeight != frame->height) {
+	if (!m_rgbBuffer || static_cast<unsigned int>(m_bufferWidth) != frame->width || static_cast<unsigned int>(m_bufferHeight) != frame->height) {
 		m_bufferWidth = frame->width;
 		m_bufferHeight = frame->height;
 		delete[] m_rgbBuffer;

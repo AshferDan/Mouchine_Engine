@@ -120,7 +120,7 @@ bool InputManager::IsAnyKeyPress() {
  *        player movement, jumping, animations, and quitting logic.
  * @param dt Delta time since the last frame.
  */
-void InputManager::Update(float dt)
+void InputManager::Update(float)
 {
 	static bool firstUpdate = true;
 	if (firstUpdate) {

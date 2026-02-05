@@ -185,7 +185,7 @@ int ParticleEmitterComponent::GetActiveParticleCount() const {
 	return count;
 }
 
-void ParticleEmitterComponent::AddParticlesToBatch(std::vector<RenderBatch>& batches, const mat4& viewProj) {
+void ParticleEmitterComponent::AddParticlesToBatch(std::vector<RenderBatch>& batches, const mat4& ) {
 	if (!IsEnabled()) {
 		return;
 	}

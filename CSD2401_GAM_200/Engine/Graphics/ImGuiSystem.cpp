@@ -2550,19 +2550,10 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
 
             ImGui::Text("Attached Scripts:");
 
-            // Debug: Show script counts from both ScriptComponent and ScriptSystem
-            const auto& componentScripts = script->GetScripts();
-            ImGui::Text("  ScriptComponent has %zu scripts", componentScripts.size());
-            for (const auto& [id, name] : componentScripts)
-            {
-                ImGui::Text("    - %s (ID: %u)", name.c_str(), id);
-            }
-
             auto* scriptSystem = CORE->GetScriptSystem();
             if (scriptSystem)
             {
                 auto* instances = scriptSystem->GetScriptInstances(obj);
-                ImGui::Text("  ScriptSystem has %zu instances for this GameObject", instances ? instances->size() : 0);
                 if (instances)
                 {
                     for (auto& instance : *instances)

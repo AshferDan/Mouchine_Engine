@@ -2106,31 +2106,70 @@
       "children": []
     },
     {
-      "name": "InGamePauseButton",
-      "localID": 9999,
+      "name": "SafeZone",
+      "localID": 55,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          0.0
+          419.7,
+          2434.7
         ],
         "scale": [
-          200.0,
-          175.0
+          800.0,
+          800.0
         ],
         "rotation": 0.0
       },
       "RenderComponent": {
         "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/Icons/paused_button.png",
+        "texturePath": "",
         "color": [
+          0.0,
+          0.0,
           1.0,
-          1.0,
-          1.0,
+          0.3
+        ],
+        "layer": 10
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          800.0,
+          800.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerText",
+      "localID": 10,
+      "parentID": -1,
+      "active": true,
+      "TextComponent": {
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 48,
+        "text": "01:00",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
           1.0
         ],
-        "layer": 700
+        "scale": 1.0,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          50,
+          630
+        ],
+        "scale": [
+          1,
+          1
+        ],
+        "rotation": 0.0
       },
       "children": []
     }
@@ -2344,15 +2383,15 @@
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,
-        "category": "bgm"
+        "category": "sfx"
       },
       {
         "name": "gameover",
         "filepath": "../Assets/audio/gameover.wav",
         "loop": true,
-        "volume": 0.4,
+        "volume": 0.40,
         "pitch": 1.0,
-        "category": "bgm"
+        "category": "sfx"
       }
     ],
     "events": [

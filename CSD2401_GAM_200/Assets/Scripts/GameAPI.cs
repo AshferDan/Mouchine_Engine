@@ -795,7 +795,10 @@ namespace CSharpScript
     public static class Animation
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void PlayAnimation(string objectName, string animationName);
+        public static extern void PlayAnimation(string objectName, string animationName, bool isLooping = true);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLooping(string objectName, bool isLooping);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AddToQueue(string objectName, string animationName);
@@ -867,6 +870,315 @@ namespace CSharpScript
         /// <returns>True if the lose screen is currently shown, false otherwise.</returns>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool IsLoseScreenActive();
+    }
+
+    /// <summary>
+    /// Particle system functions for managing particle emitters.
+    /// </summary>
+    public static class Particles
+    {
+        #region Component Management
+        /// <summary>
+        /// Adds a ParticleEmitterComponent to a GameObject.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject.</param>
+        /// <param name="maxParticles">The maximum number of particles this emitter can have.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddParticleEmitterComponent(string objectName, int maxParticles = 100);
+        #endregion
+
+        #region Emission Control
+        /// <summary>
+        /// Starts emitting particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void StartEmission(string objectName);
+
+        /// <summary>
+        /// Stops emitting particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void StopEmission(string objectName);
+
+        /// <summary>
+        /// Emits a burst of particles immediately.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="count">The number of particles to emit.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Burst(string objectName, int count);
+
+        /// <summary>
+        /// Clears all active particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Clear(string objectName);
+
+        /// <summary>
+        /// Checks if the emitter is currently emitting.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <returns>True if emitting, false otherwise.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsEmitting(string objectName);
+
+        /// <summary>
+        /// Gets the number of currently active particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <returns>The number of active particles.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetActiveParticleCount(string objectName);
+
+        /// <summary>
+        /// Gets the maximum number of particles this emitter can have.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <returns>The maximum particle count.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetMaxParticles(string objectName);
+        #endregion
+
+        #region Emission Configuration
+        /// <summary>
+        /// Sets the emission rate (particles per second).
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="rate">Particles emitted per second.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetEmissionRate(string objectName, float rate);
+
+        /// <summary>
+        /// Sets the maximum number of particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="max">Maximum particle count.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetMaxParticles(string objectName, int max);
+
+        /// <summary>
+        /// Sets the duration of emission (how long the emitter will emit).
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="seconds">Duration in seconds.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetDuration(string objectName, float seconds);
+
+        /// <summary>
+        /// Sets whether the emitter should loop.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="shouldLoop">True to loop, false otherwise.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLoop(string objectName, bool shouldLoop);
+
+        /// <summary>
+        /// Sets the lifetime of individual particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="seconds">Lifetime in seconds.</param>
+        /// <param name="variation">Random variation (+/-).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLifetime(string objectName, float seconds, float variation = 0f);
+        #endregion
+
+        #region Spawn Configuration
+        /// <summary>
+        /// Sets the spawn offset relative to the emitter position.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="x">X offset.</param>
+        /// <param name="y">Y offset.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetSpawnOffset(string objectName, float x, float y);
+
+        /// <summary>
+        /// Sets the spawn radius for circular spawn area.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="radius">Spawn radius.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetSpawnRadius(string objectName, float radius);
+
+        /// <summary>
+        /// Sets the spawn box for rectangular spawn area.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="halfWidth">Half width of the spawn box.</param>
+        /// <param name="halfHeight">Half height of the spawn box.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetSpawnBox(string objectName, float halfWidth, float halfHeight);
+        #endregion
+
+        #region Physics Configuration
+        /// <summary>
+        /// Sets the initial velocity of particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="dirX">X direction component.</param>
+        /// <param name="dirY">Y direction component.</param>
+        /// <param name="magnitude">Speed magnitude.</param>
+        /// <param name="variation">Random variation (+/-).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetVelocity(string objectName, float dirX, float dirY, float magnitude, float variation = 0f);
+
+        /// <summary>
+        /// Sets the angle spread for velocity variation.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="degrees">Spread angle in degrees.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetAngleSpread(string objectName, float degrees);
+
+        /// <summary>
+        /// Sets the gravity affecting particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="gravX">X gravity component.</param>
+        /// <param name="gravY">Y gravity component.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetGravity(string objectName, float gravX, float gravY);
+
+        /// <summary>
+        /// Sets the drag coefficient for particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="drag">Drag coefficient.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetDrag(string objectName, float drag);
+        #endregion
+
+        #region Appearance Configuration
+        /// <summary>
+        /// Sets the starting color of particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="r">Red component (0.0 to 1.0).</param>
+        /// <param name="g">Green component (0.0 to 1.0).</param>
+        /// <param name="b">Blue component (0.0 to 1.0).</param>
+        /// <param name="a">Alpha component (0.0 to 1.0).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetStartColor(string objectName, float r, float g, float b, float a);
+
+        /// <summary>
+        /// Sets the ending color of particles (interpolated over lifetime).
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="r">Red component (0.0 to 1.0).</param>
+        /// <param name="g">Green component (0.0 to 1.0).</param>
+        /// <param name="b">Blue component (0.0 to 1.0).</param>
+        /// <param name="a">Alpha component (0.0 to 1.0).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetEndColor(string objectName, float r, float g, float b, float a);
+
+        /// <summary>
+        /// Sets the starting size of particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="size">Starting size.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetStartSize(string objectName, float size);
+
+        /// <summary>
+        /// Sets the ending size of particles (interpolated over lifetime).
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="size">Ending size.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetEndSize(string objectName, float size);
+
+        /// <summary>
+        /// Sets the render layer for particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="layer">Render layer.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLayer(string objectName, int layer);
+
+        /// <summary>
+        /// Sets the fade in duration for particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="duration">Fade in duration in seconds.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFadeIn(string objectName, float duration);
+
+        /// <summary>
+        /// Sets the fade out duration for particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="duration">Fade out duration in seconds.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFadeOut(string objectName, float duration);
+
+        /// <summary>
+        /// Sets the texture for particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="texturePath">Path to the texture file.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetTexture(string objectName, string texturePath);
+        #endregion
+
+        #region Rotation Configuration
+        /// <summary>
+        /// Sets the starting rotation of particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="degrees">Starting rotation in degrees.</param>
+        /// <param name="variation">Random variation (+/-).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetStartRotation(string objectName, float degrees, float variation = 0f);
+
+        /// <summary>
+        /// Sets the angular velocity of particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        /// <param name="degreesPerSec">Angular velocity in degrees per second.</param>
+        /// <param name="variation">Random variation (+/-).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetAngularVelocity(string objectName, float degreesPerSec, float variation = 0f);
+        #endregion
+
+        #region Presets
+        /// <summary>
+        /// Configures the emitter for a dash trail effect.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ConfigureDashTrail(string objectName);
+
+        /// <summary>
+        /// Configures the emitter for a jump dust effect.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ConfigureJumpDust(string objectName);
+
+        /// <summary>
+        /// Configures the emitter for wall slide particles.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ConfigureWallSlideParticles(string objectName);
+
+        /// <summary>
+        /// Configures the emitter for speed lines effect.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ConfigureSpeedLines(string objectName);
+
+        /// <summary>
+        /// Configures the emitter for a death explosion effect.
+        /// </summary>
+        /// <param name="objectName">The name of the GameObject with the particle emitter.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void ConfigureDeathExplosion(string objectName);
+        #endregion
     }
 
     public static class Input

@@ -14,19 +14,23 @@ Technology is prohibited.
 
 #include "GameTimerSystem.h"
 #include "WinLoseLogic.h"
+#include "ColliderComponent.h"
+#include "Collision.h"
+#include "transform.h"
 
 #include <cstdio>
 #include <iostream>
+#include <cmath>
 
 /**
  * @brief Initializes the countdown timer and updates initial display.
  */
 void GameTimerSystem::Initialize()
 {
-    remainingTime = 30.0f;
-    lastDisplayedSeconds = 30;
+    remainingTime = 60.0f;
+    lastDisplayedSeconds = 60;
     hasTriggeredTimeUp = false;
-    UpdateText(30);
+    UpdateText(60);
 }
 
 /**
@@ -66,12 +70,12 @@ void GameTimerSystem::Update(float dt)
     // reset timer and text
     if (mode == EditorMode::Stop)
     {
-        if (remainingTime != 30.0f || lastDisplayedSeconds != 30)
+        if (remainingTime != 60.0f || lastDisplayedSeconds != 60)
         {
-            remainingTime = 30.0f;
-            lastDisplayedSeconds = 30;
+            remainingTime = 60.0f;
+            lastDisplayedSeconds = 60;
             hasTriggeredTimeUp = false;
-            UpdateText(30);
+            UpdateText(60);
         }
         return;
     }
@@ -85,7 +89,11 @@ void GameTimerSystem::Update(float dt)
     // only decrease time in play mode
     if (mode == EditorMode::Play)
     {
-        remainingTime -= dt;
+        // Only decrement timer if player is outside SafeZone
+        if (!IsPlayerInSafeZone())
+        {
+            remainingTime -= dt;
+        }
 
         // check for lose condition aka time ran out
         if (remainingTime <= 0.0f && !hasTriggeredTimeUp)
@@ -180,4 +188,51 @@ void GameTimerSystem::UpdateText(int totalSeconds)
     std::snprintf(buffer, sizeof(buffer), "%02d:%02d", minutes, seconds);
 
     textComp->SetText(buffer);
+}
+
+/**
+ * @brief Checks if the player is inside the safe zone using AABB collision detection.
+ */
+bool GameTimerSystem::IsPlayerInSafeZone()
+{
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* safeZone = factory.FindGameObject("SafeZone");
+    GameObject* player = factory.FindGameObject("Hero");
+
+    // if SafeZone doesn't exist or player doesn't exist, timer runs normally
+    if (!safeZone || !player || !safeZone->IsActive() || !player->IsActive())
+    {
+        return false;
+    }
+
+    auto* safeZoneTransform = safeZone->GetComponent<TransformComponent>();
+    auto* playerTransform = player->GetComponent<TransformComponent>();
+    auto* safeZoneCollider = safeZone->GetComponent<ColliderComponent>();
+    auto* playerCollider = player->GetComponent<ColliderComponent>();
+
+    if (!safeZoneTransform || !playerTransform || !safeZoneCollider || !playerCollider)
+    {
+        return false;
+    }
+
+    AABB safeAABB = safeZoneCollider->GetAABB();
+    AABB playerAABB = playerCollider->GetAABB();
+
+    float safeX = (safeAABB.min.x + safeAABB.max.x) / 2.0f;
+    float safeY = (safeAABB.min.y + safeAABB.max.y) / 2.0f;
+    float playerX = (playerAABB.min.x + playerAABB.max.x) / 2.0f;
+    float playerY = (playerAABB.min.y + playerAABB.max.y) / 2.0f;
+
+    float safeHalfWidth = (safeAABB.max.x - safeAABB.min.x) / 2.0f;
+    float safeHalfHeight = (safeAABB.max.y - safeAABB.min.y) / 2.0f;
+    float playerHalfWidth = (playerAABB.max.x - playerAABB.min.x) / 2.0f;
+    float playerHalfHeight = (playerAABB.max.y - playerAABB.min.y) / 2.0f;
+
+    float distX = std::abs(playerX - safeX);
+    float distY = std::abs(playerY - safeY);
+    float thresholdX = playerHalfWidth + safeHalfWidth;
+    float thresholdY = playerHalfHeight + safeHalfHeight;
+
+    // true if player is colliding with or inside the safe zone
+    return (distX < thresholdX) && (distY < thresholdY);
 }

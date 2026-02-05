@@ -75,29 +75,6 @@ int main()
 
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
-        GameObject* testObj = GameObjectFactory::Instance().CreateShape(
-            "MyTestSquare",                  // <--- NAME MUST MATCH C#
-            RenderComponent::ShapeType::Square,
-            100.0f, 100.0f,                      // Center of screen
-            100.0f, 100.0f,                  // Size
-            true,
-            vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
-        );
-
-        // 2. Add the ScriptComponent
-        //if (testObj)
-        //{
-        //    ScriptComponent* scriptComp = testObj->AddComponent<ScriptComponent>();
-
-        //    if (scriptComp)
-        //    {
-        //        // 3. Attach the script "SpinningSquare"
-        //        // Ensure the namespace in C# is "GameScripts"
-        //        scriptComp->AddScript("SpinningSquare");
-
-        //        std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
-        //    }
-        //}
 
         GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
             "Hero",

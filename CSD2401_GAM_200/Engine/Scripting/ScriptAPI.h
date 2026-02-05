@@ -41,6 +41,7 @@ Technology is prohibited.
 #include <functional>
 #include "MathLib.h"
 #include "InputManager.h"
+#include "ParticleEmitterComponent.h"
 
     using TimerCallback = std::function<void()>;
     using TimerID = unsigned int;
@@ -460,7 +461,8 @@ namespace API {
 #pragma endregion
 
 #pragma region Animator
-    void PlayAnimation(const std::string& objectName, const std::string& animationName);
+    void PlayAnimation(const std::string& objectName, const std::string& animationName, bool isLooping = true);
+    void SetAnimationLooping(const std::string& objectName, bool isLooping);
     void AddAnimationToQueue(const std::string& objectName, const std::string& animationName);
     void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps);
     void SetAnimation(const std::string& objectName, int startFrame, int endFrame, float fps);
@@ -499,6 +501,61 @@ namespace API {
     float GetMouseY();
     float GetMouseWorldX();
     float GetMouseWorldY();
+#pragma endregion
+
+#pragma region Particles
+    // Component management
+    void AddParticleEmitterComponent(const std::string& objectName, int maxParticles);
+
+    // Emission control
+    void Particles_StartEmission(const std::string& objectName);
+    void Particles_StopEmission(const std::string& objectName);
+    void Particles_Burst(const std::string& objectName, int count);
+    void Particles_Clear(const std::string& objectName);
+    bool Particles_IsEmitting(const std::string& objectName);
+    int Particles_GetActiveCount(const std::string& objectName);
+    int Particles_GetMaxParticles(const std::string& objectName);
+
+    // Emission configuration
+    void Particles_SetEmissionRate(const std::string& objectName, float rate);
+    void Particles_SetMaxParticles(const std::string& objectName, int max);
+    void Particles_SetDuration(const std::string& objectName, float seconds);
+    void Particles_SetLoop(const std::string& objectName, bool shouldLoop);
+    void Particles_SetLifetime(const std::string& objectName, float seconds, float variation);
+
+    // Spawn configuration
+    void Particles_SetSpawnOffset(const std::string& objectName, float x, float y);
+    void Particles_SetSpawnRadius(const std::string& objectName, float radius);
+    void Particles_SetSpawnBox(const std::string& objectName, float halfWidth, float halfHeight);
+
+    // Physics configuration
+    void Particles_SetVelocity(const std::string& objectName, float dirX, float dirY, float magnitude, float variation);
+    void Particles_SetAngleSpread(const std::string& objectName, float degrees);
+    void Particles_SetGravity(const std::string& objectName, float gravX, float gravY);
+    void Particles_SetDrag(const std::string& objectName, float drag);
+
+    // Appearance configuration
+    void Particles_SetStartColor(const std::string& objectName, float r, float g, float b, float a);
+    void Particles_SetEndColor(const std::string& objectName, float r, float g, float b, float a);
+    void Particles_SetStartSize(const std::string& objectName, float size);
+    void Particles_SetEndSize(const std::string& objectName, float size);
+    void Particles_SetLayer(const std::string& objectName, int layer);
+    void Particles_SetFadeIn(const std::string& objectName, float duration);
+    void Particles_SetFadeOut(const std::string& objectName, float duration);
+
+    // Rotation configuration
+    void Particles_SetStartRotation(const std::string& objectName, float degrees, float variation);
+    void Particles_SetAngularVelocity(const std::string& objectName, float degreesPerSec, float variation);
+
+    // Texture
+    void Particles_SetTexture(const std::string& objectName, const char* texturePath);
+
+    // Presets
+    void Particles_ConfigureDashTrail(const std::string& objectName);
+    void Particles_ConfigureJumpDust(const std::string& objectName);
+    void Particles_ConfigureWallSlideParticles(const std::string& objectName);
+    void Particles_ConfigureSpeedLines(const std::string& objectName);
+    void Particles_ConfigureDeathExplosion(const std::string& objectName);
 #pragma endregion
 
 }
