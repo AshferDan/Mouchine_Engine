@@ -165,6 +165,31 @@ static void Internal_SetAlpha(MonoString *objectName, float alpha)
     mono_free(name);
 }
 
+static void Internal_SetRenderLayer(MonoString *objectName, int layer)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetRenderLayer(name, layer);
+    mono_free(name);
+}
+
+static int Internal_GetRenderLayer(MonoString *objectName)
+{
+    char *name = mono_string_to_utf8(objectName);
+    int result = API::GetRenderLayer(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetLayerVisible(int layer, bool visible)
+{
+    API::SetLayerVisible(layer, visible);
+}
+
+static bool Internal_IsLayerVisible(int layer)
+{
+    return API::IsLayerVisible(layer);
+}
+
 // === Physics ===
 static void Internal_SetVelocity(MonoString *objectName, float vx, float vy)
 {
@@ -1155,6 +1180,10 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Graphics::SetColor", (void *)Internal_SetColor);
     mono_add_internal_call("CSharpScript.Graphics::SetAlpha", (void *)Internal_SetAlpha);
     mono_add_internal_call("CSharpScript.Graphics::GetColor", (void*)Internal_GetColor);
+    mono_add_internal_call("CSharpScript.Graphics::SetRenderLayer", (void *)Internal_SetRenderLayer);
+    mono_add_internal_call("CSharpScript.Graphics::GetRenderLayer", (void *)Internal_GetRenderLayer);
+    mono_add_internal_call("CSharpScript.Graphics::SetLayerVisible", (void *)Internal_SetLayerVisible);
+    mono_add_internal_call("CSharpScript.Graphics::IsLayerVisible", (void *)Internal_IsLayerVisible);
 
     // === Physics ===
     mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);

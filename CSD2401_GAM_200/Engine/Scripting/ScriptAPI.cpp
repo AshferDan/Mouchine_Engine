@@ -212,6 +212,53 @@ namespace API
             }
         }
     }
+
+    void SetRenderLayer(const std::string &objectName, int layer)
+    {
+        auto &factory = GameObjectFactory::Instance();
+        GameObject *obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto *render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                render->SetRenderLayerInt(layer);
+            }
+        }
+    }
+
+    int GetRenderLayer(const std::string &objectName)
+    {
+        auto &factory = GameObjectFactory::Instance();
+        GameObject *obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto *render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                return render->GetRenderLayerInt();
+            }
+        }
+        return 0;
+    }
+
+    void SetLayerVisible(int layer, bool visible)
+    {
+        if (layer >= 0 && layer < static_cast<int>(RenderComponent::RenderLayer::Count))
+        {
+            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(layer), visible);
+        }
+    }
+
+    bool IsLayerVisible(int layer)
+    {
+        if (layer >= 0 && layer < static_cast<int>(RenderComponent::RenderLayer::Count))
+        {
+            return RenderComponent::IsLayerVisible(static_cast<RenderComponent::RenderLayer>(layer));
+        }
+        return false;
+    }
+
     void SetBackGround(char const *filename)
     {
         auto &factory = GameObjectFactory::Instance();
