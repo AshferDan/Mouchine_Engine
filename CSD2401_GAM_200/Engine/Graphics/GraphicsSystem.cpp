@@ -411,6 +411,22 @@ void GraphicsSystem::Initialize()
  */
 void GraphicsSystem::Update(float)
 {
+	auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
+    auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
+    if (!dashTrail) {
+        // If it doesn't exist, add it and configure it once
+        dashTrail = player->AddComponent<ParticleEmitterComponent>();
+        if (dashTrail) {
+            dashTrail->ConfigureDashTrail();
+            dashTrail->SetTexture(0);
+            dashTrail->StartEmission();
+            std::cout << "Particle Emitter initialized successfully\n";
+        }
+        else {
+            std::cerr << "particle not initialized properly\n";
+        }
+    }
+
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
     if (!cachedBackground)
     {

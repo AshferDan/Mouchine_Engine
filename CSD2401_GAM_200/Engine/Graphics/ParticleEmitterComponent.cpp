@@ -370,7 +370,7 @@ void ParticleEmitterComponent::ConfigureDashTrail() {
 	SetLifetime(1.0f, 0.05f);
 
 	SetSpawnRadius(5.0f);
-	SetSpawnOffset(vec2(0.0f, -60.0f));
+	SetSpawnOffset(vec2(0.0f, -80.0f));
 	SetVelocity(vec2(0, 0), 0.0f);  // stationary particles
 
 	SetStartColor(vec4(0.3f, 0.6f, 1.0f, 0.8f));  // bright blue
