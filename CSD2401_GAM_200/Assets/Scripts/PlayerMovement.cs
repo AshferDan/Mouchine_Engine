@@ -232,16 +232,17 @@ namespace CSharpScript
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
 
-            // uncomment to 'visualise' grounded raycast
-            //CSharpScript.GameObject.CreateShape(
-            //    "DebugLine",
-            //    (int)CSharpScript.ShapeType.Square,
-            //    0, -200,
-            //    5, 5,
-            //    0.0f, 0.0f, 1.0f, 1.0f,
-            //    (int)CSharpScript.CollisionLayer.Platform,
-            //    false, false, false
-            //);
+            //uncomment to 'visualise' grounded raycast
+            CSharpScript.GameObject.CreateShape(
+                "vfx",
+                (int)CSharpScript.ShapeType.Square,
+                0, -200,
+                5, 5,
+                0.0f, 0.0f, 1.0f, 1.0f,
+                (int)CSharpScript.CollisionLayer.Platform,
+                false, false, false
+            );
+                 Debug.Log("created vfc gameobject");
         }
 
         public void OnUpdate(float deltaTime)
