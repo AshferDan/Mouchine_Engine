@@ -57,7 +57,7 @@ void MenuLogicSystem::Update(float dt)
                     else {                                      // SECOND CLICK: Video has finished, load the game
                         std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
                         std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
-                        CORE->RequestSceneLoad("../Assets/Scenes/Scene1.json", true);
+                        CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL.json", true);
                         std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                     }
 
