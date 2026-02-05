@@ -1486,6 +1486,7 @@ namespace CSharpScript
         {
             if (IsBeingKnockedBack)
             {
+                Camera.CameraFlash(1.0f, 1, 0, 0, 1, true);
                 currState = PlayerState.Hurting;
 
                 if (elapsedTime < MoveStats.knockbackTime)

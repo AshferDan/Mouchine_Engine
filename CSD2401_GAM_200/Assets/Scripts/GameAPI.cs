@@ -786,7 +786,10 @@ namespace CSharpScript
         public static extern float GetZoom();
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int GetMode();
+        public static extern void GetMode();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void CameraFlash(float duration, float r, float g, float b, float a, bool fadeout);
     }
 
     public static class Animation
