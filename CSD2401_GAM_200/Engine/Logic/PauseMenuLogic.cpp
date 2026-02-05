@@ -102,17 +102,6 @@ void PauseMenuLogicSystem::Update(float dt)
             bool isHoveringPauseBtn = (mouseX >= btnX - halfWidth && mouseX <= btnX + halfWidth &&
                                        mouseY >= btnY - halfHeight && mouseY <= btnY + halfHeight);
 
-            // Debug logging
-            static int logCounter = 0;
-            if (logCounter++ % 60 == 0)  // Log once per second (assuming 60 FPS)
-            {
-                std::cout << "[InGamePauseButton] Mouse: (" << mouseX << ", " << mouseY << ") | "
-                          << "Button (flipped): (" << btnX << ", " << btnY << ") | "
-                          << "Bounds: [" << (btnX - halfWidth) << " to " << (btnX + halfWidth) << ", "
-                          << (btnY - halfHeight) << " to " << (btnY + halfHeight) << "] | "
-                          << "Hovering: " << isHoveringPauseBtn << std::endl;
-            }
-
             static bool wasHoveringLastFrame = false;
 
             if (isClicked && isHoveringPauseBtn)
