@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       PauseMenuLogic.cpp
-\author     Leck Xin Yee [100% - 309 lines]
+\author     Leck Xin Yee [100% - 793 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 28, 2025
 

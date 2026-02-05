@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       WinLoseLogic.cpp
-\author     Leck Xin Yee [100% - 463 lines]
+\author     Leck Xin Yee [100% - 553 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 29, 2025
 

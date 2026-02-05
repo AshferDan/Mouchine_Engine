@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       AudioManager.cpp
-\author     Leck Xin Yee [100% - 55 lines]
+\author     Leck Xin Yee [100% - 76 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 29, 2025
 

@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ResourceManager.cpp
-\author     Leck Xin Yee [100% - 384 lines]
+\author     Leck Xin Yee [100% - 512 lines]
 \par        xinyee.leck@digipen.edu
 \date       October, 2, 2025
 
