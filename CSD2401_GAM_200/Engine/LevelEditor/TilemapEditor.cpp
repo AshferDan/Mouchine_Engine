@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "RenderComponent.h"
 #include "transform.h"
 #include "GraphicsSystem.h"
+#include "CameraManager.h"
 
 bool isTileMapFocused;
 
@@ -1432,6 +1433,9 @@ GameObject* TilemapEditor::LoadTilemapAsGameObject(
 /**
  * @brief Render a tilemap GameObject by adding tiles to the batch system
  */
+ /**
+  * @brief Render a tilemap GameObject by adding tiles to the batch system
+  */
 void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 {
     if (!tilemapObj) return;
@@ -1452,7 +1456,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
     auto* gs = CORE->GetGraphicsSystem();
     if (!gs) return;
 
-    // === FRUSTUM CULLING: Get camera bounds ===
+    // === CAMERA CULLING: Get camera bounds ===
     vec2 camPos;
     float zoom;
     float viewportWidth, viewportHeight;

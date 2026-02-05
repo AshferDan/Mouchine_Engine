@@ -1,6 +1,27 @@
 {
   "GameObjects": [
     {
+      "name": "Tilemap",
+      "localID": 2,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "TilemapDataHolder": {
+        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
+      },
+      "children": []
+    },
+    {
       "name": "MainCamera",
       "localID": 1,
       "parentID": 4294967295,
@@ -24,27 +45,6 @@
           -100.0,
           0
         ]
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 2,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
       },
       "children": []
     },
@@ -139,27 +139,6 @@
           6473.26416015625,
           13.01416015625
         ]
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 5,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
       },
       "children": []
     },
@@ -767,51 +746,9 @@
         "shape": "Square",
         "layer": "Ground",
         "size": [
-          1018.6279907226563,
+          1018.6279907226562,
           13.01416015625
         ]
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 15,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 16,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
       },
       "children": []
     },
@@ -1235,27 +1172,6 @@
           23237.7421875,
           13.01416015625
         ]
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 26,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
       },
       "children": []
     },
@@ -1976,7 +1892,7 @@
         ],
         "scale": [
           82.9276123046875,
-          840.2898559570313
+          840.2898559570312
         ],
         "rotation": 0.0
       },
@@ -2100,7 +2016,7 @@
         "layer": "Ground",
         "size": [
           64.04296875,
-          839.1790161132813
+          839.1790161132812
         ]
       },
       "children": []
@@ -2147,176 +2063,8 @@
         "layer": "Ground",
         "size": [
           63.087890625,
-          767.2219848632813
+          767.2219848632812
         ]
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 46,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 47,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 48,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 49,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 50,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 51,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 52,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
-      },
-      "children": []
-    },
-    {
-      "name": "Tilemap",
-      "localID": 53,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          1.0,
-          1.0
-        ],
-        "rotation": 0.0
-      },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/M4_LEVEL.tilemap"
       },
       "children": []
     },
@@ -2361,7 +2109,7 @@
   "TilemapFile": "../Assets/Tiles/M4_LEVEL.tilemap",
   "AudioManager": {
     "sounds": [
-            {
+      {
         "name": "bgm",
         "filepath": "../Assets/audio/Player/sneaky_bgm.wav",
         "loop": false,
