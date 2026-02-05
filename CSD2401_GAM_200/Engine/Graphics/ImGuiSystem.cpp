@@ -2550,9 +2550,6 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
 
             ImGui::Text("Attached Scripts:");
 
-            // Debug: Show script counts from both ScriptComponent and ScriptSystem
-            const auto& componentScripts = script->GetScripts();
-
             auto* scriptSystem = CORE->GetScriptSystem();
             if (scriptSystem)
             {

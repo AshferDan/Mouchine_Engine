@@ -120,7 +120,7 @@ bool InputManager::IsAnyKeyPress() {
  *        player movement, jumping, animations, and quitting logic.
  * @param dt Delta time since the last frame.
  */
-void InputManager::Update(float dt)
+void InputManager::Update(float)
 {
 	static bool firstUpdate = true;
 	if (firstUpdate) {
@@ -347,8 +347,8 @@ void InputManager::Update(float dt)
 
         {
             GameObject* howto = GameObjectFactory::Instance().FindGameObject("HowToPlay");
-            GameObject* cam = GameObjectFactory::Instance().FindGameObject("MainCamera");
-            if (howto && cam)
+            GameObject* mainCameraObj = GameObjectFactory::Instance().FindGameObject("MainCamera");
+            if (howto && mainCameraObj)
             {
                 auto* transform = howto->GetComponent<TransformComponent>();
                 if (!transform) return;

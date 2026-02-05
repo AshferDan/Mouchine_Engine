@@ -322,20 +322,20 @@ void GameObject::OnEventTriggered(EventType type, GameObject* other) {
     }
 }
 
-void GameObject::RemoveComponent(const std::string& name) {
-    if (name == "TransformComponent") {
+void GameObject::RemoveComponent(const std::string& ComponentName) {
+    if (ComponentName == "TransformComponent") {
         RemoveComponent<TransformComponent>();
-    } else if (name == "RenderComponent") {
+    } else if (ComponentName == "RenderComponent") {
         RemoveComponent<RenderComponent>();
-    } else if (name == "PhysicsComponent") {
+    } else if (ComponentName == "PhysicsComponent") {
         RemoveComponent<PhysicsComponent>();
-    } else if (name == "ColliderComponent") {
+    } else if (ComponentName == "ColliderComponent") {
         RemoveComponent<ColliderComponent>();
-    } else if (name == "ScriptComponent") {
+    } else if (ComponentName == "ScriptComponent") {
         RemoveComponent<ScriptComponent>();
-    } else if (name == "CameraComponent") {
+    } else if (ComponentName == "CameraComponent") {
         RemoveComponent<CameraComponent>();
-    } else if (name == "EventComponent") {
+    } else if (ComponentName == "EventComponent") {
         RemoveComponent<EventComponent>();
     }
 }
