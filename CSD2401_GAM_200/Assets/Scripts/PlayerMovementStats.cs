@@ -60,8 +60,8 @@ namespace CSharpScript
         public float T3_SkidDuration = 1.0f;
 
         // Wall Bonk
-        public float T3_BonkDuration = 0.8f;
-        public Vector2 T3_BonkForce = new Vector2(12f * mod, 10f * mod);
+        public float T3_BonkDuration = 0.65f;
+        public Vector2 T3_BonkForce = new Vector2(18f * mod, 10f * mod);
 
         // Grounded/Collision Checks
         public float GroundDetectionRayLength = 10.0f;
