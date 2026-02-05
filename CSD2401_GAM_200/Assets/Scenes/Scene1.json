@@ -107,10 +107,10 @@
       {
         "name": "victory",
         "filepath": "../Assets/Audio/victory.wav",
-        "loop": false,
+        "loop": true,
         "volume": 0.50,
         "pitch": 1.0,
-        "category": "music"
+        "category": "bgm"
       },
       {
         "name": "gameover",
@@ -118,7 +118,7 @@
         "loop": true,
         "volume": 0.40,
         "pitch": 1.0,
-        "category": "music"
+        "category": "bgm"
       }
     ]
   },

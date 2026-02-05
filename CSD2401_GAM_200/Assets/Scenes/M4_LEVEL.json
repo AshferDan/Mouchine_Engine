@@ -2140,10 +2140,10 @@
     "sounds": [
       {
         "name": "bgm",
-        "filepath": "../Assets/audio/Player/sneaky_bgm.wav",
-        "loop": false,
+        "filepath": "../Assets/audio/sneaky_bgm.wav",
+        "loop": true,
         "volume": 0.75,
-        "pitch": 1.5,
+        "pitch": 1.0,
         "category": "bgm"
       },
       {
@@ -2337,6 +2337,22 @@
         "volume": 0.5,
         "pitch": 1.0,
         "category": "sfx"
+      },
+      {
+        "name": "victory",
+        "filepath": "../Assets/audio/victory.wav",
+        "loop": true,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "gameover",
+        "filepath": "../Assets/audio/gameover.wav",
+        "loop": true,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "bgm"
       }
     ],
     "events": [
