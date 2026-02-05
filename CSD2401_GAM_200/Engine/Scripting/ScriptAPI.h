@@ -455,6 +455,7 @@ namespace API {
     void setCameraPos(vec2);
     void setCameraZoom(float);
     void setCameraMode(CameraComponent::CameraMode);
+    void CameraFlash(float, const vec4&, bool);
 
 #pragma endregion
 

@@ -964,7 +964,13 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         }
         camtemp->SetMode(val);
     }
-#pragma endregion
+
+    void CameraFlash(float duration, const vec4& color, bool fadeout) {
+        auto& cam = CameraManager::Instance();
+        cam.FlashActiveCamera(duration, color, fadeout);
+    }
+
+    #pragma endregion
 
 #pragma region Animator
     void PlayAnimation(const std::string& objectName, const std::string& animationName)

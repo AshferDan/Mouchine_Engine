@@ -541,6 +541,12 @@ static void Internal_SetCameraMode(int mode) {
     API::setCameraMode((CameraComponent::CameraMode)mode);
 }
 
+static void Internal_CameraFlash(float duration, float r, float g, float b, float a, bool fadeout)
+{
+    API::CameraFlash(duration, {r, g, b, a}, fadeout);
+}
+
+
 static bool Internal_Raycast(MonoString* selfName, float x, float y, float dx, float dy, float distance, MonoString** hitObjectName, float* hitDistance)
 {
     return API::Raycast(x, y, dx, dy, distance, selfName, hitObjectName, hitDistance);
@@ -965,6 +971,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Camera::GetPosition", (void*)Internal_GetCameraPosition);
     mono_add_internal_call("CSharpScript.Camera::GetZoom", (void*)Internal_GetCameraZoom);
     mono_add_internal_call("CSharpScript.Camera::GetMode", (void*)Internal_GetCameraMode);
+    mono_add_internal_call("CSharpScript.Camera::CameraFlash", (void*)Internal_CameraFlash);
 
     // === Collision Queries ===
     mono_add_internal_call("CSharpScript.Collision::Raycast_Internal", (void*)Internal_Raycast);
