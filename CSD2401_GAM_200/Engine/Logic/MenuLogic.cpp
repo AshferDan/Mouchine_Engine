@@ -78,8 +78,12 @@ void MenuLogicSystem::Update(float dt)
                 else if (hoveredButtonName == "QuitButton")
                 {
                     std::cout << "QuitButton Clicked!" << std::endl;
+                #ifndef _DEBUG
+					glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
+                #else
                     CORE->GetLevelEditor()->StopPlayMode();
                     //CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
+                #endif          
                 }
             }
 

@@ -90,6 +90,10 @@
         ],
         "rotation": 0.0
       },
+      "CameraComponent": {
+        "zoom": 1.0,
+        "mode": "FIXED"
+      },
       "children": []
     },
     {

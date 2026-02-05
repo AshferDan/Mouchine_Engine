@@ -242,27 +242,47 @@ mat4 CameraComponent::GetViewProjectionMatrix(float screenWidth, float screenHei
 	return projection * view;
 }
 
+/**
+ * @brief Increases the camera trauma level, clamped to a maximum of 1.0.
+ * @param amount The intensity to add (e.g., 0.2 for a small hit, 0.5 for an explosion).
+ */
 void CameraComponent::AddTrauma(float amount) {
 	trauma = std::min(1.f, trauma + amount);
 }
 
+/**
+ * @brief Processes the decay of trauma over time and calculates a random shake offset.
+ * * This uses a quadratic shake function (trauma squared) to ensure the intensity
+ * drops off more naturally as the trauma value decreases.
+ * * @param deltaTime Time elapsed since the last frame.
+ */
 void CameraComponent::UpdateTrauma(float deltaTime) {
+	// Linearly decay trauma over time
 	if (trauma > 0.f) {
 		trauma = std::max(0.f, trauma - traumaDecayRate * deltaTime);
 	}
 
+	// Reset offset if there is no trauma to process
 	if (trauma <= 0.f) {
 		traumaShakeOffset = vec2(0.f, 0.f);
 		return;
 	}
 
+	// Quadratic shake provides a smoother "feel" than linear shake
 	float shake = trauma * trauma;
 
-	float angle = ((float)rand()/RAND_MAX) * 6.28318530718f; // Random angle (0 to 2pi)
+	// Calculate a random displacement within a circle based on maxShakeOffset
+	float angle = ((float)rand() / RAND_MAX) * 6.28318530718f; // Random angle (0 to 2pi)
 	traumaShakeOffset.x = cos(angle) * shake * maxShakeOffset;
 	traumaShakeOffset.y = sin(angle) * shake * maxShakeOffset;
 }
 
+/**
+ * @brief Initializes and starts a full-screen flash effect.
+ * @param duration Total time in seconds the flash remains active.
+ * @param color The RGBA color of the flash overlay.
+ * @param fadeOut If true, the effect will smoothly transition to transparent.
+ */
 void CameraComponent::StartFlash(float duration, const vec4& color, bool fadeOut) {
 	isFlashing = true;
 	flashDuration = duration;
@@ -271,11 +291,18 @@ void CameraComponent::StartFlash(float duration, const vec4& color, bool fadeOut
 	flashFadeOut = fadeOut;
 }
 
+/**
+ * @brief Immediately halts the flash effect and resets the internal timer.
+ */
 void CameraComponent::StopFlash() {
 	isFlashing = false;
 	flashTimer = 0.f;
 }
 
+/**
+ * @brief Increments the flash timer and disables the effect once the duration is reached.
+ * @param dt Time elapsed since the last frame.
+ */
 void CameraComponent::UpdateFlash(float dt) {
 	if (!isFlashing) { return; };
 
@@ -286,11 +313,18 @@ void CameraComponent::UpdateFlash(float dt) {
 	}
 }
 
+/**
+ * @brief Calculates the current color of the flash overlay for rendering.
+ * * If fadeOut is enabled, the alpha channel (w) is interpolated from the
+ * initial flashColor.w down to 0 based on the effect's progress.
+ * * @return The current RGBA color to be drawn over the screen.
+ */
 vec4 CameraComponent::GetFlashColor() const {
 	if (!isFlashing) { return vec4(0.f, 0.f, 0.f, 0.f); };
 
 	vec4 currentColor = flashColor;
 
+	// Linearly interpolate alpha from start value to 0 over the duration
 	if (flashFadeOut) {
 		float progress = flashTimer / flashDuration;
 		currentColor.w = flashColor.w * (1.f - progress);

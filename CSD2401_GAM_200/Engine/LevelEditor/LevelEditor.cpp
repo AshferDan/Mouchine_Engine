@@ -86,6 +86,8 @@ void LevelEditor::Initialize()
  */
 void LevelEditor::Update(float /*dt*/)
 {
+#ifndef _DEBUG
+#else
     if (!InputManager::KeyStateImgui)
         return;
 
@@ -204,6 +206,7 @@ void LevelEditor::Update(float /*dt*/)
 
         ImGui::EndPopup();
     }
+#endif
 }
 
 /**

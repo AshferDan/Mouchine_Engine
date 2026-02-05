@@ -390,6 +390,8 @@ void InputManager::Update(float)
         }
     }
 
+#ifndef _DEBUG
+#else
     for (auto &kv : singleTriggerKeys)
     {
         int key = kv.first;
@@ -436,6 +438,7 @@ void InputManager::Update(float)
             wasPressed = false;
         }
     }
+#endif
 
     GameObject* player = nullptr;
 
