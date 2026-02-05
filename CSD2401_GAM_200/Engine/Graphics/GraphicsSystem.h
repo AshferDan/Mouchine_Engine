@@ -318,6 +318,8 @@ private:
 	// --- Single Quad Rendering (Legacy/Test) Buffers ---
 	GLuint vao = 0, vbo = 0, tex = 0;		// VAO/VBO for a simple quad/rectangle draw (used in older pipelines).
 
+	GLuint particleTexId = 0;
+
 	// For drawing outline of individual GOs
 	struct EditorSelection {
 		float x, y, sx, sy;
