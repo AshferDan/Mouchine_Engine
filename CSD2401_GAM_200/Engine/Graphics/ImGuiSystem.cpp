@@ -272,8 +272,10 @@ void ImGuiSystem::Update(float dt)
         ImGuiID dockspace_id = ImGui::GetID("DockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
-
+#ifndef _DEBUG
+#else
         TopMenuBar_Render();
+#endif
 
         LevelEditor* levelEditor = CORE->GetLevelEditor();
         bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);

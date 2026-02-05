@@ -57,7 +57,10 @@ int main()
 
         g_UseGameStates = false; // Set the flag to use Game States
         // CORE->RequestSceneLoad("Prefab_TestScene");
-
+#ifndef _DEBUG
+        CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+		CORE->GetGraphicsSystem()->SetEditorMode(false);
+#else
         GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto *cam = mainCamera->AddComponent<CameraComponent>();
 
@@ -148,7 +151,7 @@ int main()
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }
-
+#endif
         // Initialise Game State Manager (Level1)
         GameManager::Instance().ChangeState(std::make_unique<Level1>());
 
