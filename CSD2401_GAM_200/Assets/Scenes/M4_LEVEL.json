@@ -2104,6 +2104,35 @@
         ]
       },
       "children": []
+    },
+    {
+      "name": "InGamePauseButton",
+      "localID": 9999,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          175.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/paused_button.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 700
+      },
+      "children": []
     }
   ],
   "TilemapFile": "../Assets/Tiles/M4_LEVEL.tilemap",
@@ -2111,10 +2140,10 @@
     "sounds": [
       {
         "name": "bgm",
-        "filepath": "../Assets/audio/Player/sneaky_bgm.wav",
-        "loop": false,
+        "filepath": "../Assets/audio/sneaky_bgm.wav",
+        "loop": true,
         "volume": 0.75,
-        "pitch": 1.5,
+        "pitch": 1.0,
         "category": "bgm"
       },
       {
@@ -2284,8 +2313,61 @@
         "volume": 0.800000011920929,
         "pitch": 1.0,
         "category": "sfx"
+      },
+      {
+        "name": "menu_hover",
+        "filepath": "../Assets/audio/hover_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_click",
+        "filepath": "../Assets/audio/press_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_restart",
+        "filepath": "../Assets/audio/press_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "victory",
+        "filepath": "../Assets/audio/victory.wav",
+        "loop": true,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "gameover",
+        "filepath": "../Assets/audio/gameover.wav",
+        "loop": true,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "bgm"
       }
     ],
-    "events": []
+    "events": [
+      {
+        "event": "UI_Click",
+        "sound": "menu_click"
+      },
+      {
+        "event": "UI_Hover",
+        "sound": "menu_hover"
+      },
+      {
+        "event": "UI_Restart",
+        "sound": "menu_restart"
+      }
+    ]
   }
 }

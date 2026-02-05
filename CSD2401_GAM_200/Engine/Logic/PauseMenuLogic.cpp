@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       PauseMenuLogic.cpp
-\author     Leck Xin Yee [100% - 309 lines]
+\author     Leck Xin Yee [100% - 793 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 28, 2025
 
@@ -22,12 +22,19 @@ Technology is prohibited.
  */
 void PauseMenuLogicSystem::Initialize()
 {
+    // Clean up any existing UI before resetting
+    DestroyPauseSettingsUI();
+    DestroyPauseMenuUI();
+
     isPauseMenuActive = false;
     hasCreatedUI = false;
     hoveredButtonName = "";
     pendingSceneChange = false;
     isPauseSettingsOpen = false;
     hasCreatedSettingsUI = false;
+    wasSettingsOpenLastFrame = false;
+    pendingSettingsClose = false;
+    settingsCloseTimer = 0.0f;
 }
 
 /**
@@ -54,8 +61,8 @@ void PauseMenuLogicSystem::Update(float dt)
         return;
     }
 
-    // update pause menu position to follow camera
-    if (isPauseMenuActive || hasCreatedUI)
+    // update pause menu position to follow camera (only when menu is active)
+    if (isPauseMenuActive)
     {
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
         auto& factory = GameObjectFactory::Instance();
@@ -67,6 +74,7 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseRestartButton",
             "PauseSettingsButton",
             "PauseMainMenuButton",
+            "PauseHowToPlayButton",
             "PauseScreen_Settings",
             "PauseMasterText",
             "PauseMusicText",
@@ -121,10 +129,13 @@ void PauseMenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "PauseRestartButton")
             {
                 std::cout << "[PauseMenu] Restart clicked" << std::endl;
+                // Destroy UI before scene change
+                DestroyPauseSettingsUI();
+                DestroyPauseMenuUI();
+
                 // close menu first
                 if (isPauseMenuActive)
                 {
-                    SetPauseMenuVisible(false);
                     isPauseMenuActive = false;
                     CORE->SetGamePaused(false);
                 }
@@ -145,6 +156,10 @@ void PauseMenuLogicSystem::Update(float dt)
                 }
 
                 isPauseSettingsOpen = true;
+
+                // Clear the pending state immediately for settings
+                pendingSceneChange = false;
+                hoveredButtonName.clear();
             }
             else if (hoveredButtonName == "PauseMainMenuButton")
             {
@@ -158,10 +173,13 @@ void PauseMenuLogicSystem::Update(float dt)
                     std::cout << "[PauseMenu] Started music fade out" << std::endl;
                 }
 
+                // Destroy UI before scene change
+                DestroyPauseSettingsUI();
+                DestroyPauseMenuUI();
+
                 // close menu first
                 if (isPauseMenuActive)
                 {
-                    SetPauseMenuVisible(false);
                     isPauseMenuActive = false;
                     CORE->SetGamePaused(false);
                 }
@@ -183,21 +201,71 @@ void PauseMenuLogicSystem::Update(float dt)
 
     auto& factory = GameObjectFactory::Instance();
 
-    // Handle pause settings screen visibility
+    // Handle pause settings screen visibility - ONLY update when state changes
+    if (isPauseSettingsOpen != wasSettingsOpenLastFrame)
+    {
+        if (isPauseSettingsOpen)
+        {
+            // Clear any hover state from previous menu
+            hoveredButtonName.clear();
+
+            // Show settings UI
+            SetPauseSettingsVisible(true);
+
+            // Reset button textures to normal before hiding them
+            SetButtonTexture("PauseResumeButton", ButtonState::Normal);
+            SetButtonTexture("PauseRestartButton", ButtonState::Normal);
+            SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
+            SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
+
+            // Hide pause menu buttons
+            if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
+                resumeBtn->SetActive(false);
+            if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
+                restartBtn->SetActive(false);
+            if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
+                settingsBtn->SetActive(false);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(false);
+            if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
+                howToPlayBtn->SetActive(false);
+        }
+        else
+        {
+            // Hide settings UI
+            SetPauseSettingsVisible(false);
+
+            // Show pause menu buttons
+            if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
+                resumeBtn->SetActive(true);
+            if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
+                restartBtn->SetActive(true);
+            if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
+                settingsBtn->SetActive(true);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(true);
+            if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
+                howToPlayBtn->SetActive(true);
+        }
+        wasSettingsOpenLastFrame = isPauseSettingsOpen;
+    }
+
+    // Handle pause settings screen interactions
     if (isPauseSettingsOpen)
     {
-        // Show settings UI
-        SetPauseSettingsVisible(true);
-
-        // Hide pause menu buttons
-        if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
-            resumeBtn->SetActive(false);
-        if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
-            restartBtn->SetActive(false);
-        if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
-            settingsBtn->SetActive(false);
-        if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
-            mainMenuBtn->SetActive(false);
+        // Handle pending settings close (back button was clicked)
+        if (pendingSettingsClose)
+        {
+            settingsCloseTimer -= dt;
+            if (settingsCloseTimer <= 0.0f)
+            {
+                std::cout << "[PauseMenu] Closing settings after delay" << std::endl;
+                isPauseSettingsOpen = false;
+                pendingSettingsClose = false;
+                hoveredButtonName.clear();
+            }
+            return; // Don't process interactions during pending close
+        }
 
         // Check if back button is clicked to close settings
         double mouseX = InputManager::GetMouseWorldX();
@@ -229,12 +297,12 @@ void PauseMenuLogicSystem::Update(float dt)
         {
             if (!hoveredButtonName.empty())
             {
-                SetButtonTexture(hoveredButtonName, false);
+                SetButtonTexture(hoveredButtonName, ButtonState::Normal);
             }
 
             if (!currentHover.empty())
             {
-                SetButtonTexture(currentHover, true);
+                SetButtonTexture(currentHover, ButtonState::Hover);
                 AudioManager* audioManager = CORE->GetAudioManager();
                 if (audioManager)
                 {
@@ -248,6 +316,9 @@ void PauseMenuLogicSystem::Update(float dt)
         // Handle clicks
         if (isClicked && !hoveredButtonName.empty())
         {
+            // Set button to pressed state
+            SetButtonTexture(hoveredButtonName, ButtonState::Pressed);
+
             audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
@@ -256,9 +327,9 @@ void PauseMenuLogicSystem::Update(float dt)
 
             if (hoveredButtonName == "PauseBackButton")
             {
-                std::cout << "[PauseMenu] Back button clicked - closing settings" << std::endl;
-                isPauseSettingsOpen = false;
-                hoveredButtonName.clear();
+                std::cout << "[PauseMenu] Back button clicked - starting close delay" << std::endl;
+                pendingSettingsClose = true;
+                settingsCloseTimer = 0.15f; // 150ms delay to show pressed state
             }
             else if (hoveredButtonName == "PauseMasterMuteButton")
             {
@@ -266,7 +337,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 {
                     audioManager->ToggleMasterMute();
                 }
-                SetButtonTexture("PauseMasterMuteButton", true);
+                SetButtonTexture("PauseMasterMuteButton", ButtonState::Hover);
             }
             else if (hoveredButtonName == "PauseMusicMuteButton")
             {
@@ -274,7 +345,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 {
                     audioManager->ToggleCategoryMute("music");
                 }
-                SetButtonTexture("PauseMusicMuteButton", true);
+                SetButtonTexture("PauseMusicMuteButton", ButtonState::Hover);
             }
             else if (hoveredButtonName == "PauseSFXMuteButton")
             {
@@ -282,61 +353,55 @@ void PauseMenuLogicSystem::Update(float dt)
                 {
                     audioManager->ToggleCategoryMute("sfx");
                 }
-                SetButtonTexture("PauseSFXMuteButton", true);
+                SetButtonTexture("PauseSFXMuteButton", ButtonState::Hover);
             }
         }
 
         return; // Don't process normal pause menu interactions
     }
-    else
-    {
-        // Hide settings UI
-        SetPauseSettingsVisible(false);
 
-        // Show pause menu buttons
-        if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
-            resumeBtn->SetActive(true);
-        if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
-            restartBtn->SetActive(true);
-        if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
-            settingsBtn->SetActive(true);
-        if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
-            mainMenuBtn->SetActive(true);
-    }
-
+    // Normal pause menu button handling
     double mouseX = InputManager::GetMouseWorldX();
     double mouseY = InputManager::GetMouseWorldY();
     bool isClicked = InputManager::IsMouseLeftClicked();
 
     std::string currentHover = "";
 
-    if (IsMouseOver(factory.FindGameObject("PauseResumeButton"), mouseX, mouseY))
+    // Don't process hover if we're in pending state (button is pressed)
+    if (!pendingSceneChange)
     {
-        currentHover = "PauseResumeButton";
-    }
-    else if (IsMouseOver(factory.FindGameObject("PauseRestartButton"), mouseX, mouseY))
-    {
-        currentHover = "PauseRestartButton";
-    }
-    else if (IsMouseOver(factory.FindGameObject("PauseSettingsButton"), mouseX, mouseY))
-    {
-        currentHover = "PauseSettingsButton";
-    }
-    else if (IsMouseOver(factory.FindGameObject("PauseMainMenuButton"), mouseX, mouseY))
-    {
-        currentHover = "PauseMainMenuButton";
+        if (IsMouseOver(factory.FindGameObject("PauseResumeButton"), mouseX, mouseY))
+        {
+            currentHover = "PauseResumeButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("PauseRestartButton"), mouseX, mouseY))
+        {
+            currentHover = "PauseRestartButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("PauseSettingsButton"), mouseX, mouseY))
+        {
+            currentHover = "PauseSettingsButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("PauseMainMenuButton"), mouseX, mouseY))
+        {
+            currentHover = "PauseMainMenuButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("PauseHowToPlayButton"), mouseX, mouseY))
+        {
+            currentHover = "PauseHowToPlayButton";
+        }
     }
 
-    if (currentHover != hoveredButtonName)
+    if (currentHover != hoveredButtonName && !pendingSceneChange)
     {
         if (!hoveredButtonName.empty())
         {
-            SetButtonTexture(hoveredButtonName, false);
+            SetButtonTexture(hoveredButtonName, ButtonState::Normal);
         }
 
         if (!currentHover.empty())
         {
-            SetButtonTexture(currentHover, true);
+            SetButtonTexture(currentHover, ButtonState::Hover);
             audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
@@ -350,6 +415,8 @@ void PauseMenuLogicSystem::Update(float dt)
     // only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
+        // Set button to pressed state
+        SetButtonTexture(hoveredButtonName, ButtonState::Pressed);
         // play click sound based on button type
         audioManager = CORE->GetAudioManager();
         if (audioManager)
@@ -357,10 +424,6 @@ void PauseMenuLogicSystem::Update(float dt)
             if (hoveredButtonName == "PauseRestartButton")
             {
                 audioManager->TriggerEvent("UI_Restart");
-            }
-            else if (hoveredButtonName == "PauseMainMenuButton")
-            {
-                audioManager->TriggerEvent("UI_Quit");
             }
             else
             {
@@ -384,13 +447,16 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
 
     auto& factory = GameObjectFactory::Instance();
 
+    // Use a scale multiplier to make the UI larger
+    float uiScale = 2.0f;
+
     // create semi-transparent overlay background
     GameObject* overlay = factory.CreateGameObject("PauseOverlay");
     auto* overlayTransform = overlay->AddComponent<TransformComponent>();
     overlayTransform->posX = 0.0f;
     overlayTransform->posY = 0.0f;
-    overlayTransform->scaleX = 5000.0f;
-    overlayTransform->scaleY = 5000.0f;
+    overlayTransform->scaleX = 5000.0f * uiScale;
+    overlayTransform->scaleY = 5000.0f * uiScale;
     auto* overlayRender = overlay->AddComponent<RenderComponent>();
 
     // check if we're in main menu - use medium grey, otherwise use dark overlay
@@ -411,8 +477,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = 0.0f;
     boardTransform->posY = 0.0f;
-    boardTransform->scaleX = 1920.0f;
-    boardTransform->scaleY = 1080.0f;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Pause_Menu_New.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -421,10 +487,10 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     // paused button
     GameObject* pausedBtn = factory.CreateGameObject("PauseResumeButton");
     auto* pausedTransform = pausedBtn->AddComponent<TransformComponent>();
-    pausedTransform->posX = 650.0f;
-    pausedTransform->posY = -275.0f;
-    pausedTransform->scaleX = 200.0f;
-    pausedTransform->scaleY = 175.0f;
+    pausedTransform->posX = 650.0f * uiScale;
+    pausedTransform->posY = -275.0f * uiScale;
+    pausedTransform->scaleX = 200.0f * uiScale;
+    pausedTransform->scaleY = 175.0f * uiScale;
     auto* pausedRender = pausedBtn->AddComponent<RenderComponent>();
     pausedRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/paused_button.png"));
     pausedRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -434,15 +500,15 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     GameObject* restartBtn = factory.CreateGameObject("PauseRestartButton");
     auto* restartTransform = restartBtn->AddComponent<TransformComponent>();
     restartTransform->posX = 0.0f;
-    restartTransform->posY = -80.0f;
-    restartTransform->scaleX = 420.0f;
-    restartTransform->scaleY = 100.0f;
+    restartTransform->posY = -80.0f * uiScale;
+    restartTransform->scaleX = 420.0f * uiScale;
+    restartTransform->scaleY = 100.0f * uiScale;
     auto* restartRender = restartBtn->AddComponent<RenderComponent>();
     restartRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets//Sprites/Icons/blankbtnL.png"));
     restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     restartRender->SetLayer(602);
     restartBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 38, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
     //auto* restartText = restartBtn->AddComponent<TextComponent>(
     //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
@@ -450,15 +516,15 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
     auto* settingsTransform = settingsBtn->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
-    settingsTransform->posY = 40.0f;
-    settingsTransform->scaleX = 420.0f;
-    settingsTransform->scaleY = 100.0f;
+    settingsTransform->posY = 40.0f * uiScale;
+    settingsTransform->scaleX = 420.0f * uiScale;
+    settingsTransform->scaleY = 100.0f * uiScale;
     auto* settingsRender = settingsBtn->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(602);
     settingsBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 38, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
     //auto* settingsText = settingsBtn->AddComponent<TextComponent>(
     //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
@@ -466,17 +532,29 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
     auto* mainMenuTransform = mainMenuBtn->AddComponent<TransformComponent>();
     mainMenuTransform->posX = 0.0f;
-    mainMenuTransform->posY = -200.0f;
-    mainMenuTransform->scaleX = 420.0f;
-    mainMenuTransform->scaleY = 100.0f;
+    mainMenuTransform->posY = -200.0f * uiScale;
+    mainMenuTransform->scaleX = 420.0f * uiScale;
+    mainMenuTransform->scaleY = 100.0f * uiScale;
     auto* mainMenuRender = mainMenuBtn->AddComponent<RenderComponent>();
     mainMenuRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
     mainMenuRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     mainMenuRender->SetLayer(602);
     mainMenuBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 38, "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-    //auto* mainMenuText = mainMenuBtn->AddComponent<TextComponent>(
-    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // how to play button
+    GameObject* howToPlayBtn = factory.CreateGameObject("PauseHowToPlayButton");
+    auto* howToPlayTransform = howToPlayBtn->AddComponent<TransformComponent>();
+    howToPlayTransform->posX = 0.0f;
+    howToPlayTransform->posY = -320.0f * uiScale;
+    howToPlayTransform->scaleX = 420.0f * uiScale;
+    howToPlayTransform->scaleY = 100.0f * uiScale;
+    auto* howToPlayRender = howToPlayBtn->AddComponent<RenderComponent>();
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    howToPlayRender->SetLayer(602);
+    howToPlayBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "How To Play", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
 
@@ -494,64 +572,67 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
 
     auto& factory = GameObjectFactory::Instance();
 
+    // Use a scale multiplier to make the UI larger
+    float uiScale = 2.0f;
+
     // Settings screen background
     GameObject* settingsScreen = factory.CreateGameObject("PauseScreen_Settings");
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 1920.0f;
-    settingsTransform->scaleY = 1080.0f;
+    settingsTransform->scaleX = 1755.0f * uiScale;
+    settingsTransform->scaleY = 945.0f * uiScale;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
-    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Menu_settings.png"));
+    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(601);
 
     // Master Text
     GameObject* masterText = factory.CreateGameObject("PauseMasterText");
     auto* masterTextTransform = masterText->AddComponent<TransformComponent>();
-    masterTextTransform->posX = -350.0f;
-    masterTextTransform->posY = 50.0f;
+    masterTextTransform->posX = -350.0f * uiScale;
+    masterTextTransform->posY = 50.0f * uiScale;
     masterTextTransform->scaleX = 1.0f;
     masterTextTransform->scaleY = 1.0f;
     auto* masterTextRender = masterText->AddComponent<RenderComponent>();
     masterTextRender->SetColor(vec4(1.0f, 0.5f, 0.5f, 1.0f));
     masterTextRender->SetLayer(603);
     masterText->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 48, "Master", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(48 * uiScale), "Master", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // Music Text
     GameObject* musicText = factory.CreateGameObject("PauseMusicText");
     auto* musicTextTransform = musicText->AddComponent<TransformComponent>();
-    musicTextTransform->posX = -340.0f;
-    musicTextTransform->posY = -75.0f;
+    musicTextTransform->posX = -340.0f * uiScale;
+    musicTextTransform->posY = -75.0f * uiScale;
     musicTextTransform->scaleX = 1.0f;
     musicTextTransform->scaleY = 1.0f;
     auto* musicTextRender = musicText->AddComponent<RenderComponent>();
     musicTextRender->SetColor(vec4(1.0f, 0.5f, 0.5f, 1.0f));
     musicTextRender->SetLayer(603);
     musicText->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 48, "Music", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(48 * uiScale), "Music", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // SFX Text
     GameObject* sfxText = factory.CreateGameObject("PauseSFXText");
     auto* sfxTextTransform = sfxText->AddComponent<TransformComponent>();
-    sfxTextTransform->posX = -320.0f;
-    sfxTextTransform->posY = -200.0f;
+    sfxTextTransform->posX = -320.0f * uiScale;
+    sfxTextTransform->posY = -200.0f * uiScale;
     sfxTextTransform->scaleX = 1.0f;
     sfxTextTransform->scaleY = 1.0f;
     auto* sfxTextRender = sfxText->AddComponent<RenderComponent>();
     sfxTextRender->SetColor(vec4(1.0f, 0.5f, 0.5f, 1.0f));
     sfxTextRender->SetLayer(603);
     sfxText->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 48, "SFX", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(48 * uiScale), "SFX", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // Master Slider - Bar
     GameObject* masterBar = factory.CreateGameObject("PauseSlider_Bar_Master");
     auto* masterBarTransform = masterBar->AddComponent<TransformComponent>();
-    masterBarTransform->posX = 200.0f;
-    masterBarTransform->posY = 50.0f;
-    masterBarTransform->scaleX = 670.0f;
-    masterBarTransform->scaleY = 110.0f;
+    masterBarTransform->posX = 200.0f * uiScale;
+    masterBarTransform->posY = 50.0f * uiScale;
+    masterBarTransform->scaleX = 670.0f * uiScale;
+    masterBarTransform->scaleY = 110.0f * uiScale;
     auto* masterBarRender = masterBar->AddComponent<RenderComponent>();
     masterBarRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar.png"));
     masterBarRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -560,10 +641,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Master Slider - Back
     GameObject* masterBarBack = factory.CreateGameObject("PauseSlider_Bar_Back_Master");
     auto* masterBarBackTransform = masterBarBack->AddComponent<TransformComponent>();
-    masterBarBackTransform->posX = 200.0f;
-    masterBarBackTransform->posY = 50.0f;
-    masterBarBackTransform->scaleX = 670.0f;
-    masterBarBackTransform->scaleY = 110.0f;
+    masterBarBackTransform->posX = 200.0f * uiScale;
+    masterBarBackTransform->posY = 50.0f * uiScale;
+    masterBarBackTransform->scaleX = 670.0f * uiScale;
+    masterBarBackTransform->scaleY = 110.0f * uiScale;
     auto* masterBarBackRender = masterBarBack->AddComponent<RenderComponent>();
     masterBarBackRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar_Back.png"));
     masterBarBackRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -572,10 +653,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Master Slider - Knob
     GameObject* masterKnob = factory.CreateGameObject("PauseSlider_Knob_Master");
     auto* masterKnobTransform = masterKnob->AddComponent<TransformComponent>();
-    masterKnobTransform->posX = 200.0f;
-    masterKnobTransform->posY = 50.0f;
-    masterKnobTransform->scaleX = 670.0f;
-    masterKnobTransform->scaleY = 110.0f;
+    masterKnobTransform->posX = 200.0f * uiScale;
+    masterKnobTransform->posY = 50.0f * uiScale;
+    masterKnobTransform->scaleX = 670.0f * uiScale;
+    masterKnobTransform->scaleY = 110.0f * uiScale;
     auto* masterKnobRender = masterKnob->AddComponent<RenderComponent>();
     masterKnobRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Icon.png"));
     masterKnobRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -584,10 +665,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Music Slider - Bar
     GameObject* musicBar = factory.CreateGameObject("PauseSlider_Bar_Music");
     auto* musicBarTransform = musicBar->AddComponent<TransformComponent>();
-    musicBarTransform->posX = 200.0f;
-    musicBarTransform->posY = -75.0f;
-    musicBarTransform->scaleX = 670.0f;
-    musicBarTransform->scaleY = 110.0f;
+    musicBarTransform->posX = 200.0f * uiScale;
+    musicBarTransform->posY = -75.0f * uiScale;
+    musicBarTransform->scaleX = 670.0f * uiScale;
+    musicBarTransform->scaleY = 110.0f * uiScale;
     auto* musicBarRender = musicBar->AddComponent<RenderComponent>();
     musicBarRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar.png"));
     musicBarRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -596,10 +677,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Music Slider - Back
     GameObject* musicBarBack = factory.CreateGameObject("PauseSlider_Bar_Back_Music");
     auto* musicBarBackTransform = musicBarBack->AddComponent<TransformComponent>();
-    musicBarBackTransform->posX = 200.0f;
-    musicBarBackTransform->posY = -75.0f;
-    musicBarBackTransform->scaleX = 670.0f;
-    musicBarBackTransform->scaleY = 110.0f;
+    musicBarBackTransform->posX = 200.0f * uiScale;
+    musicBarBackTransform->posY = -75.0f * uiScale;
+    musicBarBackTransform->scaleX = 670.0f * uiScale;
+    musicBarBackTransform->scaleY = 110.0f * uiScale;
     auto* musicBarBackRender = musicBarBack->AddComponent<RenderComponent>();
     musicBarBackRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar_Back.png"));
     musicBarBackRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -608,10 +689,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Music Slider - Knob
     GameObject* musicKnob = factory.CreateGameObject("PauseSlider_Knob_Music");
     auto* musicKnobTransform = musicKnob->AddComponent<TransformComponent>();
-    musicKnobTransform->posX = 200.0f;
-    musicKnobTransform->posY = -75.0f;
-    musicKnobTransform->scaleX = 670.0f;
-    musicKnobTransform->scaleY = 110.0f;
+    musicKnobTransform->posX = 200.0f * uiScale;
+    musicKnobTransform->posY = -75.0f * uiScale;
+    musicKnobTransform->scaleX = 670.0f * uiScale;
+    musicKnobTransform->scaleY = 110.0f * uiScale;
     auto* musicKnobRender = musicKnob->AddComponent<RenderComponent>();
     musicKnobRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Icon.png"));
     musicKnobRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -620,10 +701,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // SFX Slider - Bar
     GameObject* sfxBar = factory.CreateGameObject("PauseSlider_Bar_SFX");
     auto* sfxBarTransform = sfxBar->AddComponent<TransformComponent>();
-    sfxBarTransform->posX = 200.0f;
-    sfxBarTransform->posY = -200.0f;
-    sfxBarTransform->scaleX = 670.0f;
-    sfxBarTransform->scaleY = 110.0f;
+    sfxBarTransform->posX = 200.0f * uiScale;
+    sfxBarTransform->posY = -200.0f * uiScale;
+    sfxBarTransform->scaleX = 670.0f * uiScale;
+    sfxBarTransform->scaleY = 110.0f * uiScale;
     auto* sfxBarRender = sfxBar->AddComponent<RenderComponent>();
     sfxBarRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar.png"));
     sfxBarRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -632,10 +713,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // SFX Slider - Back
     GameObject* sfxBarBack = factory.CreateGameObject("PauseSlider_Bar_Back_SFX");
     auto* sfxBarBackTransform = sfxBarBack->AddComponent<TransformComponent>();
-    sfxBarBackTransform->posX = 200.0f;
-    sfxBarBackTransform->posY = -200.0f;
-    sfxBarBackTransform->scaleX = 670.0f;
-    sfxBarBackTransform->scaleY = 110.0f;
+    sfxBarBackTransform->posX = 200.0f * uiScale;
+    sfxBarBackTransform->posY = -200.0f * uiScale;
+    sfxBarBackTransform->scaleX = 670.0f * uiScale;
+    sfxBarBackTransform->scaleY = 110.0f * uiScale;
     auto* sfxBarBackRender = sfxBarBack->AddComponent<RenderComponent>();
     sfxBarBackRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar_Back.png"));
     sfxBarBackRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -644,10 +725,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // SFX Slider - Knob
     GameObject* sfxKnob = factory.CreateGameObject("PauseSlider_Knob_SFX");
     auto* sfxKnobTransform = sfxKnob->AddComponent<TransformComponent>();
-    sfxKnobTransform->posX = 200.0f;
-    sfxKnobTransform->posY = -200.0f;
-    sfxKnobTransform->scaleX = 670.0f;
-    sfxKnobTransform->scaleY = 110.0f;
+    sfxKnobTransform->posX = 200.0f * uiScale;
+    sfxKnobTransform->posY = -200.0f * uiScale;
+    sfxKnobTransform->scaleX = 670.0f * uiScale;
+    sfxKnobTransform->scaleY = 110.0f * uiScale;
     auto* sfxKnobRender = sfxKnob->AddComponent<RenderComponent>();
     sfxKnobRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Icon.png"));
     sfxKnobRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -656,10 +737,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Master Mute Button
     GameObject* masterMute = factory.CreateGameObject("PauseMasterMuteButton");
     auto* masterMuteTransform = masterMute->AddComponent<TransformComponent>();
-    masterMuteTransform->posX = -200.0f;
-    masterMuteTransform->posY = 50.5f;
-    masterMuteTransform->scaleX = 125.0f;
-    masterMuteTransform->scaleY = 100.0f;
+    masterMuteTransform->posX = -200.0f * uiScale;
+    masterMuteTransform->posY = 50.5f * uiScale;
+    masterMuteTransform->scaleX = 125.0f * uiScale;
+    masterMuteTransform->scaleY = 100.0f * uiScale;
     auto* masterMuteRender = masterMute->AddComponent<RenderComponent>();
     masterMuteRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Volume_Unmute.png"));
     masterMuteRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -668,10 +749,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Music Mute Button
     GameObject* musicMute = factory.CreateGameObject("PauseMusicMuteButton");
     auto* musicMuteTransform = musicMute->AddComponent<TransformComponent>();
-    musicMuteTransform->posX = -200.0f;
-    musicMuteTransform->posY = -74.5f;
-    musicMuteTransform->scaleX = 125.0f;
-    musicMuteTransform->scaleY = 100.0f;
+    musicMuteTransform->posX = -200.0f * uiScale;
+    musicMuteTransform->posY = -74.5f * uiScale;
+    musicMuteTransform->scaleX = 125.0f * uiScale;
+    musicMuteTransform->scaleY = 100.0f * uiScale;
     auto* musicMuteRender = musicMute->AddComponent<RenderComponent>();
     musicMuteRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Volume_Unmute.png"));
     musicMuteRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -680,10 +761,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // SFX Mute Button
     GameObject* sfxMute = factory.CreateGameObject("PauseSFXMuteButton");
     auto* sfxMuteTransform = sfxMute->AddComponent<TransformComponent>();
-    sfxMuteTransform->posX = -200.0f;
-    sfxMuteTransform->posY = -199.5f;
-    sfxMuteTransform->scaleX = 125.0f;
-    sfxMuteTransform->scaleY = 100.0f;
+    sfxMuteTransform->posX = -200.0f * uiScale;
+    sfxMuteTransform->posY = -199.5f * uiScale;
+    sfxMuteTransform->scaleX = 125.0f * uiScale;
+    sfxMuteTransform->scaleY = 100.0f * uiScale;
     auto* sfxMuteRender = sfxMute->AddComponent<RenderComponent>();
     sfxMuteRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Volume_Unmute.png"));
     sfxMuteRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -692,12 +773,12 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Back Button
     GameObject* backBtn = factory.CreateGameObject("PauseBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
-    backBtnTransform->posX = 650.0f;
-    backBtnTransform->posY = -250.0f;
-    backBtnTransform->scaleX = 200.0f;
-    backBtnTransform->scaleY = 180.0f;
+    backBtnTransform->posX = 650.0f * uiScale;
+    backBtnTransform->posY = -250.0f * uiScale;
+    backBtnTransform->scaleX = 200.0f * uiScale;
+    backBtnTransform->scaleY = 180.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
-    backBtnRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_Button.png"));
+    backBtnRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
     backBtnRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     backBtnRender->SetLayer(601);
 
@@ -761,7 +842,8 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
         "PauseResumeButton",
         "PauseRestartButton",
         "PauseSettingsButton",
-        "PauseMainMenuButton"
+        "PauseMainMenuButton",
+        "PauseHowToPlayButton"
     };
 
     for (const auto& name : uiElements)
@@ -833,7 +915,8 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
         "PauseResumeButton",
         "PauseRestartButton",
         "PauseSettingsButton",
-        "PauseMainMenuButton"
+        "PauseMainMenuButton",
+        "PauseHowToPlayButton"
     };
 
     for (const auto& name : uiElements)
@@ -913,6 +996,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         CreatePauseMenuUI();
     }
 
+    // create settings UI on first toggle to avoid delays later
+    if (!hasCreatedSettingsUI)
+    {
+        CreatePauseSettingsUI();
+    }
+
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
@@ -920,6 +1009,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     if (!isPauseMenuActive)
     {
         isPauseSettingsOpen = false;
+        wasSettingsOpenLastFrame = false;
     }
 
     // pause/unpause the game
@@ -944,9 +1034,9 @@ bool PauseMenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double
 }
 
 /**
- * @brief Updates button texture based on hover state.
+ * @brief Updates button texture based on button state (Normal, Hover, Pressed).
  */
-void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered)
+void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState state)
 {
     auto& factory = GameObjectFactory::Instance();
     GameObject* btn = factory.FindGameObject(buttonName);
@@ -955,51 +1045,76 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHover
     auto* rc = btn->GetComponent<RenderComponent>();
     if (!rc) return;
 
-    // swap between normal and hover button textures
     std::string texturePath;
 
     if (buttonName == "PauseResumeButton")
     {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/playing_button.png" : "../Assets/Sprites/Icons/paused_button.png";
-    }
-    else if (buttonName == "PauseMasterMuteButton")
-    {
-        bool isMuted = false;
-        AudioManager* audioManager = CORE->GetAudioManager();
-        if (audioManager)
+        // Resume button: paused icon (default), paused light (hover), paused dark (pressed)
+        switch (state)
         {
-            isMuted = audioManager->IsMuted();
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/paused_button.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Paused_Button_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Paused_Button_dark.png";
+                break;
         }
-        texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
     }
-    else if (buttonName == "PauseMusicMuteButton")
+    else if (buttonName == "PauseMasterMuteButton" || buttonName == "PauseMusicMuteButton" || buttonName == "PauseSFXMuteButton")
     {
+        // Mute buttons show mute/unmute state, not hover state
         bool isMuted = false;
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            isMuted = audioManager->IsCategoryMuted("music");
-        }
-        texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
-    }
-    else if (buttonName == "PauseSFXMuteButton")
-    {
-        bool isMuted = false;
-        AudioManager* audioManager = CORE->GetAudioManager();
-        if (audioManager)
-        {
-            isMuted = audioManager->IsCategoryMuted("sfx");
+            if (buttonName == "PauseMasterMuteButton")
+                isMuted = audioManager->IsMuted();
+            else if (buttonName == "PauseMusicMuteButton")
+                isMuted = audioManager->IsCategoryMuted("music");
+            else if (buttonName == "PauseSFXMuteButton")
+                isMuted = audioManager->IsCategoryMuted("sfx");
         }
         texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
     }
     else if (buttonName == "PauseBackButton")
     {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/Back_button_dark.png" : "../Assets/Sprites/Icons/Back_button.png";
+        // Back button: normal, light (hover), dark (pressed)
+        switch (state)
+        {
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/Back_button.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
+                break;
+        }
     }
     else
     {
-        texturePath = isHovered ? "../Assets/Sprites/Icons/hoveringbtnL.png" : "../Assets/Sprites/Icons/blankbtnL.png";
+        // Standard pause menu buttons: default (blank), hover (light), pressed (dark)
+        switch (state)
+        {
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/blankbtnL.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Button_Large_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
+                break;
+        }
     }
+
+    std::cout << "[SetButtonTexture] Button: " << buttonName << " | State: "
+              << (state == ButtonState::Normal ? "Normal" : state == ButtonState::Hover ? "Hover" : "Pressed")
+              << " | Texture: " << texturePath << std::endl;
 
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);

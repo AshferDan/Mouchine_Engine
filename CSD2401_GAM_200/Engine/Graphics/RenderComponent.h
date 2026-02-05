@@ -195,6 +195,9 @@ public:
     void SetUVOffset(const vec2& offset) { uvOffset = offset; }
     vec2 GetUVOffset() const { return uvOffset; }
 
+    void SetScreenSpace(bool sSpace) { screenSpace = sSpace; }
+    bool isScreenSpace() const { return screenSpace; }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
@@ -205,6 +208,7 @@ private:
     vec2 uvOffset;
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
+    bool screenSpace = false;
 };
 
 namespace RenderComponentTools

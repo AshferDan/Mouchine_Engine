@@ -63,9 +63,10 @@ public:
 
 private:
     std::string hoveredButtonName = "";   ///< The name of the currently hovered button
+    std::string pressedButtonName = "";   ///< The name of the currently pressed button
     bool pendingSceneChange = false;
     float pendingTimer = 0.0f;
-    
+
     /**
      * @brief Checks if the mouse cursor is over a button GameObject.
      * @param button The button GameObject to check.
@@ -74,11 +75,12 @@ private:
      * @return True if the mouse is over the button, false otherwise.
      */
     bool IsMouseOver(GameObject* button, double mouseX, double mouseY);
-    
+
     /**
-     * @brief Sets the texture of a button based on its hover state.
+     * @brief Sets the texture of a button based on its hover and pressed state.
      * @param buttonName The name of the button to update.
      * @param isHovered Whether the button is currently being hovered.
+     * @param isPressed Whether the button is currently being pressed.
      */
-    void SetButtonTexture(std::string buttonName, bool isHovered);
+    void SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed = false);
 };

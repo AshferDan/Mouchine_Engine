@@ -182,6 +182,7 @@ class ParticleEmitterComponent : public IComponent {
 		float startSize;
 		float endSize;
 		int layer;
+		bool screenSpace = false;
 
 		float startRotation;
 		float startRotationVariation;

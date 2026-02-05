@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       ResourceManager.h
-\author     Leck Xin Yee [100% - 130 lines]
+\author     Leck Xin Yee [100% - 145 lines]
 \par        xinyee.leck@digipen.edu
 \date       October, 2, 2025
 

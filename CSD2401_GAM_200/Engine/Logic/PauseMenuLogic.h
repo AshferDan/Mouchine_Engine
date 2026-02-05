@@ -23,6 +23,16 @@ Technology is prohibited.
 class GraphicsSystem;
 
 /**
+ * @enum ButtonState
+ * @brief Represents the visual state of a button
+ */
+enum class ButtonState {
+    Normal,   // Default appearance
+    Hover,    // Mouse over (light)
+    Pressed   // Being clicked (dark)
+};
+
+/**
  * @class PauseMenuLogicSystem
  * @brief Handles pause menu UI creation, visibility, interactions, and scene actions.
  */
@@ -69,6 +79,12 @@ public:
     void SetCurrentScene(const std::string& scenePath) { currentScenePath = scenePath; }
 
     /**
+     * @brief Gets the current scene path.
+     * @return Current scene file path.
+     */
+    std::string GetCurrentScene() const { return currentScenePath; }
+
+    /**
      * @brief Toggles the pause menu on/off and pauses/unpauses the game.
      */
     void TogglePauseMenu();
@@ -82,6 +98,9 @@ private:
     std::string currentScenePath = "";
     bool isPauseSettingsOpen = false;      // whether pause settings screen is open
     bool hasCreatedSettingsUI = false;     // whether settings UI has been created
+    bool wasSettingsOpenLastFrame = false; // tracks if settings was open last frame to avoid redundant updates
+    bool pendingSettingsClose = false;     // whether settings back button was clicked and waiting to close
+    float settingsCloseTimer = 0.0f;       // timer for settings close delay
 
     /**
      * @brief Creates all pause menu UI elements (overlay, buttons, title).
@@ -125,9 +144,9 @@ private:
     bool IsMouseOver(GameObject* button, double mouseX, double mouseY);
 
     /**
-     * @brief Changes a button's texture depending on hover state.
+     * @brief Changes a button's texture depending on button state.
      * @param buttonName Name of the button object.
-     * @param isHovered True for hover texture, false for normal.
+     * @param state The visual state (Normal, Hover, or Pressed).
      */
-    void SetButtonTexture(std::string buttonName, bool isHovered);
+    void SetButtonTexture(std::string buttonName, ButtonState state);
 };

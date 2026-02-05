@@ -90,7 +90,7 @@ public:
      * @param color The color of the shape.
      * @return A pointer to the newly created shape GameObject.
      */
-    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color);
+    GameObject *CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, bool screenSpace, const vec4 &color);
 
     /**
      * @brief Creates a generic shaped GameObject with a texture.
