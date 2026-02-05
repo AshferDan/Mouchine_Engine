@@ -249,9 +249,9 @@ private:
     // Undo/Redo system
     struct TileEditAction
     {
-        int layer;
-        int x;
-        int y;
+        int layer = 0;
+        int x = 0;
+        int y= 0;
         TileData oldTile;  // Tile state before the edit
         TileData newTile;  // Tile state after the edit
     };

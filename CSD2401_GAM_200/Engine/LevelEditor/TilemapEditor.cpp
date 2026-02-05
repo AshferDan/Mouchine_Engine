@@ -35,7 +35,7 @@ TilemapEditor::TilemapEditor()
     tilemapHeight(15),
     selectedTileID(0),
     tilesetLoaded(false),
-    flipTilesetVertical(false),  // Default OFF - normal orientation is correct
+    flipTilesetVertical(false),
     currentLayer(0),
     maxLayers(3),
     currentTool(Tool::Brush),
@@ -1366,7 +1366,7 @@ void TilemapDataHolder::LoadTilemapFromFile(const std::string& filepath)
 }
 
 /**
- * @brief Load tilemap and create ONE GameObject with TilemapDataHolder
+ * @brief Load tilemap and create ONE!!! GameObject with TilemapDataHolder
  */
 GameObject* TilemapEditor::LoadTilemapAsGameObject(
     const std::string& filepath,
@@ -1433,9 +1433,6 @@ GameObject* TilemapEditor::LoadTilemapAsGameObject(
 /**
  * @brief Render a tilemap GameObject by adding tiles to the batch system
  */
- /**
-  * @brief Render a tilemap GameObject by adding tiles to the batch system
-  */
 void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 {
     if (!tilemapObj) return;
@@ -1456,7 +1453,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
     auto* gs = CORE->GetGraphicsSystem();
     if (!gs) return;
 
-    // === CAMERA CULLING: Get camera bounds ===
+    // === CAMERA CULLING: Get camera bounds === //
     vec2 camPos;
     float zoom;
     float viewportWidth, viewportHeight;
@@ -1509,10 +1506,10 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
     float tileWorldWidth = data->tileWidth * scale.x;
     float tileWorldHeight = data->tileHeight * scale.y;
 
-    // Add GENEROUS margin (10 tiles on each side) to prevent weird rendering
+    // Add generous margin (10 tiles on each side) to prevent weird rendering (might need to lower this in the future if performance aren't great)
     const int MARGIN = 10;
 
-    // X-axis calculation (straightforward)
+    // X-axis calculation 
     int startX = (int)((camLeft - position.x) / tileWorldWidth) - MARGIN;
     int endX = (int)((camRight - position.x) / tileWorldWidth) + MARGIN;
 
@@ -1568,7 +1565,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 
     auto& batches = gs->batches;
 
-    // === Render each layer ===
+    // === Render each layer === //
     for (int layer = 0; layer < data->numLayers; ++layer)
     {
         int renderLayer = -100 + (layer * 25);
@@ -1592,7 +1589,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
             batchIndex = static_cast<int>(batches.size() - 1);
         }
 
-        // === ONLY RENDER VISIBLE TILES ===
+        // === ONLY RENDER VISIBLE TILES === //
         for (int y = startY; y <= endY; ++y)
         {
             for (int x = startX; x <= endX; ++x)
