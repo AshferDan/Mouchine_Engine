@@ -1,0 +1,41 @@
+{
+    "GameObjects": [
+        {
+            "name": "HowToPlay",
+            "localID": 6,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1920.0,
+                    1080.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "shapeType": "Square",
+                "texturePath": "../Assets/HowToPlay.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0
+            },
+            "ColliderComponent": {
+                "shape": "Square",
+                "layer": "Default",
+                "size": [
+                    1920.0,
+                    1080.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}
