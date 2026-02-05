@@ -242,7 +242,7 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
         go->originalPos.y = jsonY;
         go->originalSaved = true;
     }
-
+     
     if (Serialization::Prefab_DragAndDropped)
     {
         /*std::cout << "[DeserializeTransform] Prefab transform set to cursor pos\n";
@@ -658,15 +658,27 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
     if (!j.contains("ScriptComponent")) return;
 
     const auto& scData = j["ScriptComponent"];
-    auto* sc = go->AddComponent<ScriptComponent>();
+
+    // Check if ScriptComponent already exists (shouldn't happen, but defensive check)
+    ScriptComponent* sc = go->GetComponent<ScriptComponent>();
+    if (!sc)
+    {
+        sc = go->AddComponent<ScriptComponent>();
+    }
 
     if (scData.contains("scripts"))
     {
         for (const auto& scriptName : scData["scripts"])
         {
-            sc->AddScript(scriptName.get<std::string>());
+            std::string name = scriptName.get<std::string>();
+            std::cout << "[DeserializeScript] Adding script: " << name << " to " << go->GetName() << std::endl;
+            sc->AddScript(name);
         }
     }
+
+    // Verify scripts were added
+    const auto& addedScripts = sc->GetScripts();
+    std::cout << "[DeserializeScript] " << go->GetName() << " now has " << addedScripts.size() << " scripts" << std::endl;
 }
 
 // ------------------- Serialize / Deserialize All Componenents -------------------

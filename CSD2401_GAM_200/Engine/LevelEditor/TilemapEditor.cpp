@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "RenderComponent.h"
 #include "transform.h"
 #include "GraphicsSystem.h"
+#include "CameraManager.h"
 
 bool isTileMapFocused;
 
@@ -1432,6 +1433,9 @@ GameObject* TilemapEditor::LoadTilemapAsGameObject(
 /**
  * @brief Render a tilemap GameObject by adding tiles to the batch system
  */
+ /**
+  * @brief Render a tilemap GameObject by adding tiles to the batch system
+  */
 void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 {
     if (!tilemapObj) return;
@@ -1452,15 +1456,124 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
     auto* gs = CORE->GetGraphicsSystem();
     if (!gs) return;
 
-    // Access batches
+    // === CAMERA CULLING: Get camera bounds ===
+    vec2 camPos;
+    float zoom;
+    float viewportWidth, viewportHeight;
+
+    // Check if we're in editor mode
+    if (gs->IsEditorMode())
+    {
+        auto* levelEditor = CORE->GetLevelEditor();
+        if (levelEditor)
+        {
+            camPos.x = levelEditor->GetCameraX();
+            camPos.y = levelEditor->GetCameraY();
+            zoom = levelEditor->GetCameraZoom();
+        }
+        else
+        {
+            camPos = vec2(0, 0);
+            zoom = 1.0f;
+        }
+
+        viewportWidth = gs->GetWindowWidth() / zoom;
+        viewportHeight = gs->GetWindowHeight() / zoom;
+    }
+    else
+    {
+        auto* camera = CameraManager::Instance().GetActiveCamera();
+        if (camera)
+        {
+            camPos = camera->GetPosition();
+            zoom = camera->getZoom();
+            viewportWidth = gs->GetWindowWidth() / zoom;
+            viewportHeight = gs->GetWindowHeight() / zoom;
+        }
+        else
+        {
+            camPos = vec2(0, 0);
+            zoom = 1.0f;
+            viewportWidth = gs->GetWindowWidth() * 100.0f;
+            viewportHeight = gs->GetWindowHeight() * 100.0f;
+        }
+    }
+
+    // Calculate camera viewport bounds in world space
+    float camLeft = camPos.x - viewportWidth / 2.0f;
+    float camRight = camPos.x + viewportWidth / 2.0f;
+    float camTop = camPos.y + viewportHeight / 2.0f;
+    float camBottom = camPos.y - viewportHeight / 2.0f;
+
+    // Tile dimensions in world space
+    float tileWorldWidth = data->tileWidth * scale.x;
+    float tileWorldHeight = data->tileHeight * scale.y;
+
+    // Add GENEROUS margin (10 tiles on each side) to prevent weird rendering
+    const int MARGIN = 10;
+
+    // X-axis calculation (straightforward)
+    int startX = (int)((camLeft - position.x) / tileWorldWidth) - MARGIN;
+    int endX = (int)((camRight - position.x) / tileWorldWidth) + MARGIN;
+
+    // Clamp to tilemap bounds
+    startX = std::max(0, startX);
+    endX = std::min(data->width - 1, endX);
+
+    //DEAR FUTURE KHALIL :
+
+    // Y-axis calculation
+    // Remember: tile[0][0] renders at the TOP of the tilemap
+    // position.y is the BOTTOM-LEFT corner of the tilemap
+    // The TOP of the tilemap is at: position.y + (height - 1) * tileHeight
+
+    // For each tile Y index, its world Y position is:
+    // worldY = position.y + ((data->height - 1 - y) * tileWorldHeight)
+
+    // So tile y=0 (top) renders at: position.y + ((height-1) * tileHeight)
+    // And tile y=height-1 (bottom) renders at: position.y
+
+    // To find which tiles are visible:
+    // For camera top: find which tile index has worldY closest to camTop
+    // For camera bottom: find which tile index has worldY closest to camBottom
+
+    float tilemapTopY = position.y + ((data->height - 1) * tileWorldHeight);
+    float tilemapBottomY = position.y;
+
+    // Convert camera Y to tile indices
+    // If camera is above tilemap top, start at 0
+    // If camera is below tilemap bottom, start at height-1
+    int startY = (int)((tilemapTopY - camTop) / tileWorldHeight) - MARGIN;
+    int endY = (int)((tilemapTopY - camBottom) / tileWorldHeight) + MARGIN;
+
+    // Clamp to tilemap bounds
+    startY = std::max(0, startY);
+    endY = std::min(data->height - 1, endY);
+
+    // Debug output
+    static int frameCount = 0;
+    if (++frameCount % 120 == 0) {
+        int totalTiles = data->width * data->height * data->numLayers;
+        int visibleTiles = (endX - startX + 1) * (endY - startY + 1) * data->numLayers;
+        float cullingPercent = 100.0f * (1.0f - (float)visibleTiles / totalTiles);
+
+        std::cout << "[Tilemap Culling]" << std::endl;
+        std::cout << "  Camera: (" << camPos.x << ", " << camPos.y << ") Zoom: " << zoom << std::endl;
+        std::cout << "  Camera Y bounds: [" << camBottom << " to " << camTop << "]" << std::endl;
+        std::cout << "  Tilemap Y bounds: [" << tilemapBottomY << " to " << tilemapTopY << "]" << std::endl;
+        std::cout << "  Tile Range: X[" << startX << "-" << endX << "] Y[" << startY << "-" << endY << "]" << std::endl;
+        std::cout << "  Rendering: " << visibleTiles << " / " << totalTiles
+            << " (" << (int)cullingPercent << "% culled)" << std::endl;
+    }
+
     auto& batches = gs->batches;
 
-    // Render each layer
+    // === Render each layer ===
     for (int layer = 0; layer < data->numLayers; ++layer)
     {
         int renderLayer = -100 + (layer * 25);
 
-        // Find existing batch index
+        // Find or create batch
         int batchIndex = -1;
         for (size_t i = 0; i < batches.size(); ++i)
         {
@@ -1473,24 +1586,27 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
             }
         }
 
-        // Create new batch if needed
         if (batchIndex == -1)
         {
             batches.emplace_back(data->tilesetTexture, false, renderLayer);
             batchIndex = static_cast<int>(batches.size() - 1);
         }
 
-        // NOW get the pointer (after all potential reallocations)
-       RenderBatch* targetBatch = &batches[batchIndex];
-
-        // Add all tiles in this layer
-        for (int y = 0; y < data->height; ++y)
+        // === ONLY RENDER VISIBLE TILES ===
+        for (int y = startY; y <= endY; ++y)
         {
-            for (int x = 0; x < data->width; ++x)
+            for (int x = startX; x <= endX; ++x)
             {
                 const TileData& tile = data->tiles[layer][y][x];
 
                 if (tile.tileID < 0) continue;
+
+                // Check batch overflow
+                if (batches[batchIndex].vertices.size() + 4 > 11000)
+                {
+                    batches.emplace_back(data->tilesetTexture, false, renderLayer);
+                    batchIndex = static_cast<int>(batches.size() - 1);
+                }
 
                 // Calculate world position
                 float tileX = position.x + (x * data->tileWidth * scale.x);
@@ -1499,7 +1615,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
                 float tileSX = static_cast<float>(data->tileWidth) * scale.x;
                 float tileSY = static_cast<float>(data->tileHeight) * scale.y;
 
-                // Calculate UV
+                // Calculate UV coordinates
                 int col = tile.tileID % data->tilesPerRow;
                 int row = tile.tileID / data->tilesPerRow;
 
@@ -1512,7 +1628,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
                 float uv_y = uv_height * row;
 
                 // Add 4 vertices for this tile
-                GLuint startIndex = static_cast<GLuint>(targetBatch->vertices.size());
+                GLuint startIndex = static_cast<GLuint>(batches[batchIndex].vertices.size());
 
                 vec3 localPos[4] = {
                     {-0.5f, -0.5f, 0.0f}, {0.5f, -0.5f, 0.0f},
@@ -1526,7 +1642,6 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 
                 for (int i = 0; i < 4; ++i)
                 {
-                    
                     BatchVertex vertex;
                     vertex.pos = localPos[i];
                     vertex.tex = texCoords[i];
@@ -1536,17 +1651,17 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
                     vertex.transform = vec3(tileX, tileY, rotation);
                     vertex.scale = vec2(tileSX, tileSY);
 
-                    targetBatch->vertices.push_back(vertex);
+                    batches[batchIndex].vertices.push_back(vertex);
                 }
 
                 // Add 6 indices (2 triangles)
-                targetBatch->indices.push_back(startIndex + 0);
-                targetBatch->indices.push_back(startIndex + 1);
-                targetBatch->indices.push_back(startIndex + 2);
+                batches[batchIndex].indices.push_back(startIndex + 0);
+                batches[batchIndex].indices.push_back(startIndex + 1);
+                batches[batchIndex].indices.push_back(startIndex + 2);
 
-                targetBatch->indices.push_back(startIndex + 2);
-                targetBatch->indices.push_back(startIndex + 3);
-                targetBatch->indices.push_back(startIndex + 0);
+                batches[batchIndex].indices.push_back(startIndex + 2);
+                batches[batchIndex].indices.push_back(startIndex + 3);
+                batches[batchIndex].indices.push_back(startIndex + 0);
             }
         }
     }

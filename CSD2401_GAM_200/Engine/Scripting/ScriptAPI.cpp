@@ -1104,12 +1104,10 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            std::cout << "aaa\n\n\n";
             audioManager->LoadSound({ "jump", "../Assets/Audio/jump.wav", false, 0.4f, 1.0f, "sfx" });
             audioManager->LoadSound(newSound);
             audioManager->AddSound(newSound);
         }
-        else std::cout << "asdasdasasdas\n\n\n";
     }
 
     void PlaySound(const std::string soundName, const std::string channel)

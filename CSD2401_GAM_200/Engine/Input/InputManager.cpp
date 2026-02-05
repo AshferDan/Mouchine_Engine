@@ -105,6 +105,14 @@ bool InputManager::IsMouseButtonHeld(int button)
 	return m_mouseButtonStates[button] == KEY_STATE_HOLD;
 }
 
+bool InputManager::IsAnyKeyPress() {
+    for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; ++key)
+    {
+        if (glfwGetKey(window, key) == GLFW_PRESS)
+            return true;
+    }
+    return false;
+}
 
 /**
  * @brief Updates input handling, including key presses, mouse events,
@@ -327,6 +335,32 @@ void InputManager::Update(float dt)
         {
             singleTriggerKeys[GLFW_KEY_P] = false;
         }
+
+        {
+            GameObject* howto = GameObjectFactory::Instance().FindGameObject("HowToPlay");
+            GameObject* cam = GameObjectFactory::Instance().FindGameObject("MainCamera");
+            if (howto && cam)
+            {
+                auto* transform = howto->GetComponent<TransformComponent>();
+                if (!transform) return;
+
+                // Handles Holding F1 for How To Play in playmode
+                if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+                {
+                    //show how to play and pause game as long as key held
+                    float x{}, y{};
+                    CORE->SetGamePaused(true);
+                    //camtransform->GetPosition(x, y);
+                    transform->SetPosition(x,y);
+                    howto->SetActive(true);
+                }
+                else
+                {
+                    CORE->SetGamePaused(false);
+                    howto->SetActive(false);
+                }
+            }
+        }
     }
     else
     {
@@ -382,12 +416,6 @@ void InputManager::Update(float dt)
         {
             wasPressed = false;
         }
-    }
-
-    // Handles Holding F1 for How To Play in playmode
-    if (glfwGetKey(window, GLFW_KEY_M) == GLFW_KEY_DOWN && isPlayMode)
-    {
-        //show how to play and pause game as long as key held
     }
 
     GameObject* player = nullptr;

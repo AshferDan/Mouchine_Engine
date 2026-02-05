@@ -319,6 +319,98 @@ bool CollisionSystem::JustStopped(GameObject* obj1, GameObject* obj2) {
     return !collidingNow && collidingBefore;
 }
 
+/**
+ * @brief Checks if an object is colliding with any object in a specific layer
+ * Uses spatial grid for efficient broad-phase detection, then performs narrow-phase
+ * collision testing only with objects in the target layer
+ */
+bool CollisionSystem::IsCollidingWithLayer(GameObject* obj, CollisionLayer targetLayer, GameObject** outHitObject)
+{
+    if (!obj) return false;
+
+    auto* collider = obj->GetComponent<ColliderComponent>();
+    if (!collider) return false;
+
+    // Check if the object's layer can even collide with the target layer
+    if (!ShouldCollide(collider->GetLayer(), targetLayer)) {
+        return false;
+    }
+
+    // Use spatial grid to get nearby objects (efficient broad-phase)
+    std::vector<GameObject*> nearbyObjects = spatialGrid.Query(obj, collider);
+
+    // Check each nearby object
+    for (GameObject* other : nearbyObjects)
+    {
+        auto* otherCollider = other->GetComponent<ColliderComponent>();
+        if (!otherCollider) continue;
+
+        // Filter by target layer
+        if (otherCollider->GetLayer() != targetLayer) {
+            continue;
+        }
+
+        // Perform actual collision test
+        bool isColliding = false;
+
+        if (collider->GetType() == ColliderComponent::Type::Circle &&
+            otherCollider->GetType() == ColliderComponent::Type::Circle)
+        {
+            isColliding = CollisionIntersection_CircleCircle_Static(
+                collider->GetCircle(), otherCollider->GetCircle());
+        }
+        else if (collider->GetType() == ColliderComponent::Type::Square &&
+            otherCollider->GetType() == ColliderComponent::Type::Square)
+        {
+            isColliding = CollisionIntersection_RectRect_Static(
+                collider->GetAABB(), otherCollider->GetAABB());
+        }
+        else
+        {
+            // Mixed shapes
+            if (collider->GetType() == ColliderComponent::Type::Square) {
+                isColliding = CollisionIntersection_RectCircle_Static(
+                    collider->GetAABB(), otherCollider->GetCircle());
+            }
+            else {
+                isColliding = CollisionIntersection_RectCircle_Static(
+                    otherCollider->GetAABB(), collider->GetCircle());
+            }
+        }
+
+        // If collision found, optionally store the hit object and return true (this if we wanna check for specific enemy type collision)
+        if (isColliding)
+        {
+            if (outHitObject) {
+                *outHitObject = other;
+            }
+            return true;
+        }
+    }
+
+    // No collision with any object in the target layer
+    return false;
+}
+
+/*HOW TO USE FOR ASHFER :
+Without getting the hit object - just a yes / no check
+ 
+if (collisionSystem->IsCollidingWithLayer(player, CollisionLayer::Enemy)) {
+    // PLAYER has hit ENEMY, this is for general case, we don't really care about which type of enemy
+    DamagePlayer();
+}
+
+// WITH getting the hit object - you get the specific object
+
+GameObject* hitEnemy = nullptr;
+if (collisionSystem->IsCollidingWithLayer(player, CollisionLayer::Enemy, &hitEnemy)) {
+    // Now hitEnemy points to the SPECIFIC enemy that was hit
+    std::cout << "Hit enemy: " << hitEnemy->GetName() << std::endl;
+    int damage = hitEnemy->GetComponent<EnemyComponent>()->GetDamage();
+    DamagePlayer(damage);
+
+}*/
+
 // ===== Raycast Implementation =====
 
 /**

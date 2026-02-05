@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "audio.h"
 #include "AudioManager.h"
 #include "TimerSystem.h"
+#include "ScriptComponent.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -376,6 +377,13 @@ void LevelEditor::StopPlayMode()
     hasValidSaveState = false;
     editorMode = EditorMode::Stop; // static camera
     selectedGameObjectID = 0;      // clear selection
+
+    // Also reset ImGuiSystem's selection to prevent stale EntityID references
+    if (CORE && CORE->GetImguiSystem())
+    {
+        CORE->GetImguiSystem()->ResetSelectedGameObject();
+    }
+
     //CameraManager::Instance().ClearActiveCamera();                                // COMMENTED OUT 18TH NOV BC OF BUG W PLAYING -> STOPPING -> PLAYING
     std::cout << "[LevelEditor] Returned to Edit Mode.\n";
 }
@@ -823,7 +831,20 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
 
         // clear current level
         factory.Clear();
+
+        // CRITICAL: Clear event queue AFTER factory.Clear() to remove OnDestroy events
+        // that were queued during object destruction. Without this, memory address reuse
+        // can cause new objects to have their scripts incorrectly removed.
+        EventSystem::Clear();
+
         selectedGameObjectID = 0;
+
+        // Also reset ImGuiSystem's selection to prevent stale EntityID references
+        if (CORE && CORE->GetImguiSystem())
+        {
+            CORE->GetImguiSystem()->ResetSelectedGameObject();
+        }
+
         ClearUndoStack();
 
         // reset editor mode to stop when loading a new scene
@@ -889,6 +910,27 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         }
         Serialization::ResolveHierarchy();
 
+        // Reinitialize all ScriptComponents to ensure scripts are properly attached to ScriptSystem
+        // This is a safety measure in case scripts weren't attached during deserialization
+        std::cout << "[LoadLevel] Reinitializing ScriptComponents...\n";
+        if (CORE && CORE->GetScriptSystem())
+        {
+            for (auto& goPtr : factory.GetAllGameObjects())
+            {
+                if (goPtr)
+                {
+                    ScriptComponent* scriptComp = goPtr->GetComponent<ScriptComponent>();
+                    if (scriptComp)
+                    {
+                        const auto& scripts = scriptComp->GetScripts();
+                        std::cout << "[LoadLevel] " << goPtr->GetName() << " has " << scripts.size() << " scripts in ScriptComponent\n";
+
+                        // Re-initialize to ensure all scripts are attached to ScriptSystem
+                        scriptComp->Initialize();
+                    }
+                }
+            }
+        }
 
         // check if MainCamera exists, create one if not
         GameObject* mainCam = factory.FindGameObject("MainCamera");
@@ -1046,6 +1088,10 @@ void LevelEditor::NewLevel()
     currentFilename = "Untitled";
 
     factory.Clear();
+
+    // CRITICAL: Clear event queue after factory.Clear() to remove OnDestroy events
+    EventSystem::Clear();
+
     selectedGameObjectID = 0;
     hasValidSaveState = false;
     CameraManager::Instance().ClearActiveCamera();
@@ -1610,7 +1656,18 @@ void LevelEditor::PerformSceneReload()
 
     // clear and reload safely at start of frame
     factory.Clear();
+
+    // CRITICAL: Clear event queue after factory.Clear() to remove OnDestroy events
+    EventSystem::Clear();
+
     selectedGameObjectID = 0;
+
+    // Also reset ImGuiSystem's selection to prevent stale EntityID references
+    if (CORE && CORE->GetImguiSystem())
+    {
+        CORE->GetImguiSystem()->ResetSelectedGameObject();
+    }
+
     ClearUndoStack();
 
     if (LoadLevel(pendingScenePath))

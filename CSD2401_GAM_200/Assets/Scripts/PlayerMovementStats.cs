@@ -22,7 +22,7 @@ namespace CSharpScript
 {
     public class PlayerMovementStats : GameScript
     {
-        private static float mod = 12.5f;
+        private static float mod = 12.5f * 2.5f;
         // CLAMPS - Max values 
         public float Clamp_MaxRunSpeed = 50f * mod;
         public float Clamp_MaxJumpHeight = 80f * mod;
@@ -69,11 +69,11 @@ namespace CSharpScript
         public float HeadWidth = 0.75f;
 
         // Wall Checks
-        public float WallDetectionBoxLength = 50.0f;            // unity is 0.05 - 0.02 (since our raycast is v diff)
+        public float WallDetectionBoxLength = 50.0f * 2f;            // unity is 0.05 - 0.02 (since our raycast is v diff)
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 100f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
+        public float JumpHeight = 175f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
         public float T1_JumpMultiplier = 1.05f;
         public float T2_JumpMultiplier = 1.08f;
         public float T3_JumpMultiplier = 1.15f;
@@ -105,6 +105,7 @@ namespace CSharpScript
 
         // Wall Kick
         public float WallSlidingSpeed = 4f * mod;                     // was 2
+        public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
         public float WKBaseDuration = 0.25f;
         public float WKCooldown = 0.5f;
         public float WKSpeedModifier = 30f * mod;
@@ -130,6 +131,12 @@ namespace CSharpScript
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.5f;
         public float GlideCooldown = 0.2f;
+
+        // Knockback
+        public vec2 KnockbackForce = new vec2(30f * mod, 40f * mod);
+        public vec2 KnockbackFriction = new vec2(85f * mod, 0f);
+        public float knockbackTime = 0.3f;
+        public float hurtStunDuration = 0.75f;
 
         // Zipline
         public float ZiplineSpeed = 30f * mod;
