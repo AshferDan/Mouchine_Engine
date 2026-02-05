@@ -69,11 +69,12 @@ struct RenderBatch
 	std::vector<BatchVertex> vertices; // Vertex data for all quads in this batch.
 	std::vector<GLuint> indices;	// Index data (EBO) for all quads in this batch.
 	int layer;						// Rendering layer (for depth sorting, typically based on Z-position).
+	bool screenSpace;
 
 	/**
 	 * @brief Constructor for RenderBatch.
 	 */
-	RenderBatch(GLuint texID, bool circle, int l) : textureID(texID), isCircle(circle), layer(l) {}
+	RenderBatch(GLuint texID, bool circle, int l, bool space) : textureID(texID), isCircle(circle), layer(l), screenSpace(space) {}
 };
 
 /**
@@ -290,6 +291,8 @@ public:
 	GLFWcursor* GetClickCursor() const { return clickCursor; }
 	GLSLShader* GetDefaultShader() const { return shader; }
 
+	mat4 GetScreenProjectionMatrix() const { return screenProjectionMatrix; }
+
 private:
 	// --- Window and State ---
 	GLFWwindow* window;						// The handle to the GLFW window.
@@ -298,6 +301,7 @@ private:
 	int windowedWidth, windowedHeight;
 	bool isFullscreen = false;
 	mat4 vp;								// Current view-projection matrix (camera transform).
+	mat4 screenProjectionMatrix;
 	bool debugMode = false;					// Flag to control rendering of debug shapes (lines, outlines).
 	bool editorMode;						// Flag to indicate if rendering should target the FBO (true) or the screen (false).
 	class LevelEditor* levelEditor = nullptr; // Pointer to the level editor for camera manipulation when in editor mode.

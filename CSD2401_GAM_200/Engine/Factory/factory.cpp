@@ -157,7 +157,7 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     return obj;
 }
 
-GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, const vec4 &color)
+GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderComponent::ShapeType shape, float x, float y, float w, float h, bool screenSpace, const vec4 &color)
 {
     GameObject *obj = CreateGameObject(name);
 
@@ -177,6 +177,9 @@ GameObject *GameObjectFactory::CreateShape(const std::string &name, RenderCompon
     {
         transform->SetScale(w, h);
     }
+
+    render->SetScreenSpace(screenSpace);
+
     // testing TO BE REMOVED
     std::cout << "Created "
               << (shape == RenderComponent::ShapeType::Circle ? "Circle" : shape == RenderComponent::ShapeType::Square ? "Square"

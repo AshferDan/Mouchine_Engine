@@ -197,14 +197,14 @@ void ParticleEmitterComponent::AddParticlesToBatch(std::vector<RenderBatch>& bat
 
 	RenderBatch* targetBatch = nullptr;
 	for (auto& batch : batches) {
-		if (batch.textureID == textureID && batch.isCircle == false && batch.layer == layer) {
+		if (batch.textureID == textureID && batch.isCircle == false && batch.layer == layer && batch.screenSpace == screenSpace) {
 			targetBatch = &batch;
 			break;
 		}
 	}
 
 	if (!targetBatch) {
-		batches.emplace_back(textureID, false, layer);
+		batches.emplace_back(textureID, false, layer, false);
 		targetBatch = &batches.back();
 		targetBatch->vertices.reserve(maxParticles * 4);
 		targetBatch->indices.reserve(maxParticles * 6);
