@@ -1,7 +1,7 @@
 /* Start Header************************************************************************ /
 /*!
 \file       ComponentSerialization.cpp
-\author     Lee Hwee Min [100% - 427 lines]
+\author     Lee Hwee Min [100% - 440 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 2, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -188,24 +188,33 @@ void ComponentSerialization::SerializeCamera(json &j, CameraComponent *cam)
         {"followTargetName", cam->GetFollowTargetName()}};
 }
 
-void ComponentSerialization::SerializeEvent(json &j, EventComponent *ec)
+void ComponentSerialization::SerializeEvent(json& j, EventComponent* ec)
 {
-    if (!ec)
-        return;
+    if (!ec) return;
+    json chainsArray = json::array();
 
-    json rulesJson = json::array();
-
-    for (const auto &rule : ec->rules)
+    for (const auto& chain : ec->chains)
     {
-        json r;
-        r["eventType"] = EventTypeToString(rule.eventType);
-        r["targetObjectId"] = rule.targetObjectId;
-        r["action"] = ActionTypeToString(rule.action);
+        json cNode;
+        cNode["trigger"] = EventTypeToString(chain.triggerType);
+        cNode["targetFilterID"] = chain.targetFilterID;
 
-        rulesJson.push_back(r);
+        json actionsArray = json::array();
+        for (const auto& action : chain.actions) {
+            json aNode;
+            aNode["type"] = ActionTypeToString(action->GetType());
+
+            // Serialize specific data fields based on type
+            if (action->GetType() == ActionType::PlaySound) {
+                aNode["soundName"] = static_cast<ActionPlaySound*>(action.get())->soundName;
+            }
+
+            actionsArray.push_back(aNode);
+        }
+        cNode["actions"] = actionsArray;
+        chainsArray.push_back(cNode);
     }
-
-    j["EventComponent"] = rulesJson;
+    j["EventComponent"] = chainsArray;
 }
 
 void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc)
@@ -612,24 +621,64 @@ void ComponentSerialization::DeserializeCamera(const json &j, GameObject *go)
     cam->SetZoom(zoom);
 }
 
-void ComponentSerialization::DeserializeEvent(const json &j, GameObject *go)
+void ComponentSerialization::DeserializeEvent(const json& j, GameObject* go)
 {
-    if (!j.contains("EventComponent"))
-        return;
+    if (!j.contains("EventComponent")) return;
+    auto* ec = go->AddComponent<EventComponent>();
 
-    auto *ec = go->AddComponent<EventComponent>();
-    const auto &rulesJson = j["EventComponent"];
-
-    for (const auto &item : rulesJson)
+    for (const auto& cNode : j["EventComponent"])
     {
-        EventRule rule;
-        rule.eventType = StringToEventType(item.value("eventType", "None"));
-        rule.targetObjectId = item.value("targetFilter", -1);
-        rule.action = StringToActionType(item.value("action", "None"));
+        LogicChain chain;
+        chain.triggerType = StringToEventType(cNode.value("trigger", "None"));
 
-        ec->rules.push_back(rule);
+        if (cNode.contains("targetFilterID")) {
+            chain.targetFilterID = cNode["targetFilterID"];
+        }
+
+        if (cNode.contains("actions")) {
+            for (const auto& aNode : cNode["actions"]) {
+                std::string typeStr = aNode.value("type", "None");
+                ActionType type = StringToActionType(typeStr);
+
+                // Instantiate proper class based on type
+                std::unique_ptr<IAction> newAction = nullptr;
+
+                switch (type) {
+                case ActionType::PlaySound:
+                    newAction = std::make_unique<ActionPlaySound>(aNode.value("soundName", ""));
+                    break;
+                case ActionType::DestroyObject:
+                    newAction = std::make_unique<ActionDestroy>();
+                    break;
+                case ActionType::EnableObject:
+                    newAction = std::make_unique<ActionToggleActive>(true);
+                    break;
+                case ActionType::DisableObject:
+                    newAction = std::make_unique<ActionToggleActive>(false);
+                    break;
+                case ActionType::Respawn: {
+                    float firstX = 0.0f, firstY = 0.0f;
+                    auto* transform = go->GetComponent<TransformComponent>();
+
+                    if (transform) {
+                        transform->GetPosition(firstX, firstY);
+                    }
+                    newAction = std::make_unique<ActionRespawn>(firstX, firstY);
+
+                    break;
+                }
+                    
+                }
+
+                if (newAction) {
+                    chain.actions.push_back(std::move(newAction));
+                }
+            }
+        }
+        ec->chains.push_back(chain);
     }
 }
+
 
 /**
  * @brief Serializes the TilemapDataHolder into JSON.

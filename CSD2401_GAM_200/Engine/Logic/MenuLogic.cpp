@@ -15,8 +15,8 @@ Technology is prohibited.
 #include "MenuLogic.h"
 #include <iostream>
 
-std::string introPath = "../Assets/Cutscene_M3.mpeg";
-std::string creditsPath = "../Assets/AvidMoustache_Credits.mpeg";
+std::string introPath = "../Assets/Cutscene.mpeg";
+std::string creditsPath = "../Assets/Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens {
