@@ -62,7 +62,7 @@ struct TempGOData
 
     bool addCollider = false;
     int colType = 0; // 0 for Square, 1 for Circle
-    float colSize[2] = { 100.0f, 100.0f };
+    float colSize[2]{ 50.f, 50.f};
     int colLayer = 5; // Default index for "Default" layer
 };
 
@@ -1150,6 +1150,7 @@ void GOCreationMenu_Spawn()
     float rot = tempGO.rot;
     vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
     std::string name = tempGO.name;
+    float colliderSize[2] = { tempGO.scale[0], tempGO.scale[1] };
     ColliderComponent::Type cType = (tempGO.colType == 0) ? ColliderComponent::Type::Square : ColliderComponent::Type::Circle;
     CollisionLayer cLayer = static_cast<CollisionLayer>(tempGO.colLayer);
 
@@ -1160,9 +1161,9 @@ void GOCreationMenu_Spawn()
         shapeType,              // ShapeType
         pos, scale, rot,        // Transform
         color,               // Colour
+        colliderSize,
         tempGO.addCollider,
         cType,
-        tempGO.colSize[0], tempGO.colSize[1],
         cLayer
     );
 
