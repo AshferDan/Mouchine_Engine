@@ -3528,6 +3528,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ResetDraftPlayback();
     }
 
+    static int  frameCount = 1;         // how many frames in the row animation
+    static int  rowPick = 0;            // row selector (maps to startR)
+
     // Controls
     if (draftTexID)
     {
@@ -3537,6 +3540,10 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::Text("GRID CONFIGURATION:");
         ImGui::PushItemWidth(80);
         bool gridChanged = false;
+
+        if (ImGui::Button("13 x 10")) { draftRows = 13; draftCols = 10; ResetDraftPlayback(); }
+        ImGui::Spacing();
+
         if (ImGui::InputInt("ROWS", &draftRows)) { draftRows = std::max(1, draftRows); gridChanged = true; }
         ImGui::SameLine();
         if (ImGui::InputInt("COLS", &draftCols)) { draftCols = std::max(1, draftCols); gridChanged = true; }
@@ -3598,23 +3605,39 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::Text("DEFINE ACTION RANGE:");
 
         ImGui::InputText("Name", actionName, IM_ARRAYSIZE(actionName));
+        ImGui::NewLine();
         ImGui::Checkbox("Loop", &actionLoop);
         ImGui::SameLine();
         ImGui::PushItemWidth(120);
         ImGui::InputFloat("FPS", &actionFPS, 0.5f, 1.0f, "%.2f");
         ImGui::PopItemWidth();
-        actionFPS = std::max(0.001f, actionFPS);
+        ImGui::NewLine();
+        //actionFPS = std::max(0.001f, actionFPS);
 
-        // Clamp
-        startR = std::clamp(startR, 0, draftRows - 1);
-        endR = std::clamp(endR, 0, draftRows - 1);
+        rowPick = std::clamp(rowPick, 0, draftRows - 1);
         startC = std::clamp(startC, 0, draftCols - 1);
-        endC = std::clamp(endC, 0, draftCols - 1);
+        frameCount = std::max(1, frameCount);
 
-        if (ImGui::SliderInt("Start Row", &startR, 0, draftRows - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("End Row", &endR, 0, draftRows - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("End Col", &endC, 0, draftCols - 1)) ResetDraftPlayback();
+        // picks a row
+        if (ImGui::SliderInt("Row", &rowPick, 0, draftRows - 1))
+            ResetDraftPlayback();
+
+        // map rowPick -> startR
+        startR = rowPick;
+
+        if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1))
+            ResetDraftPlayback();
+
+        // end Col
+        int maxCount = draftCols - startC;
+        frameCount = std::clamp(frameCount, 1, std::max(1, maxCount));
+
+        if (ImGui::SliderInt("End Col", &frameCount, 1, std::max(1, maxCount)))
+            ResetDraftPlayback();
+
+        // auto-compute endR/endC
+        endR = startR;
+        endC = std::clamp(startC + frameCount - 1, 0, draftCols - 1);
 
         auto FindClipIndexByName = [&](const std::string& name) -> int
             {
