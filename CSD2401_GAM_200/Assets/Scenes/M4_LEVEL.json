@@ -40,8 +40,8 @@
       "CameraComponent": {
         "mode": "FOLLOW_TARGET",
         "position": [
-          0.0,
-          0.0
+          419.7012634277344,
+          2433.27783203125
         ],
         "followOffset": [
           0.0,
@@ -50,7 +50,7 @@
         "smoothing": true,
         "zoom": 0.5,
         "smoothingSpeed": 5.0,
-        "followTargetName": ""
+        "followTargetName": "Hero"
       },
       "children": []
     },
@@ -419,18 +419,56 @@
       "children": []
     },
     {
-      "name": "Hero_vfx",
-      "localID": 6,
+      "name": "PROP_FamilyPhoto(57)",
+      "localID": 223,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          0.0
+          26252.0,
+          970.4609985351563
         ],
         "scale": [
-          200.0,
-          200.0
+          330.0,
+          270.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          330.0,
+          270.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(59)",
+      "localID": 225,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18141.978515625,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
         ],
         "rotation": 0.0
       },
@@ -448,211 +486,23 @@
       },
       "Spritesheet": {
         "defaultAnimation": "",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
+        "animations": []
       },
       "children": []
     },
     {
-      "name": "vfx",
-      "localID": 7,
+      "name": "Starfish_Hazard(58)",
+      "localID": 224,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          -200.0
+          16234.0,
+          1168.5
         ],
         "scale": [
-          5.0,
-          5.0
+          150.0,
+          128.0
         ],
         "rotation": 0.0
       },
@@ -660,27 +510,23 @@
         "shapeType": "Square",
         "texturePath": "",
         "color": [
-          0.0,
-          0.0,
+          1.0,
+          1.0,
           1.0,
           1.0
         ],
         "layer": 0,
         "screenSpace": false
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Platform",
-        "size": [
-          5.0,
-          5.0
-        ]
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
       },
       "children": []
     },
     {
       "name": "Hero_vfx",
-      "localID": 8,
+      "localID": 10,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -901,56 +747,18 @@
       "children": []
     },
     {
-      "name": "vfx",
-      "localID": 9,
+      "name": "NPC_Jellyfish(43)",
+      "localID": 210,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          -200.0
+          8068.0,
+          3319.0
         ],
         "scale": [
-          5.0,
-          5.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          0.0,
-          0.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Platform",
-        "size": [
-          5.0,
-          5.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "Hero_vfx",
-      "localID": 10,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          200.0,
-          200.0
+          449.0,
+          463.0
         ],
         "rotation": 0.0
       },
@@ -968,211 +776,23 @@
       },
       "Spritesheet": {
         "defaultAnimation": "",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
+        "animations": []
       },
       "children": []
     },
     {
-      "name": "vfx",
-      "localID": 11,
+      "name": "PROP_FamilyPhoto(55)",
+      "localID": 222,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          -200.0
+          17215.0,
+          17215.0
         ],
         "scale": [
-          5.0,
-          5.0
+          330.0,
+          270.0
         ],
         "rotation": 0.0
       },
@@ -1180,8 +800,8 @@
         "shapeType": "Square",
         "texturePath": "",
         "color": [
-          0.0,
-          0.0,
+          1.0,
+          1.0,
           1.0,
           1.0
         ],
@@ -1190,547 +810,27 @@
       },
       "ColliderComponent": {
         "shape": "Square",
-        "layer": "Platform",
+        "layer": "Default",
         "size": [
-          5.0,
-          5.0
+          330.0,
+          270.0
         ]
       },
       "children": []
     },
     {
-      "name": "Hero_vfx",
-      "localID": 12,
+      "name": "NPC_Lobster(44)",
+      "localID": 211,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          0.0
+          13370.0,
+          700.0
         ],
         "scale": [
-          200.0,
-          200.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "Clear",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "vfx",
-      "localID": 13,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          -200.0
-        ],
-        "scale": [
-          5.0,
-          5.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          0.0,
-          0.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Platform",
-        "size": [
-          5.0,
-          5.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "Hero_vfx",
-      "localID": 14,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          200.0,
-          200.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "Clear",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "vfx",
-      "localID": 15,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          -200.0
-        ],
-        "scale": [
-          5.0,
-          5.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          0.0,
-          0.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Platform",
-        "size": [
-          5.0,
-          5.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "Hero_vfx",
-      "localID": 16,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          200.0,
-          200.0
+          560.0,
+          494.0
         ],
         "rotation": 0.0
       },
@@ -1748,211 +848,23 @@
       },
       "Spritesheet": {
         "defaultAnimation": "",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
+        "animations": []
       },
       "children": []
     },
     {
-      "name": "vfx",
-      "localID": 17,
+      "name": "PROP_Chair(54)",
+      "localID": 221,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          -200.0
+          15667.0,
+          649.0
         ],
         "scale": [
-          5.0,
-          5.0
+          128.0,
+          331.0
         ],
         "rotation": 0.0
       },
@@ -1960,8 +872,128 @@
         "shapeType": "Square",
         "texturePath": "",
         "color": [
-          0.0,
-          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(45)",
+      "localID": 212,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16787.0,
+          1681.0
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Mirror(53)",
+      "localID": 220,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16030.0,
+          649.0
+        ],
+        "scale": [
+          201.0,
+          341.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(49)",
+      "localID": 216,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          26884.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_FamilyPhoto(52)",
+      "localID": 219,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          28162.0,
+          970.4609985351563
+        ],
+        "scale": [
+          330.0,
+          270.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
           1.0,
           1.0
         ],
@@ -1970,27 +1002,27 @@
       },
       "ColliderComponent": {
         "shape": "Square",
-        "layer": "Platform",
+        "layer": "Default",
         "size": [
-          5.0,
-          5.0
+          330.0,
+          270.0
         ]
       },
       "children": []
     },
     {
-      "name": "Hero_vfx",
-      "localID": 18,
+      "name": "PROP_CeilingLamp(48)",
+      "localID": 215,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          0.0
+          26294.0,
+          1620.4610595703125
         ],
         "scale": [
-          200.0,
-          200.0
+          160.0,
+          162.0
         ],
         "rotation": 0.0
       },
@@ -2006,251 +1038,21 @@
         "layer": 0,
         "screenSpace": false
       },
-      "Spritesheet": {
-        "defaultAnimation": "Clear",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
-      },
       "children": []
     },
     {
-      "name": "vfx",
-      "localID": 19,
+      "name": "PROP_DressTable(51)",
+      "localID": 218,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          -200.0
+          12189.0,
+          736.5
         ],
         "scale": [
-          5.0,
-          5.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          0.0,
-          0.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Platform",
-        "size": [
-          5.0,
-          5.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "Hero_vfx",
-      "localID": 20,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          0.0,
-          0.0
-        ],
-        "scale": [
-          200.0,
-          200.0
+          1024.0,
+          512.0
         ],
         "rotation": 0.0
       },
@@ -2266,213 +1068,21 @@
         "layer": 0,
         "screenSpace": false
       },
-      "Spritesheet": {
-        "defaultAnimation": "",
-        "animations": [
-          {
-            "name": "Bonk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 5,
-            "startCol": 0,
-            "endRow": 5,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Clear",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 10,
-            "endRow": 14,
-            "endCol": 10,
-            "fps": 0.0
-          },
-          {
-            "name": "Dash",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 6,
-            "startCol": 0,
-            "endRow": 6,
-            "endCol": 2,
-            "fps": 4.0
-          },
-          {
-            "name": "Falling",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 12,
-            "startCol": 0,
-            "endRow": 12,
-            "endCol": 1,
-            "fps": 4.0
-          },
-          {
-            "name": "Glide",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 4,
-            "startCol": 0,
-            "endRow": 4,
-            "endCol": 2,
-            "fps": 8.0
-          },
-          {
-            "name": "Groundpound",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 14,
-            "startCol": 0,
-            "endRow": 14,
-            "endCol": 2,
-            "fps": 10.0
-          },
-          {
-            "name": "Hurt",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 3,
-            "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
-            "fps": 3.0
-          },
-          {
-            "name": "Jump",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 0,
-            "endRow": 13,
-            "endCol": 4,
-            "fps": 12.0
-          },
-          {
-            "name": "Land",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 13,
-            "startCol": 6,
-            "endRow": 13,
-            "endCol": 8,
-            "fps": 4.0
-          },
-          {
-            "name": "Roll",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 11,
-            "startCol": 0,
-            "endRow": 11,
-            "endCol": 5,
-            "fps": 8.0
-          },
-          {
-            "name": "Run1",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 8.0
-          },
-          {
-            "name": "Run2",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 0,
-            "endRow": 9,
-            "endCol": 3,
-            "fps": 12.0
-          },
-          {
-            "name": "Run3",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 9,
-            "startCol": 5,
-            "endRow": 9,
-            "endCol": 8,
-            "fps": 16.0
-          },
-          {
-            "name": "Skidding",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 4,
-            "fps": 6.0
-          },
-          {
-            "name": "Walk",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 10,
-            "startCol": 0,
-            "endRow": 10,
-            "endCol": 4,
-            "fps": 8.0
-          },
-          {
-            "name": "Wallkick",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 8,
-            "startCol": 0,
-            "endRow": 8,
-            "endCol": 3,
-            "fps": 4.0
-          },
-          {
-            "name": "Zipline",
-            "filepath": "../Assets/spritesheet_player_vfx.png",
-            "rows": 15,
-            "cols": 11,
-            "startRow": 7,
-            "startCol": 0,
-            "endRow": 7,
-            "endCol": 1,
-            "fps": 4.0
-          }
-        ]
-      },
       "children": []
     },
     {
-      "name": "vfx",
-      "localID": 21,
+      "name": "PROP_CeilingLamp(47)",
+      "localID": 214,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          -200.0
+          25694.0,
+          1620.4610595703125
         ],
         "scale": [
-          5.0,
-          5.0
+          160.0,
+          162.0
         ],
         "rotation": 0.0
       },
@@ -2480,27 +1090,79 @@
         "shapeType": "Square",
         "texturePath": "",
         "color": [
-          0.0,
-          0.0,
+          1.0,
+          1.0,
           1.0,
           1.0
         ],
         "layer": 0,
         "screenSpace": false
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Platform",
-        "size": [
-          5.0,
-          5.0
-        ]
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(50)",
+      "localID": 217,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          28184.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(46)",
+      "localID": 213,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          28808.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
       },
       "children": []
     },
     {
       "name": "C_Ground",
-      "localID": 22,
+      "localID": 24,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2548,7 +1210,7 @@
     },
     {
       "name": "C_Ground(4)",
-      "localID": 23,
+      "localID": 25,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2596,7 +1258,7 @@
     },
     {
       "name": "C_Ground(5)",
-      "localID": 24,
+      "localID": 26,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2644,7 +1306,7 @@
     },
     {
       "name": "C_Ground(6)",
-      "localID": 25,
+      "localID": 27,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2692,7 +1354,7 @@
     },
     {
       "name": "C_Ground(7)",
-      "localID": 26,
+      "localID": 28,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2740,7 +1402,7 @@
     },
     {
       "name": "C_Ground(8)",
-      "localID": 27,
+      "localID": 29,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2788,7 +1450,7 @@
     },
     {
       "name": "C_Ground(37)",
-      "localID": 28,
+      "localID": 30,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2836,7 +1498,7 @@
     },
     {
       "name": "C_Ground(35)",
-      "localID": 29,
+      "localID": 31,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2884,7 +1546,7 @@
     },
     {
       "name": "C_Ground(13)",
-      "localID": 30,
+      "localID": 32,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2932,7 +1594,7 @@
     },
     {
       "name": "C_Ground(14)",
-      "localID": 31,
+      "localID": 33,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2980,7 +1642,7 @@
     },
     {
       "name": "C_Ground(16)",
-      "localID": 32,
+      "localID": 34,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3028,7 +1690,7 @@
     },
     {
       "name": "C_Ground(17)",
-      "localID": 33,
+      "localID": 35,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3076,7 +1738,7 @@
     },
     {
       "name": "C_Ground(18)",
-      "localID": 34,
+      "localID": 36,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3124,7 +1786,7 @@
     },
     {
       "name": "C_Ground(19)",
-      "localID": 35,
+      "localID": 37,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3172,7 +1834,7 @@
     },
     {
       "name": "C_Ground(20)",
-      "localID": 36,
+      "localID": 38,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3220,7 +1882,7 @@
     },
     {
       "name": "C_Ground(21)",
-      "localID": 37,
+      "localID": 39,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3268,7 +1930,7 @@
     },
     {
       "name": "C_Ground(22)",
-      "localID": 38,
+      "localID": 40,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3316,7 +1978,7 @@
     },
     {
       "name": "C_Ground(24)",
-      "localID": 39,
+      "localID": 41,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3364,7 +2026,7 @@
     },
     {
       "name": "C_Ground(25)",
-      "localID": 40,
+      "localID": 42,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3412,7 +2074,7 @@
     },
     {
       "name": "C_Ground(26)",
-      "localID": 41,
+      "localID": 43,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3460,7 +2122,7 @@
     },
     {
       "name": "C_Ground(27)",
-      "localID": 42,
+      "localID": 44,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3508,7 +2170,7 @@
     },
     {
       "name": "C_Ground(28)",
-      "localID": 43,
+      "localID": 45,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3556,7 +2218,7 @@
     },
     {
       "name": "C_Ground(29)",
-      "localID": 44,
+      "localID": 46,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3604,7 +2266,7 @@
     },
     {
       "name": "C_Ground(30)",
-      "localID": 45,
+      "localID": 47,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3652,7 +2314,7 @@
     },
     {
       "name": "C_Ground(31)",
-      "localID": 46,
+      "localID": 48,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3700,7 +2362,7 @@
     },
     {
       "name": "C_Ground(32)",
-      "localID": 47,
+      "localID": 49,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3748,7 +2410,7 @@
     },
     {
       "name": "C_Ground(33)",
-      "localID": 48,
+      "localID": 50,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3796,7 +2458,7 @@
     },
     {
       "name": "C_Ground(34)",
-      "localID": 49,
+      "localID": 51,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3844,7 +2506,7 @@
     },
     {
       "name": "C_Ground(1)",
-      "localID": 50,
+      "localID": 52,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3892,7 +2554,7 @@
     },
     {
       "name": "C_Ground(2)",
-      "localID": 51,
+      "localID": 53,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3940,7 +2602,7 @@
     },
     {
       "name": "C_Ground(3)",
-      "localID": 52,
+      "localID": 54,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3988,7 +2650,7 @@
     },
     {
       "name": "C_Ground(4)",
-      "localID": 53,
+      "localID": 55,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4036,7 +2698,7 @@
     },
     {
       "name": "C_Ground(5)",
-      "localID": 54,
+      "localID": 56,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4084,7 +2746,7 @@
     },
     {
       "name": "C_Ground(6)",
-      "localID": 55,
+      "localID": 57,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4132,7 +2794,7 @@
     },
     {
       "name": "C_Ground(7)",
-      "localID": 56,
+      "localID": 58,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4180,7 +2842,7 @@
     },
     {
       "name": "C_Ground(8)",
-      "localID": 57,
+      "localID": 59,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4228,7 +2890,7 @@
     },
     {
       "name": "WinZone",
-      "localID": 58,
+      "localID": 60,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4266,7 +2928,7 @@
     },
     {
       "name": "SafeZone",
-      "localID": 59,
+      "localID": 61,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4304,7 +2966,7 @@
     },
     {
       "name": "InGamePauseButton",
-      "localID": 56,
+      "localID": 62,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4334,12 +2996,23 @@
     },
     {
       "name": "LevelTimerBarBackground",
-      "localID": 9,
-      "parentID": -1,
+      "localID": 63,
+      "parentID": 4294967295,
       "active": true,
+      "TransformComponent": {
+        "pos": [
+          550.0,
+          920.0
+        ],
+        "scale": [
+          1000.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
       "RenderComponent": {
-        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
         "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
         "color": [
           1.0,
           1.0,
@@ -4349,27 +3022,27 @@
         "layer": 9,
         "screenSpace": true
       },
-      "TransformComponent": {
-        "pos": [
-          550,
-          920
-        ],
-        "scale": [
-          1000,
-          100
-        ],
-        "rotation": 0.0
-      },
       "children": []
     },
     {
       "name": "LevelTimerBar",
-      "localID": 10,
-      "parentID": -1,
+      "localID": 64,
+      "parentID": 4294967295,
       "active": true,
+      "TransformComponent": {
+        "pos": [
+          550.0,
+          920.0
+        ],
+        "scale": [
+          1000.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
       "RenderComponent": {
-        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
         "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
         "color": [
           1.0,
           1.0,
@@ -4379,27 +3052,27 @@
         "layer": 10,
         "screenSpace": true
       },
-      "TransformComponent": {
-        "pos": [
-          550,
-          920
-        ],
-        "scale": [
-          1000,
-          100
-        ],
-        "rotation": 0.0
-      },
       "children": []
     },
     {
       "name": "LevelTimerBarFrame",
-      "localID": 11,
-      "parentID": -1,
+      "localID": 65,
+      "parentID": 4294967295,
       "active": true,
+      "TransformComponent": {
+        "pos": [
+          550.0,
+          920.0
+        ],
+        "scale": [
+          1000.0,
+          125.0
+        ],
+        "rotation": 0.0
+      },
       "RenderComponent": {
-        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
         "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
         "color": [
           1.0,
           1.0,
@@ -4409,22 +3082,11 @@
         "layer": 11,
         "screenSpace": true
       },
-      "TransformComponent": {
-        "pos": [
-          550,
-          920
-        ],
-        "scale": [
-          1000,
-          125
-        ],
-        "rotation": 0.0
-      },
       "children": []
     },
     {
       "name": "Text FPS",
-      "localID": 60,
+      "localID": 66,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4467,7 +3129,7 @@
     },
     {
       "name": "SZ_Asset",
-      "localID": 61,
+      "localID": 67,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4497,7 +3159,7 @@
     },
     {
       "name": "Spike_Hazard",
-      "localID": 62,
+      "localID": 68,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4543,7 +3205,7 @@
     },
     {
       "name": "Spike_Hazard(1)",
-      "localID": 63,
+      "localID": 69,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4589,7 +3251,7 @@
     },
     {
       "name": "Spike_Hazard(2)",
-      "localID": 64,
+      "localID": 70,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4635,7 +3297,7 @@
     },
     {
       "name": "Spike_Hazard(3)",
-      "localID": 65,
+      "localID": 71,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4681,7 +3343,7 @@
     },
     {
       "name": "Spike_Hazard(4)",
-      "localID": 66,
+      "localID": 72,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4727,7 +3389,7 @@
     },
     {
       "name": "Spike_Hazard(5)",
-      "localID": 67,
+      "localID": 73,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4773,7 +3435,7 @@
     },
     {
       "name": "Spike_Hazard(6)",
-      "localID": 68,
+      "localID": 74,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4819,7 +3481,7 @@
     },
     {
       "name": "Spike_Hazard(7)",
-      "localID": 69,
+      "localID": 75,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4873,7 +3535,7 @@
     },
     {
       "name": "Spike_Hazard(9)",
-      "localID": 71,
+      "localID": 76,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4919,7 +3581,7 @@
     },
     {
       "name": "Spike_Hazard(10)",
-      "localID": 72,
+      "localID": 77,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4965,7 +3627,7 @@
     },
     {
       "name": "Spike_Hazard(11)",
-      "localID": 73,
+      "localID": 78,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5011,7 +3673,7 @@
     },
     {
       "name": "Spike_Hazard(12)",
-      "localID": 74,
+      "localID": 79,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5057,7 +3719,7 @@
     },
     {
       "name": "Spike_Hazard(13)",
-      "localID": 75,
+      "localID": 80,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5103,7 +3765,7 @@
     },
     {
       "name": "Spike_Hazard(14)",
-      "localID": 76,
+      "localID": 81,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5149,7 +3811,7 @@
     },
     {
       "name": "Spike_Hazard(15)",
-      "localID": 77,
+      "localID": 82,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5195,7 +3857,7 @@
     },
     {
       "name": "Spike_Hazard(16)",
-      "localID": 78,
+      "localID": 83,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5241,7 +3903,7 @@
     },
     {
       "name": "Spike_Hazard(17)",
-      "localID": 79,
+      "localID": 84,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5287,7 +3949,7 @@
     },
     {
       "name": "Spike_Hazard(18)",
-      "localID": 80,
+      "localID": 85,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5333,7 +3995,7 @@
     },
     {
       "name": "Spike_Hazard(19)",
-      "localID": 81,
+      "localID": 86,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5379,7 +4041,7 @@
     },
     {
       "name": "Spike_Hazard(20)",
-      "localID": 82,
+      "localID": 87,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5425,7 +4087,7 @@
     },
     {
       "name": "EZ_Asset",
-      "localID": 83,
+      "localID": 88,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5455,7 +4117,7 @@
     },
     {
       "name": "NPC_Jellyfish",
-      "localID": 84,
+      "localID": 89,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5501,7 +4163,7 @@
     },
     {
       "name": "NPC_Lobster",
-      "localID": 85,
+      "localID": 90,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5580,7 +4242,7 @@
     },
     {
       "name": "PROP_Cabinet",
-      "localID": 86,
+      "localID": 91,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5610,7 +4272,7 @@
     },
     {
       "name": "PROP_Mirror",
-      "localID": 87,
+      "localID": 92,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5640,7 +4302,7 @@
     },
     {
       "name": "PROP_Sink",
-      "localID": 88,
+      "localID": 93,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5670,7 +4332,7 @@
     },
     {
       "name": "PROP_Sink(1)",
-      "localID": 89,
+      "localID": 94,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5700,7 +4362,7 @@
     },
     {
       "name": "PROP_FamilyPhoto",
-      "localID": 90,
+      "localID": 95,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5738,7 +4400,7 @@
     },
     {
       "name": "PROP_Chair",
-      "localID": 91,
+      "localID": 96,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5768,7 +4430,7 @@
     },
     {
       "name": "PROP_Mirror(2)",
-      "localID": 92,
+      "localID": 97,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5798,7 +4460,7 @@
     },
     {
       "name": "PROP_Chair(3)",
-      "localID": 93,
+      "localID": 98,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5828,7 +4490,7 @@
     },
     {
       "name": "PROP_Mirror(4)",
-      "localID": 94,
+      "localID": 99,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5858,7 +4520,7 @@
     },
     {
       "name": "PROP_WL",
-      "localID": 95,
+      "localID": 100,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5885,8 +4547,8 @@
       "children": [
         {
           "name": "PROP_Lamp(5)",
-          "localID": 96,
-          "parentID": 95,
+          "localID": 101,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -5931,8 +4593,8 @@
         },
         {
           "name": "PROP_Window",
-          "localID": 97,
-          "parentID": 95,
+          "localID": 102,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -5961,8 +4623,8 @@
         },
         {
           "name": "PROP_Lamp",
-          "localID": 98,
-          "parentID": 95,
+          "localID": 103,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6007,8 +4669,8 @@
         },
         {
           "name": "PROP_Lamp(1)",
-          "localID": 164,
-          "parentID": 95,
+          "localID": 104,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6041,8 +4703,8 @@
         },
         {
           "name": "PROP_Window(2)",
-          "localID": 165,
-          "parentID": 95,
+          "localID": 105,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6071,8 +4733,8 @@
         },
         {
           "name": "PROP_Lamp(3)",
-          "localID": 166,
-          "parentID": 95,
+          "localID": 106,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6105,8 +4767,8 @@
         },
         {
           "name": "PROP_Lamp(4)",
-          "localID": 167,
-          "parentID": 95,
+          "localID": 107,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6139,8 +4801,8 @@
         },
         {
           "name": "PROP_Window(5)",
-          "localID": 168,
-          "parentID": 95,
+          "localID": 108,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6169,8 +4831,8 @@
         },
         {
           "name": "PROP_Lamp(6)",
-          "localID": 169,
-          "parentID": 95,
+          "localID": 109,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6203,8 +4865,8 @@
         },
         {
           "name": "PROP_Lamp(7)",
-          "localID": 170,
-          "parentID": 95,
+          "localID": 110,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6237,8 +4899,8 @@
         },
         {
           "name": "PROP_Window(8)",
-          "localID": 171,
-          "parentID": 95,
+          "localID": 111,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6267,8 +4929,8 @@
         },
         {
           "name": "PROP_Lamp(9)",
-          "localID": 172,
-          "parentID": 95,
+          "localID": 112,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6301,8 +4963,8 @@
         },
         {
           "name": "PROP_Lamp(11)",
-          "localID": 174,
-          "parentID": 95,
+          "localID": 113,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6335,8 +4997,8 @@
         },
         {
           "name": "PROP_Lamp(12)",
-          "localID": 175,
-          "parentID": 95,
+          "localID": 114,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6369,8 +5031,8 @@
         },
         {
           "name": "PROP_Lamp(13)",
-          "localID": 176,
-          "parentID": 95,
+          "localID": 115,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6403,8 +5065,8 @@
         },
         {
           "name": "PROP_Lamp(25)",
-          "localID": 192,
-          "parentID": 95,
+          "localID": 116,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6437,8 +5099,8 @@
         },
         {
           "name": "PROP_Lamp(26)",
-          "localID": 193,
-          "parentID": 95,
+          "localID": 117,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6471,8 +5133,8 @@
         },
         {
           "name": "PROP_Lamp(28)",
-          "localID": 195,
-          "parentID": 95,
+          "localID": 118,
+          "parentID": 100,
           "active": true,
           "TransformComponent": {
             "pos": [
@@ -6507,7 +5169,7 @@
     },
     {
       "name": "PROP_WL(6)",
-      "localID": 99,
+      "localID": 119,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6535,7 +5197,7 @@
     },
     {
       "name": "Spike_Collider",
-      "localID": 100,
+      "localID": 120,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6573,7 +5235,7 @@
     },
     {
       "name": "Spike_Collider(1)",
-      "localID": 101,
+      "localID": 121,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6611,7 +5273,7 @@
     },
     {
       "name": "Spike_Collider(2)",
-      "localID": 102,
+      "localID": 122,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6649,7 +5311,7 @@
     },
     {
       "name": "Spike_Collider(3)",
-      "localID": 103,
+      "localID": 123,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6687,7 +5349,7 @@
     },
     {
       "name": "Spike_Collider(4)",
-      "localID": 104,
+      "localID": 124,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6725,7 +5387,7 @@
     },
     {
       "name": "Spike_Collider(5)",
-      "localID": 105,
+      "localID": 125,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6763,7 +5425,7 @@
     },
     {
       "name": "Starfish_Collider",
-      "localID": 106,
+      "localID": 126,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6782,9 +5444,9 @@
         "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
         "color": [
           1.0,
-          0.0,
-          0.9882354736328125,
-          0.0
+          1.0,
+          1.0,
+          1.0
         ],
         "layer": 0,
         "screenSpace": false
@@ -6839,7 +5501,7 @@
     },
     {
       "name": "Spike_Collider(7)",
-      "localID": 107,
+      "localID": 127,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6877,7 +5539,7 @@
     },
     {
       "name": "Starfish_Hazard(9)",
-      "localID": 110,
+      "localID": 128,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6945,7 +5607,7 @@
     },
     {
       "name": "Starfish_Hazard(10)",
-      "localID": 111,
+      "localID": 129,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7013,7 +5675,7 @@
     },
     {
       "name": "Spike_Hazard(11)",
-      "localID": 112,
+      "localID": 130,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7070,7 +5732,7 @@
     },
     {
       "name": "Spike_Collider(12)",
-      "localID": 113,
+      "localID": 131,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7108,7 +5770,7 @@
     },
     {
       "name": "Starfish_Hazard(13)",
-      "localID": 114,
+      "localID": 132,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7176,7 +5838,7 @@
     },
     {
       "name": "Starfish_Hazard(14)",
-      "localID": 115,
+      "localID": 133,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7244,7 +5906,7 @@
     },
     {
       "name": "Starfish_Hazard(15)",
-      "localID": 116,
+      "localID": 134,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7312,7 +5974,7 @@
     },
     {
       "name": "Starfish_Hazard(16)",
-      "localID": 117,
+      "localID": 135,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7380,7 +6042,7 @@
     },
     {
       "name": "Starfish_Collider(17)",
-      "localID": 118,
+      "localID": 136,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7418,7 +6080,7 @@
     },
     {
       "name": "Spike_Hazard(18)",
-      "localID": 119,
+      "localID": 137,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7475,7 +6137,7 @@
     },
     {
       "name": "Spike_Hazard(19)",
-      "localID": 120,
+      "localID": 138,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7532,7 +6194,7 @@
     },
     {
       "name": "Spike_Hazard(20)",
-      "localID": 121,
+      "localID": 139,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7589,7 +6251,7 @@
     },
     {
       "name": "Spike_Hazard(21)",
-      "localID": 122,
+      "localID": 140,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7646,7 +6308,7 @@
     },
     {
       "name": "Spike_Hazard(22)",
-      "localID": 123,
+      "localID": 141,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7703,7 +6365,7 @@
     },
     {
       "name": "Spike_Hazard(23)",
-      "localID": 124,
+      "localID": 142,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7760,7 +6422,7 @@
     },
     {
       "name": "Spike_Hazard(24)",
-      "localID": 125,
+      "localID": 143,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7817,7 +6479,7 @@
     },
     {
       "name": "Spike_Hazard(25)",
-      "localID": 126,
+      "localID": 144,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7874,7 +6536,7 @@
     },
     {
       "name": "Spike_Hazard(26)",
-      "localID": 127,
+      "localID": 145,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7931,7 +6593,7 @@
     },
     {
       "name": "Spike_Hazard(27)",
-      "localID": 128,
+      "localID": 146,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -7988,7 +6650,7 @@
     },
     {
       "name": "Spike_Hazard(28)",
-      "localID": 129,
+      "localID": 147,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8045,7 +6707,7 @@
     },
     {
       "name": "Spike_Hazard(29)",
-      "localID": 130,
+      "localID": 148,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8102,7 +6764,7 @@
     },
     {
       "name": "Spike_Collider(32)",
-      "localID": 133,
+      "localID": 149,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8140,7 +6802,7 @@
     },
     {
       "name": "Spike_Hazard(33)",
-      "localID": 134,
+      "localID": 150,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8197,7 +6859,7 @@
     },
     {
       "name": "Spike_Hazard(34)",
-      "localID": 135,
+      "localID": 151,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8254,7 +6916,7 @@
     },
     {
       "name": "Spike_Hazard(35)",
-      "localID": 136,
+      "localID": 152,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8311,7 +6973,7 @@
     },
     {
       "name": "Spike_Hazard(36)",
-      "localID": 137,
+      "localID": 153,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8368,7 +7030,7 @@
     },
     {
       "name": "Spike_Hazard(37)",
-      "localID": 138,
+      "localID": 154,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8425,7 +7087,7 @@
     },
     {
       "name": "Spike_Hazard(38)",
-      "localID": 139,
+      "localID": 155,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8482,7 +7144,7 @@
     },
     {
       "name": "Spike_Hazard(39)",
-      "localID": 140,
+      "localID": 156,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8539,7 +7201,7 @@
     },
     {
       "name": "Spike_Hazard(40)",
-      "localID": 141,
+      "localID": 157,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8596,7 +7258,7 @@
     },
     {
       "name": "Spike_Hazard(41)",
-      "localID": 142,
+      "localID": 158,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8653,7 +7315,7 @@
     },
     {
       "name": "Spike_Hazard(42)",
-      "localID": 143,
+      "localID": 159,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8710,7 +7372,7 @@
     },
     {
       "name": "Spike_Hazard(43)",
-      "localID": 144,
+      "localID": 160,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8767,7 +7429,7 @@
     },
     {
       "name": "Spike_Hazard(44)",
-      "localID": 145,
+      "localID": 161,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8824,7 +7486,7 @@
     },
     {
       "name": "Starfish_Collider",
-      "localID": 146,
+      "localID": 162,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8862,7 +7524,7 @@
     },
     {
       "name": "Spike_Collider(46)",
-      "localID": 147,
+      "localID": 163,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8900,7 +7562,7 @@
     },
     {
       "name": "Starfish_Hazard(47)",
-      "localID": 148,
+      "localID": 164,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8968,7 +7630,7 @@
     },
     {
       "name": "Starfish_Hazard(48)",
-      "localID": 149,
+      "localID": 165,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9036,7 +7698,7 @@
     },
     {
       "name": "Starfish_Hazard(49)",
-      "localID": 150,
+      "localID": 166,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9104,7 +7766,7 @@
     },
     {
       "name": "Starfish_Hazard(50)",
-      "localID": 151,
+      "localID": 167,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9172,7 +7834,7 @@
     },
     {
       "name": "Starfish_Hazard(51)",
-      "localID": 152,
+      "localID": 168,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9240,7 +7902,7 @@
     },
     {
       "name": "Starfish_Hazard(52)",
-      "localID": 153,
+      "localID": 169,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9308,7 +7970,7 @@
     },
     {
       "name": "Starfish_Hazard(53)",
-      "localID": 154,
+      "localID": 170,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9376,7 +8038,7 @@
     },
     {
       "name": "Spike_Collider(55)",
-      "localID": 156,
+      "localID": 171,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9414,7 +8076,7 @@
     },
     {
       "name": "Starfish_Collider(56)",
-      "localID": 157,
+      "localID": 172,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9452,7 +8114,7 @@
     },
     {
       "name": "Starfish_Collider(57)",
-      "localID": 158,
+      "localID": 173,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9490,7 +8152,7 @@
     },
     {
       "name": "Starfish_Collider(58)",
-      "localID": 159,
+      "localID": 174,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9528,7 +8190,7 @@
     },
     {
       "name": "Starfish_Collider(59)",
-      "localID": 160,
+      "localID": 175,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9566,7 +8228,7 @@
     },
     {
       "name": "Starfish_Collider(60)",
-      "localID": 161,
+      "localID": 176,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9604,7 +8266,7 @@
     },
     {
       "name": "Starfish_Collider(61)",
-      "localID": 162,
+      "localID": 177,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9642,7 +8304,7 @@
     },
     {
       "name": "Starfish_Collider(62)",
-      "localID": 163,
+      "localID": 178,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9680,7 +8342,7 @@
     },
     {
       "name": "PROP_Cabinet(10)",
-      "localID": 173,
+      "localID": 179,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9710,7 +8372,7 @@
     },
     {
       "name": "PROP_Balcony",
-      "localID": 177,
+      "localID": 180,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9740,7 +8402,7 @@
     },
     {
       "name": "PROP_Candles",
-      "localID": 178,
+      "localID": 181,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9786,7 +8448,7 @@
     },
     {
       "name": "PROP_Candles(14)",
-      "localID": 179,
+      "localID": 182,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9820,7 +8482,7 @@
     },
     {
       "name": "PROP_Balcony(15)",
-      "localID": 180,
+      "localID": 183,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9850,7 +8512,7 @@
     },
     {
       "name": "PROP_Balcony(16)",
-      "localID": 181,
+      "localID": 184,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9880,7 +8542,7 @@
     },
     {
       "name": "PROP_Candles(17)",
-      "localID": 182,
+      "localID": 185,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9914,7 +8576,7 @@
     },
     {
       "name": "PROP_Candles(19)",
-      "localID": 184,
+      "localID": 186,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9948,7 +8610,7 @@
     },
     {
       "name": "PROP_DressTable",
-      "localID": 185,
+      "localID": 187,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -9978,7 +8640,7 @@
     },
     {
       "name": "PROP_Mirror(20)",
-      "localID": 186,
+      "localID": 188,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10008,7 +8670,7 @@
     },
     {
       "name": "PROP_Chair(21)",
-      "localID": 187,
+      "localID": 189,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10038,7 +8700,7 @@
     },
     {
       "name": "PROP_CeilingLamp",
-      "localID": 188,
+      "localID": 190,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10068,7 +8730,7 @@
     },
     {
       "name": "PROP_CeilingLamp(22)",
-      "localID": 189,
+      "localID": 191,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10098,7 +8760,7 @@
     },
     {
       "name": "PROP_CeilingLamp(23)",
-      "localID": 190,
+      "localID": 192,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10128,7 +8790,7 @@
     },
     {
       "name": "PROP_Cabinet(24)",
-      "localID": 191,
+      "localID": 193,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10188,7 +8850,7 @@
     },
     {
       "name": "PROP_Balcony(29)",
-      "localID": 196,
+      "localID": 195,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10218,7 +8880,7 @@
     },
     {
       "name": "PROP_Candles(30)",
-      "localID": 197,
+      "localID": 196,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10252,7 +8914,7 @@
     },
     {
       "name": "PROP_Candles(31)",
-      "localID": 198,
+      "localID": 197,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10286,7 +8948,7 @@
     },
     {
       "name": "PROP_Balcony(32)",
-      "localID": 199,
+      "localID": 198,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10316,7 +8978,7 @@
     },
     {
       "name": "PROP_Candles(33)",
-      "localID": 200,
+      "localID": 199,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10350,7 +9012,7 @@
     },
     {
       "name": "PROP_Candles(34)",
-      "localID": 201,
+      "localID": 200,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10384,7 +9046,7 @@
     },
     {
       "name": "PROP_Balcony(35)",
-      "localID": 202,
+      "localID": 201,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10414,7 +9076,7 @@
     },
     {
       "name": "PROP_Candles(36)",
-      "localID": 203,
+      "localID": 202,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10448,7 +9110,7 @@
     },
     {
       "name": "PROP_Candles(37)",
-      "localID": 204,
+      "localID": 203,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10482,7 +9144,7 @@
     },
     {
       "name": "PROP_Candles(38)",
-      "localID": 205,
+      "localID": 204,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10516,7 +9178,7 @@
     },
     {
       "name": "PROP_Balcony(39)",
-      "localID": 206,
+      "localID": 205,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10546,7 +9208,7 @@
     },
     {
       "name": "PROP_Candles(40)",
-      "localID": 207,
+      "localID": 206,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10580,7 +9242,7 @@
     },
     {
       "name": "PROP_DressTableSMALL",
-      "localID": 208,
+      "localID": 207,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10610,7 +9272,7 @@
     },
     {
       "name": "PROP_CeilingLamp(41)",
-      "localID": 209,
+      "localID": 208,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10640,7 +9302,7 @@
     },
     {
       "name": "PROP_CeilingLamp(42)",
-      "localID": 210,
+      "localID": 209,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -10667,526 +9329,6 @@
         "screenSpace": false
       },
       "children": []
-    },
-    {
-      "name": "NPC_Jellyfish(43)",
-      "localID": 211,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          8068.0,
-          3319.0
-        ],
-        "scale": [
-          449.0,
-          463.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "",
-        "animations": []
-      },
-      "children": []
-    },
-    {
-      "name": "NPC_Lobster(44)",
-      "localID": 212,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          13370.0,
-          700.0
-        ],
-        "scale": [
-          560.0,
-          494.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "",
-        "animations": []
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_CeilingLamp(45)",
-      "localID": 213,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          16787.0,
-          1681.0
-        ],
-        "scale": [
-          160.0,
-          162.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_CeilingLamp(46)",
-      "localID": 214,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          28808.0,
-          1620.4610595703125
-        ],
-        "scale": [
-          160.0,
-          162.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_CeilingLamp(47)",
-      "localID": 215,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          25694.0,
-          1620.4610595703125
-        ],
-        "scale": [
-          160.0,
-          162.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_CeilingLamp(48)",
-      "localID": 216,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          26294.0,
-          1620.4610595703125
-        ],
-        "scale": [
-          160.0,
-          162.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_CeilingLamp(49)",
-      "localID": 217,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          26884.0,
-          1620.4610595703125
-        ],
-        "scale": [
-          160.0,
-          162.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_CeilingLamp(50)",
-      "localID": 218,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          28184.0,
-          1620.4610595703125
-        ],
-        "scale": [
-          160.0,
-          162.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_DressTable(51)",
-      "localID": 219,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          12189.0,
-          736.5
-        ],
-        "scale": [
-          1024.0,
-          512.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_FamilyPhoto(52)",
-      "localID": 220,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          28162.0,
-          970.4609985351563
-        ],
-        "scale": [
-          330.0,
-          270.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          330.0,
-          270.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_Mirror(53)",
-      "localID": 221,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          16030.0,
-          649.0
-        ],
-        "scale": [
-          201.0,
-          341.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_Chair(54)",
-      "localID": 222,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          15667.0,
-          649.0
-        ],
-        "scale": [
-          128.0,
-          331.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_FamilyPhoto(55)",
-      "localID": 223,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          17215.0,
-          17215.0
-        ],
-        "scale": [
-          330.0,
-          270.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          330.0,
-          270.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "PROP_FamilyPhoto(57)",
-      "localID": 225,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          26252.0,
-          970.4609985351563
-        ],
-        "scale": [
-          330.0,
-          270.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          330.0,
-          270.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "Starfish_Hazard(58)",
-      "localID": 226,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          16234.0,
-          1168.5
-        ],
-        "scale": [
-          150.0,
-          128.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "",
-        "animations": []
-      },
-      "children": []
-    },
-    {
-      "name": "Starfish_Hazard(59)",
-      "localID": 227,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          18141.978515625,
-          1168.5
-        ],
-        "scale": [
-          150.0,
-          128.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "",
-        "animations": []
-      },
-      "children": []
     }
   ],
   "AudioManager": {
@@ -11197,6 +9339,14 @@
         "loop": false,
         "volume": 0.5,
         "pitch": 1.5,
+        "category": "sfx"
+      },
+      {
+        "name": "CreditsAudio",
+        "filepath": "../Assets/CreditsAudio.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
         "category": "sfx"
       },
       {
@@ -11219,7 +9369,7 @@
         "name": "bgm",
         "filepath": "../Assets/audio/sneaky_bgm.wav",
         "loop": true,
-        "volume": 0.75,
+        "volume": 0.50,
         "pitch": 1.0,
         "category": "bgm"
       },
@@ -11307,9 +9457,9 @@
         "name": "gameover",
         "filepath": "../Assets/audio/gameover.wav",
         "loop": true,
-        "volume": 0.4000000059604645,
+        "volume": 0.30000001192092896,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "bgm"
       },
       {
         "name": "groundpound_falling_sfx",
@@ -11393,7 +9543,7 @@
       },
       {
         "name": "menu_restart",
-        "filepath": "../Assets/audio/press_button.wav",
+        "filepath": "../Assets/audio/restart_button.wav",
         "loop": false,
         "volume": 0.5,
         "pitch": 1.0,
@@ -11421,7 +9571,7 @@
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "bgm"
       },
       {
         "name": "wallkick_fast_sfx",
@@ -11451,40 +9601,9 @@
         "name": "wallslide_sfx",
         "filepath": "../Assets/audio/Player/WallSlide.wav",
         "loop": false,
-        "volume": 0.5,
-        "pitch": 1.0,
+        "volume": 0.10000000149011612,
+        "pitch": 0.8999999761581421,
         "category": "sfx"
-      },
-      {
-        "name": "menu_restart",
-        "filepath": "../Assets/audio/restart_button.wav",
-        "loop": false,
-        "volume": 0.5,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "victory",
-        "filepath": "../Assets/audio/victory.wav",
-        "loop": true,
-        "volume": 0.5,
-        "pitch": 1.0,
-        "category": "bgm"
-      },
-      {
-        "name": "gameover",
-        "filepath": "../Assets/audio/gameover.wav",
-        "loop": true,
-        "volume": 0.3,
-        "pitch": 1.0,
-        "category": "bgm"
-      },
-      {
-        "name": "CreditsAudio",
-        "filepath": "../Assets/CreditsAudio.wav",
-        "type": "sound",
-        "volume": 1.0,
-        "loop": false
       }
     ],
     "events": [
