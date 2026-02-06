@@ -40,8 +40,8 @@
       "CameraComponent": {
         "mode": "FOLLOW_TARGET",
         "position": [
-          7040.2451171875,
-          1107.4476318359375
+          0.0,
+          0.0
         ],
         "followOffset": [
           0.0,
@@ -49,7 +49,7 @@
         ],
         "smoothing": true,
         "smoothingSpeed": 5.0,
-        "followTargetName": "Hero"
+        "followTargetName": ""
       },
       "children": []
     },
@@ -60,12 +60,12 @@
       "active": true,
       "TransformComponent": {
         "pos": [
-          7870.0,
+          7871.5,
           3303.0
         ],
         "scale": [
-          1596.0,
-          647.0
+          1598.0,
+          654.0
         ],
         "rotation": 0.0
       },
@@ -95,8 +95,8 @@
         "shape": "Square",
         "layer": "Ground",
         "size": [
-          1596.0,
-          647.0
+          1598.0,
+          654.0
         ]
       },
       "children": []
@@ -178,7 +178,7 @@
         "screenSpace": false
       },
       "Spritesheet": {
-        "defaultAnimation": "Wallslide",
+        "defaultAnimation": "Idle",
         "animations": [
           {
             "name": "Bonk",
@@ -446,7 +446,7 @@
         "screenSpace": false
       },
       "Spritesheet": {
-        "defaultAnimation": "Clear",
+        "defaultAnimation": "",
         "animations": [
           {
             "name": "Bonk",
@@ -685,7 +685,7 @@
       "TransformComponent": {
         "pos": [
           0.0,
-          0.0
+          528.0
         ],
         "scale": [
           200.0,
@@ -1486,7 +1486,7 @@
         "screenSpace": false
       },
       "Spritesheet": {
-        "defaultAnimation": "",
+        "defaultAnimation": "Clear",
         "animations": [
           {
             "name": "Bonk",
@@ -1718,8 +1718,788 @@
       "children": []
     },
     {
-      "name": "C_Ground",
+      "name": "Hero_vfx",
       "localID": 16,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 17,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 18,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Clear",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 19,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 20,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 21,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "C_Ground",
+      "localID": 22,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1767,7 +2547,7 @@
     },
     {
       "name": "C_Ground(4)",
-      "localID": 17,
+      "localID": 23,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1815,7 +2595,7 @@
     },
     {
       "name": "C_Ground(5)",
-      "localID": 18,
+      "localID": 24,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1863,7 +2643,7 @@
     },
     {
       "name": "C_Ground(6)",
-      "localID": 19,
+      "localID": 25,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1911,7 +2691,7 @@
     },
     {
       "name": "C_Ground(7)",
-      "localID": 20,
+      "localID": 26,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1959,7 +2739,7 @@
     },
     {
       "name": "C_Ground(8)",
-      "localID": 21,
+      "localID": 27,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2007,12 +2787,12 @@
     },
     {
       "name": "C_Ground(37)",
-      "localID": 22,
+      "localID": 28,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          15391.9326171875,
+          15392.0,
           1299.9632568359375
         ],
         "scale": [
@@ -2055,7 +2835,7 @@
     },
     {
       "name": "C_Ground(35)",
-      "localID": 23,
+      "localID": 29,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2103,7 +2883,7 @@
     },
     {
       "name": "C_Ground(13)",
-      "localID": 24,
+      "localID": 30,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2151,7 +2931,7 @@
     },
     {
       "name": "C_Ground(14)",
-      "localID": 25,
+      "localID": 31,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2199,7 +2979,7 @@
     },
     {
       "name": "C_Ground(16)",
-      "localID": 26,
+      "localID": 32,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2247,17 +3027,17 @@
     },
     {
       "name": "C_Ground(17)",
-      "localID": 27,
+      "localID": 33,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          10336.4228515625,
-          1828.2998046875
+          10335.4228515625,
+          2259.300048828125
         ],
         "scale": [
           2426.4306640625,
-          1522.1473388671875
+          660.0
         ],
         "rotation": 0.0
       },
@@ -2287,15 +3067,15 @@
         "shape": "Square",
         "layer": "Ground",
         "size": [
-          2426.431640625,
-          1522.14697265625
+          2426.4306640625,
+          660.0
         ]
       },
       "children": []
     },
     {
       "name": "C_Ground(18)",
-      "localID": 28,
+      "localID": 34,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2343,7 +3123,7 @@
     },
     {
       "name": "C_Ground(19)",
-      "localID": 29,
+      "localID": 35,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2391,7 +3171,7 @@
     },
     {
       "name": "C_Ground(20)",
-      "localID": 30,
+      "localID": 36,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2439,17 +3219,17 @@
     },
     {
       "name": "C_Ground(21)",
-      "localID": 31,
+      "localID": 37,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          2062.744140625,
-          2089.275634765625
+          2061.743896484375,
+          2269.27587890625
         ],
         "scale": [
           3999.87158203125,
-          490.1483154296875
+          128.0
         ],
         "rotation": 0.0
       },
@@ -2479,15 +3259,15 @@
         "shape": "Square",
         "layer": "Ground",
         "size": [
-          3999.8720703125,
-          490.14794921875
+          3999.87158203125,
+          128.0
         ]
       },
       "children": []
     },
     {
       "name": "C_Ground(22)",
-      "localID": 32,
+      "localID": 38,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2535,7 +3315,7 @@
     },
     {
       "name": "C_Ground(24)",
-      "localID": 33,
+      "localID": 39,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2583,12 +3363,12 @@
     },
     {
       "name": "C_Ground(25)",
-      "localID": 34,
+      "localID": 40,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          20287.783203125,
+          20286.5,
           1331.872314453125
         ],
         "scale": [
@@ -2631,7 +3411,7 @@
     },
     {
       "name": "C_Ground(26)",
-      "localID": 35,
+      "localID": 41,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2679,7 +3459,7 @@
     },
     {
       "name": "C_Ground(27)",
-      "localID": 36,
+      "localID": 42,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2727,7 +3507,7 @@
     },
     {
       "name": "C_Ground(28)",
-      "localID": 37,
+      "localID": 43,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2775,7 +3555,7 @@
     },
     {
       "name": "C_Ground(29)",
-      "localID": 38,
+      "localID": 44,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2823,7 +3603,7 @@
     },
     {
       "name": "C_Ground(30)",
-      "localID": 39,
+      "localID": 45,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2871,13 +3651,13 @@
     },
     {
       "name": "C_Ground(31)",
-      "localID": 40,
+      "localID": 46,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          23648.3984375,
-          1442.4063720703125
+          23654.3984375,
+          1440.5
         ],
         "scale": [
           2300.599609375,
@@ -2919,7 +3699,7 @@
     },
     {
       "name": "C_Ground(32)",
-      "localID": 41,
+      "localID": 47,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2967,7 +3747,7 @@
     },
     {
       "name": "C_Ground(33)",
-      "localID": 42,
+      "localID": 48,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3015,13 +3795,13 @@
     },
     {
       "name": "C_Ground(34)",
-      "localID": 43,
+      "localID": 49,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          26592.232421875,
-          2365.758544921875
+          26591.232421875,
+          2365.9609375
         ],
         "scale": [
           892.2078857421875,
@@ -3063,7 +3843,7 @@
     },
     {
       "name": "C_Ground(1)",
-      "localID": 44,
+      "localID": 50,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3111,7 +3891,7 @@
     },
     {
       "name": "C_Ground(2)",
-      "localID": 45,
+      "localID": 51,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3159,12 +3939,12 @@
     },
     {
       "name": "C_Ground(3)",
-      "localID": 46,
+      "localID": 52,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          29795.298828125,
+          29793.0,
           2462.741943359375
         ],
         "scale": [
@@ -3207,7 +3987,7 @@
     },
     {
       "name": "C_Ground(4)",
-      "localID": 47,
+      "localID": 53,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3255,7 +4035,7 @@
     },
     {
       "name": "C_Ground(5)",
-      "localID": 48,
+      "localID": 54,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3303,7 +4083,7 @@
     },
     {
       "name": "C_Ground(6)",
-      "localID": 49,
+      "localID": 55,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3351,7 +4131,7 @@
     },
     {
       "name": "C_Ground(7)",
-      "localID": 50,
+      "localID": 56,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3399,7 +4179,7 @@
     },
     {
       "name": "C_Ground(8)",
-      "localID": 51,
+      "localID": 57,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3447,7 +4227,7 @@
     },
     {
       "name": "WinZone",
-      "localID": 52,
+      "localID": 58,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3468,7 +4248,7 @@
           0.0,
           1.0,
           0.0,
-          0.5
+          0.0
         ],
         "layer": 10,
         "screenSpace": false
@@ -3485,7 +4265,7 @@
     },
     {
       "name": "SafeZone",
-      "localID": 53,
+      "localID": 59,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3506,7 +4286,7 @@
           0.0,
           0.0,
           1.0,
-          0.30000001192092896
+          0.0
         ],
         "layer": 10,
         "screenSpace": false
@@ -3523,7 +4303,7 @@
     },
     {
       "name": "Text FPS",
-      "localID": 54,
+      "localID": 60,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3566,7 +4346,7 @@
     },
     {
       "name": "SZ_Asset",
-      "localID": 55,
+      "localID": 61,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3596,7 +4376,7 @@
     },
     {
       "name": "Spike_Hazard",
-      "localID": 56,
+      "localID": 62,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3638,29 +4418,21 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(1)",
-      "localID": 57,
+      "localID": 63,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          7846.5,
-          2929.0
+          29226.29296875,
+          2096.6767578125
         ],
         "scale": [
           168.0,
-          100.0
+          100.00003051757813
         ],
         "rotation": -3.140000104904175
       },
@@ -3692,24 +4464,16 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(2)",
-      "localID": 58,
+      "localID": 64,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          5386.0,
+          5389.0,
           528.0
         ],
         "scale": [
@@ -3746,19 +4510,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(3)",
-      "localID": 59,
+      "localID": 65,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3800,19 +4556,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(4)",
-      "localID": 60,
+      "localID": 66,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3854,19 +4602,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(5)",
-      "localID": 61,
+      "localID": 67,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3908,19 +4648,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(6)",
-      "localID": 62,
+      "localID": 68,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3962,19 +4694,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(7)",
-      "localID": 63,
+      "localID": 69,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4027,74 +4751,20 @@
       "children": []
     },
     {
-      "name": "Spike_Hazard(8)",
-      "localID": 64,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          9735.0,
-          2639.0
-        ],
-        "scale": [
-          168.0,
-          100.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "Idle",
-        "animations": [
-          {
-            "name": "Idle",
-            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-            "rows": 1,
-            "cols": 3,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 2,
-            "fps": 5.0
-          }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
-      "children": []
-    },
-    {
       "name": "Spike_Hazard(9)",
-      "localID": 65,
+      "localID": 71,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          8558.5,
-          2853.0
+          29703.888671875,
+          1012.8726806640625
         ],
         "scale": [
           168.0,
           100.0
         ],
-        "rotation": -4.699999809265137
+        "rotation": 1.5831855535507202
       },
       "RenderComponent": {
         "shapeType": "Square",
@@ -4122,31 +4792,23 @@
             "endCol": 2,
             "fps": 5.0
           }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          100.0,
-          132.0
         ]
       },
       "children": []
     },
     {
       "name": "Spike_Hazard(10)",
-      "localID": 66,
+      "localID": 72,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          8392.5,
+          8006.53515625,
           2929.0
         ],
         "scale": [
           168.0,
-          100.0
+          100.00003051757813
         ],
         "rotation": -3.140000104904175
       },
@@ -4176,31 +4838,23 @@
             "endCol": 2,
             "fps": 5.0
           }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
         ]
       },
       "children": []
     },
     {
       "name": "Spike_Hazard(11)",
-      "localID": 67,
+      "localID": 73,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          8257.5,
+          7857.5009765625,
           2929.0
         ],
         "scale": [
           168.0,
-          100.0
+          100.00003051757813
         ],
         "rotation": -3.140000104904175
       },
@@ -4230,31 +4884,23 @@
             "endCol": 2,
             "fps": 5.0
           }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
         ]
       },
       "children": []
     },
     {
       "name": "Spike_Hazard(12)",
-      "localID": 68,
+      "localID": 74,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          8121.5,
+          7712.728515625,
           2929.0
         ],
         "scale": [
           168.0,
-          100.0
+          100.00003051757813
         ],
         "rotation": -3.140000104904175
       },
@@ -4284,31 +4930,23 @@
             "endCol": 2,
             "fps": 5.0
           }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
         ]
       },
       "children": []
     },
     {
       "name": "Spike_Hazard(13)",
-      "localID": 69,
+      "localID": 75,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          7985.5,
+          7571.46630859375,
           2929.0
         ],
         "scale": [
           168.0,
-          100.0
+          100.00003051757813
         ],
         "rotation": -3.140000104904175
       },
@@ -4338,31 +4976,23 @@
             "endCol": 2,
             "fps": 5.0
           }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
         ]
       },
       "children": []
     },
     {
       "name": "Spike_Hazard(14)",
-      "localID": 70,
+      "localID": 76,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          8524.5,
+          8154.3251953125,
           2929.0
         ],
         "scale": [
           168.0,
-          100.0
+          100.00003051757813
         ],
         "rotation": -3.140000104904175
       },
@@ -4394,19 +5024,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(15)",
-      "localID": 71,
+      "localID": 77,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4448,19 +5070,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          100.0,
-          132.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(16)",
-      "localID": 72,
+      "localID": 78,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4502,19 +5116,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          100.0,
-          132.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(17)",
-      "localID": 73,
+      "localID": 79,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4556,19 +5162,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          100.0,
-          132.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(18)",
-      "localID": 74,
+      "localID": 80,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4610,19 +5208,11 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          100.0,
-          132.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(19)",
-      "localID": 75,
+      "localID": 81,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4664,24 +5254,16 @@
           }
         ]
       },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
       "children": []
     },
     {
       "name": "Spike_Hazard(20)",
-      "localID": 76,
+      "localID": 82,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          9440.0,
+          9198.4912109375,
           2639.0
         ],
         "scale": [
@@ -4716,75 +5298,13 @@
             "endCol": 2,
             "fps": 5.0
           }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
-        ]
-      },
-      "children": []
-    },
-    {
-      "name": "Spike_Hazard(21)",
-      "localID": 77,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          9589.0,
-          2639.0
-        ],
-        "scale": [
-          168.0,
-          100.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "Spritesheet": {
-        "defaultAnimation": "Idle",
-        "animations": [
-          {
-            "name": "Idle",
-            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-            "rows": 1,
-            "cols": 3,
-            "startRow": 0,
-            "startCol": 0,
-            "endRow": 0,
-            "endCol": 2,
-            "fps": 5.0
-          }
-        ]
-      },
-      "ColliderComponent": {
-        "shape": "Square",
-        "layer": "Default",
-        "size": [
-          126.0,
-          100.0
         ]
       },
       "children": []
     },
     {
       "name": "EZ_Asset",
-      "localID": 78,
+      "localID": 83,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4814,17 +5334,17 @@
     },
     {
       "name": "NPC_Jellyfish",
-      "localID": 79,
+      "localID": 84,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          8222.0,
-          3305.0
+          28575.0,
+          698.4609985351563
         ],
         "scale": [
           449.0,
-          436.0
+          463.0
         ],
         "rotation": 0.0
       },
@@ -4860,13 +5380,13 @@
     },
     {
       "name": "NPC_Lobster",
-      "localID": 80,
+      "localID": 85,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          7541.5,
-          3323.0
+          25684.0,
+          698.4609985351563
         ],
         "scale": [
           560.0,
@@ -4934,6 +5454,5616 @@
             "fps": 5.0
           }
         ]
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Cabinet",
+      "localID": 86,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8600.0,
+          1425.5
+        ],
+        "scale": [
+          380.0,
+          235.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Cabinet 1.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Mirror",
+      "localID": 87,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          26748.322265625,
+          2356.9609375
+        ],
+        "scale": [
+          185.0,
+          306.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Mirror flipped.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Sink",
+      "localID": 88,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          15374.0,
+          1241.0
+        ],
+        "scale": [
+          360.0,
+          251.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Sink.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Sink(1)",
+      "localID": 89,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7483.0,
+          3224.0
+        ],
+        "scale": [
+          360.0,
+          251.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Sink.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_FamilyPhoto",
+      "localID": 90,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          17836.0,
+          749.4609985351563
+        ],
+        "scale": [
+          330.0,
+          270.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Family portrait.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          330.0,
+          270.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Chair",
+      "localID": 91,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          26452.322265625,
+          2352.9609375
+        ],
+        "scale": [
+          137.0,
+          297.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Chair 1.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Mirror(2)",
+      "localID": 92,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          13953.0,
+          649.0
+        ],
+        "scale": [
+          201.0,
+          341.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Mirror flipped.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Chair(3)",
+      "localID": 93,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          14632.0,
+          649.0
+        ],
+        "scale": [
+          128.0,
+          331.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Chair 1.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Mirror(4)",
+      "localID": 94,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          15016.0,
+          649.0
+        ],
+        "scale": [
+          201.0,
+          341.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Mirror flipped.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_WL",
+      "localID": 95,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "PhysicsComponent": {
+        "mass": 0.0,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "children": [
+        {
+          "name": "PROP_Lamp(5)",
+          "localID": 96,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1269.5,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/lamp_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "Idle",
+            "animations": [
+              {
+                "name": "Idle",
+                "filepath": "../Assets/Sprites/Sheets/lamp_spritesheet.png",
+                "rows": 1,
+                "cols": 9,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 8,
+                "fps": 12.0
+              }
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Window",
+          "localID": 97,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              3486.0,
+              1794.5
+            ],
+            "scale": [
+              256.0,
+              374.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Props/Window.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp",
+          "localID": 98,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              3737.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/lamp_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "PROP Lamp",
+            "animations": [
+              {
+                "name": "PROP Lamp",
+                "filepath": "../Assets/Sprites/Sheets/lamp_spritesheet.png",
+                "rows": 1,
+                "cols": 9,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 8,
+                "fps": 12.0
+              }
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(1)",
+          "localID": 164,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              353.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Window(2)",
+          "localID": 165,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              591.0,
+              1794.5
+            ],
+            "scale": [
+              256.0,
+              374.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(3)",
+          "localID": 166,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              832.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(4)",
+          "localID": 167,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1780.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Window(5)",
+          "localID": 168,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1523.0,
+              1794.5
+            ],
+            "scale": [
+              256.0,
+              374.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(6)",
+          "localID": 169,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              2174.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(7)",
+          "localID": 170,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              2679.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Window(8)",
+          "localID": 171,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              2423.0,
+              1794.5
+            ],
+            "scale": [
+              256.0,
+              374.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(9)",
+          "localID": 172,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              8994.0,
+              1446.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(11)",
+          "localID": 174,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              3215.0,
+              1860.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(12)",
+          "localID": 175,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              24496.525390625,
+              1843.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(13)",
+          "localID": 176,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              8188.0,
+              1446.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(25)",
+          "localID": 192,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              7395.0,
+              1446.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(26)",
+          "localID": 193,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              22797.525390625,
+              1843.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        },
+        {
+          "name": "PROP_Lamp(28)",
+          "localID": 195,
+          "parentID": 95,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              23633.525390625,
+              1843.5
+            ],
+            "scale": [
+              128.0,
+              128.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "Spritesheet": {
+            "defaultAnimation": "",
+            "animations": []
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "PROP_WL(6)",
+      "localID": 99,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "PhysicsComponent": {
+        "mass": 0.0,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider",
+      "localID": 100,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7052.5,
+          511.0
+        ],
+        "scale": [
+          130.0,
+          70.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          130.0,
+          70.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(1)",
+      "localID": 101,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          4672.0,
+          511.0
+        ],
+        "scale": [
+          286.0,
+          70.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          286.0,
+          70.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(2)",
+      "localID": 102,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          6529.5,
+          511.0
+        ],
+        "scale": [
+          286.0,
+          70.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          286.0,
+          70.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(3)",
+      "localID": 103,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          5313.5,
+          511.0
+        ],
+        "scale": [
+          286.0,
+          70.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          286.0,
+          70.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(4)",
+      "localID": 104,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          5920.5,
+          511.0
+        ],
+        "scale": [
+          130.0,
+          70.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          130.0,
+          70.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(5)",
+      "localID": 105,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8576.5,
+          2568.0
+        ],
+        "scale": [
+          65.0,
+          709.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          65.0,
+          709.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider",
+      "localID": 106,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18063.083984375,
+          1163.211181640625
+        ],
+        "scale": [
+          463.0,
+          93.2040786743164
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          0.0,
+          0.9882354736328125,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          463.0,
+          93.2040786743164
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(7)",
+      "localID": 107,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7789.57666015625,
+          2951.425048828125
+        ],
+        "scale": [
+          822.0,
+          57.149658203125
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          822.0,
+          57.149658203125
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(9)",
+      "localID": 110,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16106.0,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(10)",
+      "localID": 111,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16363.0,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(11)",
+      "localID": 112,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9341.830078125,
+          2639.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(12)",
+      "localID": 113,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29726.373046875,
+          1520.2564697265625
+        ],
+        "scale": [
+          58.0,
+          1120.2039794921875
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          58.0,
+          1120.2039794921875
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(13)",
+      "localID": 114,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16487.0,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(14)",
+      "localID": 115,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          17874.4453125,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(15)",
+      "localID": 116,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18008.2109375,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(16)",
+      "localID": 117,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18278.978515625,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(17)",
+      "localID": 118,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16281.98046875,
+          1163.211181640625
+        ],
+        "scale": [
+          457.0,
+          93.2040786743164
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          457.0,
+          93.2040786743164
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(18)",
+      "localID": 119,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9478.396484375,
+          2639.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(19)",
+      "localID": 120,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          22421.224609375,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(20)",
+      "localID": 121,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          22567.884765625,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(21)",
+      "localID": 122,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          22710.525390625,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(22)",
+      "localID": 123,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          22856.23046875,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(23)",
+      "localID": 124,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23004.3359375,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(24)",
+      "localID": 125,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23152.236328125,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(25)",
+      "localID": 126,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23295.509765625,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(26)",
+      "localID": 127,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23442.287109375,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(27)",
+      "localID": 128,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23588.4921875,
+          2670.665283203125
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(28)",
+      "localID": 129,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23730.10546875,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(29)",
+      "localID": 130,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23878.693359375,
+          2670.6650390625
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(32)",
+      "localID": 133,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9338.828125,
+          2618.82275390625
+        ],
+        "scale": [
+          392.4482421875,
+          60.273948669433594
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          392.447265625,
+          60.27399826049805
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(33)",
+      "localID": 134,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7425.4462890625,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(34)",
+      "localID": 135,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29649.669921875,
+          2096.6767578125
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(35)",
+      "localID": 136,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29508.111328125,
+          2096.6767578125
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(36)",
+      "localID": 137,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29366.5546875,
+          2096.6767578125
+        ],
+        "scale": [
+          168.0,
+          100.00003051757813
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(37)",
+      "localID": 138,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8558.5,
+          2853.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -4.699999809265137
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(38)",
+      "localID": 139,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          2022.749267578125
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(39)",
+      "localID": 140,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          1878.3048095703125
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(40)",
+      "localID": 141,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          1730.1566162109375
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(41)",
+      "localID": 142,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          1584.4776611328125
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(42)",
+      "localID": 143,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          1437.56396484375
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(43)",
+      "localID": 144,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          1295.588623046875
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(44)",
+      "localID": 145,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29703.888671875,
+          1153.6134033203125
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 1.5831855535507202
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider",
+      "localID": 146,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23440.94140625,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(46)",
+      "localID": 147,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          29436.576171875,
+          2115.81591796875
+        ],
+        "scale": [
+          553.0029907226563,
+          58.82470703125
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          553.00390625,
+          58.82500076293945
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(47)",
+      "localID": 148,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23253.525390625,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(48)",
+      "localID": 149,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23447.736328125,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(49)",
+      "localID": 150,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23640.767578125,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(50)",
+      "localID": 151,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23829.9765625,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(51)",
+      "localID": 152,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24019.708984375,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(52)",
+      "localID": 153,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24216.5390625,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(53)",
+      "localID": 154,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24406.626953125,
+          2256.93994140625
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Collider(55)",
+      "localID": 156,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23151.158203125,
+          2691.045654296875
+        ],
+        "scale": [
+          1562.8035888671875,
+          54.996826171875
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          1562.803955078125,
+          54.9970703125
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(56)",
+      "localID": 157,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24396.29296875,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(57)",
+      "localID": 158,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23242.50390625,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(58)",
+      "localID": 159,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23438.60546875,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(59)",
+      "localID": 160,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23630.55859375,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(60)",
+      "localID": 161,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23820.435546875,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(61)",
+      "localID": 162,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24011.3515625,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Collider(62)",
+      "localID": 163,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24206.416015625,
+          2253.755126953125
+        ],
+        "scale": [
+          76.03499603271484,
+          92.5616683959961
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          76.03515625,
+          92.56199645996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Cabinet(10)",
+      "localID": 173,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          24081.525390625,
+          1841.5
+        ],
+        "scale": [
+          380.0,
+          235.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony",
+      "localID": 177,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          11022.5,
+          1849.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Balcony .png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles",
+      "localID": 178,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          21782.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/candle_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/candle_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(14)",
+      "localID": 179,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18733.0,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony(15)",
+      "localID": 180,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          21531.0,
+          1530.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony(16)",
+      "localID": 181,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          10379.5,
+          1849.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(17)",
+      "localID": 182,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          10706.5,
+          1847.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(19)",
+      "localID": 184,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          10031.5,
+          1847.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_DressTable",
+      "localID": 185,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          27213.0,
+          735.9609985351563
+        ],
+        "scale": [
+          1024.0,
+          512.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Dressing_table_Full_Large.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Mirror(20)",
+      "localID": 186,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          17215.0,
+          649.0
+        ],
+        "scale": [
+          201.0,
+          341.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Chair(21)",
+      "localID": 187,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16828.0,
+          649.0
+        ],
+        "scale": [
+          128.0,
+          331.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp",
+      "localID": 188,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8362.5,
+          3539.5
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Ceiling_lamp.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(22)",
+      "localID": 189,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          17583.0,
+          1681.0
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(23)",
+      "localID": 190,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7864.5,
+          3539.5
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Cabinet(24)",
+      "localID": 191,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7743.0,
+          1425.5
+        ],
+        "scale": [
+          380.0,
+          235.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Cabinet(27)",
+      "localID": 194,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          23203.525390625,
+          1841.5
+        ],
+        "scale": [
+          380.0,
+          235.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony(29)",
+      "localID": 196,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9691.5,
+          1849.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(30)",
+      "localID": 197,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9373.5,
+          1847.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(31)",
+      "localID": 198,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          11264.5,
+          1847.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony(32)",
+      "localID": 199,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18961.0,
+          1530.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(33)",
+      "localID": 200,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          19201.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(34)",
+      "localID": 201,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          19521.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony(35)",
+      "localID": 202,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          19765.0,
+          1530.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(36)",
+      "localID": 203,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          20032.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(37)",
+      "localID": 204,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          20412.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(38)",
+      "localID": 205,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          20948.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Balcony(39)",
+      "localID": 206,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          20674.0,
+          1530.5
+        ],
+        "scale": [
+          290.0,
+          660.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Candles(40)",
+      "localID": 207,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          21283.5,
+          1546.5
+        ],
+        "scale": [
+          365.0,
+          365.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_DressTableSMALL",
+      "localID": 208,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          17184.5,
+          1373.0
+        ],
+        "scale": [
+          640.0,
+          512.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Dressing_table_Full.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(41)",
+      "localID": 209,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7411.5,
+          3539.5
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(42)",
+      "localID": 210,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          27527.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "NPC_Jellyfish(43)",
+      "localID": 211,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8068.0,
+          3319.0
+        ],
+        "scale": [
+          449.0,
+          463.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "NPC_Lobster(44)",
+      "localID": 212,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          13370.0,
+          700.0
+        ],
+        "scale": [
+          560.0,
+          494.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(45)",
+      "localID": 213,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16787.0,
+          1681.0
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(46)",
+      "localID": 214,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          28808.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(47)",
+      "localID": 215,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          25694.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(48)",
+      "localID": 216,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          26294.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(49)",
+      "localID": 217,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          26884.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_CeilingLamp(50)",
+      "localID": 218,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          28184.0,
+          1620.4610595703125
+        ],
+        "scale": [
+          160.0,
+          162.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_DressTable(51)",
+      "localID": 219,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          12189.0,
+          736.5
+        ],
+        "scale": [
+          1024.0,
+          512.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_FamilyPhoto(52)",
+      "localID": 220,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          28162.0,
+          970.4609985351563
+        ],
+        "scale": [
+          330.0,
+          270.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          330.0,
+          270.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Mirror(53)",
+      "localID": 221,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16030.0,
+          649.0
+        ],
+        "scale": [
+          201.0,
+          341.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_Chair(54)",
+      "localID": 222,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          15667.0,
+          649.0
+        ],
+        "scale": [
+          128.0,
+          331.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_FamilyPhoto(55)",
+      "localID": 223,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          17215.0,
+          17215.0
+        ],
+        "scale": [
+          330.0,
+          270.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          330.0,
+          270.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PROP_FamilyPhoto(57)",
+      "localID": 225,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          26252.0,
+          970.4609985351563
+        ],
+        "scale": [
+          330.0,
+          270.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          330.0,
+          270.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(58)",
+      "localID": 226,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          16234.0,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
+      },
+      "children": []
+    },
+    {
+      "name": "Starfish_Hazard(59)",
+      "localID": 227,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          18141.978515625,
+          1168.5
+        ],
+        "scale": [
+          150.0,
+          128.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": []
       },
       "children": []
     }
