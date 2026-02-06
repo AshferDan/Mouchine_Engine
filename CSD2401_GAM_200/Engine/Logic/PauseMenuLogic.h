@@ -101,6 +101,11 @@ private:
     bool wasSettingsOpenLastFrame = false; // tracks if settings was open last frame to avoid redundant updates
     bool pendingSettingsClose = false;     // whether settings back button was clicked and waiting to close
     float settingsCloseTimer = 0.0f;       // timer for settings close delay
+    bool isHowToPlayOpen = false;          // whether how to play screen is open
+    bool hasCreatedHowToPlayUI = false;    // whether how to play UI has been created
+    bool wasHowToPlayOpenLastFrame = false; // tracks if how to play was open last frame
+    bool pendingHowToPlayClose = false;    // whether how to play back button was clicked
+    float howToPlayCloseTimer = 0.0f;      // timer for how to play close delay
 
     /**
      * @brief Creates all pause menu UI elements (overlay, buttons, title).
@@ -133,6 +138,22 @@ private:
      * @param show Whether to enable or disable settings UI visibility.
      */
     void SetPauseSettingsVisible(bool show);
+
+    /**
+     * @brief Creates how to play screen UI.
+     */
+    void CreateHowToPlayUI();
+
+    /**
+     * @brief Destroys how to play UI objects.
+     */
+    void DestroyHowToPlayUI();
+
+    /**
+     * @brief Sets how to play UI objects active or inactive.
+     * @param show Whether to enable or disable how to play UI visibility.
+     */
+    void SetHowToPlayVisible(bool show);
 
     /**
      * @brief Checks if the mouse cursor is within a button's area.

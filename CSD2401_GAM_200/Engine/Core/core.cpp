@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "Message.h"
 #include "IMessageHandler.h"
+#include "logic.h"
 
 bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
@@ -231,6 +232,9 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
                 SetGamePaused(false);
             }
+
+            // Clear event system again to ensure no stale events from scene transition
+            EventSystem::Clear();
 
             m_pendingScene = "";
             m_hasPendingLoad = false;
