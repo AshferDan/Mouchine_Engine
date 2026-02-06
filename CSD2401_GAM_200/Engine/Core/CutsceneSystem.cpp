@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       CutsceneSystem.cpp
-\author     Lee Hwee Min [100% - ??? lines]
+\author     Lee Hwee Min [100% - 168 lines]
 \par        l.hweemin@digipen.edu
 \date       Janauary, 31, 2026
 

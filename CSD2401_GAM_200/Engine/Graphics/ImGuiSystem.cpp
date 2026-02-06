@@ -3,7 +3,7 @@
 \file       ImGuiSystem.cpp
 \author     Guan Shao Jun [10% - 200 lines]
 \co-author	Muhammad Ashfer [87% - 1941 lines]
-            Hwee Min [3% - 82 lines]
+            Hwee Min [3% - 697 lines]
 \par        shaojun.g@digipen.edu,
 \date       October 02 2025
 

@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       Message.h
-\author     Lee Hwee Min [100% - 116 lines]
+\author     Lee Hwee Min [100% - 134 lines]
 \par        l.hweemin@digipen.edu.sg
 \date       Novemeber, 3, 2025
 

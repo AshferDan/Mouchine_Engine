@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       logic.h
-\author     Lee Hwee Min [100% - 54 lines]
+\author     Lee Hwee Min [100% - 91 lines]
 \par        l.hweemin@digipen.edu
 \date       November, 29, 2025
 
