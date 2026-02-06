@@ -816,7 +816,13 @@ namespace CSharpScript
         public static extern void SetMode(int mode);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern vec2 GetPosition();
+        private static extern void GetPosition_Internal(out float x, out float y);
+
+        public static vec2 GetPosition()
+        {
+            GetPosition_Internal(out float x, out float y);
+            return new vec2(x, y);
+        }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern float GetZoom();
