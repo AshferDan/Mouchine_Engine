@@ -20,6 +20,7 @@ Technology is prohibited.
 #include <unordered_map>
 #include <vector>
 #include <variant>
+#include <memory>
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
@@ -77,8 +78,8 @@ private:
     MonoAssembly* coreAssembly = nullptr;
     MonoImage* coreImage = nullptr;
 
-    // Cache for loaded script classes
-    std::unordered_map<std::string, ScriptClass> scriptClasses;
+    // Cache for loaded script classes (unique_ptr so pointers remain stable across rehashes)
+    std::unordered_map<std::string, std::unique_ptr<ScriptClass>> scriptClasses;
 
     // Map GameObject to their script instances
     std::unordered_map<GameObject*, std::vector<ScriptInstance>> gameObjectScripts;
