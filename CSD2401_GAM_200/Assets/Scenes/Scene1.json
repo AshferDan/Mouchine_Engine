@@ -108,7 +108,7 @@
         "name": "victory",
         "filepath": "../Assets/Audio/victory.wav",
         "loop": true,
-        "volume": 0.50,
+        "volume": 0.5,
         "pitch": 1.0,
         "category": "bgm"
       },
@@ -116,7 +116,7 @@
         "name": "gameover",
         "filepath": "../Assets/Audio/gameover.wav",
         "loop": true,
-        "volume": 0.40,
+        "volume": 0.3,
         "pitch": 1.0,
         "category": "bgm"
       },

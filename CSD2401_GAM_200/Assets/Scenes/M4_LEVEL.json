@@ -2195,7 +2195,7 @@
           920
         ],
         "scale": [
-          1050,
+          1000,
           100
         ],
         "rotation": 0.0
@@ -2255,7 +2255,7 @@
           920
         ],
         "scale": [
-          1050,
+          1000,
           125
         ],
         "rotation": 0.0
@@ -2514,15 +2514,15 @@
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "bgm"
       },
       {
         "name": "gameover",
         "filepath": "../Assets/audio/gameover.wav",
         "loop": true,
-        "volume": 0.40,
+        "volume": 0.3,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "bgm"
       },
       {
       "name": "CreditsAudio",

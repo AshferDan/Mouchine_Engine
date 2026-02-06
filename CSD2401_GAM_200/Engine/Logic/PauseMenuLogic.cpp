@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "core.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
+#include "WinLoseLogic.h"
 #include <iostream>
 
 /**
@@ -67,7 +68,16 @@ void PauseMenuLogicSystem::Update(float dt)
 
     // Handle InGamePauseButton hover/click functionality (uses screen-space coordinates)
     GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
-    if (pauseBtn && !isPauseMenuActive)
+
+    // Check if win/lose screens are active
+    bool isWinLoseScreenActive = false;
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        WinLoseLogicSystem* winLoseSystem = CORE->GetWinLoseLogic();
+        isWinLoseScreenActive = winLoseSystem->IsWinScreenActive() || winLoseSystem->IsLoseScreenActive();
+    }
+
+    if (pauseBtn && !isPauseMenuActive && !isWinLoseScreenActive)
     {
         // Use screen-space mouse coordinates since button has screenSpace = true
         InputManager* inputManager = CORE->GetInputManager();
@@ -146,10 +156,22 @@ void PauseMenuLogicSystem::Update(float dt)
         }
     }
 
-    // Hide InGamePauseButton when pause menu is active
+    // Hide InGamePauseButton when pause menu is active OR when win/lose screens are showing
+    bool shouldHidePauseButton = isPauseMenuActive;
+
+    // Check if win/lose screens are active
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        WinLoseLogicSystem* winLoseSystem = CORE->GetWinLoseLogic();
+        if (winLoseSystem->IsWinScreenActive() || winLoseSystem->IsLoseScreenActive())
+        {
+            shouldHidePauseButton = true;
+        }
+    }
+
     if (pauseBtn)
     {
-        pauseBtn->SetActive(!isPauseMenuActive);
+        pauseBtn->SetActive(!shouldHidePauseButton);
     }
 
     // update pause menu position to follow camera (only when menu is active)
