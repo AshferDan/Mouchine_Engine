@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       TilemapEditor.h
-\author     Khalil Belabadia [100% - 112 lines]
+\author     Khalil Belabadia [100% - 179 lines]
 \par        khalil.b@digipen.edu
 \date       November, 22, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.
@@ -249,9 +249,9 @@ private:
     // Undo/Redo system
     struct TileEditAction
     {
-        int layer;
-        int x;
-        int y;
+        int layer = 0;
+        int x = 0;
+        int y= 0;
         TileData oldTile;  // Tile state before the edit
         TileData newTile;  // Tile state after the edit
     };
