@@ -286,15 +286,7 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseMainMenuButton")
             {
-                std::cout << "[PauseMenu] Main Menu clicked" << std::endl;
-
-                // Start audio fade out before going to main menu
-                audioManager = CORE->GetAudioManager();
-                if (audioManager)
-                {
-                    audioManager->FadeOutCategory("music", 0.5f);
-                    std::cout << "[PauseMenu] Started music fade out" << std::endl;
-                }
+                std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
 
                 // Destroy UI before scene change
                 DestroyHowToPlayUI();
@@ -711,11 +703,19 @@ void PauseMenuLogicSystem::Update(float dt)
             {
                 audioManager->TriggerEvent("UI_Click");
             }
+
+            // Start audio fade when Main Menu button is clicked
+            if (hoveredButtonName == "PauseMainMenuButton")
+            {
+                audioManager->FadeOutCategory("music", 0.5f);
+                std::cout << "[PauseMenu] Started music fade out on button click" << std::endl;
+            }
         }
 
         // start delay before executing action
         pendingSceneChange = true;
-        pendingTimer = 0.20f; // 200ms delay
+        // Longer delay for Main Menu to allow fade to complete
+        pendingTimer = (hoveredButtonName == "PauseMainMenuButton") ? 0.6f : 0.20f;
     }
 }
 
