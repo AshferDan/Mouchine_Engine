@@ -206,8 +206,6 @@ void EventSystem::ProcessEvents() {
     for (auto& e : queue) {
         if (!e.target) continue;
 
-        // If the event is OnDestroy, the GameObject's components have already been cleared.
-        // Do not attempt to GetComponent<EventComponent>() on it.
         if (e.type == EventType::OnDestroy) {
             continue;
         }
