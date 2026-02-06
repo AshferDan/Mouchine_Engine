@@ -289,6 +289,11 @@ static int Internal_GetCollisionShape(MonoString* objectName)
     return result;
 }
 
+static bool Internal_CheckColliderLayer(int layer1, int layer2)
+{
+    return API::CheckColliderLayer(layer1, layer2);
+}
+
 // === Components ===
 static bool Internal_AttachScript(MonoString* objectName, MonoString* scriptClassName)
 {
@@ -1029,22 +1034,22 @@ MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassNam
         }
 
         // Cache the class
-        ScriptClass sc;
-        sc.monoClass = monoClass;
-        sc.onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
-        sc.onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
-        sc.onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
+        auto sc = std::make_unique<ScriptClass>();
+        sc->monoClass = monoClass;
+        sc->onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
+        sc->onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
+        sc->onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
 
-        scriptClasses[scriptClassName] = sc;
+        scriptClasses[scriptClassName] = std::move(sc);
 
         std::cout << "[ScriptSystem] Cached class: " << scriptClassName << "\n";
     }
 
     // Get the cached class
-    ScriptClass& scriptClass = scriptClasses[scriptClassName];
+    ScriptClass* scriptClass = scriptClasses[scriptClassName].get();
 
     // Create instance
-    MonoObject* instance = InstantiateClass(scriptClass.monoClass);
+    MonoObject* instance = InstantiateClass(scriptClass->monoClass);
 
     if (!instance)
     {
@@ -1199,6 +1204,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Collision::SetCollisionLayer", (void *)Internal_SetCollisionLayer);
     mono_add_internal_call("CSharpScript.Collision::GetCollisionLayer", (void*)Internal_GetCollisionLayer);
     mono_add_internal_call("CSharpScript.Collision::GetCollisionShape", (void*)Internal_GetCollisionShape);
+    mono_add_internal_call("CSharpScript.Collision::CheckColliderLayer", (void*)Internal_CheckColliderLayer);
 
     // === Scripting ===
     mono_add_internal_call("CSharpScript.Scripting::AttachScript", (void*)Internal_AttachScript);
@@ -1457,25 +1463,25 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
         }
 
         // Cache it
-        ScriptClass scriptClass;
-        scriptClass.monoClass = monoClass;
-        scriptClass.onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
-        scriptClass.onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
-        scriptClass.onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
-
-        scriptClasses[scriptClassName] = scriptClass;
+        auto sc = std::make_unique<ScriptClass>();
+        sc->monoClass = monoClass;
+        sc->onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
+        sc->onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
+        sc->onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
 
         std::cout << "[ScriptSystem] Successfully cached class: " << scriptClassName << std::endl;
-        std::cout << "  OnStart: " << (scriptClass.onStart ? "Found" : "Not Found") << std::endl;
-        std::cout << "  OnUpdate: " << (scriptClass.onUpdate ? "Found" : "Not Found") << std::endl;
-        std::cout << "  OnDestroy: " << (scriptClass.onDestroy ? "Found" : "Not Found") << std::endl;
+        std::cout << "  OnStart: " << (sc->onStart ? "Found" : "Not Found") << std::endl;
+        std::cout << "  OnUpdate: " << (sc->onUpdate ? "Found" : "Not Found") << std::endl;
+        std::cout << "  OnDestroy: " << (sc->onDestroy ? "Found" : "Not Found") << std::endl;
+
+        scriptClasses[scriptClassName] = std::move(sc);
     }
 
- 
-    ScriptClass& scriptClass = scriptClasses[scriptClassName];
+
+    ScriptClass* scriptClass = scriptClasses[scriptClassName].get();
 
 
-    MonoObject* instance = InstantiateClass(scriptClass.monoClass);
+    MonoObject* instance = InstantiateClass(scriptClass->monoClass);
 
     if (!instance)
     {
@@ -1506,7 +1512,7 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
 
     ScriptInstance scriptInstance;
     scriptInstance.instance = instance;
-    scriptInstance.scriptClass = &scriptClass;
+    scriptInstance.scriptClass = scriptClass;
     scriptInstance.gcHandle = mono_gchandle_new(instance, false);
 
     gameObjectScripts[gameObject].push_back(scriptInstance);
@@ -1820,10 +1826,8 @@ std::vector<ScriptField> ScriptSystem::GetPublicFields(ScriptInstance& instance)
             MonoType* type = mono_field_get_type(field);
             int monoType = mono_type_get_type(type);
 
-            MonoObject* value = mono_field_get_value_object(rootDomain, field, instance.instance);
+            MonoObject* value = mono_field_get_value_object(appDomain, field, instance.instance);
             if (!value) continue;
-
-            char* str = mono_string_to_utf8(mono_object_to_string(value, nullptr));
 
             switch (monoType) {
             case MONO_TYPE_R4:
@@ -1850,7 +1854,6 @@ std::vector<ScriptField> ScriptSystem::GetPublicFields(ScriptInstance& instance)
             if (scriptField.type != ScriptFieldType::None) {
                 fields.push_back(scriptField);
             }
-            mono_free(str);
         }
     }
     return fields;

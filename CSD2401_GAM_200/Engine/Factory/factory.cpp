@@ -507,12 +507,6 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
     if (!gameObject)
         return;
 
-    // Notify ScriptSystem that this GameObject is about to be destroyed
-    if (CORE && CORE->GetScriptSystem()) {
-        CORE->GetScriptSystem()->NotifyGameObjectDestroyed(gameObject);
-    }
-
-    // remove parenting
     GameObject *goParent = gameObject->GetParent();
     if (goParent)
     {
@@ -571,15 +565,7 @@ void GameObjectFactory::DestroyAllGameObjects()
 {
     std::cout << "Factory: Destroying all " << gameObjects.size() << " GameObjects..." << std::endl;
 
-    // Notify ScriptSystem for each GameObject before clearing
-    if (CORE && CORE->GetScriptSystem()) {
-        for (const auto& obj_ptr : gameObjects) {
-            if (obj_ptr) {
-                CORE->GetScriptSystem()->NotifyGameObjectDestroyed(obj_ptr.get());
-            }
-        }
-    }
-
+    // Destruction and ScriptSystem notification handled by ~GameObject() -> Destroy()
     gameObjects.clear();
     entityToIndex.clear();
 
@@ -588,15 +574,7 @@ void GameObjectFactory::DestroyAllGameObjects()
 
 void GameObjectFactory::Clear()
 {
-    // Notify ScriptSystem for each GameObject before clearing
-    if (CORE && CORE->GetScriptSystem()) {
-        for (const auto& obj_ptr : gameObjects) {
-            if (obj_ptr) {
-                CORE->GetScriptSystem()->NotifyGameObjectDestroyed(obj_ptr.get());
-            }
-        }
-    }
-
+    // Destruction and ScriptSystem notification handled by ~GameObject() -> Destroy()
     gameObjects.clear();
     entityToIndex.clear();
     nextEntityID = 1;

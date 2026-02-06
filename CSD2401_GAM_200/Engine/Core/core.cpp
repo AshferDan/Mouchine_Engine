@@ -17,6 +17,8 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "Message.h"
 #include "IMessageHandler.h"
+#include "logic.h"
+#include "factory.h"
 
 bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
@@ -231,6 +233,9 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
                 SetGamePaused(false);
             }
+
+            // Clear event system again to ensure no stale events from scene transition
+            EventSystem::Clear();
 
             m_pendingScene = "";
             m_hasPendingLoad = false;
@@ -517,7 +522,12 @@ void CoreEngine::GameLoop()
    */
 void CoreEngine::DestroySystems()
 {
+    // Clear factory before destroying systems so GameObjects can still
+    // reach the ScriptSystem during their destructors
+    GameObjectFactory::Instance().Clear();
+
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
+    scriptSystem = nullptr;
     Systems.clear();
     if (audioManager)
     {

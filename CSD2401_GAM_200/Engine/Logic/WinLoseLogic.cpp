@@ -36,6 +36,7 @@ void WinLoseLogicSystem::Initialize()
     pendingSceneChange = false;
     pendingSceneTimer = 0.0f;
     pendingScenePath = "";
+    isPlayingCredits = false;
 }
 
 /**
@@ -55,6 +56,7 @@ void WinLoseLogicSystem::Update(float dt)
         hasCreatedLoseScreen = false;
         winDelayTimer = 0.0f;
         pendingSceneChange = false;
+        isPlayingCredits = false;
     }
 
     totalFrames++;
@@ -64,6 +66,25 @@ void WinLoseLogicSystem::Update(float dt)
     if (audioManager)
     {
         audioManager->UpdateFade(dt);
+    }
+
+    // Check if credits are playing and have finished
+    if (isPlayingCredits)
+    {
+        CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+        if (cutscene && !cutscene->IsPlaying())
+        {
+            std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
+            isPlayingCredits = false;
+            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+
+            hasPlayerWon = false;
+            isWaitingForWin = false;
+            hasCreatedWinScreen = false;
+            hasCreatedLoseScreen = false;
+            winDelayTimer = 0.0f;
+        }
+        return;
     }
 
     if (pendingSceneChange)
@@ -266,12 +287,25 @@ void WinLoseLogicSystem::TriggerWin()
     // pause game first
     CORE->SetGamePaused(true);
 
-    // stop all music and play victory sound
+    // Hide timer UI and pause button
+    GameObject* timerBg = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerBar = factory.FindGameObject("LevelTimerBar");
+    GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
+    GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
+
+    if (timerBg) timerBg->SetActive(false);
+    if (timerBar) timerBar->SetActive(false);
+    if (timerFrame) timerFrame->SetActive(false);
+    if (pauseBtn) pauseBtn->SetActive(false);
+
+    // stop all music and play victory sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
         audioManager->StopSound("bgm_channel");
+        audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
         audioManager->PlaySound("victory");
+        audioManager->FadeInCategory("music", 2.0f); // Fade in over 1 second
     }
 
     // win screen background
@@ -396,24 +430,23 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
         if (hoveredButtonName == "NextButton")
         {
-            std::cout << "[WinZone] Next clicked - Going to main menu for now (since no next level)" << std::endl;
+            std::cout << "[WinZone] Next clicked - Playing credits" << std::endl;
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Press");
+                // Fade out music before credits
+                audioManager->FadeOutCategory("music", 0.5f);
             }
 
-            if (audioManager)
-            {
-                audioManager->SetCategoryVolume("music", 1.0f);
+            // Play credits cutscene with audio
+            CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+            if (cutscene && !cutscene->IsPlaying()) {
+                cutscene->PlayVideo("../Assets/Credits.mpeg", "CreditsAudio");
+                isPlayingCredits = true;
             }
 
-            // TODO: Implement next level logic
             DestroyWinScreen();
-            CORE->SetGamePaused(false);
-
-            pendingSceneTimer = 0.2f;  // delay for press sound to play
-            pendingScenePath = "../Assets/Scenes/MainMenu.json"; // i set this to main menu for now since no next level
-            pendingSceneChange = true;
+            // Don't unpause - let the cutscene system handle game pause state
         }
         else if (hoveredButtonName == "ReplayButton")
         {
@@ -422,18 +455,14 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Restart");
-            }
-
-            // restore music volume before restarting
-            if (audioManager)
-            {
-                audioManager->SetCategoryVolume("music", 1.0f);
+                // Fade out music before restarting
+                audioManager->FadeOutCategory("music", 0.3f);
             }
 
             DestroyWinScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 0.2f;  // Delay for sound to play
+            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -444,16 +473,12 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Quit");
-            }
-
-            // restore music volume before going to main menu
-            if (audioManager)
-            {
-                audioManager->SetCategoryVolume("music", 1.0f);
+                // Fade out music before going to main menu
+                audioManager->FadeOutCategory("music", 0.3f);
             }
 
             DestroyWinScreen();
-            pendingSceneTimer = 0.2f;  // Delay for sound to play
+            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -486,6 +511,17 @@ void WinLoseLogicSystem::DestroyWinScreen()
             factory.DestroyGameObject(obj->GetID());
         }
     }
+
+    // Re-show timer UI and pause button
+    GameObject* timerBg = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerBar = factory.FindGameObject("LevelTimerBar");
+    GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
+    GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
+
+    if (timerBg) timerBg->SetActive(true);
+    if (timerBar) timerBar->SetActive(true);
+    if (timerFrame) timerFrame->SetActive(true);
+    if (pauseBtn) pauseBtn->SetActive(true);
 
     hasCreatedWinScreen = false;
     hasPlayerWon = false;
@@ -551,12 +587,25 @@ void WinLoseLogicSystem::TriggerLose()
     // pause game first
     CORE->SetGamePaused(true);
 
-    // stop all music and play game over sound
+    // Hide timer UI and pause button
+    GameObject* timerBg = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerBar = factory.FindGameObject("LevelTimerBar");
+    GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
+    GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
+
+    if (timerBg) timerBg->SetActive(false);
+    if (timerBar) timerBar->SetActive(false);
+    if (timerFrame) timerFrame->SetActive(false);
+    if (pauseBtn) pauseBtn->SetActive(false);
+
+    // stop all music and play game over sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
         audioManager->StopSound("bgm_channel");
+        audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
         audioManager->PlaySound("gameover");
+        audioManager->FadeInCategory("music", 2.0f); // Fade in over 1 second
     }
 
     // lose screen background
@@ -668,18 +717,14 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Click");
-            }
-
-            // Restore music volume before restarting
-            if (audioManager)
-            {
-                audioManager->SetCategoryVolume("music", 1.0f);
+                // Fade out music before restarting
+                audioManager->FadeOutCategory("music", 0.3f);
             }
 
             DestroyLoseScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 0.2f;  // Delay for sound to play
+            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -690,16 +735,12 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Click");
-            }
-
-            // Restore music volume before going to main menu
-            if (audioManager)
-            {
-                audioManager->SetCategoryVolume("music", 1.0f);
+                // Fade out music before going to main menu
+                audioManager->FadeOutCategory("music", 0.3f);
             }
 
             DestroyLoseScreen();
-            pendingSceneTimer = 0.2f;  // Delay for sound to play
+            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -731,6 +772,17 @@ void WinLoseLogicSystem::DestroyLoseScreen()
             factory.DestroyGameObject(obj->GetID());
         }
     }
+
+    // Re-show timer UI and pause button
+    GameObject* timerBg = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerBar = factory.FindGameObject("LevelTimerBar");
+    GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
+    GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
+
+    if (timerBg) timerBg->SetActive(true);
+    if (timerBar) timerBar->SetActive(true);
+    if (timerFrame) timerFrame->SetActive(true);
+    if (pauseBtn) pauseBtn->SetActive(true);
 
     hasCreatedLoseScreen = false;
     hoveredButtonName.clear();

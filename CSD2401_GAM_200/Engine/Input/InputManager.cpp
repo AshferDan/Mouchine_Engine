@@ -302,7 +302,20 @@ void InputManager::Update(float)
         // In play mode: ESC toggles pause menu (unless win/lose screen is active or in main menu)
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu) {
+            // Don't toggle pause menu if How To Play screen is open - let PauseMenuLogic handle it
+            bool isHowToPlayOpen = false;
+            if (pauseMenu && pauseMenu->IsPauseMenuActive())
+            {
+                // Check if how to play screen is currently shown
+                auto& factory = GameObjectFactory::Instance();
+                GameObject* howToPlayScreen = factory.FindGameObject("PauseScreen_HowToPlay");
+                if (howToPlayScreen && howToPlayScreen->IsActive())
+                {
+                    isHowToPlayOpen = true;
+                }
+            }
+
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen) {
                 if (pauseMenu)
                 {
                     pauseMenu->TogglePauseMenu();
