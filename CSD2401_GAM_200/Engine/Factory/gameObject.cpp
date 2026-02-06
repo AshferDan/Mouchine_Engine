@@ -105,13 +105,16 @@ void GameObject::Update(float deltaTime) {
 
    */
 void GameObject::Destroy() {
-    EventSystem::Raise(EventType::OnDestroy, this, nullptr);
-
-    for (auto& [type, component] : components) {
-        component->Destroy();
-    }
-    components.clear();
-}
+            for (auto& [type, component] : components) {
+                component->Destroy();
+            }
+                    components.clear();
+                    EventSystem::Raise(EventType::OnDestroy, this, nullptr);
+            
+                    // Notify ScriptSystem that this GameObject has been fully destroyed on the C++ side
+                    if (CORE && CORE->GetScriptSystem()) {
+                        CORE->GetScriptSystem()->NotifyGameObjectDestroyed(this);
+                    }}
 
 void GameObject::SetActive(bool active)
 {
