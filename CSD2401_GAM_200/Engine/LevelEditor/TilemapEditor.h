@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       TilemapEditor.h
-\author     Khalil Belabadia [100% - 112 lines]
+\author     Khalil Belabadia [100% - 179 lines]
 \par        khalil.b@digipen.edu
 \date       November, 22, 2025
 Copyright (C) 2025 DigiPen Institute of Technology.

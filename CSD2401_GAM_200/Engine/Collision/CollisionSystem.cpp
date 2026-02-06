@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       CollisionSystem.cpp
-\author     Khalil Belabadia [96% - 275 lines]
+\author     Khalil Belabadia [96% - 338 lines]
             Lee Hwee Min [4% - 5 lines]
 \par        khalil.b@digipen.edu
 \date       October, 2, 2025
