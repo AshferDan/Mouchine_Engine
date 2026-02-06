@@ -358,31 +358,31 @@ void InputManager::Update(float)
             singleTriggerKeys[GLFW_KEY_P] = false;
         }
 
-        {
-            GameObject* howto = GameObjectFactory::Instance().FindGameObject("HowToPlay");
-            if (howto)
-            {
-                auto* transform = howto->GetComponent<TransformComponent>();
-                auto* render = howto->GetComponent<RenderComponent>();
-                if (!render && !transform) return;
+        // Handle TAB key to toggle How To Play screen
+        static bool tabWasPressed = false;
+        bool tabPressed = (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS);
 
-                // Handles Holding F1 for How To Play in playmode
-                if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
+        if (tabPressed && !tabWasPressed)
+        {
+            PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
+            if (pauseMenu)
+            {
+                if (pauseMenu->IsHowToPlayOpen())
                 {
-                    //show how to play and pause game as long as key held
-                    vec2 res{ 1920, 1080 };         // idk how get viewport size
-                    transform->SetScale(res.x, res.y);
-                    CORE->SetGamePaused(true);
-                    render->SetScreenSpace(true);
-                    transform->SetPosition(res.x/2, res.y/2);
-                    howto->SetActive(true);
+                    std::cout << "[InputManager] TAB - Closing How To Play" << std::endl;
+                    pauseMenu->CloseHowToPlay();
                 }
                 else
                 {
-                    CORE->SetGamePaused(false);
-                    howto->SetActive(false);
+                    std::cout << "[InputManager] TAB - Opening How To Play" << std::endl;
+                    pauseMenu->OpenHowToPlay();
                 }
             }
+            tabWasPressed = true;
+        }
+        else if (!tabPressed)
+        {
+            tabWasPressed = false;
         }
 
         {
