@@ -2662,198 +2662,187 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
     ImGui::End();
 }
 
-void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
-{
-    (void)obj; // not used yet
+#pragma region Event Component ImGui
+void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
+    if (ImGui::CollapsingHeader("Event", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-    // --- Begin UI ---
-    if (ImGui::CollapsingHeader("Event Component", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::Text("Rules: %zu", ec->rules.size());
-        ImGui::Separator();
+        // Data for Selection
+        static const char* eventNames[] = { "None", "OnEnable", "OnDisable", "OnDestroy", "OnCollisionEnter", "OnCollisionStay", "OnCollisionExit" };
+        static const char* addableActions[] = { "Play Sound", "Destroy", "Enable", "Disable", "Respawn" };
 
-        auto& allObjects = factory.GetAllGameObjects();
-        std::vector<const char*> objectNames;
-        std::vector<int> objectIds;
-
-        objectNames.push_back("Any GameObjects"); // Trigger by Any Objects
-        objectIds.push_back(-1);
-
-        for (auto& o : allObjects)
-        {
-            objectNames.push_back(o->GetName().c_str());
-            objectIds.push_back(o->GetID());
+        // Get all gameObjects for the "Trigger Filter" dropdown
+        std::vector<std::string> objectNames = { "Any Object" };
+        std::vector<int> objectIds = { -1 };
+        for (const auto& goPtr : GameObjectFactory::Instance().GetAllGameObjects()) {
+            if (goPtr) {
+                objectNames.push_back(goPtr->GetName());
+                objectIds.push_back((int)goPtr->GetID());
+            }
         }
 
-        int index = 0;
-        for (auto& rule : ec->rules)
-        {
-            ImGui::PushID(index);
+        // Convert strings to const char* for ImGui Combo
+        std::vector<const char*> cStrNames;
+        for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
-            if (ImGui::TreeNodeEx("Rule", ImGuiTreeNodeFlags_DefaultOpen))
-            {
-                static const char* eventNames[] = {
-                    "None",
-                    "OnEnable",
-                    "OnDisable",
-                    "OnDestroy",
-                    "OnCollisionEnter",
-                    "OnCollisionStay",
-                    "OnCollisionExit",
-                };
 
-                int evIndex = (int)rule.eventType;
-                if (ImGui::Combo("Event", &evIndex, eventNames, IM_ARRAYSIZE(eventNames)))
-                    rule.eventType = (EventType)evIndex;
+        // Render Logic Chains
+        int chainToDelete = -1;
+        for (size_t i = 0; i < ec->chains.size(); ++i) {
+            auto& chain = ec->chains[i];
+            ImGui::PushID((int)i);
 
-                int currentIndex = -1;
+            if (ImGui::TreeNodeEx("Event Chain", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-                // find index of current ID
-                for (int i = 0; i < (int)objectIds.size(); i++)
-                {
-                    if (objectIds[i] == rule.targetObjectId)
-                        currentIndex = i;
+                // ===== Trigger Selection ("When") =====
+                int evIndex = (int)chain.triggerType;
+                if (ImGui::Combo("Event Type", &evIndex, eventNames, IM_ARRAYSIZE(eventNames))) {
+                    chain.triggerType = (EventType)evIndex;
                 }
 
-                if (ImGui::Combo("Trigger By", &currentIndex,
-                    objectNames.data(), (int)objectNames.size()))
-                {
-                    rule.targetObjectId = objectIds[currentIndex];
-                }
-
-                static const char* actionNames[] = {
-                    "None",
-                    "EnableObject",
-                    "DisableObject",
-                    "DestroyObject",
-                    "PlaySound",
-                    "StopSound",
-                    "Respawn",
-                };
-
-                int acIndex = (int)rule.action;
-                if (ImGui::Combo("Action", &acIndex, actionNames, IM_ARRAYSIZE(actionNames)))
-                    rule.action = (ActionType)acIndex;
-
-                switch (rule.action)
-                {
-                case ActionType::PlaySound:
-                {
-                    auto* audioMgr = CORE->GetAudioManager();
-
-                    // Fallback: If no sounds loaded, load global audio.json right now
-                    if (audioMgr->GetSoundDatabase().empty())
-                    {
-                        std::string fallbackPath = "../Assets/Audio/audio.json";
-                        std::ifstream f(fallbackPath);
-
-                        if (f.is_open())
-                        {
-                            json audioRoot;
-                            f >> audioRoot;
-
-                            json wrapper;
-                            wrapper["AudioManager"] = audioRoot["AudioManager"];
-
-                            Serialization::DeserializeAudioManager(wrapper, audioMgr);
-                        }
-                        else
-                        {
-                            ImGui::TextColored(ImVec4(1, 0.2f, 0.2f, 1),
-                                "ERROR: Could not open audio.json fallback.");
-                            break;
-                        }
+                // ===== Target Filter (Trigger By) =====
+                int currentIndex = 0; // Default to "Any Object"
+                for (size_t k = 0; k < objectIds.size(); k++) {
+                    if (objectIds[k] == chain.targetFilterID) {
+                        currentIndex = (int)k;
+                        break;
                     }
+                }
 
-                    // After fallback, soundDatabase MUST have entries
-                    auto& soundDB = audioMgr->GetSoundDatabase();
+                // Convert vector of strings to vector of char* for ImGui
+                std::vector<const char*> cStrNames;
+                for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
-                    if (soundDB.empty())
-                    {
-                        ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1),
-                            "No sounds loaded (even after fallback).");
+                if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
+                    chain.targetFilterID = objectIds[currentIndex];
+                }
+
+                // ===== Action List =====
+                ImGui::NewLine();
+                ImGui::Separator();
+                ImGui::Text("Actions:");
+
+                int actionToDelete = -1;
+                for (size_t j = 0; j < chain.actions.size(); ++j) {
+                    ImGui::PushID((int)j);
+                    IAction* action = chain.actions[j].get();
+
+                    ImGui::Bullet();
+                    switch (action->GetType()) {
+                    case ActionType::PlaySound: {
+                        ImGui::TextColored(ImVec4(0, 1, 0, 1), "Play Sound");
+                        ActionPlaySound* soundAction = static_cast<ActionPlaySound*>(action);
+
+                        // Combo Box Selection from Database
+                        auto* audioMgr = CORE->GetAudioManager();
+                        std::vector<std::string> soundList;
+
+                        // Fetch sound names
+                        if (audioMgr && !audioMgr->GetSoundDatabase().empty()) {
+                            for (auto const& [name, sound] : audioMgr->GetSoundDatabase()) {
+                                soundList.push_back(name);
+                            }
+                        }
+                        else {
+                            // Read from file
+                            static std::vector<std::string> cachedFallback;
+                            if (cachedFallback.empty()) {
+                                std::ifstream f("../Assets/Audio/audio.json");
+                                if (f.is_open()) {
+                                    json audioData;
+                                    f >> audioData;
+                                    for (auto& element : audioData["AudioManager"]["Sounds"]) {
+                                        cachedFallback.push_back(element["Name"]);
+                                    }
+                                }
+                            }
+                            soundList = cachedFallback;
+                        }
+
+                        // Render the Dropdown for selection of sounds
+                        if (!soundList.empty()) {
+                            if (ImGui::BeginCombo("Select Sound", soundAction->soundName.c_str())) {
+                                for (const auto& soundName : soundList) {
+                                    bool isSelected = (soundAction->soundName == soundName);
+                                    if (ImGui::Selectable(soundName.c_str(), isSelected)) {
+                                        soundAction->soundName = soundName;
+                                    }
+                                    if (isSelected) ImGui::SetItemDefaultFocus();
+                                }
+                                ImGui::EndCombo();
+                            }
+                        }
+
+                        break;
+                    }
+                    case ActionType::DestroyObject:
+                        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Destroy Self");
+                        break;
+                    case ActionType::EnableObject:
+                        ImGui::Text("Enable Object");
+                        break;
+                    case ActionType::DisableObject:
+                        ImGui::Text("Disable Object");
+                        break;
+                    case ActionType::Respawn:
+                        ImGui::Text("Respawn Object");
+                        break;
+                    default:
+                        ImGui::Text("Unknown Action");
                         break;
                     }
 
-                    std::vector<const char*> names;
-                    names.reserve(soundDB.size());
-
-                    for (auto& entry : soundDB)
-                        names.push_back(entry.first.c_str());
-
-                    // current selection
-                    int idx = 0;
-                    int i = 0;
-                    for (auto& pair : soundDB)
-                    {
-                        if (pair.first == rule.stringValue)
-                        {
-                            idx = i;
-                            break;
-                        }
-                        i++;
-                    }
-
-                    if (ImGui::Combo("Sound", &idx, names.data(), (int)names.size()))
-                    {
-                        int j = 0;
-                        for (auto& pair : soundDB)
-                        {
-                            if (j == idx)
-                            {
-                                rule.stringValue = pair.first;   // ONLY save name
-                                break;
-                            }
-                            j++;
-                        }
-                    }
-                }
-                break;
-               
-                case ActionType::StopSound: {                
-
-                    ImGui::Text("Stop this GameObject Sound.");
-
-                    const std::string& cur = obj->GetCurrentlyPlayingSound();
-
-                    if (cur.empty())
-                    {
-                        ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1),
-                            "No sound currently playing.");
-                    }
-                }
-                break;
-
-                default:
-                    break;
-                }
-
-                ImGui::Spacing();
-
-                if (ImGui::Button("Remove Rule"))
-                {
-                    ec->rules.erase(ec->rules.begin() + index);
-                    ImGui::TreePop();
+                    ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
+                    if (ImGui::SmallButton("Remove")) actionToDelete = (int)j;
+                    ImGui::PopStyleColor();
                     ImGui::PopID();
-                    break; // exit loop safely
                 }
 
+                if (actionToDelete != -1) {
+                    chain.actions.erase(chain.actions.begin() + actionToDelete);
+                }
+
+                // ===== Add Action =====
+                static int newActionIdx = 0;
+                ImGui::Combo("Add Action", &newActionIdx, addableActions, IM_ARRAYSIZE(addableActions));
+                ImGui::SameLine();
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); // Green
+                if (ImGui::Button("Add")) {
+                    if (newActionIdx == 0) chain.actions.push_back(std::make_unique<ActionPlaySound>("Empty"));
+                    if (newActionIdx == 1) chain.actions.push_back(std::make_unique<ActionDestroy>());
+                    if (newActionIdx == 2) chain.actions.push_back(std::make_unique<ActionToggleActive>(true));
+                    if (newActionIdx == 3) chain.actions.push_back(std::make_unique<ActionToggleActive>(false));
+                    if (newActionIdx == 4) chain.actions.push_back(std::make_unique<ActionRespawn>());
+                }
+                ImGui::PopStyleColor();
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
+                if (ImGui::Button("Delete Entire Chain")) chainToDelete = (int)i;
+                ImGui::PopStyleColor();
+
+                ImGui::NewLine();
                 ImGui::TreePop();
             }
-
             ImGui::PopID();
-            index++;
+        }
+
+        if (chainToDelete != -1) {
+            ec->chains.erase(ec->chains.begin() + chainToDelete);
         }
 
         ImGui::Separator();
-
-        if (ImGui::Button("Add Rule"))
-        {
-            EventRule newRule;
-            ec->rules.push_back(newRule);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); //Green
+        if (ImGui::Button("Add New Event")) {
+            ec->chains.push_back(LogicChain());
         }
+        ImGui::PopStyleColor();
+
+        ImGui::Spacing();
+        ImGui::Separator();
     }
 }
+#pragma endregion
 
 //  generate unique sound name if one already exists
 static std::string MakeUniqueSoundName(const std::string& baseName,

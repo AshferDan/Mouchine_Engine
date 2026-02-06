@@ -19,6 +19,8 @@ Technology is prohibited.
 #include <string>
 #include <vector>
 #include <memory>
+#include <iostream>
+#include <cstdlib>
 
 class GameObject;
 class GameObjectFactory;
@@ -55,25 +57,85 @@ EventType StringToEventType(const std::string& s);
 const char* ActionTypeToString(ActionType a);;
 ActionType StringToActionType(const std::string& s);
 
+
+// ========== ACTION BASE CLASS ==========
+
 /**
- * @brief Each GameObject with an EventComponent holds multiple rules.
+ * @brief Abstract Base Class for all Logic Actions.
+ * This removes the need for giant switch statements in the game loop.
  */
-struct EventRule {
-    EventType eventType = EventType::None;
+class IAction {
+public:
+    virtual ~IAction() = default;
 
-    // The ID of the OTHER object required to trigger this rule.
-    int targetObjectId = -1; // -1 = Any
-    ActionType action = ActionType::None;
+    virtual void Execute(GameObject* owner, GameObject* triggerInstigator) = 0;
 
-    // Action Parameters
-    float floatValue = 0.f;
-    float floatValue2 = 0.f;
-    float floatValue3 = 0.f;
+    // For serialization/Editor
+    virtual ActionType GetType() const = 0;
 
-    std::string stringValue = "";
-    
-    vec2 vec2Value = { 0,0 };
-    vec4 colorValue = { 1, 1, 1, 1 };
+    virtual std::unique_ptr<IAction> Clone() const = 0;
+};
+
+
+// ========== ACTION CLASSES ==========
+
+class ActionPlaySound : public IAction {
+public:
+    std::string soundName;
+
+    ActionPlaySound(const std::string& name = "") : soundName(name) {}
+
+    void Execute(GameObject* owner, GameObject* other) override;
+    ActionType GetType() const override { return ActionType::PlaySound; }
+    std::unique_ptr<IAction> Clone() const override { return std::make_unique<ActionPlaySound>(*this); }
+};
+
+class ActionDestroy : public IAction {
+public:
+    void Execute(GameObject* owner, GameObject* other) override;
+    ActionType GetType() const override { return ActionType::DestroyObject; }
+    std::unique_ptr<IAction> Clone() const override { return std::make_unique<ActionDestroy>(*this); }
+};
+
+class ActionToggleActive : public IAction {
+public:
+    bool setState; // true = enable, false = disable
+    ActionToggleActive(bool state) : setState(state) {}
+
+    void Execute(GameObject* owner, GameObject* other) override;
+    ActionType GetType() const override { return setState ? ActionType::EnableObject : ActionType::DisableObject; }
+    std::unique_ptr<IAction> Clone() const override { return std::make_unique<ActionToggleActive>(*this); }
+
+};
+
+class ActionRespawn : public IAction {
+    float spawnX, spawnY;
+public:
+    ActionRespawn(float x = 0.0f, float y = 0.0f) : spawnX(x), spawnY(y) {}
+
+    void Execute(GameObject* owner, GameObject* other) override;
+    ActionType GetType() const override { return ActionType::Respawn; }
+    std::unique_ptr<IAction> Clone() const override { return std::make_unique<ActionRespawn>(*this); }
+};
+
+
+// ========== lOGIC CONTAINER ==========
+
+/**
+ * @brief Represents a subscription to a specific event.
+ * Contains a list of Actions to execute when that event fires.
+ */
+struct LogicChain {
+    EventType triggerType = EventType::None;
+    int targetFilterID = -1; // -1 = target any object
+
+    // container of actions
+    std::vector<std::unique_ptr<IAction>> actions;
+
+    // helper - deep copy
+    LogicChain() = default;
+    LogicChain(const LogicChain& other);
+    LogicChain& operator=(const LogicChain& other);
 };
 
 /**
@@ -83,13 +145,17 @@ struct EventRule {
  */
 class EventComponent : public IComponent {
 public:
-    std::vector<EventRule> rules;
+    //std::vector<EventRule> rules;
+    // container of logic
+    std::vector<LogicChain> chains;
 
     EventComponent(GameObject* owner);
     EventComponent();
 
+    // process incoming event
+    void OnEvent(EventType type, GameObject* other);
+
     std::unique_ptr<IComponent> Clone(GameObject* newClone) const override;
-    
     std::string GetName() const override { return "EventComponent"; }
 };
 /**
