@@ -120,7 +120,7 @@ bool InputManager::IsAnyKeyPress() {
  *        player movement, jumping, animations, and quitting logic.
  * @param dt Delta time since the last frame.
  */
-void InputManager::Update(float dt)
+void InputManager::Update(float)
 {
 	static bool firstUpdate = true;
 	if (firstUpdate) {
@@ -347,20 +347,21 @@ void InputManager::Update(float dt)
 
         {
             GameObject* howto = GameObjectFactory::Instance().FindGameObject("HowToPlay");
-            GameObject* cam = GameObjectFactory::Instance().FindGameObject("MainCamera");
-            if (howto && cam)
+            if (howto)
             {
                 auto* transform = howto->GetComponent<TransformComponent>();
-                if (!transform) return;
+                auto* render = howto->GetComponent<RenderComponent>();
+                if (!render && !transform) return;
 
                 // Handles Holding F1 for How To Play in playmode
                 if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
                 {
                     //show how to play and pause game as long as key held
-                    float x{}, y{};
+                    vec2 res{ 1920, 1080 };         // idk how get viewport size
+                    transform->SetScale(res.x, res.y);
                     CORE->SetGamePaused(true);
-                    //camtransform->GetPosition(x, y);
-                    transform->SetPosition(x,y);
+                    render->SetScreenSpace(true);
+                    transform->SetPosition(res.x/2, res.y/2);
                     howto->SetActive(true);
                 }
                 else
@@ -368,6 +369,15 @@ void InputManager::Update(float dt)
                     CORE->SetGamePaused(false);
                     howto->SetActive(false);
                 }
+            }
+        }
+
+        {
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+            {
+                std::string currentScenePath = CORE->GetPauseMenuLogic()->GetCurrentScene();
+                if (!currentScenePath.empty())
+                    CORE->RequestSceneLoad(currentScenePath, true);
             }
         }
     }
@@ -380,6 +390,8 @@ void InputManager::Update(float dt)
         }
     }
 
+#ifndef _DEBUG
+#else
     for (auto &kv : singleTriggerKeys)
     {
         int key = kv.first;
@@ -426,6 +438,7 @@ void InputManager::Update(float dt)
             wasPressed = false;
         }
     }
+#endif
 
     GameObject* player = nullptr;
 

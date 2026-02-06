@@ -2106,18 +2106,55 @@
       "children": []
     },
     {
-      "name": "InGamePauseButton",
-      "localID": 9999,
+      "name": "SafeZone",
+      "localID": 55,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          0.0,
-          0.0
+          419.7,
+          2434.7
         ],
         "scale": [
-          200.0,
-          175.0
+          800.0,
+          800.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          0.3
+        ],
+        "layer": 10
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          800.0,
+          800.0
+        ]
+      },
+      "children": []
+    }, 
+    {
+      "name": "InGamePauseButton",
+      "localID": 56,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          1800.0,
+          900.0
+        ],
+        "scale": [
+          125.0,
+          110.0
         ],
         "rotation": 0.0
       },
@@ -2130,7 +2167,140 @@
           1.0,
           1.0
         ],
-        "layer": 700
+        "layer": 700,
+        "screenSpace": true
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarBackground",
+      "localID": 9,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 9,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1050,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBar",
+      "localID": 10,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 10,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1000,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarFrame",
+      "localID": 11,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 11,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1050,
+          125
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "Text FPS",
+      "localID": 5,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          100.0,
+          100.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "layer": 0
+      },
+      "TextComponent": {
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 50,
+        "text": "FPS",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": true
       },
       "children": []
     }
@@ -2344,15 +2514,15 @@
         "loop": true,
         "volume": 0.5,
         "pitch": 1.0,
-        "category": "bgm"
+        "category": "sfx"
       },
       {
         "name": "gameover",
         "filepath": "../Assets/audio/gameover.wav",
         "loop": true,
-        "volume": 0.4,
+        "volume": 0.40,
         "pitch": 1.0,
-        "category": "bgm"
+        "category": "sfx"
       }
     ],
     "events": [

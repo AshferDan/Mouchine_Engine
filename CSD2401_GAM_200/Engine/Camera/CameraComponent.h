@@ -207,26 +207,92 @@ public:
 	 */
 	mat4 GetViewProjectionMatrix(float screenWidth, float screenHeight) const;
 
+	/**
+	 * @brief Adds trauma to the camera shake system
+	 *
+	 * Increases the current trauma level by the specified amount.
+	 * Trauma values are typically clamped between 0.0 and 1.0.
+	 *
+	 * @param amount The amount of trauma to add (usually between 0.0 and 1.0)
+	 */
 	void AddTrauma(float amount);
 
+	/**
+	 * @brief Updates the trauma and camera shake over time
+	 *
+	 * Should be called every frame to update trauma decay and calculate
+	 * the current shake offset based on the trauma level.
+	 *
+	 * @param deltaTime Time elapsed since the last update in seconds
+	 */
 	void UpdateTrauma(float deltaTime);
 
+	/**
+	 * @brief Gets the current camera shake offset
+	 *
+	 * @return vec2 The current screen shake offset in 2D space
+	 */
 	vec2 GetTraumaOffset() const { return traumaShakeOffset; };
 
+	/**
+	 * @brief Gets the current trauma level
+	 *
+	 * @return float The current trauma level (typically between 0.0 and 1.0)
+	 */
 	float GetTrauma() const { return trauma; };
 
+	/**
+	 * @brief Sets the rate at which trauma decays over time
+	 *
+	 * @param rate The decay rate (higher values mean faster decay)
+	 */
 	void SetTraumaDecayRate(float rate) { traumaDecayRate = rate; };
 
+	/**
+	 * @brief Sets the maximum screen shake offset
+	 *
+	 * @param offset The maximum offset in screen space units
+	 */
 	void SetMaxShakeOffset(float offset) { maxShakeOffset = offset; };
 
+	/**
+	 * @brief Starts a screen flash effect
+	 *
+	 * @param duration The duration of the flash in seconds
+	 * @param color The color of the flash (RGBA)
+	 * @param fadeOut If true, the flash will fade out smoothly; if false, it will end abruptly
+	 */
 	void StartFlash(float duration, const vec4& color, bool fadeOut = true);
 
+	/**
+	 * @brief Stops any active flash effect immediately
+	 */
 	void StopFlash();
 
+	/**
+	 * @brief Updates the flash effect over time
+	 *
+	 * Should be called every frame to update flash animation and fading.
+	 *
+	 * @param deltaTime Time elapsed since the last update in seconds
+	 */
 	void UpdateFlash(float deltaTime);
 
+	/**
+	 * @brief Checks if a flash effect is currently active
+	 *
+	 * @return bool True if a flash effect is currently active, false otherwise
+	 */
 	bool IsFlashing() const { return isFlashing; };
 
+	/**
+	 * @brief Gets the current flash color with alpha applied
+	 *
+	 * The returned color includes the current alpha value based on
+	 * the flash progression (fade in/out).
+	 *
+	 * @return vec4 The current flash color with alpha modulation
+	 */
 	vec4 GetFlashColor() const;
 
 private:
@@ -253,17 +319,17 @@ private:
 	 */
 	void ApplyBounds();
 
-	//Trauma Shake
-	float trauma = 0.f;
-	float traumaDecayRate = 2.0f;
-	float maxShakeOffset = 20.0f;
-	vec2 traumaShakeOffset = vec2(0.f, 0.f);
+	// ========== TRAUMA/SHAKE SYSTEM ==========
+	float trauma = 0.f;					// Current trauma level (0=no shake, 1=max shake)
+	float traumaDecayRate = 2.0f;		// Trauma reduction rate (units per second)
+	float maxShakeOffset = 20.0f;		// Max camera displacement at trauma=1.0 (pixels)
+	vec2 traumaShakeOffset = vec2(0.f, 0.f);	// Calculated shake offset for current frame
 
-	//Flash Effect
-	bool isFlashing = false;
-	float flashTimer = 0.f;
-	float flashDuration = 0.f;
-	vec4 flashColor = vec4(1.f, 0.f, 0.f, 0.5f);
-	bool flashFadeOut = true;
+	// ========== FLASH EFFECT SYSTEM ==========
+	bool isFlashing = false;			// Flash effect active flag
+	float flashTimer = 0.f;				// Current time progress within flash duration
+	float flashDuration = 0.f;			// Total flash effect time (seconds)
+	vec4 flashColor = vec4(1.f, 0.f, 0.f, 0.5f);	// RGBA color for flash (r,g,b,a)
+	bool flashFadeOut = true;			// Smooth fade-out toggle (true=fade, false=cutoff)
 
 };

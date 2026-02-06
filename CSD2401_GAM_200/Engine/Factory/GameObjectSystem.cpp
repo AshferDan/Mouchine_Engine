@@ -2,7 +2,7 @@
 /*!
 \file       gameObjectSystem.cpp
 \author     Jonathan Fam Qian Wei [29% - 20 lines]
-            Lee Hwee Min [ 71% - 51 lines]
+            Lee Hwee Min [ 71% - 58 lines]
 \par        Fam.q@digipen.edu
 \date       October, 2, 2025
 
@@ -123,7 +123,7 @@ Technology is prohibited.
          if (collider) 
          {
              collider->setColliShape(msg.colType);
-             collider->SetSize(msg.colSize[0], msg.colSize[1]);
+             collider->SetSize(msg.collider[0], msg.collider[1]);
              collider->SetLayer(msg.colLayer);
          }
 

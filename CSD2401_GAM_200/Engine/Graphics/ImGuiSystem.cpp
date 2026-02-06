@@ -3,7 +3,7 @@
 \file       ImGuiSystem.cpp
 \author     Guan Shao Jun [10% - 200 lines]
 \co-author	Muhammad Ashfer [87% - 1941 lines]
-            Hwee Min [3% - 82 lines]
+            Hwee Min [3% - 697 lines]
 \par        shaojun.g@digipen.edu,
 \date       October 02 2025
 
@@ -62,7 +62,7 @@ struct TempGOData
 
     bool addCollider = false;
     int colType = 0; // 0 for Square, 1 for Circle
-    float colSize[2] = { 100.0f, 100.0f };
+    float colSize[2]{ 50.f, 50.f};
     int colLayer = 5; // Default index for "Default" layer
 };
 
@@ -272,8 +272,10 @@ void ImGuiSystem::Update(float dt)
         ImGuiID dockspace_id = ImGui::GetID("DockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
-
+#ifndef _DEBUG
+#else
         TopMenuBar_Render();
+#endif
 
         LevelEditor* levelEditor = CORE->GetLevelEditor();
         bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
@@ -446,6 +448,10 @@ void ImGuiSystem::Update(float dt)
             {
                 RenderPropertyEditor();
             }
+
+            // Render layer visibility panel
+            LayerPanel_Render();
+
             // Render profiler! Make it toggleable?
             Profiler_Render();
         }
@@ -1144,6 +1150,7 @@ void GOCreationMenu_Spawn()
     float rot = tempGO.rot;
     vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
     std::string name = tempGO.name;
+    float colliderSize[2] = { tempGO.scale[0], tempGO.scale[1] };
     ColliderComponent::Type cType = (tempGO.colType == 0) ? ColliderComponent::Type::Square : ColliderComponent::Type::Circle;
     CollisionLayer cLayer = static_cast<CollisionLayer>(tempGO.colLayer);
 
@@ -1154,9 +1161,9 @@ void GOCreationMenu_Spawn()
         shapeType,              // ShapeType
         pos, scale, rot,        // Transform
         color,               // Colour
+        colliderSize,
         tempGO.addCollider,
         cType,
-        tempGO.colSize[0], tempGO.colSize[1],
         cLayer
     );
 
@@ -2342,6 +2349,17 @@ void ImGuiSystem::RenderPropertyEditor()
                     render->SetLayer(goRenderLayer);
                 }
                 CreateHintText("Ascending order for topmost rendering position");
+
+                // Layer Category dropdown
+                const char* layerCategories[] = { "Background", "Walls", "Player", "Enemies", "Foreground", "UI" };
+                int currentLayerCategory = render->GetRenderLayerInt();
+                ImGui::Text("Layer Category");
+                ImGui::SetNextItemWidth(150.0f);
+                if (ImGui::Combo("##LayerCategory", &currentLayerCategory, layerCategories, IM_ARRAYSIZE(layerCategories)))
+                {
+                    render->SetRenderLayerInt(currentLayerCategory);
+                }
+                CreateHintText("Category for group visibility toggling");
             }
         }
     }
@@ -2550,19 +2568,10 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
 
             ImGui::Text("Attached Scripts:");
 
-            // Debug: Show script counts from both ScriptComponent and ScriptSystem
-            const auto& componentScripts = script->GetScripts();
-            ImGui::Text("  ScriptComponent has %zu scripts", componentScripts.size());
-            for (const auto& [id, name] : componentScripts)
-            {
-                ImGui::Text("    - %s (ID: %u)", name.c_str(), id);
-            }
-
             auto* scriptSystem = CORE->GetScriptSystem();
             if (scriptSystem)
             {
                 auto* instances = scriptSystem->GetScriptInstances(obj);
-                ImGui::Text("  ScriptSystem has %zu instances for this GameObject", instances ? instances->size() : 0);
                 if (instances)
                 {
                     for (auto& instance : *instances)
@@ -2662,198 +2671,187 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
     ImGui::End();
 }
 
-void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj)
-{
-    (void)obj; // not used yet
+#pragma region Event Component ImGui
+void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
+    if (ImGui::CollapsingHeader("Event", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-    // --- Begin UI ---
-    if (ImGui::CollapsingHeader("Event Component", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::Text("Rules: %zu", ec->rules.size());
-        ImGui::Separator();
+        // Data for Selection
+        static const char* eventNames[] = { "None", "OnEnable", "OnDisable", "OnDestroy", "OnCollisionEnter", "OnCollisionStay", "OnCollisionExit" };
+        static const char* addableActions[] = { "Play Sound", "Destroy", "Enable", "Disable", "Respawn" };
 
-        auto& allObjects = factory.GetAllGameObjects();
-        std::vector<const char*> objectNames;
-        std::vector<int> objectIds;
-
-        objectNames.push_back("Any GameObjects"); // Trigger by Any Objects
-        objectIds.push_back(-1);
-
-        for (auto& o : allObjects)
-        {
-            objectNames.push_back(o->GetName().c_str());
-            objectIds.push_back(o->GetID());
+        // Get all gameObjects for the "Trigger Filter" dropdown
+        std::vector<std::string> objectNames = { "Any Object" };
+        std::vector<int> objectIds = { -1 };
+        for (const auto& goPtr : GameObjectFactory::Instance().GetAllGameObjects()) {
+            if (goPtr) {
+                objectNames.push_back(goPtr->GetName());
+                objectIds.push_back((int)goPtr->GetID());
+            }
         }
 
-        int index = 0;
-        for (auto& rule : ec->rules)
-        {
-            ImGui::PushID(index);
+        // Convert strings to const char* for ImGui Combo
+        std::vector<const char*> cStrNames;
+        for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
-            if (ImGui::TreeNodeEx("Rule", ImGuiTreeNodeFlags_DefaultOpen))
-            {
-                static const char* eventNames[] = {
-                    "None",
-                    "OnEnable",
-                    "OnDisable",
-                    "OnDestroy",
-                    "OnCollisionEnter",
-                    "OnCollisionStay",
-                    "OnCollisionExit",
-                };
 
-                int evIndex = (int)rule.eventType;
-                if (ImGui::Combo("Event", &evIndex, eventNames, IM_ARRAYSIZE(eventNames)))
-                    rule.eventType = (EventType)evIndex;
+        // Render Logic Chains
+        int chainToDelete = -1;
+        for (size_t i = 0; i < ec->chains.size(); ++i) {
+            auto& chain = ec->chains[i];
+            ImGui::PushID((int)i);
 
-                int currentIndex = -1;
+            if (ImGui::TreeNodeEx("Event Chain", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-                // find index of current ID
-                for (int i = 0; i < (int)objectIds.size(); i++)
-                {
-                    if (objectIds[i] == rule.targetObjectId)
-                        currentIndex = i;
+                // ===== Trigger Selection ("When") =====
+                int evIndex = (int)chain.triggerType;
+                if (ImGui::Combo("Event Type", &evIndex, eventNames, IM_ARRAYSIZE(eventNames))) {
+                    chain.triggerType = (EventType)evIndex;
                 }
 
-                if (ImGui::Combo("Trigger By", &currentIndex,
-                    objectNames.data(), (int)objectNames.size()))
-                {
-                    rule.targetObjectId = objectIds[currentIndex];
-                }
-
-                static const char* actionNames[] = {
-                    "None",
-                    "EnableObject",
-                    "DisableObject",
-                    "DestroyObject",
-                    "PlaySound",
-                    "StopSound",
-                    "Respawn",
-                };
-
-                int acIndex = (int)rule.action;
-                if (ImGui::Combo("Action", &acIndex, actionNames, IM_ARRAYSIZE(actionNames)))
-                    rule.action = (ActionType)acIndex;
-
-                switch (rule.action)
-                {
-                case ActionType::PlaySound:
-                {
-                    auto* audioMgr = CORE->GetAudioManager();
-
-                    // Fallback: If no sounds loaded, load global audio.json right now
-                    if (audioMgr->GetSoundDatabase().empty())
-                    {
-                        std::string fallbackPath = "../Assets/Audio/audio.json";
-                        std::ifstream f(fallbackPath);
-
-                        if (f.is_open())
-                        {
-                            json audioRoot;
-                            f >> audioRoot;
-
-                            json wrapper;
-                            wrapper["AudioManager"] = audioRoot["AudioManager"];
-
-                            Serialization::DeserializeAudioManager(wrapper, audioMgr);
-                        }
-                        else
-                        {
-                            ImGui::TextColored(ImVec4(1, 0.2f, 0.2f, 1),
-                                "ERROR: Could not open audio.json fallback.");
-                            break;
-                        }
+                // ===== Target Filter (Trigger By) =====
+                int currentIndex = 0; // Default to "Any Object"
+                for (size_t k = 0; k < objectIds.size(); k++) {
+                    if (objectIds[k] == chain.targetFilterID) {
+                        currentIndex = (int)k;
+                        break;
                     }
+                }
 
-                    // After fallback, soundDatabase MUST have entries
-                    auto& soundDB = audioMgr->GetSoundDatabase();
+                // Convert vector of strings to vector of char* for ImGui
+                std::vector<const char*> cStrNames;
+                for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
-                    if (soundDB.empty())
-                    {
-                        ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1),
-                            "No sounds loaded (even after fallback).");
+                if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
+                    chain.targetFilterID = objectIds[currentIndex];
+                }
+
+                // ===== Action List =====
+                ImGui::NewLine();
+                ImGui::Separator();
+                ImGui::Text("Actions:");
+
+                int actionToDelete = -1;
+                for (size_t j = 0; j < chain.actions.size(); ++j) {
+                    ImGui::PushID((int)j);
+                    IAction* action = chain.actions[j].get();
+
+                    ImGui::Bullet();
+                    switch (action->GetType()) {
+                    case ActionType::PlaySound: {
+                        ImGui::TextColored(ImVec4(0, 1, 0, 1), "Play Sound");
+                        ActionPlaySound* soundAction = static_cast<ActionPlaySound*>(action);
+
+                        // Combo Box Selection from Database
+                        auto* audioMgr = CORE->GetAudioManager();
+                        std::vector<std::string> soundList;
+
+                        // Fetch sound names
+                        if (audioMgr && !audioMgr->GetSoundDatabase().empty()) {
+                            for (auto const& [name, sound] : audioMgr->GetSoundDatabase()) {
+                                soundList.push_back(name);
+                            }
+                        }
+                        else {
+                            // Read from file
+                            static std::vector<std::string> cachedFallback;
+                            if (cachedFallback.empty()) {
+                                std::ifstream f("../Assets/Audio/audio.json");
+                                if (f.is_open()) {
+                                    json audioData;
+                                    f >> audioData;
+                                    for (auto& element : audioData["AudioManager"]["Sounds"]) {
+                                        cachedFallback.push_back(element["Name"]);
+                                    }
+                                }
+                            }
+                            soundList = cachedFallback;
+                        }
+
+                        // Render the Dropdown for selection of sounds
+                        if (!soundList.empty()) {
+                            if (ImGui::BeginCombo("Select Sound", soundAction->soundName.c_str())) {
+                                for (const auto& soundName : soundList) {
+                                    bool isSelected = (soundAction->soundName == soundName);
+                                    if (ImGui::Selectable(soundName.c_str(), isSelected)) {
+                                        soundAction->soundName = soundName;
+                                    }
+                                    if (isSelected) ImGui::SetItemDefaultFocus();
+                                }
+                                ImGui::EndCombo();
+                            }
+                        }
+
+                        break;
+                    }
+                    case ActionType::DestroyObject:
+                        ImGui::TextColored(ImVec4(1, 0, 0, 1), "Destroy Self");
+                        break;
+                    case ActionType::EnableObject:
+                        ImGui::Text("Enable Object");
+                        break;
+                    case ActionType::DisableObject:
+                        ImGui::Text("Disable Object");
+                        break;
+                    case ActionType::Respawn:
+                        ImGui::Text("Respawn Object");
+                        break;
+                    default:
+                        ImGui::Text("Unknown Action");
                         break;
                     }
 
-                    std::vector<const char*> names;
-                    names.reserve(soundDB.size());
-
-                    for (auto& entry : soundDB)
-                        names.push_back(entry.first.c_str());
-
-                    // current selection
-                    int idx = 0;
-                    int i = 0;
-                    for (auto& pair : soundDB)
-                    {
-                        if (pair.first == rule.stringValue)
-                        {
-                            idx = i;
-                            break;
-                        }
-                        i++;
-                    }
-
-                    if (ImGui::Combo("Sound", &idx, names.data(), (int)names.size()))
-                    {
-                        int j = 0;
-                        for (auto& pair : soundDB)
-                        {
-                            if (j == idx)
-                            {
-                                rule.stringValue = pair.first;   // ONLY save name
-                                break;
-                            }
-                            j++;
-                        }
-                    }
-                }
-                break;
-               
-                case ActionType::StopSound: {                
-
-                    ImGui::Text("Stop this GameObject Sound.");
-
-                    const std::string& cur = obj->GetCurrentlyPlayingSound();
-
-                    if (cur.empty())
-                    {
-                        ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1),
-                            "No sound currently playing.");
-                    }
-                }
-                break;
-
-                default:
-                    break;
-                }
-
-                ImGui::Spacing();
-
-                if (ImGui::Button("Remove Rule"))
-                {
-                    ec->rules.erase(ec->rules.begin() + index);
-                    ImGui::TreePop();
+                    ImGui::SameLine();
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
+                    if (ImGui::SmallButton("Remove")) actionToDelete = (int)j;
+                    ImGui::PopStyleColor();
                     ImGui::PopID();
-                    break; // exit loop safely
                 }
 
+                if (actionToDelete != -1) {
+                    chain.actions.erase(chain.actions.begin() + actionToDelete);
+                }
+
+                // ===== Add Action =====
+                static int newActionIdx = 0;
+                ImGui::Combo("Add Action", &newActionIdx, addableActions, IM_ARRAYSIZE(addableActions));
+                ImGui::SameLine();
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); // Green
+                if (ImGui::Button("Add")) {
+                    if (newActionIdx == 0) chain.actions.push_back(std::make_unique<ActionPlaySound>("Empty"));
+                    if (newActionIdx == 1) chain.actions.push_back(std::make_unique<ActionDestroy>());
+                    if (newActionIdx == 2) chain.actions.push_back(std::make_unique<ActionToggleActive>(true));
+                    if (newActionIdx == 3) chain.actions.push_back(std::make_unique<ActionToggleActive>(false));
+                    if (newActionIdx == 4) chain.actions.push_back(std::make_unique<ActionRespawn>());
+                }
+                ImGui::PopStyleColor();
+
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
+                if (ImGui::Button("Delete Entire Chain")) chainToDelete = (int)i;
+                ImGui::PopStyleColor();
+
+                ImGui::NewLine();
                 ImGui::TreePop();
             }
-
             ImGui::PopID();
-            index++;
+        }
+
+        if (chainToDelete != -1) {
+            ec->chains.erase(ec->chains.begin() + chainToDelete);
         }
 
         ImGui::Separator();
-
-        if (ImGui::Button("Add Rule"))
-        {
-            EventRule newRule;
-            ec->rules.push_back(newRule);
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); //Green
+        if (ImGui::Button("Add New Event")) {
+            ec->chains.push_back(LogicChain());
         }
+        ImGui::PopStyleColor();
+
+        ImGui::Spacing();
+        ImGui::Separator();
     }
 }
+#pragma endregion
 
 //  generate unique sound name if one already exists
 static std::string MakeUniqueSoundName(const std::string& baseName,
@@ -3199,6 +3197,65 @@ void AudioAssetsPanel_Render()
 }
 #pragma endregion
 
+#pragma region Layer Panel ImGui
+
+void LayerPanel_Render()
+{
+    if (!ImGui::Begin("Render Layers", nullptr, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Toggle layer visibility:");
+    ImGui::Separator();
+
+    // Layer names matching the RenderLayer enum
+    const char* layerNames[] = {
+        "Background",
+        "Walls",
+        "Player",
+        "Enemies",
+        "Foreground",
+        "UI"
+    };
+
+    // Create a checkbox for each layer
+    for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+    {
+        RenderComponent::RenderLayer layer = static_cast<RenderComponent::RenderLayer>(i);
+        bool visible = RenderComponent::IsLayerVisible(layer);
+
+        if (ImGui::Checkbox(layerNames[i], &visible))
+        {
+            RenderComponent::SetLayerVisible(layer, visible);
+        }
+    }
+
+    ImGui::Separator();
+
+    // Quick buttons
+    if (ImGui::Button("Show All"))
+    {
+        for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+        {
+            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(i), true);
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Hide All"))
+    {
+        for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+        {
+            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(i), false);
+        }
+    }
+
+    ImGui::End();
+}
+
+#pragma endregion
+
 #pragma region Animation Previewer ImGui
 
 void ImGuiSystem::RenderAnimationPreviewer()
@@ -3472,6 +3529,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ResetDraftPlayback();
     }
 
+    static int  frameCount = 1;         // how many frames in the row animation
+    static int  rowPick = 0;            // row selector (maps to startR)
+
     // Controls
     if (draftTexID)
     {
@@ -3481,6 +3541,10 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::Text("GRID CONFIGURATION:");
         ImGui::PushItemWidth(80);
         bool gridChanged = false;
+
+        if (ImGui::Button("13 x 10")) { draftRows = 13; draftCols = 10; ResetDraftPlayback(); }
+        ImGui::Spacing();
+
         if (ImGui::InputInt("ROWS", &draftRows)) { draftRows = std::max(1, draftRows); gridChanged = true; }
         ImGui::SameLine();
         if (ImGui::InputInt("COLS", &draftCols)) { draftCols = std::max(1, draftCols); gridChanged = true; }
@@ -3542,23 +3606,39 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::Text("DEFINE ACTION RANGE:");
 
         ImGui::InputText("Name", actionName, IM_ARRAYSIZE(actionName));
+        ImGui::NewLine();
         ImGui::Checkbox("Loop", &actionLoop);
         ImGui::SameLine();
         ImGui::PushItemWidth(120);
         ImGui::InputFloat("FPS", &actionFPS, 0.5f, 1.0f, "%.2f");
         ImGui::PopItemWidth();
-        actionFPS = std::max(0.001f, actionFPS);
+        ImGui::NewLine();
+        //actionFPS = std::max(0.001f, actionFPS);
 
-        // Clamp
-        startR = std::clamp(startR, 0, draftRows - 1);
-        endR = std::clamp(endR, 0, draftRows - 1);
+        rowPick = std::clamp(rowPick, 0, draftRows - 1);
         startC = std::clamp(startC, 0, draftCols - 1);
-        endC = std::clamp(endC, 0, draftCols - 1);
+        frameCount = std::max(1, frameCount);
 
-        if (ImGui::SliderInt("Start Row", &startR, 0, draftRows - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("End Row", &endR, 0, draftRows - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("End Col", &endC, 0, draftCols - 1)) ResetDraftPlayback();
+        // picks a row
+        if (ImGui::SliderInt("Row", &rowPick, 0, draftRows - 1))
+            ResetDraftPlayback();
+
+        // map rowPick -> startR
+        startR = rowPick;
+
+        if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1))
+            ResetDraftPlayback();
+
+        // end Col
+        int maxCount = draftCols - startC;
+        frameCount = std::clamp(frameCount, 1, std::max(1, maxCount));
+
+        if (ImGui::SliderInt("End Col", &frameCount, 1, std::max(1, maxCount)))
+            ResetDraftPlayback();
+
+        // auto-compute endR/endC
+        endR = startR;
+        endC = std::clamp(startC + frameCount - 1, 0, draftCols - 1);
 
         auto FindClipIndexByName = [&](const std::string& name) -> int
             {

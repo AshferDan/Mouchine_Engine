@@ -212,6 +212,53 @@ namespace API
             }
         }
     }
+
+    void SetRenderLayer(const std::string &objectName, int layer)
+    {
+        auto &factory = GameObjectFactory::Instance();
+        GameObject *obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto *render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                render->SetRenderLayerInt(layer);
+            }
+        }
+    }
+
+    int GetRenderLayer(const std::string &objectName)
+    {
+        auto &factory = GameObjectFactory::Instance();
+        GameObject *obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto *render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                return render->GetRenderLayerInt();
+            }
+        }
+        return 0;
+    }
+
+    void SetLayerVisible(int layer, bool visible)
+    {
+        if (layer >= 0 && layer < static_cast<int>(RenderComponent::RenderLayer::Count))
+        {
+            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(layer), visible);
+        }
+    }
+
+    bool IsLayerVisible(int layer)
+    {
+        if (layer >= 0 && layer < static_cast<int>(RenderComponent::RenderLayer::Count))
+        {
+            return RenderComponent::IsLayerVisible(static_cast<RenderComponent::RenderLayer>(layer));
+        }
+        return false;
+    }
+
     void SetBackGround(char const *filename)
     {
         auto &factory = GameObjectFactory::Instance();
@@ -965,15 +1012,16 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         camtemp->SetMode(val);
     }
 
-    void CameraFlash(float duration, const vec4& color, bool fadeout) {
+    void CameraFlash(float duration, const vec4& color, bool fadeout, float cameraShakeStrength) {
         auto& cam = CameraManager::Instance();
+        CameraManager::Instance().AddCameraTrauma(cameraShakeStrength);
         cam.FlashActiveCamera(duration, color, fadeout);
     }
 
     #pragma endregion
 
 #pragma region Animator
-    void PlayAnimation(const std::string& objectName, const std::string& animationName)
+    void PlayAnimation(const std::string& objectName, const std::string& animationName, bool isLooping)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.FindGameObject(objectName);
@@ -982,7 +1030,21 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             auto* spritesheet = obj->GetComponent<Spritesheet>();
             if (spritesheet)
             {
-                spritesheet->PlayAnimation(animationName);
+                spritesheet->PlayAnimation(animationName, isLooping);
+            }
+        }
+    }
+
+    void SetAnimationLooping(const std::string& objectName, bool isLooping)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->SetLooping(isLooping);
             }
         }
     }
@@ -1458,6 +1520,505 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     float GetMouseWorldY()
     {
         return (float)InputManager::GetMouseWorldY();
+    }
+#pragma endregion
+
+#pragma region Particles
+    void AddParticleEmitterComponent(const std::string& objectName, int maxParticles)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            if (!obj->GetComponent<ParticleEmitterComponent>())
+            {
+                obj->AddComponent<ParticleEmitterComponent>(maxParticles);
+            }
+            else
+            {
+                throw std::runtime_error("Attempted to add duplicate ParticleEmitterComponent to GameObject: " + objectName);
+            }
+        }
+    }
+
+    void Particles_StartEmission(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->StartEmission();
+            }
+        }
+    }
+
+    void Particles_StopEmission(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->StopEmission();
+            }
+        }
+    }
+
+    void Particles_Burst(const std::string& objectName, int count)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->Burst(count);
+            }
+        }
+    }
+
+    void Particles_Clear(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->Clear();
+            }
+        }
+    }
+
+    bool Particles_IsEmitting(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                return emitter->IsEmitting();
+            }
+        }
+        return false;
+    }
+
+    int Particles_GetActiveCount(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                return emitter->GetActiveParticleCount();
+            }
+        }
+        return 0;
+    }
+
+    int Particles_GetMaxParticles(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                return emitter->GetMaxParticles();
+            }
+        }
+        return 0;
+    }
+
+    void Particles_SetEmissionRate(const std::string& objectName, float rate)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetEmissionRate(rate);
+            }
+        }
+    }
+
+    void Particles_SetMaxParticles(const std::string& objectName, int max)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetMaxParticles(max);
+            }
+        }
+    }
+
+    void Particles_SetDuration(const std::string& objectName, float seconds)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetDuration(seconds);
+            }
+        }
+    }
+
+    void Particles_SetLoop(const std::string& objectName, bool shouldLoop)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetLoop(shouldLoop);
+            }
+        }
+    }
+
+    void Particles_SetLifetime(const std::string& objectName, float seconds, float variation)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetLifetime(seconds, variation);
+            }
+        }
+    }
+
+    void Particles_SetSpawnOffset(const std::string& objectName, float x, float y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetSpawnOffset(vec2(x, y));
+            }
+        }
+    }
+
+    void Particles_SetSpawnRadius(const std::string& objectName, float radius)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetSpawnRadius(radius);
+            }
+        }
+    }
+
+    void Particles_SetSpawnBox(const std::string& objectName, float halfWidth, float halfHeight)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetSpawnBox(vec2(halfWidth, halfHeight));
+            }
+        }
+    }
+
+    void Particles_SetVelocity(const std::string& objectName, float dirX, float dirY, float magnitude, float variation)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetVelocity(vec2(dirX, dirY), magnitude, variation);
+            }
+        }
+    }
+
+    void Particles_SetAngleSpread(const std::string& objectName, float degrees)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetAngleSpread(degrees);
+            }
+        }
+    }
+
+    void Particles_SetGravity(const std::string& objectName, float gravX, float gravY)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetGravity(vec2(gravX, gravY));
+            }
+        }
+    }
+
+    void Particles_SetDrag(const std::string& objectName, float drag)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetDrag(drag);
+            }
+        }
+    }
+
+    void Particles_SetStartColor(const std::string& objectName, float r, float g, float b, float a)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetStartColor(vec4(r, g, b, a));
+            }
+        }
+    }
+
+    void Particles_SetEndColor(const std::string& objectName, float r, float g, float b, float a)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetEndColor(vec4(r, g, b, a));
+            }
+        }
+    }
+
+    void Particles_SetStartSize(const std::string& objectName, float size)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetStartSize(size);
+            }
+        }
+    }
+
+    void Particles_SetEndSize(const std::string& objectName, float size)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetEndSize(size);
+            }
+        }
+    }
+
+    void Particles_SetLayer(const std::string& objectName, int layer)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetLayer(layer);
+            }
+        }
+    }
+
+    void Particles_SetFadeIn(const std::string& objectName, float duration)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetFadeIn(duration);
+            }
+        }
+    }
+
+    void Particles_SetFadeOut(const std::string& objectName, float duration)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetFadeOut(duration);
+            }
+        }
+    }
+
+    void Particles_SetStartRotation(const std::string& objectName, float degrees, float variation)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetStartRotation(degrees, variation);
+            }
+        }
+    }
+
+    void Particles_SetAngularVelocity(const std::string& objectName, float degreesPerSec, float variation)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->SetAngularVelocity(degreesPerSec, variation);
+            }
+        }
+    }
+
+    void Particles_SetTexture(const std::string& objectName, const char* texturePath)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                GLuint texID = GraphicsSystem::LoadTexture(texturePath);
+                emitter->SetTexture(texID);
+            }
+        }
+    }
+
+    void Particles_ConfigureDashTrail(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->ConfigureDashTrail();
+            }
+        }
+    }
+
+    void Particles_ConfigureJumpDust(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->ConfigureJumpDust();
+            }
+        }
+    }
+
+    void Particles_ConfigureWallSlideParticles(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->ConfigureWallSlideParticles();
+            }
+        }
+    }
+
+    void Particles_ConfigureSpeedLines(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->ConfigureSpeedLines();
+            }
+        }
+    }
+
+    void Particles_ConfigureDeathExplosion(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* emitter = obj->GetComponent<ParticleEmitterComponent>();
+            if (emitter)
+            {
+                emitter->ConfigureDeathExplosion();
+            }
+        }
     }
 #pragma endregion
 

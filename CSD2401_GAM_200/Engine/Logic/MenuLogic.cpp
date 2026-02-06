@@ -15,8 +15,8 @@ Technology is prohibited.
 #include "MenuLogic.h"
 #include <iostream>
 
-std::string introPath = "../Assets/Cutscene_M3.mpeg";
-std::string creditsPath = "../Assets/AvidMoustache_Credits.mpeg";
+std::string introPath = "../Assets/Cutscene.mpeg";
+std::string creditsPath = "../Assets/Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens {
@@ -78,8 +78,12 @@ void MenuLogicSystem::Update(float dt)
                 else if (hoveredButtonName == "QuitButton")
                 {
                     std::cout << "QuitButton Clicked!" << std::endl;
+                #ifndef _DEBUG
+					glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
+                #else
                     CORE->GetLevelEditor()->StopPlayMode();
                     //CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
+                #endif          
                 }
             }
 
@@ -222,10 +226,10 @@ void MenuLogicSystem::Update(float dt)
             SetButtonTexture(currentHover, true, isCurrentPressed);
             // Play hover sound once when entering the button
 
-            AudioManager* audioManager = CORE->GetAudioManager();
-            if (audioManager)
+            AudioManager* localAudioManager = CORE->GetAudioManager();
+            if (localAudioManager)
             {
-                audioManager->TriggerEvent("UI_Hover");
+                localAudioManager->TriggerEvent("UI_Hover");
             }
         }
 
@@ -246,21 +250,20 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        // Play Click Sound based on button type
-        AudioManager* audioManager = CORE->GetAudioManager();
-        if (audioManager)
+        AudioManager* localAudioManager = CORE->GetAudioManager();
+        if (localAudioManager)
         {
             if (hoveredButtonName == "PlayButton")
             {
-                audioManager->TriggerEvent("UI_Press");
+                localAudioManager->TriggerEvent("UI_Press");
             }
             else if (hoveredButtonName == "QuitButton")
             {
-                audioManager->TriggerEvent("UI_Quit");
+                localAudioManager->TriggerEvent("UI_Quit");
             }
             else
             {
-                audioManager->TriggerEvent("UI_Click");
+                localAudioManager->TriggerEvent("UI_Click");
             }
             std::cout << "menu button clicking sound is triggered" << std::endl;
         }

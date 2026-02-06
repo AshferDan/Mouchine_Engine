@@ -281,16 +281,6 @@ public:
     void ReorderChildren(const std::vector<EntityID>& order);
 
     /**
-     * @brief Execute a gameplay action defined by an EventRule.
-     */
-    void ExecuteAction(const EventRule& rule, GameObject* other);
-
-    /**
-     * @brief Called by the EventSystem when this GameObject receives an event.
-     */
-    virtual void OnEventTriggered(EventType event, GameObject* other);
-
-    /**
      * @brief Get and Set Current Sound
      */
     const std::string& GetCurrentlyPlayingSound() const { return m_currentlyPlayingSound; }
