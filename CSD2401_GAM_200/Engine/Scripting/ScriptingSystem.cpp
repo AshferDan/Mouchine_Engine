@@ -289,6 +289,11 @@ static int Internal_GetCollisionShape(MonoString* objectName)
     return result;
 }
 
+static bool Internal_CheckColliderLayer(int layer1, int layer2)
+{
+    return API::CheckColliderLayer(layer1, layer2);
+}
+
 // === Components ===
 static bool Internal_AttachScript(MonoString* objectName, MonoString* scriptClassName)
 {
@@ -1199,6 +1204,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Collision::SetCollisionLayer", (void *)Internal_SetCollisionLayer);
     mono_add_internal_call("CSharpScript.Collision::GetCollisionLayer", (void*)Internal_GetCollisionLayer);
     mono_add_internal_call("CSharpScript.Collision::GetCollisionShape", (void*)Internal_GetCollisionShape);
+    mono_add_internal_call("CSharpScript.Collision::CheckColliderLayer", (void*)Internal_CheckColliderLayer);
 
     // === Scripting ===
     mono_add_internal_call("CSharpScript.Scripting::AttachScript", (void*)Internal_AttachScript);
