@@ -35,6 +35,7 @@ void GameTimerSystem::Initialize()
     originalScaleX = 0.0f;
     originalScaleY = 0.0f;
     originalCenterX = 0.0f;
+    originalCenterY = 0.0f;
     leftEdge = 0.0f;
 
     UpdateBar(60);
@@ -63,6 +64,10 @@ void GameTimerSystem::Update(float dt)
         return;
     }
 
+    // get background and frame objects
+    GameObject* timerBackground = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
+
     // hide timer if win or lose screen is active
     WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
     if (winLoseLogic && (winLoseLogic->IsWinScreenActive() || winLoseLogic->IsLoseScreenActive()))
@@ -71,7 +76,47 @@ void GameTimerSystem::Update(float dt)
         {
             timerGO->SetActive(false);
         }
+        if (timerBackground && timerBackground->IsActive())
+        {
+            timerBackground->SetActive(false);
+        }
+        if (timerFrame && timerFrame->IsActive())
+        {
+            timerFrame->SetActive(false);
+        }
         return;
+    }
+
+    // hide timer if game is paused
+    if (mode == EditorMode::Pause || CORE->IsGamePaused())
+    {
+        if (timerGO->IsActive())
+        {
+            timerGO->SetActive(false);
+        }
+        if (timerBackground && timerBackground->IsActive())
+        {
+            timerBackground->SetActive(false);
+        }
+        if (timerFrame && timerFrame->IsActive())
+        {
+            timerFrame->SetActive(false);
+        }
+        return;
+    }
+
+    // show timer when not paused and not in win/lose state
+    if (!timerGO->IsActive())
+    {
+        timerGO->SetActive(true);
+    }
+    if (timerBackground && !timerBackground->IsActive())
+    {
+        timerBackground->SetActive(true);
+    }
+    if (timerFrame && !timerFrame->IsActive())
+    {
+        timerFrame->SetActive(true);
     }
 
     // reset timer and bar
@@ -87,16 +132,11 @@ void GameTimerSystem::Update(float dt)
             originalScaleX = 0.0f;
             originalScaleY = 0.0f;
             originalCenterX = 0.0f;
+            originalCenterY = 0.0f;
             leftEdge = 0.0f;
 
             UpdateBar(60);
         }
-        return;
-    }
-
-    // keep timer frozen
-    if (mode == EditorMode::Pause || CORE->IsGamePaused())
-    {
         return;
     }
 
@@ -149,6 +189,7 @@ void GameTimerSystem::ResetTimer()
     originalScaleX = 0.0f;
     originalScaleY = 0.0f;
     originalCenterX = 0.0f;
+    originalCenterY = 0.0f;
     leftEdge = 0.0f;
 
     UpdateBar(30);
@@ -208,8 +249,9 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
     if (originalScaleX == 0.0f)
     {
         transformComp->GetScale(originalScaleX, originalScaleY);
-        float tempY;
-        transformComp->GetPosition(originalCenterX, tempY);
+        transformComp->GetPosition(originalCenterX, originalCenterY);
+
+        // Store the left edge position (this will be our anchor point)
         leftEdge = originalCenterX - (originalScaleX / 2.0f);
 
         // check the grey background and frame positions too
@@ -251,15 +293,11 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
     float newScaleX = originalScaleX * fillPercentage;
     if (newScaleX < MIN_WIDTH) newScaleX = MIN_WIDTH;
 
-    // position to keep left edge anchored
-    float shrinkAmount = originalScaleX - newScaleX;
-    float offsetX = -(shrinkAmount / 2.0f);
-
-    // add padding to align with the visual frame
-    const float PADDING = 25.0f;
+    // calculate new center position to keep left edge anchored at leftEdge
+    float newCenterX = leftEdge + (newScaleX / 2.0f);
 
     transformComp->SetScale(newScaleX, originalScaleY);
-    transformComp->SetPosition(originalCenterX + offsetX + PADDING, transformComp->posY);
+    transformComp->SetPosition(newCenterX, originalCenterY);
 }
 
 /**
