@@ -48,6 +48,7 @@
           0.0
         ],
         "smoothing": true,
+        "zoom": 0.5,
         "smoothingSpeed": 5.0,
         "followTargetName": ""
       },
