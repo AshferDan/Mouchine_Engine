@@ -2502,7 +2502,7 @@
       },
       {
         "name": "menu_restart",
-        "filepath": "../Assets/audio/press_button.wav",
+        "filepath": "../Assets/audio/restart_button.wav",
         "loop": false,
         "volume": 0.5,
         "pitch": 1.0,
@@ -2523,6 +2523,13 @@
         "volume": 0.40,
         "pitch": 1.0,
         "category": "sfx"
+      },
+      {
+      "name": "CreditsAudio",
+      "filepath": "../Assets/CreditsAudio.wav",
+      "type": "sound",
+      "volume": 1.0,
+      "loop": false
       }
     ],
     "events": [

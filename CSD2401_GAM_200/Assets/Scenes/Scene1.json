@@ -119,6 +119,13 @@
         "volume": 0.40,
         "pitch": 1.0,
         "category": "bgm"
+      },
+      {
+      "name": "CreditsAudio",
+      "filepath": "../Assets/CreditsAudio.wav",
+      "type": "sound",
+      "volume": 1.0,
+      "loop": false
       }
     ]
   },

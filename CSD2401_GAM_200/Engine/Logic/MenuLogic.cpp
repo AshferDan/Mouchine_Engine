@@ -323,10 +323,10 @@ void MenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "CreditsButton")
             {
                 std::cout << "CreditsButton Clicked!" << std::endl;
-  
+
                 CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
                 if (!cutscene->IsPlaying()) {
-                    cutscene->PlayVideo(creditsPath);
+                    cutscene->PlayVideo(creditsPath, "CreditsAudio");
                 }
             }
         }

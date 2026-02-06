@@ -92,6 +92,7 @@ private:
     float pendingSceneTimer = 0.0f;
     std::string pendingScenePath = "";
     bool hasCreatedTransitionOverlay = false;
+    bool isPlayingCredits = false;
 
     /**
      * @brief Checks if the player has collided with the win zone using physics.

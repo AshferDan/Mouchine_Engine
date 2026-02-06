@@ -36,6 +36,7 @@ void WinLoseLogicSystem::Initialize()
     pendingSceneChange = false;
     pendingSceneTimer = 0.0f;
     pendingScenePath = "";
+    isPlayingCredits = false;
 }
 
 /**
@@ -55,6 +56,7 @@ void WinLoseLogicSystem::Update(float dt)
         hasCreatedLoseScreen = false;
         winDelayTimer = 0.0f;
         pendingSceneChange = false;
+        isPlayingCredits = false;
     }
 
     totalFrames++;
@@ -64,6 +66,25 @@ void WinLoseLogicSystem::Update(float dt)
     if (audioManager)
     {
         audioManager->UpdateFade(dt);
+    }
+
+    // Check if credits are playing and have finished
+    if (isPlayingCredits)
+    {
+        CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+        if (cutscene && !cutscene->IsPlaying())
+        {
+            std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
+            isPlayingCredits = false;
+            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+
+            hasPlayerWon = false;
+            isWaitingForWin = false;
+            hasCreatedWinScreen = false;
+            hasCreatedLoseScreen = false;
+            winDelayTimer = 0.0f;
+        }
+        return;
     }
 
     if (pendingSceneChange)
@@ -396,24 +417,21 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
         if (hoveredButtonName == "NextButton")
         {
-            std::cout << "[WinZone] Next clicked - Going to main menu for now (since no next level)" << std::endl;
+            std::cout << "[WinZone] Next clicked - Playing credits" << std::endl;
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Press");
             }
 
-            if (audioManager)
-            {
-                audioManager->SetCategoryVolume("music", 1.0f);
+            // Play credits cutscene with audio
+            CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+            if (cutscene && !cutscene->IsPlaying()) {
+                cutscene->PlayVideo("../Assets/Credits.mpeg", "CreditsAudio");
+                isPlayingCredits = true;
             }
 
-            // TODO: Implement next level logic
             DestroyWinScreen();
-            CORE->SetGamePaused(false);
-
-            pendingSceneTimer = 0.2f;  // delay for press sound to play
-            pendingScenePath = "../Assets/Scenes/MainMenu.json"; // i set this to main menu for now since no next level
-            pendingSceneChange = true;
+            // Don't unpause - let the cutscene system handle game pause state
         }
         else if (hoveredButtonName == "ReplayButton")
         {
