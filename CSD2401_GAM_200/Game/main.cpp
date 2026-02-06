@@ -79,6 +79,19 @@ int main()
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
 
+        // Parallax background - created before Hero so it renders behind
+        GameObject* ParallaxBG = GameObjectFactory::Instance().CreateImage(
+            "ParallaxBG",
+            RenderComponent::ShapeType::Square,
+            0.0f, 0.0f,
+            3840.0f, 2160.0f,
+            "../Assets/FULL_BACKGROUND.png");
+        if (ParallaxBG)
+        {
+            auto* bgRender = ParallaxBG->GetComponent<RenderComponent>();
+            if (bgRender) bgRender->SetLayer(-10);
+        }
+
         GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
             "Hero",
             0, 0,
@@ -103,6 +116,7 @@ int main()
                 // Ensure the namespace in C# is "GameScripts"
                 scriptComp->AddScript("PlayerMovement");
                 scriptComp->AddScript("PlayerMovementStats");
+                scriptComp->AddScript("ParallaxBackground");
 
                 std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
             }

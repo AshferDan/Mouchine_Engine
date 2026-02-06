@@ -55,9 +55,9 @@ namespace CSharpScript
         // Turn Skid
         //[Range(0.1f, 1f)] 
         public float SkidSpeedRetained = 0.25f;
-        public float T1_SkidDuration = 0.5f;
-        public float T2_SkidDuration = 0.8f;
-        public float T3_SkidDuration = 1.0f;
+        public float T1_SkidDuration = 0.45f;
+        public float T2_SkidDuration = 0.55f;
+        public float T3_SkidDuration = 0.8f;
 
         // Wall Bonk
         public float T3_BonkDuration = 0.65f;
@@ -114,10 +114,10 @@ namespace CSharpScript
         // dont have tht WKEase graph thing in unity
 
         // Roll
-        public float BaseRollDuration = 0.5f;       // minimum time
+        public float BaseRollDuration = 0.45f;       // minimum time
         public float MidRollDuration = 0.65f;
         public float MaxRollDuration = 0.8f;
-        public float BaseRollSpeed = 15f * mod;     // needs to be faster than walk speed to feel like a burst forward
+        public float BaseRollSpeed = 25f * mod;     // needs to be faster than walk speed to feel like a burst forward
         public float MidRollSpeed = 30f * mod;
         public float MaxRollSpeed = 40f * mod;
 

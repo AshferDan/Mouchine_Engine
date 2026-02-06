@@ -552,9 +552,11 @@ static void Internal_SetCameraZoom(float zoom) {
     API::setCameraZoom(zoom);
 }
 
-static vec2 Internal_GetCameraPosition()
+static void Internal_GetCameraPosition(float* outX, float* outY)
 {
-    return API::GetCameraPosition();
+    vec2 pos = API::GetCameraPosition();
+    if (outX) *outX = pos.x;
+    if (outY) *outY = pos.y;
 }
 
 static float Internal_GetCameraZoom()
@@ -1262,7 +1264,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Camera::SetPosition", (void*)Internal_SetCameraPosition);
     mono_add_internal_call("CSharpScript.Camera::SetZoom", (void*)Internal_SetCameraZoom);
     mono_add_internal_call("CSharpScript.Camera::SetMode", (void*)Internal_SetCameraMode);
-    mono_add_internal_call("CSharpScript.Camera::GetPosition", (void*)Internal_GetCameraPosition);
+    mono_add_internal_call("CSharpScript.Camera::GetPosition_Internal", (void*)Internal_GetCameraPosition);
     mono_add_internal_call("CSharpScript.Camera::GetZoom", (void*)Internal_GetCameraZoom);
     mono_add_internal_call("CSharpScript.Camera::GetMode", (void*)Internal_GetCameraMode);
     mono_add_internal_call("CSharpScript.Camera::CameraFlash", (void*)Internal_CameraFlash);

@@ -341,7 +341,7 @@ TextureResource *ResourceManager::LoadTexture(const std::string &name, const std
     auto it = textures.find(name);
     if (it != textures.end())
     {
-        std::cout << "Texture '" << name << "' already loaded, returning existing resource" << std::endl;
+        //std::cout << "Texture '" << name << "' already loaded, returning existing resource" << std::endl;
         return it->second.get();
     }
 

@@ -401,6 +401,12 @@ void GraphicsSystem::Initialize()
 
     // Initialize the off-screen framebuffer for the editor viewport
     CreateFrameBuffer(800, 600);
+
+    TextureResource* pTexture = ResourceManager::Instance().LoadTexture("bubble", "../Assets/Bubble_1.png");
+    if (pTexture) {
+        // Successfully loaded!
+        particleTexId = pTexture->GetTextureID();
+    }
 }
 
 /**
@@ -411,12 +417,6 @@ void GraphicsSystem::Initialize()
  */
 void GraphicsSystem::Update(float)
 {
-    GLuint id = 0;
-    TextureResource* pTexture = ResourceManager::Instance().LoadTexture("bubble", "../Assets/Bubble_1.png");
-    if (pTexture) {
-        // Successfully loaded!
-        id = pTexture->GetTextureID();
-    }
 	auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
     if (player) {
         auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
@@ -425,7 +425,7 @@ void GraphicsSystem::Update(float)
             dashTrail = player->AddComponent<ParticleEmitterComponent>();
             if (dashTrail) {
                 dashTrail->ConfigureDashTrail();
-                dashTrail->SetTexture(id);
+                dashTrail->SetTexture(particleTexId);
                 dashTrail->StartEmission();
                 std::cout << "Particle Emitter initialized successfully\n";
             }
@@ -623,6 +623,11 @@ void GraphicsSystem::Update(float)
             // Animator takes priority (for animated sprites)
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
+            // Use Spritesheet texture if RenderComponent has none
+            if (texID == 0 && animator->GetTextureID() != 0)
+            {
+                texID = animator->GetTextureID();
+            }
         }
         else if (auto *renderComp = obj->GetComponent<RenderComponent>())
         {
@@ -1588,10 +1593,15 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
         clonedComponent->SetPoint(this->point.pos, this->point.size);
     }
 
-    // 3. Clone the enabled state and layer.
+    // 3. Clone the enabled state, layer, and other properties.
     clonedComponent->SetEnabled(this->IsEnabled());
-
     clonedComponent->SetLayer(this->layer);
+    clonedComponent->SetTexturePath(this->texturePath);
+    clonedComponent->SetUVScale(this->uvScale);
+    clonedComponent->SetUVOffset(this->uvOffset);
+    clonedComponent->SetScreenSpace(this->screenSpace);
+    clonedComponent->SetColor(this->color);
+    clonedComponent->SetRenderLayer(this->renderLayer);
 
     return clonedComponent;
 }

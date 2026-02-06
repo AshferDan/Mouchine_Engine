@@ -2118,7 +2118,7 @@ void ImGuiSystem::RenderPropertyEditor()
     ImGui::SetNextWindowPos(ImVec2(1400, 10), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(500, 900), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin("Properties##ImGuiSystem", &showPropertyEditor, ImGuiWindowFlags_NoCollapse))
+    if (!ImGui::Begin("Properties##ImGuiSystem", nullptr, ImGuiWindowFlags_NoCollapse))     // changed to remove the close window (to add back, change nullptr to priv mem showpropertyeditor)
     {
         ImGui::End();
         return;
