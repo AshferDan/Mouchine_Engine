@@ -2,7 +2,7 @@
   "GameObjects": [
     {
       "name": "Tilemap",
-      "localID": 2,
+      "localID": 1,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -23,7 +23,7 @@
     },
     {
       "name": "MainCamera",
-      "localID": 1,
+      "localID": 2,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -38,13 +38,18 @@
         "rotation": 0.0
       },
       "CameraComponent": {
-        "zoom": 0.5,
         "mode": "FOLLOW_TARGET",
-        "followTargetName": "Hero",
+        "position": [
+          7040.2451171875,
+          1107.4476318359375
+        ],
         "followOffset": [
-          -100.0,
-          0
-        ]
+          0.0,
+          0.0
+        ],
+        "smoothing": true,
+        "smoothingSpeed": 5.0,
+        "followTargetName": "Hero"
       },
       "children": []
     },
@@ -55,12 +60,12 @@
       "active": true,
       "TransformComponent": {
         "pos": [
-          7871.62841796875,
-          3299.5712890625
+          7870.0,
+          3303.0
         ],
         "scale": [
-          1595.7813720703125,
-          643.7156982421875
+          1596.0,
+          647.0
         ],
         "rotation": 0.0
       },
@@ -73,7 +78,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -89,8 +95,8 @@
         "shape": "Square",
         "layer": "Ground",
         "size": [
-          1595.78076171875,
-          643.7160034179688
+          1596.0,
+          647.0
         ]
       },
       "children": []
@@ -120,7 +126,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -144,7 +151,7 @@
     },
     {
       "name": "Hero",
-      "localID": 6,
+      "localID": 5,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -167,20 +174,32 @@
           1.0,
           1.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "Spritesheet": {
-        "defaultAnimation": "Idle",
+        "defaultAnimation": "Wallslide",
         "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 0,
+            "endRow": 2,
+            "endCol": 2,
+            "fps": 4.0
+          },
           {
             "name": "Dash",
             "filepath": "../Assets/spritesheet_R.png",
             "rows": 13,
             "cols": 10,
-            "startRow": 3,
+            "startRow": 0,
             "startCol": 0,
-            "endRow": 3,
-            "endCol": 2,
+            "endRow": 0,
+            "endCol": 3,
             "fps": 4.0
           },
           {
@@ -215,6 +234,17 @@
             "endRow": 9,
             "endCol": 4,
             "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 3.0
           },
           {
             "name": "Idle",
@@ -258,7 +288,7 @@
             "startCol": 0,
             "endRow": 8,
             "endCol": 5,
-            "fps": 12.0
+            "fps": 14.0
           },
           {
             "name": "Run",
@@ -291,7 +321,7 @@
             "startCol": 0,
             "endRow": 12,
             "endCol": 7,
-            "fps": 15.0
+            "fps": 16.0
           },
           {
             "name": "Run3",
@@ -302,7 +332,7 @@
             "startCol": 0,
             "endRow": 12,
             "endCol": 7,
-            "fps": 20.0
+            "fps": 22.0
           },
           {
             "name": "Skidding",
@@ -347,6 +377,17 @@
             "endRow": 4,
             "endCol": 1,
             "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 1,
+            "fps": 4.0
           }
         ]
       },
@@ -377,8 +418,1308 @@
       "children": []
     },
     {
-      "name": "C_Ground",
+      "name": "Hero_vfx",
+      "localID": 6,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Clear",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
       "localID": 7,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 8,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Clear",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 9,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 10,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 11,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 12,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Clear",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 13,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 14,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          200.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "vfx",
+      "localID": 15,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          5.0,
+          5.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Platform",
+        "size": [
+          5.0,
+          5.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "C_Ground",
+      "localID": 16,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -401,7 +1742,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": -10
+        "layer": -10,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -425,7 +1767,7 @@
     },
     {
       "name": "C_Ground(4)",
-      "localID": 8,
+      "localID": 17,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -448,7 +1790,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -472,7 +1815,7 @@
     },
     {
       "name": "C_Ground(5)",
-      "localID": 9,
+      "localID": 18,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -495,7 +1838,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -519,7 +1863,7 @@
     },
     {
       "name": "C_Ground(6)",
-      "localID": 10,
+      "localID": 19,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -542,7 +1886,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -566,7 +1911,7 @@
     },
     {
       "name": "C_Ground(7)",
-      "localID": 11,
+      "localID": 20,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -589,7 +1934,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -613,7 +1959,7 @@
     },
     {
       "name": "C_Ground(8)",
-      "localID": 12,
+      "localID": 21,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -636,7 +1982,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -660,7 +2007,7 @@
     },
     {
       "name": "C_Ground(37)",
-      "localID": 13,
+      "localID": 22,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -683,7 +2030,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -707,7 +2055,7 @@
     },
     {
       "name": "C_Ground(35)",
-      "localID": 14,
+      "localID": 23,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -730,7 +2078,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -746,7 +2095,7 @@
         "shape": "Square",
         "layer": "Ground",
         "size": [
-          1018.6279907226562,
+          1018.6279907226563,
           13.01416015625
         ]
       },
@@ -754,7 +2103,7 @@
     },
     {
       "name": "C_Ground(13)",
-      "localID": 17,
+      "localID": 24,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -777,7 +2126,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -801,7 +2151,7 @@
     },
     {
       "name": "C_Ground(14)",
-      "localID": 18,
+      "localID": 25,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -824,7 +2174,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -848,7 +2199,7 @@
     },
     {
       "name": "C_Ground(16)",
-      "localID": 19,
+      "localID": 26,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -871,7 +2222,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -895,7 +2247,7 @@
     },
     {
       "name": "C_Ground(17)",
-      "localID": 20,
+      "localID": 27,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -918,7 +2270,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -942,7 +2295,7 @@
     },
     {
       "name": "C_Ground(18)",
-      "localID": 21,
+      "localID": 28,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -965,7 +2318,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -989,7 +2343,7 @@
     },
     {
       "name": "C_Ground(19)",
-      "localID": 22,
+      "localID": 29,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1012,7 +2366,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1036,7 +2391,7 @@
     },
     {
       "name": "C_Ground(20)",
-      "localID": 23,
+      "localID": 30,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1059,7 +2414,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1083,7 +2439,7 @@
     },
     {
       "name": "C_Ground(21)",
-      "localID": 24,
+      "localID": 31,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1106,7 +2462,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1130,7 +2487,7 @@
     },
     {
       "name": "C_Ground(22)",
-      "localID": 25,
+      "localID": 32,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1153,7 +2510,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1177,7 +2535,7 @@
     },
     {
       "name": "C_Ground(24)",
-      "localID": 27,
+      "localID": 33,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1200,7 +2558,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1224,7 +2583,7 @@
     },
     {
       "name": "C_Ground(25)",
-      "localID": 28,
+      "localID": 34,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1247,7 +2606,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1271,7 +2631,7 @@
     },
     {
       "name": "C_Ground(26)",
-      "localID": 29,
+      "localID": 35,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1294,7 +2654,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1318,7 +2679,7 @@
     },
     {
       "name": "C_Ground(27)",
-      "localID": 30,
+      "localID": 36,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1341,7 +2702,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1365,7 +2727,7 @@
     },
     {
       "name": "C_Ground(28)",
-      "localID": 31,
+      "localID": 37,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1388,7 +2750,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1412,7 +2775,7 @@
     },
     {
       "name": "C_Ground(29)",
-      "localID": 32,
+      "localID": 38,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1435,7 +2798,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1459,7 +2823,7 @@
     },
     {
       "name": "C_Ground(30)",
-      "localID": 33,
+      "localID": 39,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1482,7 +2846,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1506,7 +2871,7 @@
     },
     {
       "name": "C_Ground(31)",
-      "localID": 34,
+      "localID": 40,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1529,7 +2894,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1553,7 +2919,7 @@
     },
     {
       "name": "C_Ground(32)",
-      "localID": 35,
+      "localID": 41,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1576,7 +2942,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1600,7 +2967,7 @@
     },
     {
       "name": "C_Ground(33)",
-      "localID": 36,
+      "localID": 42,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1623,7 +2990,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1647,7 +3015,7 @@
     },
     {
       "name": "C_Ground(34)",
-      "localID": 37,
+      "localID": 43,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1670,7 +3038,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1694,7 +3063,7 @@
     },
     {
       "name": "C_Ground(1)",
-      "localID": 38,
+      "localID": 44,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1717,7 +3086,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1741,7 +3111,7 @@
     },
     {
       "name": "C_Ground(2)",
-      "localID": 39,
+      "localID": 45,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1764,7 +3134,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1788,7 +3159,7 @@
     },
     {
       "name": "C_Ground(3)",
-      "localID": 40,
+      "localID": 46,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1811,7 +3182,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1835,7 +3207,7 @@
     },
     {
       "name": "C_Ground(4)",
-      "localID": 41,
+      "localID": 47,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1858,7 +3230,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1882,7 +3255,7 @@
     },
     {
       "name": "C_Ground(5)",
-      "localID": 42,
+      "localID": 48,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1892,7 +3265,7 @@
         ],
         "scale": [
           82.9276123046875,
-          840.2898559570312
+          840.2898559570313
         ],
         "rotation": 0.0
       },
@@ -1905,7 +3278,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1929,7 +3303,7 @@
     },
     {
       "name": "C_Ground(6)",
-      "localID": 43,
+      "localID": 49,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1952,7 +3326,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -1976,7 +3351,7 @@
     },
     {
       "name": "C_Ground(7)",
-      "localID": 44,
+      "localID": 50,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1999,7 +3374,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -2016,14 +3392,14 @@
         "layer": "Ground",
         "size": [
           64.04296875,
-          839.1790161132812
+          839.1790161132813
         ]
       },
       "children": []
     },
     {
       "name": "C_Ground(8)",
-      "localID": 45,
+      "localID": 51,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2046,7 +3422,8 @@
           0.7058823704719543,
           0.0
         ],
-        "layer": -10
+        "layer": -10,
+        "screenSpace": false
       },
       "PhysicsComponent": {
         "mass": 1.0,
@@ -2063,20 +3440,20 @@
         "layer": "Ground",
         "size": [
           63.087890625,
-          767.2219848632812
+          767.2219848632813
         ]
       },
       "children": []
     },
     {
       "name": "WinZone",
-      "localID": 54,
+      "localID": 52,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          32200.0,
-          700.0
+          32071.0,
+          722.0
         ],
         "scale": [
           200.0,
@@ -2093,7 +3470,8 @@
           0.0,
           0.5
         ],
-        "layer": 10
+        "layer": 10,
+        "screenSpace": false
       },
       "ColliderComponent": {
         "shape": "Square",
@@ -2107,13 +3485,13 @@
     },
     {
       "name": "SafeZone",
-      "localID": 55,
+      "localID": 53,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "pos": [
-          419.7,
-          2434.7
+          547.7000122070313,
+          2608.699951171875
         ],
         "scale": [
           800.0,
@@ -2128,9 +3506,10 @@
           0.0,
           0.0,
           1.0,
-          0.3
+          0.30000001192092896
         ],
-        "layer": 10
+        "layer": 10,
+        "screenSpace": false
       },
       "ColliderComponent": {
         "shape": "Square",
@@ -2141,130 +3520,10 @@
         ]
       },
       "children": []
-    }, 
-    {
-      "name": "InGamePauseButton",
-      "localID": 56,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "pos": [
-          1800.0,
-          900.0
-        ],
-        "scale": [
-          125.0,
-          110.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/Icons/paused_button.png",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 700,
-        "screenSpace": true
-      },
-      "children": []
-    },
-    {
-      "name": "LevelTimerBarBackground",
-      "localID": 9,
-      "parentID": -1,
-      "active": true,
-      "RenderComponent": {
-        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
-        "shapeType": "Square",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 9,
-        "screenSpace": true
-      },
-      "TransformComponent": {
-        "pos": [
-          550,
-          920
-        ],
-        "scale": [
-          1050,
-          100
-        ],
-        "rotation": 0.0
-      },
-      "children": []
-    },
-    {
-      "name": "LevelTimerBar",
-      "localID": 10,
-      "parentID": -1,
-      "active": true,
-      "RenderComponent": {
-        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
-        "shapeType": "Square",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 10,
-        "screenSpace": true
-      },
-      "TransformComponent": {
-        "pos": [
-          550,
-          920
-        ],
-        "scale": [
-          1000,
-          100
-        ],
-        "rotation": 0.0
-      },
-      "children": []
-    },
-    {
-      "name": "LevelTimerBarFrame",
-      "localID": 11,
-      "parentID": -1,
-      "active": true,
-      "RenderComponent": {
-        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
-        "shapeType": "Square",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 11,
-        "screenSpace": true
-      },
-      "TransformComponent": {
-        "pos": [
-          550,
-          920
-        ],
-        "scale": [
-          1050,
-          125
-        ],
-        "rotation": 0.0
-      },
-      "children": []
     },
     {
       "name": "Text FPS",
-      "localID": 5,
+      "localID": 54,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2287,7 +3546,8 @@
           0.5,
           1.0
         ],
-        "layer": 0
+        "layer": 0,
+        "screenSpace": false
       },
       "TextComponent": {
         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
@@ -2303,19 +3563,1383 @@
         "screenSpace": true
       },
       "children": []
+    },
+    {
+      "name": "SZ_Asset",
+      "localID": 55,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          548.0,
+          2675.0
+        ],
+        "scale": [
+          1000.0,
+          746.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Safe_zone.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard",
+      "localID": 56,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          4595.0,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Sea Urchin Spike",
+        "animations": [
+          {
+            "name": "Sea Urchin Spike",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(1)",
+      "localID": 57,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7846.5,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(2)",
+      "localID": 58,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          5386.0,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(3)",
+      "localID": 59,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          4751.0,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(4)",
+      "localID": 60,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          5236.5,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(5)",
+      "localID": 61,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          5919.5,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(6)",
+      "localID": 62,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          6452.5,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(7)",
+      "localID": 63,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          6605.5,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(8)",
+      "localID": 64,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9735.0,
+          2639.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(9)",
+      "localID": 65,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8558.5,
+          2853.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -4.699999809265137
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          100.0,
+          132.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(10)",
+      "localID": 66,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8392.5,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(11)",
+      "localID": 67,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8257.5,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(12)",
+      "localID": 68,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8121.5,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(13)",
+      "localID": 69,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7985.5,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(14)",
+      "localID": 70,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8524.5,
+          2929.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -3.140000104904175
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(15)",
+      "localID": 71,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8558.5,
+          2273.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -4.699999809265137
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          100.0,
+          132.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(16)",
+      "localID": 72,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8558.5,
+          2707.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -4.699999809265137
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          100.0,
+          132.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(17)",
+      "localID": 73,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8558.5,
+          2559.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -4.699999809265137
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          100.0,
+          132.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(18)",
+      "localID": 74,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8558.5,
+          2416.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": -4.699999809265137
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          100.0,
+          132.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(19)",
+      "localID": 75,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7051.5,
+          528.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(20)",
+      "localID": 76,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9440.0,
+          2639.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Spike_Hazard(21)",
+      "localID": 77,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          9589.0,
+          2639.0
+        ],
+        "scale": [
+          168.0,
+          100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Idle",
+            "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "rows": 1,
+            "cols": 3,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          126.0,
+          100.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "EZ_Asset",
+      "localID": 78,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          32073.0,
+          734.0
+        ],
+        "scale": [
+          400.0,
+          512.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Exit zone.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "NPC_Jellyfish",
+      "localID": 79,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          8222.0,
+          3305.0
+        ],
+        "scale": [
+          449.0,
+          436.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/jellyfish_crab_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Jellyfish NPC",
+        "animations": [
+          {
+            "name": "Jellyfish NPC",
+            "filepath": "../Assets/Sprites/Sheets/jellyfish_crab_spritesheet.png",
+            "rows": 1,
+            "cols": 5,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 10.0
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "NPC_Lobster",
+      "localID": 80,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          7541.5,
+          3323.0
+        ],
+        "scale": [
+          560.0,
+          494.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Sheets/lobster_eel_spritesheet.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "defaultAnimation": "Lobster NPC",
+        "animations": [
+          {
+            "name": "Jellyfish NPC",
+            "filepath": "../Assets/Sprites/Sheets/lobster_eel_spritesheet.png",
+            "rows": 1,
+            "cols": 6,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 10.0
+          },
+          {
+            "name": "Lobster NPC",
+            "filepath": "../Assets/Sprites/Sheets/lobster_eel_spritesheet.png",
+            "rows": 1,
+            "cols": 6,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 5,
+            "fps": 10.0
+          },
+          {
+            "name": "NPC Lobster",
+            "filepath": "../Assets/Sprites/Sheets/lobster_eel_spritesheet.png",
+            "rows": 1,
+            "cols": 6,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 5,
+            "fps": 10.0
+          },
+          {
+            "name": "Sea Urchin Hazard",
+            "filepath": "../Assets/Sprites/Sheets/lobster_eel_spritesheet.png",
+            "rows": 1,
+            "cols": 6,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0
+          }
+        ]
+      },
+      "children": []
     }
   ],
-  "TilemapFile": "../Assets/Tiles/M4_LEVEL.tilemap",
   "AudioManager": {
     "sounds": [
-      {
-        "name": "bgm",
-        "filepath": "../Assets/audio/sneaky_bgm.wav",
-        "loop": true,
-        "volume": 0.75,
-        "pitch": 1.0,
-        "category": "bgm"
-      },
       {
         "name": "AirGlide",
         "filepath": "../Assets/audio/Player/AirGlide.wav",
@@ -2327,6 +4951,30 @@
       {
         "name": "TurnSkid",
         "filepath": "../Assets/audio/Player/TurnSkid.wav",
+        "loop": false,
+        "volume": 0.05000000074505806,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "airglide_sfx",
+        "filepath": "../Assets/audio/Player/AirGlide.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.5,
+        "category": "sfx_loop"
+      },
+      {
+        "name": "bgm",
+        "filepath": "../Assets/audio/sneaky_bgm.wav",
+        "loop": true,
+        "volume": 0.75,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "bonk_sfx",
+        "filepath": "../Assets/audio/Player/WallBonk.wav",
         "loop": false,
         "volume": 0.05000000074505806,
         "pitch": 1.100000023841858,
@@ -2405,12 +5053,20 @@
         "category": "sfx"
       },
       {
+        "name": "gameover",
+        "filepath": "../Assets/audio/gameover.wav",
+        "loop": true,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "groundpound_falling_sfx",
         "filepath": "../Assets/audio/Player/Groundpound_falling.wav",
-        "loop": true,
+        "loop": false,
         "volume": 0.5,
         "pitch": 2.0,
-        "category": "sfx"
+        "category": "sfx_loop"
       },
       {
         "name": "groundpound_sfx",
@@ -2418,6 +5074,14 @@
         "loop": false,
         "volume": 0.5,
         "pitch": 1.5,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx",
+        "filepath": "../Assets/audio/Player/Hurt-Damage.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
         "category": "sfx"
       },
       {
@@ -2461,11 +5125,51 @@
         "category": "sfx"
       },
       {
+        "name": "menu_click",
+        "filepath": "../Assets/audio/press_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_hover",
+        "filepath": "../Assets/audio/hover_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_restart",
+        "filepath": "../Assets/audio/press_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "roll_sfx",
         "filepath": "../Assets/audio/Player/Roll.wav",
         "loop": false,
         "volume": 0.10000000149011612,
         "pitch": 1.25,
+        "category": "sfx"
+      },
+      {
+        "name": "turnskid_sfx",
+        "filepath": "../Assets/audio/Player/TurnSkid.wav",
+        "loop": false,
+        "volume": 0.05000000074505806,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "victory",
+        "filepath": "../Assets/audio/victory.wav",
+        "loop": true,
+        "volume": 0.5,
+        "pitch": 1.0,
         "category": "sfx"
       },
       {
@@ -2485,43 +5189,19 @@
         "category": "sfx"
       },
       {
-        "name": "menu_hover",
-        "filepath": "../Assets/audio/hover_button.wav",
+        "name": "wallslide_impact_sfx",
+        "filepath": "../Assets/audio/Player/Wallkick.wav",
         "loop": false,
-        "volume": 0.5,
+        "volume": 0.800000011920929,
         "pitch": 1.0,
         "category": "sfx"
       },
       {
-        "name": "menu_click",
-        "filepath": "../Assets/audio/press_button.wav",
+        "name": "wallslide_sfx",
+        "filepath": "../Assets/audio/Player/WallSlide.wav",
         "loop": false,
-        "volume": 0.5,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "menu_restart",
-        "filepath": "../Assets/audio/press_button.wav",
-        "loop": false,
-        "volume": 0.5,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "victory",
-        "filepath": "../Assets/audio/victory.wav",
-        "loop": true,
-        "volume": 0.5,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "gameover",
-        "filepath": "../Assets/audio/gameover.wav",
-        "loop": true,
-        "volume": 0.40,
-        "pitch": 1.0,
+        "volume": 0.10000000149011612,
+        "pitch": 0.8999999761581421,
         "category": "sfx"
       }
     ],
