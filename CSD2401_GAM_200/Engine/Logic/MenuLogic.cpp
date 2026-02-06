@@ -1,8 +1,12 @@
 /* Start Header ************************************************************************/
 /*!
 \file       MenuLogic.cpp
-\author     Jonathan Fam Qian Wei [100% - 83 lines]
-\par        Fam.q@digipen.edu
+\author     Jonathan Fam Qian Wei [24% - 83 lines],
+            Lee Hwee Min [5% - 16 lines],
+            Leck Xin Yee [71% - 253 lines]
+\par        Fam.q@digipen.edu,
+            l.hweemin@digipen.edu,
+            xinyee.leck@digipen.edu
 \date       October, 2, 2025
 
 Copyright (C) 2025 DigiPen Institute of Technology.

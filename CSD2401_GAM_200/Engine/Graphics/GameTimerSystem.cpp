@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameTimerSystem.cpp
-\author     Leck Xin Yee [100% - 118 lines]
+\author     Leck Xin Yee [100% - 232 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 26, 2025
 

@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameTimerSystem.h
-\author     Leck Xin Yee [100% - 35 lines]
+\author     Leck Xin Yee [100% - 34 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 26, 2025
 
@@ -97,7 +97,7 @@ private:
     float       originalScaleY = 0.0f;              // original bar height
     float       originalCenterX = 0.0f;             // original bar center X position
     float       originalCenterY = 0.0f;             // original bar center Y position
-    float       leftEdge = 0.0f;                    // left edge anchor point
+    float       rightEdge = 0.0f;                   // right edge anchor point
 
     /**
      * @brief Updates the timer's displayed UI bar fill amount.
