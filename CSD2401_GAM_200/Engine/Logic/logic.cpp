@@ -206,6 +206,14 @@ void EventSystem::ProcessEvents() {
     for (auto& e : queue) {
         if (!e.target) continue;
 
+        // Check if the target game object is still valid in the factory
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* validObject = factory.GetGameObject(e.target->GetID());
+        if (validObject != e.target) {
+            // GameObject has been destroyed, skip this event
+            continue;
+        }
+
         auto* ec = e.target->GetComponent<EventComponent>();
         if (ec) {
             ec->OnEvent(e.type, e.other);
