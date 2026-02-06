@@ -89,6 +89,22 @@ public:
      */
     void TogglePauseMenu();
 
+    /**
+     * @brief Opens the How To Play screen (creates pause menu if needed).
+     */
+    void OpenHowToPlay();
+
+    /**
+     * @brief Closes the How To Play screen.
+     */
+    void CloseHowToPlay();
+
+    /**
+     * @brief Checks if How To Play screen is currently open.
+     * @return True if How To Play is active.
+     */
+    bool IsHowToPlayOpen() const { return isHowToPlayOpen; }
+
 private:
     bool isPauseMenuActive = false;        // whether the pause menu is currently displayed
     std::string hoveredButtonName = "";    // name of the currently hovered button
@@ -106,6 +122,7 @@ private:
     bool wasHowToPlayOpenLastFrame = false; // tracks if how to play was open last frame
     bool pendingHowToPlayClose = false;    // whether how to play back button was clicked
     float howToPlayCloseTimer = 0.0f;      // timer for how to play close delay
+    bool howToPlayOpenedViaTab = false;    // tracks if how to play was opened via TAB key
 
     /**
      * @brief Creates all pause menu UI elements (overlay, buttons, title).
