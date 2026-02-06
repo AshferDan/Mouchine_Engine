@@ -96,6 +96,7 @@ private:
     float       originalScaleX = 0.0f;              // original bar width
     float       originalScaleY = 0.0f;              // original bar height
     float       originalCenterX = 0.0f;             // original bar center X position
+    float       originalCenterY = 0.0f;             // original bar center Y position
     float       leftEdge = 0.0f;                    // left edge anchor point
 
     /**
