@@ -50,10 +50,7 @@ void ScriptComponentBase::Update(float dt)
 
 void ScriptComponentBase::Destroy()
 {
-    if (scriptInstance && onDestroy)
-    {
-        mono_runtime_invoke(onDestroy, scriptInstance, nullptr, nullptr);
-    }
+    
 }
 
 bool ScriptComponentBase::CreateScriptInstance()

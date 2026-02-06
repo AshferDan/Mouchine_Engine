@@ -507,12 +507,6 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
     if (!gameObject)
         return;
 
-    // Notify ScriptSystem that this GameObject is about to be destroyed
-    if (CORE && CORE->GetScriptSystem()) {
-        CORE->GetScriptSystem()->NotifyGameObjectDestroyed(gameObject);
-    }
-
-    // remove parenting
     GameObject *goParent = gameObject->GetParent();
     if (goParent)
     {
