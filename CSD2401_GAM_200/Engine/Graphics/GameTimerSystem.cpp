@@ -14,19 +14,30 @@ Technology is prohibited.
 
 #include "GameTimerSystem.h"
 #include "WinLoseLogic.h"
+#include "ColliderComponent.h"
+#include "Collision.h"
+#include "transform.h"
 
 #include <cstdio>
 #include <iostream>
+#include <cmath>
 
 /**
  * @brief Initializes the countdown timer and updates initial display.
  */
 void GameTimerSystem::Initialize()
 {
-    remainingTime = 30.0f;
-    lastDisplayedSeconds = 30;
+    remainingTime = 60.0f;
+    lastDisplayedSeconds = 60;
     hasTriggeredTimeUp = false;
-    UpdateText(30);
+
+    // Reset bar scaling variables
+    originalScaleX = 0.0f;
+    originalScaleY = 0.0f;
+    originalCenterX = 0.0f;
+    leftEdge = 0.0f;
+
+    UpdateBar(60);
 }
 
 /**
@@ -63,15 +74,22 @@ void GameTimerSystem::Update(float dt)
         return;
     }
 
-    // reset timer and text
+    // reset timer and bar
     if (mode == EditorMode::Stop)
     {
-        if (remainingTime != 30.0f || lastDisplayedSeconds != 30)
+        if (remainingTime != 60.0f || lastDisplayedSeconds != 60)
         {
-            remainingTime = 30.0f;
-            lastDisplayedSeconds = 30;
+            remainingTime = 60.0f;
+            lastDisplayedSeconds = 60;
             hasTriggeredTimeUp = false;
-            UpdateText(30);
+
+            // Reset bar scaling variables
+            originalScaleX = 0.0f;
+            originalScaleY = 0.0f;
+            originalCenterX = 0.0f;
+            leftEdge = 0.0f;
+
+            UpdateBar(60);
         }
         return;
     }
@@ -85,13 +103,16 @@ void GameTimerSystem::Update(float dt)
     // only decrease time in play mode
     if (mode == EditorMode::Play)
     {
-        remainingTime -= dt;
+        // Only decrement timer if player is outside SafeZone
+        if (!IsPlayerInSafeZone())
+        {
+            remainingTime -= dt;
+        }
 
         // check for lose condition aka time ran out
         if (remainingTime <= 0.0f && !hasTriggeredTimeUp)
         {
             remainingTime = 0.0f;
-            UpdateText(0);
             hasTriggeredTimeUp = true;
 
             // LOSE CONDITION - trigger lose screen
@@ -108,8 +129,10 @@ void GameTimerSystem::Update(float dt)
         if (totalSeconds != lastDisplayedSeconds)
         {
             lastDisplayedSeconds = totalSeconds;
-            UpdateText(totalSeconds);
         }
+
+        // Update bar every frame for smooth animation
+        UpdateBar(totalSeconds);
     }
 }
 
@@ -121,7 +144,14 @@ void GameTimerSystem::ResetTimer()
     remainingTime = 30.0f;
     lastDisplayedSeconds = 30;
     hasTriggeredTimeUp = false;
-    UpdateText(30);
+
+    // Reset bar scaling variables
+    originalScaleX = 0.0f;
+    originalScaleY = 0.0f;
+    originalCenterX = 0.0f;
+    leftEdge = 0.0f;
+
+    UpdateBar(30);
 }
 
 /**
@@ -137,11 +167,11 @@ void GameTimerSystem::DecreaseTime(float amount)
 }
 
 /**
- * @brief Updates the formatted timer text (mm:ss) on the assigned TextComponent.
+ * @brief Updates the timer bar fill amount based on remaining time.
  */
-void GameTimerSystem::UpdateText(int totalSeconds)
+void GameTimerSystem::UpdateBar(int totalSeconds)
 {
-    // find timer by name
+    // find timer bar by name
     auto& factory = GameObjectFactory::Instance();
     GameObject* timerGO = factory.FindGameObject(timerObjectName);
 
@@ -151,10 +181,12 @@ void GameTimerSystem::UpdateText(int totalSeconds)
         return;
     }
 
-    auto* textComp = timerGO->GetComponent<TextComponent>();
-    if (!textComp)
+    auto* renderComp = timerGO->GetComponent<RenderComponent>();
+    auto* transformComp = timerGO->GetComponent<TransformComponent>();
+
+    if (!renderComp || !transformComp)
     {
-        //std::cout << "[GameTimerSystem] No TextComponent on \"" << timerObjectName << "\".\n";
+        //std::cout << "[GameTimerSystem] No RenderComponent or TransformComponent on \"" << timerObjectName << "\".\n";
         return;
     }
 
@@ -162,7 +194,6 @@ void GameTimerSystem::UpdateText(int totalSeconds)
     WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
     if (winLoseLogic && (winLoseLogic->IsWinScreenActive() || winLoseLogic->IsLoseScreenActive()))
     {
-        textComp->SetText("");
         timerGO->SetActive(false);
         return;
     }
@@ -173,11 +204,107 @@ void GameTimerSystem::UpdateText(int totalSeconds)
         timerGO->SetActive(true);
     }
 
-    int minutes = totalSeconds / 60;
-    int seconds = totalSeconds % 60;
+    // store original dimensions ONCE (when variables are zero)
+    if (originalScaleX == 0.0f)
+    {
+        transformComp->GetScale(originalScaleX, originalScaleY);
+        float tempY;
+        transformComp->GetPosition(originalCenterX, tempY);
+        leftEdge = originalCenterX - (originalScaleX / 2.0f);
 
-    char buffer[16];
-    std::snprintf(buffer, sizeof(buffer), "%02d:%02d", minutes, seconds);
+        // check the grey background and frame positions too
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* greyBG = factory.FindGameObject("LevelTimerBarBackground");
+        GameObject* frame = factory.FindGameObject("LevelTimerBarFrame");
 
-    textComp->SetText(buffer);
+        if (greyBG && frame)
+        {
+            auto* greyTransform = greyBG->GetComponent<TransformComponent>();
+            auto* frameTransform = frame->GetComponent<TransformComponent>();
+
+            float greyX, greyY, greyScaleX, greyScaleY;
+            float frameX, frameY, frameScaleX, frameScaleY;
+
+            greyTransform->GetPosition(greyX, greyY);
+            greyTransform->GetScale(greyScaleX, greyScaleY);
+            frameTransform->GetPosition(frameX, frameY);
+            frameTransform->GetScale(frameScaleX, frameScaleY);
+
+            float greyLeft = greyX - (greyScaleX / 2.0f);
+            float greyRight = greyX + (greyScaleX / 2.0f);
+
+            //std::cout << "[Timer Init] BLUE: Center=" << originalCenterX << ", Scale=" << originalScaleX
+            //          << ", Edges=[" << leftEdge << " to " << (leftEdge + originalScaleX) << "]" << std::endl;
+            //std::cout << "[Timer Init] GREY: Center=" << greyX << ", Scale=" << greyScaleX
+            //          << ", Edges=[" << greyLeft << " to " << greyRight << "]" << std::endl;
+            //std::cout << "[Timer Init] FRAME: Center=" << frameX << ", Scale=" << frameScaleX << std::endl;
+        }
+    }
+
+    // calculate fill percentage (0.0 to 1.0)
+    float fillPercentage = remainingTime / 60.0f;
+    if (fillPercentage < 0.0f) fillPercentage = 0.0f;
+    if (fillPercentage > 1.0f) fillPercentage = 1.0f;
+
+    // scale the bar width
+    const float MIN_WIDTH = 20.0f;
+    float newScaleX = originalScaleX * fillPercentage;
+    if (newScaleX < MIN_WIDTH) newScaleX = MIN_WIDTH;
+
+    // position to keep left edge anchored
+    float shrinkAmount = originalScaleX - newScaleX;
+    float offsetX = -(shrinkAmount / 2.0f);
+
+    // add padding to align with the visual frame
+    const float PADDING = 25.0f;
+
+    transformComp->SetScale(newScaleX, originalScaleY);
+    transformComp->SetPosition(originalCenterX + offsetX + PADDING, transformComp->posY);
+}
+
+/**
+ * @brief Checks if the player is inside the safe zone using AABB collision detection.
+ */
+bool GameTimerSystem::IsPlayerInSafeZone()
+{
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* safeZone = factory.FindGameObject("SafeZone");
+    GameObject* player = factory.FindGameObject("Hero");
+
+    // if SafeZone doesn't exist or player doesn't exist, timer runs normally
+    if (!safeZone || !player || !safeZone->IsActive() || !player->IsActive())
+    {
+        return false;
+    }
+
+    auto* safeZoneTransform = safeZone->GetComponent<TransformComponent>();
+    auto* playerTransform = player->GetComponent<TransformComponent>();
+    auto* safeZoneCollider = safeZone->GetComponent<ColliderComponent>();
+    auto* playerCollider = player->GetComponent<ColliderComponent>();
+
+    if (!safeZoneTransform || !playerTransform || !safeZoneCollider || !playerCollider)
+    {
+        return false;
+    }
+
+    AABB safeAABB = safeZoneCollider->GetAABB();
+    AABB playerAABB = playerCollider->GetAABB();
+
+    float safeX = (safeAABB.min.x + safeAABB.max.x) / 2.0f;
+    float safeY = (safeAABB.min.y + safeAABB.max.y) / 2.0f;
+    float playerX = (playerAABB.min.x + playerAABB.max.x) / 2.0f;
+    float playerY = (playerAABB.min.y + playerAABB.max.y) / 2.0f;
+
+    float safeHalfWidth = (safeAABB.max.x - safeAABB.min.x) / 2.0f;
+    float safeHalfHeight = (safeAABB.max.y - safeAABB.min.y) / 2.0f;
+    float playerHalfWidth = (playerAABB.max.x - playerAABB.min.x) / 2.0f;
+    float playerHalfHeight = (playerAABB.max.y - playerAABB.min.y) / 2.0f;
+
+    float distX = std::abs(playerX - safeX);
+    float distY = std::abs(playerY - safeY);
+    float thresholdX = playerHalfWidth + safeHalfWidth;
+    float thresholdY = playerHalfHeight + safeHalfHeight;
+
+    // true if player is colliding with or inside the safe zone
+    return (distX < thresholdX) && (distY < thresholdY);
 }

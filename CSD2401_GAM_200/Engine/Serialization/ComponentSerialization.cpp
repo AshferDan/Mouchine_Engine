@@ -60,7 +60,8 @@ void ComponentSerialization::SerializeRender(json &j, RenderComponent *r)
         {"shapeType", r->GetShapeTypeName()},
         {"texturePath", texPath},
         {"color", {r->GetColor().x, r->GetColor().y, r->GetColor().z, r->GetColor().w}},
-        {"layer", r->GetLayer()} };
+        {"layer", r->GetLayer()},
+        {"screenSpace", r->isScreenSpace()}};
 }
 
 /**
@@ -317,6 +318,9 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
     // Deserialize layer with default value of 0
     int layer = r.value("layer", 0);
     render->SetLayer(layer);
+
+    bool screenSpace = r.value("screenSpace", false);
+    render->SetScreenSpace(screenSpace);
 
     std::string texPath = r.value("texturePath", "");
     GLuint texID = 0;

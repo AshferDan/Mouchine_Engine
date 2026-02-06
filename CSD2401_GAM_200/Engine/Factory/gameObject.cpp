@@ -230,20 +230,112 @@ void GameObject::ReorderChildren(const std::vector<EntityID>& newOrder) {
     children = reordered;
 }
 
-void GameObject::RemoveComponent(const std::string& name) {
-    if (name == "TransformComponent") {
+/**
+ * @brief Execute a gameplay action defined by an EventRule.
+ */
+void GameObject::ExecuteAction(const EventRule& rule, GameObject* other) {
+    (void)other;
+    switch (rule.action)
+    {
+    case ActionType::EnableObject:
+        SetActive(true);
+        break;
+
+    case ActionType::DisableObject:
+        SetActive(false);
+        break;
+
+    case ActionType::DestroyObject:
+        Destroy();
+        break;
+
+    case ActionType::PlaySound:
+        {
+            auto* audioMgr = CORE->GetAudioManager();
+            if (!audioMgr) break;
+
+            // rule.stringValue contains the sound name
+            if (!rule.stringValue.empty())
+            {
+                audioMgr->PlaySound(rule.stringValue, "sfx");
+                //currentlyPlayingSound = rule.stringValue;
+                SetCurrentlyPlayingSound(rule.stringValue);
+
+            }
+        }
+        break;
+
+    case ActionType::StopSound:
+        {
+            auto* audio = CORE->GetAudioManager();
+            if (!audio) break;
+
+            const std::string& sound = this->GetCurrentlyPlayingSound();
+
+            if (!sound.empty())
+            {
+                audio->StopSound(sound);
+
+                this->ClearCurrentlyPlayingSound();
+            }
+            else
+            {
+                std::cout << "[StopSound] Nothing to stop for this object\n";
+            }
+        }
+        break;
+
+    case ActionType::Respawn:
+    {
+        auto* tc = GetComponent<TransformComponent>();
+        if (tc) {
+            // Respawn here
+            tc->SetPosition(this->originalPos.x, this->originalPos.y);
+            //tc->SetPosition(0,0);
+        }
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief Called by the EventSystem when this GameObject receives an event.
+ */
+void GameObject::OnEventTriggered(EventType type, GameObject* other) {
+    // Get this object's eventComponent
+    auto* ec = GetComponent<EventComponent>();
+    if (!ec) return;
+
+    for (auto& rule : ec->rules) {
+        if (rule.eventType != type) continue;
+
+        if (rule.targetObjectId != -1)
+        {
+            if (!other) continue;
+            if (other->GetID() != static_cast<unsigned int>(rule.targetObjectId))
+                continue;
+        }
+        ExecuteAction(rule, other);
+    }
+}
+
+void GameObject::RemoveComponent(const std::string& ComponentName) {
+    if (ComponentName == "TransformComponent") {
         RemoveComponent<TransformComponent>();
-    } else if (name == "RenderComponent") {
+    } else if (ComponentName == "RenderComponent") {
         RemoveComponent<RenderComponent>();
-    } else if (name == "PhysicsComponent") {
+    } else if (ComponentName == "PhysicsComponent") {
         RemoveComponent<PhysicsComponent>();
-    } else if (name == "ColliderComponent") {
+    } else if (ComponentName == "ColliderComponent") {
         RemoveComponent<ColliderComponent>();
-    } else if (name == "ScriptComponent") {
+    } else if (ComponentName == "ScriptComponent") {
         RemoveComponent<ScriptComponent>();
-    } else if (name == "CameraComponent") {
+    } else if (ComponentName == "CameraComponent") {
         RemoveComponent<CameraComponent>();
-    } else if (name == "EventComponent") {
+    } else if (ComponentName == "EventComponent") {
         RemoveComponent<EventComponent>();
     }
 }

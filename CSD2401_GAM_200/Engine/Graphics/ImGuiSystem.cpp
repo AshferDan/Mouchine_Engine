@@ -272,8 +272,10 @@ void ImGuiSystem::Update(float dt)
         ImGuiID dockspace_id = ImGui::GetID("DockSpace");
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::End();
-
+#ifndef _DEBUG
+#else
         TopMenuBar_Render();
+#endif
 
         LevelEditor* levelEditor = CORE->GetLevelEditor();
         bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
@@ -446,6 +448,10 @@ void ImGuiSystem::Update(float dt)
             {
                 RenderPropertyEditor();
             }
+
+            // Render layer visibility panel
+            LayerPanel_Render();
+
             // Render profiler! Make it toggleable?
             Profiler_Render();
         }
@@ -2342,6 +2348,17 @@ void ImGuiSystem::RenderPropertyEditor()
                     render->SetLayer(goRenderLayer);
                 }
                 CreateHintText("Ascending order for topmost rendering position");
+
+                // Layer Category dropdown
+                const char* layerCategories[] = { "Background", "Walls", "Player", "Enemies", "Foreground", "UI" };
+                int currentLayerCategory = render->GetRenderLayerInt();
+                ImGui::Text("Layer Category");
+                ImGui::SetNextItemWidth(150.0f);
+                if (ImGui::Combo("##LayerCategory", &currentLayerCategory, layerCategories, IM_ARRAYSIZE(layerCategories)))
+                {
+                    render->SetRenderLayerInt(currentLayerCategory);
+                }
+                CreateHintText("Category for group visibility toggling");
             }
         }
     }
@@ -2550,19 +2567,10 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
 
             ImGui::Text("Attached Scripts:");
 
-            // Debug: Show script counts from both ScriptComponent and ScriptSystem
-            const auto& componentScripts = script->GetScripts();
-            ImGui::Text("  ScriptComponent has %zu scripts", componentScripts.size());
-            for (const auto& [id, name] : componentScripts)
-            {
-                ImGui::Text("    - %s (ID: %u)", name.c_str(), id);
-            }
-
             auto* scriptSystem = CORE->GetScriptSystem();
             if (scriptSystem)
             {
                 auto* instances = scriptSystem->GetScriptInstances(obj);
-                ImGui::Text("  ScriptSystem has %zu instances for this GameObject", instances ? instances->size() : 0);
                 if (instances)
                 {
                     for (auto& instance : *instances)
@@ -3186,6 +3194,65 @@ void AudioAssetsPanel_Render()
         showAudioAssetsPanel = false;
     }
 }
+#pragma endregion
+
+#pragma region Layer Panel ImGui
+
+void LayerPanel_Render()
+{
+    if (!ImGui::Begin("Render Layers", nullptr, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    ImGui::Text("Toggle layer visibility:");
+    ImGui::Separator();
+
+    // Layer names matching the RenderLayer enum
+    const char* layerNames[] = {
+        "Background",
+        "Walls",
+        "Player",
+        "Enemies",
+        "Foreground",
+        "UI"
+    };
+
+    // Create a checkbox for each layer
+    for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+    {
+        RenderComponent::RenderLayer layer = static_cast<RenderComponent::RenderLayer>(i);
+        bool visible = RenderComponent::IsLayerVisible(layer);
+
+        if (ImGui::Checkbox(layerNames[i], &visible))
+        {
+            RenderComponent::SetLayerVisible(layer, visible);
+        }
+    }
+
+    ImGui::Separator();
+
+    // Quick buttons
+    if (ImGui::Button("Show All"))
+    {
+        for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+        {
+            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(i), true);
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Hide All"))
+    {
+        for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+        {
+            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(i), false);
+        }
+    }
+
+    ImGui::End();
+}
+
 #pragma endregion
 
 #pragma region Animation Previewer ImGui

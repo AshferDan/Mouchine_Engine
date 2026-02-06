@@ -21,6 +21,7 @@ Technology is prohibited.
 #include "GameTimerSystem.h"
 #include "PauseMenuLogic.h"
 #include "LevelEditor.h"
+#include "CameraManager.h"
 
 bool InputManager::KeyStateImgui = true;
 double InputManager::MouseWorldX = 0.0;
@@ -119,7 +120,7 @@ bool InputManager::IsAnyKeyPress() {
  *        player movement, jumping, animations, and quitting logic.
  * @param dt Delta time since the last frame.
  */
-void InputManager::Update(float dt)
+void InputManager::Update(float)
 {
 	static bool firstUpdate = true;
 	if (firstUpdate) {
@@ -169,11 +170,19 @@ void InputManager::Update(float dt)
 
     // Convert screen to world coordinates
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
-    MouseWorldX = static_cast<double>(xpos - width / 2.0) + camPos.x;
-    MouseWorldY = static_cast<double>(height / 2.0 - ypos) + camPos.y; // Flip Y axis
+
+    // Get camera zoom to properly scale mouse coordinates
+    float zoom = 1.0f;
+    CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
+    if (cam) {
+        zoom = cam->getZoom();
+    }
+
+    MouseWorldX = static_cast<double>((xpos - width / 2.0) / zoom) + camPos.x;
+    MouseWorldY = static_cast<double>((height / 2.0 - ypos) / zoom) + camPos.y; // Flip Y axis
 
     static bool keyPressed = false;
-    LevelEditor *levelEditor = CORE->GetLevelEditor();
+    LevelEditor *levelEditor = CORE ? CORE->GetLevelEditor() : nullptr;
     if (levelEditor && levelEditor->GetEditorMode() != EditorMode::Play && levelEditor->GetEditorMode() != EditorMode::Stop)
     {
         static bool editorModeWarning = true;
@@ -197,7 +206,7 @@ void InputManager::Update(float dt)
 
     // ------------------- UNDO: Ctrl + Z -------------------//
     {
-        LevelEditor* editor = CORE->GetLevelEditor();
+        LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
         if (editor)
         {
             bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
@@ -260,7 +269,7 @@ void InputManager::Update(float dt)
     {
         if (!singleTriggerKeys[GLFW_KEY_M])
         {
-            AudioManager* audioManager = CORE->GetAudioManager();
+            AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
             if (audioManager)
             {
                 audioManager->ToggleMute();
@@ -269,23 +278,31 @@ void InputManager::Update(float dt)
         }
     }
 
-    // Check if in play mode for pause menu 
+    // Check if in play mode for pause menu
     LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
     bool isPlayMode = (editor && editor->GetEditorMode() == EditorMode::Play);
+
+    // Check if we're in the main menu
+    PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
+    bool isMainMenu = false;
+    if (pauseMenu)
+    {
+        std::string currentScene = pauseMenu->GetCurrentScene();
+        isMainMenu = (currentScene.find("MainMenu") != std::string::npos);
+    }
 
     // Handle ESC key
     if (isPlayMode)
     {
         // Check if win or lose screen is active - if so, disable ESC key
-        WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
+        WinLoseLogicSystem* winZone = CORE ? CORE->GetWinLoseLogic() : nullptr;
         bool winScreenActive = winZone && winZone->IsWinScreenActive();
         bool loseScreenActive = winZone && winZone->IsLoseScreenActive();
 
-        // In play mode: ESC toggles pause menu (unless win/lose screen is active)
+        // In play mode: ESC toggles pause menu (unless win/lose screen is active or in main menu)
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive) {
-                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu) {
                 if (pauseMenu)
                 {
                     pauseMenu->TogglePauseMenu();
@@ -311,12 +328,11 @@ void InputManager::Update(float dt)
     // Handle P key
     if (isPlayMode)
     {
-        // In play mode: P toggles pause menu
+        // In play mode: P toggles pause menu (unless in main menu)
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
         {
-            if (!singleTriggerKeys[GLFW_KEY_P])
+            if (!singleTriggerKeys[GLFW_KEY_P] && !isMainMenu)
             {
-                PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
                 if (pauseMenu)
                 {
                     pauseMenu->TogglePauseMenu();
@@ -331,20 +347,21 @@ void InputManager::Update(float dt)
 
         {
             GameObject* howto = GameObjectFactory::Instance().FindGameObject("HowToPlay");
-            GameObject* cam = GameObjectFactory::Instance().FindGameObject("MainCamera");
-            if (howto && cam)
+            if (howto)
             {
                 auto* transform = howto->GetComponent<TransformComponent>();
-                if (!transform) return;
+                auto* render = howto->GetComponent<RenderComponent>();
+                if (!render && !transform) return;
 
                 // Handles Holding F1 for How To Play in playmode
                 if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS)
                 {
                     //show how to play and pause game as long as key held
-                    float x{}, y{};
+                    vec2 res{ 1920, 1080 };         // idk how get viewport size
+                    transform->SetScale(res.x, res.y);
                     CORE->SetGamePaused(true);
-                    //camtransform->GetPosition(x, y);
-                    transform->SetPosition(x,y);
+                    render->SetScreenSpace(true);
+                    transform->SetPosition(res.x/2, res.y/2);
                     howto->SetActive(true);
                 }
                 else
@@ -352,6 +369,15 @@ void InputManager::Update(float dt)
                     CORE->SetGamePaused(false);
                     howto->SetActive(false);
                 }
+            }
+        }
+
+        {
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+            {
+                std::string currentScenePath = CORE->GetPauseMenuLogic()->GetCurrentScene();
+                if (!currentScenePath.empty())
+                    CORE->RequestSceneLoad(currentScenePath, true);
             }
         }
     }
@@ -364,6 +390,8 @@ void InputManager::Update(float dt)
         }
     }
 
+#ifndef _DEBUG
+#else
     for (auto &kv : singleTriggerKeys)
     {
         int key = kv.first;
@@ -410,6 +438,7 @@ void InputManager::Update(float dt)
             wasPressed = false;
         }
     }
+#endif
 
     GameObject* player = nullptr;
 

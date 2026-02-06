@@ -57,7 +57,10 @@ int main()
 
         g_UseGameStates = false; // Set the flag to use Game States
         // CORE->RequestSceneLoad("Prefab_TestScene");
-
+#ifndef _DEBUG
+        CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+		CORE->GetGraphicsSystem()->SetEditorMode(false);
+#else
         GameObject *mainCamera = GameObjectFactory::Instance().CreateGameObject("MainCamera");
         auto *cam = mainCamera->AddComponent<CameraComponent>();
 
@@ -75,28 +78,6 @@ int main()
 
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
-        GameObject* testObj = GameObjectFactory::Instance().CreateShape(
-            "MyTestSquare",                  // <--- NAME MUST MATCH C#
-            RenderComponent::ShapeType::Square,
-            -200.0f, 400.0f,                      // Center of screen
-            100.0f, 100.0f,                  // Size
-            vec4(1.0f, 1.0f, 1.0f, 1.0f)     // White (Script will change this to Yellow)
-        );
-
-        // 2. Add the ScriptComponent
-        if (testObj)
-        {
-            ScriptComponent* scriptComp = testObj->AddComponent<ScriptComponent>();
-
-            if (scriptComp)
-            {
-                // 3. Attach the script "SpinningSquare"
-                // Ensure the namespace in C# is "GameScripts"
-                scriptComp->AddScript("SpinningSquare");
-
-                std::cout << "[Main] Created 'MyTestSquare' and attached 'SpinningSquare'.\n";
-            }
-        }
 
         GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
             "Hero",
@@ -131,7 +112,8 @@ int main()
             "Platform",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             0.0f, -200.0f,                      // Center of screen
-            10000.0f, 200.0f,                  // Size
+            100000.0f, 200.0f,                  // Size
+            false,
             vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
         );
 
@@ -143,7 +125,7 @@ int main()
             if (colComp && phyComp)
             {
                 phyComp->SetStatic(true);
-                colComp->SetSize(10000.0f, 200.0f);
+                colComp->SetSize(100000.0f, 200.0f);
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }
@@ -153,6 +135,7 @@ int main()
             RenderComponent::ShapeType::Square,
             -200.0f, 0.0f,                      // Center of screen
             100.0f, 1000.0f,                  // Size
+            false,
             vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
         );
 
@@ -168,7 +151,7 @@ int main()
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }
-
+#endif
         // Initialise Game State Manager (Level1)
         GameManager::Instance().ChangeState(std::make_unique<Level1>());
 

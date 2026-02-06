@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       WinLoseLogic.cpp
-\author     Leck Xin Yee [100% - 463 lines]
+\author     Leck Xin Yee [100% - 553 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 29, 2025
 
@@ -116,13 +116,16 @@ void WinLoseLogicSystem::Update(float dt)
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
         auto& factory = GameObjectFactory::Instance();
 
+        // use a scale multiplier to match pause menu UI scaling
+        float uiScale = 2.0f;
+
         // update all win screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"WinScreen", vec2(0.0f, 0.0f)},
-            {"NextLevelLogo", vec2(550.0f, 250.0f)},
-            {"NextButton", vec2(550.0f, 50.0f)},
-            {"ReplayButton", vec2(550.0f, -100.0f)},
-            {"QuitButton", vec2(550.0f, -250.0f)}
+            {"NextLevelLogo", vec2(550.0f * uiScale, 250.0f * uiScale)},
+            {"NextButton", vec2(550.0f * uiScale, 50.0f * uiScale)},
+            {"ReplayButton", vec2(550.0f * uiScale, -100.0f * uiScale)},
+            {"QuitButton", vec2(550.0f * uiScale, -250.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -149,12 +152,14 @@ void WinLoseLogicSystem::Update(float dt)
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
         auto& factory = GameObjectFactory::Instance();
 
+        float uiScale = 2.0f;
+
         // update all lose screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"LoseScreen", vec2(0.0f, 0.0f)},
-            {"LoseReplayLogo", vec2(550.0f, 125.0f)},
-            {"YesButton", vec2(550.0f, -50.0f)},
-            {"LoseQuitButton", vec2(550.0f, -200.0f)}
+            {"LoseReplayLogo", vec2(550.0f * uiScale, 125.0f * uiScale)},
+            {"YesButton", vec2(550.0f * uiScale, -50.0f * uiScale)},
+            {"LoseQuitButton", vec2(550.0f * uiScale, -200.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -256,6 +261,8 @@ void WinLoseLogicSystem::TriggerWin()
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
+    float uiScale = 2.0f;
+
     // pause game first
     CORE->SetGamePaused(true);
 
@@ -263,9 +270,8 @@ void WinLoseLogicSystem::TriggerWin()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->SetCategoryVolume("music", 0.0f);
-        audioManager->StopSound("bgm");
-        audioManager->PlaySound("victory", "sfx");
+        audioManager->StopSound("bgm_channel");
+        audioManager->PlaySound("victory");
     }
 
     // win screen background
@@ -273,8 +279,8 @@ void WinLoseLogicSystem::TriggerWin()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x + 0.0f;
     boardTransform->posY = camPos.y + 0.0f;
-    boardTransform->scaleX = 1920.0f;
-    boardTransform->scaleY = 1080.0f;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -283,58 +289,58 @@ void WinLoseLogicSystem::TriggerWin()
     // next level logo
     GameObject* bigLogo = factory.CreateGameObject("NextLevelLogo");
     auto* logoTransform = bigLogo->AddComponent<TransformComponent>();
-    logoTransform->posX = camPos.x + 550.0f;
-    logoTransform->posY = camPos.y + 250.0f;
-    logoTransform->scaleX = 600.0f;
-    logoTransform->scaleY = 175.0f;
+    logoTransform->posX = camPos.x + 550.0f * uiScale;
+    logoTransform->posY = camPos.y + 250.0f * uiScale;
+    logoTransform->scaleX = 600.0f * uiScale;
+    logoTransform->scaleY = 175.0f * uiScale;
     auto* logoRender = bigLogo->AddComponent<RenderComponent>();
     logoRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
     logoRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     logoRender->SetLayer(102);
     bigLogo->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 72, "Next Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(72 * uiScale), "Next Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // next button which goes to next level
     GameObject* nextBtn = factory.CreateGameObject("NextButton");
     auto* nextTransform = nextBtn->AddComponent<TransformComponent>();
-    nextTransform->posX = camPos.x + 550.0f;
-    nextTransform->posY = camPos.y + 50.0f;
-    nextTransform->scaleX = 550.0f;
-    nextTransform->scaleY = 140.0f;
+    nextTransform->posX = camPos.x + 550.0f * uiScale;
+    nextTransform->posY = camPos.y + 50.0f * uiScale;
+    nextTransform->scaleX = 550.0f * uiScale;
+    nextTransform->scaleY = 140.0f * uiScale;
     auto* nextRender = nextBtn->AddComponent<RenderComponent>();
     nextRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     nextRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     nextRender->SetLayer(102);
     nextBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Next", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Next", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // replay button which restarts level
     GameObject* replayBtn = factory.CreateGameObject("ReplayButton");
     auto* replayTransform = replayBtn->AddComponent<TransformComponent>();
-    replayTransform->posX = camPos.x + 550.0f;
-    replayTransform->posY = camPos.y + -100.0f;
-    replayTransform->scaleX = 550.0f;
-    replayTransform->scaleY = 140.0f;
+    replayTransform->posX = camPos.x + 550.0f * uiScale;
+    replayTransform->posY = camPos.y + -100.0f * uiScale;
+    replayTransform->scaleX = 550.0f * uiScale;
+    replayTransform->scaleY = 140.0f * uiScale;
     auto* replayRender = replayBtn->AddComponent<RenderComponent>();
     replayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     replayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     replayRender->SetLayer(102);
     replayBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // quit button which goes bk to main menu
     GameObject* quitBtn = factory.CreateGameObject("QuitButton");
     auto* quitTransform = quitBtn->AddComponent<TransformComponent>();
-    quitTransform->posX = camPos.x + 550.0f;
-    quitTransform->posY = camPos.y + -250.0f;
-    quitTransform->scaleX = 550.0f;
-    quitTransform->scaleY = 140.0f;
+    quitTransform->posX = camPos.x + 550.0f * uiScale;
+    quitTransform->posY = camPos.y + -250.0f * uiScale;
+    quitTransform->scaleX = 550.0f * uiScale;
+    quitTransform->scaleY = 140.0f * uiScale;
     auto* quitRender = quitBtn->AddComponent<RenderComponent>();
     quitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     quitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     quitRender->SetLayer(102);
     quitBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedWinScreen = true;
 }
@@ -539,6 +545,9 @@ void WinLoseLogicSystem::TriggerLose()
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
+    // Use a scale multiplier to match pause menu UI scaling
+    float uiScale = 2.0f;
+
     // pause game first
     CORE->SetGamePaused(true);
 
@@ -546,10 +555,8 @@ void WinLoseLogicSystem::TriggerLose()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->SetCategoryVolume("music", 0.0f);
-        audioManager->StopSound("bgm");
-        audioManager->PauseAllSounds(false);  // unpause audio so UI sounds work
-        audioManager->PlaySound("gameover", "sfx");
+        audioManager->StopSound("bgm_channel");
+        audioManager->PlaySound("gameover");
     }
 
     // lose screen background
@@ -557,8 +564,8 @@ void WinLoseLogicSystem::TriggerLose()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x + 0.0f;
     boardTransform->posY = camPos.y + 0.0f;
-    boardTransform->scaleX = 1920.0f;
-    boardTransform->scaleY = 1080.0f;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_over_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -567,44 +574,44 @@ void WinLoseLogicSystem::TriggerLose()
     // retry level logo
     GameObject* loseLogo = factory.CreateGameObject("LoseReplayLogo");
     auto* loseTransform = loseLogo->AddComponent<TransformComponent>();
-    loseTransform->posX = camPos.x + 550.0f;
-    loseTransform->posY = camPos.y + 125.0f;
-    loseTransform->scaleX = 600.0f;
-    loseTransform->scaleY = 175.0f;
+    loseTransform->posX = camPos.x + 550.0f * uiScale;
+    loseTransform->posY = camPos.y + 125.0f * uiScale;
+    loseTransform->scaleX = 600.0f * uiScale;
+    loseTransform->scaleY = 175.0f * uiScale;
     auto* loseRender = loseLogo->AddComponent<RenderComponent>();
     loseRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
     loseRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     loseRender->SetLayer(102);
     loseLogo->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 72, "Retry Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(72 * uiScale), "Retry Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // yes button which restarts level
     GameObject* yesBtn = factory.CreateGameObject("YesButton");
     auto* yesTransform = yesBtn->AddComponent<TransformComponent>();
-    yesTransform->posX = camPos.x + 550.0f;
-    yesTransform->posY = camPos.y + -500.0f;
-    yesTransform->scaleX = 550.0f;
-    yesTransform->scaleY = 140.0f;
+    yesTransform->posX = camPos.x + 550.0f * uiScale;
+    yesTransform->posY = camPos.y + -50.0f * uiScale;
+    yesTransform->scaleX = 550.0f * uiScale;
+    yesTransform->scaleY = 140.0f * uiScale;
     auto* yesRender = yesBtn->AddComponent<RenderComponent>();
     yesRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     yesRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     yesRender->SetLayer(102);
     yesBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Yes", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Yes", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // quit button which goes back to main menu
     GameObject* loseQuitBtn = factory.CreateGameObject("LoseQuitButton");
     auto* loseQuitTransform = loseQuitBtn->AddComponent<TransformComponent>();
-    loseQuitTransform->posX = camPos.x + 550.0f;
-    loseQuitTransform->posY = camPos.y + -200.0f;
-    loseQuitTransform->scaleX = 550.0f;
-    loseQuitTransform->scaleY = 140.0f;
+    loseQuitTransform->posX = camPos.x + 550.0f * uiScale;
+    loseQuitTransform->posY = camPos.y + -200.0f * uiScale;
+    loseQuitTransform->scaleX = 550.0f * uiScale;
+    loseQuitTransform->scaleY = 140.0f * uiScale;
     auto* loseQuitRender = loseQuitBtn->AddComponent<RenderComponent>();
     loseQuitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     loseQuitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     loseQuitRender->SetLayer(102);
     loseQuitBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", 50, "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedLoseScreen = true;
 }
@@ -660,7 +667,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
 
             if (audioManager)
             {
-                audioManager->TriggerEvent("UI_Restart");
+                audioManager->TriggerEvent("UI_Click");
             }
 
             // Restore music volume before restarting
@@ -682,7 +689,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
 
             if (audioManager)
             {
-                audioManager->TriggerEvent("UI_Quit");
+                audioManager->TriggerEvent("UI_Click");
             }
 
             // Restore music volume before going to main menu

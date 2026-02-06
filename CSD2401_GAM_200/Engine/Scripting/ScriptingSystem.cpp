@@ -165,6 +165,31 @@ static void Internal_SetAlpha(MonoString *objectName, float alpha)
     mono_free(name);
 }
 
+static void Internal_SetRenderLayer(MonoString *objectName, int layer)
+{
+    char *name = mono_string_to_utf8(objectName);
+    API::SetRenderLayer(name, layer);
+    mono_free(name);
+}
+
+static int Internal_GetRenderLayer(MonoString *objectName)
+{
+    char *name = mono_string_to_utf8(objectName);
+    int result = API::GetRenderLayer(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_SetLayerVisible(int layer, bool visible)
+{
+    API::SetLayerVisible(layer, visible);
+}
+
+static bool Internal_IsLayerVisible(int layer)
+{
+    return API::IsLayerVisible(layer);
+}
+
 // === Physics ===
 static void Internal_SetVelocity(MonoString *objectName, float vx, float vy)
 {
@@ -541,9 +566,9 @@ static void Internal_SetCameraMode(int mode) {
     API::setCameraMode((CameraComponent::CameraMode)mode);
 }
 
-static void Internal_CameraFlash(float duration, float r, float g, float b, float a, bool fadeout)
+static void Internal_CameraFlash(float duration, float r, float g, float b, float a, bool fadeout, float camShakeStrength)
 {
-    API::CameraFlash(duration, {r, g, b, a}, fadeout);
+    API::CameraFlash(duration, {r, g, b, a}, fadeout, camShakeStrength);
 }
 
 
@@ -580,13 +605,20 @@ static bool Internal_OnTriggerStay(MonoString* obj1, MonoString* obj2) {
     return result;
 }
 
-static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName)
+static void Internal_PlayAnimation(MonoString* objectName, MonoString* animationName, bool isLooping)
 {
     char* objName = mono_string_to_utf8(objectName);
     char* animName = mono_string_to_utf8(animationName);
-    API::PlayAnimation(objName, animName);
+    API::PlayAnimation(objName, animName, isLooping);
     mono_free(objName);
     mono_free(animName);
+}
+
+static void Internal_SetAnimationLooping(MonoString* objectName, bool isLooping)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    API::SetAnimationLooping(objName, isLooping);
+    mono_free(objName);
 }
 
 static void Internal_AddAnimationToQueue(MonoString* objectName, MonoString* animationName)
@@ -626,7 +658,7 @@ static MonoString* Internal_GetCurrentAnimationName(MonoString* objectName)
 
 // === Misc ===
 static int Internal_RandomRange(int min, int max) {
-    return API::RandomNumberGen(max, min); // Note: API args are (max, min)
+    return API::RandomNumberGen(max, min); 
 }
 static float Internal_GetDelta_Time() {
     return static_cast<float>(API::GetDelta_Time());
@@ -712,6 +744,257 @@ static bool Internal_IsLoseScreenActive()
         return CORE->GetWinLoseLogic()->IsLoseScreenActive();
     }
     return false;
+}
+
+// === Particles ===
+static void Internal_AddParticleEmitterComponent(MonoString* objectName, int maxParticles)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::AddParticleEmitterComponent(name, maxParticles);
+    mono_free(name);
+}
+
+static void Internal_Particles_StartEmission(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_StartEmission(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_StopEmission(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_StopEmission(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_Burst(MonoString* objectName, int count)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_Burst(name, count);
+    mono_free(name);
+}
+
+static void Internal_Particles_Clear(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_Clear(name);
+    mono_free(name);
+}
+
+static bool Internal_Particles_IsEmitting(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    bool result = API::Particles_IsEmitting(name);
+    mono_free(name);
+    return result;
+}
+
+static int Internal_Particles_GetActiveCount(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    int result = API::Particles_GetActiveCount(name);
+    mono_free(name);
+    return result;
+}
+
+static int Internal_Particles_GetMaxParticles(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    int result = API::Particles_GetMaxParticles(name);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_Particles_SetEmissionRate(MonoString* objectName, float rate)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetEmissionRate(name, rate);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetMaxParticles(MonoString* objectName, int max)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetMaxParticles(name, max);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetDuration(MonoString* objectName, float seconds)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetDuration(name, seconds);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetLoop(MonoString* objectName, bool shouldLoop)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetLoop(name, shouldLoop);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetLifetime(MonoString* objectName, float seconds, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetLifetime(name, seconds, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetSpawnOffset(MonoString* objectName, float x, float y)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetSpawnOffset(name, x, y);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetSpawnRadius(MonoString* objectName, float radius)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetSpawnRadius(name, radius);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetSpawnBox(MonoString* objectName, float halfWidth, float halfHeight)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetSpawnBox(name, halfWidth, halfHeight);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetVelocity(MonoString* objectName, float dirX, float dirY, float magnitude, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetVelocity(name, dirX, dirY, magnitude, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetAngleSpread(MonoString* objectName, float degrees)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetAngleSpread(name, degrees);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetGravity(MonoString* objectName, float gravX, float gravY)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetGravity(name, gravX, gravY);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetDrag(MonoString* objectName, float drag)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetDrag(name, drag);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetStartColor(MonoString* objectName, float r, float g, float b, float a)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetStartColor(name, r, g, b, a);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetEndColor(MonoString* objectName, float r, float g, float b, float a)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetEndColor(name, r, g, b, a);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetStartSize(MonoString* objectName, float size)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetStartSize(name, size);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetEndSize(MonoString* objectName, float size)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetEndSize(name, size);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetLayer(MonoString* objectName, int layer)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetLayer(name, layer);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetFadeIn(MonoString* objectName, float duration)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetFadeIn(name, duration);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetFadeOut(MonoString* objectName, float duration)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetFadeOut(name, duration);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetStartRotation(MonoString* objectName, float degrees, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetStartRotation(name, degrees, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetAngularVelocity(MonoString* objectName, float degreesPerSec, float variation)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_SetAngularVelocity(name, degreesPerSec, variation);
+    mono_free(name);
+}
+
+static void Internal_Particles_SetTexture(MonoString* objectName, MonoString* texturePath)
+{
+    char* name = mono_string_to_utf8(objectName);
+    char* texPath = mono_string_to_utf8(texturePath);
+    API::Particles_SetTexture(name, texPath);
+    mono_free(name);
+    mono_free(texPath);
+}
+
+static void Internal_Particles_ConfigureDashTrail(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureDashTrail(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureJumpDust(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureJumpDust(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureWallSlideParticles(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureWallSlideParticles(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureSpeedLines(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureSpeedLines(name);
+    mono_free(name);
+}
+
+static void Internal_Particles_ConfigureDeathExplosion(MonoString* objectName)
+{
+    char* name = mono_string_to_utf8(objectName);
+    API::Particles_ConfigureDeathExplosion(name);
+    mono_free(name);
 }
 
 MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassName, GameObject* owner)
@@ -897,6 +1180,10 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Graphics::SetColor", (void *)Internal_SetColor);
     mono_add_internal_call("CSharpScript.Graphics::SetAlpha", (void *)Internal_SetAlpha);
     mono_add_internal_call("CSharpScript.Graphics::GetColor", (void*)Internal_GetColor);
+    mono_add_internal_call("CSharpScript.Graphics::SetRenderLayer", (void *)Internal_SetRenderLayer);
+    mono_add_internal_call("CSharpScript.Graphics::GetRenderLayer", (void *)Internal_GetRenderLayer);
+    mono_add_internal_call("CSharpScript.Graphics::SetLayerVisible", (void *)Internal_SetLayerVisible);
+    mono_add_internal_call("CSharpScript.Graphics::IsLayerVisible", (void *)Internal_IsLayerVisible);
 
     // === Physics ===
     mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);
@@ -958,6 +1245,7 @@ void ScriptSystem::RegisterInternalCalls()
 
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);
+    mono_add_internal_call("CSharpScript.Animation::SetLooping", (void*)Internal_SetAnimationLooping);
     mono_add_internal_call("CSharpScript.Animation::AddToQueue", (void*)Internal_AddAnimationToQueue);
     mono_add_internal_call("CSharpScript.Animation::RegisterAnimation", (void*)Internal_RegisterAnimation);
     mono_add_internal_call("CSharpScript.Animation::SetAnimation", (void*)Internal_SetAnimation);
@@ -1006,6 +1294,43 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.WinLoseSystem::TriggerLose", (void*)Internal_TriggerLoseZone);
     mono_add_internal_call("CSharpScript.WinLoseSystem::IsWinScreenActive", (void*)Internal_IsWinScreenActive);
     mono_add_internal_call("CSharpScript.WinLoseSystem::IsLoseScreenActive", (void*)Internal_IsLoseScreenActive);
+
+    // === Particles ===
+    mono_add_internal_call("CSharpScript.Particles::AddParticleEmitterComponent", (void*)Internal_AddParticleEmitterComponent);
+    mono_add_internal_call("CSharpScript.Particles::StartEmission", (void*)Internal_Particles_StartEmission);
+    mono_add_internal_call("CSharpScript.Particles::StopEmission", (void*)Internal_Particles_StopEmission);
+    mono_add_internal_call("CSharpScript.Particles::Burst", (void*)Internal_Particles_Burst);
+    mono_add_internal_call("CSharpScript.Particles::Clear", (void*)Internal_Particles_Clear);
+    mono_add_internal_call("CSharpScript.Particles::IsEmitting", (void*)Internal_Particles_IsEmitting);
+    mono_add_internal_call("CSharpScript.Particles::GetActiveParticleCount", (void*)Internal_Particles_GetActiveCount);
+    mono_add_internal_call("CSharpScript.Particles::GetMaxParticles", (void*)Internal_Particles_GetMaxParticles);
+    mono_add_internal_call("CSharpScript.Particles::SetEmissionRate", (void*)Internal_Particles_SetEmissionRate);
+    mono_add_internal_call("CSharpScript.Particles::SetMaxParticles", (void*)Internal_Particles_SetMaxParticles);
+    mono_add_internal_call("CSharpScript.Particles::SetDuration", (void*)Internal_Particles_SetDuration);
+    mono_add_internal_call("CSharpScript.Particles::SetLoop", (void*)Internal_Particles_SetLoop);
+    mono_add_internal_call("CSharpScript.Particles::SetLifetime", (void*)Internal_Particles_SetLifetime);
+    mono_add_internal_call("CSharpScript.Particles::SetSpawnOffset", (void*)Internal_Particles_SetSpawnOffset);
+    mono_add_internal_call("CSharpScript.Particles::SetSpawnRadius", (void*)Internal_Particles_SetSpawnRadius);
+    mono_add_internal_call("CSharpScript.Particles::SetSpawnBox", (void*)Internal_Particles_SetSpawnBox);
+    mono_add_internal_call("CSharpScript.Particles::SetVelocity", (void*)Internal_Particles_SetVelocity);
+    mono_add_internal_call("CSharpScript.Particles::SetAngleSpread", (void*)Internal_Particles_SetAngleSpread);
+    mono_add_internal_call("CSharpScript.Particles::SetGravity", (void*)Internal_Particles_SetGravity);
+    mono_add_internal_call("CSharpScript.Particles::SetDrag", (void*)Internal_Particles_SetDrag);
+    mono_add_internal_call("CSharpScript.Particles::SetStartColor", (void*)Internal_Particles_SetStartColor);
+    mono_add_internal_call("CSharpScript.Particles::SetEndColor", (void*)Internal_Particles_SetEndColor);
+    mono_add_internal_call("CSharpScript.Particles::SetStartSize", (void*)Internal_Particles_SetStartSize);
+    mono_add_internal_call("CSharpScript.Particles::SetEndSize", (void*)Internal_Particles_SetEndSize);
+    mono_add_internal_call("CSharpScript.Particles::SetLayer", (void*)Internal_Particles_SetLayer);
+    mono_add_internal_call("CSharpScript.Particles::SetFadeIn", (void*)Internal_Particles_SetFadeIn);
+    mono_add_internal_call("CSharpScript.Particles::SetFadeOut", (void*)Internal_Particles_SetFadeOut);
+    mono_add_internal_call("CSharpScript.Particles::SetStartRotation", (void*)Internal_Particles_SetStartRotation);
+    mono_add_internal_call("CSharpScript.Particles::SetAngularVelocity", (void*)Internal_Particles_SetAngularVelocity);
+    mono_add_internal_call("CSharpScript.Particles::SetTexture", (void*)Internal_Particles_SetTexture);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureDashTrail", (void*)Internal_Particles_ConfigureDashTrail);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureJumpDust", (void*)Internal_Particles_ConfigureJumpDust);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureWallSlideParticles", (void*)Internal_Particles_ConfigureWallSlideParticles);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureSpeedLines", (void*)Internal_Particles_ConfigureSpeedLines);
+    mono_add_internal_call("CSharpScript.Particles::ConfigureDeathExplosion", (void*)Internal_Particles_ConfigureDeathExplosion);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)
@@ -1056,7 +1381,7 @@ bool ScriptSystem::LoadScriptAssembly(const std::string& filepath)
     // List all classes in the assembly for debugging (Alternative method)
     std::cout << "[ScriptSystem] Scanning for classes in 'CSharpScript' namespace...\n";
 
-    // Try to find some common classes to verify the assembly loaded correctly
+    
     const char* testClasses[] = {
         "GameScript",
         "SpinningSquare",
@@ -1146,10 +1471,10 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
         std::cout << "  OnDestroy: " << (scriptClass.onDestroy ? "Found" : "Not Found") << std::endl;
     }
 
-    // Get cached script class
+ 
     ScriptClass& scriptClass = scriptClasses[scriptClassName];
 
-    // Create instance
+
     MonoObject* instance = InstantiateClass(scriptClass.monoClass);
 
     if (!instance)
@@ -1178,7 +1503,7 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
             << scriptClassName << std::endl;
     }
 
-    // Create script instance and add to GameObject
+
     ScriptInstance scriptInstance;
     scriptInstance.instance = instance;
     scriptInstance.scriptClass = &scriptClass;
@@ -1227,7 +1552,13 @@ void ScriptSystem::CallOnStart(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-        // Validate all pointers before calling mono_runtime_invoke
+       
+        if (scriptInstance.isStarted)
+        {
+            continue;
+        }
+
+      
         if (!scriptInstance.scriptClass)
         {
             std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
@@ -1242,12 +1573,16 @@ void ScriptSystem::CallOnStart(GameObject *gameObject)
 
         if (!scriptInstance.scriptClass->onStart)
         {
-            // OnStart method not found or doesn't exist - skip silently
+
+            scriptInstance.isStarted = true;
             continue;
         }
 
         MonoObject* exception = nullptr;
         mono_runtime_invoke(scriptInstance.scriptClass->onStart, scriptInstance.instance, nullptr, &exception);
+
+        // Mark as started after calling OnStart
+        scriptInstance.isStarted = true;
 
         if (exception)
         {
@@ -1353,7 +1688,7 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-        // Validate all pointers before calling mono_runtime_invoke
+     
         if (!scriptInstance.scriptClass)
         {
             std::cerr << "[ScriptSystem] ERROR: scriptClass is null for " << gameObject->GetName() << std::endl;
@@ -1368,7 +1703,7 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
         if (!scriptInstance.scriptClass->onDestroy)
         {
-            // OnDestroy method not found or doesn't exist - skip silently
+           
             continue;
         }
 
@@ -1403,9 +1738,9 @@ void ScriptSystem::CallOnDestroy(GameObject *gameObject)
 
 void ScriptSystem::Update(float deltaTime)
 {
-    // Create a copy of events to iterate over, as events might be modified during processing
+   
     std::vector<QueuedEvent> eventsCopy = EventSystem::events;
-    EventSystem::Clear(); // Clear the static events queue as they are being processed now
+    EventSystem::Clear();
 
     for (auto& e : eventsCopy)
     {
@@ -1426,7 +1761,7 @@ void ScriptSystem::Update(float deltaTime)
         }
         else
         {
-            // Re-raise events that are not OnDestroy for other systems to process
+           
             EventSystem::Raise(e.type, e.target, e.other);
         }
     }
@@ -1452,23 +1787,22 @@ void ScriptSystem::ReloadScriptAssembly()
             }
         }
     }
-    // 2. Clear all cached data
     gameObjectScripts.clear();
     scriptClasses.clear();
 
-    // 3. Unload the old domain
+
     mono_domain_set(rootDomain, false);
     mono_domain_unload(appDomain);
 
-    // Create new domain
+
     char domainName[] = "GameScriptDomain";
     appDomain = mono_domain_create_appdomain(domainName, nullptr);
     mono_domain_set(appDomain, true);
 
-    // Re-register all C++ functions for the new domain
+
     RegisterInternalCalls();
 
-    // Reload the assembly
+ 
     LoadScriptAssembly("./Scripts/GameScripts.dll");
 
     std::cout << "Script assembly reloaded" << std::endl;
@@ -1487,7 +1821,7 @@ std::vector<ScriptField> ScriptSystem::GetPublicFields(ScriptInstance& instance)
             int monoType = mono_type_get_type(type);
 
             MonoObject* value = mono_field_get_value_object(rootDomain, field, instance.instance);
-            if (!value) continue; // Skip if value is null
+            if (!value) continue;
 
             char* str = mono_string_to_utf8(mono_object_to_string(value, nullptr));
 
@@ -1565,15 +1899,13 @@ void ScriptSystem::NotifyGameObjectDestroyed(GameObject* gameObject)
 
     std::cout << "[ScriptSystem] Notifying destruction of GameObject: " << gameObject->GetName() << std::endl;
 
-    // 1. Call OnDestroy for all scripts attached to this GameObject
-    // This ensures C# cleanup logic runs before references are removed.
+
     CallOnDestroy(gameObject);
 
-    // 2. Remove the GameObject's entry from gameObjectScripts map
     auto it = gameObjectScripts.find(gameObject);
     if (it != gameObjectScripts.end())
     {
-        // Free Mono garbage collection handles for all script instances
+       
         for (auto& scriptInstance : it->second)
         {
             if (scriptInstance.gcHandle != 0)

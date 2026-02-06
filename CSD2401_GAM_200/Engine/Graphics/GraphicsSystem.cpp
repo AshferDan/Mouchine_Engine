@@ -411,6 +411,30 @@ void GraphicsSystem::Initialize()
  */
 void GraphicsSystem::Update(float)
 {
+    GLuint id = 0;
+    TextureResource* pTexture = ResourceManager::Instance().LoadTexture("bubble", "../Assets/Bubble_1.png");
+    if (pTexture) {
+        // Successfully loaded!
+        id = pTexture->GetTextureID();
+    }
+	auto* player = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (player) {
+        auto* dashTrail = player->GetComponent<ParticleEmitterComponent>();
+        if (!dashTrail) {
+            // If it doesn't exist, add it and configure it once
+            dashTrail = player->AddComponent<ParticleEmitterComponent>();
+            if (dashTrail) {
+                dashTrail->ConfigureDashTrail();
+                dashTrail->SetTexture(id);
+                dashTrail->StartEmission();
+                std::cout << "Particle Emitter initialized successfully\n";
+            }
+            else {
+                std::cerr << "particle not initialized properly\n";
+            }
+        }
+    }
+
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
     if (!cachedBackground)
     {
@@ -468,7 +492,8 @@ void GraphicsSystem::Update(float)
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
 
-    // === Camera Bounds Debug Drawing ===
+    screenProjectionMatrix = mat4::ortho(0.0f, (float)Wwidth, 0.0f, (float)Wheight);
+
     // === Camera Bounds Debug Drawing ===
     if (debugMode)
     {
@@ -560,7 +585,7 @@ void GraphicsSystem::Update(float)
 
         auto *rend = obj->GetComponent<RenderComponent>();
 
-        if (!rend || !rend->IsEnabled())
+        if (!rend || !rend->IsEnabled() || !rend->IsLayerEnabled())
         {
             continue;
         }
@@ -581,6 +606,13 @@ void GraphicsSystem::Update(float)
         vec4 color = vec4(rend->GetColor());
         bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
         int layer = rend->GetLayer(); // For draw order sorting
+        bool screenSpace = rend->isScreenSpace();
+
+        //if (obj->GetName() == "MyTestSquare") {
+        //    std::cout << "MyTestSquare - screenSpace: " << screenSpace
+        //        << ", Layer: " << layer
+        //        << ", Pos: (" << x << ", " << y << ")\n";
+        //}
 
         // Gather UV data for spritesheets/animation/tiles
         vec2 uvScale = vec2(1.0f);
@@ -603,7 +635,7 @@ void GraphicsSystem::Update(float)
         RenderBatch *targetBatch = nullptr;
         for (auto &batch : batches)
         {
-            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer)
+            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer && batch.screenSpace == screenSpace)
             {
                 targetBatch = &batch;
                 break;
@@ -613,7 +645,7 @@ void GraphicsSystem::Update(float)
         // If no matching batch found, create a new one
         if (!targetBatch)
         {
-            batches.emplace_back(texID, isCircle, layer);
+            batches.emplace_back(texID, isCircle, layer, screenSpace);
             targetBatch = &batches.back();
 
             // Reserve space to minimize reallocations
@@ -682,8 +714,11 @@ void GraphicsSystem::Update(float)
     }
 
     // Sort batches by rendering layer (lower layer draws first)
-    std::sort(batches.begin(), batches.end(), [](const RenderBatch &a, const RenderBatch &b)
-              { return a.layer < b.layer; });
+    std::sort(batches.begin(), batches.end(), [](const RenderBatch &a, const RenderBatch &b) {
+        if (a.screenSpace != b.screenSpace) {
+            return !a.screenSpace; // World space (false) before screen space (true)
+        }
+        return a.layer < b.layer; });
     // auto afterSort = std::chrono::high_resolution_clock::now();
 
     // Draw all accumulated batches
@@ -699,7 +734,7 @@ void GraphicsSystem::Update(float)
         }
 
         auto *rend = obj->GetComponent<RenderComponent>();
-        if (rend && rend->IsEnabled())
+        if (rend && rend->IsEnabled() && rend->IsLayerEnabled())
         {
             // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
             switch (rend->GetShapeType())
@@ -731,16 +766,19 @@ void GraphicsSystem::Update(float)
                     transform->GetPosition(x, y);
                     transform->GetScale(sx, sy);
 
+                    bool isScreenSpace = rend->isScreenSpace();
+                    mat4 debugVP = isScreenSpace ? screenProjectionMatrix : vp;
+
                     // Draw outlines based on the shape type
                     if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
                     {
                         // For circles, the scale is interpreted as diameter, so radius is scale*0.5
-                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), {0, 1, 0, 1}, vp);
+                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), {0, 1, 0, 1}, debugVP);
                     }
                     else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
                     {
                         // std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
-                        DrawRectOutline(x, y, sx, sy, {0, 1, 0, 1}, vp);
+                        DrawRectOutline(x, y, sx, sy, {0, 1, 0, 1}, debugVP);
                     }
                 }
             }
@@ -1057,7 +1095,8 @@ void GraphicsSystem::DrawBatches()
         glNamedBufferSubData(batchEBO, 0, batch.indices.size() * sizeof(GLuint), batch.indices.data());
 
         // Set Uniforms that apply to the whole batch
-        shader->SetUniform("uMVP", vp);
+        mat4 projection = batch.screenSpace ? screenProjectionMatrix : vp;
+        shader->SetUniform("uMVP", projection);
         shader->SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
 
         // Bind Texture

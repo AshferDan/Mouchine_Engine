@@ -36,6 +36,38 @@ public:
         Empty
     };
 
+    /*! @enum RenderLayer
+        @brief Layer categories for organizing rendering and enabling/disabling groups.
+    */
+    enum class RenderLayer
+    {
+        Background = 0,
+        Walls,
+        Player,
+        Enemies,
+        Foreground,
+        UI,
+        Count  // Keep last for iteration
+    };
+
+    // Static layer visibility - controls whether entire layer categories render
+    static inline bool layerVisible[static_cast<int>(RenderLayer::Count)] = {true, true, true, true, true, true};
+
+    /*! @brief Enable/disable an entire layer category */
+    static void SetLayerVisible(RenderLayer layer, bool visible) {
+        layerVisible[static_cast<int>(layer)] = visible;
+    }
+
+    /*! @brief Check if a layer category is visible */
+    static bool IsLayerVisible(RenderLayer layer) {
+        return layerVisible[static_cast<int>(layer)];
+    }
+
+    /*! @brief Check if this component's layer is visible */
+    bool IsLayerEnabled() const {
+        return layerVisible[static_cast<int>(renderLayer)];
+    }
+
     /*! @struct LineData
         @brief Data structure for a line (start/end points and color).
     */
@@ -195,6 +227,34 @@ public:
     void SetUVOffset(const vec2& offset) { uvOffset = offset; }
     vec2 GetUVOffset() const { return uvOffset; }
 
+    void SetScreenSpace(bool sSpace) { screenSpace = sSpace; }
+    bool isScreenSpace() const { return screenSpace; }
+
+    /*! @brief Get render layer category */
+    RenderLayer GetRenderLayer() const { return renderLayer; }
+
+    /*! @brief Set render layer category */
+    void SetRenderLayer(RenderLayer rl) { renderLayer = rl; }
+
+    /*! @brief Get render layer as int for serialization */
+    int GetRenderLayerInt() const { return static_cast<int>(renderLayer); }
+
+    /*! @brief Set render layer from int for serialization */
+    void SetRenderLayerInt(int rl) { renderLayer = static_cast<RenderLayer>(rl); }
+
+    /*! @brief Get render layer name as string */
+    const char* GetRenderLayerName() const {
+        switch (renderLayer) {
+            case RenderLayer::Background: return "Background";
+            case RenderLayer::Walls: return "Walls";
+            case RenderLayer::Player: return "Player";
+            case RenderLayer::Enemies: return "Enemies";
+            case RenderLayer::Foreground: return "Foreground";
+            case RenderLayer::UI: return "UI";
+            default: return "Background";
+        }
+    }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
@@ -205,6 +265,8 @@ private:
     vec2 uvOffset;
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
+    bool screenSpace = false;
+    RenderLayer renderLayer = RenderLayer::Background;  /*!< Layer category for grouping */
 };
 
 namespace RenderComponentTools

@@ -90,9 +90,9 @@
       },
       {
         "name": "menu_restart",
-        "filepath": "../Assets/Audio/restart_button.wav",
+        "filepath": "../Assets/Audio/press_button.wav",
         "loop": false,
-        "volume": 0.3,
+        "volume": 0.5,
         "pitch": 1.0,
         "category": "sfx"
       },
@@ -107,18 +107,18 @@
       {
         "name": "victory",
         "filepath": "../Assets/Audio/victory.wav",
-        "loop": false,
+        "loop": true,
         "volume": 0.50,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "bgm"
       },
       {
         "name": "gameover",
         "filepath": "../Assets/Audio/gameover.wav",
-        "loop": false,
+        "loop": true,
         "volume": 0.40,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "bgm"
       }
     ]
   },
@@ -576,21 +576,20 @@
       "children": []
     },
     {
-      "name": "LevelTimerText",
-      "localID": 10,
+      "name": "LevelTimerBarBackground",
+      "localID": 9,
       "parentID": -1,
       "active": true,
-      "TextComponent": {
-        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-        "fontSize": 48,
-        "text": "00:30",
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
+        "shapeType": "Square",
         "color": [
-          0.0,
-          0.0,
-          0.0,
+          1.0,
+          1.0,
+          1.0,
           1.0
         ],
-        "scale": 1.0,
+        "layer": 9,
         "screenSpace": true
       },
       "TransformComponent": {
@@ -599,8 +598,98 @@
           630
         ],
         "scale": [
-          1,
-          1
+          200,
+          30
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarLeftCap",
+      "localID": 9001,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 9,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          -40,
+          630
+        ],
+        "scale": [
+          10,
+          30
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBar",
+      "localID": 10,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 10,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          50,
+          630
+        ],
+        "scale": [
+          200,
+          30
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarFrame",
+      "localID": 11,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 11,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          50,
+          630
+        ],
+        "scale": [
+          200,
+          30
         ],
         "rotation": 0.0
       },
