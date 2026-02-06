@@ -225,7 +225,7 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero", "Run1", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 12.0f);
             Animation.RegisterAnimation("Hero", "Run2", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 16.0f);
             Animation.RegisterAnimation("Hero", "Run3", "../Assets/spritesheet_R.png", 13, 10, 12, 0, 12, 7, 22.0f);
-            Animation.RegisterAnimation("Hero", "Skidding", "../Assets/spritesheet_R.png", 13, 10, 3, 0, 3, 2, 4.0f);
+            Animation.RegisterAnimation("Hero", "Skidding", "../Assets/spritesheet_R.png", 13, 10, 3, 0, 3, 2, 6.0f);
             Animation.RegisterAnimation("Hero", "Jump", "../Assets/spritesheet_R.png", 13, 10, 11, 4, 11, 5, 12.0f);
             Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png", 13, 10, 1, 0, 1, 2, 8.0f);
             Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 14.0f);
@@ -271,18 +271,6 @@ namespace CSharpScript
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
             Camera.SetZoom(0.5f);
-
-            //uncomment to 'visualise' grounded raycast
-            CSharpScript.GameObject.CreateShape(
-                "vfx",
-                (int)CSharpScript.ShapeType.Square,
-                0, -200,
-                5, 5,
-                0.0f, 0.0f, 1.0f, 1.0f,
-                (int)CSharpScript.CollisionLayer.Platform,
-                false, false, false
-            );
-                 Debug.Log("created vfc gameobject");
         }
 
         public void OnUpdate(float deltaTime)
@@ -358,7 +346,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.Rolling:
                     Animation.PlayAnimation(OwnerName, "Roll");
-                    Animation.PlayAnimation(vfx, "Roll", false);
+                    Animation.PlayAnimation(vfx, "Roll", true);
                     break;
                 case PlayerState.WallKicking:
                     Animation.PlayAnimation(OwnerName, "Wallkick");
@@ -403,8 +391,8 @@ namespace CSharpScript
                 IsBeingKnockedBack = true;
             }
 
-            //Debug.Log(_facingDirection.ToString());
-            Debug.Log(currState.ToString());
+            Debug.Log(Camera.GetZoom().ToString());
+            //Debug.Log(currState.ToString());
 
             // set vfx pos to player
             vfxTracksPlayer = nonTrackingVFX.Contains(currState) ? false : true;
@@ -497,6 +485,7 @@ namespace CSharpScript
                     Move(InputManager.Movement);
                 }
                 HandleKnockback();
+                HandleHazardCollision();
                 // hurt movement lock & friction
                 if (isHurting)
                 {
@@ -536,12 +525,11 @@ namespace CSharpScript
             }
             if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding)
             {
-                Debug.Log("KENAKEA");
                 currState = PlayerState.Idle;
             }
 
             // horizontal input = moving - trigger run animation
-            if ((InputManager.Movement.x != 0 || InputManager.RunIsHeld) && currState != PlayerState.Jumping && currState != PlayerState.WallSliding)
+            if ((InputManager.Movement.x != 0 || InputManager.RunIsHeld) && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Rolling)
             {
                 int index = GetCurrentTentacleLevel();
                 if (index == 0)
@@ -1030,8 +1018,11 @@ namespace CSharpScript
             // landing
             if ((_isJumping || _isFalling) && _isGrounded && VerticalVelocity <= 0f)
             {
-                currState = PlayerState.Land;
-                EnterState(currState);
+                if (currState != PlayerState.Rolling)
+                {
+                    currState = PlayerState.Land;
+                    EnterState(currState);
+                }
 
                 // wallkick() grounded check
                 if (_isWallKicking) StopWallKick();
@@ -1057,7 +1048,7 @@ namespace CSharpScript
 
         private void InitiateJump(int numberOfJumpsUsed)
         {
-            if (!_isGrounded || numberOfJumpsUsed > MoveStats.NumberOfJumpsAllowed)
+            if (!_isGrounded || numberOfJumpsUsed > MoveStats.NumberOfJumpsAllowed || _isSkidding)
             {
                 _isJumping = false;
                 return;
@@ -1246,11 +1237,10 @@ namespace CSharpScript
             // we dont have this :(
             // get speed multiplier from curve @ current progress point
             //float curveMultiplier = MoveStats.WKEaseCurve.Evaluate(progress);
-            float curveMultiplier = 1.0f;
 
             // actual speed is peak speed multiplied by curve's value
-            float currentSpeed = _moveVelocity.x * curveMultiplier;
-            float verticalGain = MoveStats.WKVerticalModifier * curveMultiplier;
+            float currentSpeed = _moveVelocity.x;               // * curveMultiplier;
+            float verticalGain = MoveStats.WKVerticalModifier;  // * curveMultiplier;
 
             // apply new eased speed
             // to fix the jank vert momentum, we just ignore gravity for now, and give back control to the grav after wall kicks
@@ -1610,6 +1600,14 @@ namespace CSharpScript
             }
         }
 
+        private void HandleHazardCollision()
+        {
+            //if (Collision.CheckColliderLayer(4, -1))
+            //{
+            //    Debug.Log("AAAAWORKWORKWORK");
+            //}
+        }
+
         #endregion
 
         public void OnDestroy()
@@ -1627,7 +1625,7 @@ namespace CSharpScript
         // depending on running tiers, play randomised footsteps at different frequencies
         private void PlayFootsteps()
         {
-            if (_isGrounded && movespeed > minFootstepDistance)
+            if (_isGrounded && movespeed > minFootstepDistance && !_isRolling && !_isSkidding && !_isGroundPounding && !_islanding)
             {
                 footstepTimer += fixeddt;
                 int index = GetCurrentTentacleLevel();
@@ -1763,7 +1761,7 @@ namespace CSharpScript
 
         private void IsGrounded()
         {
-            bool oldIsGrounded = _isGrounded;
+            bool triggeredLand = _isGrounded;                       // flag to play sound once
             vec2 position = Transform.GetPosition(OwnerName);
             vec2 scale = Transform.GetScale(OwnerName);
             float halfWidth = Math.Abs(scale.x) / 2;
@@ -1786,7 +1784,7 @@ namespace CSharpScript
             {
                 _isGrounded = true;
                 _coyoteTimer = MoveStats.JumpCoyoteTime;
-                if (!oldIsGrounded)
+                if (!triggeredLand)
                 {
                     //Audio.PlaySound("land_sfx", "sfx");
                     currState = PlayerState.Land;

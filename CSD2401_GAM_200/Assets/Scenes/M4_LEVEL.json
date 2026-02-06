@@ -160,7 +160,7 @@
       },
       "RenderComponent": {
         "shapeType": "Square",
-        "texturePath": "../Assets/spritesheet_L.png",
+        "texturePath": "../Assets/spritesheet_R.png",
         "color": [
           1.0,
           1.0,
