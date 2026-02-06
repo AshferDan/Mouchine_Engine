@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "Message.h"
 #include "IMessageHandler.h"
 #include "logic.h"
+#include "factory.h"
 
 bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
@@ -521,7 +522,12 @@ void CoreEngine::GameLoop()
    */
 void CoreEngine::DestroySystems()
 {
+    // Clear factory before destroying systems so GameObjects can still
+    // reach the ScriptSystem during their destructors
+    GameObjectFactory::Instance().Clear();
+
     std::cout << "Destroying " << Systems.size() << " systems" << std::endl;
+    scriptSystem = nullptr;
     Systems.clear();
     if (audioManager)
     {
