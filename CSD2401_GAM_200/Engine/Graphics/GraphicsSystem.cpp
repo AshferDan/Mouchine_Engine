@@ -623,6 +623,11 @@ void GraphicsSystem::Update(float)
             // Animator takes priority (for animated sprites)
             uvScale = animator->GetUVScale();
             uvOffset = animator->GetUVOffset();
+            // Use Spritesheet texture if RenderComponent has none
+            if (texID == 0 && animator->GetTextureID() != 0)
+            {
+                texID = animator->GetTextureID();
+            }
         }
         else if (auto *renderComp = obj->GetComponent<RenderComponent>())
         {
@@ -1588,10 +1593,15 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
         clonedComponent->SetPoint(this->point.pos, this->point.size);
     }
 
-    // 3. Clone the enabled state and layer.
+    // 3. Clone the enabled state, layer, and other properties.
     clonedComponent->SetEnabled(this->IsEnabled());
-
     clonedComponent->SetLayer(this->layer);
+    clonedComponent->SetTexturePath(this->texturePath);
+    clonedComponent->SetUVScale(this->uvScale);
+    clonedComponent->SetUVOffset(this->uvOffset);
+    clonedComponent->SetScreenSpace(this->screenSpace);
+    clonedComponent->SetColor(this->color);
+    clonedComponent->SetRenderLayer(this->renderLayer);
 
     return clonedComponent;
 }

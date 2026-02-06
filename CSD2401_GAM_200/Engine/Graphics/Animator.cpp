@@ -72,10 +72,14 @@ Spritesheet::Spritesheet(Spritesheet const &rhs, GameObject *NewClone)
 	  startFrame(rhs.startFrame),
 	  endFrame(rhs.endFrame),
 	  textureID(rhs.textureID),
-	  SpriteFile(0),
-	  alpha(0),
+	  SpriteFile(rhs.SpriteFile),
+	  alpha(rhs.alpha),
 	  ownsTexture(false)
 {
+	// Copy animation registry and current animation name
+	animation_mList = rhs.animation_mList;
+	currentAnimName = rhs.currentAnimName;
+	looping = rhs.looping;
 }
 
 /**
@@ -83,7 +87,18 @@ Spritesheet::Spritesheet(Spritesheet const &rhs, GameObject *NewClone)
  */
 std::unique_ptr<IComponent> Spritesheet::Clone(GameObject *NewClone) const
 {
-	return std::make_unique<Spritesheet>(*this, NewClone);
+	auto cloned = std::make_unique<Spritesheet>(*this, NewClone);
+
+	// Sync the texture ID to the clone's RenderComponent
+	if (auto* render = NewClone->GetComponent<RenderComponent>())
+	{
+		if (render->GetTextureID() == 0 && cloned->textureID != 0)
+		{
+			render->SetTextureID(cloned->textureID);
+		}
+	}
+
+	return cloned;
 }
 
 /**
@@ -166,6 +181,12 @@ void Spritesheet::LoadNewSpritesheet(const char *textureFile, int numRows, int n
 		currCol = 0;
 		startFrame = 0;
 		endFrame = 0;
+
+		// Sync texture to RenderComponent in case it wasn't set yet
+		if (auto* render = owner->GetComponent<RenderComponent>())
+		{
+			render->SetTextureID(textureID);
+		}
 		return;
 	}
 
