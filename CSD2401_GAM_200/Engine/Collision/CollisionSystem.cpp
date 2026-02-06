@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       CollisionSystem.cpp
-\author     Khalil Belabadia [96% - 275 lines]
+\author     Khalil Belabadia [96% - 338 lines]
             Lee Hwee Min [4% - 5 lines]
 \par        khalil.b@digipen.edu
 \date       October, 2, 2025
@@ -133,7 +133,7 @@ void CollisionSystem::Update(float deltaTime)
                 continue;
 
 
-            // OPTIMIZATION: Check layer collision rules FIRST (cheap)
+            // OPTIMIZATION: Check layer collision rules FIRST
             // Skip expensive shape collision if layers should not collide
             if (!ShouldCollide(col1->GetLayer(), col2->GetLayer()))
             {
@@ -419,6 +419,14 @@ if (collisionSystem->IsCollidingWithLayer(player, CollisionLayer::Enemy, &hitEne
 bool CollisionSystem::Raycast(const vec2& origin, const vec2& direction, float distance,
     RaycastHit& hit, GameObject* self, CollisionLayer layerMask)
 {
+    //If called from a GameObject, verify it has an enabled collider
+    if (self) {
+        auto* collider = self->GetComponent<ColliderComponent>();
+        if (!collider || !collider->IsEnabled()) {
+            return false; // No collider or disabled = no raycasting ability
+        }
+    }
+
     // Normalize direction
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length < 0.0001f) return false;

@@ -4303,6 +4303,126 @@
       "children": []
     },
     {
+      "name": "InGamePauseButton",
+      "localID": 56,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "pos": [
+          1800.0,
+          900.0
+        ],
+        "scale": [
+          125.0,
+          110.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/paused_button.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 700,
+        "screenSpace": true
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarBackground",
+      "localID": 9,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 9,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1000,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBar",
+      "localID": 10,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 10,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1000,
+          100
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "LevelTimerBarFrame",
+      "localID": 11,
+      "parentID": -1,
+      "active": true,
+      "RenderComponent": {
+        "texturePath": "../Assets/Sprites/Icons/Time bar.png",
+        "shapeType": "Square",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 11,
+        "screenSpace": true
+      },
+      "TransformComponent": {
+        "pos": [
+          550,
+          920
+        ],
+        "scale": [
+          1000,
+          125
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
       "name": "Text FPS",
       "localID": 60,
       "parentID": 4294967295,
@@ -11331,9 +11451,40 @@
         "name": "wallslide_sfx",
         "filepath": "../Assets/audio/Player/WallSlide.wav",
         "loop": false,
-        "volume": 0.10000000149011612,
-        "pitch": 0.8999999761581421,
+        "volume": 0.5,
+        "pitch": 1.0,
         "category": "sfx"
+      },
+      {
+        "name": "menu_restart",
+        "filepath": "../Assets/audio/restart_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "victory",
+        "filepath": "../Assets/audio/victory.wav",
+        "loop": true,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "gameover",
+        "filepath": "../Assets/audio/gameover.wav",
+        "loop": true,
+        "volume": 0.3,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "CreditsAudio",
+        "filepath": "../Assets/CreditsAudio.wav",
+        "type": "sound",
+        "volume": 1.0,
+        "loop": false
       }
     ],
     "events": [

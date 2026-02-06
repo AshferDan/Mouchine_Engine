@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "core.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
+#include "WinLoseLogic.h"
 #include <iostream>
 
 /**
@@ -24,6 +25,7 @@ Technology is prohibited.
 void PauseMenuLogicSystem::Initialize()
 {
     // Clean up any existing UI before resetting
+    DestroyHowToPlayUI();
     DestroyPauseSettingsUI();
     DestroyPauseMenuUI();
 
@@ -36,6 +38,12 @@ void PauseMenuLogicSystem::Initialize()
     wasSettingsOpenLastFrame = false;
     pendingSettingsClose = false;
     settingsCloseTimer = 0.0f;
+    isHowToPlayOpen = false;
+    hasCreatedHowToPlayUI = false;
+    wasHowToPlayOpenLastFrame = false;
+    pendingHowToPlayClose = false;
+    howToPlayCloseTimer = 0.0f;
+    howToPlayOpenedViaTab = false;
 }
 
 /**
@@ -67,7 +75,16 @@ void PauseMenuLogicSystem::Update(float dt)
 
     // Handle InGamePauseButton hover/click functionality (uses screen-space coordinates)
     GameObject* pauseBtn = factory.FindGameObject("InGamePauseButton");
-    if (pauseBtn && !isPauseMenuActive)
+
+    // Check if win/lose screens are active
+    bool isWinLoseScreenActive = false;
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        WinLoseLogicSystem* winLoseSystem = CORE->GetWinLoseLogic();
+        isWinLoseScreenActive = winLoseSystem->IsWinScreenActive() || winLoseSystem->IsLoseScreenActive();
+    }
+
+    if (pauseBtn && !isPauseMenuActive && !isWinLoseScreenActive)
     {
         // Use screen-space mouse coordinates since button has screenSpace = true
         InputManager* inputManager = CORE->GetInputManager();
@@ -146,10 +163,22 @@ void PauseMenuLogicSystem::Update(float dt)
         }
     }
 
-    // Hide InGamePauseButton when pause menu is active
+    // Hide InGamePauseButton when pause menu is active OR when win/lose screens are showing
+    bool shouldHidePauseButton = isPauseMenuActive;
+
+    // Check if win/lose screens are active
+    if (CORE && CORE->GetWinLoseLogic())
+    {
+        WinLoseLogicSystem* winLoseSystem = CORE->GetWinLoseLogic();
+        if (winLoseSystem->IsWinScreenActive() || winLoseSystem->IsLoseScreenActive())
+        {
+            shouldHidePauseButton = true;
+        }
+    }
+
     if (pauseBtn)
     {
-        pauseBtn->SetActive(!isPauseMenuActive);
+        pauseBtn->SetActive(!shouldHidePauseButton);
     }
 
     // update pause menu position to follow camera (only when menu is active)
@@ -181,7 +210,9 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseMasterMuteButton",
             "PauseMusicMuteButton",
             "PauseSFXMuteButton",
-            "PauseBackButton"
+            "PauseBackButton",
+            "PauseScreen_HowToPlay",
+            "HowToPlayBackButton"
         };
 
         for (const auto& name : uiElements)
@@ -214,12 +245,15 @@ void PauseMenuLogicSystem::Update(float dt)
             if (hoveredButtonName == "PauseResumeButton")
             {
                 std::cout << "[PauseMenu] Resume clicked" << std::endl;
+                // Reset button texture before closing
+                SetButtonTexture("PauseResumeButton", ButtonState::Normal);
                 TogglePauseMenu(); // close menu and unpause
             }
             else if (hoveredButtonName == "PauseRestartButton")
             {
                 std::cout << "[PauseMenu] Restart clicked" << std::endl;
                 // Destroy UI before scene change
+                DestroyHowToPlayUI();
                 DestroyPauseSettingsUI();
                 DestroyPauseMenuUI();
 
@@ -253,17 +287,10 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseMainMenuButton")
             {
-                std::cout << "[PauseMenu] Main Menu clicked" << std::endl;
-
-                // Start audio fade out before going to main menu
-                audioManager = CORE->GetAudioManager();
-                if (audioManager)
-                {
-                    audioManager->FadeOutCategory("music", 0.5f);
-                    std::cout << "[PauseMenu] Started music fade out" << std::endl;
-                }
+                std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
 
                 // Destroy UI before scene change
+                DestroyHowToPlayUI();
                 DestroyPauseSettingsUI();
                 DestroyPauseMenuUI();
 
@@ -276,6 +303,23 @@ void PauseMenuLogicSystem::Update(float dt)
                 // back to main menu
                 CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
             }
+            else if (hoveredButtonName == "PauseHowToPlayButton")
+            {
+                std::cout << "[PauseMenu] How To Play clicked - opening how to play" << std::endl;
+
+                // Create how to play UI if not created yet
+                if (!hasCreatedHowToPlayUI)
+                {
+                    CreateHowToPlayUI();
+                }
+
+                isHowToPlayOpen = true;
+                howToPlayOpenedViaTab = false; // Opened via button, not TAB
+
+                // Clear the pending state immediately
+                pendingSceneChange = false;
+                hoveredButtonName.clear();
+            }
 
             pendingSceneChange = false;
             hoveredButtonName.clear();
@@ -287,6 +331,59 @@ void PauseMenuLogicSystem::Update(float dt)
     if (!isPauseMenuActive)
     {
         return;
+    }
+
+    // Handle how to play screen visibility
+    if (isHowToPlayOpen != wasHowToPlayOpenLastFrame)
+    {
+        if (isHowToPlayOpen)
+        {
+            // Clear any hover state
+            hoveredButtonName.clear();
+
+            // Show how to play UI
+            SetHowToPlayVisible(true);
+
+            // Reset button textures to normal before hiding them
+            SetButtonTexture("PauseResumeButton", ButtonState::Normal);
+            SetButtonTexture("PauseRestartButton", ButtonState::Normal);
+            SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
+            SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
+            SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
+
+            // Hide pause menu buttons
+            if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
+                resumeBtn->SetActive(false);
+            if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
+                restartBtn->SetActive(false);
+            if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
+                settingsBtn->SetActive(false);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(false);
+            if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
+                howToPlayBtn->SetActive(false);
+        }
+        else
+        {
+            // Hide how to play UI
+            SetHowToPlayVisible(false);
+
+            // Reset how to play button texture to normal
+            SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
+
+            // Show pause menu buttons
+            if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
+                resumeBtn->SetActive(true);
+            if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
+                restartBtn->SetActive(true);
+            if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
+                settingsBtn->SetActive(true);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(true);
+            if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
+                howToPlayBtn->SetActive(true);
+        }
+        wasHowToPlayOpenLastFrame = isHowToPlayOpen;
     }
 
     // Handle pause settings screen visibility - ONLY update when state changes
@@ -305,6 +402,7 @@ void PauseMenuLogicSystem::Update(float dt)
             SetButtonTexture("PauseRestartButton", ButtonState::Normal);
             SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
             SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
+            SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
 
             // Hide pause menu buttons
             if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
@@ -448,6 +546,96 @@ void PauseMenuLogicSystem::Update(float dt)
         return; // Don't process normal pause menu interactions
     }
 
+    // Handle how to play screen interactions
+    if (isHowToPlayOpen)
+    {
+        // Handle pending how to play close
+        if (pendingHowToPlayClose)
+        {
+            howToPlayCloseTimer -= dt;
+            if (howToPlayCloseTimer <= 0.0f)
+            {
+                std::cout << "[PauseMenu] Closing how to play after delay" << std::endl;
+
+                // Reset back button texture to normal before closing
+                SetButtonTexture("HowToPlayBackButton", ButtonState::Normal);
+
+                isHowToPlayOpen = false;
+                pendingHowToPlayClose = false;
+                hoveredButtonName.clear();
+            }
+            return;
+        }
+
+        // Check for ESC key or back button click to close
+        double mouseX = InputManager::GetMouseWorldX();
+        double mouseY = InputManager::GetMouseWorldY();
+        bool isClicked = InputManager::IsMouseLeftClicked();
+
+        // Check if user pressed ESC to close
+        if (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            static bool escWasPressed = false;
+            if (!escWasPressed)
+            {
+                std::cout << "[PauseMenu] ESC pressed - closing how to play" << std::endl;
+                pendingHowToPlayClose = true;
+                howToPlayCloseTimer = 0.15f;
+                escWasPressed = true;
+            }
+        }
+        else
+        {
+            static bool escWasPressed = false;
+            escWasPressed = false;
+        }
+
+        // Check for back button hover and click
+        std::string currentHover = "";
+        GameObject* backBtn = factory.FindGameObject("HowToPlayBackButton");
+        if (backBtn && IsMouseOver(backBtn, mouseX, mouseY))
+        {
+            currentHover = "HowToPlayBackButton";
+        }
+
+        // Handle hover state changes
+        if (currentHover != hoveredButtonName)
+        {
+            if (!hoveredButtonName.empty())
+            {
+                SetButtonTexture(hoveredButtonName, ButtonState::Normal);
+            }
+
+            if (!currentHover.empty())
+            {
+                SetButtonTexture(currentHover, ButtonState::Hover);
+                AudioManager* localAudioManager = CORE->GetAudioManager();
+                if (localAudioManager)
+                {
+                    localAudioManager->TriggerEvent("UI_Hover");
+                }
+            }
+
+            hoveredButtonName = currentHover;
+        }
+
+        // Handle click
+        if (isClicked && hoveredButtonName == "HowToPlayBackButton")
+        {
+            SetButtonTexture("HowToPlayBackButton", ButtonState::Pressed);
+            audioManager = CORE->GetAudioManager();
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Click");
+            }
+            std::cout << "[PauseMenu] How To Play back button clicked" << std::endl;
+            pendingHowToPlayClose = true;
+            howToPlayCloseTimer = 0.15f;
+        }
+
+        return; // Don't process normal pause menu interactions
+    }
+
     // Normal pause menu button handling
     double mouseX = InputManager::GetMouseWorldX();
     double mouseY = InputManager::GetMouseWorldY();
@@ -517,11 +705,19 @@ void PauseMenuLogicSystem::Update(float dt)
             {
                 audioManager->TriggerEvent("UI_Click");
             }
+
+            // Start audio fade when Main Menu button is clicked
+            if (hoveredButtonName == "PauseMainMenuButton")
+            {
+                audioManager->FadeOutCategory("music", 0.5f);
+                std::cout << "[PauseMenu] Started music fade out on button click" << std::endl;
+            }
         }
 
         // start delay before executing action
         pendingSceneChange = true;
-        pendingTimer = 0.20f; // 200ms delay
+        // Longer delay for Main Menu to allow fade to complete
+        pendingTimer = (hoveredButtonName == "PauseMainMenuButton") ? 0.6f : 0.20f;
     }
 }
 
@@ -572,7 +768,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     boardRender->SetLayer(601); // above overlay
 
-    // paused button
+    // back button (resume)
     GameObject* pausedBtn = factory.CreateGameObject("PauseResumeButton");
     auto* pausedTransform = pausedBtn->AddComponent<TransformComponent>();
     pausedTransform->posX = 650.0f * uiScale;
@@ -580,7 +776,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     pausedTransform->scaleX = 200.0f * uiScale;
     pausedTransform->scaleY = 175.0f * uiScale;
     auto* pausedRender = pausedBtn->AddComponent<RenderComponent>();
-    pausedRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/paused_button.png"));
+    pausedRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/back_button.png"));
     pausedRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     pausedRender->SetLayer(602);
 
@@ -1090,14 +1286,30 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         CreatePauseSettingsUI();
     }
 
+    // create how to play UI on first toggle to avoid delays later
+    if (!hasCreatedHowToPlayUI)
+    {
+        CreateHowToPlayUI();
+    }
+
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
-    // Reset pause settings state when closing pause menu
+    // Reset pause settings and how to play state when closing pause menu
     if (!isPauseMenuActive)
     {
         isPauseSettingsOpen = false;
         wasSettingsOpenLastFrame = false;
+        isHowToPlayOpen = false;
+        wasHowToPlayOpenLastFrame = false;
+        howToPlayOpenedViaTab = false;
+
+        // Reset all button textures when closing pause menu
+        SetButtonTexture("PauseResumeButton", ButtonState::Normal);
+        SetButtonTexture("PauseRestartButton", ButtonState::Normal);
+        SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
+        SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
+        SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
     }
 
     // pause/unpause the game
@@ -1137,17 +1349,17 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
 
     if (buttonName == "PauseResumeButton")
     {
-        // Resume button: paused icon (default), paused light (hover), paused dark (pressed)
+        // Resume button: back button (default), back button light (hover), back button dark (pressed)
         switch (state)
         {
             case ButtonState::Normal:
-                texturePath = "../Assets/Sprites/Icons/paused_button.png";
+                texturePath = "../Assets/Sprites/Icons/back_button.png";
                 break;
             case ButtonState::Hover:
-                texturePath = "../Assets/Sprites/Icons/Paused_Button_light.png";
+                texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
                 break;
             case ButtonState::Pressed:
-                texturePath = "../Assets/Sprites/Icons/Paused_Button_dark.png";
+                texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
                 break;
         }
     }
@@ -1167,7 +1379,7 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
         }
         texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
     }
-    else if (buttonName == "PauseBackButton")
+    else if (buttonName == "PauseBackButton" || buttonName == "HowToPlayBackButton")
     {
         // Back button: normal, light (hover), dark (pressed)
         switch (state)
@@ -1180,6 +1392,22 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
                 break;
             case ButtonState::Pressed:
                 texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
+                break;
+        }
+    }
+    else if (buttonName == "PauseHowToPlayButton")
+    {
+        // How to play button: default (blank), hover (light), pressed (dark)
+        switch (state)
+        {
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/blankbtnL.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Button_Large_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
                 break;
         }
     }
@@ -1206,4 +1434,177 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
 
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);
+}
+
+/**
+ * @brief Opens the How To Play screen (creates pause menu if needed).
+ */
+void PauseMenuLogicSystem::OpenHowToPlay()
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    // Create pause menu UI if not created
+    if (!hasCreatedUI)
+    {
+        CreatePauseMenuUI();
+    }
+
+    // Create how to play UI if not created
+    if (!hasCreatedHowToPlayUI)
+    {
+        CreateHowToPlayUI();
+    }
+
+    // Open pause menu if not active
+    if (!isPauseMenuActive)
+    {
+        isPauseMenuActive = true;
+        CORE->SetGamePaused(true);
+
+        // Show overlay and board
+        if (auto* overlay = factory.FindGameObject("PauseOverlay"))
+            overlay->SetActive(true);
+        if (auto* board = factory.FindGameObject("PauseBoard"))
+            board->SetActive(true);
+
+        std::cout << "[PauseMenu] Pause menu auto-opened for How To Play" << std::endl;
+    }
+
+    // Hide pause menu buttons
+    if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
+        resumeBtn->SetActive(false);
+    if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
+        restartBtn->SetActive(false);
+    if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
+        settingsBtn->SetActive(false);
+    if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+        mainMenuBtn->SetActive(false);
+    if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
+        howToPlayBtn->SetActive(false);
+
+    // Show how to play screen
+    SetHowToPlayVisible(true);
+
+    // Open how to play screen
+    isHowToPlayOpen = true;
+    howToPlayOpenedViaTab = true; // Mark that it was opened via TAB
+    std::cout << "[PauseMenu] How To Play opened via TAB" << std::endl;
+}
+
+/**
+ * @brief Closes the How To Play screen.
+ */
+void PauseMenuLogicSystem::CloseHowToPlay()
+{
+    isHowToPlayOpen = false;
+
+    // If How To Play was opened via TAB, close the entire pause menu
+    if (howToPlayOpenedViaTab)
+    {
+        std::cout << "[PauseMenu] How To Play closed via TAB - closing pause menu" << std::endl;
+        howToPlayOpenedViaTab = false;
+
+        if (isPauseMenuActive)
+        {
+            isPauseMenuActive = false;
+            SetPauseMenuVisible(false);
+            SetHowToPlayVisible(false);
+            CORE->SetGamePaused(false);
+        }
+    }
+    else
+    {
+        std::cout << "[PauseMenu] How To Play closed" << std::endl;
+    }
+}
+
+/**
+ * @brief Creates how to play screen UI.
+ */
+void PauseMenuLogicSystem::CreateHowToPlayUI()
+{
+    if (hasCreatedHowToPlayUI)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+
+    float uiScale = 2.0f;
+
+    // How to play screen background
+    GameObject* howToPlayScreen = factory.CreateGameObject("PauseScreen_HowToPlay");
+    auto* howToPlayTransform = howToPlayScreen->AddComponent<TransformComponent>();
+    howToPlayTransform->posX = 0.0f;
+    howToPlayTransform->posY = 0.0f;
+    howToPlayTransform->scaleX = 1755.0f * uiScale;
+    howToPlayTransform->scaleY = 945.0f * uiScale;
+    auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/HowToPlay.png"));
+    howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    howToPlayRender->SetLayer(601);
+
+    GameObject* backBtn = factory.CreateGameObject("HowToPlayBackButton");
+    auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
+    backBtnTransform->posX = 750.0f * uiScale;
+    backBtnTransform->posY = -275.0f * uiScale;
+    backBtnTransform->scaleX = 200.0f * uiScale;
+    backBtnTransform->scaleY = 180.0f * uiScale;
+    auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
+    backBtnRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
+    backBtnRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    backBtnRender->SetLayer(602);
+
+    hasCreatedHowToPlayUI = true;
+
+    // Initially hide UI
+    SetHowToPlayVisible(false);
+}
+
+/**
+ * @brief Destroys how to play UI elements.
+ */
+void PauseMenuLogicSystem::DestroyHowToPlayUI()
+{
+    if (!hasCreatedHowToPlayUI)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+
+    std::vector<std::string> howToPlayElements = {
+        "PauseScreen_HowToPlay",
+        "HowToPlayBackButton"
+    };
+
+    for (const auto& name : howToPlayElements)
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj)
+        {
+            factory.DestroyGameObject(obj->GetID());
+        }
+    }
+
+    hasCreatedHowToPlayUI = false;
+    std::cout << "[PauseMenu] How To Play UI destroyed" << std::endl;
+}
+
+/**
+ * @brief Sets visibility of how to play UI elements.
+ */
+void PauseMenuLogicSystem::SetHowToPlayVisible(bool show)
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    std::vector<std::string> howToPlayElements = {
+        "PauseScreen_HowToPlay",
+        "HowToPlayBackButton"
+    };
+
+    for (const auto& name : howToPlayElements)
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj)
+        {
+            obj->SetActive(show);
+        }
+    }
 }

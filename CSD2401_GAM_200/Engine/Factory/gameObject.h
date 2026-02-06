@@ -297,6 +297,7 @@ private:
     EntityID entityID;
     std::string name;
     bool isActive;
+    bool isDestroyed = false;
     GameObject* parent;
     std::vector<GameObject*> children;                  
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;

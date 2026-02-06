@@ -62,7 +62,7 @@ struct TempGOData
 
     bool addCollider = false;
     int colType = 0; // 0 for Square, 1 for Circle
-    float colSize[2] = { 100.0f, 100.0f };
+    float colSize[2]{ 50.f, 50.f};
     int colLayer = 5; // Default index for "Default" layer
 };
 
@@ -1150,6 +1150,7 @@ void GOCreationMenu_Spawn()
     float rot = tempGO.rot;
     vec4 color = vec4(tempGO.color.x, tempGO.color.y, tempGO.color.z, 1.f);
     std::string name = tempGO.name;
+    float colliderSize[2] = { tempGO.scale[0], tempGO.scale[1] };
     ColliderComponent::Type cType = (tempGO.colType == 0) ? ColliderComponent::Type::Square : ColliderComponent::Type::Circle;
     CollisionLayer cLayer = static_cast<CollisionLayer>(tempGO.colLayer);
 
@@ -1160,9 +1161,9 @@ void GOCreationMenu_Spawn()
         shapeType,              // ShapeType
         pos, scale, rot,        // Transform
         color,               // Colour
+        colliderSize,
         tempGO.addCollider,
         cType,
-        tempGO.colSize[0], tempGO.colSize[1],
         cLayer
     );
 
@@ -3278,8 +3279,14 @@ void ImGuiSystem::RenderAnimationPreviewer()
     struct DraftClip
     {
         std::string name;
+        std::string filepath;
+
+        int rows = 1;
+        int cols = 1;
+
         int startR = 0, startC = 0;
         int endR = 0, endC = 0;
+
         float fps = 12.0f;
         bool loop = true;
     };
@@ -3297,7 +3304,10 @@ void ImGuiSystem::RenderAnimationPreviewer()
 
     // Get context
     GameObject* obj = factory.GetGameObject(selectedGameObjectID);
+    RenderComponent* rc = obj ? obj->GetComponent<RenderComponent>() : nullptr;
     Spritesheet* ss = obj ? obj->GetComponent<Spritesheet>() : nullptr;
+
+    bool hasStaticTexture = (rc && rc->GetTextureID() != 0 && !rc->GetTexturePath().empty());
     bool hasExistingSS = (ss != nullptr);
 
     ImGui::Begin("Animation Preview");
@@ -3404,9 +3414,26 @@ void ImGuiSystem::RenderAnimationPreviewer()
             }
             else
             {
-                ImGui::BeginChild("NoExisting", ImVec2(180, 180), true);
-                ImGui::TextWrapped("\n\n NO EXISTING\n SPRITESHEET");
-                ImGui::EndChild();
+                if (hasStaticTexture)
+                {
+                    ImGui::TextColored(ImVec4(0.9f, 0.9f, 0.9f, 1.0f), "STATIC TEXTURE");
+
+                    // Full texture
+                    ImGui::Image((void*)(intptr_t)rc->GetTextureID(),
+                        ImVec2(180, 180),
+                        ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f),
+                        ImVec4(1, 1, 1, 1),
+                        ImVec4(1, 1, 1, 0.2f));
+
+                    ImGui::TextDisabled("Texture: %s",
+                        rc->GetTexturePath().substr(rc->GetTexturePath().find_last_of("\\/") + 1).c_str());
+                }
+                else
+                {
+                    ImGui::BeginChild("NoExisting", ImVec2(180, 180), true);
+                    ImGui::TextWrapped("\n\n NO TEXTURE\n / SPRITESHEET");
+                    ImGui::EndChild();
+                }
             }
 
             ImGui::Text("GAMEOBJECT: %s", obj->GetName().c_str());
@@ -3528,6 +3555,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ResetDraftPlayback();
     }
 
+    static int  frameCount = 1;         // how many frames in the row animation
+    static int  rowPick = 0;            // row selector (maps to startR)
+
     // Controls
     if (draftTexID)
     {
@@ -3537,6 +3567,10 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::Text("GRID CONFIGURATION:");
         ImGui::PushItemWidth(80);
         bool gridChanged = false;
+
+        if (ImGui::Button("13 x 10")) { draftRows = 13; draftCols = 10; ResetDraftPlayback(); }
+        ImGui::Spacing();
+
         if (ImGui::InputInt("ROWS", &draftRows)) { draftRows = std::max(1, draftRows); gridChanged = true; }
         ImGui::SameLine();
         if (ImGui::InputInt("COLS", &draftCols)) { draftCols = std::max(1, draftCols); gridChanged = true; }
@@ -3562,23 +3596,50 @@ void ImGuiSystem::RenderAnimationPreviewer()
         if (ImGui::Combo("Draft Clip", &comboIndex, clipLabelPtrs.data(), (int)clipLabelPtrs.size()))
         {
             selectedDraftClip = comboIndex - 1;
-            ResetDraftPlayback();
 
             if (selectedDraftClip >= 0 && selectedDraftClip < (int)draftClips.size())
             {
                 const auto& c = draftClips[selectedDraftClip];
+             
+                draftRows = std::max(1, c.rows);
+                draftCols = std::max(1, c.cols);
+
                 std::strncpy(actionName, c.name.c_str(), sizeof(actionName) - 1);
                 actionName[sizeof(actionName) - 1] = '\0';
+
+                draftPath = c.filepath;
+                draftTexID = GraphicsSystem::LoadTexture(draftPath.c_str());
+
                 startR = c.startR; startC = c.startC;
                 endR = c.endR; endC = c.endC;
+
                 actionFPS = c.fps;
                 actionLoop = c.loop;
+
+                rowPick = startR;                   // Sync row slider
+                frameCount = (endC - startC) + 1;   // Sync column count slider
+
+                // clamp + force preview to first frame of this clip
+                startR = std::clamp(startR, 0, draftRows - 1);
+                startC = std::clamp(startC, 0, draftCols - 1);
+
+                draftFrameLinear = (startR * draftCols) + startC;
+                isPlayingDraft = false;
+                draftTimer = 0.0f;
             }
             else
             {
                 // "<New / Unsaved>" -> clear the name so user sees it's a fresh slot
                 std::strncpy(actionName, "", sizeof(actionName) - 1);
                 actionName[sizeof(actionName) - 1] = '\0';
+
+                // clamp + force preview to first frame of this clip
+                startR = std::clamp(startR, 0, draftRows - 1);
+                startC = std::clamp(startC, 0, draftCols - 1);
+                endR = std::clamp(endR, 0, draftRows - 1);
+                endC = std::clamp(endC, 0, draftCols - 1);
+
+                draftFrameLinear = 0;
             }
         }
 
@@ -3598,23 +3659,39 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::Text("DEFINE ACTION RANGE:");
 
         ImGui::InputText("Name", actionName, IM_ARRAYSIZE(actionName));
+        ImGui::NewLine();
         ImGui::Checkbox("Loop", &actionLoop);
         ImGui::SameLine();
         ImGui::PushItemWidth(120);
         ImGui::InputFloat("FPS", &actionFPS, 0.5f, 1.0f, "%.2f");
         ImGui::PopItemWidth();
-        actionFPS = std::max(0.001f, actionFPS);
+        ImGui::NewLine();
+        //actionFPS = std::max(0.001f, actionFPS);
 
-        // Clamp
-        startR = std::clamp(startR, 0, draftRows - 1);
-        endR = std::clamp(endR, 0, draftRows - 1);
+        rowPick = std::clamp(rowPick, 0, draftRows - 1);
         startC = std::clamp(startC, 0, draftCols - 1);
-        endC = std::clamp(endC, 0, draftCols - 1);
+        frameCount = std::max(1, frameCount);
 
-        if (ImGui::SliderInt("Start Row", &startR, 0, draftRows - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("End Row", &endR, 0, draftRows - 1)) ResetDraftPlayback();
-        if (ImGui::SliderInt("End Col", &endC, 0, draftCols - 1)) ResetDraftPlayback();
+        // picks a row
+        if (ImGui::SliderInt("Row", &rowPick, 0, draftRows - 1))
+            ResetDraftPlayback();
+
+        // map rowPick -> startR
+        startR = rowPick;
+
+        if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1))
+            ResetDraftPlayback();
+
+        // end Col
+        int maxCount = draftCols - startC;
+        frameCount = std::clamp(frameCount, 1, std::max(1, maxCount));
+
+        if (ImGui::SliderInt("End Col", &frameCount, 1, std::max(1, maxCount)))
+            ResetDraftPlayback();
+
+        // auto-compute endR/endC
+        endR = startR;
+        endC = std::clamp(startC + frameCount - 1, 0, draftCols - 1);
 
         auto FindClipIndexByName = [&](const std::string& name) -> int
             {
@@ -3637,10 +3714,17 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 int idx = FindClipIndexByName(nameStr);
                 DraftClip c;
                 c.name = nameStr;
+
+                c.rows = draftRows;
+                c.cols = draftCols;
+
                 c.startR = startR; c.startC = startC;
                 c.endR = endR; c.endC = endC;
+
                 c.fps = actionFPS;
                 c.loop = actionLoop;
+
+                c.filepath = draftPath;
 
                 if (idx >= 0)
                 {
@@ -3682,62 +3766,76 @@ void ImGuiSystem::RenderAnimationPreviewer()
         {
             if (!draftPath.empty())
             {
+                const bool wantsAnimated = (draftRows > 1 || draftCols > 1 || !draftClips.empty());
+
                 // Check if a RenderComponent exists
-                RenderComponent* render = obj->GetComponent<RenderComponent>();
-                if (!render)
+                if (!rc)
                 {
                     obj->AddComponent<RenderComponent>();
-                    render = obj->GetComponent<RenderComponent>();
+                    rc = obj->GetComponent<RenderComponent>();
                 }
 
-                // Check if the Spritesheet component exist
-                if (ss)
+                if (rc)
                 {
-                    ss->LoadNewSpritesheet(draftPath.c_str(), draftRows, draftCols);
-                }
-                else
-                {
-                    obj->AddComponent<Spritesheet>(draftPath.c_str(), draftRows, draftCols);
-                    ss = obj->GetComponent<Spritesheet>();
+                    rc->SetTextureID(draftTexID);
+                    rc->SetTexturePath(draftPath);
+                    rc->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
                 }
 
-                // Checking texture is visible + serializes properly
-                if (render && ss)
-                {
-                    render->SetTextureID(ss->GetTextureID());
-                    render->SetTexturePath(draftPath);
-                    render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-                }
-
-                // Register animations into Spritesheet component
-                if (ss)
-                {
-                    if (!draftClips.empty())
+                if (wantsAnimated) {
+                    // Check if the Spritesheet component exist
+                    if (ss)
                     {
-                        for (const auto& c : draftClips)
-                        {
-                            if (c.name.empty()) continue;
-                            ss->RegisterAnimation(c.name, draftPath, draftRows, draftCols,
-                                c.startR, c.startC, c.endR, c.endC, c.fps);
-                        }
-
-                        // Play currently selected draft clip, else play first
-                        if (selectedDraftClip >= 0 && selectedDraftClip < (int)draftClips.size())
-                            ss->PlayAnimation(draftClips[selectedDraftClip].name);
-                        else
-                            ss->PlayAnimation(draftClips.front().name);
+                        ss->LoadNewSpritesheet(draftPath.c_str(), draftRows, draftCols);
                     }
                     else
                     {
-                        // Register a single clip from current inputs
-                        std::string oneName(actionName);
-                        if (!oneName.empty())
+                        obj->AddComponent<Spritesheet>(draftPath.c_str(), draftRows, draftCols);
+                        ss = obj->GetComponent<Spritesheet>();
+                    }
+
+                    // Checking texture is visible + serializes properly
+                    if (rc && ss)
+                    {
+                        rc->SetTextureID(ss->GetTextureID());
+                        rc->SetTexturePath(draftPath);
+                        rc->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                    }
+
+                    // Register animations into Spritesheet component
+                    if (ss)
+                    {
+                        if (!draftClips.empty())
                         {
-                            ss->RegisterAnimation(oneName, draftPath, draftRows, draftCols,
-                                startR, startC, endR, endC, actionFPS);
-                            ss->PlayAnimation(oneName);
+                            for (const auto& c : draftClips)
+                            {
+                                if (c.name.empty()) continue;
+                                ss->RegisterAnimation(c.name, draftPath, draftRows, draftCols,
+                                    c.startR, c.startC, c.endR, c.endC, c.fps);
+                            }
+
+                            // Play currently selected draft clip, else play first
+                            if (selectedDraftClip >= 0 && selectedDraftClip < (int)draftClips.size())
+                                ss->PlayAnimation(draftClips[selectedDraftClip].name);
+                            else
+                                ss->PlayAnimation(draftClips.front().name);
+                        }
+                        else
+                        {
+                            // Register a single clip from current inputs
+                            std::string oneName(actionName);
+                            if (!oneName.empty())
+                            {
+                                ss->RegisterAnimation(oneName, draftPath, draftRows, draftCols,
+                                    startR, startC, endR, endC, actionFPS);
+                                ss->PlayAnimation(oneName);
+                            }
                         }
                     }
+                }
+                else {
+                    draftClips.clear();
+                    selectedDraftClip = -1;
                 }
             }
 

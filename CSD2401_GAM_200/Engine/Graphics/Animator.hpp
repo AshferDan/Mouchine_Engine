@@ -114,7 +114,8 @@ public:
 	 */
 	vec2 GetUVScale() const;
 	vec2 GetUVOffset() const;
-
+	float GetUVWidth() const { return uv_width; }
+	float GetUVHeight() const { return uv_height; }
 	/**
 	 * @brief Getters/ Setters for Rows and Cols
 	 */

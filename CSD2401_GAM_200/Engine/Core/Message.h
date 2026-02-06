@@ -123,7 +123,7 @@ public:
     vec4 color;
     bool addCollider;
     ColliderComponent::Type colType;
-    float colSize[2] = { 100.0f, 100.0f };
+    float collider[2];
     CollisionLayer colLayer;
 
     CreateObjectMessage(const std::string& objName,
@@ -133,10 +133,9 @@ public:
         const float scaleVal[2],
         float rot,
         const vec4& col,
+        const float colliderSize[2],
         bool hasCollider = false,
-        ColliderComponent::Type cType = ColliderComponent::Type::Square,
-        float cw = 100.0f,
-        float ch = 100.0f,
+        ColliderComponent::Type cType = ColliderComponent::Type::Square,      
         CollisionLayer cl = CollisionLayer::Default)
 
         : Message(Id::CREATE_OBJECT),
@@ -152,7 +151,7 @@ public:
     {
         pos[0] = position[0];   pos[1] = position[1];
         scale[0] = scaleVal[0]; scale[1] = scaleVal[1];
-        colSize[0] = cw;    colSize[1] = ch;
+        collider[0] = colliderSize[0]; collider[1] = colliderSize[1];
     }
 
 };
