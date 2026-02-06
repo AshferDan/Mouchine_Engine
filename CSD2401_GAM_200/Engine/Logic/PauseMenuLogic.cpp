@@ -1453,7 +1453,7 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     howToPlayTransform->scaleX = 1755.0f * uiScale;
     howToPlayTransform->scaleY = 945.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/ControlPanelm4.png"));
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/HowToPlay.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 
