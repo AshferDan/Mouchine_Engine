@@ -47,20 +47,17 @@ void MenuLogicSystem::Update(float dt)
                     std::cout << "PlayButton Clicked!" << std::endl;
 
                     CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
-                    if (!cutscene->HasFinished(introPath)) {    // FIRST CLICK: Play Cutscene
-                        if (!cutscene->IsPlaying()) {
-                            cutscene->PlayVideo(introPath, "CutsceneAudio");
-                            // Don't fade back in - let the fade out complete
-                            std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
-                        }
-                    }
-                    else {                                      // SECOND CLICK: Video has finished, load the game
-                        std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                        std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
-                        CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL.json", true);
-                        std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
-                    }
 
+                    if (!cutscene->IsPlaying()) {
+                        cutscene->PlayVideo(introPath, "CutsceneAudio");
+                        // Don't fade back in - let the fade out complete
+                        std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
+                    }
+                    
+                    std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                    std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
+                    CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL.json", true);
+                    std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                 }
                 else if (hoveredButtonName == "SettingsButton")
                 {
