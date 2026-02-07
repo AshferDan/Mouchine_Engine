@@ -391,7 +391,6 @@ namespace CSharpScript
                 IsBeingKnockedBack = true;
             }
 
-            Debug.Log(Camera.GetZoom().ToString());
             //Debug.Log(currState.ToString());
 
             // set vfx pos to player
@@ -1125,7 +1124,7 @@ namespace CSharpScript
                     // reset jumps if want wall sliding to refresh double jump
                     _numberOfJumpsUsed = 0;
                 }
-                Debug.Log(wallslideTrigger.ToString());
+                
                 if (wallslideTime >= MoveStats.WallSlidingTimeToTriggerSound)         // magic number replace with a
                 {
                     if (wallslideTrigger == false)
@@ -1429,8 +1428,6 @@ namespace CSharpScript
 
         private void StopGroundPound()
         {
-            Audio.StopSound("groundpound_sfx");
-
             // reset vertical velocity
             _moveVelocity.y = 0;
             Physics.SetVelocity(OwnerName, 0, 0);
@@ -1770,9 +1767,9 @@ namespace CSharpScript
             vec2 rayDirection = new vec2(0, -1);
 
             // Center raycast
-            vec2 leftRayOrigin = new vec2(position.x - halfWidth * 0.9f, bottomY);
+            vec2 leftRayOrigin = new vec2(position.x - halfWidth * 0.8f, bottomY);
             vec2 centerRayOrigin = new vec2(position.x, bottomY);
-            vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.9f, bottomY);
+            vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.8f, bottomY);
 
             // debug for ground check raycast
             //Transform.SetScale("DebugLine", 5, raycastLength);
@@ -1787,8 +1784,8 @@ namespace CSharpScript
                 if (!triggeredLand)
                 {
                     //Audio.PlaySound("land_sfx", "sfx");
-                    currState = PlayerState.Land;
-                    EnterState(currState);
+                    //currState = PlayerState.Land;
+                    //EnterState(currState);
                 }
                 return;
             }
@@ -1829,6 +1826,7 @@ namespace CSharpScript
             vec2 centerRayOrigin = new vec2(position.x, position.y);
             if (RaycastForWall(centerRayOrigin, rayDirection, raycastLength))
             {
+                Debug.Log("[Raycast] TOUCHING");
                 _isTouchingWall = true;
                 return;
             }
@@ -1837,7 +1835,8 @@ namespace CSharpScript
             vec2 topRayOrigin = new vec2(position.x, position.y + halfHeight * 0.9f);
             if (RaycastForWall(topRayOrigin, rayDirection, raycastLength))
             {
-                _isTouchingWall = true; Debug.Log("TOUCHING");
+                Debug.Log("[Raycast] TOUCHING");
+                _isTouchingWall = true;
                 return;
             }
 
@@ -1845,7 +1844,7 @@ namespace CSharpScript
             vec2 bottomRayOrigin = new vec2(position.x, position.y - halfHeight * 0.9f);
             if (RaycastForWall(bottomRayOrigin, rayDirection, raycastLength))
             {
-                _isTouchingWall = true; Debug.Log("TOUCHING");
+                _isTouchingWall = true; Debug.Log("[Raycast] TOUCHING");
                 return;
             }
         }

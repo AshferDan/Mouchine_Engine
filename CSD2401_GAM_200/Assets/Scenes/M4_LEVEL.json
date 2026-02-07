@@ -161,8 +161,8 @@
           2434.7412109375
         ],
         "scale": [
-          200.0,
-          200.0
+          192.0,
+          192.0
         ],
         "rotation": 0.0
       },
@@ -404,10 +404,10 @@
       },
       "ColliderComponent": {
         "shape": "Square",
-        "layer": "Default",
+        "layer": "Player",
         "size": [
-          200.0,
-          200.0
+          168.0,
+          192.0
         ]
       },
       "ScriptComponent": {

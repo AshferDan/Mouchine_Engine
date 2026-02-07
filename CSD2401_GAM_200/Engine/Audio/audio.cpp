@@ -199,6 +199,10 @@ void AudioEngine::stopSound(const std::string& channelName) {
 		}
 		channels.erase(it);
 	}
+	else
+	{
+		std::cout << "[Audio] Channel not found\n";
+	}
 }
 
 /**
