@@ -422,7 +422,14 @@ namespace CSharpScript
             if (_bonkTimer > 0)
             {
                 _bonkTimer -= fixeddt;
-                currState = PlayerState.Bonking;
+                if (_bonkTimer <= 0)
+                {
+                    currState = PlayerState.Idle;
+                }
+                else
+                {
+                    currState = PlayerState.Bonking;
+                }
                 CollisionChecks();
                 Jump();
 
@@ -513,6 +520,7 @@ namespace CSharpScript
 
                 if (landAnimTimerBuffer < 0f)
                 {
+                    Debug.Log("HANCUR");
                     currState = PlayerState.Idle;
                 }
 
@@ -522,8 +530,9 @@ namespace CSharpScript
             {
                 landAnimTimerBuffer = landAnimationLength;
             }
-            if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding)
+            if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Bonking)
             {
+                Debug.Log("\nKENA\n");
                 currState = PlayerState.Idle;
             }
 
@@ -1434,6 +1443,7 @@ namespace CSharpScript
 
             // calculate height
             float fallHeight = lastPos.y - transform.position.y;
+            Debug.Log(fallHeight.ToString());
 
             // roll speed logic
             float targetRollSpeed;
@@ -1465,6 +1475,7 @@ namespace CSharpScript
 
             // duration logic - base time + (height / divisor)  
             float targetDuration = MoveStats.BaseRollDuration + (fallHeight / MoveStats.RollHeightToDurationDivisor);
+            targetDuration = targetDuration > MoveStats.MaxRollDuration ? MoveStats.MaxRollDuration : targetDuration;           // clamp at maxrollduration
 
             // direction - if pressing A/D = roll that way : if pressing nothing = roll facing direction
             if (InputManager.Movement.x != 0)
@@ -1826,7 +1837,7 @@ namespace CSharpScript
             vec2 centerRayOrigin = new vec2(position.x, position.y);
             if (RaycastForWall(centerRayOrigin, rayDirection, raycastLength))
             {
-                Debug.Log("[Raycast] TOUCHING");
+                //Debug.Log("[Raycast] TOUCHING");
                 _isTouchingWall = true;
                 return;
             }
@@ -1835,7 +1846,7 @@ namespace CSharpScript
             vec2 topRayOrigin = new vec2(position.x, position.y + halfHeight * 0.9f);
             if (RaycastForWall(topRayOrigin, rayDirection, raycastLength))
             {
-                Debug.Log("[Raycast] TOUCHING");
+                //Debug.Log("[Raycast] TOUCHING");
                 _isTouchingWall = true;
                 return;
             }

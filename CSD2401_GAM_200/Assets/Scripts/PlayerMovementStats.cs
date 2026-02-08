@@ -117,16 +117,17 @@ namespace CSharpScript
         public float BaseRollDuration = 0.45f;       // minimum time
         public float MidRollDuration = 0.65f;
         public float MaxRollDuration = 0.8f;
-        public float BaseRollSpeed = 25f * mod;     // needs to be faster than walk speed to feel like a burst forward
-        public float MidRollSpeed = 30f * mod;
+        public float BaseRollSpeed = 32f * mod;     // needs to be faster than walk speed to feel like a burst forward
+        public float MidRollSpeed = 35f * mod;
         public float MaxRollSpeed = 40f * mod;
 
 
         // Ground Pound
         public float GPPauseTime = 0.3f;
         public float GPFallSpeed = 50f * mod;
-        public float RollHeightToDurationDivisor = 100f * mod;
-        public float GroundPoundMaxSpeedHeightThreshold = 50f;
+        public float RollHeightToDurationDivisor = 75f * mod;
+        public float GroundPoundMaxSpeedHeightThreshold = 80f;
+        public float GPMaxDuratin = 2.5f;
 
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.5f;
