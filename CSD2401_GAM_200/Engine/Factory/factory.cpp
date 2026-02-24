@@ -15,8 +15,8 @@ Technology is prohibited.
 
 #include "Factory.h"
 #include <queue>
-#include "core.h" // Added for CORE access
-#include "ScriptingSystem.h" // Added for ScriptSystem access
+#include "core.h"
+#include "ScriptingSystem.h" 
 
 /*
     /brief
@@ -679,8 +679,7 @@ bool GameObjectFactory::IsAlive(GameObject *ptr) const
 
 #pragma region M1 Showcase - 2500 GOs Test
 
-// Vector to store all GOs made by test function
-std::vector<GameObject *> vecGOs;
+std::vector<GameObject*> vecGOs;
 
 /**
 * @brief Spawns 2500 Circle Game Objects on screen randomly within the 1920x1080 resolution window.

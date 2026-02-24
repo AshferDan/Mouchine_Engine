@@ -812,6 +812,22 @@ void ImGuiSystem::Hierarchy_Render()
     ImGui::PopStyleColor();
     ImGui::Separator();
 
+    // Expand parents of selected object so it is visible in the hierarchy
+    if (hierarchyScrollToSelected && selectedGameObjectID != 0)
+    {
+        GameObject* sel = factory.GetGameObject(selectedGameObjectID);
+        if (sel)
+        {
+            GameObject* parent = sel->GetParent();
+            while (parent)
+            {
+                ImGuiStorage* storage = ImGui::GetStateStorage();
+                storage->SetInt(ImGui::GetID((void*)(intptr_t)parent->GetID()), 1);
+                parent = parent->GetParent();
+            }
+        }
+    }
+
     // list all game objects, if they have no parent (root), if not render the tree display!
     for (const auto &objPtr : allObjects)
     {
@@ -949,6 +965,13 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     if (!obj->IsActive())
     {
         ImGui::PopStyleColor();
+    }
+
+    // Scroll hierarchy to show this item when it was just selected
+    if (selectedGOID == id && hierarchyScrollToSelected)
+    {
+        ImGui::SetScrollHereY(0.5f);
+        hierarchyScrollToSelected = false;
     }
 
     if (!ImGui::IsItemFocused() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
@@ -1178,6 +1201,7 @@ void GOCreationMenu_Spawn()
 void ImGuiSystem::SetSelectedGameObject(EntityID id)
 {
     selectedGameObjectID = id;
+    hierarchyScrollToSelected = true;
     CORE->GetGraphicsSystem()->ClearEditorSelection();              // need to clear after resassigning so newly selected GO can have the correct outlines drawn
 }
 

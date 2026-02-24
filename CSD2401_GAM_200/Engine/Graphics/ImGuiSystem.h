@@ -211,6 +211,7 @@ private:
     void Shutdown();
     GameObjectFactory& factory;
     EntityID selectedGameObjectID;        // currently selected game object
+    bool hierarchyScrollToSelected = false; // scroll hierarchy to show selected item
     bool showPropertyEditor;              // show property editor panel
     const char* GetShapeTypeName(int type);         // get shape type name
     const char* GetCollisionLayerName(int layer);   // get collision layer name
