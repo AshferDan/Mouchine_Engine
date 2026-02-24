@@ -526,6 +526,20 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
     entityToIndex.erase(it);
 }
 
+void GameObjectFactory::QueueDestroyGameObject(EntityID id)
+{
+    pendingDestroyIDs.push_back(id);
+}
+
+void GameObjectFactory::FlushPendingDestroys()
+{
+    for (EntityID id : pendingDestroyIDs)
+    {
+        DestroyGameObject(id);
+    }
+    pendingDestroyIDs.clear();
+}
+
 void GameObjectFactory::DestroyAllRelatedGameObjects(EntityID parentID)
 {
     std::vector<EntityID> goDestroyList; // vector to gather all items to destroy - cant use getfamilytree because we need the order

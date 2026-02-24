@@ -374,6 +374,9 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
+                // Flush any GameObjects destroyed from scripts this frame
+                GameObjectFactory::Instance().FlushPendingDestroys();
+
                 if (menuLogicSystem)
                 {
                     std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();

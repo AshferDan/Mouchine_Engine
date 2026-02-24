@@ -911,6 +911,18 @@ namespace API
 		return CollisionSystem::ShouldCollide(static_cast<CollisionLayer>(layer1), static_cast<CollisionLayer>(layer2));
 	}
 
+    bool IsCollidingWithLayer(const std::string& objectName, int targetLayer)
+    {
+        CollisionSystem* collisionSystem = CORE->GetCollisionSystem();
+        if (!collisionSystem) return false;
+
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (!obj) return false;
+
+        return collisionSystem->IsCollidingWithLayer(obj, static_cast<CollisionLayer>(targetLayer));
+    }
+
 bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* selfName, MonoString** hitObjectName, float* hitDistance)
 {
     CollisionSystem* collisionSystem = CORE->GetCollisionSystem();
@@ -1161,6 +1173,16 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             return obj->GetName().c_str();
         }
         return "";
+    }
+
+    void DestroyGameObject(const std::string& name)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj)
+        {
+            factory.QueueDestroyGameObject(obj->GetID());
+        }
     }
 #pragma endregion
 

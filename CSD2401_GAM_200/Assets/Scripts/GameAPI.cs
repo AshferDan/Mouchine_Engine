@@ -205,6 +205,12 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string FindGameObjectByID(int id);
+
+        /// <summary>
+        /// Destroys the named GameObject, triggering OnDestroy on its scripts.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Destroy(string name);
     }
 
     /// <summary>
@@ -525,6 +531,14 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool CheckColliderLayer(int layer1, int layer2);
+
+        /// <summary>
+        /// Returns true if the named object's collider is currently overlapping
+        /// any object on the specified collision layer.
+        /// Backed by CollisionSystem::IsCollidingWithLayer (spatial-grid narrow phase).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsCollidingWithLayer(string objectName, int targetLayer);
 
         // --- Typed helpers (no extra internal calls needed) ---
 
