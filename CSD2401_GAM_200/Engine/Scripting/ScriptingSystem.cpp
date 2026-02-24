@@ -272,6 +272,7 @@ static void Internal_SetCollisionLayer(MonoString* objectName, int layer)
 {
     char* name = mono_string_to_utf8(objectName);
     API::SetCollisionLayer(name, (CollisionLayer)layer);
+    mono_free(name);
 }
 static int Internal_GetCollisionLayer(MonoString* objectName)
 {
