@@ -181,6 +181,7 @@ void ComponentSerialization::SerializeCamera(json &j, CameraComponent *cam)
 
     j["CameraComponent"] = {
         {"mode", modeStr},
+        {"zoom", cam->getZoom()},
         {"position", {cam->GetPosition().x, cam->GetPosition().y}},
         {"followOffset", {cam->GetFollowOffset().x, cam->GetFollowOffset().y}},
         {"smoothing", cam->IsSmoothingEnabled()},
@@ -599,12 +600,11 @@ void ComponentSerialization::DeserializeCamera(const json &j, GameObject *go)
     {
         cam->SetMode(CameraComponent::CameraMode::FOLLOW_TARGET);
 
+        // Store the target name for deferred resolution in ResolveHierarchy,
+        // because the target object may not have been created yet at this point.
         std::string targetName = c.value("followTargetName", "");
-        GameObject *target = GameObjectFactory::Instance().FindGameObject(targetName);
-        if (target)
-        {
-            cam->SetFollowTarget(target);
-        }
+        cam->SetPendingFollowTargetName(targetName);
+
         if (c.contains("followOffset"))
         {
             cam->SetFollowOffset(vec2(

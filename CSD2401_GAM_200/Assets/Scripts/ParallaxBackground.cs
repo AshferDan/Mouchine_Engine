@@ -12,42 +12,41 @@ namespace CSharpScript
     /// </summary>
     public class ParallaxBackground : GameScript
     {
-        public string Layer0 = "ParallaxBG";
-        public string Layer1 = "";
-        public string Layer2 = "";
-        public string Layer3 = "";
+        public enum Layer { FarBack = 0, Back = 1, Mid = 2, Front = 3 }
+        private const int LayerCount = 4;
 
-        public float Factor0 = 1.0f;
-        public float Factor1 = 0.3f;
-        public float Factor2 = 0.5f;
-        public float Factor3 = 0.8f;
+        public string LayerFarBack = "ParallaxBG";
+        public string LayerBack    = "";
+        public string LayerMid     = "";
+        public string LayerFront   = "";
 
-        private vec2 startPos0, startPos1, startPos2, startPos3;
-        private bool init0, init1, init2, init3;
+        public float FactorFarBack = 1.0f;
+        public float FactorBack    = 0.3f;
+        public float FactorMid     = 0.5f;
+        public float FactorFront   = 0.8f;
+
+        private string[] layerNames;
+        private float[]  factors;
+        private vec2[]   startPos = new vec2[LayerCount];
+        private float[]  lengths  = new float[LayerCount];
+        private bool[]   inited   = new bool[LayerCount];
 
         public override void OnStart()
         {
-            if (Layer0 != "")
+            layerNames = new string[] { LayerFarBack, LayerBack, LayerMid, LayerFront };
+            factors    = new float[]  { FactorFarBack, FactorBack, FactorMid, FactorFront };
+
+            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
             {
-                Transform.SetPosition(Layer0, 0, 430);
-                Transform.SetScale(Layer0, 3100, 4320);
-                startPos0 = Transform.GetPosition(Layer0);
-                init0 = true;
-            }
-            if (Layer1 != "")
-            {
-                startPos1 = Transform.GetPosition(Layer1);
-                init1 = true;
-            }
-            if (Layer2 != "")
-            {
-                startPos2 = Transform.GetPosition(Layer2);
-                init2 = true;
-            }
-            if (Layer3 != "")
-            {
-                startPos3 = Transform.GetPosition(Layer3);
-                init3 = true;
+                int i = (int)layer;
+                if (layerNames[i] == "") continue;
+
+                float scaleX = Transform.GetScale(layerNames[i]).x;
+                if (scaleX == 0f) continue; // object not found or has no width
+
+                startPos[i] = Transform.GetPosition(layerNames[i]);
+                lengths[i]  = scaleX;
+                inited[i]   = true;
             }
         }
 
@@ -55,29 +54,24 @@ namespace CSharpScript
         {
             vec2 camPos = Camera.GetPosition();
 
-            if (init0)
+            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
             {
-                Transform.SetPosition(Layer0,
-                    startPos0.x + camPos.x * Factor0,
-                    startPos0.y + camPos.y * Factor0);
-            }
-            if (init1)
-            {
-                Transform.SetPosition(Layer1,
-                    startPos1.x + camPos.x * Factor1,
-                    startPos1.y + camPos.y * Factor1);
-            }
-            if (init2)
-            {
-                Transform.SetPosition(Layer2,
-                    startPos2.x + camPos.x * Factor2,
-                    startPos2.y + camPos.y * Factor2);
-            }
-            if (init3)
-            {
-                Transform.SetPosition(Layer3,
-                    startPos3.x + camPos.x * Factor3,
-                    startPos3.y + camPos.y * Factor3);
+                int i = (int)layer;
+                if (!inited[i]) continue;
+
+                float f    = factors[i];
+                float temp = camPos.x * (1 - f);
+                float dist = camPos.x * f;
+
+                Transform.SetPosition(layerNames[i],
+                    startPos[i].x + dist,
+                    startPos[i].y + camPos.y * f);
+
+                // Seamless looping: shift anchor when camera drifts past one tile width
+                vec2 sp = startPos[i];
+                if      (temp > sp.x + lengths[i]) sp.x += lengths[i];
+                else if (temp < sp.x - lengths[i]) sp.x -= lengths[i];
+                startPos[i] = sp;
             }
         }
 
