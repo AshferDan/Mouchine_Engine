@@ -16,6 +16,8 @@ Technology is prohibited.
 #include "logic.h"
 #include "TilemapEditor.h"
 #include "ScriptComponent.h"
+#include "core.h"
+#include "ScriptingSystem.h"
 
 std::unordered_map<GLuint, std::string> s_TexturePathByID;
 std::unordered_map<std::string, GLuint> s_IDByTexturePath;
@@ -218,16 +220,48 @@ void ComponentSerialization::SerializeEvent(json& j, EventComponent* ec)
     j["EventComponent"] = chainsArray;
 }
 
-void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc)
+void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc, GameObject* go)
 {
-    if (!sc) return;
+    if (!sc || !go) return;
 
     json scriptsArray = json::array();
     for (const auto& pair : sc->GetScripts())
     {
         scriptsArray.push_back(pair.second);
     }
-    j["ScriptComponent"] = { {"scripts", scriptsArray} };
+
+    // Serialize public field values for each attached script instance
+    json fieldsObj = json::object();
+    auto* scriptSys = CORE ? CORE->GetScriptSystem() : nullptr;
+    if (scriptSys)
+    {
+        auto* instances = scriptSys->GetScriptInstances(go);
+        if (instances)
+        {
+            for (auto& instance : *instances)
+            {
+                const char* className = mono_class_get_name(instance.scriptClass->monoClass);
+                auto fields = scriptSys->GetPublicFields(instance);
+                if (fields.empty()) continue;
+
+                json scriptFields = json::object();
+                for (auto& field : fields)
+                {
+                    if (field.type == ScriptFieldType::Float)
+                        scriptFields[field.name] = std::get<float>(field.value);
+                    else if (field.type == ScriptFieldType::Int)
+                        scriptFields[field.name] = std::get<int>(field.value);
+                    else if (field.type == ScriptFieldType::Bool)
+                        scriptFields[field.name] = std::get<bool>(field.value);
+                    else if (field.type == ScriptFieldType::String)
+                        scriptFields[field.name] = std::get<std::string>(field.value);
+                }
+                fieldsObj[className] = scriptFields;
+            }
+        }
+    }
+
+    j["ScriptComponent"] = { {"scripts", scriptsArray}, {"fields", fieldsObj} };
 }
 
 // ------------------- Deserialize -------------------
@@ -712,26 +746,71 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
 
     const auto& scData = j["ScriptComponent"];
 
-    // Check if ScriptComponent already exists (shouldn't happen, but defensive check)
     ScriptComponent* sc = go->GetComponent<ScriptComponent>();
     if (!sc)
     {
         sc = go->AddComponent<ScriptComponent>();
     }
 
-    if (scData.contains("scripts"))
+    auto* scriptSys = CORE ? CORE->GetScriptSystem() : nullptr;
+
+    if (scData.contains("scripts") && scriptSys)
     {
+        // Phase 1: Register names and attach Mono instances WITHOUT calling OnStart yet.
+        // This ensures field values can be restored before OnStart reads them.
         for (const auto& scriptName : scData["scripts"])
         {
             std::string name = scriptName.get<std::string>();
-            std::cout << "[DeserializeScript] Adding script: " << name << " to " << go->GetName() << std::endl;
-            sc->AddScript(name);
+            std::cout << "[DeserializeScript] Attaching script: " << name << " to " << go->GetName() << std::endl;
+            sc->AddScriptName(name);
+            scriptSys->AttachScript(go, name);
+        }
+
+        // Phase 2: Restore saved public field values before OnStart runs.
+        if (scData.contains("fields"))
+        {
+            const auto& fieldsObj = scData["fields"];
+            auto* instances = scriptSys->GetScriptInstances(go);
+            if (instances)
+            {
+                for (auto& instance : *instances)
+                {
+                    const char* className = mono_class_get_name(instance.scriptClass->monoClass);
+                    if (!fieldsObj.contains(className)) continue;
+
+                    const auto& savedFields = fieldsObj[className];
+                    auto liveFields = scriptSys->GetPublicFields(instance);
+                    for (auto& field : liveFields)
+                    {
+                        if (!savedFields.contains(field.name)) continue;
+                        const auto& val = savedFields[field.name];
+                        if (field.type == ScriptFieldType::Float && val.is_number())
+                            scriptSys->SetPublicField(instance, field.name, val.get<float>());
+                        else if (field.type == ScriptFieldType::Int && val.is_number_integer())
+                            scriptSys->SetPublicField(instance, field.name, val.get<int>());
+                        else if (field.type == ScriptFieldType::Bool && val.is_boolean())
+                            scriptSys->SetPublicField(instance, field.name, val.get<bool>());
+                        else if (field.type == ScriptFieldType::String && val.is_string())
+                            scriptSys->SetPublicField(instance, field.name, val.get<std::string>());
+                    }
+                }
+            }
+        }
+
+        // Phase 3: Now call OnStart with the correct field values in place.
+        scriptSys->CallOnStart(go);
+    }
+    else if (scData.contains("scripts"))
+    {
+        // Fallback: no ScriptSystem available, use legacy AddScript path
+        for (const auto& scriptName : scData["scripts"])
+        {
+            sc->AddScript(scriptName.get<std::string>());
         }
     }
 
-    // Verify scripts were added
-    const auto& addedScripts = sc->GetScripts();
-    std::cout << "[DeserializeScript] " << go->GetName() << " now has " << addedScripts.size() << " scripts" << std::endl;
+    std::cout << "[DeserializeScript] " << go->GetName() << " now has "
+              << sc->GetScripts().size() << " scripts" << std::endl;
 }
 
 // ------------------- Serialize / Deserialize All Componenents -------------------
@@ -760,8 +839,8 @@ void ComponentSerialization::SerializeAllComponents(GameObject *go, json &j)
         SerializeEvent(j, t);
     if (auto* tilemap = go->GetComponent<TilemapDataHolder>())
         SerializeTilemap(j, tilemap);
-    if (auto *sc = go->GetComponent<ScriptComponent>()) 
-        SerializeScript(j, sc);
+    if (auto *sc = go->GetComponent<ScriptComponent>())
+        SerializeScript(j, sc, go);
 }
 
 /**
