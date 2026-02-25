@@ -284,7 +284,18 @@ public:
     void DestroyGameObject(EntityID id);
 
     /**
-     * @brief Destroys all child and further descended game objects in the family tree. 
+     * @brief Queues a GameObject for destruction at the end of the frame.
+     * Safe to call from inside OnUpdate / script callbacks.
+     */
+    void QueueDestroyGameObject(EntityID id);
+
+    /**
+     * @brief Flushes the deferred destroy queue. Call once per frame after all systems update.
+     */
+    void FlushPendingDestroys();
+
+    /**
+     * @brief Destroys all child and further descended game objects in the family tree.
      */
     void DestroyAllRelatedGameObjects(EntityID parentID);
 
@@ -327,6 +338,7 @@ private:
     std::vector<std::unique_ptr<GameObject>> gameObjects;
     std::unordered_map<EntityID, size_t> entityToIndex;
     unsigned int cloneCounter;
+    std::vector<EntityID> pendingDestroyIDs; // deferred destroy queue — safe to use from scripts
 };
 
 /**

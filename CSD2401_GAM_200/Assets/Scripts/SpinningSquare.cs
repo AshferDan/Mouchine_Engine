@@ -6,51 +6,40 @@ namespace CSharpScript
     public class SpinningSquare : GameScript
     {
         public float RotationSpeed = 2.0f;
-        public bool ShouldRotate = true;
-        public string Message = "Hello, Editor!";
-        public int LoopCount = 5;
-        public float MoveSpeed = 50.0f;
-        public bool TestPhysics = true;
-
-        private bool physicsSetup = false;
+        public float MoveSpeed = 150.0f;
 
         public override void OnStart()
         {
-            Debug.Log($"SpinningSquare started on {OwnerName}");
+            Components.AddPhysicsComponent(OwnerName);
+            Components.AddCollisionComponent(OwnerName);
 
-            if (TestPhysics)
-            {
-                // Add physics component
-                Components.AddPhysicsComponent(OwnerName);
+            Physics.SetMass(OwnerName, 1.0f);
+            Physics.SetGravity(OwnerName, false);
+            Physics.SetStatic(OwnerName, false);
 
-                // Add collider component
-                Components.AddCollisionComponent(OwnerName);
+            Collision.SetLayer(OwnerName, CollisionLayer.Player);
 
-                // Set physics properties
-                Physics.SetMass(OwnerName, 1.0f);
-                Physics.SetFriction(OwnerName, 0.5f);
-                Physics.SetGravity(OwnerName, false);
-                Physics.SetStatic(OwnerName, false);
-
-                // Set initial velocity to make it move
-                Physics.SetVelocity(OwnerName, MoveSpeed, 0.0f);
-
-                physicsSetup = true;
-            }
+            Debug.Log($"[SpinningSquare] Ready. Move down into a Ground object to destroy.");
         }
 
         public override void OnUpdate(float dt)
         {
-            if (ShouldRotate)
+            vec2 dir = Input.Movement();
+            Physics.SetVelocity(OwnerName, dir.x * MoveSpeed, dir.y * MoveSpeed);
+            Transform.AddRotation(OwnerName, RotationSpeed * dt);
+
+            // Destroy only when moving downward and hitting Ground
+            bool movingDown = Physics.GetVelocity(OwnerName).y < 0f;
+            if (movingDown && Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Ground))
             {
-                Transform.AddRotation(OwnerName, RotationSpeed * dt);
-                Graphics.SetColor(OwnerName, 0.0f, 0.0f, 0.0f, 1.0f);
+                Debug.Log($"[SpinningSquare] Hit Ground while moving down — destroying {OwnerName}.");
+                GameObject.Destroy(OwnerName);
             }
         }
 
         public override void OnDestroy()
         {
-            Debug.Log($"SpinningSquare destroyed on {OwnerName}");
+            Debug.Log($"[SpinningSquare] OnDestroy called for {OwnerName}.");
         }
     }
 }

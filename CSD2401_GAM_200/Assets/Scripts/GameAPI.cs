@@ -205,6 +205,12 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string FindGameObjectByID(int id);
+
+        /// <summary>
+        /// Destroys the named GameObject, triggering OnDestroy on its scripts.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Destroy(string name);
     }
 
     /// <summary>
@@ -525,6 +531,44 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool CheckColliderLayer(int layer1, int layer2);
+
+        /// <summary>
+        /// Returns true if the named object's collider is currently overlapping
+        /// any object on the specified collision layer.
+        /// Backed by CollisionSystem::IsCollidingWithLayer (spatial-grid narrow phase).
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsCollidingWithLayer(string objectName, int targetLayer);
+
+        // --- Typed helpers (no extra internal calls needed) ---
+
+        /// <summary>
+        /// Sets the collision layer for a GameObject using the CollisionLayer enum.
+        /// </summary>
+        public static void SetLayer(string objectName, CollisionLayer layer)
+            => SetCollisionLayer(objectName, (int)layer);
+
+        /// <summary>
+        /// Gets the collision layer for a GameObject as a CollisionLayer enum value.
+        /// Returns CollisionLayer.Default if the object has no collider.
+        /// </summary>
+        public static CollisionLayer GetLayer(string objectName)
+        {
+            int raw = GetCollisionLayer(objectName);
+            return raw < 0 ? CollisionLayer.Default : (CollisionLayer)raw;
+        }
+
+        /// <summary>
+        /// Returns true if both layers are configured to collide with each other.
+        /// </summary>
+        public static bool DoLayersCollide(CollisionLayer a, CollisionLayer b)
+            => CheckColliderLayer((int)a, (int)b);
+
+        /// <summary>
+        /// Returns true if the named object's collider is on the specified layer.
+        /// </summary>
+        public static bool IsOnLayer(string objectName, CollisionLayer layer)
+            => GetLayer(objectName) == layer;
     }
 
     /// <summary>
