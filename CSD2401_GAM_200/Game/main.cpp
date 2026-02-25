@@ -185,7 +185,7 @@ int main()
             {
                 phyComp->SetStatic(true);
                 colComp->SetSize(100.0f, 1000.0f);
-                colComp->SetLayer(CollisionLayer::Player);
+                colComp->SetLayer(CollisionLayer::Ground);
             }
         }
 #endif

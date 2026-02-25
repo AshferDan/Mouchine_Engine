@@ -9397,7 +9397,7 @@
         "name": "bgm",
         "filepath": "../Assets/audio/sneaky_bgm.wav",
         "loop": true,
-        "volume": 0.50,
+        "volume": 0.20,
         "pitch": 1.0,
         "category": "bgm"
       },

@@ -99,24 +99,30 @@ namespace CSharpScript
         // Jump Coyote Time
         public float JumpCoyoteTime = 0.1f;
 
+        // Cooldowns
+        public float GPCooldown = 1.0f;
+        public float RollCooldown = 0.5f;
+        public float WKCooldown = 0.5f;
+        public float GlideCooldown = 0.2f;
+
         // Wall Jump
         public vec2 WallJumpForce = new vec2(20f * mod, 30f * mod);
         public float WallCoyoteTime = 0.1f;
 
         // Wall Kick
-        public float WallSlidingSpeed = 4f * mod;                     // was 2
+        public float WallSlidingSpeed = 4f * mod;                       // was 2
         public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
+        public float WallSlideRestickCooldown = 0.5f;                   // cooldown for remagnetising back to wall aft pressing S to cancel wallslide
         public float WKBaseDuration = 0.25f;
-        public float WKCooldown = 0.5f;
         public float WKSpeedModifier = 35f * mod;
         public float WKVerticalModifier = 7f * mod;
         public float WKDurationMultiplier = 0.75f;
         // dont have tht WKEase graph thing in unity
 
         // Roll
-        public float BaseRollDuration = 0.45f;       // minimum time
-        public float MidRollDuration = 0.65f;
-        public float MaxRollDuration = 0.8f;
+        public float BaseRollDuration = 0.4f;       // minimum time
+        public float MidRollDuration = 0.55f;
+        public float MaxRollDuration = 0.7f;
         public float BaseRollSpeed = 32f * mod;     // needs to be faster than walk speed to feel like a burst forward
         public float MidRollSpeed = 35f * mod;
         public float MaxRollSpeed = 40f * mod;
@@ -131,7 +137,6 @@ namespace CSharpScript
 
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.5f;
-        public float GlideCooldown = 0.2f;
 
         // Knockback
         public vec2 KnockbackForce = new vec2(30f * mod, 40f * mod);
@@ -147,7 +152,11 @@ namespace CSharpScript
         public float ZiplineLaunchDuration = 0.25f;
         public vec2 ZiplineLaunchForce = new vec2(40f * mod, 16f * mod);
         public float ZiplineCoyoteTime = 0.2f;
-        
+
+        // Damage Taken/ Hurt
+        public float HazardTimeDeduction = 1.0f;
+        public float HurtImmunityLength = 2.0f;
+
         // Time Deduction Penalties
         public float JumpTimeDeduction = 1.0f;
         public float RunTimeDeduction = 0.1f;
