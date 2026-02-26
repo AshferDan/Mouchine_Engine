@@ -13,8 +13,12 @@ namespace CSharpScript
     ///   1.0 = moves exactly with camera (appears FROZEN on screen)
     ///
     /// TileWidthXxx:
-    ///   0 (default) = no looping (use for single-image backgrounds)
-    ///   &gt; 0          = tile width for seamless infinite looping
+    ///   0 (default) = no tiling (single image, no side copies)
+    ///   > 0          = enables 3-copy seamless tiling. Duplicate the layer
+    ///                  GameObject twice and name the copies:
+    ///                    <LayerName>_L   (left  copy)
+    ///                    <LayerName>_R   (right copy)
+    ///                  Set TileWidth to the visual width of one copy.
     /// </summary>
     public class ParallaxBackground : GameScript
     {
@@ -33,17 +37,22 @@ namespace CSharpScript
         public float FactorMid     = 0.7f;   // pillars move mostly with camera
         public float FactorFront   = 0.9f;
 
-        // --- Tile widths for seamless looping. Leave at 0 to disable looping ---
+        // --- Tile widths. Set > 0 to enable 3-copy seamless tiling.
+        //     Side copies must be named "<LayerName>_L" and "<LayerName>_R". ---
         public float TileWidthFarBack = 0f;
         public float TileWidthBack    = 0f;
         public float TileWidthMid     = 0f;
         public float TileWidthFront   = 0f;
 
         private string[] layerNames;
+        private string[] layerNames_L;  // "<name>_L" side copies
+        private string[] layerNames_R;  // "<name>_R" side copies
         private float[]  factors;
         private float[]  tileWidths;
         private vec2[]   startPos = new vec2[LayerCount];
         private bool[]   inited   = new bool[LayerCount];
+        private bool[]   inited_L = new bool[LayerCount];
+        private bool[]   inited_R = new bool[LayerCount];
 
         public override void OnStart()
         {
@@ -51,26 +60,44 @@ namespace CSharpScript
             factors    = new float[]  { FactorFarBack, FactorBack, FactorMid, FactorFront };
             tileWidths = new float[]  { TileWidthFarBack, TileWidthBack, TileWidthMid, TileWidthFront };
 
-            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
+            layerNames_L = new string[LayerCount];
+            layerNames_R = new string[LayerCount];
+            for (int i = 0; i < LayerCount; i++)
             {
-                int i = (int)layer;
-                if (layerNames[i] == "") continue;
-
-                float scaleX = Transform.GetScale(layerNames[i]).x;
-                if (scaleX == 0f) continue; // object not found in scene
-
-                startPos[i] = Transform.GetPosition(layerNames[i]);
-                inited[i]   = true;
+                layerNames_L[i] = layerNames[i] + "_L";
+                layerNames_R[i] = layerNames[i] + "_R";
             }
+
+            // Try to init layers that are already loaded at this point
+            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
+                TryInitLayer((int)layer);
         }
 
+        // Attempts to initialize a layer (and its side copies) if the objects
+        // are present in the scene. Called from OnStart and lazily from OnUpdate.
         private void TryInitLayer(int i)
         {
             if (layerNames == null || layerNames[i] == "") return;
-            float scaleX = Transform.GetScale(layerNames[i]).x;
-            if (scaleX == 0f) return; // object not yet in scene
-            startPos[i] = Transform.GetPosition(layerNames[i]);
-            inited[i]   = true;
+
+            // Main copy
+            if (!inited[i])
+            {
+                float scaleX = Transform.GetScale(layerNames[i]).x;
+                if (scaleX != 0f)
+                {
+                    startPos[i] = Transform.GetPosition(layerNames[i]);
+                    inited[i]   = true;
+                }
+            }
+
+            // Side copies — only checked when tiling is enabled
+            if (tileWidths != null && tileWidths[i] > 0f)
+            {
+                if (!inited_L[i] && Transform.GetScale(layerNames_L[i]).x != 0f)
+                    inited_L[i] = true;
+                if (!inited_R[i] && Transform.GetScale(layerNames_R[i]).x != 0f)
+                    inited_R[i] = true;
+            }
         }
 
         public override void OnUpdate(float dt)
@@ -81,29 +108,47 @@ namespace CSharpScript
             {
                 int i = (int)layer;
 
-                // Lazy init: try each frame until the object appears in the scene
+                // Lazy init: retry until the object appears in the scene
                 if (!inited[i])
                 {
                     TryInitLayer(i);
                     if (!inited[i]) continue; // still not ready
                 }
 
-                float f = factors[i];
+                float f  = factors[i];
+                float tw = tileWidths[i];
+                float posY = startPos[i].y + camPos.y * f;
+                float posX;
 
-                // Position the layer so it lags behind the camera by (1 - f)
-                Transform.SetPosition(layerNames[i],
-                    startPos[i].x + camPos.x * f,
-                    startPos[i].y + camPos.y * f);
-
-                // Seamless looping — only when TileWidth is set
-                if (tileWidths[i] > 0f)
+                if (tw > 0f)
                 {
-                    float temp = camPos.x * (1f - f);
-                    vec2  sp   = startPos[i];
-                    if      (temp > sp.x + tileWidths[i]) sp.x += tileWidths[i];
-                    else if (temp < sp.x - tileWidths[i]) sp.x -= tileWidths[i];
-                    startPos[i] = sp;
+                    // How far the background has drifted on-screen total
+                    float drift = camPos.x * (1f - f);
+
+                    // Wrap drift into [0, tw) so the position cycles seamlessly
+                    float wrapped = drift % tw;
+                    if (wrapped < 0f) wrapped += tw;
+
+                    // World position that produces the wrapped screen position
+                    posX = startPos[i].x - wrapped + camPos.x;
+
+                    // Lazy init side copies in case they loaded after OnStart
+                    if (!inited_L[i] || !inited_R[i])
+                        TryInitLayer(i);
+
+                    // L and R always flank the center by exactly one tile width
+                    if (inited_L[i])
+                        Transform.SetPosition(layerNames_L[i], posX - tw, posY);
+                    if (inited_R[i])
+                        Transform.SetPosition(layerNames_R[i], posX + tw, posY);
                 }
+                else
+                {
+                    // No tiling — simple parallax drift
+                    posX = startPos[i].x + camPos.x * f;
+                }
+
+                Transform.SetPosition(layerNames[i], posX, posY);
             }
         }
 
