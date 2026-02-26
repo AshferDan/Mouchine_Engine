@@ -2524,10 +2524,10 @@ void ImGuiSystem::RenderPropertyEditor()
 
 
                 // Editable Collision Layer Dropdown
-                const char* layerNames[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+                const char* layerNames[] = { "Player", "Ground", "Enemy", "Platform", "Default" };
                 int currentLayer = static_cast<int>(collider->GetLayer());
 
-                if (ImGui::Combo("Layer", &currentLayer, layerNames, 6))
+                if (ImGui::Combo("Layer", &currentLayer, layerNames, 5))
                 {
                     collider->SetLayer(static_cast<CollisionLayer>(currentLayer));
                     std::cout << "[Property Editor] Changed collision layer to "
