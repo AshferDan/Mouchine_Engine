@@ -553,6 +553,26 @@ void GraphicsSystem::Update(float)
         }
     }
 
+	float camLeft = 0.f, camRight = 0.f, camBottom = 0.f, camTop = 0.f;
+    bool hasCamBounds = false;
+
+    auto* cullCam = CameraManager::Instance().GetActiveCamera();
+    if (cullCam) {
+        float camX = cullCam->GetPosition().x;
+        float camY = cullCam->GetPosition().y;
+        float zoom = cullCam->getZoom();
+
+        float halfW = (Wwidth / 2.f) / zoom;
+		float halfH = (Wheight / 2.f) / zoom;
+
+		constexpr float CULL_MARGIN = 64.f;// Extra margin to avoid popping objects at the edges
+        camLeft = camX - halfW - CULL_MARGIN;
+        camRight = camX + halfW + CULL_MARGIN;
+        camBottom = camY - halfH - CULL_MARGIN;
+        camTop = camY + halfH + CULL_MARGIN;
+		hasCamBounds = true;
+    }
+
     auto &gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
     // === Batch Accumulation Loop ===
     for (auto &obj : gameObjects)
@@ -607,6 +627,17 @@ void GraphicsSystem::Update(float)
         bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
         int layer = rend->GetLayer(); // For draw order sorting
         bool screenSpace = rend->isScreenSpace();
+
+        if (hasCamBounds && !screenSpace)
+        {
+            float halfSX = sx * 0.5f;
+			float halfSY = sy * 0.5f;
+
+            if (x + halfSX < camLeft || x - halfSX > camRight || y + halfSY < camBottom || y - halfSY > camTop)
+            {
+				continue; // Skip objects outside camera bounds
+            }
+        }
 
         //if (obj->GetName() == "MyTestSquare") {
         //    std::cout << "MyTestSquare - screenSpace: " << screenSpace
@@ -773,6 +804,17 @@ void GraphicsSystem::Update(float)
 
                     bool isScreenSpace = rend->isScreenSpace();
                     mat4 debugVP = isScreenSpace ? screenProjectionMatrix : vp;
+
+                    if (hasCamBounds && !isScreenSpace)
+                    {
+                        float halfSX = sx * 0.5f;
+                        float halfSY = sy * 0.5f;
+
+                        if (x + halfSX < camLeft || x - halfSX > camRight || y + halfSY < camBottom || y - halfSY > camTop)
+                        {
+                            continue; // Skip objects outside camera bounds
+                        }
+                    }
 
                     // Draw outlines based on the shape type
                     if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
