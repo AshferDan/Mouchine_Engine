@@ -158,6 +158,21 @@ void Serialization::ResolveHierarchy()
 		}
 	}
 
+	// Resolve camera follow targets deferred from DeserializeCamera.
+	// At deserialization time the target object may not exist yet, so we
+	// store the name and look it up here after all objects are created.
+	for (auto& [id, go] : idToObject)
+	{
+		auto* cam = go->GetComponent<CameraComponent>();
+		if (cam && !cam->GetPendingFollowTargetName().empty())
+		{
+			GameObject* target = GameObjectFactory::Instance().FindGameObject(cam->GetPendingFollowTargetName());
+			if (target)
+				cam->SetFollowTarget(target);
+			cam->SetPendingFollowTargetName("");
+		}
+	}
+
 	idToObject.clear();
 	pendingHierarchy.clear();
 	g_OldToNewID.clear();

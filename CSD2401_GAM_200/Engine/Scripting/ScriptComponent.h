@@ -20,6 +20,9 @@ class ScriptComponent : public IComponent {
 	std::string GetName() const override { return "ScriptComponent"; }
 	
 	void AddScript(const std::string& Script_Name);
+	// Registers a script name without attaching it to the ScriptSystem or calling OnStart.
+	// Used during deserialization so field values can be restored before OnStart runs.
+	void AddScriptName(const std::string& Script_Name);
 
 	void RemoveScript(ScriptID);
 	void RemoveScript(const std::string& Script_Name);
