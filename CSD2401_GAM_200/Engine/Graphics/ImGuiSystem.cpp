@@ -2524,10 +2524,10 @@ void ImGuiSystem::RenderPropertyEditor()
 
 
                 // Editable Collision Layer Dropdown
-                const char* layerNames[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+                const char* layerNames[] = { "Player", "Ground", "Enemy", "Platform", "Default" };
                 int currentLayer = static_cast<int>(collider->GetLayer());
 
-                if (ImGui::Combo("Layer", &currentLayer, layerNames, 6))
+                if (ImGui::Combo("Layer", &currentLayer, layerNames, 5))
                 {
                     collider->SetLayer(static_cast<CollisionLayer>(currentLayer));
                     std::cout << "[Property Editor] Changed collision layer to "
@@ -2598,9 +2598,24 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
                 auto* instances = scriptSystem->GetScriptInstances(obj);
                 if (instances)
                 {
+                    std::string scriptToRemove;
                     for (auto& instance : *instances)
                     {
                         const char* className = mono_class_get_name(instance.scriptClass->monoClass);
+                        ImGui::PushID(className);
+
+                        // Red X button to detach this script
+                        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+                        if (ImGui::Button("X", ImVec2(20, 0)))
+                        {
+                            scriptToRemove = className;
+                        }
+                        ImGui::PopStyleColor(3);
+
+                        ImGui::SameLine();
+
                         if (ImGui::TreeNode(className))
                         {
                             auto fields = scriptSystem->GetPublicFields(instance);
@@ -2644,6 +2659,15 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
                             }
                             ImGui::TreePop();
                         }
+
+                        ImGui::PopID();
+                    }
+
+                    // Remove after iteration to avoid invalidating the instances vector
+                    if (!scriptToRemove.empty())
+                    {
+                        scriptSystem->RemoveScript(obj, scriptToRemove);
+                        script->RemoveScript(scriptToRemove);
                     }
                 }
             }

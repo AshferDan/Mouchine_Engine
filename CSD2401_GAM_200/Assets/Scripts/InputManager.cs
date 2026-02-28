@@ -7,6 +7,7 @@ namespace CSharpScript
         public static vec2 Movement => Input.Movement();
         public static bool JumpWasPressed => Input.GetKeyPressed(Input.KeyCode.Space);
         public static bool JumpWasReleased => Input.GetKeyReleased(Input.KeyCode.Space);
+        public static bool FastDropWasPressed => Input.GetKeyHeld(Input.KeyCode.S);
         public static bool RunWasPressed => Input.GetKeyPressed(Input.KeyCode.J);
         public static bool RunIsHeld => Input.GetKeyHeld(Input.KeyCode.J);
         public static bool WallKickWasPressed => Input.GetKeyPressed(Input.KeyCode.L);

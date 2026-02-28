@@ -94,6 +94,15 @@ std::unique_ptr<IComponent> ScriptComponent::Clone(GameObject* NewClone) const
 
 	return newComp;
 }
+void ScriptComponent::AddScriptName(const std::string& scriptName) {
+	for (const auto& [id, existingName] : ActiveScript)
+	{
+		if (existingName == scriptName) return;
+	}
+	ScriptID newID = NextScript_ID++;
+	ActiveScript[newID] = scriptName;
+}
+
 void ScriptComponent::AddScript(const std::string& scriptName) {
 	// Check if script already exists
 	for (const auto& [id, existingName] : ActiveScript)

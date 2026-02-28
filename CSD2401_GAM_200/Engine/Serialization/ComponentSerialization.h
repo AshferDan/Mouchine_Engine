@@ -54,7 +54,7 @@ namespace ComponentSerialization
     void SerializeCamera(json& j, CameraComponent* cam);
     void SerializeEvent(json& j, EventComponent* ec);
     void SerializeTilemap(json& j, TilemapDataHolder* tilemap);
-    void SerializeScript(json& j, ScriptComponent* sc);
+    void SerializeScript(json& j, ScriptComponent* sc, GameObject* go);
 
     // ----------- Deserialize Individual Components ----------------
     void DeserializeTransform(const json& j, GameObject* go);

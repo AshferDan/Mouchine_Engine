@@ -56,7 +56,7 @@ void MenuLogicSystem::Update(float dt)
                     
                     std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
                     std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
-                    CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL.json", true);
+                    CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
                     std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                 }
                 else if (hoveredButtonName == "SettingsButton")
