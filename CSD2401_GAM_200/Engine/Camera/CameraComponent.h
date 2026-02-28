@@ -134,6 +134,12 @@ public:
 	std::string GetFollowTargetName() const { return followTarget ? followTarget->GetName() : ""; }
 
 	/**
+	 * @brief Stores the desired follow target name for deferred resolution after full scene load.
+	 */
+	void SetPendingFollowTargetName(const std::string& name) { pendingFollowTargetName = name; }
+	const std::string& GetPendingFollowTargetName() const { return pendingFollowTargetName; }
+
+	/**
 	 * @brief Sets the operational mode of the camera.
 	 * @param m The new CameraMode.
 	 */
@@ -299,6 +305,7 @@ private:
 	vec2 position; 				///< The center position of the camera in world coordinates.
 	float zoom;					///< The zoom factor applied to the view (1.0 = no zoom).
 	CameraMode mode;			///< The current operational mode (FIXED, FOLLOW, FREE).
+	std::string pendingFollowTargetName; ///< Deferred follow target name, resolved after full scene load.
 
 	// Follow target settings
 	GameObject* followTarget;	///< Pointer to the GameObject the camera is tracking.

@@ -46,3 +46,43 @@ invalid stoi argument
 [11] BaseThreadInitThunk - 0x7ff8265de8c0
 [12] RtlUserThreadStart - 0x7ff82880c510
 
+
+[EXCEPTION] 2026-02-24 12:38:01
+Attempted to add duplicate ColliderComponent to GameObject: Game Object
+[0] CrashHandler::GetStackTrace - 0x7ff6d8923ec0
+[1] CrashHandler::LogCrash - 0x7ff6d8924170
+[2] main$catch$14 - 0x7ff6d8eb0920
+[3] _CxxFrameHandler4 - 0x7ff8a69864a0
+[5] RtlCaptureContext2 - 0x7ff8d5800e60
+[6] main - 0x7ff6d89243d0
+[7] invoke_main - 0x7ff6d8ea3430
+[8] __scrt_common_main_seh - 0x7ff6d8ea3220
+[9] __scrt_common_main - 0x7ff6d8ea3200
+[10] mainCRTStartup - 0x7ff6d8ea34f0
+[11] BaseThreadInitThunk - 0x7ff8d36ce8c0
+[12] RtlUserThreadStart - 0x7ff8d576c3e0
+
+
+[EXCEPTION] 2026-02-24 12:38:31
+Attempted to add duplicate ColliderComponent to GameObject: Game Object
+[0] CrashHandler::GetStackTrace - 0x7ff6d8923ec0
+[1] CrashHandler::LogCrash - 0x7ff6d8924170
+[2] main$catch$14 - 0x7ff6d8eb0920
+[3] _CxxFrameHandler4 - 0x7ff8a69864a0
+[5] RtlCaptureContext2 - 0x7ff8d5800e60
+[6] main - 0x7ff6d89243d0
+[7] invoke_main - 0x7ff6d8ea3430
+[8] __scrt_common_main_seh - 0x7ff6d8ea3220
+[9] __scrt_common_main - 0x7ff6d8ea3200
+[10] mainCRTStartup - 0x7ff6d8ea34f0
+[11] BaseThreadInitThunk - 0x7ff8d36ce8c0
+[12] RtlUserThreadStart - 0x7ff8d576c3e0
+
+
+[EXCEPTION] 2026-02-26 12:33:20
+bad allocation
+[3] _CxxFrameHandler4 - 0x7ff921323fd0
+[5] RtlCaptureContext2 - 0x7ff950900e60
+[8] BaseThreadInitThunk - 0x7ff94e5ae8c0
+[9] RtlUserThreadStart - 0x7ff95086c3e0
+

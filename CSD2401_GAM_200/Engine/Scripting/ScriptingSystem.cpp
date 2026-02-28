@@ -67,6 +67,13 @@ static void Internal_CreateAnimatedImage(MonoString *name, float x, float y,
     mono_free(texPath);
 }
 
+static void Internal_DestroyGameObject(MonoString* name)
+{
+    char* objName = mono_string_to_utf8(name);
+    API::DestroyGameObject(objName);
+    mono_free(objName);
+}
+
 // === Transform ===
 static void Internal_SetPosition(MonoString *objectName, float x, float y)
 {
@@ -272,6 +279,7 @@ static void Internal_SetCollisionLayer(MonoString* objectName, int layer)
 {
     char* name = mono_string_to_utf8(objectName);
     API::SetCollisionLayer(name, (CollisionLayer)layer);
+    mono_free(name);
 }
 static int Internal_GetCollisionLayer(MonoString* objectName)
 {
@@ -292,6 +300,14 @@ static int Internal_GetCollisionShape(MonoString* objectName)
 static bool Internal_CheckColliderLayer(int layer1, int layer2)
 {
     return API::CheckColliderLayer(layer1, layer2);
+}
+
+static bool Internal_IsCollidingWithLayer(MonoString* objectName, int targetLayer)
+{
+    char* name = mono_string_to_utf8(objectName);
+    bool result = API::IsCollidingWithLayer(name, targetLayer);
+    mono_free(name);
+    return result;
 }
 
 // === Components ===
@@ -1170,6 +1186,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::CreateShape", (void *)Internal_CreateShape);
     mono_add_internal_call("CSharpScript.GameObject::CreateImage", (void *)Internal_CreateImage);
     mono_add_internal_call("CSharpScript.GameObject::CreateAnimatedImage", (void *)Internal_CreateAnimatedImage);
+    mono_add_internal_call("CSharpScript.GameObject::Destroy", (void *)Internal_DestroyGameObject);
 
     // === Transform ===
     mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);
@@ -1207,6 +1224,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Collision::GetCollisionLayer", (void*)Internal_GetCollisionLayer);
     mono_add_internal_call("CSharpScript.Collision::GetCollisionShape", (void*)Internal_GetCollisionShape);
     mono_add_internal_call("CSharpScript.Collision::CheckColliderLayer", (void*)Internal_CheckColliderLayer);
+    mono_add_internal_call("CSharpScript.Collision::IsCollidingWithLayer", (void*)Internal_IsCollidingWithLayer);
 
     // === Scripting ===
     mono_add_internal_call("CSharpScript.Scripting::AttachScript", (void*)Internal_AttachScript);

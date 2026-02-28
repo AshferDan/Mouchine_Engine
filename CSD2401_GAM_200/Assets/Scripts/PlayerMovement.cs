@@ -119,6 +119,8 @@ namespace CSharpScript
         private float _wallKickTotalDuration = 0;
 
         // wall slide variables
+        //private float _wallSlideRestickCooldown = 0;
+        //private bool canWallSlide = false;
         private bool _isTouchingWall = false;
         private bool _isWallSliding = false;
 
@@ -126,10 +128,12 @@ namespace CSharpScript
         private bool _isGroundPounding = false;     // checks if player is currently in groundpound state
         vec2 lastPos;                            // stores pos of when the player initiated groundpound (for conversion to horizontal dist)
         private float _groundPoundPauseTimer = 0;
+        private float _groundPoundCooldownTimer = 0;
 
         // roll variables
         private bool _isRolling = false;            // checks if player is in rolling state
         private float _rollTimer = 0;
+        private float _rollCooldownTimer = 0;
 
         // glide variables
         private bool _isGliding = false;            // checks if player is in gliding state
@@ -149,12 +153,13 @@ namespace CSharpScript
         public float inputForce = 7.5f;
         public static bool isControlLocked { get; set; }
 
-        // movement penalties - bonk & skid
+        // movement penalties - bonk & skid & hurt
         private float _bonkTimer = 0f;
         private bool _isSkidding;
         private int _skidTargetDirection;
         private float _skidTimer = 0f;
         private float _calculatedSkidDecel;
+        private float _hurtTimer = 0f;
 
         public string vfx = "Hero_vfx";
         #endregion
@@ -273,6 +278,9 @@ namespace CSharpScript
             Camera.SetZoom(0.5f);
         }
 
+        bool vfxTracksPlayer;
+        bool vfxInitialized;
+        vec2 staticVfxPos;
         public void OnUpdate(float deltaTime)
         {
             if (OwnerName == null || OwnerName == "") return;
@@ -282,6 +290,9 @@ namespace CSharpScript
             _coyoteTimer -= deltaTime;
             _wallKickCooldownTimer -= deltaTime;
             _ziplineCoyoteTimer -= deltaTime;
+            _groundPoundCooldownTimer -= deltaTime;
+            _rollCooldownTimer -= deltaTime;
+            _hurtTimer -= deltaTime;
 
             // additional checks here
             UpdatePlayerState();
@@ -378,22 +389,8 @@ namespace CSharpScript
                     Animation.PlayAnimation(vfx, "Bonk");
                     break;
             }
-        }
 
-        static bool resetSkid = false;
-        bool vfxTracksPlayer;
-        bool vfxInitialized;
-        vec2 staticVfxPos;
-        public void OnFixedUpdate(float fixedDeltaTime)
-        {
-            if (Input.GetKeyHeld(Input.KeyCode.V))
-            {
-                IsBeingKnockedBack = true;
-            }
-
-            Debug.Log(Camera.GetZoom().ToString());
-            //Debug.Log(currState.ToString());
-
+            // WAS ORIGINALLY IN FIXEDUPDATE BUT HAD ISSUES WITH FRAME TIMINGS SO MOVED HERE!
             // set vfx pos to player
             vfxTracksPlayer = nonTrackingVFX.Contains(currState) ? false : true;
             vec2 pos = Transform.GetPosition(OwnerName);
@@ -410,9 +407,23 @@ namespace CSharpScript
             vec2 finalPos = vfxTracksPlayer ? pos : staticVfxPos;
             if (currState == PlayerState.Running || currState == PlayerState.Skidding)
                 finalPos.x -= 100f * _facingDirection;
-            
+            else if (currState == PlayerState.Falling)
+                finalPos.y += 100f;
+
 
             Transform.SetPosition(vfx, finalPos.x, finalPos.y - 10f);
+        }
+
+        static bool resetSkid = false;
+        public void OnFixedUpdate(float fixedDeltaTime)
+        {
+            if (Input.GetKeyHeld(Input.KeyCode.V))
+            {
+                IsBeingKnockedBack = true;
+            }
+
+            Debug.Log(currState.ToString());
+
 
             // check for certain states where it should be drawn at player feet rather than tracking
 
@@ -423,7 +434,14 @@ namespace CSharpScript
             if (_bonkTimer > 0)
             {
                 _bonkTimer -= fixeddt;
-                currState = PlayerState.Bonking;
+                if (_bonkTimer <= 0)
+                {
+                    currState = PlayerState.Idle;
+                }
+                else
+                {
+                    currState = PlayerState.Bonking;
+                }
                 CollisionChecks();
                 Jump();
 
@@ -523,13 +541,13 @@ namespace CSharpScript
             {
                 landAnimTimerBuffer = landAnimationLength;
             }
-            if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding)
+            if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Bonking && currState != PlayerState.Falling)
             {
                 currState = PlayerState.Idle;
             }
 
             // horizontal input = moving - trigger run animation
-            if ((InputManager.Movement.x != 0 || InputManager.RunIsHeld) && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Rolling)
+            if ((InputManager.Movement.x != 0 || InputManager.RunIsHeld) && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Rolling && currState != PlayerState.Falling)
             {
                 int index = GetCurrentTentacleLevel();
                 if (index == 0)
@@ -902,18 +920,23 @@ namespace CSharpScript
                         }
                     }
                 }
-
-                // gravity on descending
-                else if (!_isFastFalling)
+                else
                 {
-                    VerticalVelocity += MoveStats.Gravity * MoveStats.GravityOnReleaseMultiplier * fixeddt;
-                }
+                    if (!_isWallSliding)
+                        currState = PlayerState.Falling;
 
-                else if (VerticalVelocity < 0f)
-                {
-                    if (!_isFalling)
+                    // gravity on descending
+                    if (!_isFastFalling)
                     {
-                        _isFalling = true;
+                        VerticalVelocity += MoveStats.Gravity * MoveStats.GravityOnReleaseMultiplier * fixeddt;
+                    }
+
+                    if (VerticalVelocity < 0f)
+                    {
+                        if (!_isFalling)
+                        {
+                            _isFalling = true;
+                        }
                     }
                 }
             }
@@ -1102,7 +1125,7 @@ namespace CSharpScript
         static float wallslideTime = 0f;
         private void WallSlide()
         {
-            if (_isGrounded || IsBeingKnockedBack)
+            if (_isGrounded || IsBeingKnockedBack || InputManager.FastDropWasPressed)
             {
                 if (_isWallSliding)
                 {
@@ -1125,7 +1148,7 @@ namespace CSharpScript
                     // reset jumps if want wall sliding to refresh double jump
                     _numberOfJumpsUsed = 0;
                 }
-                Debug.Log(wallslideTrigger.ToString());
+                
                 if (wallslideTime >= MoveStats.WallSlidingTimeToTriggerSound)         // magic number replace with a
                 {
                     if (wallslideTrigger == false)
@@ -1164,6 +1187,7 @@ namespace CSharpScript
             blockMovement = true;
             _isWallSliding = false;
             _isJumping = true;
+            _isSkidding = false;
             _numberOfJumpsUsed = 1; // CHANGE
 
             currState = PlayerState.WallJumping;
@@ -1272,7 +1296,7 @@ namespace CSharpScript
 
         private void InitiateRoll(float speedOverride = -1f, float durationOverride = -1f)
         {
-            if (_isRolling || !_isGrounded) return;         // remove if causing issue
+            if (_isRolling || !_isGrounded || _rollCooldownTimer > 0) return;         // remove if causing issue
 
             currState = PlayerState.Rolling;
             EnterState(currState);
@@ -1280,6 +1304,7 @@ namespace CSharpScript
             fRoll = true;
             _isRolling = true;
             blockMovement = true;
+            _rollCooldownTimer = MoveStats.RollCooldown;
 
             int tent = GetCurrentTentacleLevel();
 
@@ -1368,13 +1393,14 @@ namespace CSharpScript
         #region Ground Pound
         private void InitiateGroundPound()
         {
-            if (_isGroundPounding || _isGliding || _isWallSliding || _isGrounded) return;
+            if (_isGroundPounding || _isGliding || _isWallSliding || _isGrounded || _groundPoundCooldownTimer > 0) return;
 
             currState = PlayerState.GroundPounding;
             EnterState(currState);
 
             fGroundPound = true; // time deduction
             _isGroundPounding = true;
+            _groundPoundCooldownTimer = MoveStats.GPCooldown;
 
             _groundPoundPauseTimer = MoveStats.GPPauseTime;
 
@@ -1429,14 +1455,13 @@ namespace CSharpScript
 
         private void StopGroundPound()
         {
-            Audio.StopSound("groundpound_sfx");
-
             // reset vertical velocity
             _moveVelocity.y = 0;
             Physics.SetVelocity(OwnerName, 0, 0);
 
             // calculate height
             float fallHeight = lastPos.y - transform.position.y;
+            Debug.Log(fallHeight.ToString());
 
             // roll speed logic
             float targetRollSpeed;
@@ -1468,6 +1493,7 @@ namespace CSharpScript
 
             // duration logic - base time + (height / divisor)  
             float targetDuration = MoveStats.BaseRollDuration + (fallHeight / MoveStats.RollHeightToDurationDivisor);
+            targetDuration = targetDuration > MoveStats.MaxRollDuration ? MoveStats.MaxRollDuration : targetDuration;           // clamp at maxrollduration
 
             // direction - if pressing A/D = roll that way : if pressing nothing = roll facing direction
             if (InputManager.Movement.x != 0)
@@ -1561,6 +1587,7 @@ namespace CSharpScript
             if (IsBeingKnockedBack)
             {
                 currState = PlayerState.Hurting;
+                // trigger once
                 if (HurtTrigger == false)
                 {
                     EnterState(currState);
@@ -1602,10 +1629,16 @@ namespace CSharpScript
 
         private void HandleHazardCollision()
         {
-            //if (Collision.CheckColliderLayer(4, -1))
-            //{
-            //    Debug.Log("AAAAWORKWORKWORK");
-            //}
+            if (Collision.IsCollidingWithLayer(OwnerName, (int)(CollisionLayer.Enemy)))
+            {
+                Debug.Log("AAAAWORKWORKWORK");
+                if (_hurtTimer < 0)
+                {
+                    // take dmg
+                    IsBeingKnockedBack = true;
+                    _hurtTimer = MoveStats.HurtImmunityLength;
+                }
+            }
         }
 
         #endregion
@@ -1770,9 +1803,9 @@ namespace CSharpScript
             vec2 rayDirection = new vec2(0, -1);
 
             // Center raycast
-            vec2 leftRayOrigin = new vec2(position.x - halfWidth * 0.9f, bottomY);
+            vec2 leftRayOrigin = new vec2(position.x - halfWidth * 0.8f, bottomY);
             vec2 centerRayOrigin = new vec2(position.x, bottomY);
-            vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.9f, bottomY);
+            vec2 rightRayOrigin = new vec2(position.x + halfWidth * 0.8f, bottomY);
 
             // debug for ground check raycast
             //Transform.SetScale("DebugLine", 5, raycastLength);
@@ -1787,8 +1820,8 @@ namespace CSharpScript
                 if (!triggeredLand)
                 {
                     //Audio.PlaySound("land_sfx", "sfx");
-                    currState = PlayerState.Land;
-                    EnterState(currState);
+                    //currState = PlayerState.Land;
+                    //EnterState(currState);
                 }
                 return;
             }
@@ -1829,6 +1862,7 @@ namespace CSharpScript
             vec2 centerRayOrigin = new vec2(position.x, position.y);
             if (RaycastForWall(centerRayOrigin, rayDirection, raycastLength))
             {
+                //Debug.Log("[Raycast] TOUCHING");
                 _isTouchingWall = true;
                 return;
             }
@@ -1837,7 +1871,8 @@ namespace CSharpScript
             vec2 topRayOrigin = new vec2(position.x, position.y + halfHeight * 0.9f);
             if (RaycastForWall(topRayOrigin, rayDirection, raycastLength))
             {
-                _isTouchingWall = true; Debug.Log("TOUCHING");
+                //Debug.Log("[Raycast] TOUCHING");
+                _isTouchingWall = true;
                 return;
             }
 
@@ -1845,7 +1880,7 @@ namespace CSharpScript
             vec2 bottomRayOrigin = new vec2(position.x, position.y - halfHeight * 0.9f);
             if (RaycastForWall(bottomRayOrigin, rayDirection, raycastLength))
             {
-                _isTouchingWall = true; Debug.Log("TOUCHING");
+                _isTouchingWall = true; Debug.Log("[Raycast] TOUCHING");
                 return;
             }
         }

@@ -434,6 +434,7 @@ namespace API {
     bool OnTriggerExit(const std::string, const std::string);
     bool OnTriggerStay(const std::string, const std::string);
     bool CheckColliderLayer(int, int);
+    bool IsCollidingWithLayer(const std::string& objectName, int targetLayer);
 
 #pragma endregion
 
@@ -511,6 +512,7 @@ namespace API {
 
     const char* FindGameObjectByName(const std::string& name);
     const char* FindGameObjectByID(int id);
+    void DestroyGameObject(const std::string& name);
 
 #pragma endregion
 

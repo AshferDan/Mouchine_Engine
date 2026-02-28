@@ -1,0 +1,275 @@
+{
+    "GameObjects": [
+        {
+            "name": "Parallax_BG",
+            "localID": 2,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "pos": [
+                    0.0,
+                    -1275.555419921875
+                ],
+                "scale": [
+                    4200.0,
+                    12960.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "shapeType": "Square",
+                "texturePath": "../Assets/WALLPAPER MORE BLUR.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": -10,
+                "screenSpace": false
+            },
+            "children": [
+                {
+                    "name": "Wall_Deco",
+                    "localID": 8,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            -1145.555419921875
+                        ],
+                        "scale": [
+                            1219.3546142578125,
+                            179.99996948242188
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WALL_DECOR.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Window",
+                    "localID": 9,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            -4085.55908203125
+                        ],
+                        "scale": [
+                            690.9677734375,
+                            448.4399108886719
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WINDOWS.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Deco(8)",
+                    "localID": 18,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            -3551.11376953125
+                        ],
+                        "scale": [
+                            1219.3546142578125,
+                            179.99996948242188
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WALL_DECOR.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Window(7)",
+                    "localID": 17,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            -1705.5550537109375
+                        ],
+                        "scale": [
+                            690.9677734375,
+                            448.4399108886719
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WINDOWS.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Deco(15)",
+                    "localID": 26,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            3580.0
+                        ],
+                        "scale": [
+                            1219.3546142578125,
+                            179.99996948242188
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WALL_DECOR.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Window(16)",
+                    "localID": 27,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            3080.0
+                        ],
+                        "scale": [
+                            690.9677734375,
+                            448.4399108886719
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WINDOWS.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Window(22)",
+                    "localID": 33,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            655.5555419921875
+                        ],
+                        "scale": [
+                            690.9677734375,
+                            448.4399108886719
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WINDOWS.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Wall_Deco(23)",
+                    "localID": 34,
+                    "parentID": 2,
+                    "active": true,
+                    "TransformComponent": {
+                        "pos": [
+                            0.0,
+                            1154.4444580078125
+                        ],
+                        "scale": [
+                            1219.3546142578125,
+                            179.99996948242188
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/WALL_DECOR.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -10,
+                        "screenSpace": false
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

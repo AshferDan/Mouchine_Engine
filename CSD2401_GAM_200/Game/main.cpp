@@ -73,24 +73,11 @@ int main()
             cam->SetFollowTarget(player);
             cam->SetFollowOffset(vec2(0.f, 0.f));
             cam->SetSmoothing(true, 2.f);
-            cam->SetZoom(0.5f);         //doesnt rly work
+            cam->SetZoom(0.5f);         
         }
 
         CameraManager::Instance().SetActiveCamera(mainCamera);
 
-
-        // Parallax background - created before Hero so it renders behind
-        GameObject* ParallaxBG = GameObjectFactory::Instance().CreateImage(
-            "ParallaxBG",
-            RenderComponent::ShapeType::Square,
-            0.0f, 0.0f,
-            3840.0f, 2160.0f,
-            "../Assets/FULL_BACKGROUND.png");
-        if (ParallaxBG)
-        {
-            auto* bgRender = ParallaxBG->GetComponent<RenderComponent>();
-            if (bgRender) bgRender->SetLayer(-10);
-        }
 
         GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
             "Hero",
@@ -112,11 +99,9 @@ int main()
 
             if (scriptComp)
             {
-                // 3. Attach the script "SpinningSquare"
-                // Ensure the namespace in C# is "GameScripts"
                 scriptComp->AddScript("PlayerMovement");
                 scriptComp->AddScript("PlayerMovementStats");
-                scriptComp->AddScript("ParallaxBackground");
+                
 
                 std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
             }
@@ -157,6 +142,29 @@ int main()
         {
             ColliderComponent* colComp = Wall->AddComponent<ColliderComponent>();
             PhysicsComponent* phyComp = Wall->AddComponent<PhysicsComponent>();
+
+            if (colComp && phyComp)
+            {
+                phyComp->SetStatic(true);
+                colComp->SetSize(100.0f, 1000.0f);
+                colComp->SetLayer(CollisionLayer::Ground);
+            }
+        }
+
+
+        GameObject* Wall2 = GameObjectFactory::Instance().CreateShape(
+            "Platform",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            200.0f, 0.0f,                      // Center of screen
+            100.0f, 1000.0f,                  // Size
+            false,
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
+
+        if (Wall2)
+        {
+            ColliderComponent* colComp = Wall2->AddComponent<ColliderComponent>();
+            PhysicsComponent* phyComp = Wall2->AddComponent<PhysicsComponent>();
 
             if (colComp && phyComp)
             {
