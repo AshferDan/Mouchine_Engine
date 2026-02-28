@@ -315,6 +315,21 @@ private:
 	GLSLShader* textShader;	// Shader dedicated to rendering font glyphs.
 	GLSLShader* debugShader; // Shader for drawing non-batched items like lines and points.
 
+	// Vignette post-processing
+	GLSLShader* vignetteShader = nullptr;
+	bool    vignetteEnabled = true;
+	float   vignetteInnerRadius = 0.3f;
+	float   vignetteOuterRadius = 0.75f;
+	float   vignetteIntensity = 0.5f;
+	vec4    vignetteColor = vec4(0.f, 0.f, 0.f, 1.f);
+
+	// expose setters so ImGui / level editor can tweak at runtime
+	void SetVignetteEnabled(bool e) { vignetteEnabled = e; }
+	void SetVignetteInnerRadius(float r) { vignetteInnerRadius = r; }
+	void SetVignetteOuterRadius(float r) { vignetteOuterRadius = r; }
+	void SetVignetteIntensity(float i) { vignetteIntensity = i; }
+	void SetVignetteColor(const vec4& c) { vignetteColor = c; }
+
 	// --- Single Quad Rendering (Legacy/Test) Buffers ---
 	GLuint vao = 0, vbo = 0, tex = 0;		// VAO/VBO for a simple quad/rectangle draw (used in older pipelines).
 

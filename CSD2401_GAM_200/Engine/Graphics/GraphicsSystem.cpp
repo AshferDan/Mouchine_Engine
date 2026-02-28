@@ -265,6 +265,9 @@ void GraphicsSystem::Initialize()
         "debugShader", "../Shaders/debug.vert", "../Shaders/debug.frag");
     debugShader = debugShaderResource->GetShader();
 
+    ShaderResource* vignetteShaderResource = ResourceManager::Instance().LoadShader("vignetteShader", "../Shaders/vignette.vert", "../Shaders/vignette.frag");
+    vignetteShader = vignetteShaderResource->GetShader();
+
     // Define vertex structure for a textured quad.
     struct Vertex
     {
@@ -445,24 +448,26 @@ void GraphicsSystem::Update(float)
         return; // Skip if no valid window.
 
     // === Framebuffer and Viewport Setup ===
+    // Always render scene into the FBO (needed for post-processing)
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
     if (editorMode)
     {
-        // Render to the custom framebuffer texture for the editor viewport
-        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
         glViewport(0, 0, frameBufferWidth, frameBufferHeight);
     }
     else
     {
-        // Render directly to the default window framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         int currentWidth, currentHeight;
         glfwGetFramebufferSize(window, &currentWidth, &currentHeight);
-
-        // Update stored dimensions if they changed
         if (currentWidth != Wwidth || currentHeight != Wheight)
         {
             Wwidth = currentWidth;
             Wheight = currentHeight;
+        }
+        // Always keep FBO in sync with window size in play mode
+        if (currentWidth != frameBufferWidth || currentHeight != frameBufferHeight)
+        {
+            ResizeFrameBuffer(currentWidth, currentHeight);
         }
         glViewport(0, 0, Wwidth, Wheight);
     }
@@ -929,6 +934,32 @@ void GraphicsSystem::Update(float)
     if (currentSelection.exist)
     {
         DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, {1, 1, 1, 1}, vp); // draw white outline
+    }
+
+    // === Vignette Post-Processing Pass ===
+    if (vignetteEnabled && vignetteShader && !editorMode)
+    {
+        // Step 1: switch to the default framebuffer (the actual screen)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        vignetteShader->Use();
+
+        // Bind the scene texture (what we just rendered into the FBO)
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+        vignetteShader->SetUniform("uSceneTexture", 0);
+        vignetteShader->SetUniform("uInnerRadius", vignetteInnerRadius);
+        vignetteShader->SetUniform("uOuterRadius", vignetteOuterRadius);
+        vignetteShader->SetUniform("uIntensity", vignetteIntensity);
+        vignetteShader->SetUniform("uVignetteColor", vignetteColor);
+
+        // Reuse the existing fullscreen quad
+        glBindVertexArray(flashVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(0);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
