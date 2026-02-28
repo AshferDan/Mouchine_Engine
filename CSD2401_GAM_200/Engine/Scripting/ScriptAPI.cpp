@@ -1188,12 +1188,12 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
 
     }
 
-    void StopSound(const std::string soundName)
+    void StopSound(const std::string channelName)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            audioManager->StopSound(soundName);
+            audioManager->StopSound(channelName);
         }
     }
 

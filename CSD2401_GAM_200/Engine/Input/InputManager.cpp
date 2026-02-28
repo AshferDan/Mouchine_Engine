@@ -362,7 +362,7 @@ void InputManager::Update(float)
         static bool tabWasPressed = false;
         bool tabPressed = (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS);
 
-        if (tabPressed && !tabWasPressed)
+        if (tabPressed && !tabWasPressed && !isMainMenu)
         {
             PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
             if (pauseMenu)

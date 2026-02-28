@@ -351,7 +351,7 @@ void PauseMenuLogicSystem::Update(float dt)
             SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
             SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
 
-            // Hide pause menu buttons
+            // Hide pause menu buttons and board
             if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
                 resumeBtn->SetActive(false);
             if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
@@ -362,6 +362,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
+            if (auto* board = factory.FindGameObject("PauseBoard"))
+                board->SetActive(false);
         }
         else
         {
@@ -371,7 +373,7 @@ void PauseMenuLogicSystem::Update(float dt)
             // Reset how to play button texture to normal
             SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
 
-            // Show pause menu buttons
+            // Show pause menu buttons and board
             if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
                 resumeBtn->SetActive(true);
             if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
@@ -382,6 +384,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
+            if (auto* board = factory.FindGameObject("PauseBoard"))
+                board->SetActive(true);
         }
         wasHowToPlayOpenLastFrame = isHowToPlayOpen;
     }
@@ -404,7 +408,7 @@ void PauseMenuLogicSystem::Update(float dt)
             SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
             SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
 
-            // Hide pause menu buttons
+            // Hide pause menu buttons and board
             if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
                 resumeBtn->SetActive(false);
             if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
@@ -415,13 +419,15 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
+            if (auto* board = factory.FindGameObject("PauseBoard"))
+                board->SetActive(false);
         }
         else
         {
             // Hide settings UI
             SetPauseSettingsVisible(false);
 
-            // Show pause menu buttons
+            // Show pause menu buttons and board
             if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
                 resumeBtn->SetActive(true);
             if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
@@ -432,6 +438,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
+            if (auto* board = factory.FindGameObject("PauseBoard"))
+                board->SetActive(true);
         }
         wasSettingsOpenLastFrame = isPauseSettingsOpen;
     }
@@ -1461,16 +1469,14 @@ void PauseMenuLogicSystem::OpenHowToPlay()
         isPauseMenuActive = true;
         CORE->SetGamePaused(true);
 
-        // Show overlay and board
+        // Show overlay only (not board, since we're showing How To Play instead)
         if (auto* overlay = factory.FindGameObject("PauseOverlay"))
             overlay->SetActive(true);
-        if (auto* board = factory.FindGameObject("PauseBoard"))
-            board->SetActive(true);
 
         std::cout << "[PauseMenu] Pause menu auto-opened for How To Play" << std::endl;
     }
 
-    // Hide pause menu buttons
+    // Hide pause menu buttons and board
     if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))
         resumeBtn->SetActive(false);
     if (auto* restartBtn = factory.FindGameObject("PauseRestartButton"))
@@ -1481,6 +1487,8 @@ void PauseMenuLogicSystem::OpenHowToPlay()
         mainMenuBtn->SetActive(false);
     if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
         howToPlayBtn->SetActive(false);
+    if (auto* board = factory.FindGameObject("PauseBoard"))
+        board->SetActive(false);
 
     // Show how to play screen
     SetHowToPlayVisible(true);
@@ -1497,6 +1505,7 @@ void PauseMenuLogicSystem::OpenHowToPlay()
 void PauseMenuLogicSystem::CloseHowToPlay()
 {
     isHowToPlayOpen = false;
+    wasHowToPlayOpenLastFrame = false; // Reset state tracking
 
     // If How To Play was opened via TAB, close the entire pause menu
     if (howToPlayOpenedViaTab)

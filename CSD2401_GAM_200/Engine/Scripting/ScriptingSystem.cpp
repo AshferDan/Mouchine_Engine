@@ -445,10 +445,10 @@ static void Internal_PlaySound(MonoString* soundName, MonoString* channel) {
     mono_free(cChannel);
 }
 
-static void Internal_StopSound(MonoString* soundName) {
-    char* cName = mono_string_to_utf8(soundName);
-    API::StopSound(cName);
-    mono_free(cName);
+static void Internal_StopSound(MonoString* channelName) {
+    char* cChannelName = mono_string_to_utf8(channelName);
+    API::StopSound(cChannelName);
+    mono_free(cChannelName);
 }
 
 static void Internal_StopAllSounds() {

@@ -98,6 +98,7 @@ private:
     float       originalCenterX = 0.0f;             // original bar center X position
     float       originalCenterY = 0.0f;             // original bar center Y position
     float       rightEdge = 0.0f;                   // right edge anchor point
+    float       leftEdge = 0.0f;                   // right edge anchor point
 
     /**
      * @brief Updates the timer's displayed UI bar fill amount.

@@ -186,65 +186,74 @@ void CoreEngine::GameLoop()
 
         if (m_hasPendingLoad)
         {
-            std::cout << "[CoreEngine] ===== PENDING SCENE LOAD DETECTED =====" << std::endl;
-            std::cout << "[CoreEngine] Scene to load: " << m_pendingScene << std::endl;
-            std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
-
-            LevelEditor *level = GetLevelEditor();
-            level->LoadLevel(m_pendingScene);
-            std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
-
-            // Reset pause menu system (UI was destroyed during scene load)
-            if (pauseMenuLogicSystem)
+            // Wait for cutscene to finish before loading scene
+            if (cutsceneSystem && cutsceneSystem->IsPlaying())
             {
-                pauseMenuLogicSystem->Initialize();
-                std::cout << "[CoreEngine] Pause menu system reset" << std::endl;
-            }
-
-            // Reset game timer system
-            if (gameTimerSystem)
-            {
-                gameTimerSystem->Initialize();
-                std::cout << "[CoreEngine] Game timer system reset" << std::endl;
-            }
-
-            // Reset win zone logic system
-            if (winLoseLogicSystem)
-            {
-                winLoseLogicSystem->Initialize();
-                std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
-            }
-
-            // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
-            if (m_autoPlayAfterLoad)
-            {
-                std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
-                level->EnterPlayMode();
-                std::cout << "[CoreEngine] Play mode entered\n";
+                // Cutscene still playing - delay scene load
+                // (scene will load on next frame after cutscene ends)
             }
             else
             {
-                std::cout << "[CoreEngine] Auto-play flag is FALSE - NOT entering play mode\n";
+                std::cout << "[CoreEngine] ===== PENDING SCENE LOAD DETECTED =====" << std::endl;
+                std::cout << "[CoreEngine] Scene to load: " << m_pendingScene << std::endl;
+                std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
+
+                LevelEditor *level = GetLevelEditor();
+                level->LoadLevel(m_pendingScene);
+                std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
+
+                // Reset pause menu system (UI was destroyed during scene load)
+                if (pauseMenuLogicSystem)
+                {
+                    pauseMenuLogicSystem->Initialize();
+                    std::cout << "[CoreEngine] Pause menu system reset" << std::endl;
+                }
+
+                // Reset game timer system
+                if (gameTimerSystem)
+                {
+                    gameTimerSystem->Initialize();
+                    std::cout << "[CoreEngine] Game timer system reset" << std::endl;
+                }
+
+                // Reset win zone logic system
+                if (winLoseLogicSystem)
+                {
+                    winLoseLogicSystem->Initialize();
+                    std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
+                }
+
+                // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
+                if (m_autoPlayAfterLoad)
+                {
+                    std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
+                    level->EnterPlayMode();
+                    std::cout << "[CoreEngine] Play mode entered\n";
+                }
+                else
+                {
+                    std::cout << "[CoreEngine] Auto-play flag is FALSE - NOT entering play mode\n";
+                }
+
+                // Unpause the game after scene load completes
+                if (m_gamePause)
+                {
+                    std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
+                    SetGamePaused(false);
+                }
+
+                // Clear event system again to ensure no stale events from scene transition
+                EventSystem::Clear();
+
+                m_pendingScene = "";
+                m_hasPendingLoad = false;
+                m_autoPlayAfterLoad = false; // Reset flag
+
+                if (inputManager)
+                    inputManager->ResetState();
+                CameraManager::Instance().ResetState();
+                accumulator = 0.0;
             }
-
-            // Unpause the game after scene load completes
-            if (m_gamePause)
-            {
-                std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
-                SetGamePaused(false);
-            }
-
-            // Clear event system again to ensure no stale events from scene transition
-            EventSystem::Clear();
-
-            m_pendingScene = "";
-            m_hasPendingLoad = false;
-            m_autoPlayAfterLoad = false; // Reset flag
-
-            if (inputManager)
-                inputManager->ResetState();
-            CameraManager::Instance().ResetState();
-            accumulator = 0.0;
         }
 
         // Update variable delta_time and FPS
