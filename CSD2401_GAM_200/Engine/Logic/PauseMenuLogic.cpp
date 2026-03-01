@@ -1467,13 +1467,15 @@ void PauseMenuLogicSystem::OpenHowToPlay()
     if (!isPauseMenuActive)
     {
         isPauseMenuActive = true;
-        CORE->SetGamePaused(true);
+        // DON'T pause the game when opening How To Play - let audio/game continue
+        // Only the timer will stop (handled in GameTimerSystem)
+        // CORE->SetGamePaused(true); // Commented out - don't pause
 
         // Show overlay only (not board, since we're showing How To Play instead)
         if (auto* overlay = factory.FindGameObject("PauseOverlay"))
             overlay->SetActive(true);
 
-        std::cout << "[PauseMenu] Pause menu auto-opened for How To Play" << std::endl;
+        std::cout << "[PauseMenu] Pause menu auto-opened for How To Play (game NOT paused)" << std::endl;
     }
 
     // Hide pause menu buttons and board

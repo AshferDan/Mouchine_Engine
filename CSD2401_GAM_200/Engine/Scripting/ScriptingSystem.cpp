@@ -558,6 +558,31 @@ static void Internal_FadeOutAll(float duration) {
     API::FadeOutAll(duration);
 }
 
+// === 3D Audio / Spatial Sound ===
+static void Internal_Set3DListenerPosition(float x, float y) {
+    API::Set3DListenerPosition(x, y);
+}
+
+static void Internal_Set3DSoundPosition(MonoString* channelName, float x, float y) {
+    char* cChannelName = mono_string_to_utf8(channelName);
+    API::Set3DSoundPosition(cChannelName, x, y);
+    mono_free(cChannelName);
+}
+
+static void Internal_Load3DSound(MonoString* name, MonoString* filepath, bool loop,
+                                 float minDistance, float maxDistance, MonoString* category,
+                                 float volume, float pitch) {
+    char* cName = mono_string_to_utf8(name);
+    char* cFilepath = mono_string_to_utf8(filepath);
+    char* cCategory = mono_string_to_utf8(category);
+
+    API::Load3DSound(cName, cFilepath, loop, minDistance, maxDistance, cCategory, volume, pitch);
+
+    mono_free(cName);
+    mono_free(cFilepath);
+    mono_free(cCategory);
+}
+
 // === Camera ===
 static void Internal_SetCameraPosition(float x, float y) {
     vec2 pos = { x, y };
@@ -1268,6 +1293,9 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Audio::FadeOutCategory", (void*)Internal_FadeOutCategory);
     mono_add_internal_call("CSharpScript.Audio::FadeInCategory", (void*)Internal_FadeInCategory);
     mono_add_internal_call("CSharpScript.Audio::FadeOutAll", (void*)Internal_FadeOutAll);
+    mono_add_internal_call("CSharpScript.Audio::Set3DListenerPosition", (void*)Internal_Set3DListenerPosition);
+    mono_add_internal_call("CSharpScript.Audio::Set3DSoundPosition", (void*)Internal_Set3DSoundPosition);
+    mono_add_internal_call("CSharpScript.Audio::Load3DSound", (void*)Internal_Load3DSound);
 
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);

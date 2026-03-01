@@ -138,10 +138,6 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 	// Stop all music before playing cutscene audio
 	AudioManager* audioMgr = CORE->GetAudioManager();
 	if (audioMgr) {
-		// Mute music category immediately
-		audioMgr->SetCategoryVolume("music", 0.0f);
-		std::cout << "[CutsceneSystem] Muted music category" << std::endl;
-
 		// Stop BGM channel
 		audioMgr->StopSound("bgm_channel");
 		std::cout << "[CutsceneSystem] Stopped bgm_channel" << std::endl;

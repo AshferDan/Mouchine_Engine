@@ -1368,6 +1368,36 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             audioManager->FadeOutAll(duration);
         }
     }
+
+    // 3D Audio / Spatial Sound
+    void Set3DListenerPosition(float x, float y)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->Set3DListenerPosition(x, y);
+        }
+    }
+
+    void Set3DSoundPosition(const std::string channelName, float x, float y)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->Set3DSoundPosition(channelName, x, y);
+        }
+    }
+
+    void Load3DSound(const std::string name, const std::string filepath, bool loop,
+                     float minDistance, float maxDistance, const std::string category,
+                     float volume, float pitch)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->Load3DSound(name, filepath, loop, minDistance, maxDistance, category, volume, pitch);
+        }
+    }
 #pragma endregion
 
 #pragma region Timer

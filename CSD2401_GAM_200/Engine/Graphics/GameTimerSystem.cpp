@@ -87,6 +87,30 @@ void GameTimerSystem::Update(float dt)
         return;
     }
 
+    // Check if How To Play is open - if so, stop timer and hide it
+    PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+    bool isHowToPlayOpen = pauseMenu && pauseMenu->IsHowToPlayOpen();
+
+    // Stop timer countdown and hide timer bar if How To Play is open
+    if (isHowToPlayOpen)
+    {
+        // Hide timer bar
+        if (timerGO->IsActive())
+        {
+            timerGO->SetActive(false);
+        }
+        if (timerBackground && timerBackground->IsActive())
+        {
+            timerBackground->SetActive(false);
+        }
+        if (timerFrame && timerFrame->IsActive())
+        {
+            timerFrame->SetActive(false);
+        }
+        // Don't count down
+        return;
+    }
+
     // hide timer if game is paused
     if (mode == EditorMode::Pause || CORE->IsGamePaused())
     {

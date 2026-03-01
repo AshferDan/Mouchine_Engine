@@ -463,6 +463,13 @@ namespace API {
     void FadeOutCategory(const std::string, float);
     void FadeInCategory(const std::string, float, float);
     void FadeOutAll(float);
+
+    // 3D Audio / Spatial Sound
+    void Set3DListenerPosition(float x, float y);
+    void Set3DSoundPosition(const std::string channelName, float x, float y);
+    void Load3DSound(const std::string name, const std::string filepath, bool loop,
+                     float minDistance, float maxDistance, const std::string category,
+                     float volume, float pitch);
 #pragma endregion
 
 

@@ -168,6 +168,33 @@ public:
 
 	void setPitch(const std::string& channelName, float pitch);
 
+	/*  3D Audio / Spatial Sound  */
+	/**
+	 * @brief Sets the 3D position of the audio listener (usually the camera/player)
+	 * @param x X position
+	 * @param y Y position (use 0 for 2D games)
+	 */
+	void set3DListenerPosition(float x, float y);
+
+	/**
+	 * @brief Sets the 3D position of a sound source
+	 * @param channelName Name of the channel playing the sound
+	 * @param x X position of the sound source
+	 * @param y Y position (use 0 for 2D games)
+	 */
+	void set3DSoundPosition(const std::string& channelName, float x, float y);
+
+	/**
+	 * @brief Loads a 3D positional sound (with distance attenuation and panning)
+	 * @param name Identifier for the sound
+	 * @param filepath Path to the audio file
+	 * @param loop Whether the sound should loop
+	 * @param minDistance Minimum distance before sound starts attenuating
+	 * @param maxDistance Maximum distance where sound is silent
+	 * @return True if loading was successful
+	 */
+	bool load3DSound(const std::string& name, const std::string& filepath, bool loop = false, float minDistance = 100.0f, float maxDistance = 1000.0f);
+
 	/*  Error Handling  */
 	/**
 	 * @brief Checks and logs FMOD errors
