@@ -38,6 +38,24 @@ bool AudioEngine::initialiseAudio() {
 		return false;
 	}
 
+	// Set 3D settings for spatial audio
+	// distancefactor: units per meter (1.0 = 1 unit = 1 meter)
+	// rolloffscale: how quickly sound attenuates (1.0 = normal, higher = faster attenuation)
+	result = system->set3DSettings(1.0f, 1.0f, 1.0f);
+	if (result != FMOD_OK) {
+		checkError(result, "Setting 3D audio settings");
+	}
+
+	// Initialize listener position at origin
+	FMOD_VECTOR position = { 0.0f, 0.0f, 0.0f };
+	FMOD_VECTOR velocity = { 0.0f, 0.0f, 0.0f };
+	FMOD_VECTOR forward = { 0.0f, 0.0f, 1.0f };
+	FMOD_VECTOR up = { 0.0f, 1.0f, 0.0f };
+	result = system->set3DListenerAttributes(0, &position, &velocity, &forward, &up);
+	if (result != FMOD_OK) {
+		checkError(result, "Setting initial 3D listener position");
+	}
+
 	std::cout << "Audio initialised sucessfully" << std::endl;
 	return true;
 }
@@ -314,15 +332,103 @@ void AudioEngine::muteSound(const std::string& channelName) {
 	}
 }
 
-void AudioEngine::setPitch(const std::string& channelName, float pitch) 
+void AudioEngine::setPitch(const std::string& channelName, float pitch)
 {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second)
 	{
 		if (pitch < 0.0f)
-			pitch = 0.0f; 
+			pitch = 0.0f;
 		it->second->setPitch(pitch);
 	}
+}
+
+/*  3D Audio / Spatial Sound  */
+/**
+ * @brief Sets the 3D position of the audio listener (usually the camera/player)
+ * @param x X position in world space
+ * @param y Y position in world space (use 0 for 2D games)
+ */
+void AudioEngine::set3DListenerPosition(float x, float y) {
+	if (!system) return;
+
+	// FMOD uses a 3D vector, but we're working in 2D so z = 0
+	FMOD_VECTOR position = { x, y, 0.0f };
+	FMOD_VECTOR velocity = { 0.0f, 0.0f, 0.0f }; // No doppler effect for now
+	FMOD_VECTOR forward = { 0.0f, 0.0f, 1.0f };  // Looking forward (into screen)
+	FMOD_VECTOR up = { 0.0f, 1.0f, 0.0f };        // Up is Y-axis
+
+	FMOD_RESULT result = system->set3DListenerAttributes(0, &position, &velocity, &forward, &up);
+	checkError(result, "set3DListenerPosition");
+}
+
+/**
+ * @brief Sets the 3D position of a sound source (channel)
+ * @param channelName Name of the channel playing the sound
+ * @param x X position of the sound source in world space
+ * @param y Y position in world space (use 0 for 2D games)
+ */
+void AudioEngine::set3DSoundPosition(const std::string& channelName, float x, float y) {
+	auto it = channels.find(channelName);
+	if (it == channels.end() || !it->second) return;
+
+	// Set the 3D position for this channel
+	FMOD_VECTOR position = { x, y, 0.0f };
+	FMOD_VECTOR velocity = { 0.0f, 0.0f, 0.0f }; // No doppler effect
+
+	FMOD_RESULT result = it->second->set3DAttributes(&position, &velocity);
+	checkError(result, "set3DSoundPosition for " + channelName);
+}
+
+/**
+ * @brief Loads a 3D positional sound with distance attenuation and panning
+ * @param name Identifier for the sound
+ * @param filepath Path to the audio file
+ * @param loop Whether the sound should loop continuously
+ * @param minDistance Minimum distance before sound starts attenuating (default: 100.0f)
+ * @param maxDistance Maximum distance where sound is silent (default: 1000.0f)
+ * @return True if loading was successful
+ */
+bool AudioEngine::load3DSound(const std::string& name, const std::string& filepath, bool loop, float minDistance, float maxDistance) {
+	if (!system) {
+		std::cout << "Audio system not initialised" << std::endl;
+		return false;
+	}
+
+	// Check if sound already exists
+	if (sounds.find(name) != sounds.end()) {
+		std::cout << "Sound: " << name << " already loaded" << std::endl;
+		return true;
+	}
+
+	FMOD::Sound* sound = nullptr;
+	FMOD_MODE mode = FMOD_3D | FMOD_3D_LINEARROLLOFF; // 3D mode with linear distance attenuation
+
+	if (loop) {
+		mode |= FMOD_LOOP_NORMAL;
+	}
+	else {
+		mode |= FMOD_LOOP_OFF;
+	}
+
+	// Load the audio file with 3D mode
+	FMOD_RESULT result = system->createSound(filepath.c_str(), mode, nullptr, &sound);
+	if (result != FMOD_OK) {
+		checkError(result, "Loading 3D sound " + filepath);
+		return false;
+	}
+
+	// Set min and max distance for 3D attenuation
+	result = sound->set3DMinMaxDistance(minDistance, maxDistance);
+	if (result != FMOD_OK) {
+		checkError(result, "Setting 3D distance for " + name);
+		sound->release();
+		return false;
+	}
+
+	sounds[name] = sound;
+	std::cout << "Loaded 3D sound: " << name << " (min: " << minDistance << ", max: " << maxDistance << ")" << std::endl;
+	return true;
 }
 
 /*  Error Handling  */

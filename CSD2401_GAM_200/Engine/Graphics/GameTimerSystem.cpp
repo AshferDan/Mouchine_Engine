@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file       GameTimerSystem.cpp
-\author     Leck Xin Yee [100% - 118 lines]
+\author     Leck Xin Yee [100% - 232 lines]
 \par        xinyee.leck@digipen.edu
 \date       November, 26, 2025
 
@@ -84,6 +84,30 @@ void GameTimerSystem::Update(float dt)
         {
             timerFrame->SetActive(false);
         }
+        return;
+    }
+
+    // Check if How To Play is open - if so, stop timer and hide it
+    PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
+    bool isHowToPlayOpen = pauseMenu && pauseMenu->IsHowToPlayOpen();
+
+    // Stop timer countdown and hide timer bar if How To Play is open
+    if (isHowToPlayOpen)
+    {
+        // Hide timer bar
+        if (timerGO->IsActive())
+        {
+            timerGO->SetActive(false);
+        }
+        if (timerBackground && timerBackground->IsActive())
+        {
+            timerBackground->SetActive(false);
+        }
+        if (timerFrame && timerFrame->IsActive())
+        {
+            timerFrame->SetActive(false);
+        }
+        // Don't count down
         return;
     }
 

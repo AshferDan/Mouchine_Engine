@@ -439,11 +439,11 @@ namespace API {
 #pragma endregion
 
 #pragma region Audio
-    void AddSound(const std::string, const std::string, bool, float, float,std::string);
-    void PlaySound(const std::string,const std::string);
-    void StopSound(const std::string);
+    void AddSound(const std::string name, const std::string filepath, bool loop, float volume, float pitch, std::string category);
+    void PlaySound(const std::string soundName, const std::string channelName);
+    void StopSound(const std::string channelName);
     void StopAllSound();
-    void RemoveSound(const std::string);
+    void RemoveSound(const std::string soundName);
 
     void TriggerEvent(const std::string);
     void AddEventSound(const std::string, const std::string);
@@ -463,6 +463,13 @@ namespace API {
     void FadeOutCategory(const std::string, float);
     void FadeInCategory(const std::string, float, float);
     void FadeOutAll(float);
+
+    // 3D Audio / Spatial Sound
+    void Set3DListenerPosition(float x, float y);
+    void Set3DSoundPosition(const std::string channelName, float x, float y);
+    void Load3DSound(const std::string name, const std::string filepath, bool loop,
+                     float minDistance, float maxDistance, const std::string category,
+                     float volume, float pitch);
 #pragma endregion
 
 

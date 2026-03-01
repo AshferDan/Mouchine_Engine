@@ -135,11 +135,12 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 
 	plm_set_audio_enabled(m_plm, 1); // Disable internal audio decoding (using AudioManager instead)
 
-	// Pause ALL audio before playing cutscene audio (will resume when cutscene ends)
+	// Stop all music before playing cutscene audio
 	AudioManager* audioMgr = CORE->GetAudioManager();
-	if (audioMgr && !audioName.empty()) {
-		audioMgr->PauseAllSounds(true);
-		std::cout << "[CutsceneSystem] Paused all sounds for cutscene" << std::endl;
+	if (audioMgr) {
+		// Stop BGM channel
+		audioMgr->StopSound("bgm_channel");
+		std::cout << "[CutsceneSystem] Stopped bgm_channel" << std::endl;
 	}
 
 	// Play cutscene audio on dedicated channel
@@ -179,7 +180,7 @@ void CutsceneSystem::StopCutscene() {
 		m_plm = nullptr;
 	}
 
-	// Stop cutscene audio and resume other sounds
+	// Stop cutscene audio
 	AudioManager* audioMgr = CORE->GetAudioManager();
 	if (audioMgr) {
 		// Stop the cutscene audio
@@ -188,17 +189,18 @@ void CutsceneSystem::StopCutscene() {
 			m_currentAudio = "";
 			std::cout << "[CutsceneSystem] Stopped cutscene audio" << std::endl;
 		}
-
-		// Resume all paused sounds
-		audioMgr->PauseAllSounds(false);
-		std::cout << "[CutsceneSystem] Resumed all sounds after cutscene" << std::endl;
 	}
 
 	m_timeAccumulator = 0.0;
 
-	// Resume Game
-	//m_currentVideoPath = ""; // Reset
-	CORE->SetGamePaused(false);
+	// Resume Game only if there's no pending scene load
+	// (if there's a pending load, the scene load will unpause after loading)
+	if (!CORE->HasPendingSceneLoad()) {
+		CORE->SetGamePaused(false);
+		std::cout << "[CutsceneSystem] No pending scene load - resuming game" << std::endl;
+	} else {
+		std::cout << "[CutsceneSystem] Pending scene load detected - keeping game paused" << std::endl;
+	}
 	m_canSkip = false;
 }
 

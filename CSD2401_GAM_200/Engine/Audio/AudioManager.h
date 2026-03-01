@@ -289,6 +289,38 @@ public:
      */
     bool IsAnyFadeActive() const;
 
+    /*  3D Audio / Spatial Sound  */
+    /**
+     * @brief Sets the 3D position of the audio listener (usually the camera/player).
+     * @param x X position in world space.
+     * @param y Y position in world space.
+     */
+    void Set3DListenerPosition(float x, float y);
+
+    /**
+     * @brief Sets the 3D position of a sound source.
+     * @param channelName Name of the channel playing the sound.
+     * @param x X position of the sound source.
+     * @param y Y position of the sound source.
+     */
+    void Set3DSoundPosition(const std::string& channelName, float x, float y);
+
+    /**
+     * @brief Loads a 3D positional sound with distance attenuation and panning.
+     * @param name Identifier for the sound.
+     * @param filepath Path to the audio file.
+     * @param loop Whether the sound should loop.
+     * @param minDistance Minimum distance before sound starts attenuating.
+     * @param maxDistance Maximum distance where sound is silent.
+     * @param category Audio category (music, sfx, voice, etc.).
+     * @param volume Initial volume (0.0-1.0).
+     * @param pitch Pitch multiplier.
+     * @return True if loading was successful.
+     */
+    bool Load3DSound(const std::string& name, const std::string& filepath, bool loop = false,
+                     float minDistance = 100.0f, float maxDistance = 1000.0f,
+                     const std::string& category = "sfx", float volume = 1.0f, float pitch = 1.0f);
+
 private:
     std::map<std::string, FadeState> categoryFadeStates;
 };

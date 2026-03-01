@@ -329,6 +329,12 @@ public:
         m_autoPlayAfterLoad = autoPlay;
     }
 
+    /**
+     * @brief Checks if there's a pending scene load waiting to be processed.
+     * @return True if a scene load is pending.
+     */
+    bool HasPendingSceneLoad() const { return m_hasPendingLoad; }
+
     // Step-by-step physics debugging
     bool stepMode;
     bool stepOnce;

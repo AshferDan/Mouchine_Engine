@@ -382,7 +382,7 @@ void InputManager::Update(float)
         static bool tabWasPressed = false;
         bool tabPressed = (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS);
 
-        if (tabPressed && !tabWasPressed)
+        if (tabPressed && !tabWasPressed && !isMainMenu)
         {
             PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
             if (pauseMenu)
@@ -423,8 +423,7 @@ void InputManager::Update(float)
         }
     }
 
-#ifndef _DEBUG
-#else
+
     for (auto &kv : singleTriggerKeys)
     {
         int key = kv.first;
@@ -434,6 +433,8 @@ void InputManager::Update(float)
         {
             if (!wasPressed)
             {
+#ifndef _DEBUG
+#else
                 if (key == GLFW_KEY_F1)
                 {
                     CORE->GetGraphicsSystem()->toggleDebugMode();
@@ -455,7 +456,8 @@ void InputManager::Update(float)
                     CORE->stepOnce = true;
                     std::cout << "[STEP MODE] Advancing 1 frame..." << std::endl;
                 }
-                else if (key == GLFW_KEY_F4)
+#endif
+                if (key == GLFW_KEY_F4)
                 {
                     ShowFPS = !ShowFPS;
                     std::cout << "FPS display " << (ShowFPS ? "ENABLED" : "DISABLED") << std::endl;
@@ -471,7 +473,7 @@ void InputManager::Update(float)
             wasPressed = false;
         }
     }
-#endif
+
 
     GameObject* player = nullptr;
 

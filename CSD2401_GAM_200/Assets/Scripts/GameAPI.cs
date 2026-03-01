@@ -840,6 +840,42 @@ namespace CSharpScript
         /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void FadeOutAll(float duration);
+
+        /// <summary>
+        /// Sets the 3D position of the audio listener (usually the camera/player).
+        /// Sounds will be positioned relative to this listener position.
+        /// </summary>
+        /// <param name="x">X position in world space.</param>
+        /// <param name="y">Y position in world space.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Set3DListenerPosition(float x, float y);
+
+        /// <summary>
+        /// Sets the 3D position of a sound source for spatial audio.
+        /// The sound will have distance-based attenuation and stereo panning.
+        /// </summary>
+        /// <param name="channelName">Name of the channel playing the sound.</param>
+        /// <param name="x">X position of the sound source in world space.</param>
+        /// <param name="y">Y position of the sound source in world space.</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Set3DSoundPosition(string channelName, float x, float y);
+
+        /// <summary>
+        /// Loads a 3D positional sound with distance attenuation and panning.
+        /// Sounds get quieter as the listener moves away and pan left/right based on position.
+        /// </summary>
+        /// <param name="name">Identifier for the sound.</param>
+        /// <param name="filepath">Path to the audio file.</param>
+        /// <param name="loop">Whether the sound should loop continuously.</param>
+        /// <param name="minDistance">Minimum distance before sound starts attenuating (default: 100.0).</param>
+        /// <param name="maxDistance">Maximum distance where sound is silent (default: 1000.0).</param>
+        /// <param name="category">Audio category (default: "sfx").</param>
+        /// <param name="volume">Initial volume 0.0-1.0 (default: 1.0).</param>
+        /// <param name="pitch">Pitch multiplier (default: 1.0).</param>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void Load3DSound(string name, string filepath, bool loop = false,
+                                              float minDistance = 100.0f, float maxDistance = 1000.0f,
+                                              string category = "sfx", float volume = 1.0f, float pitch = 1.0f);
     }
 
     /// <summary>

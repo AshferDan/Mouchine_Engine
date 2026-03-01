@@ -323,6 +323,9 @@ void LevelEditor::EnterPlayMode()
     {
         std::cout << "[LevelEditor] Play button clicked - starting BGM\n";
 
+        // Stop any previous BGM and reset volume before starting new one
+        audioManager->StopSound("bgm_channel");
+
         // Check what sounds are available and play the appropriate BGM
         const auto& sounds = audioManager->GetSoundDatabase();
 

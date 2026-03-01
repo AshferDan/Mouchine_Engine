@@ -1210,12 +1210,12 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
 
     }
 
-    void StopSound(const std::string soundName)
+    void StopSound(const std::string channelName)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            audioManager->StopSound(soundName);
+            audioManager->StopSound(channelName);
         }
     }
 
@@ -1366,6 +1366,36 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         if (audioManager)
         {
             audioManager->FadeOutAll(duration);
+        }
+    }
+
+    // 3D Audio / Spatial Sound
+    void Set3DListenerPosition(float x, float y)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->Set3DListenerPosition(x, y);
+        }
+    }
+
+    void Set3DSoundPosition(const std::string channelName, float x, float y)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->Set3DSoundPosition(channelName, x, y);
+        }
+    }
+
+    void Load3DSound(const std::string name, const std::string filepath, bool loop,
+                     float minDistance, float maxDistance, const std::string category,
+                     float volume, float pitch)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->Load3DSound(name, filepath, loop, minDistance, maxDistance, category, volume, pitch);
         }
     }
 #pragma endregion

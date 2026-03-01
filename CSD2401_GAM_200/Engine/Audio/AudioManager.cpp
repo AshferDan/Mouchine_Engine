@@ -336,6 +336,22 @@ void AudioManager::SetCategoryVolume(const std::string& category, float volume)
             audioEngine->setVolume(channelName, finalVolume);
         }
     }
+
+    // Also update the shared bgm_channel if this is the music category
+    if (category == "music")
+    {
+        // Find any music sound and use its volume for bgm_channel
+        for (const auto& pair : soundDatabase)
+        {
+            const SoundData& sound = pair.second;
+            if (sound.category == "music")
+            {
+                float finalVolume = sound.volume * categoryVolumes[category];
+                audioEngine->setVolume("bgm_channel", finalVolume);
+                break;  // Only need to set it once
+            }
+        }
+    }
 }
 
 /**
@@ -619,6 +635,14 @@ void AudioManager::FadeInCategory(const std::string& category, float duration, f
         return;
     }
 
+    // Cancel any existing fade for this category
+    auto fadeIt = categoryFadeStates.find(category);
+    if (fadeIt != categoryFadeStates.end() && fadeIt->second.isFading)
+    {
+        std::cout << "[AudioManager] Cancelling existing fade for category: " << category << std::endl;
+        fadeIt->second.isFading = false;
+    }
+
     // Start from 0 volume
     SetCategoryVolume(category, 0.0f);
 
@@ -746,4 +770,62 @@ bool AudioManager::IsAnyFadeActive() const
         }
     }
     return false;
+}
+
+/*  3D Audio / Spatial Sound  */
+/**
+ * @brief Sets the 3D position of the audio listener (usually the camera/player).
+ */
+void AudioManager::Set3DListenerPosition(float x, float y)
+{
+    if (audioEngine)
+    {
+        audioEngine->set3DListenerPosition(x, y);
+    }
+}
+
+/**
+ * @brief Sets the 3D position of a sound source.
+ */
+void AudioManager::Set3DSoundPosition(const std::string& channelName, float x, float y)
+{
+    if (audioEngine)
+    {
+        audioEngine->set3DSoundPosition(channelName, x, y);
+    }
+}
+
+/**
+ * @brief Loads a 3D positional sound with distance attenuation and panning.
+ */
+bool AudioManager::Load3DSound(const std::string& name, const std::string& filepath, bool loop,
+                               float minDistance, float maxDistance,
+                               const std::string& category, float volume, float pitch)
+{
+    if (!audioEngine)
+    {
+        std::cout << "[AudioManager] AudioEngine not initialized" << std::endl;
+        return false;
+    }
+
+    // Load the 3D sound using AudioEngine
+    bool success = audioEngine->load3DSound(name, filepath, loop, minDistance, maxDistance);
+
+    if (success)
+    {
+        // Store sound data in the database
+        SoundData soundData;
+        soundData.name = name;
+        soundData.filepath = filepath;
+        soundData.loop = loop;
+        soundData.volume = volume;
+        soundData.pitch = pitch;
+        soundData.category = category;
+
+        soundDatabase[name] = soundData;
+
+        std::cout << "[AudioManager] Loaded 3D sound: " << name << " in category: " << category << std::endl;
+    }
+
+    return success;
 }
