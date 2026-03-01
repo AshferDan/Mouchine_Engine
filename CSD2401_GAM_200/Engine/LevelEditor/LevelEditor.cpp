@@ -1702,8 +1702,7 @@ void LevelEditor::PerformSceneReload()
  * @brief Record a new undo command into the undo history.
  */
 void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
-    
-    // Check if undo exceed 20
+    // Check if undo exceed 30
     if (undoStack.size() >= undoCapacity) {
         undoStack.erase(undoStack.begin()); // Remove oldest
     }
@@ -1711,57 +1710,44 @@ void LevelEditor::RecordUndo(const EditorUndoCommand& undocmd) {
     undoStack.push_back(undocmd);
 
     // New edit after undo means redo should be cleared
-    //redoStack.clear();
-    
+    redoStack.clear();
 }
 
 /**
  * @brief Undo the most recent editor action.
  */
 void LevelEditor::PerformUndo() {
-    if (undoStack.empty()) return;
+    if (undoStack.empty()) {
+        return;
+    }
 
     EditorUndoCommand undocmd = undoStack.back();
     undoStack.pop_back();
 
     switch (undocmd.action) {
-        case EditorUndoCommand::ActionType::ObjectTransform: {
-            GameObject* obj = factory.GetGameObject(undocmd.entityID);
-            if (!obj) break;
-
-            auto* transform = obj->GetComponent<TransformComponent>();
-            if (!transform) break;
-
-            json t = undocmd.beforeJson;
-
-            // Restore ONLY transform fields
-            if (t.contains("pos"))
-                transform->SetPosition(t["pos"][0], t["pos"][1]);
-
-            if (t.contains("scale"))
-                transform->SetScale(t["scale"][0], t["scale"][1]);
-
-            if (t.contains("rotation"))
-                transform->SetRotation(t["rotation"]);
-
-            break;
+        case EditorUndoCommand::ActionType::ObjectModified: 
+        {
+            Serialization::s_IsUndoRedoMode = true;           
+            Serialization::DeserializeGameObject(undocmd.beforeJson);
+            Serialization::ResolveHierarchy();
+            Serialization::s_IsUndoRedoMode = false;
+            break;          
         }
 
-        case EditorUndoCommand::ActionType::ObjectCreated: {
+        case EditorUndoCommand::ActionType::ObjectCreated: 
+        {
             GameObject* obj = factory.GetGameObject(undocmd.entityID);
             
             if (obj)
             {
-                if (CORE && CORE->GetImguiSystem()) // Deselect from Editor
-                {
-                    CORE->GetImguiSystem()->ResetSelectedGameObject();
-                }
-
+                // Deselect from Editor
+                if (CORE && CORE->GetImguiSystem()) CORE->GetImguiSystem()->ResetSelectedGameObject();
                 factory.DestroyAllRelatedGameObjects(undocmd.entityID);
             }
             break;
         }
-        case EditorUndoCommand::ActionType::ObjectDeleted: {
+        case EditorUndoCommand::ActionType::ObjectDeleted: 
+        {
             Serialization::DeserializeGameObject(undocmd.beforeJson);
             Serialization::ResolveHierarchy(); // Reconnect hierarchy via parentID & children
 
@@ -1788,7 +1774,48 @@ void LevelEditor::PerformUndo() {
 
     }
 
-    //redoStack.push_back(undocmd);
+    redoStack.push_back(undocmd); // Push back for redo   
+}
+
+/**
+ * @brief Redo the most recent editor action.
+ */
+void LevelEditor::PerformRedo() {
+    if (redoStack.empty()) {     
+        return;
+    }
+
+    EditorUndoCommand redocmd = redoStack.back();
+    redoStack.pop_back();
+
+    switch (redocmd.action) {
+    case EditorUndoCommand::ActionType::ObjectModified: {
+        Serialization::s_IsUndoRedoMode = true;
+        Serialization::DeserializeGameObject(redocmd.afterJson);
+        Serialization::ResolveHierarchy();
+        Serialization::s_IsUndoRedoMode = false;
+        break;
+    }
+
+    case EditorUndoCommand::ActionType::ObjectCreated: {
+        // Redo creation = Re-create the object using the afterJson state
+        Serialization::DeserializeGameObject(redocmd.afterJson);
+        Serialization::ResolveHierarchy();
+        break;
+    }
+
+    case EditorUndoCommand::ActionType::ObjectDeleted: {
+        // Redo deletion = Delete it again
+        GameObject* obj = factory.GetGameObject(redocmd.entityID);
+        if (obj) {
+            if (CORE->GetImguiSystem()) CORE->GetImguiSystem()->ResetSelectedGameObject();
+            factory.DestroyAllRelatedGameObjects(redocmd.entityID);
+        }
+        break;
+    }
+    }
+
+    undoStack.push_back(redocmd); // Push back for undo
 }
 
 /**

@@ -114,9 +114,9 @@ struct LevelData
  * @brief Stores one undo operation for the Level Editor.
  */
 struct EditorUndoCommand {
-    enum class ActionType { ObjectTransform, ObjectCreated, ObjectDeleted };
+    enum class ActionType { ObjectModified, ObjectCreated, ObjectDeleted };
 
-    ActionType action = ActionType::ObjectTransform;
+    ActionType action = ActionType::ObjectModified;
     EntityID entityID = 0;
 
     json beforeJson;
@@ -351,9 +351,16 @@ public:
     void PerformUndo();
 
     /**
+     * @brief Executes the most recent redo operation.
+     */
+    void PerformRedo();
+
+    /**
      * @brief Clears all undo operations.
      */
     void ClearUndoStack();
+
+    static int GetUndoCapacity() { return undoCapacity; }
 
     std::vector<EditorUndoCommand> undoStack;
     std::vector<EditorUndoCommand> redoStack;
@@ -460,5 +467,5 @@ private:
     std::string currentBGMName = "";
     std::string currentBGMChannel = "bgm_channel";
     float currentBGMVolume = 0.5f;
-    static const int undoCapacity = 20;  // Maximum (action) history size
+    static const int undoCapacity = 30;  // Maximum (action) history size
 };

@@ -117,7 +117,7 @@ ImVec2 viewportSize;
 ImVec2 viewportPos;
 std::unordered_set<EntityID> lockedGizmosGOs{};
 
-// Animator Preview
+// ANIMATOR
 bool isAnimPreviewFocused;
 
 // PROPERTIES
@@ -161,6 +161,139 @@ static EntityID selectedGameObjectID = 0;
 
 // stress test 
 static bool stressTestActive = false;
+
+// UNDO/REDO TRACKER
+static bool isEditingProperty = false;
+static json propertyBeforeJson;
+
+struct UndoTracker 
+{
+    GameObject* obj;
+    LevelEditor* editor;
+    bool& isEditing;
+    json& beforeJson;
+
+    // Construct handles BOTH Gizmos and Sliders
+    UndoTracker(GameObject* o, LevelEditor* ed, bool& editingFlag, json& bJson, bool isCurrentlyUsing = false)
+        : obj(o), editor(ed), isEditing(editingFlag), beforeJson(bJson)
+    {
+        if (beforeJson.is_null()) {
+            beforeJson = json::object();
+        }
+
+        bool started = isCurrentlyUsing || ImGui::IsItemActivated();
+
+        if (!isEditing && started)
+        {
+            isEditing = true;
+            beforeJson = Serialization::SerializeGameObject(obj);
+        }
+    }
+
+    // Static helper for instant actions for Undo/Redo
+    static void RecordInstantChange(GameObject* obj, LevelEditor* editor, json& beforeJson)
+    {
+        EditorUndoCommand cmd;
+        cmd.action = EditorUndoCommand::ActionType::ObjectModified;
+        cmd.entityID = obj->GetID();
+        cmd.beforeJson = beforeJson;
+        cmd.afterJson = Serialization::SerializeGameObject(obj);
+
+        if (cmd.beforeJson == cmd.afterJson) {
+            std::cout << "[Undo System] WARNING: Before and After states are identical. Redo will have no effect." << std::endl;
+        }
+
+        editor->RecordUndo(cmd);
+    }
+
+    static void RecordDeletion(GameObject* obj, LevelEditor* editor, GameObjectFactory& factory) {
+        if (!obj || !editor) return;
+
+        EditorUndoCommand cmd;
+        cmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
+        cmd.entityID = obj->GetID();
+
+        // Capture everything BEFORE we kill it
+        cmd.beforeJson = Serialization::SerializeGameObject(obj);
+
+        // Capture Hierarchy context
+        GameObject* parent = obj->GetParent();
+        cmd.parentID = parent ? parent->GetID() : -1;
+        
+        if (parent) {
+            for (GameObject* c : parent->GetAllChildren())
+                cmd.siblingOrderIDs.push_back(c->GetID());
+        }
+        else {
+            for (auto& u : factory.GetAllGameObjects()) // Ensure factory has this helper
+                cmd.rootOrderIDs.push_back(u->GetID());
+        }
+
+        for (GameObject* c : obj->GetAllChildren()) {
+            cmd.childIDs.push_back(c->GetID());
+        }
+
+        if (CORE->GetLevelEditor()) {
+            CORE->GetLevelEditor()->RecordUndo(cmd);
+        }
+    }
+
+    static void RecordCreation(GameObject* obj, LevelEditor* editor, GameObjectFactory& factory)
+    {
+        if (!obj || !editor) return;
+
+        EditorUndoCommand cmd;
+        cmd.action = EditorUndoCommand::ActionType::ObjectCreated;
+        cmd.entityID = obj->GetID();
+
+        // Capture everything needed to redo (re-create) the object
+        cmd.afterJson = Serialization::SerializeGameObject(obj);
+
+        // Capture hierarchy context so redo can put it back in the same place
+        GameObject* parent = obj->GetParent();
+        cmd.parentID = parent ? parent->GetID() : -1;
+
+        if (parent)
+        {
+            // Order among siblings under the same parent (includes the new object)
+            for (GameObject* c : parent->GetAllChildren())
+                cmd.siblingOrderIDs.push_back(c->GetID());
+        }
+        else
+        {
+            // Order among roots (includes the new object)
+            for (auto& u : factory.GetAllGameObjects())
+                cmd.rootOrderIDs.push_back(u->GetID());
+        }
+
+        editor->RecordUndo(cmd);
+    }
+
+    ~UndoTracker() 
+    {
+        if (!obj || beforeJson.is_null() || !GameObjectFactory::Instance().GetGameObject(obj->GetID())) {
+            isEditing = false;
+            return;
+        }
+
+        bool stoppedGizmo = (isEditing && !ImGuizmo::IsUsing() && !ImGui::IsAnyItemActive());
+        bool stoppedSlider = ImGui::IsItemDeactivatedAfterEdit();
+
+        if (stoppedGizmo || stoppedSlider) 
+        {
+            isEditing = false;
+
+            EditorUndoCommand cmd;
+            cmd.action = EditorUndoCommand::ActionType::ObjectModified;
+            cmd.entityID = obj->GetID();
+            cmd.beforeJson = beforeJson;
+            cmd.afterJson = Serialization::SerializeGameObject(obj);
+
+            editor->RecordUndo(cmd);
+        }
+    }
+};
+
 
 /**
  * @brief Ctor - Inits window variable
@@ -334,19 +467,9 @@ void ImGuiSystem::Update(float dt)
 
                     if (root)
                     {
-                        // Record Undo Entries - Undo Create on Drag and Drop
                         LevelEditor* editor = CORE->GetLevelEditor();
                         if (editor)
-                        {
-                            EditorUndoCommand cmd;
-                            cmd.action = EditorUndoCommand::ActionType::ObjectCreated;
-                            cmd.entityID = root->GetID();
-
-                            // Save object's entire state for redo
-                            cmd.afterJson = Serialization::SerializeGameObject(root);
-
-                            editor->RecordUndo(cmd);
-                        }
+                            UndoTracker::RecordCreation(root, editor, factory);
                     }
                 
                 }
@@ -779,18 +902,50 @@ void ImGuiSystem::Hierarchy_Render()
         }
     }
 
-    // Undo Feature
+    // Undo & Redo Feature
     LevelEditor* editor = CORE->GetLevelEditor();
-    bool canUndo = !editor->undoStack.empty();
+    int undoCount = editor ? (int)editor->undoStack.size() : 0;
+    int redoCount = editor ? (int)editor->redoStack.size() : 0;
+    int cap = LevelEditor::GetUndoCapacity();
+
+    bool canUndo = undoCount > 0;
+    bool canRedo = redoCount > 0;
+
+    std::string undoLabel = "Undo (" + std::to_string(undoCount) + "/" + std::to_string(cap) + ")";
+    std::string redoLabel = "Redo (" + std::to_string(redoCount) + ")";
 
     if (!canUndo) ImGui::BeginDisabled();
-    if (ImGui::Button("Undo"))
+    if (ImGui::Button(undoLabel.c_str()))
     {
-        if (canUndo) {
-            CORE->GetLevelEditor()->PerformUndo();       
-        } 
+        if (editor) editor->PerformUndo();
     }
     if (!canUndo) ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    if (!canRedo) ImGui::BeginDisabled();
+    if (ImGui::Button(redoLabel.c_str()))
+    {
+        if (editor) editor->PerformRedo();
+    }
+    if (!canRedo) ImGui::EndDisabled();
+
+    //if (!canUndo) ImGui::BeginDisabled();
+    //if (ImGui::Button("Undo"))
+    //{
+    //    if (canUndo) {
+    //        CORE->GetLevelEditor()->PerformUndo();       
+    //    } 
+    //}
+    //if (!canUndo) ImGui::EndDisabled();
+    //ImGui::SameLine();
+
+    //if (!canRedo) ImGui::BeginDisabled();
+    //if (ImGui::Button("Redo"))
+    //{
+    //    CORE->GetLevelEditor()->PerformRedo();
+    //}
+    //if (!canRedo) ImGui::EndDisabled();
 
     // display current scene name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
@@ -888,6 +1043,8 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     //    return;
     if (!obj) return;
     EntityID id = obj->GetID();
+    LevelEditor* editor = CORE->GetLevelEditor();
+    json propertyBeforeJson;
 
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -943,7 +1100,9 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         }
         if (ImGui::InputText("##Renaming", rename_str, IM_ARRAYSIZE(rename_str), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
         {
+            propertyBeforeJson = Serialization::SerializeGameObject(obj);
             GetSelectedGameObject()->SetName(std::string(rename_str));
+            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             hierarchy_renameIndex = -1;
         }
 
@@ -1022,8 +1181,13 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
             if (check == familyTree.end() && checkSelfParenting == selfParentingTree.end())
             {
                 GameObject *deliveredGO = p_factory.GetGameObject(deliveredID);
+
+                propertyBeforeJson = Serialization::SerializeGameObject(deliveredGO);
+
                 std::cout << "[Hierarchy] Setting " << deliveredGO->GetName() << " to be child of " << obj->GetName() << std::endl;
                 deliveredGO->SetParent(obj);                                        // Set Dragged GO to be parent of receiver GO
+
+                UndoTracker::RecordInstantChange(deliveredGO, editor, propertyBeforeJson);
 
                 if (!nodeOpen && !obj->GetAllChildren().empty())
                 {
@@ -1071,66 +1235,46 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
         }
         if (ImGui::MenuItem("Clone"))
         {
-            p_factory.CloneGameObject(id);
+            GameObject* clone = p_factory.CloneGameObject(id);
+
+            if (clone)
+            {               
+                if (clone)
+                    UndoTracker::RecordCreation(clone, editor, p_factory);
+            }
         }
         // find way to unparent by drag and drop in the future
         if (obj->GetParent() && ImGui::MenuItem("Make Root"))
         {
+            propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
             obj->GetParent()->RemoveChild(obj);
+
+            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
 
         if (ImGui::MenuItem("Delete"))
             deleteID = id;
 
         ImGui::EndPopup();
-    }
+    }  
 
     if (deleteID)
     {
-        // TODO - block out the deleting of main camera - crashes the game
-
-        // Record Undo Entries - Undo Delete
-        if (factory.GetGameObject(deleteID)->GetName() == "MainCamera")
-            return;
-
-        LevelEditor* editor = CORE->GetLevelEditor();
         GameObject* gameObj = factory.GetGameObject(deleteID);
 
-        if (gameObj)
-        {       
-            EditorUndoCommand undocmd;
-            undocmd.action = EditorUndoCommand::ActionType::ObjectDeleted;
-            undocmd.entityID = deleteID;
-            //cmd.beforeState = editor->SerialiseGameObject(obj);
-            undocmd.beforeJson = Serialization::SerializeGameObject(gameObj);
+        // TODO - block out the deleting of main camera - crashes the game
+        if (!gameObj) return;
+        if (factory.GetGameObject(deleteID)->GetName() == "MainCamera") return;
+        else 
+        {            
+            if (gameObj) {
+                UndoTracker::RecordDeletion(gameObj, CORE->GetLevelEditor(), factory);
 
-            // Store Parent
-            GameObject* parent = gameObj->GetParent();
-            undocmd.parentID = parent ? parent->GetID() : 0;
+                factory.DestroyAllRelatedGameObjects(deleteID);
 
-            if (parent) // Get child order
-            {
-                for (GameObject* c : parent->GetAllChildren())
-                    undocmd.siblingOrderIDs.push_back(c->GetID()); // Order of children
-            }
-            else { // Get root order
-                auto& allObjs = GameObjectFactory::Instance().GetAllGameObjects();
-                for (auto& u : allObjs) {
-                    undocmd.rootOrderIDs.push_back(u->GetID()); // Order of root objects
-                }
-            }
-
-            // Store Children
-            for (GameObject* c : gameObj->GetAllChildren())
-                undocmd.childIDs.push_back(c->GetID());
-
-            editor->RecordUndo(undocmd);
-
-            factory.DestroyAllRelatedGameObjects(deleteID);  // handles cases for both individual GOs and parented GOs
-
-            // Clear selection if it was selected
-            if (selectedGameObjectID == deleteID)
-                ResetSelectedGameObject();
+                if (selectedGameObjectID == deleteID)  ResetSelectedGameObject();
+            }                 
         }
     }
 
@@ -1487,6 +1631,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
             return;
         }
 
+        // Setup Viewport Data
         ImVec2 vpSize{ ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y };
         ImVec2 vpPos{ ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x, ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y };
 
@@ -1499,6 +1644,11 @@ void ImGuiSystem::Viewport_ManageGizmos()
 
         //mat4 projection = camComp->GetProjectionMatrix(ImGui::GetWindowWidth(), ImGui::GetWindowHeight());                                // replaced with getVp() bc this doesnt scale with cam zoom etc
         mat4 mtx = transform->GetMatrix();
+
+        // Record Undo/Redo Entries
+        UndoTracker gizmoTracker(go, CORE->GetLevelEditor(), isEditingProperty, propertyBeforeJson, ImGuizmo::IsUsing());
+
+        // Manipulate
         ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION(gizmo_type), ImGuizmo::WORLD, value_ptr(mtx));
 
         if (gizmo_type == (int)(ImGuizmo::OPERATION::BOUNDS))
@@ -1506,33 +1656,6 @@ void ImGuiSystem::Viewport_ManageGizmos()
             float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
             float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
             ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
-        }
-
-        // Record Undo Entries - Undo Transform on Gizmo
-        static bool gizmoEditing = false;
-        static json gizmoBeforeJson;
-
-        if (ImGuizmo::IsUsing() && !gizmoEditing)
-        {
-            // User STARTED dragging gizmo, record BEFORE state
-            gizmoEditing = true;
-            gizmoBeforeJson = Serialization::SerializeGameObject(go)["TransformComponent"];
-        }
-
-        if (!ImGuizmo::IsUsing() && gizmoEditing)
-        {
-            // User STOPPED dragging, record AFTER & push undo
-            gizmoEditing = false;
-
-            LevelEditor* editor = CORE->GetLevelEditor();
-
-            EditorUndoCommand cmd;
-            cmd.action = EditorUndoCommand::ActionType::ObjectTransform;
-            cmd.entityID = go->GetID();
-            cmd.beforeJson = gizmoBeforeJson;
-            cmd.afterJson = Serialization::SerializeGameObject(go)["TransformComponent"];
-
-            editor->RecordUndo(cmd);
         }
 
         if (ImGuizmo::IsUsing())
@@ -2149,12 +2272,17 @@ void ImGuiSystem::RenderPropertyEditor()
     }
 
     GameObject* obj = GetSelectedGameObject();
+
     if (!obj)
     {
         // if selected go is nullptr
         ImGui::End();
         return;
     }
+
+    static bool isEditingProperty = false;
+    static json propertyBeforeJson;
+    LevelEditor* editor = CORE->GetLevelEditor();
 
     ImGui::Text("GameObject: %s", obj->GetName().c_str());
     ImGui::Text("ID: %u", obj->GetID());
@@ -2167,6 +2295,8 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         obj->SetActive(isActive);
     }
+    
+    UndoTracker activeTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
     ImGui::Spacing();
     // this is done, just need to attach to a component? so it'll belong to a specific component where users can drag and drop stuff
@@ -2183,41 +2313,10 @@ void ImGuiSystem::RenderPropertyEditor()
                     transform->SetEnabled(isTransformEnabled);
                 }
 
-                // Record Undo Entries - Undo Transform
-                LevelEditor* editor = CORE->GetLevelEditor();
-
-                static bool editingTransform = false;
-                static json beforeJson;   // JSON before edit
-
-                // Helper lambdas (when on drag)
-                auto BeginEdit = [&](void)
-                    {
-                        if (!editingTransform && ImGui::IsItemActivated())
-                        {
-                            editingTransform = true;
-                            beforeJson = Serialization::SerializeGameObject(obj)["TransformComponent"];
-                        }
-                    };
-
-                auto EndEdit = [&](void)
-                    {
-                        if (editingTransform && ImGui::IsItemDeactivatedAfterEdit())
-                        {
-                            editingTransform = false;
-
-                            EditorUndoCommand cmd;
-                            cmd.action = EditorUndoCommand::ActionType::ObjectTransform;
-                            cmd.entityID = obj->GetID();
-                            cmd.beforeJson = beforeJson;
-                            cmd.afterJson = Serialization::SerializeGameObject(obj)["TransformComponent"];
-
-                            editor->RecordUndo(cmd);
-                        }
-                    };
-
+                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                
                 // sliders for position, scale, rotation etc
 
-                
                 bool isGizmoLocked = lockedGizmosGOs.contains(obj->GetID());
                 if (ImGui::Checkbox("Lock Gizmos ##Transform", &isGizmoLocked))
                 {
@@ -2228,6 +2327,8 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 ImGuizmo::Enable(!isGizmoLocked);
 
+                //UndoTracker lockTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
                 float pos[2] = { 0.0f, 0.0f };
                 transform->GetPosition(pos[0], pos[1]);
                 if (ImGui::DragFloat2("Position", pos, 0.5f))
@@ -2235,8 +2336,8 @@ void ImGuiSystem::RenderPropertyEditor()
                     transform->SetPosition(pos[0], pos[1]);
 
                 }
-                BeginEdit();
-                EndEdit();
+                
+                UndoTracker posTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 float scale[2] = { 1.0f, 1.0f };
                 transform->GetScale(scale[0], scale[1]);
@@ -2250,8 +2351,8 @@ void ImGuiSystem::RenderPropertyEditor()
                         collider->SetSize(scale[0], scale[1]);
                     }
                 }
-                BeginEdit();
-                EndEdit();
+
+                UndoTracker scaleTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 float rotation = transform->GetRotation();
                 if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
@@ -2263,8 +2364,8 @@ void ImGuiSystem::RenderPropertyEditor()
                     transform->SetRotation(rotation);
 
                 }
-                BeginEdit();
-                EndEdit();
+
+                UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 if (ImGui::Button("Press Here to add DND Slot"))
                 {
@@ -2276,6 +2377,7 @@ void ImGuiSystem::RenderPropertyEditor()
                     for (auto& slot : transform->GetPropertySlots())
                     {
                         slot.RenderImGui();
+                        //UndoTracker slotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                     }
                 }
         }
@@ -2296,7 +2398,11 @@ void ImGuiSystem::RenderPropertyEditor()
             ImGui::PopStyleColor(3);
             if (renderRemove)
             {
+                propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                 obj->RemoveComponent("RenderComponent");
+
+                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             }
             else
             {
@@ -2305,6 +2411,8 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     render->SetEnabled(isRenderEnabled);
                 }
+
+                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
                 static bool showTextureDND = false;
@@ -2319,6 +2427,8 @@ void ImGuiSystem::RenderPropertyEditor()
                         render->SetColor(vec4(colorArray[0], colorArray[1], colorArray[2], colorArray[3]));
                     }
 
+                    UndoTracker colorTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
                     if (showTextureDND)
                     {
                         std::string draggedSprite{};
@@ -2331,6 +2441,8 @@ void ImGuiSystem::RenderPropertyEditor()
                         ReceiveDragAndDrop(SpritePayloadID, draggedSprite);
                         if (!draggedSprite.empty())
                         {
+                            propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                             std::cout << draggedSprite << std::endl;
                             render->SetTexturePath(draggedSprite);
                             GLuint newTexID = CORE->GetGraphicsSystem()->LoadTexture(draggedSprite.c_str());
@@ -2340,6 +2452,8 @@ void ImGuiSystem::RenderPropertyEditor()
                                 render->SetTextureID(newTexID);
                                 strcpy(draggedSprite_str, "<Drag Image Here>");                   // reset
                                 std::cout << "[Properties] New Texture loaded successfully!" << std::endl;
+
+                                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                             }
                             else
                             {
@@ -2361,8 +2475,12 @@ void ImGuiSystem::RenderPropertyEditor()
                     showTextureDND = false;
                     if (ImGui::Button("Remove Existing Texture"))
                     {
+                        propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                         render->SetTextureID(GLuint{});
                         render->SetColor({ 1,0,1,1 });                    // set to pink to make it obvious if texture missing
+
+                        UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                     }
                 }
                 int goRenderLayer{ render->GetLayer() };
@@ -2372,6 +2490,7 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     render->SetLayer(goRenderLayer);
                 }
+                UndoTracker layerTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Ascending order for topmost rendering position");
 
                 // Layer Category dropdown
@@ -2383,6 +2502,7 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     render->SetRenderLayerInt(currentLayerCategory);
                 }
+                //UndoTracker categoryTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Category for group visibility toggling");
             }
         }
@@ -2404,7 +2524,11 @@ void ImGuiSystem::RenderPropertyEditor()
 
             if (physicsRemove)
             {
+                propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                 obj->RemoveComponent("PhysicsComponent");
+
+                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             }
             else
             {
@@ -2415,6 +2539,8 @@ void ImGuiSystem::RenderPropertyEditor()
                     physics->SetEnabled(isPhysEnabled);
                 }
 
+                UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
                 float vel[2] = { 0.0f, 0.0f };
                 physics->GetVelocity(vel[0], vel[1]);
                 if (ImGui::DragFloat2("Velocity", vel, 0.1f))
@@ -2422,17 +2548,23 @@ void ImGuiSystem::RenderPropertyEditor()
                     physics->SetVelocity(vel[0], vel[1]);
                 }
 
+                UndoTracker velTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
                 bool isStatic = physics->IsStatic();
                 if (ImGui::Checkbox("Static", &isStatic))
                 {
                     physics->SetStatic(isStatic);
                 }
 
+                UndoTracker staticTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
                 bool hasGravity = physics->useGravity;
                 if (ImGui::Checkbox("Gravity", &hasGravity))
                 {
                     physics->SetGravity(hasGravity);
                 }
+
+                UndoTracker gravTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 ImGui::Text("Mass: %.2f", physics->GetMass());
                 ImGui::Text("Grounded: %s", physics->IsGrounded() ? "Yes" : "No");
@@ -2456,7 +2588,11 @@ void ImGuiSystem::RenderPropertyEditor()
 
             if (colliderRemove)
             {
+                propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                 obj->RemoveComponent("ColliderComponent");
+
+                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             }
             else
             {
@@ -2465,6 +2601,8 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     collider->SetEnabled(isColEnabled);
                 }
+
+                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 const char* colliderTypes[] = { "Square", "Circle" };
                 int currentType = (collider->GetType() == ColliderComponent::Type::Circle) ? 1 : 0;
@@ -2476,8 +2614,10 @@ void ImGuiSystem::RenderPropertyEditor()
                         : ColliderComponent::Type::Square;
                     collider->setColliShape(newType);
                     std::cout << "[Property Editor] Changed collider type to "
-                        << colliderTypes[currentType] << std::endl;
+                        << colliderTypes[currentType] << std::endl;                    
                 }
+
+                //UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
 
                 // Display dimensions
                 if (collider->GetType() == ColliderComponent::Type::Circle)
@@ -2508,6 +2648,7 @@ void ImGuiSystem::RenderPropertyEditor()
                         std::cout << "[Property Editor] Changed collider size to "
                             << newSize[0] << "x" << newSize[1] << std::endl;
                     }
+                    //UndoTracker sizeTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 }
                 else if (collider->GetType() == ColliderComponent::Type::Circle)
                 {
@@ -2520,6 +2661,7 @@ void ImGuiSystem::RenderPropertyEditor()
                         std::cout << "[Property Editor] Changed circle radius to "
                             << radius << std::endl;
                     }
+                   //UndoTracker radiusTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 }
 
 
@@ -2532,6 +2674,7 @@ void ImGuiSystem::RenderPropertyEditor()
                     collider->SetLayer(static_cast<CollisionLayer>(currentLayer));
                     std::cout << "[Property Editor] Changed collision layer to "
                         << layerNames[currentLayer] << std::endl;
+                    //UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
             }
         }
@@ -2543,137 +2686,151 @@ void ImGuiSystem::RenderPropertyEditor()
         RenderEventComponent(events, obj);
     }
 
-// Script component
-if (auto* script = obj->GetComponent<ScriptComponent>())
-{
-    if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen))
+    // Script component
+    if (auto* script = obj->GetComponent<ScriptComponent>())
     {
-        // Remove button aligned right
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
-        float buttonWidth = 100.0f;
-        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
-        bool scriptRemove = ImGui::Button("Remove##Script", ImVec2(buttonWidth, 22));
-        ImGui::PopStyleColor(3);
-        if (scriptRemove)
+        if (ImGui::CollapsingHeader("Script", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            // Remove all attached scripts from ScriptSystem before removing the component
-            auto* scriptSystem = CORE->GetScriptSystem();
-            if (scriptSystem)
+            // Remove button aligned right
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+            float buttonWidth = 100.0f;
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
+            bool scriptRemove = ImGui::Button("Remove##Script", ImVec2(buttonWidth, 22));
+            ImGui::PopStyleColor(3);
+            if (scriptRemove)
             {
-                const auto& activeScripts = script->GetScripts();
-                for (const auto& [id, scriptName] : activeScripts)
-                {
-                    scriptSystem->RemoveScript(obj, scriptName);
-                }
-            }
-            obj->RemoveComponent("ScriptComponent");
-        }
-        else
-        {
-            bool isScriptEnabled = script->IsEnabled();
-            if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
-            {
-                script->SetEnabled(isScriptEnabled);
-            }
-            if (ImGui::Button("Add Script Slot"))
-            {
-                script->AddDragDropSlot("Drag Script Here", ScriptPayloadID);
-            }
+                propertyBeforeJson = Serialization::SerializeGameObject(obj);
 
-            if (script->GetPropertySlots().size())
-            {
-                for (auto& slot : script->GetPropertySlots())
+                // Remove all attached scripts from ScriptSystem before removing the component
+                auto* scriptSystem = CORE->GetScriptSystem();
+                if (scriptSystem)
                 {
-                    slot.RenderImGui();
-                }
-            }
-
-            ImGui::Text("Attached Scripts:");
-
-            auto* scriptSystem = CORE->GetScriptSystem();
-            if (scriptSystem)
-            {
-                auto* instances = scriptSystem->GetScriptInstances(obj);
-                if (instances)
-                {
-                    std::string scriptToRemove;
-                    for (auto& instance : *instances)
+                    const auto& activeScripts = script->GetScripts();
+                    for (const auto& [id, scriptName] : activeScripts)
                     {
-                        const char* className = mono_class_get_name(instance.scriptClass->monoClass);
-                        ImGui::PushID(className);
-
-                        // Red X button to detach this script
-                        ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
-                        if (ImGui::Button("X", ImVec2(20, 0)))
-                        {
-                            scriptToRemove = className;
-                        }
-                        ImGui::PopStyleColor(3);
-
-                        ImGui::SameLine();
-
-                        if (ImGui::TreeNode(className))
-                        {
-                            auto fields = scriptSystem->GetPublicFields(instance);
-                            for (auto& field : fields)
-                            {
-                                if (field.type == ScriptFieldType::Float)
-                                {
-                                    float val = std::get<float>(field.value);
-                                    if (ImGui::DragFloat(field.name.c_str(), &val, 0.1f))
-                                    {
-                                        scriptSystem->SetPublicField(instance, field.name, val);
-                                    }
-                                }
-                                else if (field.type == ScriptFieldType::Int)
-                                {
-                                    int val = std::get<int>(field.value);
-                                    if (ImGui::DragInt(field.name.c_str(), &val))
-                                    {
-                                        scriptSystem->SetPublicField(instance, field.name, val);
-                                    }
-                                }
-                                else if (field.type == ScriptFieldType::Bool)
-                                {
-                                    bool val = std::get<bool>(field.value);
-                                    if (ImGui::Checkbox(field.name.c_str(), &val))
-                                    {
-                                        scriptSystem->SetPublicField(instance, field.name, val);
-                                    }
-                                }
-                                else if (field.type == ScriptFieldType::String)
-                                {
-                                    std::string val = std::get<std::string>(field.value);
-                                    char buffer[256];
-                                    strncpy(buffer, val.c_str(), sizeof(buffer));
-                                    buffer[sizeof(buffer) - 1] = 0;
-                                    if (ImGui::InputText(field.name.c_str(), buffer, sizeof(buffer)))
-                                    {
-                                        scriptSystem->SetPublicField(instance, field.name, std::string(buffer));
-                                    }
-                                }
-                            }
-                            ImGui::TreePop();
-                        }
-
-                        ImGui::PopID();
+                        scriptSystem->RemoveScript(obj, scriptName);
                     }
+                }
+                obj->RemoveComponent("ScriptComponent");
 
-                    // Remove after iteration to avoid invalidating the instances vector
-                    if (!scriptToRemove.empty())
+                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+            }
+            else
+            {
+                bool isScriptEnabled = script->IsEnabled();
+                if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
+                {
+                    script->SetEnabled(isScriptEnabled);
+                }
+
+                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
+                if (ImGui::Button("Add Script Slot"))
+                {
+                    script->AddDragDropSlot("Drag Script Here", ScriptPayloadID);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
+
+                if (script->GetPropertySlots().size())
+                {
+                    for (auto& slot : script->GetPropertySlots())
                     {
-                        scriptSystem->RemoveScript(obj, scriptToRemove);
-                        script->RemoveScript(scriptToRemove);
+                        slot.RenderImGui();
+                    }
+                }
+
+                ImGui::Text("Attached Scripts:");
+
+                auto* scriptSystem = CORE->GetScriptSystem();
+                if (scriptSystem)
+                {
+                    auto* instances = scriptSystem->GetScriptInstances(obj);
+                    if (instances)
+                    {
+                        std::string scriptToRemove;
+                        for (auto& instance : *instances)
+                        {
+                            const char* className = mono_class_get_name(instance.scriptClass->monoClass);
+                            ImGui::PushID(className);
+
+                            // Red X button to detach this script
+                            ImGui::PushStyleColor(ImGuiCol_Button,        ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+                            if (ImGui::Button("X", ImVec2(20, 0)))
+                            {
+                                propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                                scriptToRemove = className;
+                            }
+                            ImGui::PopStyleColor(3);
+
+                            ImGui::SameLine();
+
+                            if (ImGui::TreeNode(className))
+                            {
+                                auto fields = scriptSystem->GetPublicFields(instance);
+                                for (auto& field : fields)
+                                {
+                                    if (field.type == ScriptFieldType::Float)
+                                    {
+                                        float val = std::get<float>(field.value);
+                                        if (ImGui::DragFloat(field.name.c_str(), &val, 0.1f))
+                                        {
+                                            scriptSystem->SetPublicField(instance, field.name, val);
+                                        }
+                                        UndoTracker fieldTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                                    }
+                                    else if (field.type == ScriptFieldType::Int)
+                                    {
+                                        int val = std::get<int>(field.value);
+                                        if (ImGui::DragInt(field.name.c_str(), &val))
+                                        {
+                                            scriptSystem->SetPublicField(instance, field.name, val);
+                                        }
+                                        UndoTracker fieldTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                                    }
+                                    else if (field.type == ScriptFieldType::Bool)
+                                    {
+                                        bool val = std::get<bool>(field.value);
+                                        if (ImGui::Checkbox(field.name.c_str(), &val))
+                                        {
+                                            scriptSystem->SetPublicField(instance, field.name, val);
+                                        }
+                                        UndoTracker fieldTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                                    }
+                                    else if (field.type == ScriptFieldType::String)
+                                    {
+                                        std::string val = std::get<std::string>(field.value);
+                                        char buffer[256];
+                                        strncpy(buffer, val.c_str(), sizeof(buffer));
+                                        buffer[sizeof(buffer) - 1] = 0;
+                                        if (ImGui::InputText(field.name.c_str(), buffer, sizeof(buffer)))
+                                        {
+                                            scriptSystem->SetPublicField(instance, field.name, std::string(buffer));
+                                        }
+                                        UndoTracker fieldTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                                    }
+                                }
+                                ImGui::TreePop();
+                            }
+
+                            ImGui::PopID();
+                        }
+
+                        // Remove after iteration to avoid invalidating the instances vector
+                        if (!scriptToRemove.empty())
+                        {
+                            scriptSystem->RemoveScript(obj, scriptToRemove);
+                            script->RemoveScript(scriptToRemove);
+                            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                        }
                     }
                 }
             }
         }
     }
-}
 
     // Add Component Button
     ImVec2 space = ImGui::GetContentRegionAvail();
@@ -2723,6 +2880,10 @@ if (auto* script = obj->GetComponent<ScriptComponent>())
 void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
     if (ImGui::CollapsingHeader("Event", ImGuiTreeNodeFlags_DefaultOpen)) {
 
+        LevelEditor* editor = CORE->GetLevelEditor();
+        static bool isEditingProperty = false;
+        static json propertyBeforeJson;
+
         // Data for Selection
         static const char* eventNames[] = { "None", "OnEnable", "OnDisable", "OnDestroy", "OnCollisionEnter", "OnCollisionStay", "OnCollisionExit" };
         static const char* addableActions[] = { "Play Sound", "Destroy", "Enable", "Disable", "Respawn" };
@@ -2754,6 +2915,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 int evIndex = (int)chain.triggerType;
                 if (ImGui::Combo("Event Type", &evIndex, eventNames, IM_ARRAYSIZE(eventNames))) {
                     chain.triggerType = (EventType)evIndex;
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
 
                 // ===== Target Filter (Trigger By) =====
@@ -2771,6 +2933,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
 
                 if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
                     chain.targetFilterID = objectIds[currentIndex];
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
 
                 // ===== Action List =====
@@ -2822,6 +2985,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                                     bool isSelected = (soundAction->soundName == soundName);
                                     if (ImGui::Selectable(soundName.c_str(), isSelected)) {
                                         soundAction->soundName = soundName;
+                                        UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                                     }
                                     if (isSelected) ImGui::SetItemDefaultFocus();
                                 }
@@ -2850,13 +3014,18 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
 
                     ImGui::SameLine();
                     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
-                    if (ImGui::SmallButton("Remove")) actionToDelete = (int)j;
+                    if (ImGui::SmallButton("Remove")) 
+                    { 
+                        propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                        actionToDelete = (int)j; 
+                    }
                     ImGui::PopStyleColor();
                     ImGui::PopID();
                 }
 
                 if (actionToDelete != -1) {
                     chain.actions.erase(chain.actions.begin() + actionToDelete);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
 
                 // ===== Add Action =====
@@ -2871,11 +3040,16 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                     if (newActionIdx == 2) chain.actions.push_back(std::make_unique<ActionToggleActive>(true));
                     if (newActionIdx == 3) chain.actions.push_back(std::make_unique<ActionToggleActive>(false));
                     if (newActionIdx == 4) chain.actions.push_back(std::make_unique<ActionRespawn>());
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
                 ImGui::PopStyleColor();
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // Red
-                if (ImGui::Button("Delete Entire Chain")) chainToDelete = (int)i;
+                if (ImGui::Button("Delete Entire Chain")) 
+                { 
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                    chainToDelete = (int)i; 
+                }
                 ImGui::PopStyleColor();
 
                 ImGui::NewLine();
@@ -2886,12 +3060,14 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
 
         if (chainToDelete != -1) {
             ec->chains.erase(ec->chains.begin() + chainToDelete);
+            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
 
         ImGui::Separator();
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); //Green
         if (ImGui::Button("Add New Event")) {
             ec->chains.push_back(LogicChain());
+            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
         ImGui::PopStyleColor();
 

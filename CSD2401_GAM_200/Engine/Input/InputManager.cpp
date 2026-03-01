@@ -204,7 +204,7 @@ void InputManager::Update(float)
         playModeConfirmed = true;
     }
 
-    // ------------------- UNDO: Ctrl + Z -------------------//
+    // ------------------- UNDO & REDO: Ctrl+Z / Ctrl+Y -------------------//
     {
         LevelEditor* editor = CORE ? CORE->GetLevelEditor() : nullptr;
         if (editor)
@@ -212,21 +212,41 @@ void InputManager::Update(float)
             bool ctrl = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
                 glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS;
 
+            bool shift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
+                glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
+
             bool zPressed = glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS;
+            bool yPressed = glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS;
 
-            static bool undoConsumed = false;
+            static bool undoRedoConsumed = false;
 
-            if (ctrl && zPressed)
+            if (ctrl && (zPressed || yPressed))
             {
-                if (!undoConsumed && !editor->undoStack.empty())
+                if (!undoRedoConsumed)
                 {
-                    editor->PerformUndo();
-                    undoConsumed = true;       // Prevents rapid repeat
+                    // REDO: Ctrl + Y  OR  Ctrl + Shift + Z
+                    if (yPressed || (zPressed && shift))
+                    {
+                        if (!editor->redoStack.empty())
+                        {
+                            editor->PerformRedo();
+                            undoRedoConsumed = true;
+                        }
+                    }
+                    // UNDO: Ctrl + Z (without shift)
+                    else if (zPressed && !shift)
+                    {
+                        if (!editor->undoStack.empty())
+                        {
+                            editor->PerformUndo();
+                            undoRedoConsumed = true;
+                        }
+                    }
                 }
             }
             else
             {
-                undoConsumed = false;          // Reset when keys released
+                undoRedoConsumed = false; // Reset when keys are released
             }
         }
     }

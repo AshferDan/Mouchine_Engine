@@ -24,6 +24,7 @@ namespace fs = std::filesystem;
 
 static const std::string PREFAB_DIR = PrefabFilePath;
 static GameObject* s_CapturedRoot = nullptr;
+bool Serialization::s_IsUndoRedoMode = false;
 
 // Global temporary loading maps (cleared after load)
 std::unordered_map<EntityID, GameObject*> Serialization::idToObject{};
@@ -96,42 +97,70 @@ json Serialization::SerializeGameObject(GameObject *go)
  *
  * @param j JSON object describing the GameObject.
  */
-void Serialization::DeserializeGameObject(const json& j)
-{
-	std::string name = j.value("name", "Unnamed");
+void Serialization::DeserializeGameObject(const json& j) {
+	if (j.is_null() || j.empty()) return;
 
-	EntityID oldID = j.value("localID", -1);
-	EntityID oldParentID = j.value("parentID", -1);
-
-	// Check if ID already exists
+	// Use long long to handle -1 safely before casting to EntityID
+	long long rawID = j.value("localID", -1LL);
+	EntityID jsonID = static_cast<EntityID>(rawID);
 	GameObjectFactory& factory = GameObjectFactory::Instance();
-	//bool idExists = (oldID != -1 && factory.GetGameObject(oldID) != nullptr);
 
-	EntityID newID = oldID;
-	// Get smallest available ID map to GameObjects 
-	newID = factory.GetSmallestAvailableID();   // assign new unique ID
-	g_OldToNewID[oldID] = newID;         // store mapping
+	GameObject* go = nullptr;
 
-	// Create GameObject
-	GameObject* go = factory.CreateGameObjectWithID(newID, name);
-	idToObject[newID] = go;
+	// If we are in UNDO mode, try to find the existing object to update it.
+	if (s_IsUndoRedoMode && rawID != -1) {
+		go = factory.GetGameObject(jsonID);
+	}
 
-	// Return GameObject for LoadPrefabWithReturn
-	if (s_CapturedRoot == nullptr)
-		s_CapturedRoot = go;
+	if (go) {
+		// UNDO/REDO (Existing object found)
+		go->SetName(j.value("name", "Unnamed"));
+		go->SetActive(j.value("active", true));
 
+		std::vector<std::string> currentComponents = go->GetAllComponentName();
 
-	go->SetActive(j.value("active", true));
+		// Remove components that are NOT in the incoming JSON
+		for (const std::string& compName : currentComponents) {
+			// If the JSON doesn't contain this component key, it means it was deleted in this state
+			if (!j.contains(compName)) {
+				go->RemoveComponent(compName);				
+			}
+		}
 
-	// Store parent-child link using ORIGINAL old parent ID
-	pendingHierarchy.push_back({ oldID, oldParentID });
+		ComponentSerialization::DeserializeAllComponents(go, j);
+		idToObject[jsonID] = go;
+	}
+	else {
+		// SPAWNING (Prefab Drop / Scene Load)
+		EntityID targetID;
 
-	// Deserialize components
-	ComponentSerialization::DeserializeAllComponents(go, j);
+		// If we aren't in undo mode, OR the ID is already taken by something else,
+		// we MUST generate a brand new unique ID.
+		if (!s_IsUndoRedoMode || factory.IsIDTaken(jsonID) || rawID == -1) {
+			targetID = factory.GetSmallestAvailableID();
+		}
+		else {
+			targetID = jsonID;
+		}
 
-	// Load children recursively
-	if (j.contains("children"))
-	{
+		// Create the NEW object
+		go = factory.CreateGameObjectWithID(targetID, j.value("name", "Unnamed"));
+
+		// Map the IDs so hierarchy/references work
+		idToObject[targetID] = go;
+		if (rawID != -1) {
+			g_OldToNewID[jsonID] = targetID;
+		}
+
+		go->SetActive(j.value("active", true));
+		ComponentSerialization::DeserializeAllComponents(go, j);
+	}
+
+	// --- RECURSIVE HIERARCHY ---
+	if (s_CapturedRoot == nullptr) s_CapturedRoot = go;
+	pendingHierarchy.push_back({ jsonID, j.value("parentID", (EntityID)-1) });
+
+	if (j.contains("children") && j["children"].is_array()) {
 		for (const auto& childJSON : j["children"])
 			DeserializeGameObject(childJSON);
 	}
@@ -144,18 +173,35 @@ void Serialization::ResolveHierarchy()
 		EntityID oldChildID = info.localID;
 		EntityID oldParentID = info.parentID;
 
-		EntityID newChildID = g_OldToNewID[oldChildID];
-		EntityID newParentID = (oldParentID == -1 ? -1 : g_OldToNewID[oldParentID]);
+		// 1. Find the Child: 
+		// If it was remapped, use the new ID. Otherwise, use the original ID.
+		EntityID actualChildID = (g_OldToNewID.count(oldChildID) > 0) ? g_OldToNewID[oldChildID] : oldChildID;
 
-		GameObject* child = idToObject[newChildID];
-
-		if (newParentID != -1)
-		{
-			GameObject* parent = idToObject[newParentID];
-			if (child && parent) {
-				parent->AddChild(child);
-			}
+		// 2. Find the Parent:
+		EntityID actualParentID = -1;
+		if (oldParentID != -1) {
+			actualParentID = (g_OldToNewID.count(oldParentID) > 0) ? g_OldToNewID[oldParentID] : oldParentID;
 		}
+
+		// 3. Get the Pointers
+		// During Undo, idToObject might be empty for existing objects, we fall back to the Factory.
+		GameObject* child = (idToObject.count(actualChildID) > 0) ? idToObject[actualChildID] : GameObjectFactory::Instance().GetGameObject(actualChildID);
+
+		if (!child) continue;
+
+		if (actualParentID == -1)
+		{
+			if (GameObject* p = child->GetParent())
+				p->RemoveChild(child);
+			continue;
+		}
+
+		GameObject* parent = (idToObject.count(actualParentID) > 0) ? idToObject[actualParentID] : GameObjectFactory::Instance().GetGameObject(actualParentID);
+
+		if (!parent) continue;
+
+		if (child->GetParent() != parent)
+			child->SetParent(parent);
 	}
 
 	// Resolve camera follow targets deferred from DeserializeCamera.
@@ -173,11 +219,12 @@ void Serialization::ResolveHierarchy()
 		}
 	}
 
+	// Reset the mode and clear maps
+	s_IsUndoRedoMode = false;
 	idToObject.clear();
 	pendingHierarchy.clear();
 	g_OldToNewID.clear();
 }
-
 
 /**
  * @brief Saves a single GameObject as a prefab JSON file.

@@ -332,6 +332,13 @@ public:
      */
     bool IsAlive(GameObject* ptr) const;
 
+    /**
+     * @brief Check if gameObject Id exist
+     */
+    bool IsIDTaken(EntityID id) const {
+        // If the ID is in the map, it's currently in use
+        return entityToIndex.find(id) != entityToIndex.end();
+    }
 private:
     GameObjectFactory() : nextEntityID(1), cloneCounter(0) { gameObjects.reserve(1000); }           // HAVE TO PUT THIS HERE IF NOT CRASHES WHEN WE WANT TO CLONE LOL
     EntityID nextEntityID;

@@ -52,6 +52,8 @@ namespace Serialization
     std::vector<std::string> GetAllPrefabs();
     std::string GetFullPath(const std::string& filename);
 
+    extern bool s_IsUndoRedoMode;
+
     /**
      * @brief Serializes a GameObject and all its components into JSON format.
      * @param go Pointer to GameObject.
