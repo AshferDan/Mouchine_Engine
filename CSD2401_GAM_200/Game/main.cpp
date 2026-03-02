@@ -36,6 +36,7 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
+
 /**
  * @brief Main entry point of the program.
  *
@@ -89,6 +90,7 @@ int main()
         {
             ColliderComponent* colComp = Hero->AddComponent<ColliderComponent>();
             PhysicsComponent* phyComp = Hero->AddComponent<PhysicsComponent>();
+            TransformComponent* TransComp = Hero->GetComponent<TransformComponent>();
 
             if (colComp && phyComp)
             {
@@ -105,7 +107,34 @@ int main()
 
                 std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
             }
+            // --- Ghost Player Setup ---
+            // Load the best recording saved from any previous run (no-op if no file exists yet)
+            CORE->GetGhostSystem()->LoadRecording("DebugLevel");
+
+            // Start recording the current run using the Hero object
+            CORE->GetGhostSystem()->StartRecording("Hero");
+
+            // If a previous ghost recording was loaded, clone Hero as the ghost object.
+            // The clone inherits Hero's Spritesheet and RenderComponent automatically —
+            // no manual animation setup needed. Physics and collision are stripped so
+            // the ghost is purely visual and passes through walls.
+            if (CORE->GetGhostSystem()->IsGhostAvailable())
+            {
+                GameObject* GhostHero = GameObjectFactory::Instance().CloneGameObject(
+                    Hero->GetID(), "GhostHero");
+
+                if (GhostHero)
+                {
+                    GhostHero->RemoveComponent<ColliderComponent>();
+                    GhostHero->RemoveComponent<PhysicsComponent>();
+                    GhostHero->RemoveComponent<ScriptComponent>();
+                    CORE->GetGhostSystem()->StartPlayback("GhostHero");
+                }
+            }
         }
+
+        // Stop recording + save best run when Hero crosses x = 3000
+        CORE->GetGhostSystem()->SetFinishTrigger("Hero", 3000.f, "DebugLevel");
 
         GameObject* Platform = GameObjectFactory::Instance().CreateShape(
             "Platform",                  // <--- NAME MUST MATCH C#

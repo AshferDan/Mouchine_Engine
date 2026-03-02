@@ -51,6 +51,7 @@ Technology is prohibited.
 
 #include "TimerSystem.h"
 #include "GameTimerSystem.h"
+#include "GhostSystem.h"
 
 // Inside CoreEngine class
 
@@ -278,6 +279,12 @@ public:
     TimerSystem *GetTimerSystem() const { return timerSystem; }
 
     /**
+     * @brief Gets a pointer to the GhostSystem.
+     * @return A pointer to the GhostSystem.
+     */
+    GhostSystem *GetGhostSystem() const { return ghostSystem; }
+
+    /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
      */
@@ -376,6 +383,7 @@ private:
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
     GameTimerSystem * gameTimerSystem = nullptr;
+    GhostSystem *ghostSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;

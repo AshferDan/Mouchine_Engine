@@ -595,4 +595,42 @@ namespace API {
     void Particles_ConfigureDeathExplosion(const std::string& objectName);
 #pragma endregion
 
+#pragma region Ghost
+    namespace Ghost
+    {
+        /** @brief Begin recording the named target's position and animation each fixed tick. */
+        void StartRecording(const std::string& targetName);
+
+        /** @brief Stop recording. Recording stays in memory until SaveBestRun or StartRecording. */
+        void StopRecording();
+
+        /**
+         * @brief If finishTime beats the current best, save as new best and write to disk.
+         * @param levelName  Used to derive the save file (e.g. "M4_LEVEL").
+         * @param finishTime Player's completion time in seconds.
+         * @return True if this is the new best run.
+         */
+        bool SaveBestRun(const std::string& levelName, float finishTime);
+
+        /** @brief Drive the named ghost GameObject from the best recording. */
+        void StartPlayback(const std::string& ghostObjectName);
+
+        /** @brief Stop driving the ghost object. */
+        void StopPlayback();
+
+        /**
+         * @brief Load the best recording from disk. Call before StartPlayback on a new session.
+         * @param levelName Level identifier matching what was used in SaveBestRun.
+         * @return True if a file was found and loaded successfully.
+         */
+        bool LoadRecording(const std::string& levelName);
+
+        /** @return True if a best recording is available to play back. */
+        bool IsGhostAvailable();
+
+        /** @return Best run time in seconds, or FLT_MAX if none recorded. */
+        float GetBestRunTime();
+    }
+#pragma endregion
+
 }

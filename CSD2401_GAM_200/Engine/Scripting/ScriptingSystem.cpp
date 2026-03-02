@@ -1045,6 +1045,57 @@ static void Internal_Particles_ConfigureDeathExplosion(MonoString* objectName)
     mono_free(name);
 }
 
+// === Ghost ===
+static void Internal_Ghost_StartRecording(MonoString* targetName)
+{
+    char* name = mono_string_to_utf8(targetName);
+    API::Ghost::StartRecording(name);
+    mono_free(name);
+}
+
+static void Internal_Ghost_StopRecording()
+{
+    API::Ghost::StopRecording();
+}
+
+static bool Internal_Ghost_SaveBestRun(MonoString* levelName, float finishTime)
+{
+    char* name = mono_string_to_utf8(levelName);
+    bool result = API::Ghost::SaveBestRun(name, finishTime);
+    mono_free(name);
+    return result;
+}
+
+static void Internal_Ghost_StartPlayback(MonoString* ghostObjectName)
+{
+    char* name = mono_string_to_utf8(ghostObjectName);
+    API::Ghost::StartPlayback(name);
+    mono_free(name);
+}
+
+static void Internal_Ghost_StopPlayback()
+{
+    API::Ghost::StopPlayback();
+}
+
+static bool Internal_Ghost_LoadRecording(MonoString* levelName)
+{
+    char* name = mono_string_to_utf8(levelName);
+    bool result = API::Ghost::LoadRecording(name);
+    mono_free(name);
+    return result;
+}
+
+static bool Internal_Ghost_IsGhostAvailable()
+{
+    return API::Ghost::IsGhostAvailable();
+}
+
+static float Internal_Ghost_GetBestRunTime()
+{
+    return API::Ghost::GetBestRunTime();
+}
+
 MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassName, GameObject* owner)
 {
     if (!coreAssembly || !coreImage)
@@ -1385,6 +1436,16 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Particles::ConfigureWallSlideParticles", (void*)Internal_Particles_ConfigureWallSlideParticles);
     mono_add_internal_call("CSharpScript.Particles::ConfigureSpeedLines", (void*)Internal_Particles_ConfigureSpeedLines);
     mono_add_internal_call("CSharpScript.Particles::ConfigureDeathExplosion", (void*)Internal_Particles_ConfigureDeathExplosion);
+
+    // === Ghost ===
+    mono_add_internal_call("CSharpScript.Ghost::StartRecording",    (void*)Internal_Ghost_StartRecording);
+    mono_add_internal_call("CSharpScript.Ghost::StopRecording",     (void*)Internal_Ghost_StopRecording);
+    mono_add_internal_call("CSharpScript.Ghost::SaveBestRun",       (void*)Internal_Ghost_SaveBestRun);
+    mono_add_internal_call("CSharpScript.Ghost::StartPlayback",     (void*)Internal_Ghost_StartPlayback);
+    mono_add_internal_call("CSharpScript.Ghost::StopPlayback",      (void*)Internal_Ghost_StopPlayback);
+    mono_add_internal_call("CSharpScript.Ghost::LoadRecording",     (void*)Internal_Ghost_LoadRecording);
+    mono_add_internal_call("CSharpScript.Ghost::IsGhostAvailable",  (void*)Internal_Ghost_IsGhostAvailable);
+    mono_add_internal_call("CSharpScript.Ghost::GetBestRunTime",    (void*)Internal_Ghost_GetBestRunTime);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)

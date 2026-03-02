@@ -2074,4 +2074,61 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     }
 #pragma endregion
 
+#pragma region Ghost
+    namespace Ghost
+    {
+        void StartRecording(const std::string& targetName)
+        {
+            if (CORE && CORE->GetGhostSystem())
+                CORE->GetGhostSystem()->StartRecording(targetName);
+        }
+
+        void StopRecording()
+        {
+            if (CORE && CORE->GetGhostSystem())
+                CORE->GetGhostSystem()->StopRecording();
+        }
+
+        bool SaveBestRun(const std::string& levelName, float finishTime)
+        {
+            if (CORE && CORE->GetGhostSystem())
+                return CORE->GetGhostSystem()->SaveBestRun(levelName, finishTime);
+            return false;
+        }
+
+        void StartPlayback(const std::string& ghostObjectName)
+        {
+            if (CORE && CORE->GetGhostSystem())
+                CORE->GetGhostSystem()->StartPlayback(ghostObjectName);
+        }
+
+        void StopPlayback()
+        {
+            if (CORE && CORE->GetGhostSystem())
+                CORE->GetGhostSystem()->StopPlayback();
+        }
+
+        bool LoadRecording(const std::string& levelName)
+        {
+            if (CORE && CORE->GetGhostSystem())
+                return CORE->GetGhostSystem()->LoadRecording(levelName);
+            return false;
+        }
+
+        bool IsGhostAvailable()
+        {
+            if (CORE && CORE->GetGhostSystem())
+                return CORE->GetGhostSystem()->IsGhostAvailable();
+            return false;
+        }
+
+        float GetBestRunTime()
+        {
+            if (CORE && CORE->GetGhostSystem())
+                return CORE->GetGhostSystem()->GetBestRunTime();
+            return FLT_MAX;
+        }
+    }
+#pragma endregion
+
 }

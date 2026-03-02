@@ -125,6 +125,7 @@ void CoreEngine::InitSystems()
 
     timerSystem = AddSystem<TimerSystem>();
     gameTimerSystem = AddSystem<GameTimerSystem>();
+    ghostSystem = AddSystem<GhostSystem>();
     //eventSystem = AddSystem<EventSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
@@ -385,6 +386,10 @@ void CoreEngine::GameLoop()
 
                 // Flush any GameObjects destroyed from scripts this frame
                 GameObjectFactory::Instance().FlushPendingDestroys();
+
+                // Ghost system: record player state + drive ghost object (after scripts)
+                if (ghostSystem)
+                    ghostSystem->Update(static_cast<float>(fixed_dt));
 
                 if (menuLogicSystem)
                 {
