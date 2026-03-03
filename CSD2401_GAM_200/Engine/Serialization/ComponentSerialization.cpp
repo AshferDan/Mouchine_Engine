@@ -38,6 +38,7 @@ float DND_rootJsonY = 0.0f;
 void ComponentSerialization::SerializeTransform(json &j, const TransformComponent *t)
 {
     j["TransformComponent"] = {
+        {"enabled", t->IsEnabled()},
         {"pos", {t->posX, t->posY}},
         {"scale", {t->scaleX, t->scaleY}},
         {"rotation", t->GetRotation()}};
@@ -59,10 +60,12 @@ void ComponentSerialization::SerializeRender(json &j, RenderComponent *r)
     }
 
     j["RenderComponent"] = {
+        {"enabled", r->IsEnabled()},
         {"shapeType", r->GetShapeTypeName()},
         {"texturePath", texPath},
         {"color", {r->GetColor().x, r->GetColor().y, r->GetColor().z, r->GetColor().w}},
         {"layer", r->GetLayer()},
+        {"renderLayer", r->GetRenderLayerInt()},
         {"screenSpace", r->isScreenSpace()}};
 }
 
@@ -110,6 +113,7 @@ void ComponentSerialization::SerializeSpritesheet(json &j, Spritesheet *s)
         animArray.push_back(animNode);
     }
     j["Spritesheet"] = {
+        {"enabled", s->IsEnabled()},
         {"defaultAnimation", s->GetCurrentAnimationName()},
         {"animations", animArray}};
 }
@@ -122,6 +126,7 @@ void ComponentSerialization::SerializeSpritesheet(json &j, Spritesheet *s)
 void ComponentSerialization::SerializePhysics(json &j, PhysicsComponent *p)
 {
     j["PhysicsComponent"] = {
+        {"enabled", p->IsEnabled()},
         {"mass", p->GetMass()},
         {"isStatic", p->IsStatic()},
         {"useGravity", p->useGravity},
@@ -139,6 +144,7 @@ void ComponentSerialization::SerializeCollider(json &j, ColliderComponent *c)
     vec2 size = c->GetSize();
 
     j["ColliderComponent"] = {
+        {"enabled", c->IsEnabled()},
         {"shape", EnumConverters::ToString(c->GetType())},
         {"layer", EnumConverters::ToString(c->GetLayer())},
         { "size", { size.x, size.y }} 
@@ -154,6 +160,7 @@ void ComponentSerialization::SerializeCollider(json &j, ColliderComponent *c)
 void ComponentSerialization::SerializeText(json &j, TextComponent *tc)
 {
     j["TextComponent"] = {
+        {"enabled", tc->IsEnabled()},
         {"fontPath", tc->GetFontPath()},
         {"fontSize", tc->GetFontSize()},
         {"text", tc->GetText()},
@@ -182,6 +189,7 @@ void ComponentSerialization::SerializeCamera(json &j, CameraComponent *cam)
     }
 
     j["CameraComponent"] = {
+        {"enabled", cam->IsEnabled()},
         {"mode", modeStr},
         {"zoom", cam->getZoom()},
         {"position", {cam->GetPosition().x, cam->GetPosition().y}},
@@ -261,7 +269,7 @@ void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc, GameO
         }
     }
 
-    j["ScriptComponent"] = { {"scripts", scriptsArray}, {"fields", fieldsObj} };
+    j["ScriptComponent"] = { {"enabled", sc->IsEnabled()}, {"scripts", scriptsArray}, {"fields", fieldsObj} };
 }
 
 // ------------------- Deserialize -------------------
@@ -277,6 +285,9 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
 
     const auto &t = j["TransformComponent"];
     auto *tc = go->AddComponent<TransformComponent>();
+
+    if (tc)
+        tc->SetEnabled(t.value("enabled", true));
 
     float jsonX = t["pos"][0];
     float jsonY = t["pos"][1];
@@ -347,6 +358,9 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
     const auto &r = j["RenderComponent"];
     auto *render = go->AddComponent<RenderComponent>();
 
+    if (render)
+        render->SetEnabled(r.value("enabled", true));
+
     std::string shapeType = r.value("shapeType", "Square");
     render->SetShapeType(RenderComponentTools::ShapeEnumToString(shapeType));
 
@@ -354,6 +368,10 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
     int layer = r.value("layer", 0);
     render->SetLayer(layer);
 
+    int rl = r.value("renderLayer", 0);
+    rl = std::clamp(rl, 0, (int)RenderComponent::RenderLayer::Count - 1);
+    render->SetRenderLayer(static_cast<RenderComponent::RenderLayer>(rl));
+        
     bool screenSpace = r.value("screenSpace", false);
     render->SetScreenSpace(screenSpace);
 
@@ -472,6 +490,9 @@ void ComponentSerialization::DeserializeSpritesheet(const json &j, GameObject *g
         initialRows,
         initialCols);
 
+    if (spr)
+        spr->SetEnabled(s.value("enabled", true));
+
     // 3. Loop through the "animations" array and Register them
     if (s.contains("animations") && s["animations"].is_array())
     {
@@ -516,6 +537,10 @@ void ComponentSerialization::DeserializePhysics(const json &j, GameObject *go)
     const auto &p = j["PhysicsComponent"];
     auto *pc = go->AddComponent<PhysicsComponent>();
 
+
+    if (pc)
+        pc->SetEnabled(p.value("enabled", true));
+
     pc->SetStatic(p.value("isStatic", false));
     pc->SetGravity(p.value("useGravity", true));
     pc->SetMass(p.value("mass", 1.0f));
@@ -536,6 +561,7 @@ void ComponentSerialization::DeserializeCollider(const json &j, GameObject *go)
     if (!j.contains("ColliderComponent"))
         return;
     const auto &c = j["ColliderComponent"];
+    auto* cc = go->AddComponent<ColliderComponent>();
 
     ColliderComponent::Type type = EnumConverters::ToColliderType(c.value("shape", "Square"));
     CollisionLayer layer = EnumConverters::ToCollisionLayer(c.value("layer", "Default"));
@@ -563,7 +589,15 @@ void ComponentSerialization::DeserializeCollider(const json &j, GameObject *go)
     if (type == ColliderComponent::Type::Circle && height <= 0.0f)
         height = width;
 
-    go->AddComponent<ColliderComponent>(type, width, height, layer);
+    if (cc)
+        cc->SetEnabled(c.value("enabled", true));
+
+    cc->setColliShape(type);
+    cc->SetLayer(layer);
+    cc->SetSize(width, height);
+
+    //auto* cc = go->AddComponent<ColliderComponent>(type, width, height, layer);
+
 }
 
 /**
@@ -599,6 +633,9 @@ void ComponentSerialization::DeserializeText(const json &j, GameObject *go)
         color,
         screenSpace);
 
+    if (textComp)
+        textComp->SetEnabled(t.value("enabled", true));
+
     textComp->SetScale(t.value("scale", 1.f));
 }
 
@@ -617,6 +654,9 @@ void ComponentSerialization::DeserializeCamera(const json &j, GameObject *go)
     const auto &c = j["CameraComponent"];
 
     auto *cam = go->AddComponent<CameraComponent>();
+
+    if (cam)
+        cam->SetEnabled(c.value("enabled", true));
 
     std::string modeStr = c.value("mode", "FIXED");
     if (modeStr == "FIXED")
@@ -753,6 +793,9 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
     }
 
     auto* scriptSys = CORE ? CORE->GetScriptSystem() : nullptr;
+
+    if (sc)
+        sc->SetEnabled(scData.value("enabled", true));
 
     if (scData.contains("scripts") && scriptSys)
     {
