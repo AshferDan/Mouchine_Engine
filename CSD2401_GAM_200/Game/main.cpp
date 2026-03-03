@@ -56,7 +56,72 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        g_UseGameStates = false; // Set the flag to use Game States
+        // ── Register game-specific systems & callbacks ────────────────────────
+        // These systems are compiled in the Game project, not the engine.
+        // They are registered here so the engine can update and notify them
+        // through the IGameCallbacks interface without depending on their types.
+
+        struct GameApp : public IGameCallbacks
+        {
+            MenuLogicSystem*      menuLogic      = nullptr;
+            PauseMenuLogicSystem* pauseMenuLogic = nullptr;
+            WinLoseLogicSystem*   winLoseLogic   = nullptr;
+            GameTimerSystem*      gameTimer      = nullptr;
+
+            void FixedUpdatePlaying(float dt) override {
+                if (menuLogic) menuLogic->Update(dt);
+            }
+            void FixedUpdateAlways(float dt) override {
+                if (pauseMenuLogic) pauseMenuLogic->Update(dt);
+                if (winLoseLogic)   winLoseLogic->Update(dt);
+            }
+            void VariableUpdate(float dt) override {
+                if (gameTimer) gameTimer->Update(dt);
+                GameManager::Instance().GameStateLoop(dt);
+            }
+            void OnEditorStop() override {
+                if (menuLogic) menuLogic->Reset();
+            }
+            void OnLevelLoaded(const std::string& path) override {
+                if (pauseMenuLogic) pauseMenuLogic->SetCurrentScene(path);
+                if (winLoseLogic)   winLoseLogic->SetCurrentScene(path);
+            }
+            void OnSceneLoadReinit() override {
+                if (pauseMenuLogic) pauseMenuLogic->Initialize();
+                if (gameTimer)      gameTimer->Initialize();
+                if (winLoseLogic)   winLoseLogic->Initialize();
+            }
+            bool IsPauseMenuActive()  const override { return pauseMenuLogic && pauseMenuLogic->IsPauseMenuActive(); }
+            bool IsWinScreenActive()  const override { return winLoseLogic   && winLoseLogic->IsWinScreenActive(); }
+            bool IsLoseScreenActive() const override { return winLoseLogic   && winLoseLogic->IsLoseScreenActive(); }
+            bool IsHowToPlayOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsHowToPlayOpen(); }
+            bool IsOnMainMenu()       const override {
+                return pauseMenuLogic &&
+                       pauseMenuLogic->GetCurrentScene().find("MainMenu") != std::string::npos;
+            }
+            std::string GetCurrentScenePath() const override {
+                return pauseMenuLogic ? pauseMenuLogic->GetCurrentScene() : "";
+            }
+            void TogglePauseMenu() override { if (pauseMenuLogic) pauseMenuLogic->TogglePauseMenu(); }
+            void OpenHowToPlay()   override { if (pauseMenuLogic) pauseMenuLogic->OpenHowToPlay(); }
+            void CloseHowToPlay()  override { if (pauseMenuLogic) pauseMenuLogic->CloseHowToPlay(); }
+            void TriggerLose()     override { if (winLoseLogic)   winLoseLogic->TriggerLose(); }
+        };
+
+        static GameApp gameApp;
+        gameApp.menuLogic      = CORE->AddSystem<MenuLogicSystem>();
+        gameApp.pauseMenuLogic = CORE->AddSystem<PauseMenuLogicSystem>();
+        gameApp.winLoseLogic   = CORE->AddSystem<WinLoseLogicSystem>();
+        gameApp.gameTimer      = CORE->AddSystem<GameTimerSystem>();
+
+        gameApp.menuLogic->Initialize();
+        gameApp.pauseMenuLogic->Initialize();
+        gameApp.winLoseLogic->Initialize();
+        gameApp.gameTimer->Initialize();
+
+        CORE->SetGameCallbacks(&gameApp);
+        // ─────────────────────────────────────────────────────────────────────
+
         // CORE->RequestSceneLoad("Prefab_TestScene");
 #ifndef _DEBUG
         CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);

@@ -33,14 +33,15 @@ include(ImportDependencies)
 importDependencies()
 
 # ======================= Directories =============================
-# Game directory - contains Main.cpp and Main.h only
+# Game directory - contains Main.cpp, Main.h, and game-specific systems
 set(Game_DIR          ./Game)
+set(Game_Logic_DIR    ./Game/Logic)
+set(Game_Manager_DIR  ./Game/GameManager)
 
 # Engine directories - all other engine systems
 set(Audio_DIR         ./Engine/Audio)
 set(Camera_DIR        ./Engine/Camera)
 set(Collision_DIR     ./Engine/Collision)
-set(GameManager_DIR   ./Engine/GameManager)
 set(Graphics_DIR      ./Engine/Graphics)
 set(LevelEditor_DIR   ./Engine/LevelEditor)
 set(Logic_DIR         ./Engine/Logic)
@@ -58,9 +59,13 @@ set(Replay_DIR        ./Engine/Replay)
 set(Extern_DIR        ./Engine/Extern)
 
 # ======================= File Globbing ============================
-# Game files (Main.cpp and Main.h only)
-file(GLOB Game_SRC        "${Game_DIR}/*.cpp")
-file(GLOB Game_HEAD       "${Game_DIR}/*.h" "${Game_DIR}/*.hpp")
+# Game files
+file(GLOB Game_SRC             "${Game_DIR}/*.cpp")
+file(GLOB Game_HEAD            "${Game_DIR}/*.h" "${Game_DIR}/*.hpp")
+file(GLOB_RECURSE Game_Logic_SRC     "${Game_Logic_DIR}/*.cpp")
+file(GLOB_RECURSE Game_Logic_HEAD    "${Game_Logic_DIR}/*.h" "${Game_Logic_DIR}/*.hpp")
+file(GLOB_RECURSE Game_Manager_SRC   "${Game_Manager_DIR}/*.cpp")
+file(GLOB_RECURSE Game_Manager_HEAD  "${Game_Manager_DIR}/*.h" "${Game_Manager_DIR}/*.hpp")
 
 # Engine files
 file(GLOB_RECURSE Audio_SRC        "${Audio_DIR}/*.cpp")
@@ -71,9 +76,6 @@ file(GLOB_RECURSE Camera_HEAD      "${Camera_DIR}/*.h" "${Camera_DIR}/*.hpp")
 
 file(GLOB_RECURSE Collision_SRC    "${Collision_DIR}/*.cpp")
 file(GLOB_RECURSE Collision_HEAD   "${Collision_DIR}/*.h" "${Collision_DIR}/*.hpp")
-
-file(GLOB_RECURSE GameManager_SRC  "${GameManager_DIR}/*.cpp")
-file(GLOB_RECURSE GameManager_HEAD "${GameManager_DIR}/*.h" "${GameManager_DIR}/*.hpp")
 
 file(GLOB_RECURSE Graphics_SRC     "${Graphics_DIR}/*.cpp")
 file(GLOB_RECURSE Graphics_HEAD    "${Graphics_DIR}/*.h" "${Graphics_DIR}/*.hpp")
@@ -121,7 +123,6 @@ set(ENGINE_SOURCES
     ${Audio_SRC}
     ${Camera_SRC}
     ${Collision_SRC}
-    ${GameManager_SRC}
     ${Graphics_SRC}
     ${LevelEditor_SRC}
     ${Logic_SRC}
@@ -141,7 +142,6 @@ set(ENGINE_HEADERS
     ${Audio_HEAD}
     ${Camera_HEAD}
     ${Collision_HEAD}
-    ${GameManager_HEAD}
     ${Graphics_HEAD}
     ${LevelEditor_HEAD}
     ${Logic_HEAD}
@@ -176,9 +176,6 @@ source_group("Camera\\Header Files" FILES ${Camera_HEAD})
 
 source_group("Collision\\Source Files" FILES ${Collision_SRC})
 source_group("Collision\\Header Files" FILES ${Collision_HEAD})
-
-source_group("GameManager\\Source Files" FILES ${GameManager_SRC})
-source_group("GameManager\\Header Files" FILES ${GameManager_HEAD})
 
 source_group("Graphics\\Source Files" FILES ${Graphics_SRC})
 source_group("Graphics\\Header Files" FILES ${Graphics_HEAD})
@@ -224,7 +221,6 @@ target_include_directories(Engine PUBLIC
     ${Audio_DIR}
     ${Camera_DIR}
     ${Collision_DIR}
-    ${GameManager_DIR}
     ${Graphics_DIR}
     ${LevelEditor_DIR}
     ${Logic_DIR}
@@ -270,6 +266,10 @@ endif()
 add_executable(Game
     ${Game_SRC}
     ${Game_HEAD}
+    ${Game_Logic_SRC}
+    ${Game_Logic_HEAD}
+    ${Game_Manager_SRC}
+    ${Game_Manager_HEAD}
 )
 
 # Link Game with Engine
@@ -280,7 +280,11 @@ set_property(TARGET Game PROPERTY CXX_STANDARD 20)
 set_property(TARGET Game PROPERTY CXX_STANDARD_REQUIRED ON)
 
 # ======================= Game Include Directories ================
-target_include_directories(Game PRIVATE ${Game_DIR})
+target_include_directories(Game PRIVATE
+    ${Game_DIR}
+    ${Game_Logic_DIR}
+    ${Game_Manager_DIR}
+)
 
 # Set Game as startup project for Visual Studio
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Game)

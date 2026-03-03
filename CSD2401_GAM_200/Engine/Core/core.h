@@ -40,18 +40,12 @@ Technology is prohibited.
 #include "logic.h"
 #include "CutsceneSystem.h"
 #include "LevelEditor.h"
-#include "MenuLogic.h"
-#include "PauseMenuLogic.h"
-#include "WinLoseLogic.h"
 #include "AudioManager.h"
-
-#include "GameManager.h"
 #include "Message.h"
 #include "IMessageHandler.h"
-
 #include "TimerSystem.h"
-#include "GameTimerSystem.h"
 #include "GhostSystem.h"
+#include "GameCallbacks.h"
 
 // Inside CoreEngine class
 
@@ -66,11 +60,7 @@ class DebugSystem;
 class TransformSystem;
 class ScriptSystem;
 class LevelEditor;
-class MenuLogicSystem;
-class PauseMenuLogicSystem;
-class WinLoseLogicSystem;
 class AudioManager;
-class GameTimerSystem;
 class CutsceneSystem;
 
 class CoreEngine : public IMessageHandler
@@ -227,40 +217,15 @@ public:
     }
 
     /**
-     * @brief Gets a pointer to the GameTimerSystem.
-     * @return A pointer to the GameTimerSystem.
+     * @brief Registers the game-side callback implementation.
+     *        Call this after Init() and before StartEngineLoop().
      */
-    GameTimerSystem *GetGameTimerSystem() const
-    {
-        return gameTimerSystem;
-    }
+    void SetGameCallbacks(IGameCallbacks* cb) { m_gameCallbacks = cb; }
 
     /**
-     * @brief Gets a pointer to the MenuLogicSystem.
-     * @return A pointer to the MenuLogicSystem.
+     * @brief Returns the registered game callbacks (may be nullptr).
      */
-    MenuLogicSystem *GetMenuLogic() const
-    {
-        return menuLogicSystem;
-    }
-
-    /**
-     * @brief Gets a pointer to the PauseMenuLogicSystem.
-     * @return A pointer to the PauseMenuLogicSystem.
-     */
-    PauseMenuLogicSystem *GetPauseMenuLogic() const
-    {
-        return pauseMenuLogicSystem;
-    }
-
-    /**
-     * @brief Gets a pointer to the WinLoseLogicSystem.
-     * @return A pointer to the WinLoseLogicSystem.
-     */
-    WinLoseLogicSystem *GetWinLoseLogic() const
-    {
-        return winLoseLogicSystem;
-    }
+    IGameCallbacks* GetGameCallbacks() const { return m_gameCallbacks; }
 
     /**
      * @brief Gets a pointer to the AudioEngine.
@@ -377,13 +342,10 @@ private:
     CameraSystem *cameraSystem = nullptr;
     CutsceneSystem *cutsceneSystem = nullptr;
     LevelEditor *levelEditor = nullptr;
-    MenuLogicSystem *menuLogicSystem = nullptr;
-    PauseMenuLogicSystem *pauseMenuLogicSystem = nullptr;
-    WinLoseLogicSystem * winLoseLogicSystem = nullptr;
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
-    GameTimerSystem * gameTimerSystem = nullptr;
     GhostSystem *ghostSystem = nullptr;
+    IGameCallbacks *m_gameCallbacks = nullptr;
 
     unsigned LastTime;
     bool GameActive;

@@ -15,7 +15,6 @@ Technology is prohibited.
 #include "ScriptingSystem.h"
 #include "gameObject.h"
 #include "ScriptAPI.h"
-#include "WinLoseLogic.h"
 #include <iostream>
 #include <filesystem>
 #include <mono/metadata/attrdefs.h>
@@ -770,28 +769,18 @@ static float Internal_GetMouseWorldY()
 // === WinLose System ===
 static void Internal_TriggerLoseZone()
 {
-    if (CORE && CORE->GetWinLoseLogic())
-    {
-        CORE->GetWinLoseLogic()->TriggerLose();
-    }
+    if (CORE && CORE->GetGameCallbacks())
+        CORE->GetGameCallbacks()->TriggerLose();
 }
 
 static bool Internal_IsWinScreenActive()
 {
-    if (CORE && CORE->GetWinLoseLogic())
-    {
-        return CORE->GetWinLoseLogic()->IsWinScreenActive();
-    }
-    return false;
+    return CORE && CORE->GetGameCallbacks() && CORE->GetGameCallbacks()->IsWinScreenActive();
 }
 
 static bool Internal_IsLoseScreenActive()
 {
-    if (CORE && CORE->GetWinLoseLogic())
-    {
-        return CORE->GetWinLoseLogic()->IsLoseScreenActive();
-    }
-    return false;
+    return CORE && CORE->GetGameCallbacks() && CORE->GetGameCallbacks()->IsLoseScreenActive();
 }
 
 // === Particles ===

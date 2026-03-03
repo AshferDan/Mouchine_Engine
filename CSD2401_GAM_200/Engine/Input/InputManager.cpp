@@ -18,8 +18,6 @@ Technology is prohibited.
 #include "core.h"
 #include "Serialization.h"
 #include "IMessageHandler.h"
-#include "GameTimerSystem.h"
-#include "PauseMenuLogic.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
 
@@ -303,43 +301,25 @@ void InputManager::Update(float)
     bool isPlayMode = (editor && editor->GetEditorMode() == EditorMode::Play);
 
     // Check if we're in the main menu
-    PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
-    bool isMainMenu = false;
-    if (pauseMenu)
-    {
-        std::string currentScene = pauseMenu->GetCurrentScene();
-        isMainMenu = (currentScene.find("MainMenu") != std::string::npos);
-    }
+    IGameCallbacks* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
+    bool isMainMenu = gameCb && gameCb->IsOnMainMenu();
 
     // Handle ESC key
     if (isPlayMode)
     {
         // Check if win or lose screen is active - if so, disable ESC key
-        WinLoseLogicSystem* winZone = CORE ? CORE->GetWinLoseLogic() : nullptr;
-        bool winScreenActive = winZone && winZone->IsWinScreenActive();
-        bool loseScreenActive = winZone && winZone->IsLoseScreenActive();
+        bool winScreenActive  = gameCb && gameCb->IsWinScreenActive();
+        bool loseScreenActive = gameCb && gameCb->IsLoseScreenActive();
 
         // In play mode: ESC toggles pause menu (unless win/lose screen is active or in main menu)
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
             // Don't toggle pause menu if How To Play screen is open - let PauseMenuLogic handle it
-            bool isHowToPlayOpen = false;
-            if (pauseMenu && pauseMenu->IsPauseMenuActive())
-            {
-                // Check if how to play screen is currently shown
-                auto& factory = GameObjectFactory::Instance();
-                GameObject* howToPlayScreen = factory.FindGameObject("PauseScreen_HowToPlay");
-                if (howToPlayScreen && howToPlayScreen->IsActive())
-                {
-                    isHowToPlayOpen = true;
-                }
-            }
+            bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
 
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen) {
-                if (pauseMenu)
-                {
-                    pauseMenu->TogglePauseMenu();
-                }
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen)
+            {
+                if (gameCb) gameCb->TogglePauseMenu();
                 singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
             }
         }
@@ -366,10 +346,7 @@ void InputManager::Update(float)
         {
             if (!singleTriggerKeys[GLFW_KEY_P] && !isMainMenu)
             {
-                if (pauseMenu)
-                {
-                    pauseMenu->TogglePauseMenu();
-                }
+                if (gameCb) gameCb->TogglePauseMenu();
                 singleTriggerKeys[GLFW_KEY_P] = true;
             }
         }
@@ -384,18 +361,17 @@ void InputManager::Update(float)
 
         if (tabPressed && !tabWasPressed && !isMainMenu)
         {
-            PauseMenuLogicSystem* pauseMenu = CORE ? CORE->GetPauseMenuLogic() : nullptr;
-            if (pauseMenu)
+            if (gameCb)
             {
-                if (pauseMenu->IsHowToPlayOpen())
+                if (gameCb->IsHowToPlayOpen())
                 {
                     std::cout << "[InputManager] TAB - Closing How To Play" << std::endl;
-                    pauseMenu->CloseHowToPlay();
+                    gameCb->CloseHowToPlay();
                 }
                 else
                 {
                     std::cout << "[InputManager] TAB - Opening How To Play" << std::endl;
-                    pauseMenu->OpenHowToPlay();
+                    gameCb->OpenHowToPlay();
                 }
             }
             tabWasPressed = true;
@@ -408,7 +384,7 @@ void InputManager::Update(float)
         {
             if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
             {
-                std::string currentScenePath = CORE->GetPauseMenuLogic()->GetCurrentScene();
+                std::string currentScenePath = gameCb ? gameCb->GetCurrentScenePath() : "";
                 if (!currentScenePath.empty())
                     CORE->RequestSceneLoad(currentScenePath, true);
             }

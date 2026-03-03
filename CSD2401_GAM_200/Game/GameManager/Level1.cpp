@@ -29,19 +29,12 @@ void Level1::Init() {
 
 void Level1::Update(float dt) {
 	timer += dt;
-	std::cout << "[LEVEL 1] Updating, timer = " << timer << "\n";
 
     // Press P to enter pause -- for testing, will have to be place in inputmanager
     if (GetAsyncKeyState('P') & 1)
     {
         GameManager::Instance().PushState(
             std::unique_ptr<GameState>(new PauseState()));
-    }
-
-    // Press ESC to remove THIS LEVEL -- for testing, will have to be place in inputmanager
-    if (GetAsyncKeyState(VK_ESCAPE) & 1)
-    {
-        GameManager::Instance().PopState();
     }
 
     // Proceed to level 2th
