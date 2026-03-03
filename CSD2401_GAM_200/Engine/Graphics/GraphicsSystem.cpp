@@ -362,6 +362,12 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribFormat(batchVAO, 6, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, scale));
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
+    // Attribute 7: Tile Count (vec2)
+    glEnableVertexArrayAttrib(batchVAO, 7);
+    glVertexArrayAttribFormat(batchVAO, 7, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, tileCount));
+    glVertexArrayAttribBinding(batchVAO, 7, 0);
+
+
     // === Text Rendering Buffers Setup ===
     // Load the text shader through ResourceManager
     ShaderResource *textShaderResource = ResourceManager::Instance().LoadShader(
@@ -653,6 +659,7 @@ void GraphicsSystem::Update(float)
         // Gather UV data for spritesheets/animation/tiles
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
+        vec2 tileCOunt = vec2(1.0f);
 
         if (auto *animator = obj->GetComponent<Spritesheet>())
         {
@@ -671,6 +678,7 @@ void GraphicsSystem::Update(float)
             uvScale = renderComp->GetUVScale();
             uvOffset = renderComp->GetUVOffset();
         }
+        
 
         // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
         RenderBatch *targetBatch = nullptr;

@@ -255,6 +255,12 @@ public:
         }
     }
 
+    void SetTileable(bool t) { tileable = t; }
+    bool IsTileable() const { return tileable; }
+
+    void SetTileCount(const vec2& count) { tileCount = count; }
+    vec2 GetTileCount() const { return tileCount; }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
@@ -267,6 +273,8 @@ private:
     PointData point; /*!< Point data if ShapeType::Point */
     bool screenSpace = false;
     RenderLayer renderLayer = RenderLayer::Background;  /*!< Layer category for grouping */
+    bool tileable;
+    vec2 tileCount = {1.0f, 1.0f};
 };
 
 namespace RenderComponentTools

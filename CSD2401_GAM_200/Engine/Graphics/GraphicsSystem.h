@@ -55,6 +55,7 @@ struct BatchVertex
 	vec2 uvOffset;	// UV offset (for spritesheets/animation frame selection).
 	vec3 transform;	// World Translation (x, y) and Rotation (z).
 	vec2 scale;		// World Scale (x, y).
+	vec2 tileCount;
 };
 
 
@@ -318,7 +319,7 @@ private:
 	// Vignette post-processing
 	GLSLShader* vignetteShader = nullptr;
 	bool    vignetteEnabled = true;
-	float   vignetteInnerRadius = 0.3f;
+	float   vignetteInnerRadius = 0.25f;
 	float   vignetteOuterRadius = 0.75f;
 	float   vignetteIntensity = 0.5f;
 	vec4    vignetteColor = vec4(0.f, 0.f, 0.f, 1.f);
