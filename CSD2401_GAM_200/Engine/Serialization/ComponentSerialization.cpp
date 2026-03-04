@@ -225,7 +225,11 @@ void ComponentSerialization::SerializeEvent(json& j, EventComponent* ec)
         cNode["actions"] = actionsArray;
         chainsArray.push_back(cNode);
     }
-    j["EventComponent"] = chainsArray;
+
+    j["EventComponent"] = {
+        {"enabled", ec->IsEnabled()},
+        {"chains", chainsArray}
+    };
 }
 
 void ComponentSerialization::SerializeScript(json &j, ScriptComponent *sc, GameObject* go)
@@ -698,18 +702,59 @@ void ComponentSerialization::DeserializeCamera(const json &j, GameObject *go)
 void ComponentSerialization::DeserializeEvent(const json& j, GameObject* go)
 {
     if (!j.contains("EventComponent")) return;
-    auto* ec = go->AddComponent<EventComponent>();
 
-    for (const auto& cNode : j["EventComponent"])
+    const auto& node = j["EventComponent"];
+
+    auto* ec = go->AddComponent<EventComponent>();
+    if (!ec) ec = go->AddComponent<EventComponent>();
+    if (!ec) return;
+
+    bool enabled = ec->IsEnabled();
+
+    const json* chainsNode = nullptr;
+    
+    if (node.is_object())
     {
+        enabled = node.value("enabled", enabled);
+
+        if (node.contains("chains") && node["chains"].is_array())
+            chainsNode = &node["chains"];
+        else
+            chainsNode = nullptr; // no chains provided
+    }
+
+    else if (node.is_array())
+    {
+        chainsNode = &node;
+        enabled = true;
+    }
+    else if (node.is_boolean())
+    {
+        enabled = node.get<bool>();
+        chainsNode = nullptr; // no chains data
+    }
+    else
+    {
+        return;
+    }
+
+    ec->SetEnabled(enabled);
+    ec->chains.clear();
+
+    if (!chainsNode) return;
+
+    for (const auto& cNode : *chainsNode)
+    {
+        if (!cNode.is_object()) continue;
+
         LogicChain chain;
         chain.triggerType = StringToEventType(cNode.value("trigger", "None"));
+        chain.targetFilterID = cNode.value("targetFilterID", -1);
+        //if (cNode.contains("targetFilterID")) {
+        //    chain.targetFilterID = cNode["targetFilterID"];
+        //}
 
-        if (cNode.contains("targetFilterID")) {
-            chain.targetFilterID = cNode["targetFilterID"];
-        }
-
-        if (cNode.contains("actions")) {
+        if (cNode.contains("actions") && cNode["actions"].is_array()) {
             for (const auto& aNode : cNode["actions"]) {
                 std::string typeStr = aNode.value("type", "None");
                 ActionType type = StringToActionType(typeStr);
@@ -741,7 +786,8 @@ void ComponentSerialization::DeserializeEvent(const json& j, GameObject* go)
 
                     break;
                 }
-                    
+                default: 
+                    break;
                 }
 
                 if (newAction) {
@@ -749,7 +795,7 @@ void ComponentSerialization::DeserializeEvent(const json& j, GameObject* go)
                 }
             }
         }
-        ec->chains.push_back(chain);
+        ec->chains.push_back(std::move(chain));
     }
 }
 
@@ -797,6 +843,20 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
     if (sc)
         sc->SetEnabled(scData.value("enabled", true));
 
+    {
+        std::vector<std::string> existingNames;
+        existingNames.reserve(sc->GetScripts().size());
+        for (const auto& [id, name] : sc->GetScripts())
+            existingNames.push_back(name);
+
+        if (scriptSys)
+            for (const auto& name : existingNames)
+                scriptSys->RemoveScript(go, name);
+
+        for (const auto& name : existingNames)
+            sc->RemoveScript(name);
+    }
+
     if (scData.contains("scripts") && scriptSys)
     {
         // Phase 1: Register names and attach Mono instances WITHOUT calling OnStart yet.
@@ -841,7 +901,12 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
         }
 
         // Phase 3: Now call OnStart with the correct field values in place.
-        scriptSys->CallOnStart(go);
+        //scriptSys->CallOnStart(go);
+        if (CORE && CORE->GetLevelEditor() &&
+            CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play)
+        {
+            scriptSys->CallOnStart(go);
+        }
     }
     else if (scData.contains("scripts"))
     {

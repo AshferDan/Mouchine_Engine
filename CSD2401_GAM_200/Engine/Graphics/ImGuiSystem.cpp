@@ -2854,6 +2854,14 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
         static bool isEditingProperty = false;
         static json propertyBeforeJson;
 
+        bool isEventEnabled = ec->IsEnabled();
+        if (ImGui::Checkbox("Component Enabled ##Event", &isEventEnabled))
+        {
+            propertyBeforeJson = Serialization::SerializeGameObject(obj);
+            ec->SetEnabled(isEventEnabled);
+            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+        }
+
         // Data for Selection
         static const char* eventNames[] = { "None", "OnEnable", "OnDisable", "OnDestroy", "OnCollisionEnter", "OnCollisionStay", "OnCollisionExit" };
         static const char* addableActions[] = { "Play Sound", "Destroy", "Enable", "Disable", "Respawn" };
@@ -2884,6 +2892,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 // ===== Trigger Selection ("When") =====
                 int evIndex = (int)chain.triggerType;
                 if (ImGui::Combo("Event Type", &evIndex, eventNames, IM_ARRAYSIZE(eventNames))) {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     chain.triggerType = (EventType)evIndex;
                     UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
@@ -2902,6 +2911,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
                 if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     chain.targetFilterID = objectIds[currentIndex];
                     UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
@@ -2954,6 +2964,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                                 for (const auto& soundName : soundList) {
                                     bool isSelected = (soundAction->soundName == soundName);
                                     if (ImGui::Selectable(soundName.c_str(), isSelected)) {
+                                        propertyBeforeJson = Serialization::SerializeGameObject(obj);
                                         soundAction->soundName = soundName;
                                         UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                                     }
@@ -3005,6 +3016,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); // Green
                 if (ImGui::Button("Add")) {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     if (newActionIdx == 0) chain.actions.push_back(std::make_unique<ActionPlaySound>("Empty"));
                     if (newActionIdx == 1) chain.actions.push_back(std::make_unique<ActionDestroy>());
                     if (newActionIdx == 2) chain.actions.push_back(std::make_unique<ActionToggleActive>(true));
@@ -3033,11 +3045,10 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
             UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
 
-        ImGui::Separator();
+        //ImGui::Separator();
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); //Green
         if (ImGui::Button("Add New Event")) {
             ec->chains.push_back(LogicChain());
-            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
         ImGui::PopStyleColor();
 
