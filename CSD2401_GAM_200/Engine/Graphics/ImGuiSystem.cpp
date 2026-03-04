@@ -930,23 +930,6 @@ void ImGuiSystem::Hierarchy_Render()
     }
     if (!canRedo) ImGui::EndDisabled();
 
-    //if (!canUndo) ImGui::BeginDisabled();
-    //if (ImGui::Button("Undo"))
-    //{
-    //    if (canUndo) {
-    //        CORE->GetLevelEditor()->PerformUndo();       
-    //    } 
-    //}
-    //if (!canUndo) ImGui::EndDisabled();
-    //ImGui::SameLine();
-
-    //if (!canRedo) ImGui::BeginDisabled();
-    //if (ImGui::Button("Redo"))
-    //{
-    //    CORE->GetLevelEditor()->PerformRedo();
-    //}
-    //if (!canRedo) ImGui::EndDisabled();
-
     // display current scene name
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.4f, 0.8f, 1.0f, 1.0f));
     if (auto* levelEditor = CORE->GetLevelEditor())
@@ -2310,13 +2293,12 @@ void ImGuiSystem::RenderPropertyEditor()
             bool isTransformEnabled = transform->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled ##Transform", &isTransformEnabled))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj); // BEFORE change
                     transform->SetEnabled(isTransformEnabled);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-
-                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
-                
+  
                 // sliders for position, scale, rotation etc
-
                 bool isGizmoLocked = lockedGizmosGOs.contains(obj->GetID());
                 if (ImGui::Checkbox("Lock Gizmos ##Transform", &isGizmoLocked))
                 {
@@ -2327,16 +2309,13 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 ImGuizmo::Enable(!isGizmoLocked);
 
-                //UndoTracker lockTracker(obj, editor, isEditingProperty, propertyBeforeJson);
-
                 float pos[2] = { 0.0f, 0.0f };
                 transform->GetPosition(pos[0], pos[1]);
                 if (ImGui::DragFloat2("Position", pos, 0.5f))
                 {
                     transform->SetPosition(pos[0], pos[1]);
 
-                }
-                
+                }               
                 UndoTracker posTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 float scale[2] = { 1.0f, 1.0f };
@@ -2351,7 +2330,6 @@ void ImGuiSystem::RenderPropertyEditor()
                         collider->SetSize(scale[0], scale[1]);
                     }
                 }
-
                 UndoTracker scaleTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 float rotation = transform->GetRotation();
@@ -2364,7 +2342,6 @@ void ImGuiSystem::RenderPropertyEditor()
                     transform->SetRotation(rotation);
 
                 }
-
                 UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 if (ImGui::Button("Press Here to add DND Slot"))
@@ -2399,9 +2376,7 @@ void ImGuiSystem::RenderPropertyEditor()
             if (renderRemove)
             {
                 propertyBeforeJson = Serialization::SerializeGameObject(obj);
-
                 obj->RemoveComponent("RenderComponent");
-
                 UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             }
             else
@@ -2409,10 +2384,10 @@ void ImGuiSystem::RenderPropertyEditor()
                 bool isRenderEnabled = render->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled ##Render", &isRenderEnabled))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     render->SetEnabled(isRenderEnabled);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-
-                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 ImGui::Text("Shape Type: %s", GetShapeTypeName((int)render->GetShapeType()));
                 static bool showTextureDND = false;
@@ -2426,7 +2401,6 @@ void ImGuiSystem::RenderPropertyEditor()
                     {
                         render->SetColor(vec4(colorArray[0], colorArray[1], colorArray[2], colorArray[3]));
                     }
-
                     UndoTracker colorTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                     if (showTextureDND)
@@ -2476,10 +2450,8 @@ void ImGuiSystem::RenderPropertyEditor()
                     if (ImGui::Button("Remove Existing Texture"))
                     {
                         propertyBeforeJson = Serialization::SerializeGameObject(obj);
-
                         render->SetTextureID(GLuint{});
                         render->SetColor({ 1,0,1,1 });                    // set to pink to make it obvious if texture missing
-
                         UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                     }
                 }
@@ -2500,9 +2472,10 @@ void ImGuiSystem::RenderPropertyEditor()
                 ImGui::SetNextItemWidth(150.0f);
                 if (ImGui::Combo("##LayerCategory", &currentLayerCategory, layerCategories, IM_ARRAYSIZE(layerCategories)))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     render->SetRenderLayerInt(currentLayerCategory);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-                //UndoTracker categoryTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Category for group visibility toggling");
             }
         }
@@ -2525,9 +2498,7 @@ void ImGuiSystem::RenderPropertyEditor()
             if (physicsRemove)
             {
                 propertyBeforeJson = Serialization::SerializeGameObject(obj);
-
                 obj->RemoveComponent("PhysicsComponent");
-
                 UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             }
             else
@@ -2536,18 +2507,17 @@ void ImGuiSystem::RenderPropertyEditor()
                 bool isPhysEnabled = physics->IsEnabled();
                 if (ImGui::Checkbox("Phsyics Enabled##Physics", &isPhysEnabled))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     physics->SetEnabled(isPhysEnabled);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-
-                UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
-
+ 
                 float vel[2] = { 0.0f, 0.0f };
                 physics->GetVelocity(vel[0], vel[1]);
                 if (ImGui::DragFloat2("Velocity", vel, 0.1f))
                 {
                     physics->SetVelocity(vel[0], vel[1]);
                 }
-
                 UndoTracker velTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 bool isStatic = physics->IsStatic();
@@ -2555,7 +2525,6 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     physics->SetStatic(isStatic);
                 }
-
                 UndoTracker staticTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 bool hasGravity = physics->useGravity;
@@ -2563,7 +2532,6 @@ void ImGuiSystem::RenderPropertyEditor()
                 {
                     physics->SetGravity(hasGravity);
                 }
-
                 UndoTracker gravTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 ImGui::Text("Mass: %.2f", physics->GetMass());
@@ -2589,9 +2557,7 @@ void ImGuiSystem::RenderPropertyEditor()
             if (colliderRemove)
             {
                 propertyBeforeJson = Serialization::SerializeGameObject(obj);
-
                 obj->RemoveComponent("ColliderComponent");
-
                 UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
             }
             else
@@ -2599,25 +2565,27 @@ void ImGuiSystem::RenderPropertyEditor()
                 bool isColEnabled = collider->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled##Collider", &isColEnabled))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     collider->SetEnabled(isColEnabled);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-
-                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 const char* colliderTypes[] = { "Square", "Circle" };
                 int currentType = (collider->GetType() == ColliderComponent::Type::Circle) ? 1 : 0;
 
                 if (ImGui::Combo("Type", &currentType, colliderTypes, 2))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                     ColliderComponent::Type newType = (currentType == 1)
                         ? ColliderComponent::Type::Circle
                         : ColliderComponent::Type::Square;
                     collider->setColliShape(newType);
                     std::cout << "[Property Editor] Changed collider type to "
-                        << colliderTypes[currentType] << std::endl;                    
-                }
+                        << colliderTypes[currentType] << std::endl;  
 
-                //UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
 
                 // Display dimensions
                 if (collider->GetType() == ColliderComponent::Type::Circle)
@@ -2648,7 +2616,7 @@ void ImGuiSystem::RenderPropertyEditor()
                         std::cout << "[Property Editor] Changed collider size to "
                             << newSize[0] << "x" << newSize[1] << std::endl;
                     }
-                    //UndoTracker sizeTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                    UndoTracker sizeTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 }
                 else if (collider->GetType() == ColliderComponent::Type::Circle)
                 {
@@ -2661,7 +2629,7 @@ void ImGuiSystem::RenderPropertyEditor()
                         std::cout << "[Property Editor] Changed circle radius to "
                             << radius << std::endl;
                     }
-                   //UndoTracker radiusTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+                   UndoTracker radiusTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 }
 
 
@@ -2671,10 +2639,12 @@ void ImGuiSystem::RenderPropertyEditor()
 
                 if (ImGui::Combo("Layer", &currentLayer, layerNames, 5))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+
                     collider->SetLayer(static_cast<CollisionLayer>(currentLayer));
                     std::cout << "[Property Editor] Changed collision layer to "
                         << layerNames[currentLayer] << std::endl;
-                    //UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
             }
         }
@@ -2722,15 +2692,14 @@ void ImGuiSystem::RenderPropertyEditor()
                 bool isScriptEnabled = script->IsEnabled();
                 if (ImGui::Checkbox("Component Enabled ##Script", &isScriptEnabled))
                 {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     script->SetEnabled(isScriptEnabled);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-
-                //UndoTracker enabledTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
                 if (ImGui::Button("Add Script Slot"))
                 {
                     script->AddDragDropSlot("Drag Script Here", ScriptPayloadID);
-                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
 
                 if (script->GetPropertySlots().size())
@@ -2822,6 +2791,7 @@ void ImGuiSystem::RenderPropertyEditor()
                         // Remove after iteration to avoid invalidating the instances vector
                         if (!scriptToRemove.empty())
                         {
+                            propertyBeforeJson = Serialization::SerializeGameObject(obj);
                             scriptSystem->RemoveScript(obj, scriptToRemove);
                             script->RemoveScript(scriptToRemove);
                             UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
@@ -2884,6 +2854,14 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
         static bool isEditingProperty = false;
         static json propertyBeforeJson;
 
+        bool isEventEnabled = ec->IsEnabled();
+        if (ImGui::Checkbox("Component Enabled ##Event", &isEventEnabled))
+        {
+            propertyBeforeJson = Serialization::SerializeGameObject(obj);
+            ec->SetEnabled(isEventEnabled);
+            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+        }
+
         // Data for Selection
         static const char* eventNames[] = { "None", "OnEnable", "OnDisable", "OnDestroy", "OnCollisionEnter", "OnCollisionStay", "OnCollisionExit" };
         static const char* addableActions[] = { "Play Sound", "Destroy", "Enable", "Disable", "Respawn" };
@@ -2914,6 +2892,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 // ===== Trigger Selection ("When") =====
                 int evIndex = (int)chain.triggerType;
                 if (ImGui::Combo("Event Type", &evIndex, eventNames, IM_ARRAYSIZE(eventNames))) {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     chain.triggerType = (EventType)evIndex;
                     UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
@@ -2932,6 +2911,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
                 if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     chain.targetFilterID = objectIds[currentIndex];
                     UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
@@ -2984,6 +2964,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                                 for (const auto& soundName : soundList) {
                                     bool isSelected = (soundAction->soundName == soundName);
                                     if (ImGui::Selectable(soundName.c_str(), isSelected)) {
+                                        propertyBeforeJson = Serialization::SerializeGameObject(obj);
                                         soundAction->soundName = soundName;
                                         UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                                     }
@@ -3035,6 +3016,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
 
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); // Green
                 if (ImGui::Button("Add")) {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
                     if (newActionIdx == 0) chain.actions.push_back(std::make_unique<ActionPlaySound>("Empty"));
                     if (newActionIdx == 1) chain.actions.push_back(std::make_unique<ActionDestroy>());
                     if (newActionIdx == 2) chain.actions.push_back(std::make_unique<ActionToggleActive>(true));
@@ -3063,11 +3045,10 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
             UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
 
-        ImGui::Separator();
+        //ImGui::Separator();
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 0.2f, 1.0f)); //Green
         if (ImGui::Button("Add New Event")) {
             ec->chains.push_back(LogicChain());
-            UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
         }
         ImGui::PopStyleColor();
 
