@@ -4166,7 +4166,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               76.03515625,
               92.56199645996094
@@ -4192,7 +4192,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               76.03515625,
               92.56199645996094
@@ -4218,7 +4218,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               76.03515625,
               92.56199645996094
@@ -4244,7 +4244,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               76.03515625,
               92.56199645996094
@@ -4270,7 +4270,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               1442.803955078125,
               54.998046875
@@ -4568,7 +4568,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               553.00390625,
               58.82500076293945
@@ -4594,7 +4594,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               76.03515625,
               92.56199645996094
@@ -5172,7 +5172,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               392.447265625,
               60.27399826049805
@@ -5704,7 +5704,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               457.0,
               93.2040786743164
@@ -6002,7 +6002,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               58.0,
               1120.2039794921875
@@ -6210,7 +6210,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               822.0,
               57.149658203125
@@ -6274,7 +6274,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               463.0,
               93.2040786743164
@@ -6300,7 +6300,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               65.0,
               709.0
@@ -6326,7 +6326,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               130.0,
               70.0
@@ -6352,7 +6352,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               286.0,
               70.0
@@ -6378,7 +6378,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               286.0,
               70.0
@@ -6404,7 +6404,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               286.0,
               70.0
@@ -6430,7 +6430,7 @@
           },
           "ColliderComponent": {
             "shape": "Square",
-            "layer": "Platform",
+            "layer": "Enemy",
             "size": [
               130.0,
               70.0
