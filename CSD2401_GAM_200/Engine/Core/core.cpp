@@ -198,9 +198,9 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
                 // Re-init game-specific systems after scene load
-                if (m_gameCallbacks)
+                if (gameCallbacks)
                 {
-                    m_gameCallbacks->OnSceneLoadReinit();
+                    gameCallbacks->OnSceneLoadReinit();
                     std::cout << "[CoreEngine] Game systems re-initialised after scene load" << std::endl;
                 }
 
@@ -366,15 +366,15 @@ void CoreEngine::GameLoop()
                     ghostSystem->Update(static_cast<float>(fixed_dt));
 
                 // Game-specific fixed update (menu logic, etc.) – injected by the game project
-                if (m_gameCallbacks)
-                    m_gameCallbacks->FixedUpdatePlaying(static_cast<float>(fixed_dt));
+                if (gameCallbacks)
+                    gameCallbacks->FixedUpdatePlaying(static_cast<float>(fixed_dt));
 
                 stepOnce = false; // Reset after processing one frame
             }
 
             // Game-specific always-fixed update (pause menu, win/lose) – runs even when paused
-            if (m_gameCallbacks)
-                m_gameCallbacks->FixedUpdateAlways(static_cast<float>(fixed_dt));
+            if (gameCallbacks)
+                gameCallbacks->FixedUpdateAlways(static_cast<float>(fixed_dt));
             // In step mode, only process ONE timestep then break
             if (stepMode)
                 break;
@@ -438,8 +438,8 @@ void CoreEngine::GameLoop()
         }
 
         // Game-specific variable-timestep update (game timer, state machine, etc.)
-        if (m_gameCallbacks)
-            m_gameCallbacks->VariableUpdate(static_cast<float>(delta_time));
+        if (gameCallbacks)
+            gameCallbacks->VariableUpdate(static_cast<float>(delta_time));
 
         if (imguiSystem)
         {

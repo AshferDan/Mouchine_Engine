@@ -16,7 +16,7 @@ Technology is prohibited.
 #include <string>
 
 /**
- * @interface IGameCallbacks
+ * @interface GameCallBackSystem
  * @brief Abstract interface that the game project implements to receive engine
  *        lifecycle events and inject game-specific system updates.
  *
@@ -26,10 +26,10 @@ Technology is prohibited.
  *        Register an implementation with CoreEngine::SetGameCallbacks() before
  *        starting the game loop.
  */
-class IGameCallbacks
+class IGameCallbacksSystem
 {
 public:
-    virtual ~IGameCallbacks() = default;
+    virtual ~IGameCallbacksSystem() = default;
 
     // ── Update hooks ──────────────────────────────────────────────────────────
     // Called inside the fixed-timestep loop, only while the game is playing.
@@ -51,7 +51,7 @@ public:
     /** Called after a pending scene load finishes (re-init game systems). */
     virtual void OnSceneLoadReinit() {}
 
-    // ── State queries (used by InputManager, ScriptingSystem) ─────────────────
+    // ── State queries ─────────────────
     virtual bool IsPauseMenuActive()  const { return false; }
     virtual bool IsWinScreenActive()  const { return false; }
     virtual bool IsLoseScreenActive() const { return false; }

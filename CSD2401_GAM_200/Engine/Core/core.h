@@ -220,12 +220,12 @@ public:
      * @brief Registers the game-side callback implementation.
      *        Call this after Init() and before StartEngineLoop().
      */
-    void SetGameCallbacks(IGameCallbacks* cb) { m_gameCallbacks = cb; }
+    void SetGameCallbacks(IGameCallbacksSystem* callback) { gameCallbacks = callback; }
 
     /**
      * @brief Returns the registered game callbacks (may be nullptr).
      */
-    IGameCallbacks* GetGameCallbacks() const { return m_gameCallbacks; }
+    IGameCallbacksSystem* GetGameCallbacks() const { return gameCallbacks; }
 
     /**
      * @brief Gets a pointer to the AudioEngine.
@@ -345,7 +345,7 @@ private:
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
     GhostSystem *ghostSystem = nullptr;
-    IGameCallbacks *m_gameCallbacks = nullptr;
+    IGameCallbacksSystem *gameCallbacks = nullptr;
 
     unsigned LastTime;
     bool GameActive;

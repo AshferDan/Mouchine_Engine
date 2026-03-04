@@ -69,7 +69,7 @@ void GameTimerSystem::Update(float dt)
     GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
 
     // hide timer if win or lose screen is active
-    IGameCallbacks* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
+    GameCallBackSystem* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
     if (gameCb && (gameCb->IsWinScreenActive() || gameCb->IsLoseScreenActive()))
     {
         if (timerGO->IsActive())
@@ -254,7 +254,7 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
     }
 
     // check if win or lose screen is active, if so hide the timer
-    IGameCallbacks* cb = CORE ? CORE->GetGameCallbacks() : nullptr;
+    GameCallBackSystem* cb = CORE ? CORE->GetGameCallbacks() : nullptr;
     if (cb && (cb->IsWinScreenActive() || cb->IsLoseScreenActive()))
     {
         timerGO->SetActive(false);

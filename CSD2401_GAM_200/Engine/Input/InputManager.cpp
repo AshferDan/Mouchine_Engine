@@ -301,7 +301,7 @@ void InputManager::Update(float)
     bool isPlayMode = (editor && editor->GetEditorMode() == EditorMode::Play);
 
     // Check if we're in the main menu
-    IGameCallbacks* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
+    IGameCallbacksSystem* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
     bool isMainMenu = gameCb && gameCb->IsOnMainMenu();
 
     // Handle ESC key

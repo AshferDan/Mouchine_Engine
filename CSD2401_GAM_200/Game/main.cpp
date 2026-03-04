@@ -59,9 +59,10 @@ int main()
         // ── Register game-specific systems & callbacks ────────────────────────
         // These systems are compiled in the Game project, not the engine.
         // They are registered here so the engine can update and notify them
-        // through the IGameCallbacks interface without depending on their types.
+        // through the I
+        // interface without depending on their types.
 
-        struct GameApp : public IGameCallbacks
+        struct GameApp : public GameCallBacksSystem
         {
             MenuLogicSystem*      menuLogic      = nullptr;
             PauseMenuLogicSystem* pauseMenuLogic = nullptr;
