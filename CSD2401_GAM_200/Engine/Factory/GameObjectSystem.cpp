@@ -118,13 +118,16 @@ Technology is prohibited.
          // --- Physics ---
          //go->AddComponent<PhysicsComponent>();
 
-         // --- Collider ---
-         auto* collider = go->AddComponent<ColliderComponent>();
-         if (collider) 
+         // --- Collider (only if checkbox was ticked) ---
+         if (msg.addCollider)
          {
-             collider->setColliShape(msg.colType);
-             collider->SetSize(msg.collider[0], msg.collider[1]);
-             collider->SetLayer(msg.colLayer);
+             auto* collider = go->AddComponent<ColliderComponent>();
+             if (collider)
+             {
+                 collider->setColliShape(msg.colType);
+                 collider->SetSize(msg.collider[0], msg.collider[1]);
+                 collider->SetLayer(msg.colLayer);
+             }
          }
 
          break;

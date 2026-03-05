@@ -256,6 +256,10 @@ void InputManager::Update(float)
         {GLFW_KEY_F2, false},
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
+        {GLFW_KEY_F6, false}, // replay best run
+        {GLFW_KEY_F7, false}, // rewind 10s
+        {GLFW_KEY_F8, false}, // pause/resume replay
+        {GLFW_KEY_F9, false}, // forward 10s
         {GLFW_KEY_M, false}, // toggle pause (for now)
         {GLFW_KEY_ENTER, false},
         {GLFW_KEY_ESCAPE,false},
@@ -437,6 +441,46 @@ void InputManager::Update(float)
                 {
                     ShowFPS = !ShowFPS;
                     std::cout << "FPS display " << (ShowFPS ? "ENABLED" : "DISABLED") << std::endl;
+                }
+                else if (key == GLFW_KEY_F6 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostAvailable())
+                    {
+                        ghost->StartPlayback("GhostHero");
+                        std::cout << "[InputManager] F6 - Replaying best run" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "[InputManager] F6 - No ghost recording available yet" << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F7 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostPlaying())
+                    {
+                        ghost->SeekReplay(-10.0f);
+                        std::cout << "[InputManager] F7 - Rewind 10s" << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F8 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostPlaying())
+                    {
+                        ghost->ToggleReplayPause();
+                        std::cout << "[InputManager] F8 - Replay " << (ghost->IsReplayPaused() ? "paused" : "resumed") << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F9 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostPlaying())
+                    {
+                        ghost->SeekReplay(10.0f);
+                        std::cout << "[InputManager] F9 - Forward 10s" << std::endl;
+                    }
                 }
                 else if (key == GLFW_KEY_P) {
 

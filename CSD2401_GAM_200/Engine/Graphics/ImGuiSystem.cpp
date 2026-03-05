@@ -1317,6 +1317,7 @@ void GOCreationMenu_Spawn()
         cLayer
     );
 
+
     std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;
     //msg.Dispatch(*CORE);
     CORE->GetMessageBus().Publish(msg);

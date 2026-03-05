@@ -30,7 +30,27 @@ void ReplayPlayer::StartPlayback(const std::string& ghostObjectName, const Ghost
 void ReplayPlayer::StopPlayback()
 {
     m_isPlaying = false;
+    m_isPaused  = false;
     m_recording = nullptr;
+}
+
+void ReplayPlayer::TogglePause()
+{
+    if (m_isPlaying)
+        m_isPaused = !m_isPaused;
+}
+
+void ReplayPlayer::Seek(float deltaSeconds)
+{
+    if (!m_recording || m_recording->empty())
+        return;
+
+    m_clock += deltaSeconds;
+
+    if (m_clock < 0.0f)
+        m_clock = 0.0f;
+    else if (m_clock > m_recording->back().timestamp)
+        m_clock = m_recording->back().timestamp;
 }
 
 void ReplayPlayer::Update(float dt)
@@ -38,15 +58,15 @@ void ReplayPlayer::Update(float dt)
     if (!m_isPlaying || !m_recording || m_recording->empty())
         return;
 
-    m_clock += dt;
-
     const GhostRecording& rec = *m_recording;
 
-    // Recording ended — hold the last frame
-    if (m_clock >= rec.back().timestamp)
+    if (!m_isPaused)
     {
-        m_clock     = rec.back().timestamp;
-        m_isPlaying = false;
+        m_clock += dt;
+
+        // Recording ended — clamp and stop advancing (ghost stays visible at end)
+        if (m_clock >= rec.back().timestamp)
+            m_clock = rec.back().timestamp;
     }
 
     // Binary search for the last keyframe with timestamp <= clock (keyframe A)

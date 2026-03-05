@@ -61,6 +61,18 @@ public:
     /** @brief Stop driving the ghost object. */
     void StopPlayback();
 
+    /** @brief Toggle pause — ghost freezes in place but stays visible. */
+    void ToggleReplayPause() { m_player.TogglePause(); }
+
+    /**
+     * @brief Shift the replay clock by deltaSeconds (negative = rewind).
+     *        Clamps to [0, recording end]. Safe to call while paused.
+     */
+    void SeekReplay(float deltaSeconds) { m_player.Seek(deltaSeconds); }
+
+    /** @return True if the replay is currently paused. */
+    bool IsReplayPaused() const { return m_player.IsPaused(); }
+
     // ===== Persistence =====
 
     /**
