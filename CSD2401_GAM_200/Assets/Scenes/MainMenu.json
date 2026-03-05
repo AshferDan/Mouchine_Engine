@@ -330,7 +330,7 @@
       },
       "RenderComponent": {
         "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/Menu_settings.png",
+        "texturePath": "../Assets/Sprites/Menu_Settings.png",
         "color": [
           1.0,
           1.0,
@@ -945,11 +945,11 @@
         "category": "sfx"
       },
       {
-      "name": "CreditsAudio",
-      "filepath": "../Assets/CreditsAudio.wav",
-      "type": "sound",
-      "volume": 1.0,
-      "loop": false
+        "name": "CreditsAudio",
+        "filepath": "../Assets/CreditsAudio.wav",
+        "type": "sound",
+        "volume": 1.0,
+        "loop": false
       }
     ],
     "events": [

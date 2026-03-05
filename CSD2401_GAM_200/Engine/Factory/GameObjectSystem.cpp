@@ -68,7 +68,6 @@ Technology is prohibited.
      std::cout << "[GameObjectSystem] Received CreateObjectMessage for "
          << msg.name << " (Type: " << static_cast<int>(msg.type) << ")\n";
 
-     //GameObjectFactory& factory = GameObjectFactory::Instance();
      GameObject* go = nullptr;
 
      switch (msg.type)
@@ -98,7 +97,7 @@ Technology is prohibited.
          go = factory.CreateGameObject(msg.name);
          if (!go) break;
 
-         // --- Transform (always required) ---
+         // --- Transform  ---
          auto* transform = go->AddComponent<TransformComponent>();
          if (transform)
          {
@@ -114,9 +113,6 @@ Technology is prohibited.
              render->SetShapeType(msg.shapeType);
              render->SetColor({ msg.color.x, msg.color.y, msg.color.z, msg.color.w });
          }
-
-         // --- Physics ---
-         //go->AddComponent<PhysicsComponent>();
 
          // --- Collider (only if checkbox was ticked) ---
          if (msg.addCollider)
