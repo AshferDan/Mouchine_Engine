@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "transform.h"
 #include "Animator.hpp"
 #include <algorithm>
+#include <cmath>
 
 void ReplayPlayer::StartPlayback(const std::string& ghostObjectName, const GhostRecording& recording)
 {
@@ -29,7 +30,27 @@ void ReplayPlayer::StartPlayback(const std::string& ghostObjectName, const Ghost
 void ReplayPlayer::StopPlayback()
 {
     m_isPlaying = false;
+    m_isPaused  = false;
     m_recording = nullptr;
+}
+
+void ReplayPlayer::TogglePause()
+{
+    if (m_isPlaying)
+        m_isPaused = !m_isPaused;
+}
+
+void ReplayPlayer::Seek(float deltaSeconds)
+{
+    if (!m_recording || m_recording->empty())
+        return;
+
+    m_clock += deltaSeconds;
+
+    if (m_clock < 0.0f)
+        m_clock = 0.0f;
+    else if (m_clock > m_recording->back().timestamp)
+        m_clock = m_recording->back().timestamp;
 }
 
 void ReplayPlayer::Update(float dt)
@@ -37,15 +58,15 @@ void ReplayPlayer::Update(float dt)
     if (!m_isPlaying || !m_recording || m_recording->empty())
         return;
 
-    m_clock += dt;
-
     const GhostRecording& rec = *m_recording;
 
-    // Recording ended — hold the last frame
-    if (m_clock >= rec.back().timestamp)
+    if (!m_isPaused)
     {
-        m_clock     = rec.back().timestamp;
-        m_isPlaying = false;
+        m_clock += dt;
+
+        // Recording ended — clamp and stop advancing (ghost stays visible at end)
+        if (m_clock >= rec.back().timestamp)
+            m_clock = rec.back().timestamp;
     }
 
     // Binary search for the last keyframe with timestamp <= clock (keyframe A)
@@ -102,5 +123,32 @@ void ReplayPlayer::Update(float dt)
             sprite->PlayAnimation(A.animName, true);
 
         sprite->SetCurrentFrame(A.animRow, A.animCol);
+    }
+
+    // VFX companion — position + animation driven from recorded VFX state
+    GameObject* vfxObj = GameObjectFactory::Instance().FindGameObject(m_ghostName + "_vfx");
+    if (vfxObj)
+    {
+        auto* vfxTransform = vfxObj->GetComponent<TransformComponent>();
+        if (vfxTransform)
+        {
+            vfxTransform->SetPosition(posX, posY - 10.0f);
+            // Mirror facing direction from ghost scale sign
+            float vfxSx, vfxSy;
+            vfxTransform->GetScale(vfxSx, vfxSy);
+            float sign = (A.scaleX >= 0.0f) ? 1.0f : -1.0f;
+            vfxTransform->SetScale(std::abs(vfxSx) * sign, vfxSy);
+        }
+
+        if (!A.vfxAnimName.empty())
+        {
+            auto* vfxSprite = vfxObj->GetComponent<Spritesheet>();
+            if (vfxSprite)
+            {
+                if (vfxSprite->GetCurrentAnimationName() != A.vfxAnimName)
+                    vfxSprite->PlayAnimation(A.vfxAnimName, true);
+                vfxSprite->SetCurrentFrame(A.vfxAnimRow, A.vfxAnimCol);
+            }
+        }
     }
 }

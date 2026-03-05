@@ -15,16 +15,19 @@ Technology is prohibited.
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-#include <cstdint>
 #include "Factory.h"
 #include "transform.h"
+#include "CameraManager.h"
+#include "CameraComponent.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::ordered_json;
 
 // ===== Helpers =====
 
 std::string GhostSystem::MakePath(const std::string& levelName)
 {
     std::filesystem::create_directories("../Assets/Replay");
-    return "../Assets/Replay/" + levelName + ".ghost";
+    return "../Assets/Replay/" + levelName + ".json";
 }
 
 // ===== ISystem =====
@@ -120,6 +123,69 @@ void GhostSystem::StopPlayback()
     m_player.StopPlayback();
 }
 
+// ===== Replay Watch Mode =====
+
+void GhostSystem::EnterReplayMode()
+{
+    if (m_bestRecording.empty())
+    {
+        std::cout << "[GhostSystem] EnterReplayMode: No recording available." << std::endl;
+        return;
+    }
+
+    // Hide the live player and its VFX so they can't interfere
+    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (hero) hero->SetActive(false);
+
+    GameObject* heroVfx = GameObjectFactory::Instance().FindGameObject("Hero_vfx");
+    if (heroVfx) heroVfx->SetActive(false);
+
+    // Ensure ghost objects are visible
+    GameObject* ghost = GameObjectFactory::Instance().FindGameObject("GhostHero");
+    if (ghost) ghost->SetActive(true);
+
+    GameObject* ghostVfx = GameObjectFactory::Instance().FindGameObject("GhostHero_vfx");
+    if (ghostVfx) ghostVfx->SetActive(true);
+
+    // Switch camera follow target to GhostHero
+    CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
+    if (cam && ghost)
+        cam->SetFollowTarget(ghost);
+
+    // Start playback from the beginning
+    m_player.StartPlayback("GhostHero", m_bestRecording);
+
+    m_isReplayMode = true;
+    std::cout << "[GhostSystem] Replay mode entered." << std::endl;
+}
+
+void GhostSystem::ExitReplayMode()
+{
+    m_player.StopPlayback();
+
+    // Hide ghost objects — playback stopped, they would freeze in place
+    GameObject* ghost = GameObjectFactory::Instance().FindGameObject("GhostHero");
+    if (ghost) ghost->SetActive(false);
+
+    GameObject* ghostVfx = GameObjectFactory::Instance().FindGameObject("GhostHero_vfx");
+    if (ghostVfx) ghostVfx->SetActive(false);
+
+    // Restore live player and its VFX
+    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (hero) hero->SetActive(true);
+
+    GameObject* heroVfx = GameObjectFactory::Instance().FindGameObject("Hero_vfx");
+    if (heroVfx) heroVfx->SetActive(true);
+
+    // Switch camera back to Hero
+    CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
+    if (cam && hero)
+        cam->SetFollowTarget(hero);
+
+    m_isReplayMode = false;
+    std::cout << "[GhostSystem] Replay mode exited." << std::endl;
+}
+
 // ===== Persistence =====
 
 bool GhostSystem::LoadRecording(const std::string& levelName)
@@ -137,34 +203,36 @@ bool GhostSystem::IsGhostAvailable() const
 void GhostSystem::SaveToDisk(const std::string& levelName)
 {
     std::string path = MakePath(levelName);
-    std::ofstream file(path, std::ios::binary | std::ios::trunc);
+    std::ofstream file(path);
     if (!file)
     {
         std::cerr << "[GhostSystem] Failed to open for write: " << path << std::endl;
         return;
     }
 
-    // Header
-    file.write(reinterpret_cast<const char*>(&m_bestTime), sizeof(float));
-    uint32_t count = static_cast<uint32_t>(m_bestRecording.size());
-    file.write(reinterpret_cast<const char*>(&count), sizeof(uint32_t));
+    json root;
+    root["bestTime"] = m_bestTime;
 
-    // Keyframes
+    json frames = json::array();
     for (const auto& kf : m_bestRecording)
     {
-        file.write(reinterpret_cast<const char*>(&kf.timestamp), sizeof(float));
-        file.write(reinterpret_cast<const char*>(&kf.posX),      sizeof(float));
-        file.write(reinterpret_cast<const char*>(&kf.posY),      sizeof(float));
-        file.write(reinterpret_cast<const char*>(&kf.scaleX),    sizeof(float));
-        file.write(reinterpret_cast<const char*>(&kf.scaleY),    sizeof(float));
-
-        uint16_t nameLen = static_cast<uint16_t>(kf.animName.size());
-        file.write(reinterpret_cast<const char*>(&nameLen), sizeof(uint16_t));
-        file.write(kf.animName.c_str(), nameLen);
-
-        file.write(reinterpret_cast<const char*>(&kf.animRow), sizeof(int));
-        file.write(reinterpret_cast<const char*>(&kf.animCol), sizeof(int));
+        json frame;
+        frame["t"]          = kf.timestamp;
+        frame["x"]          = kf.posX;
+        frame["y"]          = kf.posY;
+        frame["sx"]         = kf.scaleX;
+        frame["sy"]         = kf.scaleY;
+        frame["anim"]       = kf.animName;
+        frame["animRow"]    = kf.animRow;
+        frame["animCol"]    = kf.animCol;
+        frame["vfxAnim"]    = kf.vfxAnimName;
+        frame["vfxAnimRow"] = kf.vfxAnimRow;
+        frame["vfxAnimCol"] = kf.vfxAnimCol;
+        frames.push_back(std::move(frame));
     }
+    root["frames"] = std::move(frames);
+
+    file << root.dump(2);
 }
 
 // ===== Finish Trigger =====
@@ -183,45 +251,44 @@ void GhostSystem::SetFinishTrigger(const std::string& targetName, float xThresho
 bool GhostSystem::LoadFromDisk(const std::string& levelName)
 {
     std::string path = MakePath(levelName);
-    std::ifstream file(path, std::ios::binary);
+    std::ifstream file(path);
     if (!file)
     {
         std::cout << "[GhostSystem] No saved recording found for: " << levelName << std::endl;
         return false;
     }
 
-    float    bestTime = FLT_MAX;
-    uint32_t count    = 0;
+    json root;
+    try { file >> root; }
+    catch (const json::parse_error& e)
+    {
+        std::cerr << "[GhostSystem] JSON parse error: " << e.what() << std::endl;
+        return false;
+    }
 
-    file.read(reinterpret_cast<char*>(&bestTime), sizeof(float));
-    file.read(reinterpret_cast<char*>(&count),    sizeof(uint32_t));
+    float bestTime = root.value("bestTime", FLT_MAX);
+    const auto& frames = root["frames"];
 
-    if (!file || count == 0)
+    if (frames.empty())
         return false;
 
     GhostRecording loaded;
-    loaded.reserve(count);
+    loaded.reserve(frames.size());
 
-    for (uint32_t i = 0; i < count; ++i)
+    for (const auto& frame : frames)
     {
         GhostKeyframe kf;
-        file.read(reinterpret_cast<char*>(&kf.timestamp), sizeof(float));
-        file.read(reinterpret_cast<char*>(&kf.posX),      sizeof(float));
-        file.read(reinterpret_cast<char*>(&kf.posY),      sizeof(float));
-        file.read(reinterpret_cast<char*>(&kf.scaleX),    sizeof(float));
-        file.read(reinterpret_cast<char*>(&kf.scaleY),    sizeof(float));
-
-        uint16_t nameLen = 0;
-        file.read(reinterpret_cast<char*>(&nameLen), sizeof(uint16_t));
-        kf.animName.resize(nameLen);
-        file.read(kf.animName.data(), nameLen);
-
-        file.read(reinterpret_cast<char*>(&kf.animRow), sizeof(int));
-        file.read(reinterpret_cast<char*>(&kf.animCol), sizeof(int));
-
-        if (!file)
-            break;
-
+        kf.timestamp   = frame.value("t",          0.0f);
+        kf.posX        = frame.value("x",          0.0f);
+        kf.posY        = frame.value("y",          0.0f);
+        kf.scaleX      = frame.value("sx",         1.0f);
+        kf.scaleY      = frame.value("sy",         1.0f);
+        kf.animName    = frame.value("anim",       std::string{});
+        kf.animRow     = frame.value("animRow",    0);
+        kf.animCol     = frame.value("animCol",    0);
+        kf.vfxAnimName = frame.value("vfxAnim",   std::string{});
+        kf.vfxAnimRow  = frame.value("vfxAnimRow", 0);
+        kf.vfxAnimCol  = frame.value("vfxAnimCol", 0);
         loaded.push_back(std::move(kf));
     }
 
