@@ -85,7 +85,8 @@ namespace CSharpScript
         Ground = 1,
         Enemy = 2,
         Platform = 3,
-        Default = 4
+        Pickup = 4,
+        Default = 5
         // Values must match the C++ enum in ColliderComponent.h
     }
 

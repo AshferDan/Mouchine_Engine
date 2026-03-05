@@ -25,6 +25,7 @@ enum class CollisionLayer
     Ground, // Ground/Wall - used for all static terrain
     Enemy,
     Platform,
+    Pickup,
     Default // For objects without a specific layer
 };
 

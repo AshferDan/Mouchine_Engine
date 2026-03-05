@@ -822,7 +822,7 @@ void GOCreationMenu_Render()
 
             ImGui::DragFloat2("Size", tempGO.colSize, 1.0f);
 
-            const char* layers[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+            const char* layers[] = { "Player", "Ground", "Enemy", "Platform", "Pickup", "Default"};
             ImGui::Combo("Layer", &tempGO.colLayer, layers, IM_ARRAYSIZE(layers));
 
             ImGui::Unindent();
@@ -1782,7 +1782,7 @@ void DirectoryNavigator::RenderImGui()
         if (aIsDir != bIsDir)
             return aIsDir > bIsDir;                                             // prioritise folders, compare bools
         return lhs.path().filename().string() < rhs.path().filename().string(); // alphabet, compare strings
-    });
+    }); 
 
     // For each item in the current folder
     for (auto &iter : entries)
@@ -2647,10 +2647,10 @@ void ImGuiSystem::RenderPropertyEditor()
 
 
                 // Editable Collision Layer Dropdown
-                const char* layerNames[] = { "Player", "Ground", "Enemy", "Platform", "Default" };
+                const char* layerNames[] = { "Player", "Ground", "Enemy", "Platform", "Pickup", "Default" };
                 int currentLayer = static_cast<int>(collider->GetLayer());
 
-                if (ImGui::Combo("Layer", &currentLayer, layerNames, 5))
+                if (ImGui::Combo("Layer", &currentLayer, layerNames, 6))
                 {
                     propertyBeforeJson = Serialization::SerializeGameObject(obj);
 
@@ -4165,6 +4165,8 @@ const char* ImGuiSystem::GetCollisionLayerName(int layer)
     case 4:
         return "Platform";
     case 5:
+        return "Pickup";
+    case 6:
         return "Default";
     default:
         return "Unknown";

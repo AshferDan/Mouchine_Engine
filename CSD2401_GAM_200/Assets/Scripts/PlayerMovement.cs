@@ -196,6 +196,17 @@ namespace CSharpScript
                 false
             );
 
+            // tryina fuckin debug ts wallcheck for walljump fuhfuhfuhfuhfuh
+            CSharpScript.GameObject.CreateShape(
+                "debugraytop",
+                (int)ShapeType.Line,
+                0,0,
+                1000, 50,
+                0.5f, 0.5f, 0.5f, 1.0f,
+                (int)CSharpScript.CollisionLayer.Ground,
+                true, true, false
+            );
+
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
@@ -1656,7 +1667,6 @@ namespace CSharpScript
         {
             if (Collision.IsCollidingWithLayer(OwnerName, (int)(CollisionLayer.Enemy)))
             {
-                Debug.Log("AAAAWORKWORKWORK");
                 if (_hurtTimer < 0)
                 {
                     // take dmg
