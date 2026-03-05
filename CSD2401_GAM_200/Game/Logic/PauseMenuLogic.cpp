@@ -80,7 +80,7 @@ void PauseMenuLogicSystem::Update(float dt)
     bool isWinLoseScreenActive = false;
     if (CORE && CORE->GetGameCallbacks())
     {
-        IGameCallbacks* cb = CORE->GetGameCallbacks();
+        IGameCallbacksSystem* cb = CORE->GetGameCallbacks();
         isWinLoseScreenActive = cb->IsWinScreenActive() || cb->IsLoseScreenActive();
     }
 
@@ -169,7 +169,7 @@ void PauseMenuLogicSystem::Update(float dt)
     // Check if win/lose screens are active
     if (CORE && CORE->GetGameCallbacks())
     {
-        IGameCallbacks* cb = CORE->GetGameCallbacks();
+        IGameCallbacksSystem* cb = CORE->GetGameCallbacks();
         if (cb->IsWinScreenActive() || cb->IsLoseScreenActive())
         {
             shouldHidePauseButton = true;
