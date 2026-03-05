@@ -75,5 +75,18 @@ void ReplayRecorder::Update(float dt)
         frame.animCol = 0;
     }
 
+    // --- VFX companion (e.g. "Hero_vfx" alongside "Hero") ---
+    GameObject* vfxObj = GameObjectFactory::Instance().FindGameObject(m_targetName + "_vfx");
+    if (vfxObj)
+    {
+        auto* vfxSprite = vfxObj->GetComponent<Spritesheet>();
+        if (vfxSprite)
+        {
+            frame.vfxAnimName = vfxSprite->GetCurrentAnimationName();
+            frame.vfxAnimRow  = vfxSprite->GetCurrentRow();
+            frame.vfxAnimCol  = vfxSprite->GetCurrentCol();
+        }
+    }
+
     m_recording.push_back(frame);
 }

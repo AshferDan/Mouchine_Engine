@@ -46,12 +46,25 @@ public:
      */
     void Update(float dt);
 
-    /** @return True while actively playing back. */
+    /** @brief Toggle pause — clock stops advancing but ghost stays visible. */
+    void TogglePause();
+
+    /**
+     * @brief Shift the playback clock by deltaSeconds (negative = rewind).
+     *        Clamps to [0, recording end]. Safe to call while paused.
+     */
+    void Seek(float deltaSeconds);
+
+    /** @return True while actively playing back (including when paused). */
     bool IsPlaying() const { return m_isPlaying; }
+
+    /** @return True if playback is paused. */
+    bool IsPaused()  const { return m_isPaused; }
 
 private:
     std::string           m_ghostName;
     const GhostRecording* m_recording  = nullptr;
     float                 m_clock      = 0.0f;
     bool                  m_isPlaying  = false;
+    bool                  m_isPaused   = false;
 };

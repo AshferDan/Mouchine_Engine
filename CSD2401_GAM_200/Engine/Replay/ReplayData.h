@@ -28,6 +28,11 @@ struct GhostKeyframe
 
     std::string animName; // registered animation name (empty if no Spritesheet)
     int animRow, animCol; // exact spritesheet frame within that animation
+
+    // VFX companion object (e.g. "Hero_vfx" recorded alongside "Hero")
+    std::string vfxAnimName;
+    int vfxAnimRow = 0;
+    int vfxAnimCol = 0;
 };
 
 /** @brief A full run recording — ordered by timestamp ascending. */
