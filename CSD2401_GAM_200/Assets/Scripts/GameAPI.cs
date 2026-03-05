@@ -1456,5 +1456,73 @@ namespace CSharpScript
         }
     }
 
+    /// <summary>
+    /// Ghost player system — records the player's position and animation each frame,
+    /// then drives a ghost object from the best recorded run.
+    ///
+    /// Typical usage:
+    ///   OnStart:  Ghost.LoadRecording("M4_LEVEL");
+    ///             Ghost.StartRecording("Hero");
+    ///             if (Ghost.IsGhostAvailable()) Ghost.StartPlayback("GhostHero");
+    ///   OnFinish: Ghost.StopRecording();
+    ///             Ghost.SaveBestRun("M4_LEVEL", finishTime);
+    /// </summary>
+    public static class Ghost
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void StartRecording(string targetName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void StopRecording();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool SaveBestRun(string levelName, float finishTime);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void StartPlayback(string ghostObjectName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void StopPlayback();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool LoadRecording(string levelName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGhostAvailable();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern float GetBestRunTime();
+
+        /// <summary>Begin recording the named target's position and animation each tick.</summary>
+        public static void BeginRecording(string targetName) => StartRecording(targetName);
+
+        /// <summary>Stop recording. The recording stays in memory.</summary>
+        public static void EndRecording() => StopRecording();
+
+        /// <summary>
+        /// If finishTime beats the current best, save as new best and write to disk.
+        /// Returns true if this is the new best run.
+        /// </summary>
+        public static bool SubmitRun(string levelName, float finishTime) => SaveBestRun(levelName, finishTime);
+
+        /// <summary>Drive the named ghost GameObject from the best recording.</summary>
+        public static void BeginPlayback(string ghostObjectName) => StartPlayback(ghostObjectName);
+
+        /// <summary>Stop driving the ghost object.</summary>
+        public static void EndPlayback() => StopPlayback();
+
+        /// <summary>
+        /// Load the best recording from disk. Call this before BeginPlayback on a new session.
+        /// Returns true if a saved file was found.
+        /// </summary>
+        public static bool Load(string levelName) => LoadRecording(levelName);
+
+        /// <summary>True if a best recording is available to play back.</summary>
+        public static bool HasGhost() => IsGhostAvailable();
+
+        /// <summary>Best run time in seconds. Returns float.MaxValue if no run recorded yet.</summary>
+        public static float BestTime() => GetBestRunTime();
+    }
+
 
 }

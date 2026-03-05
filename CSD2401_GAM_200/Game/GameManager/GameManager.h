@@ -16,8 +16,6 @@ Technology is prohibited.
 #include <memory>
 #include <iostream>
 
-extern bool g_UseGameStates;
-
 /*
  * @Brief Base class for all game states
  */
@@ -55,7 +53,6 @@ public:
 	const char* GetActiveStateName() const;
 	unsigned int GetStackSize() const;
 
-	static bool g_UseGameStates;
 private:
 	GameManager() {}
 	std::stack<std::unique_ptr<GameState>> m_stateStack;

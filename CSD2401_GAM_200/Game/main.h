@@ -38,8 +38,14 @@ Technology is prohibited.
 #include "ScriptComponent.h"
 
 
+// Game-specific systems (now in Game/Logic and Game/GameManager)
 #include "GameManager.h"
 #include "Level1.h"
+#include "MenuLogic.h"
+#include "PauseMenuLogic.h"
+#include "WinLoseLogic.h"
+#include "GameTimerSystem.h"
+#include "GameCallbacks.h"
 
 /**
  * @brief Initializes all main systems and resources for the game.

@@ -16,7 +16,7 @@ Technology is prohibited.
 #include "core.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
-#include "WinLoseLogic.h"
+#include "GameCallbacks.h"
 #include <iostream>
 
 /**
@@ -78,10 +78,10 @@ void PauseMenuLogicSystem::Update(float dt)
 
     // Check if win/lose screens are active
     bool isWinLoseScreenActive = false;
-    if (CORE && CORE->GetWinLoseLogic())
+    if (CORE && CORE->GetGameCallbacks())
     {
-        WinLoseLogicSystem* winLoseSystem = CORE->GetWinLoseLogic();
-        isWinLoseScreenActive = winLoseSystem->IsWinScreenActive() || winLoseSystem->IsLoseScreenActive();
+        IGameCallbacksSystem* cb = CORE->GetGameCallbacks();
+        isWinLoseScreenActive = cb->IsWinScreenActive() || cb->IsLoseScreenActive();
     }
 
     if (pauseBtn && !isPauseMenuActive && !isWinLoseScreenActive)
@@ -167,10 +167,10 @@ void PauseMenuLogicSystem::Update(float dt)
     bool shouldHidePauseButton = isPauseMenuActive;
 
     // Check if win/lose screens are active
-    if (CORE && CORE->GetWinLoseLogic())
+    if (CORE && CORE->GetGameCallbacks())
     {
-        WinLoseLogicSystem* winLoseSystem = CORE->GetWinLoseLogic();
-        if (winLoseSystem->IsWinScreenActive() || winLoseSystem->IsLoseScreenActive())
+        IGameCallbacksSystem* cb = CORE->GetGameCallbacks();
+        if (cb->IsWinScreenActive() || cb->IsLoseScreenActive())
         {
             shouldHidePauseButton = true;
         }

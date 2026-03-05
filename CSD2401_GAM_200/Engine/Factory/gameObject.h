@@ -44,7 +44,6 @@ Technology is prohibited.
 
 #pragma once
 #include "Component.h"
-#include "GameManager.h"
 #include "MathLib.h"
 
 #include <vector>
