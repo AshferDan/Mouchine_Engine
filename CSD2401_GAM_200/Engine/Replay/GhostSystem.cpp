@@ -17,6 +17,8 @@ Technology is prohibited.
 #include <filesystem>
 #include "Factory.h"
 #include "transform.h"
+#include "CameraManager.h"
+#include "CameraComponent.h"
 #include <nlohmann/json.hpp>
 using json = nlohmann::ordered_json;
 
@@ -119,6 +121,69 @@ void GhostSystem::StartPlayback(const std::string& ghostObjectName)
 void GhostSystem::StopPlayback()
 {
     m_player.StopPlayback();
+}
+
+// ===== Replay Watch Mode =====
+
+void GhostSystem::EnterReplayMode()
+{
+    if (m_bestRecording.empty())
+    {
+        std::cout << "[GhostSystem] EnterReplayMode: No recording available." << std::endl;
+        return;
+    }
+
+    // Hide the live player and its VFX so they can't interfere
+    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (hero) hero->SetActive(false);
+
+    GameObject* heroVfx = GameObjectFactory::Instance().FindGameObject("Hero_vfx");
+    if (heroVfx) heroVfx->SetActive(false);
+
+    // Ensure ghost objects are visible
+    GameObject* ghost = GameObjectFactory::Instance().FindGameObject("GhostHero");
+    if (ghost) ghost->SetActive(true);
+
+    GameObject* ghostVfx = GameObjectFactory::Instance().FindGameObject("GhostHero_vfx");
+    if (ghostVfx) ghostVfx->SetActive(true);
+
+    // Switch camera follow target to GhostHero
+    CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
+    if (cam && ghost)
+        cam->SetFollowTarget(ghost);
+
+    // Start playback from the beginning
+    m_player.StartPlayback("GhostHero", m_bestRecording);
+
+    m_isReplayMode = true;
+    std::cout << "[GhostSystem] Replay mode entered." << std::endl;
+}
+
+void GhostSystem::ExitReplayMode()
+{
+    m_player.StopPlayback();
+
+    // Hide ghost objects — playback stopped, they would freeze in place
+    GameObject* ghost = GameObjectFactory::Instance().FindGameObject("GhostHero");
+    if (ghost) ghost->SetActive(false);
+
+    GameObject* ghostVfx = GameObjectFactory::Instance().FindGameObject("GhostHero_vfx");
+    if (ghostVfx) ghostVfx->SetActive(false);
+
+    // Restore live player and its VFX
+    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (hero) hero->SetActive(true);
+
+    GameObject* heroVfx = GameObjectFactory::Instance().FindGameObject("Hero_vfx");
+    if (heroVfx) heroVfx->SetActive(true);
+
+    // Switch camera back to Hero
+    CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
+    if (cam && hero)
+        cam->SetFollowTarget(hero);
+
+    m_isReplayMode = false;
+    std::cout << "[GhostSystem] Replay mode exited." << std::endl;
 }
 
 // ===== Persistence =====
