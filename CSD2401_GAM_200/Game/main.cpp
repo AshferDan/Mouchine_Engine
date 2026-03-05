@@ -62,7 +62,7 @@ int main()
         // through the I
         // interface without depending on their types.
 
-        struct GameApp : public GameCallBacksSystem
+        struct GameApp : public IGameCallbacksSystem
         {
             MenuLogicSystem*      menuLogic      = nullptr;
             PauseMenuLogicSystem* pauseMenuLogic = nullptr;
