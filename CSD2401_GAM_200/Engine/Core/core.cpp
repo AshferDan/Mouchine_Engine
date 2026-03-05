@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "IMessageHandler.h"
 #include "logic.h"
 #include "factory.h"
+#include "GameCallbacks.h"
 
 bool InputManager::KeyStateQuit = false;
 CoreEngine *CORE;
@@ -28,7 +29,6 @@ double CoreEngine::delta_time = 0.0;
 double CoreEngine::fixed_dt = 1.0 / 60.0;
 double g_totalLoopTime = 0.0;
 std::map<std::string, double> g_systemTimings;
-bool g_UseGameStates = false; // TRUE: GameState Mode, FALSE: Engine Mode
 
 /* brief
    Constuctor
@@ -119,13 +119,8 @@ void CoreEngine::InitSystems()
     // 11. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
-    menuLogicSystem = AddSystem<MenuLogicSystem>();
-    pauseMenuLogicSystem = AddSystem<PauseMenuLogicSystem>();
-    winLoseLogicSystem = AddSystem<WinLoseLogicSystem>();
-
     timerSystem = AddSystem<TimerSystem>();
-    gameTimerSystem = AddSystem<GameTimerSystem>();
-    //eventSystem = AddSystem<EventSystem>();
+    ghostSystem = AddSystem<GhostSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
@@ -202,25 +197,11 @@ void CoreEngine::GameLoop()
                 level->LoadLevel(m_pendingScene);
                 std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
-                // Reset pause menu system (UI was destroyed during scene load)
-                if (pauseMenuLogicSystem)
+                // Re-init game-specific systems after scene load
+                if (gameCallbacks)
                 {
-                    pauseMenuLogicSystem->Initialize();
-                    std::cout << "[CoreEngine] Pause menu system reset" << std::endl;
-                }
-
-                // Reset game timer system
-                if (gameTimerSystem)
-                {
-                    gameTimerSystem->Initialize();
-                    std::cout << "[CoreEngine] Game timer system reset" << std::endl;
-                }
-
-                // Reset win zone logic system
-                if (winLoseLogicSystem)
-                {
-                    winLoseLogicSystem->Initialize();
-                    std::cout << "[CoreEngine] Win zone logic system reset" << std::endl;
+                    gameCallbacks->OnSceneLoadReinit();
+                    std::cout << "[CoreEngine] Game systems re-initialised after scene load" << std::endl;
                 }
 
                 // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
@@ -288,14 +269,8 @@ void CoreEngine::GameLoop()
             g_systemTimings[scriptSystem->GetName()] = 0.0;
         if (imguiSystem)
             g_systemTimings[imguiSystem->GetName()] = 0.0;
-        if (menuLogicSystem)
-            g_systemTimings[menuLogicSystem->GetName()] = 0.0;
-        if (pauseMenuLogicSystem)
-            g_systemTimings[pauseMenuLogicSystem->GetName()] = 0.0;
         if (timerSystem)
-            g_systemTimings[menuLogicSystem->GetName()] = 0.0;
-        if (gameTimerSystem)
-            g_systemTimings[gameTimerSystem->GetName()] = 0.0;
+            g_systemTimings[timerSystem->GetName()] = 0.0;
 
         // Start ImGui frame
         if (imguiSystem)
@@ -386,39 +361,20 @@ void CoreEngine::GameLoop()
                 // Flush any GameObjects destroyed from scripts this frame
                 GameObjectFactory::Instance().FlushPendingDestroys();
 
-                if (menuLogicSystem)
-                {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    menuLogicSystem->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[menuLogicSystem->GetName()] = ms;
-                    g_totalLoopTime += ms;
-                }
+                // Ghost system: record player state + drive ghost object (after scripts)
+                if (ghostSystem)
+                    ghostSystem->Update(static_cast<float>(fixed_dt));
+
+                // Game-specific fixed update (menu logic, etc.) – injected by the game project
+                if (gameCallbacks)
+                    gameCallbacks->FixedUpdatePlaying(static_cast<float>(fixed_dt));
+
                 stepOnce = false; // Reset after processing one frame
             }
 
-            // Pause menu must update even when game is paused to handle button clicks
-            if (pauseMenuLogicSystem)
-            {
-                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                pauseMenuLogicSystem->Update(static_cast<float>(fixed_dt));
-                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[pauseMenuLogicSystem->GetName()] = ms;
-                g_totalLoopTime += ms;
-            }
-
-            // Win lone logic system
-            if (winLoseLogicSystem)
-            {
-                std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                winLoseLogicSystem->Update(static_cast<float>(fixed_dt));
-                std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                g_systemTimings[winLoseLogicSystem->GetName()] = ms;
-                g_totalLoopTime += ms;
-            }
+            // Game-specific always-fixed update (pause menu, win/lose) – runs even when paused
+            if (gameCallbacks)
+                gameCallbacks->FixedUpdateAlways(static_cast<float>(fixed_dt));
             // In step mode, only process ONE timestep then break
             if (stepMode)
                 break;
@@ -481,19 +437,9 @@ void CoreEngine::GameLoop()
             timerSystem->Update(static_cast<float>(delta_time));
         }
 
-        if (gameTimerSystem)
-        {
-            std::chrono::high_resolution_clock::time_point sysStart =
-                std::chrono::high_resolution_clock::now();
-
-            gameTimerSystem->Update(static_cast<float>(delta_time));
-
-            std::chrono::high_resolution_clock::time_point sysEnd =
-                std::chrono::high_resolution_clock::now();
-            double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-            g_systemTimings[gameTimerSystem->GetName()] = ms;
-            g_totalLoopTime += ms;
-        }
+        // Game-specific variable-timestep update (game timer, state machine, etc.)
+        if (gameCallbacks)
+            gameCallbacks->VariableUpdate(static_cast<float>(delta_time));
 
         if (imguiSystem)
         {
@@ -510,11 +456,6 @@ void CoreEngine::GameLoop()
         {
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
-
-        if (g_UseGameStates)
-        {
-            GameManager::Instance().GameStateLoop(static_cast<float>(delta_time));
         }
 
         // Update cutscene

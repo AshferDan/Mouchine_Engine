@@ -36,6 +36,7 @@ void EnableMemoryLeakChecking(int breakAlloc = -1)
         _CrtSetBreakAlloc(breakAlloc);
 }
 
+
 /**
  * @brief Main entry point of the program.
  *
@@ -55,7 +56,73 @@ int main()
 
         API::Init_Engine(engine, audio);
 
-        g_UseGameStates = false; // Set the flag to use Game States
+        // ── Register game-specific systems & callbacks ────────────────────────
+        // These systems are compiled in the Game project, not the engine.
+        // They are registered here so the engine can update and notify them
+        // through the I
+        // interface without depending on their types.
+
+        struct GameApp : public IGameCallbacksSystem
+        {
+            MenuLogicSystem*      menuLogic      = nullptr;
+            PauseMenuLogicSystem* pauseMenuLogic = nullptr;
+            WinLoseLogicSystem*   winLoseLogic   = nullptr;
+            GameTimerSystem*      gameTimer      = nullptr;
+
+            void FixedUpdatePlaying(float dt) override {
+                if (menuLogic) menuLogic->Update(dt);
+            }
+            void FixedUpdateAlways(float dt) override {
+                if (pauseMenuLogic) pauseMenuLogic->Update(dt);
+                if (winLoseLogic)   winLoseLogic->Update(dt);
+            }
+            void VariableUpdate(float dt) override {
+                if (gameTimer) gameTimer->Update(dt);
+                GameManager::Instance().GameStateLoop(dt);
+            }
+            void OnEditorStop() override {
+                if (menuLogic) menuLogic->Reset();
+            }
+            void OnLevelLoaded(const std::string& path) override {
+                if (pauseMenuLogic) pauseMenuLogic->SetCurrentScene(path);
+                if (winLoseLogic)   winLoseLogic->SetCurrentScene(path);
+            }
+            void OnSceneLoadReinit() override {
+                if (pauseMenuLogic) pauseMenuLogic->Initialize();
+                if (gameTimer)      gameTimer->Initialize();
+                if (winLoseLogic)   winLoseLogic->Initialize();
+            }
+            bool IsPauseMenuActive()  const override { return pauseMenuLogic && pauseMenuLogic->IsPauseMenuActive(); }
+            bool IsWinScreenActive()  const override { return winLoseLogic   && winLoseLogic->IsWinScreenActive(); }
+            bool IsLoseScreenActive() const override { return winLoseLogic   && winLoseLogic->IsLoseScreenActive(); }
+            bool IsHowToPlayOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsHowToPlayOpen(); }
+            bool IsOnMainMenu()       const override {
+                return pauseMenuLogic &&
+                       pauseMenuLogic->GetCurrentScene().find("MainMenu") != std::string::npos;
+            }
+            std::string GetCurrentScenePath() const override {
+                return pauseMenuLogic ? pauseMenuLogic->GetCurrentScene() : "";
+            }
+            void TogglePauseMenu() override { if (pauseMenuLogic) pauseMenuLogic->TogglePauseMenu(); }
+            void OpenHowToPlay()   override { if (pauseMenuLogic) pauseMenuLogic->OpenHowToPlay(); }
+            void CloseHowToPlay()  override { if (pauseMenuLogic) pauseMenuLogic->CloseHowToPlay(); }
+            void TriggerLose()     override { if (winLoseLogic)   winLoseLogic->TriggerLose(); }
+        };
+
+        static GameApp gameApp;
+        gameApp.menuLogic      = CORE->AddSystem<MenuLogicSystem>();
+        gameApp.pauseMenuLogic = CORE->AddSystem<PauseMenuLogicSystem>();
+        gameApp.winLoseLogic   = CORE->AddSystem<WinLoseLogicSystem>();
+        gameApp.gameTimer      = CORE->AddSystem<GameTimerSystem>();
+
+        gameApp.menuLogic->Initialize();
+        gameApp.pauseMenuLogic->Initialize();
+        gameApp.winLoseLogic->Initialize();
+        gameApp.gameTimer->Initialize();
+
+        CORE->SetGameCallbacks(&gameApp);
+        // ─────────────────────────────────────────────────────────────────────
+
         // CORE->RequestSceneLoad("Prefab_TestScene");
 #ifndef _DEBUG
         CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
@@ -89,6 +156,7 @@ int main()
         {
             ColliderComponent* colComp = Hero->AddComponent<ColliderComponent>();
             PhysicsComponent* phyComp = Hero->AddComponent<PhysicsComponent>();
+            TransformComponent* TransComp = Hero->GetComponent<TransformComponent>();
 
             if (colComp && phyComp)
             {
@@ -105,7 +173,34 @@ int main()
 
                 std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
             }
+            // --- Ghost Player Setup ---
+            // Load the best recording saved from any previous run (no-op if no file exists yet)
+            CORE->GetGhostSystem()->LoadRecording("DebugLevel");
+
+            // Start recording the current run using the Hero object
+            CORE->GetGhostSystem()->StartRecording("Hero");
+
+            // If a previous ghost recording was loaded, clone Hero as the ghost object.
+            // The clone inherits Hero's Spritesheet and RenderComponent automatically —
+            // no manual animation setup needed. Physics and collision are stripped so
+            // the ghost is purely visual and passes through walls.
+            if (CORE->GetGhostSystem()->IsGhostAvailable())
+            {
+                GameObject* GhostHero = GameObjectFactory::Instance().CloneGameObject(
+                    Hero->GetID(), "GhostHero");
+
+                if (GhostHero)
+                {
+                    GhostHero->RemoveComponent<ColliderComponent>();
+                    GhostHero->RemoveComponent<PhysicsComponent>();
+                    GhostHero->RemoveComponent<ScriptComponent>();
+                    CORE->GetGhostSystem()->StartPlayback("GhostHero");
+                }
+            }
         }
+
+        // Stop recording + save best run when Hero crosses x = 3000
+        CORE->GetGhostSystem()->SetFinishTrigger("Hero", 3000.f, "DebugLevel");
 
         GameObject* Platform = GameObjectFactory::Instance().CreateShape(
             "Platform",                  // <--- NAME MUST MATCH C#

@@ -13,7 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "GameTimerSystem.h"
-#include "WinLoseLogic.h"
+#include "GameCallbacks.h"
 #include "ColliderComponent.h"
 #include "Collision.h"
 #include "transform.h"
@@ -69,8 +69,8 @@ void GameTimerSystem::Update(float dt)
     GameObject* timerFrame = factory.FindGameObject("LevelTimerBarFrame");
 
     // hide timer if win or lose screen is active
-    WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
-    if (winLoseLogic && (winLoseLogic->IsWinScreenActive() || winLoseLogic->IsLoseScreenActive()))
+    IGameCallbacksSystem* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
+    if (gameCb && (gameCb->IsWinScreenActive() || gameCb->IsLoseScreenActive()))
     {
         if (timerGO->IsActive())
         {
@@ -88,8 +88,7 @@ void GameTimerSystem::Update(float dt)
     }
 
     // Check if How To Play is open - if so, stop timer and hide it
-    PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
-    bool isHowToPlayOpen = pauseMenu && pauseMenu->IsHowToPlayOpen();
+    bool isHowToPlayOpen = gameCb && gameCb->IsHowToPlayOpen();
 
     // Stop timer countdown and hide timer bar if How To Play is open
     if (isHowToPlayOpen)
@@ -181,10 +180,9 @@ void GameTimerSystem::Update(float dt)
 
             // LOSE CONDITION - trigger lose screen
             std::cout << "TIME'S UP! Triggering lose screen..." << std::endl;
-            WinLoseLogicSystem* P_winLoseLogic = CORE->GetWinLoseLogic();
-            if (P_winLoseLogic)
+            if (gameCb)
             {
-                P_winLoseLogic->TriggerLose();
+                gameCb->TriggerLose();
             }
             return;
         }
@@ -256,8 +254,8 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
     }
 
     // check if win or lose screen is active, if so hide the timer
-    WinLoseLogicSystem* winLoseLogic = CORE->GetWinLoseLogic();
-    if (winLoseLogic && (winLoseLogic->IsWinScreenActive() || winLoseLogic->IsLoseScreenActive()))
+    IGameCallbacksSystem* cb = CORE ? CORE->GetGameCallbacks() : nullptr;
+    if (cb && (cb->IsWinScreenActive() || cb->IsLoseScreenActive()))
     {
         timerGO->SetActive(false);
         return;

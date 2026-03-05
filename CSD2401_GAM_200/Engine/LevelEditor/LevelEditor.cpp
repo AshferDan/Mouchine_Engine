@@ -378,12 +378,11 @@ void LevelEditor::StopPlayMode()
             std::cout << "[LevelEditor] Clearing all active timers.\n";
             ts->ClearAllTimers();
         }
-        MenuLogicSystem* menuLogic = CORE->GetMenuLogic();
-        if (menuLogic)
+        if (CORE->GetGameCallbacks())
         {
-			std::cout << "[LevelEditor] Resetting menu logic.\n";
-			menuLogic->Reset();
-		}
+            std::cout << "[LevelEditor] Notifying game of editor stop.\n";
+            CORE->GetGameCallbacks()->OnEditorStop();
+        }
     }
 
     RestoreSceneState();           // restore saved scene
@@ -984,20 +983,10 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         std::cout << "Level loaded from: " << filepath << "\n";
         std::cout << "Loaded " << factory.GetAllGameObjects().size() << " game objects\n";
 
-        // Update pause menu with current scene path for restart functionality
-        if (CORE)
+        // Notify game systems that a level has been loaded
+        if (CORE && CORE->GetGameCallbacks())
         {
-            PauseMenuLogicSystem* pauseMenu = CORE->GetPauseMenuLogic();
-            if (pauseMenu)
-            {
-                pauseMenu->SetCurrentScene(filepath);
-            }
-
-            WinLoseLogicSystem* winZone = CORE->GetWinLoseLogic();
-            if (winZone)
-            {
-                winZone->SetCurrentScene(filepath);
-            }
+            CORE->GetGameCallbacks()->OnLevelLoaded(filepath);
         }
         currentTilemapPath = "";  // Clear any existing tilemap first
 
