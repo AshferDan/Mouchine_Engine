@@ -101,7 +101,7 @@ namespace CSharpScript
 
         // Cooldowns
         public float GPCooldown = 1.0f;
-        public float RollCooldown = 0.5f;
+        public float RollCooldown = 1.0f;
         public float WKCooldown = 0.5f;
         public float GlideCooldown = 0.2f;
 
@@ -120,8 +120,8 @@ namespace CSharpScript
         // dont have tht WKEase graph thing in unity
 
         // Roll
-        public float BaseRollDuration = 0.4f;       // minimum time
-        public float MidRollDuration = 0.55f;
+        public float BaseRollDuration = 0.3f;       // minimum time
+        public float MidRollDuration = 0.45f;
         public float MaxRollDuration = 0.7f;
         public float BaseRollSpeed = 32f * mod;     // needs to be faster than walk speed to feel like a burst forward
         public float MidRollSpeed = 35f * mod;
@@ -133,7 +133,7 @@ namespace CSharpScript
         public float GPFallSpeed = 50f * mod;
         public float RollHeightToDurationDivisor = 75f * mod;
         public float GroundPoundMaxSpeedHeightThreshold = 80f;
-        public float GPMaxDuratin = 2.5f;
+        public float GPMaxDuration = 2.5f;
 
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.5f;

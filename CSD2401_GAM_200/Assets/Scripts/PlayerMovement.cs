@@ -427,14 +427,12 @@ namespace CSharpScript
                 IsBeingKnockedBack = true;
             }
 
-            //Debug.Log(currState.ToString());
-            if (_isFacingRight) Debug.Log("right");
-            else Debug.Log("left");
+            Debug.Log(currState.ToString());
+            //if (_isFacingRight) Debug.Log("right");
+            //else Debug.Log("left");
 
-                // check for certain states where it should be drawn at player feet rather than tracking
-
-                // check if player is taking damage
-                bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
+            // check if player is taking damage
+            bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
 
             // wall bonk stun
             if (_bonkTimer > 0)
@@ -497,14 +495,17 @@ namespace CSharpScript
                 }
 
                 // normal abilities
-                WallKick();
-                GroundPound();
-                Roll();
-                Glide();
-                WallSlide();
+                if (!isHurting)
+                {
+                    WallKick();
+                    GroundPound();
+                    Roll();
+                    Glide();
+                    WallSlide();
+                }
 
                 // player movement
-                if (!_isRunning && !_isWallKicking && !_isWallJumping && !_isGroundPounding && !_isWallSliding && !_isRolling)
+                if (!_isRunning && !_isWallKicking && !_isWallJumping && !_isGroundPounding && !_isWallSliding && !_isRolling && !isHurting)
                 {
                     Move(InputManager.Movement);
                 }
@@ -628,6 +629,8 @@ namespace CSharpScript
             //{
             //    return;
             //}
+            if (_isWallJumping) return;
+
             float inputX = moveInput.x;
             bool isRunHeld = _isRunToggleActive; // for run toggle option
 
@@ -845,6 +848,7 @@ namespace CSharpScript
             EnterState(currState);
 
             // force roll + ground pound states to end immediately
+            if (_isRolling) StopRoll();
             _isRolling = false;
             _isGroundPounding = false;
 
@@ -859,6 +863,11 @@ namespace CSharpScript
 
             // use T3 variable directly since bonk only happens at top speed
             Vector2 force = MoveStats.T3_BonkForce;
+
+            vec2 currentPos = Transform.GetPosition(OwnerName);
+            Transform.SetPosition(OwnerName,
+                currentPos.x + (-_facingDirection * 5f),   // nudge opposite to facing (away from wall)
+                currentPos.y);
 
             Physics.SetVelocity(OwnerName, -_facingDirection * force.X, force.Y);
             _bonkTimer = MoveStats.T3_BonkDuration;
@@ -1197,6 +1206,11 @@ namespace CSharpScript
             _isSkidding = false;
             _numberOfJumpsUsed = 1; // CHANGE
 
+            //testing
+            _skidTimer = 0f;
+            _calculatedSkidDecel = 0f;
+            resetSkid = false;
+
             currState = PlayerState.WallJumping;
             EnterState(currState);
 
@@ -1216,6 +1230,12 @@ namespace CSharpScript
 
             // apply
             _moveVelocity.x = movespeed * _facingDirection;
+
+            vec2 currentPos = Transform.GetPosition(OwnerName);
+            Transform.SetPosition(OwnerName,
+                currentPos.x + (_facingDirection * 5f),   // 5f = small pixel nudge away from wall
+                currentPos.y);
+
             Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
         }
 
@@ -1387,9 +1407,9 @@ namespace CSharpScript
             blockMovement = false; // allow movement
 
             if (_isTouchingWall || _isWallJumping || _isWallKicking)
-    {
-        movespeed = 0;
-    }
+            {
+                _moveVelocity = new vec2(0, 0);
+            }
         }
 
         #endregion
@@ -1540,11 +1560,10 @@ namespace CSharpScript
             if (_isGliding)
             {
                 currState = PlayerState.Gliding;
-                // play looping glide sound??
 
                 // cooldown ready
-                // cancel if hit ground or dash
-                if (_isGrounded || _isRunning)
+                // cancel if hit ground or wallsliding
+                if (_isGrounded || _isRunning || _isWallSliding)
                 {
                     StopGlide();
                 }
