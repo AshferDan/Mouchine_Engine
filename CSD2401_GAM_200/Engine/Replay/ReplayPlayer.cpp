@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "transform.h"
 #include "Animator.hpp"
 #include <algorithm>
+#include <cmath>
 
 void ReplayPlayer::StartPlayback(const std::string& ghostObjectName, const GhostRecording& recording)
 {
@@ -102,5 +103,32 @@ void ReplayPlayer::Update(float dt)
             sprite->PlayAnimation(A.animName, true);
 
         sprite->SetCurrentFrame(A.animRow, A.animCol);
+    }
+
+    // VFX companion — position + animation driven from recorded VFX state
+    GameObject* vfxObj = GameObjectFactory::Instance().FindGameObject(m_ghostName + "_vfx");
+    if (vfxObj)
+    {
+        auto* vfxTransform = vfxObj->GetComponent<TransformComponent>();
+        if (vfxTransform)
+        {
+            vfxTransform->SetPosition(posX, posY - 10.0f);
+            // Mirror facing direction from ghost scale sign
+            float vfxSx, vfxSy;
+            vfxTransform->GetScale(vfxSx, vfxSy);
+            float sign = (A.scaleX >= 0.0f) ? 1.0f : -1.0f;
+            vfxTransform->SetScale(std::abs(vfxSx) * sign, vfxSy);
+        }
+
+        if (!A.vfxAnimName.empty())
+        {
+            auto* vfxSprite = vfxObj->GetComponent<Spritesheet>();
+            if (vfxSprite)
+            {
+                if (vfxSprite->GetCurrentAnimationName() != A.vfxAnimName)
+                    vfxSprite->PlayAnimation(A.vfxAnimName, true);
+                vfxSprite->SetCurrentFrame(A.vfxAnimRow, A.vfxAnimCol);
+            }
+        }
     }
 }

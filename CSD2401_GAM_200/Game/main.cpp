@@ -194,6 +194,17 @@ int main()
                     GhostHero->RemoveComponent<ColliderComponent>();
                     GhostHero->RemoveComponent<PhysicsComponent>();
                     GhostHero->RemoveComponent<ScriptComponent>();
+
+                    // Clone the VFX companion so ReplayPlayer can drive it
+                    GameObject* HeroVFX = GameObjectFactory::Instance().FindGameObject("Hero_vfx");
+                    if (HeroVFX)
+                    {
+                        GameObject* GhostVFX = GameObjectFactory::Instance().CloneGameObject(
+                            HeroVFX->GetID(), "GhostHero_vfx");
+                        if (GhostVFX)
+                            GhostVFX->RemoveComponent<ScriptComponent>();
+                    }
+
                     CORE->GetGhostSystem()->StartPlayback("GhostHero");
                 }
             }
