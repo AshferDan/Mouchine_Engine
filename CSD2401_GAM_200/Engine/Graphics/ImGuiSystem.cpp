@@ -1771,8 +1771,21 @@ void DirectoryNavigator::RenderImGui()
         columns = 1;
     ImGui::Columns(columns, 0, false);
 
+    //sorts alphabetically
+    std::vector<fs::directory_entry> entries;
+    for (auto& iter : fs::directory_iterator(currentDir))
+        entries.push_back(iter);
+
+    std::sort(entries.begin(), entries.end(), [](fs::directory_entry const& lhs, fs::directory_entry const& rhs)
+    {
+        bool aIsDir{ lhs.is_directory() }, bIsDir{ rhs.is_directory() };
+        if (aIsDir != bIsDir)
+            return aIsDir > bIsDir;                                             // prioritise folders, compare bools
+        return lhs.path().filename().string() < rhs.path().filename().string(); // alphabet, compare strings
+    });
+
     // For each item in the current folder
-    for (auto &iter : fs::directory_iterator(currentDir))
+    for (auto &iter : entries)
     {
         std::string path = iter.path().string();                            // Path we are currently in
         auto relativePath = fs::relative(iter.path(), assetPath);           // Path relative from where we started (assets) to where we are
