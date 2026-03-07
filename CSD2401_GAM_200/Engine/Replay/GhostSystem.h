@@ -61,6 +61,18 @@ public:
     /** @brief Stop driving the ghost object. */
     void StopPlayback();
 
+    /** @brief Toggle pause — ghost freezes in place but stays visible. */
+    void ToggleReplayPause() { m_player.TogglePause(); }
+
+    /**
+     * @brief Shift the replay clock by deltaSeconds (negative = rewind).
+     *        Clamps to [0, recording end]. Safe to call while paused.
+     */
+    void SeekReplay(float deltaSeconds) { m_player.Seek(deltaSeconds); }
+
+    /** @return True if the replay is currently paused. */
+    bool IsReplayPaused() const { return m_player.IsPaused(); }
+
     // ===== Persistence =====
 
     /**
@@ -81,6 +93,25 @@ public:
 
     /** @return True while the ghost is actively playing back. */
     bool IsGhostPlaying() const { return m_player.IsPlaying(); }
+
+    // ===== Replay Watch Mode =====
+
+    /**
+     * @brief Enter a dedicated replay watch mode.
+     *        Hides the live Hero, switches the camera to follow GhostHero,
+     *        and starts playback from the beginning. Only F7/F8/F9/ESC respond.
+     *        No-op if no recording is available.
+     */
+    void EnterReplayMode();
+
+    /**
+     * @brief Exit replay watch mode.
+     *        Restores the live Hero, switches camera back to Hero, stops playback.
+     */
+    void ExitReplayMode();
+
+    /** @return True while in the dedicated replay watch mode. */
+    bool IsReplayMode() const { return m_isReplayMode; }
 
     // ===== Finish Trigger =====
 
@@ -110,4 +141,7 @@ private:
     float       m_finishX    = FLT_MAX;
     std::string m_finishLevel;
     bool        m_finishDone = false;
+
+    // Replay watch mode
+    bool        m_isReplayMode = false;
 };

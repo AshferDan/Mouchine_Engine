@@ -136,7 +136,7 @@ void CameraManager::ResetState() {
 		}
 	}
 
-	// 2. If NO camera found, CREATE one (Fallback)
+	// 2. If NO camera found, CREATE one 
 	if (!activeCamObj) {
 		std::cout << "[CameraManager] No camera found. Creating default 'MainCamera'.\n";
 		// Create the new object

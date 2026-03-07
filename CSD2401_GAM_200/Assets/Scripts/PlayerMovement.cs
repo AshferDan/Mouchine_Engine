@@ -196,6 +196,17 @@ namespace CSharpScript
                 false
             );
 
+            // tryina fuckin debug ts wallcheck for walljump fuhfuhfuhfuhfuh
+            CSharpScript.GameObject.CreateShape(
+                "debugraytop",
+                (int)ShapeType.Line,
+                0,0,
+                1000, 50,
+                0.5f, 0.5f, 0.5f, 1.0f,
+                (int)CSharpScript.CollisionLayer.Ground,
+                true, true, false
+            );
+
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
             Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
@@ -234,6 +245,7 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero", "Jump", "../Assets/spritesheet_R.png", 13, 10, 11, 4, 11, 5, 12.0f);
             Animation.RegisterAnimation("Hero", "Glide", "../Assets/spritesheet_R.png", 13, 10, 1, 0, 1, 2, 8.0f);
             Animation.RegisterAnimation("Hero", "Roll", "../Assets/spritesheet_R.png", 13, 10, 8, 0, 8, 5, 14.0f);
+            Animation.RegisterAnimation("Hero", "Groundpound_Init", "../Assets/spritesheet_R.png", 13, 10, 9, 0, 9, 1, 10.0f);
             Animation.RegisterAnimation("Hero", "Groundpound", "../Assets/spritesheet_R.png", 13, 10, 9, 3, 9, 4, 10.0f);
             Animation.RegisterAnimation("Hero", "Dash", "../Assets/spritesheet_R.png", 13, 10, 0, 0, 0, 3, 4.0f);
             Animation.RegisterAnimation("Hero", "Wallkick", "../Assets/spritesheet_R.png", 13, 10, 4, 3, 4, 4, 4.0f);
@@ -352,6 +364,10 @@ namespace CSharpScript
                     Animation.PlayAnimation(vfx, "Land", false);
                     break;
                 case PlayerState.GroundPounding:
+                    Animation.PlayAnimation(OwnerName, "Groundpound_Init", false);
+                    Animation.PlayAnimation(vfx, "Groundpound");
+                    break;
+                case PlayerState.GroundPounding_Falling:
                     Animation.PlayAnimation(OwnerName, "Groundpound");
                     Animation.PlayAnimation(vfx, "Groundpound");
                     break;
@@ -423,9 +439,8 @@ namespace CSharpScript
             }
 
             Debug.Log(currState.ToString());
-
-
-            // check for certain states where it should be drawn at player feet rather than tracking
+            //if (_isFacingRight) Debug.Log("right");
+            //else Debug.Log("left");
 
             // check if player is taking damage
             bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
@@ -491,14 +506,17 @@ namespace CSharpScript
                 }
 
                 // normal abilities
-                WallKick();
-                GroundPound();
-                Roll();
-                Glide();
-                WallSlide();
+                if (!isHurting)
+                {
+                    WallKick();
+                    GroundPound();
+                    Roll();
+                    Glide();
+                    WallSlide();
+                }
 
                 // player movement
-                if (!_isRunning && !_isWallKicking && !_isWallJumping && !_isGroundPounding && !_isWallSliding && !_isRolling)
+                if (!_isRunning && !_isWallKicking && !_isWallJumping && !_isGroundPounding && !_isWallSliding && !_isRolling && !isHurting)
                 {
                     Move(InputManager.Movement);
                 }
@@ -622,6 +640,8 @@ namespace CSharpScript
             //{
             //    return;
             //}
+            if (_isWallJumping) return;
+
             float inputX = moveInput.x;
             bool isRunHeld = _isRunToggleActive; // for run toggle option
 
@@ -632,7 +652,7 @@ namespace CSharpScript
             // landing skid check - for jump flip
             // if hit groud + fast speed BUT facing opposite direction of movement = landing skid
             bool movingAgainstFacing = Math.Sign(Physics.GetVelocity(OwnerName).x) != _facingDirection;
-            bool isMovingFast = Math.Abs(Physics.GetVelocity(OwnerName).x) > 5f;            // small threshold (1f) to ignore tiny jitters when stopping
+            bool isMovingFast = Math.Abs(Physics.GetVelocity(OwnerName).x) >= MoveStats.T1_Threshold;            // small threshold (1f) to ignore tiny jitters when stopping
 
 
             if (_isGrounded && isMovingFast && movingAgainstFacing && !_isSkidding)
@@ -767,10 +787,10 @@ namespace CSharpScript
             if (!_isGrounded && movespeed > MoveStats.T0_MaxSpeed)
             {
                 // if facing right (1) but moving left (vel < -1) -> apply force left (-1)
-                if (_facingDirection == 1 && Physics.GetVelocity(OwnerName).x < -1f) moveDir = -1;
-
-                // if facing left (-1) but moving right (vel > 1) -> apply force right (1)
-                else if (_facingDirection == -1 && Physics.GetVelocity(OwnerName).x > 1f) moveDir = 1;
+                if (_facingDirection == 1 && Physics.GetVelocity(OwnerName).x < -1f)
+                    moveDir = -1;
+                else if (_facingDirection == -1 && Physics.GetVelocity(OwnerName).x > 1f)
+                    moveDir = 1;
             }
 
             _moveVelocity.x = movespeed * moveDir;
@@ -839,6 +859,7 @@ namespace CSharpScript
             EnterState(currState);
 
             // force roll + ground pound states to end immediately
+            if (_isRolling) StopRoll();
             _isRolling = false;
             _isGroundPounding = false;
 
@@ -853,6 +874,11 @@ namespace CSharpScript
 
             // use T3 variable directly since bonk only happens at top speed
             Vector2 force = MoveStats.T3_BonkForce;
+
+            vec2 currentPos = Transform.GetPosition(OwnerName);
+            Transform.SetPosition(OwnerName,
+                currentPos.x + (-_facingDirection * 5f),   // nudge opposite to facing (away from wall)
+                currentPos.y);
 
             Physics.SetVelocity(OwnerName, -_facingDirection * force.X, force.Y);
             _bonkTimer = MoveStats.T3_BonkDuration;
@@ -1144,6 +1170,7 @@ namespace CSharpScript
 
                     currState = PlayerState.WallSliding;
                     EnterState(currState);
+                    StopRoll();
 
                     // reset jumps if want wall sliding to refresh double jump
                     _numberOfJumpsUsed = 0;
@@ -1190,6 +1217,11 @@ namespace CSharpScript
             _isSkidding = false;
             _numberOfJumpsUsed = 1; // CHANGE
 
+            //testing
+            _skidTimer = 0f;
+            _calculatedSkidDecel = 0f;
+            resetSkid = false;
+
             currState = PlayerState.WallJumping;
             EnterState(currState);
 
@@ -1199,6 +1231,7 @@ namespace CSharpScript
             // flip to jump away from wall
             Turn(jumpDir == 1);
             _facingDirection = jumpDir;
+            _isFacingRight = jumpDir == 1;
 
             // force - restore stats values
             VerticalVelocity = MoveStats.WallJumpForce.y;
@@ -1208,6 +1241,12 @@ namespace CSharpScript
 
             // apply
             _moveVelocity.x = movespeed * _facingDirection;
+
+            vec2 currentPos = Transform.GetPosition(OwnerName);
+            Transform.SetPosition(OwnerName,
+                currentPos.x + (_facingDirection * 5f),   // 5f = small pixel nudge away from wall
+                currentPos.y);
+
             Physics.SetVelocity(OwnerName, _moveVelocity.x, VerticalVelocity);
         }
 
@@ -1356,23 +1395,14 @@ namespace CSharpScript
             // Cancel roll if touching wall in air
             if (_isRolling)
             {
+                if (_isTouchingWall || _rollTimer <= 0 || _isWallJumping || _isWallKicking)
+                {
+                    StopRoll();
+                    return;
+                }
+
                 currState = PlayerState.Rolling;
-                //block input here
-                // hit wall = stop roll immediately
-                if (_isTouchingWall)
-                {
-                    StopRoll();
-                    return;
-                }
-
-                // timer logic
                 _rollTimer -= fixeddt;
-
-                if (_rollTimer <= 0)
-                {
-                    StopRoll();
-                    return;
-                }
 
                 // constant velocity (no friction) - just keep moving at set movespeed for whole duration
                 _moveVelocity.x = movespeed * _facingDirection;
@@ -1386,6 +1416,11 @@ namespace CSharpScript
 
             _isRolling = false;
             blockMovement = false; // allow movement
+
+            if (_isTouchingWall || _isWallJumping || _isWallKicking)
+            {
+                _moveVelocity = new vec2(0, 0);
+            }
         }
 
         #endregion
@@ -1424,6 +1459,7 @@ namespace CSharpScript
                 {
                     // freeze in air
                     // maybe pause sound effect?
+                    currState = PlayerState.GroundPounding;
                     _groundPoundPauseTimer -= fixeddt;
                     Physics.SetVelocity(OwnerName, 0,0);
                     transform.position = lastPos;
@@ -1445,6 +1481,7 @@ namespace CSharpScript
                             EnterState(currState);
                         }
                         gp_falling = true;
+                        currState = PlayerState.GroundPounding_Falling;
                         _moveVelocity.y = -MoveStats.GPFallSpeed;
                         Physics.SetVelocity(OwnerName, 0, _moveVelocity.y);
                         CollisionChecks();
@@ -1534,11 +1571,10 @@ namespace CSharpScript
             if (_isGliding)
             {
                 currState = PlayerState.Gliding;
-                // play looping glide sound??
 
                 // cooldown ready
-                // cancel if hit ground or dash
-                if (_isGrounded || _isRunning)
+                // cancel if hit ground or wallsliding
+                if (_isGrounded || _isRunning || _isWallSliding)
                 {
                     StopGlide();
                 }
@@ -1631,7 +1667,6 @@ namespace CSharpScript
         {
             if (Collision.IsCollidingWithLayer(OwnerName, (int)(CollisionLayer.Enemy)))
             {
-                Debug.Log("AAAAWORKWORKWORK");
                 if (_hurtTimer < 0)
                 {
                     // take dmg
@@ -1835,7 +1870,7 @@ namespace CSharpScript
         {
             if (Collision.Raycast(OwnerName, origin, direction, length, out string hitObject, out float hitDistance))
             {
-                if (Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Ground)
+                if (Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Ground || Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Enemy)
                 {
                     return true;
                 }
@@ -1877,7 +1912,7 @@ namespace CSharpScript
             }
 
             // Bottom raycast
-            vec2 bottomRayOrigin = new vec2(position.x, position.y - halfHeight * 0.9f);
+            vec2 bottomRayOrigin = new vec2(position.x, position.y - halfHeight * 0.8f);
             if (RaycastForWall(bottomRayOrigin, rayDirection, raycastLength))
             {
                 _isTouchingWall = true; Debug.Log("[Raycast] TOUCHING");

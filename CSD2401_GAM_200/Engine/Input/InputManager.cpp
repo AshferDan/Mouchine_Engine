@@ -256,6 +256,11 @@ void InputManager::Update(float)
         {GLFW_KEY_F2, false},
         {GLFW_KEY_F3, false},
         {GLFW_KEY_F4, false},
+        {GLFW_KEY_F6, false}, // replay best run (ghost alongside player)
+        {GLFW_KEY_F10, false}, // enter replay watch mode
+        {GLFW_KEY_F7, false}, // rewind 10s
+        {GLFW_KEY_F8, false}, // pause/resume replay
+        {GLFW_KEY_F9, false}, // forward 10s
         {GLFW_KEY_M, false}, // toggle pause (for now)
         {GLFW_KEY_ENTER, false},
         {GLFW_KEY_ESCAPE,false},
@@ -311,15 +316,27 @@ void InputManager::Update(float)
         bool winScreenActive  = gameCb && gameCb->IsWinScreenActive();
         bool loseScreenActive = gameCb && gameCb->IsLoseScreenActive();
 
-        // In play mode: ESC toggles pause menu (unless win/lose screen is active or in main menu)
+        // In play mode: ESC exits replay mode if active, otherwise toggles pause menu
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            // Don't toggle pause menu if How To Play screen is open - let PauseMenuLogic handle it
-            bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
+            GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
+            bool isReplayMode = ghostSys && ghostSys->IsReplayMode();
 
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen)
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE])
             {
-                if (gameCb) gameCb->TogglePauseMenu();
+                if (isReplayMode)
+                {
+                    ghostSys->ExitReplayMode();
+                }
+                else
+                {
+                    // Don't toggle pause menu if How To Play screen is open
+                    bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
+                    if (!winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen)
+                    {
+                        if (gameCb) gameCb->TogglePauseMenu();
+                    }
+                }
                 singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
             }
         }
@@ -438,6 +455,59 @@ void InputManager::Update(float)
                     ShowFPS = !ShowFPS;
                     std::cout << "FPS display " << (ShowFPS ? "ENABLED" : "DISABLED") << std::endl;
                 }
+                else if (key == GLFW_KEY_F6 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostAvailable())
+                    {
+                        ghost->StartPlayback("GhostHero");
+                        std::cout << "[InputManager] F6 - Replaying best run (ghost alongside)" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "[InputManager] F6 - No ghost recording available yet" << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F10 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostAvailable())
+                    {
+                        ghost->EnterReplayMode();
+                        std::cout << "[InputManager] F10 - Entering replay watch mode" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "[InputManager] F10 - No ghost recording available yet" << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F7 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostPlaying())
+                    {
+                        ghost->SeekReplay(-10.0f);
+                        std::cout << "[InputManager] F7 - Rewind 10s" << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F8 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostPlaying())
+                    {
+                        ghost->ToggleReplayPause();
+                        std::cout << "[InputManager] F8 - Replay " << (ghost->IsReplayPaused() ? "paused" : "resumed") << std::endl;
+                    }
+                }
+                else if (key == GLFW_KEY_F9 && isPlayMode)
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost && ghost->IsGhostPlaying())
+                    {
+                        ghost->SeekReplay(10.0f);
+                        std::cout << "[InputManager] F9 - Forward 10s" << std::endl;
+                    }
+                }
                 else if (key == GLFW_KEY_P) {
 
                 }
@@ -450,6 +520,13 @@ void InputManager::Update(float)
         }
     }
 
+
+    // In replay watch mode, block all player input below this point
+    {
+        GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
+        if (ghostSys && ghostSys->IsReplayMode())
+            return;
+    }
 
     GameObject* player = nullptr;
 
