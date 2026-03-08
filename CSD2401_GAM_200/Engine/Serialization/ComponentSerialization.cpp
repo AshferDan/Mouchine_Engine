@@ -825,6 +825,18 @@ void ComponentSerialization::DeserializeTilemap(const json& j, GameObject* go)
     {
         tilemap->LoadTilemapFromFile(filepath);
     }
+
+    // AUTO-ADD RENDERCOMPONENT IF IT DOESN'T EXIST (because im too lazy to reload the tilemap)
+    if (!go->GetComponent<RenderComponent>())
+    {
+        auto* renderComp = go->AddComponent<RenderComponent>();
+        if (renderComp)
+        {
+            renderComp->SetShapeType(RenderComponent::ShapeType::Empty);
+            renderComp->SetEnabled(true);
+            std::cout << "[Tilemap] Auto-added RenderComponent to tilemap" << std::endl;
+        }
+    }
 }
 void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
 {
