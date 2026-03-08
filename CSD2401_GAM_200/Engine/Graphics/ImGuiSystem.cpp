@@ -577,7 +577,6 @@ void ImGuiSystem::Update(float dt)
             // Render layer visibility panel
             LayerPanel_Render();
 
-            // Render profiler! Make it toggleable?
             Profiler_Render();
         }
         // if IS in play mode

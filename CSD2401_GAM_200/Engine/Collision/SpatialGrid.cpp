@@ -16,6 +16,7 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include <cmath>
 #include <algorithm>
+#include <unordered_set>
 
 /**
  * @brief Constructs spatial grid and calculates grid dimensions
@@ -113,17 +114,18 @@ std::vector<GameObject*> SpatialGrid::Query(GameObject* obj, ColliderComponent* 
     maxCol = (maxCol < numCols - 1) ? maxCol + 1 : numCols - 1;
     maxRow = (maxRow < numRows - 1) ? maxRow + 1 : numRows - 1;
 
+    // O(1) duplicate tracking instead of O(n) std::find per object
+    std::unordered_set<GameObject*> seen;
+    seen.insert(obj); // treat self as already seen to skip self-collision
+
     // Collect all objects from relevant cells
     for (int row = minRow; row <= maxRow; ++row) {
         for (int col = minCol; col <= maxCol; ++col) {
             int hash = CellToHash(col, row);
             auto it = cells.find(hash);
             if (it != cells.end()) {
-                // Add all objects from this cell
                 for (GameObject* other : it->second) {
-                    // Avoid duplicates and self-collision
-                    if (other != obj &&
-                        std::find(results.begin(), results.end(), other) == results.end()) {
+                    if (seen.insert(other).second) { // insert returns false if already present
                         results.push_back(other);
                     }
                 }
