@@ -184,7 +184,7 @@ namespace API {
     /**
      * @brief Sets the render layer category for a GameObject.
      * @param objectName The name of the GameObject.
-     * @param layer The layer category (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).
+     * @param layer The game layer index (0=Background, 1=Player, 2=Enemies, 3=UI).
      */
     void SetRenderLayer(const std::string& objectName, int layer);
 
@@ -197,8 +197,8 @@ namespace API {
 
     /**
      * @brief Sets visibility for an entire layer category.
-     * @param layer The layer category (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).
-     * @param visible True to show, false to hide all objects in this layer.
+     * @param layer The game layer index (0=Background, 1=Player, 2=Enemies, 3=UI).
+     * @param visible True to enable, false to disable all objects in this layer (rendering, physics, scripting).
      */
     void SetLayerVisible(int layer, bool visible);
 

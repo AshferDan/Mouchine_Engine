@@ -262,6 +262,21 @@ public:
      */
     bool IsActive() const { return isActive; }
 
+    // Game layer
+    /**
+     * @brief Gets the game layer index this GameObject belongs to.
+     * @return Layer index (0 = Default).
+     */
+    int GetGameLayer() const { return gameLayer; }
+
+    /**
+     * @brief Assigns this GameObject to a game layer.
+     * When the layer is disabled via LayerManager, this object is skipped
+     * by all systems (rendering, physics, collision, scripting).
+     * @param layer Layer index (0 to LayerManager::MAX_LAYERS-1).
+     */
+    void SetGameLayer(int layer) { gameLayer = layer; }
+
     void AddChild(GameObject* ChildGO);
 
     void RemoveChild(GameObject* ChildGO);
@@ -297,8 +312,9 @@ private:
     std::string name;
     bool isActive;
     bool isDestroyed = false;
+    int gameLayer = 0;  // Layer index (0 = Default); controlled by LayerManager
     GameObject* parent;
-    std::vector<GameObject*> children;                  
+    std::vector<GameObject*> children;
     std::unordered_map<std::type_index, std::unique_ptr<IComponent>> components;
 
     std::string m_currentlyPlayingSound;

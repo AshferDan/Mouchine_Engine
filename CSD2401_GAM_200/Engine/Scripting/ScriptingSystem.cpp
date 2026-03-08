@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "ScriptingSystem.h"
 #include "gameObject.h"
 #include "ScriptAPI.h"
+#include "LayerManager.h"
 #include <iostream>
 #include <filesystem>
 #include <mono/metadata/attrdefs.h>
@@ -1873,6 +1874,9 @@ void ScriptSystem::Update(float deltaTime)
     // Update all scripts attached to game objects
     for (auto &[gameObject, instances] : gameObjectScripts)
     {
+        if (!LayerManager::IsLayerEnabled(gameObject->GetGameLayer()))
+            continue;
+
         CallOnUpdate(gameObject, deltaTime);
     }
 }

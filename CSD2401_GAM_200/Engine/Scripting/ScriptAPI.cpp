@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "ScriptAPI.h"
+#include "LayerManager.h"
 
 namespace API
 {
@@ -219,11 +220,7 @@ namespace API
         GameObject *obj = factory.FindGameObject(objectName);
         if (obj)
         {
-            auto *render = obj->GetComponent<RenderComponent>();
-            if (render)
-            {
-                render->SetRenderLayerInt(layer);
-            }
+            obj->SetGameLayer(layer);
         }
     }
 
@@ -233,30 +230,19 @@ namespace API
         GameObject *obj = factory.FindGameObject(objectName);
         if (obj)
         {
-            auto *render = obj->GetComponent<RenderComponent>();
-            if (render)
-            {
-                return render->GetRenderLayerInt();
-            }
+            return obj->GetGameLayer();
         }
         return 0;
     }
 
     void SetLayerVisible(int layer, bool visible)
     {
-        if (layer >= 0 && layer < static_cast<int>(RenderComponent::RenderLayer::Count))
-        {
-            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(layer), visible);
-        }
+        LayerManager::SetLayerEnabled(layer, visible);
     }
 
     bool IsLayerVisible(int layer)
     {
-        if (layer >= 0 && layer < static_cast<int>(RenderComponent::RenderLayer::Count))
-        {
-            return RenderComponent::IsLayerVisible(static_cast<RenderComponent::RenderLayer>(layer));
-        }
-        return false;
+        return LayerManager::IsLayerEnabled(layer);
     }
 
     void SetBackGround(char const *filename)
