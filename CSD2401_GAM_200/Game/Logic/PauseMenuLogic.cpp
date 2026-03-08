@@ -14,6 +14,7 @@ Technology is prohibited.
 
 #include "PauseMenuLogic.h"
 #include "core.h"
+#include "GhostSystem.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
 #include "GameCallbacks.h"
@@ -252,6 +253,14 @@ void PauseMenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "PauseRestartButton")
             {
                 std::cout << "[PauseMenu] Restart clicked" << std::endl;
+
+                // Discard any in-progress recording before restarting
+                if (GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr)
+                {
+                    ghost->StopRecording();
+                    ghost->ResetRecording();
+                }
+
                 // Destroy UI before scene change
                 DestroyHowToPlayUI();
                 DestroyPauseSettingsUI();
