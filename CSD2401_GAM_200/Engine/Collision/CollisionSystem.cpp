@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "Factory.h"
 #include "ColliderComponent.h"
 #include "Collision.h"
+#include "LayerManager.h"
 #include <iostream>
 #include <algorithm>
 
@@ -108,6 +109,9 @@ void CollisionSystem::Update(float deltaTime)
     // Insert all objects with colliders into the grid
     for (const auto& obj : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue;
+
         auto* collider = obj->GetComponent<ColliderComponent>();
         if (collider && collider->IsEnabled())
         {
@@ -118,6 +122,9 @@ void CollisionSystem::Update(float deltaTime)
     // Use spatial grid for broad-phase collision detection
     for (const auto& obj1 : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj1->GetGameLayer()))
+            continue;
+
         auto* col1 = obj1->GetComponent<ColliderComponent>();
         if (!col1 || !col1->IsEnabled())
             continue;

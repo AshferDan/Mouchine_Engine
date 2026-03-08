@@ -15,7 +15,7 @@ Technology is prohibited.
 
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
-
+#include "LayerManager.h"
 #include "ResourceManager.h"
 
 // Global constant for configuration file path (currently unused in this file)
@@ -608,9 +608,14 @@ void GraphicsSystem::Update(float)
             continue;
         }
 
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+        {
+            continue;
+        }
+
         auto *rend = obj->GetComponent<RenderComponent>();
 
-        if (!rend || !rend->IsEnabled() || !rend->IsLayerEnabled())
+        if (!rend || !rend->IsEnabled())
         {
             continue;
         }
@@ -774,8 +779,13 @@ void GraphicsSystem::Update(float)
             continue;
         }
 
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+        {
+            continue;
+        }
+
         auto *rend = obj->GetComponent<RenderComponent>();
-        if (rend && rend->IsEnabled() && rend->IsLayerEnabled())
+        if (rend && rend->IsEnabled())
         {
             // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
             switch (rend->GetShapeType())
@@ -1686,8 +1696,6 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     clonedComponent->SetUVOffset(this->uvOffset);
     clonedComponent->SetScreenSpace(this->screenSpace);
     clonedComponent->SetColor(this->color);
-    clonedComponent->SetRenderLayer(this->renderLayer);
-
     return clonedComponent;
 }
 
