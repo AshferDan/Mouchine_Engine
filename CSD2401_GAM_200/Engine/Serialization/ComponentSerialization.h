@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "GameObject.h"
 #include "Transform.h"
 #include "RenderComponent.h"
+#include "LayerComponent.h"
 #include "TextComponent.h"
 #include "CameraComponent.h"
 #include "Physics.h"
@@ -67,6 +68,7 @@ namespace ComponentSerialization
     void DeserializeEvent(const json& j, GameObject* go);
     void DeserializeTilemap(const json& j, GameObject* go);
     void DeserializeScript(const json& j, GameObject* go);
+    void DeserializeLayerComponent(const json& j, GameObject* go);
 
     // ----------- Convenience Wrappers ------------------------------
     void SerializeAllComponents(GameObject* go, json& j);

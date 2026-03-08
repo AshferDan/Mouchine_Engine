@@ -25,6 +25,7 @@ Technology is prohibited.
 
 #include "Message.h"
 #include "IMessageHandler.h"
+#include "LayerManager.h"
 
 /**
  * @brief Default constructor
@@ -61,6 +62,9 @@ void PhysicsSystem::Update(float deltaTime)
     // Integrate physics for all objects
     for (const auto& obj : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue;
+
         auto* physics = obj->GetComponent<PhysicsComponent>();
         if (physics && physics->IsEnabled())
         {
@@ -71,6 +75,9 @@ void PhysicsSystem::Update(float deltaTime)
     // Clear grounded state for ALL objects before resolving collisions
     for (const auto& obj : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue;
+
         auto* physics = obj->GetComponent<PhysicsComponent>();
         if (physics && !physics->IsStatic())
         {
