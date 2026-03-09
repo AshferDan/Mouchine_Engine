@@ -46,6 +46,7 @@ Technology is prohibited.
 #include "TimerSystem.h"
 #include "GhostSystem.h"
 #include "GameCallbacks.h"
+#include "ScreenTransitionSystem.h"
 
 // Inside CoreEngine class
 
@@ -62,6 +63,7 @@ class ScriptSystem;
 class LevelEditor;
 class AudioManager;
 class CutsceneSystem;
+class ScreenTransitionSystem;
 
 class CoreEngine : public IMessageHandler
 {
@@ -250,6 +252,12 @@ public:
     GhostSystem *GetGhostSystem() const { return ghostSystem; }
 
     /**
+     * @brief Gets a pointer to the Screen Transition.
+     * @return A pointer to the GhostSystem.
+     */
+    ScreenTransitionSystem* GetScreenTransitionSystem() const { return screenTransitionSystem; }
+
+    /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
      */
@@ -346,6 +354,7 @@ private:
     TimerSystem *timerSystem = nullptr;
     GhostSystem *ghostSystem = nullptr;
     IGameCallbacksSystem *gameCallbacks = nullptr;
+    ScreenTransitionSystem* screenTransitionSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;

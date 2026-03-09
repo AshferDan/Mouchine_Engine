@@ -120,7 +120,10 @@ void CoreEngine::InitSystems()
     scriptSystem = AddSystem<ScriptSystem>();
 
     timerSystem = AddSystem<TimerSystem>();
+
     ghostSystem = AddSystem<GhostSystem>();
+
+    screenTransitionSystem = AddSystem<ScreenTransitionSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
@@ -405,6 +408,10 @@ void CoreEngine::GameLoop()
             double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
             g_systemTimings[graphicsSystem->GetName()] = ms;
             g_totalLoopTime += ms;
+        }
+
+        if (screenTransitionSystem) {
+            screenTransitionSystem->Render();
         }
 
         if (debugSystem)
