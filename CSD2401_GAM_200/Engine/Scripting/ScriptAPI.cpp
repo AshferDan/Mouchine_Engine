@@ -1492,7 +1492,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         return static_cast<int>(cs->GetCollidingObjectIDOnLayer(obj, static_cast<CollisionLayer>(targetLayer)));
     }
 
-    // --- Shared helper: find a MonoObject instance + MonoClassField by names ---
+    // --- find a MonoObject instance + MonoClassField by names ---
     static bool FindScriptField(const std::string& objectName,
                                 const std::string& scriptClass,
                                 const std::string& fieldName,

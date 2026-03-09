@@ -386,7 +386,7 @@ std::string CollisionSystem::GetCollidingObjectNameOnLayer(GameObject* obj, Coll
     return "";
 }
 
-uint32_t CollisionSystem::GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer)
+EntityID CollisionSystem::GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer)
 {
     GameObject* hitObject = nullptr;
     if (IsCollidingWithLayer(obj, targetLayer, &hitObject) && hitObject)

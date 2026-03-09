@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "System.h"
 #include "ColliderComponent.h"
 #include "SpatialGrid.h"
+#include "gameObject.h"
 #include <unordered_set>
 #include <string>
 
@@ -84,7 +85,7 @@ public:
      * @brief Returns the unique EntityID of the first object on targetLayer colliding with obj.
      * @return The object's ID, or 0 if no collision (IDs start at 1).
      */
-    uint32_t GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer);
+    EntityID GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer);
 
 
     // ===== Raycast Functions =====

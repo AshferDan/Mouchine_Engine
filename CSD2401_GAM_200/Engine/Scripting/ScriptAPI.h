@@ -525,6 +525,16 @@ namespace API {
 
 #pragma region Scripting
     bool AttachScript(const std::string& objectName, const std::string& scriptClassName);
+    std::string GetCollidingObjectNameOnLayer(const std::string& objectName, int targetLayer);
+    int GetCollidingObjectIDOnLayer(const std::string& objectName, int targetLayer);
+    float       GetFloatField (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    int         GetIntField   (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    bool        GetBoolField  (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    std::string GetStringField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    void SetFloatField (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, float value);
+    void SetIntField   (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, int value);
+    void SetBoolField  (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, bool value);
+    void SetStringField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, const std::string& value);
 #pragma endregion
 
 #pragma region Input
