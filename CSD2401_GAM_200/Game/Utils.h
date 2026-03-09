@@ -48,7 +48,7 @@ Technology is prohibited.
 class PickupSystem
 {
 public:
-	PickupSystem() : _coins{}, _shells{}, currCoins{}, currShells{}
+	PickupSystem() : _coins{10}, _shells{}, currCoins{}, currShells{}
 	{
 		for (auto const& go : GameObjectFactory::Instance().GetAllGameObjects())
 		{
@@ -68,14 +68,14 @@ public:
 
 	void SetTotalCoins(int val) { _coins = val; }
 	void SetTotalShells(int val) { _shells = val; }
-	int GetTotalCoins(int val) const { return _coins; }
-	int GetTotalShells(int val) const { return _shells; }
+	int GetTotalCoins() const { return _coins; }
+	int GetTotalShells() const { return _shells; }
 
 	void SetCurrentCoins(int val) { currCoins = val; }
 	void SetCurrentShells(int val) { currShells = val; }
 	int GetCurrentCoins() const { return currCoins; }
 	int GetCurrentShells() const { return currShells; }
-private:
+public:
 	int _coins,  _shells;
 	int currCoins, currShells;
 };

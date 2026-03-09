@@ -50,6 +50,14 @@ namespace CSharpScript
             if (OwnerName == null || OwnerName == "") { Debug.Log("no name"); return; }
 
             OnFixedUpdate(fixeddt);
+            //likely can remove
+            //if (Input.GetKeyPressed(Input.KeyCode.L))
+            //{
+            //    int test = Scripting.GetIntField(OwnerName, "pickupSys", "GetTotalCoins()");
+            //    int datamem = Scripting.GetIntField(OwnerName, "pickupSys", "_coins");
+            //    Debug.Log("test: " + test.ToString());
+            //    Debug.Log("datamem: " + datamem.ToString());
+            //}
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
@@ -57,26 +65,34 @@ namespace CSharpScript
             HandlePickup();
         }
 
+        // Script will only handle collision and effect. Tracking and counting will be handled in c++ because its easier to access from other systems, save to file etc.
         public void HandlePickup()
         {
-            int coinID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
-            if (coinID != 0)
+            if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
             {
                 int goID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
-                Debug.Log(goID.ToString());            // works
+                if (goID <= 0) return;
 
-                //GameObject.Destroy(GameObject.FindGameObjectByID(goID));
+                if (GameObject.FindGameObjectByID(goID).Contains("PU_Coin"))
+                {
+                    // coin effect
+                }
+                else if (GameObject.FindGameObjectByID(goID).Contains("PU_Shell"))
+                {
+                    // shell effect
+                }
+                else if (GameObject.FindGameObjectByID(goID).Contains("PU_Powerup"))
+                {
+                    // powerup effect
+                }
+                else
+                {
+                    // Mismatched name but still of type Pickup?
+                }
 
-                string coinName = GameObject.FindGameObjectByID(goID);
-                GameObject.Destroy(coinName);
-                
-
-                                                // get the game object, check type apply accordingly
-
-                // if out obj == coin
-                // call c++ function to increment coin tracker
-                // waiting for api
-                //destroy gameobject
+                // destroy regardless of pickup type
+                GameObject.DestroyByID(goID);
+                Debug.Log("destroyed go id: " + goID.ToString());            // works
             }
         }
 
