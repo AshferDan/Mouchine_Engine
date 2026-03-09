@@ -61,7 +61,15 @@ namespace CSharpScript
         {
             if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
             {
-                Debug.Log("FAAAAH");            // works
+                int goID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
+                Debug.Log(goID.ToString());            // works
+
+                //GameObject.Destroy(GameObject.FindGameObjectByID(goID));
+
+                string coinName = GameObject.FindGameObjectByID(goID);
+                GameObject.Destroy(coinName);
+                
+
                                                 // get the game object, check type apply accordingly
 
                 // if out obj == coin
