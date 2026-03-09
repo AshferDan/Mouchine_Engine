@@ -242,6 +242,14 @@ void PauseMenuLogicSystem::Update(float dt)
         pendingTimer -= dt;
         if (pendingTimer <= 0.0f)
         {
+            // Check if fade is still active for Main Menu button - if so, wait a bit longer
+            if (hoveredButtonName == "PauseMainMenuButton" && audioManager && audioManager->IsAnyFadeActive())
+            {
+                std::cout << "[PauseMenu] Fade still active, waiting..." << std::endl;
+                pendingTimer = 0.1f; // Wait another 100ms and check again
+                return;
+            }
+
             if (hoveredButtonName == "PauseResumeButton")
             {
                 std::cout << "[PauseMenu] Resume clicked" << std::endl;
@@ -393,7 +401,6 @@ void PauseMenuLogicSystem::Update(float dt)
     // Handle pause settings screen visibility - ONLY update when state changes
     if (isPauseSettingsOpen != wasSettingsOpenLastFrame)
     {
-        std::cout << "[PauseMenu] Settings visibility changing: " << (isPauseSettingsOpen ? "SHOW" : "HIDE") << std::endl;
         if (isPauseSettingsOpen)
         {
             // Clear any hover state from previous menu
@@ -458,9 +465,6 @@ void PauseMenuLogicSystem::Update(float dt)
                 isPauseSettingsOpen = false;
                 pendingSettingsClose = false;
                 hoveredButtonName.clear();
-
-                // Force the visibility update by ensuring the state change is detected
-                // The next frame will see isPauseSettingsOpen != wasSettingsOpenLastFrame and hide the UI
             }
             return; // Don't process interactions during pending close
         }
@@ -720,15 +724,15 @@ void PauseMenuLogicSystem::Update(float dt)
             // Start audio fade when Main Menu button is clicked
             if (hoveredButtonName == "PauseMainMenuButton")
             {
-                audioManager->FadeOutCategory("music", 0.5f);
-                std::cout << "[PauseMenu] Started music fade out on button click" << std::endl;
+                audioManager->FadeOutCategory("music", 2.0f);
+                std::cout << "[PauseMenu] Started music fade out (2.0 seconds)" << std::endl;
             }
         }
 
         // start delay before executing action
         pendingSceneChange = true;
         // Longer delay for Main Menu to allow fade to complete
-        pendingTimer = (hoveredButtonName == "PauseMainMenuButton") ? 0.6f : 0.20f;
+        pendingTimer = (hoveredButtonName == "PauseMainMenuButton") ? 2.2f : 0.20f;
     }
 }
 

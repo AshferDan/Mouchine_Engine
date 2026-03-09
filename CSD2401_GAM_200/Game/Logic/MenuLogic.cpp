@@ -44,11 +44,19 @@ void MenuLogicSystem::Update(float dt)
         pendingTimer -= dt;
         if (pendingTimer <= 0.0f)                       // timer delay to play the sound effect before loading into scene
         {
+            if (audioManager && audioManager->IsAnyFadeActive())
+            {
+                std::cout << "[MenuLogic] Fade still active, waiting..." << std::endl;
+                pendingTimer = 0.1f; // wait another 100ms and check again
+                return;
+            }
+
             if (currScreen == MenuScreens::Home)
             {
                 if (hoveredButtonName == "PlayButton")
                 {
                     std::cout << "PlayButton Clicked!" << std::endl;
+                    std::cout << "[MenuLogic] Fade complete! Loading scene..." << std::endl;
 
                     CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
 
@@ -57,9 +65,9 @@ void MenuLogicSystem::Update(float dt)
                         // Don't fade back in - let the fade out complete
                         std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                     }
-                    
+
                     std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                    std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
+                    std::cout << "[MenuLogic] Music should already be faded out" << std::endl;
                     CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
                     std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                 }
@@ -84,7 +92,7 @@ void MenuLogicSystem::Update(float dt)
                 #else
                     CORE->GetLevelEditor()->StopPlayMode();
                     //CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
-                #endif          
+                #endif
                 }
             }
 
@@ -166,6 +174,10 @@ void MenuLogicSystem::Update(float dt)
         {
             currentHover = "QuitButton";
         }
+        //else if (IsMouseOver(factory.FindGameObject("TestFadeButton"), mouseX, mouseY))
+        //{
+        //    currentHover = "TestFadeButton";
+        //}
         break;
     case MenuScreens::Settings:
         // do settings stuff here
@@ -272,17 +284,18 @@ void MenuLogicSystem::Update(float dt)
         // Start small delay before loading scene
         if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MasterMuteButton" &&
             hoveredButtonName != "MusicMuteButton" && hoveredButtonName != "SFXMuteButton" &&
-            hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton")
+            hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton"
+            /*&& hoveredButtonName != "TestFadeButton"*/)
         {
             // Start audio fade out for scene transitions
             if (hoveredButtonName == "PlayButton" && audioManager)
             {
-                audioManager->FadeOutCategory("music", 1.0f);  // Fade out over 1.0 sec
-                std::cout << "[MenuLogic] Started music fade out" << std::endl;
+                audioManager->FadeOutCategory("music", 2.5f);  // Fade out over 3.0 sec
+                std::cout << "[MenuLogic] Started music fade out (3.0 seconds)" << std::endl;
             }
 
             pendingSceneChange = true;
-            pendingTimer = 2.0f;                       // Wait 3.0s so 2.5s fade completes before scene loads
+            pendingTimer = 2.6f;
         }
         else
         {
@@ -321,6 +334,20 @@ void MenuLogicSystem::Update(float dt)
             {
                 currScreen = MenuScreens::Settings;
             }
+            //else if (hoveredButtonName == "TestFadeButton")
+            //{
+            //    std::cout << "[TEST] TestFadeButton Clicked - Starting fade out!" << std::endl;
+            //    if (audioManager)
+            //    {
+            //        audioManager->FadeOutCategory("music", 2.0f);  // Fade out over 2 seconds
+            //        std::cout << "[TEST] Music fade out started (2 seconds duration)" << std::endl;
+            //        testFadeTriggered = true;
+            //    }
+            //    else
+            //    {
+            //        std::cout << "[TEST] ERROR: AudioManager is null!" << std::endl;
+            //    }
+            //}
             else if (hoveredButtonName == "CreditsButton")
             {
                 std::cout << "CreditsButton Clicked!" << std::endl;
