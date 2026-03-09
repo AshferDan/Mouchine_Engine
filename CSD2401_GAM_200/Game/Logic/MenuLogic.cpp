@@ -166,6 +166,11 @@ void MenuLogicSystem::Update(float dt)
         {
             currentHover = "QuitButton";
         }
+
+        else if (IsMouseOver(factory.FindGameObject("ReplayButton"), mouseX, mouseY))
+        {
+            currentHover = "ReplayButton";
+        }
         break;
     case MenuScreens::Settings:
         // do settings stuff here
@@ -376,12 +381,27 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
     else if (buttonName == "QuitButton") {
         if (isPressed) {
             texturePath = "../Assets/Sprites/Icons/Menu_quit_NEW_HOVER.png";
-        } else if (isHovered) {
+        }
+        else if (isHovered) {
             texturePath = "../Assets/Sprites/Icons/Menu_quit_NEW_bright.png";
-        } else {
+        }
+        else {
             texturePath = "../Assets/Sprites/Icons/Menu_quit.png";
         }
     }
+
+    else if (buttonName == "ReplayButton") {
+        if (isPressed) {
+            texturePath = "../Assets/Sprites/Icons/Replay_button_dark.png";
+        }
+        else if (isHovered) {
+            texturePath = "../Assets/Sprites/Icons/Replay_button_light.png";
+        }
+        else {
+            texturePath = "../Assets/Sprites/Icons/Replay_button.png";
+        }
+    }
+
     else if (buttonName == "CreditsButton") {
         if (isPressed) {
             texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW_HOVER.png";

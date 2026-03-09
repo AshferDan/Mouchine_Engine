@@ -103,7 +103,7 @@
       "active": true,
       "TransformComponent": {
         "pos": [
-          825.0,
+          -720.0,
           375.0
         ],
         "scale": [
@@ -300,6 +300,35 @@
           "RenderComponent": {
             "shapeType": "Square",
             "texturePath": "../Assets/Sprites/Icons/Menu_quit.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0
+          },
+          "children": []
+        },
+        {
+          "name": "ReplayButton",
+          "localID": 12,
+          "parentID": 6,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              890,
+              340
+            ],
+            "scale": [
+              120,
+              110
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_Button.png",
             "color": [
               1.0,
               1.0,
