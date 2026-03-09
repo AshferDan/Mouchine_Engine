@@ -664,7 +664,7 @@ void GraphicsSystem::Update(float)
         // Gather UV data for spritesheets/animation/tiles
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
-        vec2 tileCOunt = vec2(1.0f);
+        vec2 tileCount = vec2(1.0f);
 
         if (auto *animator = obj->GetComponent<Spritesheet>())
         {
@@ -682,6 +682,11 @@ void GraphicsSystem::Update(float)
             // Use RenderComponent UV (for tiles/static sprites)
             uvScale = renderComp->GetUVScale();
             uvOffset = renderComp->GetUVOffset();
+        }
+
+        if (rend->IsTileable())
+        {
+            tileCount = rend->GetTileCount();
         }
         
 
@@ -741,6 +746,7 @@ void GraphicsSystem::Update(float)
             vert.uvOffset = uvOffset;
             vert.transform = vec3(x, y, rot); // Translation (x,y) and Rotation (rot)
             vert.scale = vec2(sx, sy);        // Scale (sx, sy)
+            vert.tileCount = tileCount;
 
             targetBatch->vertices.push_back(vert);
         }
@@ -1704,6 +1710,9 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     clonedComponent->SetUVOffset(this->uvOffset);
     clonedComponent->SetScreenSpace(this->screenSpace);
     clonedComponent->SetColor(this->color);
+    clonedComponent->SetTileable(this->tileable);
+    clonedComponent->SetTileCount(this->tileCount);
+
     return clonedComponent;
 }
 

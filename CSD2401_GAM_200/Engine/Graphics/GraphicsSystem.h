@@ -294,6 +294,13 @@ public:
 
 	mat4 GetScreenProjectionMatrix() const { return screenProjectionMatrix; }
 
+	// expose setters so ImGui / level editor can tweak at runtime
+	void SetVignetteEnabled(bool e) { vignetteEnabled = e; }
+	void SetVignetteInnerRadius(float r) { vignetteInnerRadius = r; }
+	void SetVignetteOuterRadius(float r) { vignetteOuterRadius = r; }
+	void SetVignetteIntensity(float i) { vignetteIntensity = i; }
+	void SetVignetteColor(const vec4& c) { vignetteColor = c; }
+
 private:
 	// --- Window and State ---
 	GLFWwindow* window;						// The handle to the GLFW window.
@@ -323,13 +330,6 @@ private:
 	float   vignetteOuterRadius = 0.75f;
 	float   vignetteIntensity = 0.5f;
 	vec4    vignetteColor = vec4(0.f, 0.f, 0.f, 1.f);
-
-	// expose setters so ImGui / level editor can tweak at runtime
-	void SetVignetteEnabled(bool e) { vignetteEnabled = e; }
-	void SetVignetteInnerRadius(float r) { vignetteInnerRadius = r; }
-	void SetVignetteOuterRadius(float r) { vignetteOuterRadius = r; }
-	void SetVignetteIntensity(float i) { vignetteIntensity = i; }
-	void SetVignetteColor(const vec4& c) { vignetteColor = c; }
 
 	// --- Single Quad Rendering (Legacy/Test) Buffers ---
 	GLuint vao = 0, vbo = 0, tex = 0;		// VAO/VBO for a simple quad/rectangle draw (used in older pipelines).
