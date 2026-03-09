@@ -484,7 +484,7 @@ void PhysicsSystem::ResolveMixed(GameObject* obj1, GameObject* obj2,
                         squarePhysics->velocity.y = 0.0f;
                     }
 
-                    std::cout << "[Grounded] Player standing on enemy!" << std::endl;
+                    //std::cout << "[Grounded] Player standing on enemy!" << std::endl;
                 }
                 // NOTE: Knockback is now handled in InputManager, not here!
                 // PhysicsSystem only detects collision, game script decides response

@@ -15,8 +15,6 @@ Technology is prohibited.
 #include "System.h"
 #include "ColliderComponent.h"
 #include "SpatialGrid.h"
-#include <vector>
-#include <utility>
 #include <unordered_set>
 #include <string>
 
@@ -98,8 +96,8 @@ public:
     bool JustStopped(GameObject* obj1, GameObject* obj2);
 
 private:
-    // Track collision pairs to avoid spam
-    std::vector<std::pair<GameObject*, GameObject*>> activeCollisions;
+    // Track active collision pairs by key for O(1) lookup/insert/erase
+    std::unordered_set<std::string> activeCollisions;
 
     // Reference to physics system for reporting collisions
     PhysicsSystem* physicsSystem;
