@@ -433,6 +433,15 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
     }
     else
     {
+        auto& resourceMgr = ResourceManager::Instance();
+        std::string goName = go->GetName();
+
+        // evict the stale texture from the manager so it doesn't cause caching issues
+        if (resourceMgr.GetTexture(goName))
+        {
+            resourceMgr.UnloadTexture(goName);
+        }
+
         if (r.contains("color"))
         {
             vec4 c(
@@ -974,6 +983,12 @@ void ComponentSerialization::SerializeAllComponents(GameObject *go, json &j)
  */
 void ComponentSerialization::DeserializeAllComponents(GameObject *go, const json &j)
 {
+    // Type-safe Spritesheet removal
+    if (!j.contains("Spritesheet") && go->GetComponent<Spritesheet>())
+    {
+        go->RemoveComponent<Spritesheet>();
+    }
+
     DeserializeTransform(j, go);
     DeserializeRender(j, go);
     DeserializeSpritesheet(j, go);

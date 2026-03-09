@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Idle",
+        "filepath": "../Assets/spritesheet_R.png",
+        "rows": 13,
+        "cols": 10,
+        "startR": 7,
+        "startC": 0,
+        "endR": 7,
+        "endC": 1,
+        "fps": 12.0,
+        "loop": true
+    }
+]
