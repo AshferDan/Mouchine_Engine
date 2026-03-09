@@ -59,7 +59,8 @@ namespace CSharpScript
 
         public void HandlePickup()
         {
-            if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
+            int coinID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
+            if (coinID != 0)
             {
                 int goID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
                 Debug.Log(goID.ToString());            // works

@@ -681,14 +681,14 @@ void GameObjectFactory::ReorderRootObjects(const std::vector<EntityID> &order)
 bool GameObjectFactory::IsAlive(GameObject *ptr) const
 {
     auto &allGOs = GameObjectFactory::GetAllGameObjects();
-    // Loop through all alive game objects
+   
     for (const auto &obj : allGOs)
     {
         if (obj.get() == ptr)
-            return true; // pointer is valid and alive
+            return true; 
     }
 
-    return false; // pointer not found = invalid/destroyed
+    return false; 
 }
 
 #pragma region M1 Showcase - 2500 GOs Test

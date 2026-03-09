@@ -74,6 +74,32 @@ static void Internal_DestroyGameObject(MonoString* name)
     mono_free(objName);
 }
 
+static void Internal_DestroyByID(int id)
+{
+    API::DestroyByID(static_cast<EntityID>(id));
+}
+
+static void Internal_DestroyByName(MonoString* name)
+{
+    char* objName = mono_string_to_utf8(name);
+    API::DestroyByName(objName);
+    mono_free(objName);
+}
+
+static MonoString* Internal_FindGameObjectByName(MonoString* name)
+{
+    char* objName = mono_string_to_utf8(name);
+    std::string result = API::FindGameObjectByName(objName);
+    mono_free(objName);
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+
+static MonoString* Internal_FindGameObjectByID(int id)
+{
+    std::string result = API::FindGameObjectByID(id);
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+
 // === Transform ===
 static void Internal_SetPosition(MonoString *objectName, float x, float y)
 {
@@ -1347,7 +1373,11 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::CreateShape", (void *)Internal_CreateShape);
     mono_add_internal_call("CSharpScript.GameObject::CreateImage", (void *)Internal_CreateImage);
     mono_add_internal_call("CSharpScript.GameObject::CreateAnimatedImage", (void *)Internal_CreateAnimatedImage);
-    mono_add_internal_call("CSharpScript.GameObject::Destroy", (void *)Internal_DestroyGameObject);
+    mono_add_internal_call("CSharpScript.GameObject::Destroy",             (void *)Internal_DestroyGameObject);
+    mono_add_internal_call("CSharpScript.GameObject::DestroyByID",         (void *)Internal_DestroyByID);
+    mono_add_internal_call("CSharpScript.GameObject::DestroyByName",       (void *)Internal_DestroyByName);
+    mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
+    mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
 
     // === Transform ===
     mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);
