@@ -198,31 +198,6 @@ public:
     void SetScreenSpace(bool sSpace) { screenSpace = sSpace; }
     bool isScreenSpace() const { return screenSpace; }
 
-    /*! @brief Get render layer category */
-    RenderLayer GetRenderLayer() const { return renderLayer; }
-
-    /*! @brief Set render layer category */
-    void SetRenderLayer(RenderLayer rl) { renderLayer = rl; }
-
-    /*! @brief Get render layer as int for serialization */
-    int GetRenderLayerInt() const { return static_cast<int>(renderLayer); }
-
-    /*! @brief Set render layer from int for serialization */
-    void SetRenderLayerInt(int rl) { renderLayer = static_cast<RenderLayer>(rl); }
-
-    /*! @brief Get render layer name as string */
-    const char* GetRenderLayerName() const {
-        switch (renderLayer) {
-            case RenderLayer::Background: return "Background";
-            case RenderLayer::Walls: return "Walls";
-            case RenderLayer::Player: return "Player";
-            case RenderLayer::Enemies: return "Enemies";
-            case RenderLayer::Foreground: return "Foreground";
-            case RenderLayer::UI: return "UI";
-            default: return "Background";
-        }
-    }
-
     void SetTileable(bool t) { tileable = t; }
     bool IsTileable() const { return tileable; }
 
@@ -240,7 +215,6 @@ private:
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
     bool screenSpace = false;
-    RenderLayer renderLayer = RenderLayer::Background;  /*!< Layer category for grouping */
     bool tileable;
     vec2 tileCount = {1.0f, 1.0f};
 };
