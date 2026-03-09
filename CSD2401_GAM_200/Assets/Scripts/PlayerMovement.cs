@@ -58,6 +58,7 @@ namespace CSharpScript
         private string audioFilepath = "..Assets/Audio/";
 
         public PlayerMovementStats MoveStats;
+        public PickupManager pickupManager;
 
         #region Variables
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
@@ -170,6 +171,7 @@ namespace CSharpScript
         {
             // When the script is created, instantiate its stats
             MoveStats = new PlayerMovementStats();
+            pickupManager = new PickupManager();
             Debug.Log("PlayerMovement instantiated with new stats.");
         }
 

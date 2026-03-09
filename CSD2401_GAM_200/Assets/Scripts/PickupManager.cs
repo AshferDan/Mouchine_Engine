@@ -26,6 +26,9 @@ namespace CSharpScript
 {
     public class PickupManager : GameScript
     {
+        private float dt => Utils.GetDelta_Time();
+        private float fixeddt => Utils.GetFixed_Delta_Time();
+
         public PickupManager()
         {
             // When the script is created, instantiate its stats
@@ -44,8 +47,9 @@ namespace CSharpScript
 
         public void OnUpdate(float deltaTime)
         {
-            if (OwnerName == null || OwnerName == "") return;
+            if (OwnerName == null || OwnerName == "") { Debug.Log("no name"); return; }
 
+            OnFixedUpdate(fixeddt);
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
@@ -57,10 +61,13 @@ namespace CSharpScript
         {
             if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
             {
+                Debug.Log("FAAAAH");            // works
                 // get the game object, check type apply accordingly
 
-                // if obj == coin
+                // if out obj == coin
                 // call c++ function to increment coin tracker
+                    // waiting for api
+                //destroy gameobject
             }
         }
 
