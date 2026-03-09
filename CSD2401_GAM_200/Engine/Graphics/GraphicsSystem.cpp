@@ -680,8 +680,16 @@ void GraphicsSystem::Update(float)
         else if (auto *renderComp = obj->GetComponent<RenderComponent>())
         {
             // Use RenderComponent UV (for tiles/static sprites)
-            uvScale = renderComp->GetUVScale();
-            uvOffset = renderComp->GetUVOffset();
+            if (renderComp->IsTileable())
+            {
+                uvScale = renderComp->GetTileCount();
+                uvOffset = vec2(0.0f, 0.0f);
+            }
+            else
+            {
+                uvScale = renderComp->GetUVScale();
+                uvOffset = renderComp->GetUVOffset();
+            }
         }
 
         if (rend->IsTileable())
@@ -692,9 +700,10 @@ void GraphicsSystem::Update(float)
 
         // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
         RenderBatch *targetBatch = nullptr;
+        bool isTileable = rend->IsTileable();
         for (auto &batch : batches)
         {
-            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer && batch.screenSpace == screenSpace)
+            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer && batch.screenSpace == screenSpace && batch.tileable == isTileable)
             {
                 targetBatch = &batch;
                 break;
@@ -704,7 +713,7 @@ void GraphicsSystem::Update(float)
         // If no matching batch found, create a new one
         if (!targetBatch)
         {
-            batches.emplace_back(texID, isCircle, layer, screenSpace);
+            batches.emplace_back(texID, isCircle, layer, screenSpace, isTileable);
             targetBatch = &batches.back();
 
             // Reserve space to minimize reallocations
@@ -1219,6 +1228,22 @@ void GraphicsSystem::DrawBatches()
             shader->SetUniform("uHasTexture", 1);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, batch.textureID);
+
+            GLint wrapMode = batch.tileable ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+
+            if (batch.tileable)
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); // use nearest mip instead of linear blend between mips
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.0f); // clamp to mip 0 only
+            }
+            else
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.0f); // restore default
+            }
+
             shader->SetUniform("uTexture", 0); // Set sampler to texture unit 0
         }
         else

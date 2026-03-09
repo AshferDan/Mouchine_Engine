@@ -71,11 +71,12 @@ struct RenderBatch
 	std::vector<GLuint> indices;	// Index data (EBO) for all quads in this batch.
 	int layer;						// Rendering layer (for depth sorting, typically based on Z-position).
 	bool screenSpace;
+	bool tileable;
 
 	/**
 	 * @brief Constructor for RenderBatch.
 	 */
-	RenderBatch(GLuint texID, bool circle, int l, bool space) : textureID(texID), isCircle(circle), layer(l), screenSpace(space) {}
+	RenderBatch(GLuint texID, bool circle, int l, bool space, bool tile = false) : textureID(texID), isCircle(circle), layer(l), screenSpace(space), tileable(tile) {}
 };
 
 /**

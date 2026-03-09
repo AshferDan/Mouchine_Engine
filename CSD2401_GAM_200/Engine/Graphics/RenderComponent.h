@@ -1,6 +1,6 @@
 /* Start Header ************************************************************************/
 /*!
-\file       GraphicsSystem.h
+\file       RenderComponent.h
 \author     Guan Shao Jun [50%]
 \co-author
 \par        shaojun.g@digipen.edu,
@@ -215,7 +215,7 @@ private:
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
     bool screenSpace = false;
-    bool tileable;
+    bool tileable = false;
     vec2 tileCount = {1.0f, 1.0f};
 };
 

@@ -6,14 +6,14 @@ layout(location = 3) in vec2 aUVScale;
 layout(location = 4) in vec2 aUVOffset;   
 layout(location = 5) in vec3 aTransform;
 layout(location = 6) in vec2 aScale;
-layout(location = 7) in vec2 aTileCount;  // NEW
+layout(location = 7) in vec2 aTileCount;
 
 out vec2 TexCoord;
 out vec2 CircleCoord;
 out vec4 VertColor;                        
 out vec2 UVScale;                          
 out vec2 UVOffset;
-out vec2 TileCount;                        // NEW
+out vec2 TileCount;
 
 uniform mat4 uMVP;
 uniform int uUseBatching;
@@ -45,5 +45,5 @@ void main() {
     VertColor   = aColor;
     UVScale     = aUVScale;
     UVOffset    = aUVOffset;
-    TileCount   = (uUseBatching == 1) ? aTileCount : vec2(1.0); // NEW
+    TileCount   = (uUseBatching == 1) ? aTileCount : vec2(1.0);
 }

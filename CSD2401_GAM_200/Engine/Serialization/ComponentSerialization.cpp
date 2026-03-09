@@ -49,7 +49,7 @@ void ComponentSerialization::SerializeTransform(json &j, const TransformComponen
  * @param j JSON object to write into.
  * @param r Pointer to the RenderComponent.
  */
-void ComponentSerialization::SerializeRender(json &j, RenderComponent *r)
+void ComponentSerialization::SerializeRender(json& j, RenderComponent* r)
 {
     std::string texPath = r->GetTexturePath();
 
@@ -65,7 +65,10 @@ void ComponentSerialization::SerializeRender(json &j, RenderComponent *r)
         {"texturePath", texPath},
         {"color", {r->GetColor().x, r->GetColor().y, r->GetColor().z, r->GetColor().w}},
         {"layer", r->GetLayer()},
-        {"screenSpace", r->isScreenSpace()}};
+        {"screenSpace", r->isScreenSpace()},
+        {"tileable", r->IsTileable()},                          
+        {"tileCount", {r->GetTileCount().x, r->GetTileCount().y}} 
+    };
 }
 
 /**
@@ -374,6 +377,15 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
     bool screenSpace = r.value("screenSpace", false);
     render->SetScreenSpace(screenSpace);
 
+    bool tileable = r.value("tileable", false);
+    render->SetTileable(tileable);
+
+    vec2 tileCount(
+        r.value("tileCount", json::array({ 1.0f, 1.0f }))[0].get<float>(),
+        r.value("tileCount", json::array({ 1.0f, 1.0f }))[1].get<float>()
+    );
+    render->SetTileCount(tileCount);
+
     std::string texPath = r.value("texturePath", "");
     GLuint texID = 0;
 
@@ -418,9 +430,10 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
             render->SetTexturePath(texPath);
             render->SetColor({1, 1, 1, 1});
 
+            GLint wrapMode = tileable ? GL_REPEAT : GL_CLAMP_TO_EDGE;
             glBindTexture(GL_TEXTURE_2D, texID);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
         else
