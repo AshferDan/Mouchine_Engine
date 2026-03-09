@@ -14,6 +14,9 @@ Technology is prohibited.
 
 #include "ScriptAPI.h"
 #include "LayerManager.h"
+#include "ScriptingSystem.h"
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
 
 namespace API
 {
@@ -1471,6 +1474,120 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             }
         }
         return false;
+    }
+
+    std::string GetCollidingObjectNameOnLayer(const std::string& objectName, int targetLayer)
+    {
+        GameObject* obj = GameObjectFactory::Instance().FindGameObject(objectName);
+        CollisionSystem* cs = CORE ? CORE->GetCollisionSystem() : nullptr;
+        if (!obj || !cs) return "";
+        return cs->GetCollidingObjectNameOnLayer(obj, static_cast<CollisionLayer>(targetLayer));
+    }
+
+    int GetCollidingObjectIDOnLayer(const std::string& objectName, int targetLayer)
+    {
+        GameObject* obj = GameObjectFactory::Instance().FindGameObject(objectName);
+        CollisionSystem* cs = CORE ? CORE->GetCollisionSystem() : nullptr;
+        if (!obj || !cs) return 0;
+        return static_cast<int>(cs->GetCollidingObjectIDOnLayer(obj, static_cast<CollisionLayer>(targetLayer)));
+    }
+
+    // --- find a MonoObject instance + MonoClassField by names ---
+    static bool FindScriptField(const std::string& objectName,
+                                const std::string& scriptClass,
+                                const std::string& fieldName,
+                                MonoObject*& outInstance,
+                                MonoClassField*& outField)
+    {
+        ScriptSystem* ss = CORE ? CORE->GetScriptSystem() : nullptr;
+        if (!ss) return false;
+        GameObject* obj = GameObjectFactory::Instance().FindGameObject(objectName);
+        if (!obj) return false;
+        auto* instances = ss->GetScriptInstances(obj);
+        if (!instances) return false;
+        for (auto& inst : *instances)
+        {
+            if (!inst.instance) continue;
+            MonoClass* klass = mono_object_get_class(inst.instance);
+            if (scriptClass != mono_class_get_name(klass)) continue;
+            MonoClassField* field = mono_class_get_field_from_name(klass, fieldName.c_str());
+            if (!field) return false;
+            outInstance = inst.instance;
+            outField    = field;
+            return true;
+        }
+        return false;
+    }
+
+    // --- Getters ---
+    float GetFloatField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return 0.f;
+        float val = 0.f;
+        mono_field_get_value(inst, field, &val);
+        return val;
+    }
+
+    int GetIntField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return 0;
+        int val = 0;
+        mono_field_get_value(inst, field, &val);
+        return val;
+    }
+
+    bool GetBoolField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return false;
+        bool val = false;
+        mono_field_get_value(inst, field, &val);
+        return val;
+    }
+
+    std::string GetStringField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return "";
+        MonoString* monoStr = nullptr;
+        mono_field_get_value(inst, field, &monoStr);
+        if (!monoStr) return "";
+        char* raw = mono_string_to_utf8(monoStr);
+        std::string result(raw);
+        mono_free(raw);
+        return result;
+    }
+
+    // --- Setters ---
+    void SetFloatField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, float value)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return;
+        mono_field_set_value(inst, field, &value);
+    }
+
+    void SetIntField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, int value)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return;
+        mono_field_set_value(inst, field, &value);
+    }
+
+    void SetBoolField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, bool value)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return;
+        mono_field_set_value(inst, field, &value);
+    }
+
+    void SetStringField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, const std::string& value)
+    {
+        MonoObject* inst = nullptr; MonoClassField* field = nullptr;
+        if (!FindScriptField(objectName, scriptClass, fieldName, inst, field)) return;
+        MonoString* monoStr = mono_string_new(mono_domain_get(), value.c_str());
+        mono_field_set_value(inst, field, monoStr);
     }
 #pragma endregion
 

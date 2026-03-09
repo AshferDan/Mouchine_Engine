@@ -113,6 +113,19 @@ public:
     /** @return True while in the dedicated replay watch mode. */
     bool IsReplayMode() const { return m_isReplayMode; }
 
+    /**
+     * @brief Save the current recording to disk unconditionally (no best-time check).
+     *        Useful for test recordings where you always want the run saved.
+     * @param levelName  Used to derive the save file path (e.g. "Level1_testing").
+     */
+    void SaveCurrentRun(const std::string& levelName);
+
+    /**
+     * @brief Discard any in-progress recording and reset the recorder to a clean state.
+     *        Call this when the player dies or restarts so the next run starts fresh.
+     */
+    void ResetRecording();
+
     // ===== Finish Trigger =====
 
     /**

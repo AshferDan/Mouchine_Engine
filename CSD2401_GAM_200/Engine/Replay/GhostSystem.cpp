@@ -235,6 +235,30 @@ void GhostSystem::SaveToDisk(const std::string& levelName)
     file << root.dump(2);
 }
 
+void GhostSystem::ResetRecording()
+{
+    m_recorder.Reset();
+    m_finishDone = false;
+    std::cout << "[GhostSystem] Recording reset — buffer cleared.\n";
+}
+
+void GhostSystem::SaveCurrentRun(const std::string& levelName)
+{
+    const auto& rec = m_recorder.GetRecording();
+    if (rec.empty())
+    {
+        std::cout << "[GhostSystem] SaveCurrentRun: no frames recorded — skipped.\n";
+        return;
+    }
+
+    m_bestRecording = rec;
+    m_bestTime      = rec.back().timestamp;
+
+    SaveToDisk(levelName);
+    std::cout << "[GhostSystem] SaveCurrentRun: saved " << rec.size()
+              << " frames (" << m_bestTime << "s) to '" << levelName << "'.\n";
+}
+
 // ===== Finish Trigger =====
 
 void GhostSystem::SetFinishTrigger(const std::string& targetName, float xThreshold,

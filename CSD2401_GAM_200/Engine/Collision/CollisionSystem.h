@@ -15,8 +15,7 @@ Technology is prohibited.
 #include "System.h"
 #include "ColliderComponent.h"
 #include "SpatialGrid.h"
-#include <vector>
-#include <utility>
+#include "gameObject.h"
 #include <unordered_set>
 #include <string>
 
@@ -76,6 +75,18 @@ public:
      */
     bool IsCollidingWithLayer(GameObject* obj, CollisionLayer targetLayer, GameObject** outHitObject = nullptr);
 
+    /**
+     * @brief Returns the name of the first object on targetLayer colliding with obj.
+     * @return The object's name, or an empty string if no collision.
+     */
+    std::string GetCollidingObjectNameOnLayer(GameObject* obj, CollisionLayer targetLayer);
+
+    /**
+     * @brief Returns the unique EntityID of the first object on targetLayer colliding with obj.
+     * @return The object's ID, or 0 if no collision (IDs start at 1).
+     */
+    EntityID GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer);
+
 
     // ===== Raycast Functions =====
 
@@ -98,8 +109,8 @@ public:
     bool JustStopped(GameObject* obj1, GameObject* obj2);
 
 private:
-    // Track collision pairs to avoid spam
-    std::vector<std::pair<GameObject*, GameObject*>> activeCollisions;
+    // Track active collision pairs by key for O(1) lookup/insert/erase
+    std::unordered_set<std::string> activeCollisions;
 
     // Reference to physics system for reporting collisions
     PhysicsSystem* physicsSystem;

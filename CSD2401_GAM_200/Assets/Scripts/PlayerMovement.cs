@@ -58,6 +58,7 @@ namespace CSharpScript
         private string audioFilepath = "..Assets/Audio/";
 
         public PlayerMovementStats MoveStats;
+        public PickupManager pickupManager;
 
         #region Variables
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
@@ -162,6 +163,7 @@ namespace CSharpScript
         private float _hurtTimer = 0f;
 
         public string vfx = "Hero_vfx";
+        public string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
 
 
@@ -169,6 +171,7 @@ namespace CSharpScript
         {
             // When the script is created, instantiate its stats
             MoveStats = new PlayerMovementStats();
+            pickupManager = new PickupManager();
             Debug.Log("PlayerMovement instantiated with new stats.");
         }
 
@@ -196,16 +199,20 @@ namespace CSharpScript
                 false
             );
 
-            // tryina fuckin debug ts wallcheck for walljump fuhfuhfuhfuhfuh
-            CSharpScript.GameObject.CreateShape(
-                "debugraytop",
-                (int)ShapeType.Line,
-                0,0,
-                1000, 50,
-                0.5f, 0.5f, 0.5f, 1.0f,
-                (int)CSharpScript.CollisionLayer.Ground,
-                true, true, false
-            );
+            // wip to fix the vfx issue
+            //CSharpScript.GameObject.CreateAnimatedImage(
+            //    vfx_nontracking,
+            //    0, 0,
+            //    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
+            //    "../Assets/spritesheet_player_vfx.png",
+            //    15, 11,
+            //    0, 0, 0, 1,
+            //    12.0f,
+            //    (int)CSharpScript.CollisionLayer.Player,
+            //    false,
+            //    false,
+            //    false
+            //);
 
             // Add sounds
             Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
@@ -438,7 +445,7 @@ namespace CSharpScript
                 IsBeingKnockedBack = true;
             }
 
-            Debug.Log(currState.ToString());
+            //Debug.Log(currState.ToString());
             //if (_isFacingRight) Debug.Log("right");
             //else Debug.Log("left");
 
@@ -480,6 +487,25 @@ namespace CSharpScript
                 // gravity logic
                 Jump();
 
+                HandleKnockback();
+                HandleHazardCollision();
+                // hurt movement lock & friction
+                if (isHurting)
+                {
+                    // reset internal speed so player cannot instantly sprint after recovering
+                    movespeed = 0;
+                    _isSkidding = false;
+
+                    // only apply friction on ground
+                    if (_isGrounded)
+                    {
+                        float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, MoveStats.KnockbackFriction.x * fixeddt);
+                        Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
+                    }
+
+                    return;
+                }
+
                 // wall bonk trigger
                 if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold)
                 {
@@ -519,23 +545,6 @@ namespace CSharpScript
                 if (!_isRunning && !_isWallKicking && !_isWallJumping && !_isGroundPounding && !_isWallSliding && !_isRolling && !isHurting)
                 {
                     Move(InputManager.Movement);
-                }
-                HandleKnockback();
-                HandleHazardCollision();
-                // hurt movement lock & friction
-                if (isHurting)
-                {
-                    // reset internal speed so player cannot instantly sprint after recovering
-                    movespeed = 0;
-
-                    // only apply friction on ground
-                    if (_isGrounded)
-                    {
-                        float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, MoveStats.KnockbackFriction.x * fixeddt);
-                        Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
-                    }
-
-                    return;
                 }
             }
         }
@@ -654,7 +663,6 @@ namespace CSharpScript
             bool movingAgainstFacing = Math.Sign(Physics.GetVelocity(OwnerName).x) != _facingDirection;
             bool isMovingFast = Math.Abs(Physics.GetVelocity(OwnerName).x) >= MoveStats.T1_Threshold;            // small threshold (1f) to ignore tiny jitters when stopping
 
-
             if (_isGrounded && isMovingFast && movingAgainstFacing && !_isSkidding)
             {
                 // direct skid trigger
@@ -705,7 +713,7 @@ namespace CSharpScript
                         // force skid if holding / toggling run
                         if (isRunHeld && movespeed > 5f && tier == 0) tier = 1;
 
-                        if (tier == 0)
+                        if (tier == 0 || !isMovingFast) //Math.Abs(Physics.GetVelocity(OwnerName).x) >= MoveStats.T1_Threshold * 0.9f;  
                         {
                             // nstant turn
                             movespeed = MoveStats.TurnResetSpeed;
@@ -715,6 +723,7 @@ namespace CSharpScript
                         }
                         else
                         {
+                            Debug.Log("here");
                             _isSkidding = true;
                             _facingDirection = targetDirection;
                             Turn(targetDirection > 0);
@@ -728,7 +737,7 @@ namespace CSharpScript
 
 
                             // skid will stop at "exitspeed" so player doesnt drop down to 0
-                            float exitSpeed = 4f;
+                            float exitSpeed = MoveStats.SkidExitSpeed;
 
                             if (movespeed > exitSpeed)
                             {
@@ -1892,6 +1901,7 @@ namespace CSharpScript
             float halfHeight = scale.y / 2;
             float raycastLength = MoveStats.WallDetectionBoxLength;
             vec2 rayDirection = new vec2(_isFacingRight ? 1 : -1, 0);
+
 
             // Center raycast
             vec2 centerRayOrigin = new vec2(position.x, position.y);

@@ -584,6 +584,39 @@ namespace CSharpScript
         /// <param name="scriptClassName">The name of the script class to attach.</param>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern bool AttachScript(string objectName, string scriptClassName);
+
+        /// <summary>
+        /// Returns the name of the first object on targetLayer currently colliding with objectName, or "" if none.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string GetCollidingObjectName(string objectName, int layer);
+
+        /// <summary>
+        /// Returns the unique EntityID of the first object on targetLayer colliding with objectName, or 0 if none.
+        /// Prefer this over GetCollidingObjectName when objects may share names.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetCollidingObjectID(string objectName, int layer);
+
+        // ---- Field getters ----
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float  GetFloatField (string objectName, string scriptClass, string fieldName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int    GetIntField   (string objectName, string scriptClass, string fieldName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool   GetBoolField  (string objectName, string scriptClass, string fieldName);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string GetStringField(string objectName, string scriptClass, string fieldName);
+
+        // ---- Field setters ----
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFloatField (string objectName, string scriptClass, string fieldName, float  value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetIntField   (string objectName, string scriptClass, string fieldName, int    value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetBoolField  (string objectName, string scriptClass, string fieldName, bool   value);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetStringField(string objectName, string scriptClass, string fieldName, string value);
     }
 
     public static class Components

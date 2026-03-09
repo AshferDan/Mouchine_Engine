@@ -58,6 +58,7 @@ namespace CSharpScript
         public float T1_SkidDuration = 0.45f;
         public float T2_SkidDuration = 0.55f;
         public float T3_SkidDuration = 0.8f;
+        public float SkidExitSpeed = 100f;
 
         // Wall Bonk
         public float T3_BonkDuration = 0.65f;
