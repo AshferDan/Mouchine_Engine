@@ -36,38 +36,6 @@ public:
         Empty
     };
 
-    /*! @enum RenderLayer
-        @brief Layer categories for organizing rendering and enabling/disabling groups.
-    */
-    enum class RenderLayer
-    {
-        Background = 0,
-        Walls,
-        Player,
-        Enemies,
-        Foreground,
-        UI,
-        Count  // Keep last for iteration
-    };
-
-    // Static layer visibility - controls whether entire layer categories render
-    static inline bool layerVisible[static_cast<int>(RenderLayer::Count)] = {true, true, true, true, true, true};
-
-    /*! @brief Enable/disable an entire layer category */
-    static void SetLayerVisible(RenderLayer layer, bool visible) {
-        layerVisible[static_cast<int>(layer)] = visible;
-    }
-
-    /*! @brief Check if a layer category is visible */
-    static bool IsLayerVisible(RenderLayer layer) {
-        return layerVisible[static_cast<int>(layer)];
-    }
-
-    /*! @brief Check if this component's layer is visible */
-    bool IsLayerEnabled() const {
-        return layerVisible[static_cast<int>(renderLayer)];
-    }
-
     /*! @struct LineData
         @brief Data structure for a line (start/end points and color).
     */
