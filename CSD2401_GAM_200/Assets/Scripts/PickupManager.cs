@@ -64,7 +64,7 @@ namespace CSharpScript
             {
                 string coinName = GameObject.FindGameObjectByID(coinID);
                 Debug.Log("Picked up: " + coinName);
-                GameObject.Destroy(coinName);
+
             }
         }
 
