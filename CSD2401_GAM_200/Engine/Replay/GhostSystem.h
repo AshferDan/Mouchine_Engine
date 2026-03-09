@@ -157,4 +157,9 @@ private:
 
     // Replay watch mode
     bool        m_isReplayMode = false;
+
+    // Runtime ghost toggle (key 0)
+    bool        m_ghostVisible  = false;
+    bool        m_key0WasHeld   = false;
+    void        ToggleGhost();
 };
