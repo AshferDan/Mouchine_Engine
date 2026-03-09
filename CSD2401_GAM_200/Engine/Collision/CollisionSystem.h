@@ -74,6 +74,18 @@ public:
      */
     bool IsCollidingWithLayer(GameObject* obj, CollisionLayer targetLayer, GameObject** outHitObject = nullptr);
 
+    /**
+     * @brief Returns the name of the first object on targetLayer colliding with obj.
+     * @return The object's name, or an empty string if no collision.
+     */
+    std::string GetCollidingObjectNameOnLayer(GameObject* obj, CollisionLayer targetLayer);
+
+    /**
+     * @brief Returns the unique EntityID of the first object on targetLayer colliding with obj.
+     * @return The object's ID, or 0 if no collision (IDs start at 1).
+     */
+    uint32_t GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer);
+
 
     // ===== Raycast Functions =====
 

@@ -62,11 +62,11 @@ namespace CSharpScript
             if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
             {
                 Debug.Log("FAAAAH");            // works
-                // get the game object, check type apply accordingly
+                                                // get the game object, check type apply accordingly
 
                 // if out obj == coin
                 // call c++ function to increment coin tracker
-                    // waiting for api
+                // waiting for api
                 //destroy gameobject
             }
         }

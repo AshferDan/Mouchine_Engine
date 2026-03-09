@@ -321,6 +321,101 @@ static bool Internal_AttachScript(MonoString* objectName, MonoString* scriptClas
     return result;
 }
 
+static MonoString* Internal_GetCollidingObjectNameOnLayer(MonoString* objectName, int targetLayer)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    std::string result = API::GetCollidingObjectNameOnLayer(obj, targetLayer);
+    mono_free(obj);
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+
+static int Internal_GetCollidingObjectIDOnLayer(MonoString* objectName, int targetLayer)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    int result = API::GetCollidingObjectIDOnLayer(obj, targetLayer);
+    mono_free(obj);
+    return result;
+}
+
+// === Script field getters ===
+static float Internal_GetFloatField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    float result = API::GetFloatField(obj, cls, fld);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+    return result;
+}
+
+static int Internal_GetIntField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    int result = API::GetIntField(obj, cls, fld);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+    return result;
+}
+
+static bool Internal_GetBoolField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    bool result = API::GetBoolField(obj, cls, fld);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+    return result;
+}
+
+static MonoString* Internal_GetStringField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    std::string result = API::GetStringField(obj, cls, fld);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+
+// === Script field setters ===
+static void Internal_SetFloatField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName, float value)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    API::SetFloatField(obj, cls, fld, value);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+}
+
+static void Internal_SetIntField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName, int value)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    API::SetIntField(obj, cls, fld, value);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+}
+
+static void Internal_SetBoolField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName, bool value)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    API::SetBoolField(obj, cls, fld, value);
+    mono_free(obj); mono_free(cls); mono_free(fld);
+}
+
+static void Internal_SetStringField(MonoString* objectName, MonoString* scriptClass, MonoString* fieldName, MonoString* value)
+{
+    char* obj = mono_string_to_utf8(objectName);
+    char* cls = mono_string_to_utf8(scriptClass);
+    char* fld = mono_string_to_utf8(fieldName);
+    char* val = mono_string_to_utf8(value);
+    API::SetStringField(obj, cls, fld, val);
+    mono_free(obj); mono_free(cls); mono_free(fld); mono_free(val);
+}
+
 static void Internal_SetComponentActive(MonoString* objectName, MonoString* componentName, bool active)
 {
     char* objName = mono_string_to_utf8(objectName);
@@ -1294,6 +1389,16 @@ void ScriptSystem::RegisterInternalCalls()
 
     // === Scripting ===
     mono_add_internal_call("CSharpScript.Scripting::AttachScript", (void*)Internal_AttachScript);
+    mono_add_internal_call("CSharpScript.Scripting::GetCollidingObjectName", (void*)Internal_GetCollidingObjectNameOnLayer);
+    mono_add_internal_call("CSharpScript.Scripting::GetCollidingObjectID",   (void*)Internal_GetCollidingObjectIDOnLayer);
+    mono_add_internal_call("CSharpScript.Scripting::GetFloatField",  (void*)Internal_GetFloatField);
+    mono_add_internal_call("CSharpScript.Scripting::GetIntField",    (void*)Internal_GetIntField);
+    mono_add_internal_call("CSharpScript.Scripting::GetBoolField",   (void*)Internal_GetBoolField);
+    mono_add_internal_call("CSharpScript.Scripting::GetStringField", (void*)Internal_GetStringField);
+    mono_add_internal_call("CSharpScript.Scripting::SetFloatField",  (void*)Internal_SetFloatField);
+    mono_add_internal_call("CSharpScript.Scripting::SetIntField",    (void*)Internal_SetIntField);
+    mono_add_internal_call("CSharpScript.Scripting::SetBoolField",   (void*)Internal_SetBoolField);
+    mono_add_internal_call("CSharpScript.Scripting::SetStringField", (void*)Internal_SetStringField);
 
     // === Components ===
     mono_add_internal_call("CSharpScript.Components::SetComponentActive", (void*)Internal_SetComponentActive);

@@ -378,6 +378,22 @@ bool CollisionSystem::IsCollidingWithLayer(GameObject* obj, CollisionLayer targe
     return false;
 }
 
+std::string CollisionSystem::GetCollidingObjectNameOnLayer(GameObject* obj, CollisionLayer targetLayer)
+{
+    GameObject* hitObject = nullptr;
+    if (IsCollidingWithLayer(obj, targetLayer, &hitObject) && hitObject)
+        return hitObject->GetName();
+    return "";
+}
+
+uint32_t CollisionSystem::GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer)
+{
+    GameObject* hitObject = nullptr;
+    if (IsCollidingWithLayer(obj, targetLayer, &hitObject) && hitObject)
+        return hitObject->GetID();
+    return 0; // 0 = invalid (IDs start at 1)
+}
+
 /*HOW TO USE FOR ASHFER :
 Without getting the hit object - just a yes / no check
  
