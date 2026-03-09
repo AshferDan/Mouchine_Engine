@@ -85,6 +85,10 @@ private:
     // ---------------- LOSE STATE ----------------
     bool hasCreatedLoseScreen = false;
 
+    // ---------------- RECORDING STATE ----------------
+    bool m_playerInSafeZone  = true;   // true until player first leaves SafeZone
+    bool m_recordingActive   = false;  // true while the GhostSystem is recording
+
     // ---------------- SHARED STATE ----------------
     std::string hoveredButtonName = "";
     std::string currentScenePath = "";
@@ -93,6 +97,14 @@ private:
     std::string pendingScenePath = "";
     bool hasCreatedTransitionOverlay = false;
     bool isPlayingCredits = false;
+
+    /**
+     * @brief Checks if the player has left the safe zone and starts recording.
+     */
+    void CheckSafeZoneExit();
+
+    /** @brief Stop and discard any in-progress recording (player died / restarted). */
+    void AbandonRecording();
 
     /**
      * @brief Checks if the player has collided with the win zone using physics.
