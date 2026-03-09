@@ -59,15 +59,12 @@ namespace CSharpScript
 
         public void HandlePickup()
         {
-            if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
+            int coinID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
+            if (coinID != 0)
             {
-                Debug.Log("FAAAAH");            // works
-                                                // get the game object, check type apply accordingly
-
-                // if out obj == coin
-                // call c++ function to increment coin tracker
-                // waiting for api
-                //destroy gameobject
+                string coinName = GameObject.FindGameObjectByID(coinID);
+                Debug.Log("Picked up: " + coinName);
+                GameObject.Destroy(coinName);
             }
         }
 
