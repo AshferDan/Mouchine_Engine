@@ -56,13 +56,15 @@ public:
     virtual bool IsWinScreenActive()  const { return false; }
     virtual bool IsLoseScreenActive() const { return false; }
     virtual bool IsHowToPlayOpen()    const { return false; }
+    virtual bool IsPauseSettingsOpen() const { return false; }
     virtual bool IsOnMainMenu()       const { return false; }
     virtual std::string GetCurrentScenePath() const { return ""; }
 
     // ── Actions (triggered by engine systems) ────────────────────────────────
-    virtual void TogglePauseMenu() {}
-    virtual void OpenHowToPlay()   {}
-    virtual void CloseHowToPlay()  {}
-    virtual void TriggerWin()      {}
-    virtual void TriggerLose()     {}
+    virtual void TogglePauseMenu()     {}
+    virtual void OpenHowToPlay()       {}
+    virtual void CloseHowToPlay()      {}
+    virtual void ClosePauseSettings()  {}
+    virtual void TriggerWin()          {}
+    virtual void TriggerLose()         {}
 };

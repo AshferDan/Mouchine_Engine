@@ -1684,6 +1684,7 @@ namespace CSharpScript
             // ^ im commenting this out for now cause its stopping the level bgm
 
             Audio.StopSound("sfx");
+            Audio.StopSound("sfx_loop");
             if (_isGrounded || nonTrackingVFX.Contains(state))
                 staticVfxPos = Transform.GetPosition(OwnerName);
 
@@ -1728,7 +1729,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.GroundPounding_Falling:
                     if (enableDebug) Debug.Log("CurrState: " + "Groundpound_falling");
-                    Audio.PlaySound("groundpound_falling_sfx", "sfx");
+                    Audio.PlaySound("groundpound_falling_sfx", "sfx_loop");
                 break;
                 case PlayerState.Rolling:
                     if (enableDebug) Debug.Log("CurrState: " + "Roll");

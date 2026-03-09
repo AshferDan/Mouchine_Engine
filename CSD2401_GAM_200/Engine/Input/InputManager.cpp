@@ -314,13 +314,22 @@ void InputManager::Update(float)
         // In play mode: ESC toggles pause menu (unless win/lose screen is active or in main menu)
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            // Don't toggle pause menu if How To Play screen is open - let PauseMenuLogic handle it
-            bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
-
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen)
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu)
             {
-                if (gameCb) gameCb->TogglePauseMenu();
-                singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                // Check if settings screen is open - if so, close it
+                bool isPauseSettingsOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsPauseSettingsOpen();
+                if (isPauseSettingsOpen)
+                {
+                    std::cout << "[InputManager] ESC - Closing Pause Settings" << std::endl;
+                    if (gameCb) gameCb->ClosePauseSettings();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                }
+                else
+                {
+                    // Otherwise toggle pause menu normally
+                    if (gameCb) gameCb->TogglePauseMenu();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                }
             }
         }
         else

@@ -393,6 +393,7 @@ void PauseMenuLogicSystem::Update(float dt)
     // Handle pause settings screen visibility - ONLY update when state changes
     if (isPauseSettingsOpen != wasSettingsOpenLastFrame)
     {
+        std::cout << "[PauseMenu] Settings visibility changing: " << (isPauseSettingsOpen ? "SHOW" : "HIDE") << std::endl;
         if (isPauseSettingsOpen)
         {
             // Clear any hover state from previous menu
@@ -447,7 +448,7 @@ void PauseMenuLogicSystem::Update(float dt)
     // Handle pause settings screen interactions
     if (isPauseSettingsOpen)
     {
-        // Handle pending settings close (back button was clicked)
+        // Handle pending settings close (back button was clicked or ESC pressed)
         if (pendingSettingsClose)
         {
             settingsCloseTimer -= dt;
@@ -457,6 +458,9 @@ void PauseMenuLogicSystem::Update(float dt)
                 isPauseSettingsOpen = false;
                 pendingSettingsClose = false;
                 hoveredButtonName.clear();
+
+                // Force the visibility update by ensuring the state change is detected
+                // The next frame will see isPauseSettingsOpen != wasSettingsOpenLastFrame and hide the UI
             }
             return; // Don't process interactions during pending close
         }
@@ -581,21 +585,20 @@ void PauseMenuLogicSystem::Update(float dt)
         bool isClicked = InputManager::IsMouseLeftClicked();
 
         // Check if user pressed ESC to close
+        static bool escWasPressedHowToPlay = false;
         if (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            static bool escWasPressed = false;
-            if (!escWasPressed)
+            if (!escWasPressedHowToPlay)
             {
                 std::cout << "[PauseMenu] ESC pressed - closing how to play" << std::endl;
                 pendingHowToPlayClose = true;
                 howToPlayCloseTimer = 0.15f;
-                escWasPressed = true;
+                escWasPressedHowToPlay = true;
             }
         }
         else
         {
-            static bool escWasPressed = false;
-            escWasPressed = false;
+            escWasPressedHowToPlay = false;
         }
 
         // Check for back button hover and click
@@ -1527,6 +1530,16 @@ void PauseMenuLogicSystem::CloseHowToPlay()
     {
         std::cout << "[PauseMenu] How To Play closed" << std::endl;
     }
+}
+
+/**
+ * @brief Closes the pause settings screen.
+ */
+void PauseMenuLogicSystem::ClosePauseSettings()
+{
+    std::cout << "[PauseMenu] Closing settings screen (ESC pressed)" << std::endl;
+    pendingSettingsClose = true;
+    settingsCloseTimer = 0.15f; // 150ms delay to match back button behavior
 }
 
 /**
