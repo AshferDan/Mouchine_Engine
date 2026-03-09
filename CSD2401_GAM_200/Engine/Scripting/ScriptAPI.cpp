@@ -137,6 +137,19 @@ namespace API
         }
     }
 
+    void DestroyByID(const EntityID id)
+    {
+        GameObjectFactory::Instance().QueueDestroyGameObject(id);
+    }
+
+    void DestroyByName(const std::string& name)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj)
+            factory.QueueDestroyGameObject(obj->GetID());
+    }
+    
 #pragma endregion
 
 #pragma region Graphics

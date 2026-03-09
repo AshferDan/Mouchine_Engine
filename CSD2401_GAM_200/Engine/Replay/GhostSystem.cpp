@@ -19,6 +19,7 @@ Technology is prohibited.
 #include "transform.h"
 #include "CameraManager.h"
 #include "CameraComponent.h"
+#include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::ordered_json;
 
@@ -39,6 +40,12 @@ void GhostSystem::Initialize()
 
 void GhostSystem::Update(float dt)
 {
+    // Key-0: toggle ghost on/off (rising-edge detection)
+    bool key0Now = (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_0) == GLFW_PRESS);
+    if (key0Now && !m_key0WasHeld)
+        ToggleGhost();
+    m_key0WasHeld = key0Now;
+
     // Recorder samples AFTER the game has updated this tick
     m_recorder.Update(dt);
 
@@ -121,6 +128,37 @@ void GhostSystem::StartPlayback(const std::string& ghostObjectName)
 void GhostSystem::StopPlayback()
 {
     m_player.StopPlayback();
+}
+
+// ===== Ghost Toggle =====
+
+void GhostSystem::ToggleGhost()
+{
+    m_ghostVisible = !m_ghostVisible;
+
+    GameObject* ghost    = GameObjectFactory::Instance().FindGameObject("GhostHero");
+    GameObject* ghostVfx = GameObjectFactory::Instance().FindGameObject("GhostHero_vfx");
+
+    if (m_ghostVisible)
+    {
+        if (!IsGhostAvailable())
+        {
+            m_ghostVisible = false;
+            std::cout << "[GhostSystem] Toggle: no recording available — ghost stays hidden.\n";
+            return;
+        }
+        if (ghost)    ghost->SetActive(true);
+        if (ghostVfx) ghostVfx->SetActive(true);
+        m_player.StartPlayback("GhostHero", m_bestRecording);
+        std::cout << "[GhostSystem] Ghost toggled ON.\n";
+    }
+    else
+    {
+        m_player.StopPlayback();
+        if (ghost)    ghost->SetActive(false);
+        if (ghostVfx) ghostVfx->SetActive(false);
+        std::cout << "[GhostSystem] Ghost toggled OFF.\n";
+    }
 }
 
 // ===== Replay Watch Mode =====

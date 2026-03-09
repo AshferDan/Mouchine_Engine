@@ -212,6 +212,18 @@ namespace CSharpScript
         /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Destroy(string name);
+
+        /// <summary>
+        /// Destroys a GameObject by its unique EntityID. Prefer over DestroyByName when IDs are available.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void DestroyByID(int id);
+
+        /// <summary>
+        /// Destroys the first GameObject found with the given name. Equivalent to Destroy().
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void DestroyByName(string name);
     }
 
     /// <summary>

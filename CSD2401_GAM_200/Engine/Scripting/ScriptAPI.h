@@ -148,6 +148,8 @@ namespace API {
         bool isStatic = false,
         bool hasGravity = false);
 
+    void DestroyByID(const EntityID);
+    void DestroyByName(const std::string&);
 #pragma endregion
 
 #pragma region Graphics
