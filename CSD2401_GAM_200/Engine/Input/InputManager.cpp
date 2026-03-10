@@ -321,9 +321,14 @@ void InputManager::Update(float)
         {
             if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu)
             {
+                // check if how to play is open and if so, handle it in PauseMenuLogic
+                bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
+                if (isHowToPlayOpen)
+                {
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                }
                 // Check if settings screen is open - if so, close it
-                bool isPauseSettingsOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsPauseSettingsOpen();
-                if (isPauseSettingsOpen)
+                else if (gameCb && gameCb->IsPauseMenuActive() && gameCb->IsPauseSettingsOpen())
                 {
                     std::cout << "[InputManager] ESC - Closing Pause Settings" << std::endl;
                     if (gameCb) gameCb->ClosePauseSettings();
@@ -338,22 +343,11 @@ void InputManager::Update(float)
             }
             GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
             bool isReplayMode = ghostSys && ghostSys->IsReplayMode();
-
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE])
+            
+            // in replay mode, ESC exits the replay
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && isReplayMode)
             {
-                if (isReplayMode)
-                {
-                    ghostSys->ExitReplayMode();
-                }
-                else
-                {
-                    // Don't toggle pause menu if How To Play screen is open
-                    bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
-                    if (!winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen)
-                    {
-                        if (gameCb) gameCb->TogglePauseMenu();
-                    }
-                }
+                ghostSys->ExitReplayMode();
                 singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
             }
         }

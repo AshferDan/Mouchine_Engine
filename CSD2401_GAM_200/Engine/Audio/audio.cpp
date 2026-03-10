@@ -15,7 +15,7 @@ Technology is prohibited.
 #include "audio.h"
 #include <algorithm>
 
-AudioEngine::AudioEngine() : sounds(), channels(), system(nullptr) {}
+AudioEngine::AudioEngine() : sounds(), channels(), lowPassFilters(), system(nullptr), masterLowPassFilter(nullptr) {}
 AudioEngine::~AudioEngine() { stopAudio(); }
 
 /*  Core Functionalities  */
@@ -76,6 +76,19 @@ void AudioEngine::updateAudio() {
 void AudioEngine::stopAudio() {
 	stopAllSound();
 	unloadAllSound();
+
+	// releases allt he low pass filters
+	for (auto& pair : lowPassFilters) {
+		if (pair.second) {
+			pair.second->release();
+		}
+	}
+	lowPassFilters.clear();
+
+	if (masterLowPassFilter) {
+		masterLowPassFilter->release();
+		masterLowPassFilter = nullptr;
+	}
 
 	if (system) {
 		system->close();
@@ -428,6 +441,203 @@ bool AudioEngine::load3DSound(const std::string& name, const std::string& filepa
 
 	sounds[name] = sound;
 	std::cout << "Loaded 3D sound: " << name << " (min: " << minDistance << ", max: " << maxDistance << ")" << std::endl;
+	return true;
+}
+
+/*  DSP EFFECTS  */
+/**
+ * @brief Enables or disables a low pass filter on a specific channel
+ */
+bool AudioEngine::setLowPassFilter(const std::string& channelName, bool enable, float cutoffFrequency, float resonance)
+{
+	if (!system)
+	{
+		std::cout << "Audio system not initialised" << std::endl;
+		return false;
+	}
+
+	auto channelIt = channels.find(channelName);
+	if (channelIt == channels.end() || !channelIt->second)
+	{
+		std::cout << "Channel not found: " << channelName << std::endl;
+		return false;
+	}
+
+	FMOD::Channel* channel = channelIt->second;
+
+	if (enable)
+	{
+		// clamp parameters to safe ranges
+		cutoffFrequency = std::max(10.0f, std::min(22000.0f, cutoffFrequency));
+		resonance = std::max(1.0f, std::min(10.0f, resonance));
+
+		FMOD::DSP* lowPass = nullptr;
+		FMOD_RESULT result;
+
+		// check if a filter already exists for this channel
+		auto filterIt = lowPassFilters.find(channelName);
+		if (filterIt != lowPassFilters.end() && filterIt->second)
+		{
+			// reuse existing filter if have
+			lowPass = filterIt->second;
+			lowPass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoffFrequency);
+			lowPass->setParameterFloat(FMOD_DSP_LOWPASS_RESONANCE, resonance);
+			lowPass->setBypass(false);
+		}
+		else
+		{
+			// create a new low pass filter if dh
+			result = system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &lowPass);
+			if (result != FMOD_OK)
+			{
+				checkError(result, "Creating low pass filter for " + channelName);
+				return false;
+			}
+
+			// set the parameters
+			lowPass->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoffFrequency);
+			lowPass->setParameterFloat(FMOD_DSP_LOWPASS_RESONANCE, resonance);
+
+			// add dsp to channel
+			result = channel->addDSP(0, lowPass);
+			if (result != FMOD_OK)
+			{
+				checkError(result, "Adding low pass filter to channel " + channelName);
+				lowPass->release();
+				return false;
+			}
+
+			lowPassFilters[channelName] = lowPass;
+		}
+
+		std::cout << "Low pass filter enabled on " << channelName
+			<< " (cutoff: " << cutoffFrequency << " Hz, resonance: " << resonance << ")" << std::endl;
+	}
+	else
+	{
+		// disable filter
+		auto filterIt = lowPassFilters.find(channelName);
+		if (filterIt != lowPassFilters.end() && filterIt->second)
+		{
+			filterIt->second->setBypass(true);
+			std::cout << "Low pass filter disabled on " << channelName << std::endl;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * @brief Updates the cutoff frequency of an existing low pass filter
+ */
+bool AudioEngine::updateLowPassFilterFrequency(const std::string& channelName, float cutoffFrequency)
+{
+	auto filterIt = lowPassFilters.find(channelName);
+	if (filterIt == lowPassFilters.end() || !filterIt->second)
+	{
+		std::cout << "No low pass filter found on channel: " << channelName << std::endl;
+		return false;
+	}
+
+	cutoffFrequency = std::max(10.0f, std::min(22000.0f, cutoffFrequency));
+
+	FMOD_RESULT result = filterIt->second->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoffFrequency);
+	if (result != FMOD_OK)
+	{
+		checkError(result, "Updating low pass filter frequency for " + channelName);
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * @brief Enables or disables a low pass filter on the master channel group
+ */
+bool AudioEngine::setMasterLowPassFilter(bool enable, float cutoffFrequency, float resonance)
+{
+	if (!system)
+	{
+		std::cout << "Audio system not initialised" << std::endl;
+		return false;
+	}
+
+	FMOD::ChannelGroup* masterGroup = nullptr;
+	FMOD_RESULT result = system->getMasterChannelGroup(&masterGroup);
+	if (result != FMOD_OK || !masterGroup)
+	{
+		checkError(result, "Getting MASTER channel group");
+		return false;
+	}
+
+	if (enable)
+	{
+		cutoffFrequency = std::max(10.0f, std::min(22000.0f, cutoffFrequency));
+		resonance = std::max(1.0f, std::min(10.0f, resonance));
+
+		if (masterLowPassFilter)
+		{
+			masterLowPassFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoffFrequency);
+			masterLowPassFilter->setParameterFloat(FMOD_DSP_LOWPASS_RESONANCE, resonance);
+			masterLowPassFilter->setBypass(false);
+		}
+		else
+		{
+			result = system->createDSPByType(FMOD_DSP_TYPE_LOWPASS, &masterLowPassFilter);
+			if (result != FMOD_OK)
+			{
+				checkError(result, "Creating MASTER low pass filter");
+				return false;
+			}
+
+			masterLowPassFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoffFrequency);
+			masterLowPassFilter->setParameterFloat(FMOD_DSP_LOWPASS_RESONANCE, resonance);
+
+			result = masterGroup->addDSP(0, masterLowPassFilter);
+			if (result != FMOD_OK)
+			{
+				checkError(result, "Adding low pass filter to MASTER channel group");
+				masterLowPassFilter->release();
+				masterLowPassFilter = nullptr;
+				return false;
+			}
+		}
+
+		//std::cout << "Master low pass filter enabled (cutoff: " << cutoffFrequency
+		//	<< " Hz, resonance: " << resonance << ")" << std::endl;
+	}
+	else
+	{
+		if (masterLowPassFilter)
+		{
+			masterLowPassFilter->setBypass(true);
+			//std::cout << "Master low pass filter disabled" << std::endl;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * @brief Updates the cutoff frequency of the master low pass filter
+ */
+bool AudioEngine::updateMasterLowPassFilterFrequency(float cutoffFrequency)
+{
+	if (!masterLowPassFilter)
+	{
+		std::cout << "No master low pass filter active" << std::endl;
+		return false;
+	}
+
+	cutoffFrequency = std::max(10.0f, std::min(22000.0f, cutoffFrequency));
+
+	FMOD_RESULT result = masterLowPassFilter->setParameterFloat(FMOD_DSP_LOWPASS_CUTOFF, cutoffFrequency);
+	if (result != FMOD_OK)
+	{
+		checkError(result, "Updating MASTER low pass filter frequency");
+		return false;
+	}
+
 	return true;
 }
 

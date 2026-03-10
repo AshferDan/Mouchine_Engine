@@ -321,6 +321,41 @@ public:
                      float minDistance = 100.0f, float maxDistance = 1000.0f,
                      const std::string& category = "sfx", float volume = 1.0f, float pitch = 1.0f);
 
+    /*  DSP Effects  */
+    /**
+     * @brief Enables or disables a low pass filter on a specific sound
+     * @param soundName Name of the sound to apply the filter to
+     * @param enable True to enable the filter, false to disable
+     * @param cutoffFrequency Frequency in Hz above which sounds are attenuated (default: 5000 Hz)
+     * @param resonance Filter resonance or Q factor (default: 1.0)
+     * @return True if the operation was successful
+     */
+    bool SetLowPassFilter(const std::string& soundName, bool enable, float cutoffFrequency = 5000.0f, float resonance = 1.0f);
+
+    /**
+     * @brief Updates the cutoff frequency of an existing low pass filter on a sound
+     * @param soundName Name of the sound with the filter
+     * @param cutoffFrequency New cutoff frequency in Hz (range: 10-22000)
+     * @return True if the operation was successful
+     */
+    bool UpdateLowPassFilterFrequency(const std::string& soundName, float cutoffFrequency);
+
+    /**
+     * @brief Enables or disables a low pass filter on all audio
+     * @param enable True to enable the filter, false to disable
+     * @param cutoffFrequency Frequency in Hz above which sounds are attenuated (default: 5000 Hz)
+     * @param resonance Filter resonance or Q factor (default: 1.0)
+     * @return True if the operation was successful
+     */
+    bool SetMasterLowPassFilter(bool enable, float cutoffFrequency = 5000.0f, float resonance = 1.0f);
+
+    /**
+     * @brief Updates the cutoff frequency of the master low pass filter
+     * @param cutoffFrequency New cutoff frequency in Hz (range: 10-22000)
+     * @return True if the operation was successful
+     */
+    bool UpdateMasterLowPassFilterFrequency(float cutoffFrequency);
+
 private:
     std::map<std::string, FadeState> categoryFadeStates;
 };
