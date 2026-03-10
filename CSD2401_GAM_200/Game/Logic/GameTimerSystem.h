@@ -86,6 +86,12 @@ public:
      */
     bool IsTimeUp() const { return remainingTime <= 0.0f; }
 
+    /**
+     * @brief Compute Bar UV Bounds for timer
+     *  @param renderComp of the TimerGO
+     */
+    void ComputeBarUVBounds(RenderComponent* renderComp);
+
 private:
     float       remainingTime = 30.0f;              // remaining time in 30 seconds for now
     int         lastDisplayedSeconds = -1;          // last whole second shown on HUD
@@ -99,6 +105,11 @@ private:
     float       originalCenterY = 0.0f;             // original bar center Y position
     float       rightEdge = 0.0f;                   // right edge anchor point
     float       leftEdge = 0.0f;                   // right edge anchor point
+
+    float       uvBarMin = 0.0f;
+    float       uvBarMax = 1.0f;
+    float       uvBarWidth = 1.0f;
+    bool        uvBoundsReady = false;
 
     /**
      * @brief Updates the timer's displayed UI bar fill amount.

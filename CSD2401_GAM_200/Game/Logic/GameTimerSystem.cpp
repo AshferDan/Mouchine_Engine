@@ -17,10 +17,12 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "Collision.h"
 #include "transform.h"
+#include "stb_image.h"
 
 #include <cstdio>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 /**
  * @brief Initializes the countdown timer and updates initial display.
@@ -37,6 +39,11 @@ void GameTimerSystem::Initialize()
     originalCenterX = 0.0f;
     originalCenterY = 0.0f;
     leftEdge = 0.0f;
+
+    uvBoundsReady = false;
+    uvBarMin = 0.0f;
+    uvBarMax = 1.0f;
+    uvBarWidth = 1.0f;
 
     UpdateBar(60);
 }
@@ -145,11 +152,29 @@ void GameTimerSystem::Update(float dt)
     // reset timer and bar
     if (mode == EditorMode::Stop)
     {
-        if (remainingTime != 60.0f || lastDisplayedSeconds != 60)
+        if (remainingTime != 60.0f || lastDisplayedSeconds != 60) 
         {
+
             remainingTime = 60.0f;
             lastDisplayedSeconds = 60;
             hasTriggeredTimeUp = false;
+
+            auto* renderComp = timerGO->GetComponent<RenderComponent>();
+            auto* transformComp = timerGO->GetComponent<TransformComponent>();
+
+            // Restore full bar transform
+            if (transformComp && originalScaleX > 0.0f)
+            {
+                transformComp->SetScale(originalScaleX, originalScaleY);
+                transformComp->SetPosition(originalCenterX, originalCenterY);
+            }
+
+            // Restore full texture uv
+            if (renderComp)
+            {
+                renderComp->SetUVScale(vec2(1.0f, 1.0f));
+                renderComp->SetUVOffset(vec2(0.0f, 0.0f));
+            }
 
             // Reset bar scaling variables
             originalScaleX = 0.0f;
@@ -160,6 +185,7 @@ void GameTimerSystem::Update(float dt)
 
             UpdateBar(60);
         }
+
         return;
     }
 
@@ -214,6 +240,11 @@ void GameTimerSystem::ResetTimer()
     originalCenterY = 0.0f;
     leftEdge = 0.0f;
 
+    uvBoundsReady = false;
+    uvBarMin = 0.0f;
+    uvBarMax = 1.0f;
+    uvBarWidth = 1.0f;
+
     UpdateBar(30);
 }
 
@@ -229,6 +260,60 @@ void GameTimerSystem::DecreaseTime(float amount)
     }
 }
 
+void GameTimerSystem::ComputeBarUVBounds(RenderComponent* renderComp) {
+    // Use the real blue bar texture path here if you do not have a getter
+    std::string texturePath = renderComp->GetTexturePath();
+
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    unsigned char* pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
+
+    if (pixels && width > 0 && height > 0)
+    {
+        int minX = width;
+        int maxX = -1;
+
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                int index = (y * width + x) * 4;
+                unsigned char alpha = pixels[index + 3];
+
+                if (alpha > 0)
+                {
+                    minX = std::min(minX, x);
+                    maxX = std::max(maxX, x);
+                }
+            }
+        }
+
+        if (maxX >= minX)
+        {
+            uvBarMin = static_cast<float>(minX) / static_cast<float>(width);
+            uvBarMax = static_cast<float>(maxX + 1) / static_cast<float>(width); // exclusive bound
+            uvBarWidth = uvBarMax - uvBarMin;
+        }
+        else
+        {
+            uvBarMin = 0.0f;
+            uvBarMax = 1.0f;
+            uvBarWidth = 1.0f;
+        }
+
+        stbi_image_free(pixels);
+    }
+    else
+    {
+        uvBarMin = 0.0f;
+        uvBarMax = 1.0f;
+        uvBarWidth = 1.0f;
+    }
+
+    uvBoundsReady = true;
+}
+
 /**
  * @brief Updates the timer bar fill amount based on remaining time.
  */
@@ -237,6 +322,7 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
     // find timer bar by name
     auto& factory = GameObjectFactory::Instance();
     GameObject* timerGO = factory.FindGameObject(timerObjectName);
+    GameObject* timerBackground = factory.FindGameObject("LevelTimerBarBackground");
 
     if (!timerGO)
     {
@@ -246,6 +332,7 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
 
     auto* renderComp = timerGO->GetComponent<RenderComponent>();
     auto* transformComp = timerGO->GetComponent<TransformComponent>();
+    auto* bgTransform = timerBackground->GetComponent<TransformComponent>();
 
     if (!renderComp || !transformComp)
     {
@@ -266,60 +353,39 @@ void GameTimerSystem::UpdateBar(int totalSeconds)
     {
         timerGO->SetActive(true);
     }
+    
+    // Compute the visible blue UV range once from the actual timer texture
+    if (!uvBoundsReady)
+    {
+        ComputeBarUVBounds(renderComp);
+    }
 
-    // store original dimensions ONCE (when variables are zero)
-    if (originalScaleX == 0.0f)
+    if (originalScaleX <= 0.0f)
     {
         transformComp->GetScale(originalScaleX, originalScaleY);
         transformComp->GetPosition(originalCenterX, originalCenterY);
 
-        // Store the left edge position (this will be our anchor point)
-        leftEdge = originalCenterX - (originalScaleX / 2.0f);
+        // world-space start of the ACTUAL visible blue bar
+        leftEdge = (originalCenterX - originalScaleX * 0.5f) + (originalScaleX * uvBarMin);
 
-        // check the grey background and frame positions too
-        auto& factory = GameObjectFactory::Instance();
-        GameObject* greyBG = factory.FindGameObject("LevelTimerBarBackground");
-        GameObject* frame = factory.FindGameObject("LevelTimerBarFrame");
-
-        if (greyBG && frame)
-        {
-            auto* greyTransform = greyBG->GetComponent<TransformComponent>();
-            auto* frameTransform = frame->GetComponent<TransformComponent>();
-
-            float greyX, greyY, greyScaleX, greyScaleY;
-            float frameX, frameY, frameScaleX, frameScaleY;
-
-            greyTransform->GetPosition(greyX, greyY);
-            greyTransform->GetScale(greyScaleX, greyScaleY);
-            frameTransform->GetPosition(frameX, frameY);
-            frameTransform->GetScale(frameScaleX, frameScaleY);
-
-            float greyLeft = greyX - (greyScaleX / 2.0f);
-            float greyRight = greyX + (greyScaleX / 2.0f);
-
-            //std::cout << "[Timer Init] BLUE: Center=" << originalCenterX << ", Scale=" << originalScaleX
-            //          << ", Edges=[" << leftEdge << " to " << (leftEdge + originalScaleX) << "]" << std::endl;
-            //std::cout << "[Timer Init] GREY: Center=" << greyX << ", Scale=" << greyScaleX
-            //          << ", Edges=[" << greyLeft << " to " << greyRight << "]" << std::endl;
-            //std::cout << "[Timer Init] FRAME: Center=" << frameX << ", Scale=" << frameScaleX << std::endl;
-        }
+        // usable visible blue width only
+        rightEdge = originalScaleX * uvBarWidth;
     }
 
-    // calculate fill percentage (0.0 to 1.0)
-    float fillPercentage = remainingTime / 60.0f;
-    if (fillPercentage < 0.0f) fillPercentage = 0.0f;
-    if (fillPercentage > 1.0f) fillPercentage = 1.0f;
+    float fillPercentage = std::clamp(remainingTime / 60.0f, 0.0f, 1.0f);
+    float safeFill = std::max(fillPercentage, 0.001f);
 
-    // scale the bar width
-    const float MIN_WIDTH = 20.0f;
-    float newScaleX = originalScaleX * fillPercentage;
-    if (newScaleX < MIN_WIDTH) newScaleX = MIN_WIDTH;
-
-    // calculate new center position to keep left edge anchored at leftEdge
-    float newCenterX = leftEdge + (newScaleX / 2.0f);
+    // world width of remaining visible blue
+    float newScaleX = rightEdge * safeFill;
+    float newCenterX = leftEdge + (newScaleX * 0.5f);
 
     transformComp->SetScale(newScaleX, originalScaleY);
     transformComp->SetPosition(newCenterX, originalCenterY);
+
+    // crop inside the painted blue bar and preserve the right-end detail
+    float croppedUWidth = uvBarWidth * safeFill;
+    renderComp->SetUVScale(vec2(croppedUWidth, 1.0f));
+    renderComp->SetUVOffset(vec2(uvBarMax - croppedUWidth, 0.0f));;
 }
 
 /**

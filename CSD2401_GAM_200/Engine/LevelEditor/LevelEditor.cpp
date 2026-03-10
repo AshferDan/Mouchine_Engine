@@ -1781,7 +1781,8 @@ void LevelEditor::PerformRedo() {
     redoStack.pop_back();
 
     switch (redocmd.action) {
-    case EditorUndoCommand::ActionType::ObjectModified: {
+    case EditorUndoCommand::ActionType::ObjectModified: 
+    {
         Serialization::s_IsUndoRedoMode = true;
         Serialization::DeserializeGameObject(redocmd.afterJson);
         Serialization::ResolveHierarchy();
@@ -1789,14 +1790,16 @@ void LevelEditor::PerformRedo() {
         break;
     }
 
-    case EditorUndoCommand::ActionType::ObjectCreated: {
+    case EditorUndoCommand::ActionType::ObjectCreated: 
+    {
         // Redo creation = Re-create the object using the afterJson state
         Serialization::DeserializeGameObject(redocmd.afterJson);
         Serialization::ResolveHierarchy();
         break;
     }
 
-    case EditorUndoCommand::ActionType::ObjectDeleted: {
+    case EditorUndoCommand::ActionType::ObjectDeleted: 
+    {
         // Redo deletion = Delete it again
         GameObject* obj = factory.GetGameObject(redocmd.entityID);
         if (obj) {
