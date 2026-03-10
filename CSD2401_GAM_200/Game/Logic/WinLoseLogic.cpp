@@ -260,6 +260,7 @@ void WinLoseLogicSystem::CheckSafeZoneExit()
         GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
         if (ghost)
         {
+            ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
             ghost->StartRecording("Hero");
             std::cout << "[WinLoseLogic] Player left SafeZone — recording started.\n";
         }

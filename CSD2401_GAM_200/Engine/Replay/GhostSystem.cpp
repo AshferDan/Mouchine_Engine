@@ -40,22 +40,25 @@ void GhostSystem::Initialize()
 
 void GhostSystem::Update(float dt)
 {
-    // Deferred replay-on-load: wait until Hero exists (scene is ready), then start replay
-    if (m_pendingReplayLoad)
+    // Deferred replay-on-load: wait until liveTarget exists (scene is ready), then start replay
+    if (m_pendingReplayLoad && !m_liveTarget.empty())
     {
-        if (GameObjectFactory::Instance().FindGameObject("Hero"))
+        if (GameObjectFactory::Instance().FindGameObject(m_liveTarget))
         {
             m_pendingReplayLoad = false;
-            LoadRecording("Level1_testing");
+            LoadRecording(m_pendingRecordingName);
             EnterReplayMode();
         }
     }
 
-    // Key-0: toggle ghost on/off (rising-edge detection)
-    bool key0Now = (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_0) == GLFW_PRESS);
-    if (key0Now && !m_key0WasHeld)
-        ToggleGhost();
-    m_key0WasHeld = key0Now;
+    // Key-0: toggle ghost on/off — disabled during full replay watch mode
+    if (!m_isReplayMode)
+    {
+        bool key0Now = (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_0) == GLFW_PRESS);
+        if (key0Now && !m_key0WasHeld)
+            ToggleGhost();
+        m_key0WasHeld = key0Now;
+    }
 
     // Recorder samples AFTER the game has updated this tick
     m_recorder.Update(dt);
@@ -98,7 +101,8 @@ void GhostSystem::Update(float dt)
 
 void GhostSystem::StartRecording(const std::string& targetName)
 {
-    m_recorder.StartRecording(targetName);
+    const std::string& target = targetName.empty() ? m_liveTarget : targetName;
+    m_recorder.StartRecording(target);
     m_finishDone = false;
     std::cout << "[GhostSystem] Recording started for: " << targetName << std::endl;
 }
@@ -132,7 +136,8 @@ void GhostSystem::StartPlayback(const std::string& ghostObjectName)
         std::cout << "[GhostSystem] No recording available — playback skipped." << std::endl;
         return;
     }
-    m_player.StartPlayback(ghostObjectName, m_bestRecording);
+    const std::string& target = ghostObjectName.empty() ? m_ghostTarget : ghostObjectName;
+    m_player.StartPlayback(target, m_bestRecording);
     std::cout << "[GhostSystem] Ghost playback started on: " << ghostObjectName << std::endl;
 }
 
@@ -147,8 +152,15 @@ void GhostSystem::ToggleGhost()
 {
     m_ghostVisible = !m_ghostVisible;
 
-    GameObject* ghost    = GameObjectFactory::Instance().FindGameObject("GhostHero");
-    GameObject* ghostVfx = GameObjectFactory::Instance().FindGameObject("GhostHero_vfx");
+    if (m_liveTarget.empty() || m_ghostTarget.empty())
+    {
+        std::cout << "[GhostSystem] ToggleGhost: Call Configure() first.\n";
+        return;
+    }
+
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* ghost    = factory.FindGameObject(m_ghostTarget);
+    GameObject* ghostVfx = m_ghostVfx.empty() ? nullptr : factory.FindGameObject(m_ghostVfx);
 
     if (m_ghostVisible)
     {
@@ -159,29 +171,26 @@ void GhostSystem::ToggleGhost()
             return;
         }
 
-        auto& factory = GameObjectFactory::Instance();
-
-        // Clone Hero → GhostHero if not already in the scene
+        // Clone live player → ghost if not already in the scene
         if (!ghost)
         {
-            GameObject* hero = factory.FindGameObject("Hero");
-            if (hero) ghost = factory.CloneGameObject(hero->GetID(), "GhostHero");
+            GameObject* live = factory.FindGameObject(m_liveTarget);
+            if (live) ghost = factory.CloneGameObject(live->GetID(), m_ghostTarget);
         }
-        if (!ghostVfx)
+        if (!ghostVfx && !m_ghostVfx.empty())
         {
-            GameObject* heroVfx = factory.FindGameObject("Hero_vfx");
-            if (heroVfx) ghostVfx = factory.CloneGameObject(heroVfx->GetID(), "GhostHero_vfx");
+            GameObject* liveVfx = factory.FindGameObject(m_liveVfx);
+            if (liveVfx) ghostVfx = factory.CloneGameObject(liveVfx->GetID(), m_ghostVfx);
         }
 
         if (ghost)    ghost->SetActive(true);
         if (ghostVfx) ghostVfx->SetActive(true);
-        m_player.StartPlayback("GhostHero", m_bestRecording);
+        m_player.StartPlayback(m_ghostTarget, m_bestRecording);
         std::cout << "[GhostSystem] Ghost toggled ON.\n";
     }
     else
     {
         m_player.StopPlayback();
-        auto& factory = GameObjectFactory::Instance();
         if (ghost)    factory.QueueDestroyGameObject(ghost->GetID());
         if (ghostVfx) factory.QueueDestroyGameObject(ghostVfx->GetID());
         std::cout << "[GhostSystem] Ghost toggled OFF.\n";
@@ -194,44 +203,48 @@ void GhostSystem::EnterReplayMode()
 {
     if (m_bestRecording.empty())
     {
-        std::cout << "[GhostSystem] EnterReplayMode: No recording available." << std::endl;
+        std::cout << "[GhostSystem] EnterReplayMode: No recording available.\n";
+        return;
+    }
+    if (m_liveTarget.empty() || m_ghostTarget.empty())
+    {
+        std::cout << "[GhostSystem] EnterReplayMode: Call Configure() first.\n";
         return;
     }
 
     auto& factory = GameObjectFactory::Instance();
 
     // Hide the live player and its VFX
-    GameObject* hero    = factory.FindGameObject("Hero");
-    GameObject* heroVfx = factory.FindGameObject("Hero_vfx");
-    if (hero)    hero->SetActive(false);
-    if (heroVfx) heroVfx->SetActive(false);
+    GameObject* live    = factory.FindGameObject(m_liveTarget);
+    GameObject* liveVfx = m_liveVfx.empty() ? nullptr : factory.FindGameObject(m_liveVfx);
+    if (live)    live->SetActive(false);
+    if (liveVfx) liveVfx->SetActive(false);
 
-    // Create GhostHero by cloning Hero if it doesn't already exist in the scene
-    GameObject* ghost = factory.FindGameObject("GhostHero");
-    if (!ghost && hero)
+    // Create ghost by cloning live player if it doesn't already exist
+    GameObject* ghost = factory.FindGameObject(m_ghostTarget);
+    if (!ghost && live)
     {
-        ghost = factory.CloneGameObject(hero->GetID(), "GhostHero");
-        std::cout << "[GhostSystem] Created GhostHero by cloning Hero.\n";
+        ghost = factory.CloneGameObject(live->GetID(), m_ghostTarget);
+        std::cout << "[GhostSystem] Created " << m_ghostTarget << " by cloning " << m_liveTarget << ".\n";
     }
 
-    // Create GhostHero_vfx by cloning Hero_vfx if needed
-    GameObject* ghostVfx = factory.FindGameObject("GhostHero_vfx");
-    if (!ghostVfx && heroVfx)
+    // Create ghost VFX by cloning live VFX if needed
+    GameObject* ghostVfx = m_ghostVfx.empty() ? nullptr : factory.FindGameObject(m_ghostVfx);
+    if (!ghostVfx && !m_ghostVfx.empty() && liveVfx)
     {
-        ghostVfx = factory.CloneGameObject(heroVfx->GetID(), "GhostHero_vfx");
-        std::cout << "[GhostSystem] Created GhostHero_vfx by cloning Hero_vfx.\n";
+        ghostVfx = factory.CloneGameObject(liveVfx->GetID(), m_ghostVfx);
+        std::cout << "[GhostSystem] Created " << m_ghostVfx << " by cloning " << m_liveVfx << ".\n";
     }
 
     if (ghost)    ghost->SetActive(true);
     if (ghostVfx) ghostVfx->SetActive(true);
 
-    // Switch camera follow target to GhostHero
+    // Switch camera to follow the ghost
     CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
     if (cam && ghost)
         cam->SetFollowTarget(ghost);
 
-    // Start playback from the beginning
-    m_player.StartPlayback("GhostHero", m_bestRecording);
+    m_player.StartPlayback(m_ghostTarget, m_bestRecording);
 
     m_isReplayMode = true;
     std::cout << "[GhostSystem] Replay mode entered.\n";
@@ -244,22 +257,25 @@ void GhostSystem::ExitReplayMode()
     auto& factory = GameObjectFactory::Instance();
 
     // Destroy the cloned ghost objects so they don't linger
-    GameObject* ghost = factory.FindGameObject("GhostHero");
+    GameObject* ghost = factory.FindGameObject(m_ghostTarget);
     if (ghost) factory.QueueDestroyGameObject(ghost->GetID());
 
-    GameObject* ghostVfx = factory.FindGameObject("GhostHero_vfx");
-    if (ghostVfx) factory.QueueDestroyGameObject(ghostVfx->GetID());
+    if (!m_ghostVfx.empty())
+    {
+        GameObject* ghostVfx = factory.FindGameObject(m_ghostVfx);
+        if (ghostVfx) factory.QueueDestroyGameObject(ghostVfx->GetID());
+    }
 
     // Restore live player and its VFX
-    GameObject* hero    = factory.FindGameObject("Hero");
-    GameObject* heroVfx = factory.FindGameObject("Hero_vfx");
-    if (hero)    hero->SetActive(true);
-    if (heroVfx) heroVfx->SetActive(true);
+    GameObject* live    = factory.FindGameObject(m_liveTarget);
+    GameObject* liveVfx = m_liveVfx.empty() ? nullptr : factory.FindGameObject(m_liveVfx);
+    if (live)    live->SetActive(true);
+    if (liveVfx) liveVfx->SetActive(true);
 
-    // Switch camera back to Hero
+    // Switch camera back to live player
     CameraComponent* cam = CameraManager::Instance().GetActiveCamera();
-    if (cam && hero)
-        cam->SetFollowTarget(hero);
+    if (cam && live)
+        cam->SetFollowTarget(live);
 
     m_isReplayMode = false;
     std::cout << "[GhostSystem] Replay mode exited.\n";

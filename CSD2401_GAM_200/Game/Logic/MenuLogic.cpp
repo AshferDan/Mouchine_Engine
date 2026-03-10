@@ -82,7 +82,10 @@ void MenuLogicSystem::Update(float dt)
                 {
                     std::cout << "ReplayButton Clicked! Loading replay..." << std::endl;
                     if (GhostSystem* ghost = CORE->GetGhostSystem())
-                        ghost->RequestReplayOnLoad();
+                    {
+                        ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+                        ghost->RequestReplayOnLoad("Level1_testing");
+                    }
                     CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
                 }
                 else if (hoveredButtonName == "YesButton")
