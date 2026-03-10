@@ -1157,6 +1157,17 @@ static void Internal_Particles_ConfigureDeathExplosion(MonoString* objectName)
 }
 
 // === Ghost ===
+static void Internal_Ghost_Configure(MonoString* liveTarget, MonoString* ghostTarget,
+                                     MonoString* liveVfx, MonoString* ghostVfx)
+{
+    char* live  = mono_string_to_utf8(liveTarget);
+    char* ghost = mono_string_to_utf8(ghostTarget);
+    char* lvfx  = mono_string_to_utf8(liveVfx);
+    char* gvfx  = mono_string_to_utf8(ghostVfx);
+    API::Ghost::Configure(live, ghost, lvfx, gvfx);
+    mono_free(live); mono_free(ghost); mono_free(lvfx); mono_free(gvfx);
+}
+
 static void Internal_Ghost_StartRecording(MonoString* targetName)
 {
     char* name = mono_string_to_utf8(targetName);
@@ -1563,6 +1574,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Particles::ConfigureDeathExplosion", (void*)Internal_Particles_ConfigureDeathExplosion);
 
     // === Ghost ===
+    mono_add_internal_call("CSharpScript.Ghost::Configure",         (void*)Internal_Ghost_Configure);
     mono_add_internal_call("CSharpScript.Ghost::StartRecording",    (void*)Internal_Ghost_StartRecording);
     mono_add_internal_call("CSharpScript.Ghost::StopRecording",     (void*)Internal_Ghost_StopRecording);
     mono_add_internal_call("CSharpScript.Ghost::SaveBestRun",       (void*)Internal_Ghost_SaveBestRun);

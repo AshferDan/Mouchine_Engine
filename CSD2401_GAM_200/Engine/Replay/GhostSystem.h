@@ -171,16 +171,6 @@ public:
 
     // ===== Finish Trigger =====
 
-    /**
-     * @brief Auto-stop recording and save the run when targetName's X position
-     *        reaches or exceeds xThreshold. Fires once per recording session.
-     * @param targetName  The GameObject to watch (e.g. "Hero").
-     * @param xThreshold  X position that marks the finish line.
-     * @param levelName   Level identifier used for the save file.
-     */
-    void SetFinishTrigger(const std::string& targetName, float xThreshold,
-                          const std::string& levelName);
-
 private:
     void SaveToDisk(const std::string& levelName);
     bool LoadFromDisk(const std::string& levelName);
@@ -191,12 +181,6 @@ private:
     ReplayPlayer   m_player;
     GhostRecording m_bestRecording;
     float          m_bestTime = FLT_MAX;
-
-    // Finish trigger state
-    std::string m_finishTarget;
-    float       m_finishX    = FLT_MAX;
-    std::string m_finishLevel;
-    bool        m_finishDone = false;
 
     // Game-supplied object names (set via Configure())
     std::string m_liveTarget;   ///< e.g. "Hero"

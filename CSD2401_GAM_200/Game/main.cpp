@@ -213,9 +213,6 @@ int main()
             }
         }
 
-        // Stop recording + save best run when Hero crosses x = 3000
-        CORE->GetGhostSystem()->SetFinishTrigger("Hero", 3000.f, "DebugLevel");
-
         GameObject* Platform = GameObjectFactory::Instance().CreateShape(
             "Platform",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,

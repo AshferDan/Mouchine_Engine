@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "transform.h"
 #include "CameraManager.h"
 #include "CameraComponent.h"
+#include "Collidercomponent.h"
+#include "Physics.h"
 #include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::ordered_json;
@@ -66,35 +68,6 @@ void GhostSystem::Update(float dt)
     // Player drives the ghost object this tick
     m_player.Update(dt);
 
-    // Finish trigger: auto-stop + save when target crosses the X threshold
-    if (!m_finishDone && !m_finishTarget.empty() && m_recorder.IsRecording())
-    {
-        GameObject* obj = GameObjectFactory::Instance().FindGameObject(m_finishTarget);
-        if (obj)
-        {
-            auto* tf = obj->GetComponent<TransformComponent>();
-            if (tf)
-            {
-                float x = 0.f, y = 0.f;
-                tf->GetPosition(x, y);
-
-                if (x >= m_finishX)
-                {
-                    StopRecording();
-
-                    const auto& rec = m_recorder.GetRecording();
-                    float runTime = rec.empty() ? 0.f : rec.back().timestamp;
-
-                    bool newBest = SaveBestRun(m_finishLevel, runTime);
-                    std::cout << "[GhostSystem] Finish trigger fired at x=" << x
-                              << "  time=" << runTime << "s"
-                              << (newBest ? "  — NEW BEST saved!" : "  — not a new best.") << "\n";
-
-                    m_finishDone = true;
-                }
-            }
-        }
-    }
 }
 
 // ===== Recording =====
@@ -103,7 +76,6 @@ void GhostSystem::StartRecording(const std::string& targetName)
 {
     const std::string& target = targetName.empty() ? m_liveTarget : targetName;
     m_recorder.StartRecording(target);
-    m_finishDone = false;
     std::cout << "[GhostSystem] Recording started for: " << targetName << std::endl;
 }
 
@@ -175,7 +147,15 @@ void GhostSystem::ToggleGhost()
         if (!ghost)
         {
             GameObject* live = factory.FindGameObject(m_liveTarget);
-            if (live) ghost = factory.CloneGameObject(live->GetID(), m_ghostTarget);
+            if (live)
+            {
+                ghost = factory.CloneGameObject(live->GetID(), m_ghostTarget);
+                if (ghost)
+                {
+                    ghost->RemoveComponent<ColliderComponent>();
+                    ghost->RemoveComponent<PhysicsComponent>();
+                }
+            }
         }
         if (!ghostVfx && !m_ghostVfx.empty())
         {
@@ -226,6 +206,11 @@ void GhostSystem::EnterReplayMode()
     {
         ghost = factory.CloneGameObject(live->GetID(), m_ghostTarget);
         std::cout << "[GhostSystem] Created " << m_ghostTarget << " by cloning " << m_liveTarget << ".\n";
+        if (ghost)
+        {
+            ghost->RemoveComponent<ColliderComponent>();
+            ghost->RemoveComponent<PhysicsComponent>();
+        }
     }
 
     // Create ghost VFX by cloning live VFX if needed
@@ -333,7 +318,6 @@ void GhostSystem::SaveToDisk(const std::string& levelName)
 void GhostSystem::ResetRecording()
 {
     m_recorder.Reset();
-    m_finishDone = false;
     std::cout << "[GhostSystem] Recording reset — buffer cleared.\n";
 }
 
@@ -352,19 +336,6 @@ void GhostSystem::SaveCurrentRun(const std::string& levelName)
     SaveToDisk(levelName);
     std::cout << "[GhostSystem] SaveCurrentRun: saved " << rec.size()
               << " frames (" << m_bestTime << "s) to '" << levelName << "'.\n";
-}
-
-// ===== Finish Trigger =====
-
-void GhostSystem::SetFinishTrigger(const std::string& targetName, float xThreshold,
-                                   const std::string& levelName)
-{
-    m_finishTarget = targetName;
-    m_finishX      = xThreshold;
-    m_finishLevel  = levelName;
-    m_finishDone   = false;
-    std::cout << "[GhostSystem] Finish trigger set: watch '" << targetName
-              << "' at x>=" << xThreshold << " for level '" << levelName << "'\n";
 }
 
 bool GhostSystem::LoadFromDisk(const std::string& levelName)
