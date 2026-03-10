@@ -913,6 +913,241 @@
           "children": []
         }
       ]
+    },
+    {
+      "name": "Screen_QuitButton",
+      "localID": 33,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1920.0,
+          1100.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/AreYouSure_Menu.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": [
+        {
+          "name": "YesButton",
+          "localID": 34,
+          "parentID": 33,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -100.0,
+              -10.0
+            ],
+            "scale": [
+              180.0,
+              51.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/blankbtn.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "NoButton",
+          "localID": 35,
+          "parentID": 33,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              100.0,
+              -10.0
+            ],
+            "scale": [
+              180.0,
+              51.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/blankbtn.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "AreYouSureText",
+          "localID": 36,
+          "parentID": 33,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              9.999679565429688,
+              63.99949264526367
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 34,
+            "text": "Are you sure?",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "YesText",
+          "localID": 37,
+          "parentID": 33,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -100,
+              -10
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Yes",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "NoText",
+          "localID": 38,
+          "parentID": 33,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              100,
+              -10
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "No",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        }
+      ]
     }
   ],
   "AudioManager": {

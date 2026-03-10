@@ -126,6 +126,13 @@ public:
      */
     void ResetRecording();
 
+    /**
+     * @brief Flag the ghost system to auto-load Level1_testing.json and enter
+     *        replay watch mode as soon as the next scene finishes loading.
+     *        Call this before RequestSceneLoad() from the menu.
+     */
+    void RequestReplayOnLoad() { m_pendingReplayLoad = true; }
+
     // ===== Finish Trigger =====
 
     /**
@@ -162,4 +169,7 @@ private:
     bool        m_ghostVisible  = false;
     bool        m_key0WasHeld   = false;
     void        ToggleGhost();
+
+    // Deferred replay: set before scene load, fires once GhostHero exists in the new scene
+    bool        m_pendingReplayLoad = false;
 };
