@@ -148,6 +148,8 @@ namespace API {
         bool isStatic = false,
         bool hasGravity = false);
 
+    void DestroyByID(const EntityID);
+    void DestroyByName(const std::string&);
 #pragma endregion
 
 #pragma region Graphics
@@ -184,7 +186,7 @@ namespace API {
     /**
      * @brief Sets the render layer category for a GameObject.
      * @param objectName The name of the GameObject.
-     * @param layer The layer category (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).
+     * @param layer The game layer index (0=Background, 1=Player, 2=Enemies, 3=UI).
      */
     void SetRenderLayer(const std::string& objectName, int layer);
 
@@ -197,8 +199,8 @@ namespace API {
 
     /**
      * @brief Sets visibility for an entire layer category.
-     * @param layer The layer category (0=Background, 1=Walls, 2=Player, 3=Enemies, 4=Foreground, 5=UI).
-     * @param visible True to show, false to hide all objects in this layer.
+     * @param layer The game layer index (0=Background, 1=Player, 2=Enemies, 3=UI).
+     * @param visible True to enable, false to disable all objects in this layer (rendering, physics, scripting).
      */
     void SetLayerVisible(int layer, bool visible);
 
@@ -525,6 +527,16 @@ namespace API {
 
 #pragma region Scripting
     bool AttachScript(const std::string& objectName, const std::string& scriptClassName);
+    std::string GetCollidingObjectNameOnLayer(const std::string& objectName, int targetLayer);
+    int GetCollidingObjectIDOnLayer(const std::string& objectName, int targetLayer);
+    float GetFloatField (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    int GetIntField   (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    bool GetBoolField  (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    std::string GetStringField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName);
+    void SetFloatField (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, float value);
+    void SetIntField   (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, int value);
+    void SetBoolField  (const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, bool value);
+    void SetStringField(const std::string& objectName, const std::string& scriptClass, const std::string& fieldName, const std::string& value);
 #pragma endregion
 
 #pragma region Input

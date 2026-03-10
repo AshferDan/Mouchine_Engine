@@ -45,7 +45,7 @@ void Level1::Update(float dt) {
 }
 
 void Level1::Draw() {
-    std::cout << "[LEVEL 1] Drawing Level\n";
+    //std::cout << "[LEVEL 1] Drawing Level\n";
 }
 
 void Level1::Free() {

@@ -22,35 +22,35 @@ namespace CSharpScript
 {
     public class PlayerMovementStats : GameScript
     {
-        private static float mod = 12.5f * 2.5f;
+        private static float mod = 31.25f;          // 12.5f * 2.5f
         // CLAMPS - Max values 
-        public float Clamp_MaxRunSpeed = 50f * mod;
-        public float Clamp_MaxJumpHeight = 80f * mod;
+        public float Clamp_MaxRunSpeed = 1562.5f;   // 50.0f * mod
+        public float Clamp_MaxJumpHeight = 2500f;   // 80f * mod
 
         // walking tiers
-        public float T0_BaseSpeed = 1f * mod;       //2
-        public float T0_MaxSpeed = 12f * mod;       //12
+        public float T0_BaseSpeed = 31.25f;         // 1f * mod
+        public float T0_MaxSpeed = 375f;            // 12f * mod
 
         // running tiers
-        public float T1_Threshold = 18f * mod;       //18
-        public float T2_Threshold = 24f * mod;       //24
-        public float T3_Threshold = 30f * mod;       //30
-        public float T3_MaxSpeed = 32f * mod;        //40
+        public float T1_Threshold = 562.5f;         // 18f * mod
+        public float T2_Threshold = 750f;           // 24f * mod
+        public float T3_Threshold = 937.5f;         // 30f * mod
+        public float T3_MaxSpeed = 1000f;           // 32f * mod
 
         // Running
         public bool UseToggleRun = false;
-        public float RunBaseSpeed = 15f * mod;
-        public float RunCoastDeceleration = 15f * mod;
+        public float RunBaseSpeed = 468.75f;            // 15f * mod
+        public float RunCoastDeceleration = 468.75f;    //15f * mod
 
         // Accel/ Decel
-        public float GroundAcceleration = 20f * mod;
-        public float GroundDeceleration = 50f * mod;
+        public float GroundAcceleration = 625f;             // 20f * mod
+        public float GroundDeceleration = 1562.5f;          // 50f * mod
         //[Range(0.25f, 50f)] 
-        public float AirAcceleration = 20f * mod;
+        public float AirAcceleration = 625f;                // 20f * mod
         //[Range(0.25f, 50f)] 
-        public float AirDeceleration = 5f * mod;
-        public float TurnResetSpeed = 5f * mod;
-        public float TentAcceleration = 10f * mod;
+        public float AirDeceleration = 156.25f;             // 5f * mod
+        public float TurnResetSpeed = 156.25f;              // 5f * mod
+        public float TentAcceleration = 312.5f;             // 10f * mod
 
         // Turn Skid
         //[Range(0.1f, 1f)] 
@@ -58,10 +58,11 @@ namespace CSharpScript
         public float T1_SkidDuration = 0.45f;
         public float T2_SkidDuration = 0.55f;
         public float T3_SkidDuration = 0.8f;
+        public float SkidExitSpeed = 100f;
 
         // Wall Bonk
         public float T3_BonkDuration = 0.65f;
-        public Vector2 T3_BonkForce = new Vector2(18f * mod, 10f * mod);
+        public Vector2 T3_BonkForce = new Vector2(562.5f, 312.5f);        // 18f * mod, 10f * mod
 
         // Grounded/Collision Checks
         public float GroundDetectionRayLength = 10.0f;
@@ -73,14 +74,14 @@ namespace CSharpScript
 
         // Jump
         public bool EnableVariableJumpHeight = false;
-        public float JumpHeight = 185f;         // unity is 5.7 * mod???                        // unity is 5.7f * mod
+        public float JumpHeight = 185f;                         // unity is 5.7 * mod???                        // unity is 5.7f * mod
         public float T1_JumpMultiplier = 1.05f;
         public float T2_JumpMultiplier = 1.08f;
         public float T3_JumpMultiplier = 1.15f;
         public float JumpHeightCompensationFactor = 1.054f;
         public float TimeTillJumpApex = 0.35f;
         public float GravityOnReleaseMultiplier = 3.0f;         // was 1.4
-        public float MaxFallSpeed = 40f * mod;
+        public float MaxFallSpeed = 1250f;                      // 40f * mod
         public int NumberOfJumpsAllowed = 1;
 
         // Jump Cut
@@ -101,56 +102,56 @@ namespace CSharpScript
 
         // Cooldowns
         public float GPCooldown = 1.0f;
-        public float RollCooldown = 0.5f;
+        public float RollCooldown = 1.0f;
         public float WKCooldown = 0.5f;
         public float GlideCooldown = 0.2f;
 
         // Wall Jump
-        public vec2 WallJumpForce = new vec2(20f * mod, 30f * mod);
+        public vec2 WallJumpForce = new vec2(625f, 937.5f);             // 20f * mod, 30f * mod
         public float WallCoyoteTime = 0.1f;
 
         // Wall Kick
-        public float WallSlidingSpeed = 4f * mod;                       // was 2
+        public float WallSlidingSpeed = 125f;                           // 4f * mod
         public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
         public float WallSlideRestickCooldown = 0.5f;                   // cooldown for remagnetising back to wall aft pressing S to cancel wallslide
         public float WKBaseDuration = 0.25f;
-        public float WKSpeedModifier = 35f * mod;
-        public float WKVerticalModifier = 7f * mod;
+        public float WKSpeedModifier = 1093.75f;                        // 35f * mod
+        public float WKVerticalModifier = 218.75f;                      // 7f * mod
         public float WKDurationMultiplier = 0.75f;
         // dont have tht WKEase graph thing in unity
 
         // Roll
-        public float BaseRollDuration = 0.4f;       // minimum time
-        public float MidRollDuration = 0.55f;
+        public float BaseRollDuration = 0.3f;       // minimum time
+        public float MidRollDuration = 0.45f;
         public float MaxRollDuration = 0.7f;
-        public float BaseRollSpeed = 32f * mod;     // needs to be faster than walk speed to feel like a burst forward
-        public float MidRollSpeed = 35f * mod;
-        public float MaxRollSpeed = 40f * mod;
+        public float BaseRollSpeed = 1000f;         // 32f * mod
+        public float MidRollSpeed = 1093.75f;       // 35f * mod
+        public float MaxRollSpeed = 1250f;          // 40f * mod
 
 
         // Ground Pound
         public float GPPauseTime = 0.3f;
-        public float GPFallSpeed = 50f * mod;
-        public float RollHeightToDurationDivisor = 75f * mod;
+        public float GPFallSpeed = 1562.5f;                             // 50f * mod
+        public float RollHeightToDurationDivisor = 2343.75f;            // 75f * mod
         public float GroundPoundMaxSpeedHeightThreshold = 80f;
-        public float GPMaxDuratin = 2.5f;
+        public float GPMaxDuration = 2.5f;
 
         // Air Glide
         public float GlideFallSpeedMultiplier = 0.5f;
 
         // Knockback
-        public vec2 KnockbackForce = new vec2(30f * mod, 40f * mod);
-        public vec2 KnockbackFriction = new vec2(85f * mod, 0f);
+        public vec2 KnockbackForce = new vec2(937.5f, 1250f);           // 30f * mod, 40f * mod
+        public vec2 KnockbackFriction = new vec2(2656.25f, 0f);         // 85f * mod
         public float knockbackTime = 0.3f;
         public float hurtStunDuration = 0.75f;
 
         // Zipline
-        public float ZiplineSpeed = 30f * mod;
+        public float ZiplineSpeed = 937.5f;                             // 30f * mod
         public float ZiplineAttachDuration = 0.15f;
 
         // Zipline Launch
         public float ZiplineLaunchDuration = 0.25f;
-        public vec2 ZiplineLaunchForce = new vec2(40f * mod, 16f * mod);
+        public vec2 ZiplineLaunchForce = new vec2(1250f, 500f);            // 40f * mod, 16f * mod
         public float ZiplineCoyoteTime = 0.2f;
 
         // Damage Taken/ Hurt

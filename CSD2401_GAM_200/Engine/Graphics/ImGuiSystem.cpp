@@ -25,6 +25,8 @@ Technology is prohibited.
 #include <cctype>  
 #include "core.h"
 #include "RenderComponent.h"
+#include "LayerManager.h"
+#include "LayerComponent.h"
 #include <typeinfo>
 #include <type_traits>
 #include "LevelEditor.h"
@@ -575,7 +577,6 @@ void ImGuiSystem::Update(float dt)
             // Render layer visibility panel
             LayerPanel_Render();
 
-            // Render profiler! Make it toggleable?
             Profiler_Render();
         }
         // if IS in play mode
@@ -822,7 +823,7 @@ void GOCreationMenu_Render()
 
             ImGui::DragFloat2("Size", tempGO.colSize, 1.0f);
 
-            const char* layers[] = { "Player", "Ground", "Wall", "Enemy", "Platform", "Default" };
+            const char* layers[] = { "Player", "Ground", "Enemy", "Platform", "Pickup", "Default"};
             ImGui::Combo("Layer", &tempGO.colLayer, layers, IM_ARRAYSIZE(layers));
 
             ImGui::Unindent();
@@ -1317,6 +1318,7 @@ void GOCreationMenu_Spawn()
         cLayer
     );
 
+
     std::cout << "[ImGuiSystem] Sending CreateObjectMessage for " << tempGO.name << std::endl;
     //msg.Dispatch(*CORE);
     CORE->GetMessageBus().Publish(msg);
@@ -1771,8 +1773,21 @@ void DirectoryNavigator::RenderImGui()
         columns = 1;
     ImGui::Columns(columns, 0, false);
 
+    //sorts alphabetically
+    std::vector<fs::directory_entry> entries;
+    for (auto& iter : fs::directory_iterator(currentDir))
+        entries.push_back(iter);
+
+    std::sort(entries.begin(), entries.end(), [](fs::directory_entry const& lhs, fs::directory_entry const& rhs)
+    {
+        bool aIsDir{ lhs.is_directory() }, bIsDir{ rhs.is_directory() };
+        if (aIsDir != bIsDir)
+            return aIsDir > bIsDir;                                             // prioritise folders, compare bools
+        return lhs.path().filename().string() < rhs.path().filename().string(); // alphabet, compare strings
+    }); 
+
     // For each item in the current folder
-    for (auto &iter : fs::directory_iterator(currentDir))
+    for (auto &iter : entries)
     {
         std::string path = iter.path().string();                            // Path we are currently in
         auto relativePath = fs::relative(iter.path(), assetPath);           // Path relative from where we started (assets) to where we are
@@ -2278,7 +2293,7 @@ void ImGuiSystem::RenderPropertyEditor()
     {
         obj->SetActive(isActive);
     }
-    
+
     UndoTracker activeTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
     ImGui::Spacing();
@@ -2465,18 +2480,47 @@ void ImGuiSystem::RenderPropertyEditor()
                 UndoTracker layerTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Ascending order for topmost rendering position");
 
-                // Layer Category dropdown
-                const char* layerCategories[] = { "Background", "Walls", "Player", "Enemies", "Foreground", "UI" };
-                int currentLayerCategory = render->GetRenderLayerInt();
-                ImGui::Text("Layer Category");
-                ImGui::SetNextItemWidth(150.0f);
-                if (ImGui::Combo("##LayerCategory", &currentLayerCategory, layerCategories, IM_ARRAYSIZE(layerCategories)))
+            }
+        }
+    }
+
+    // Layer component
+    if (auto* lc = obj->GetComponent<LayerComponent>())
+    {
+        (void)lc;
+        if (ImGui::CollapsingHeader("Layer", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            // Remove button
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+            float buttonWidth = 100.0f;
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth - 10);
+            bool layerRemove = ImGui::Button("Remove##Layer", ImVec2(buttonWidth, 22));
+            ImGui::PopStyleColor(3);
+
+            if (layerRemove)
+            {
+                propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                obj->RemoveComponent("LayerComponent");
+                obj->SetGameLayer(0); // reset to Default
+                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+            }
+            else
+            {
+                const char* layerNames[] = { "Default", "Background", "Player", "Enemies", "UI" };
+                constexpr int NUM_LAYERS = 5;
+                int currentLayer = obj->GetGameLayer();
+                if (currentLayer < 0 || currentLayer >= NUM_LAYERS) currentLayer = 0;
+                ImGui::Text("Game Layer");
+                ImGui::SetNextItemWidth(180.0f);
+                if (ImGui::Combo("##GameLayerComp", &currentLayer, layerNames, NUM_LAYERS))
                 {
                     propertyBeforeJson = Serialization::SerializeGameObject(obj);
-                    render->SetRenderLayerInt(currentLayerCategory);
+                    obj->SetGameLayer(currentLayer);
                     UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
                 }
-                CreateHintText("Category for group visibility toggling");
+                CreateHintText("Disabling a layer freezes rendering, physics and scripting for all objects on it.");
             }
         }
     }
@@ -2634,10 +2678,10 @@ void ImGuiSystem::RenderPropertyEditor()
 
 
                 // Editable Collision Layer Dropdown
-                const char* layerNames[] = { "Player", "Ground", "Enemy", "Platform", "Default" };
+                const char* layerNames[] = { "Player", "Ground", "Enemy", "Platform", "Pickup", "Default" };
                 int currentLayer = static_cast<int>(collider->GetLayer());
 
-                if (ImGui::Combo("Layer", &currentLayer, layerNames, 5))
+                if (ImGui::Combo("Layer", &currentLayer, layerNames, 6))
                 {
                     propertyBeforeJson = Serialization::SerializeGameObject(obj);
 
@@ -3415,25 +3459,16 @@ void LayerPanel_Render()
     ImGui::Text("Toggle layer visibility:");
     ImGui::Separator();
 
-    // Layer names matching the RenderLayer enum
-    const char* layerNames[] = {
-        "Background",
-        "Walls",
-        "Player",
-        "Enemies",
-        "Foreground",
-        "UI"
-    };
+    // Named game layers (must match LayerManager initialization order)
+    const char* layerNames[] = { "Default", "Background", "Player", "Enemies", "UI" };
+    constexpr int NUM_NAMED_LAYERS = 5;
 
-    // Create a checkbox for each layer
-    for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
+    for (int i = 0; i < NUM_NAMED_LAYERS; i++)
     {
-        RenderComponent::RenderLayer layer = static_cast<RenderComponent::RenderLayer>(i);
-        bool visible = RenderComponent::IsLayerVisible(layer);
-
-        if (ImGui::Checkbox(layerNames[i], &visible))
+        bool enabled = LayerManager::IsLayerEnabled(i);
+        if (ImGui::Checkbox(layerNames[i], &enabled))
         {
-            RenderComponent::SetLayerVisible(layer, visible);
+            LayerManager::SetLayerEnabled(i, enabled);
         }
     }
 
@@ -3442,18 +3477,14 @@ void LayerPanel_Render()
     // Quick buttons
     if (ImGui::Button("Show All"))
     {
-        for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
-        {
-            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(i), true);
-        }
+        for (int i = 0; i < NUM_NAMED_LAYERS; i++)
+            LayerManager::SetLayerEnabled(i, true);
     }
     ImGui::SameLine();
     if (ImGui::Button("Hide All"))
     {
-        for (int i = 0; i < static_cast<int>(RenderComponent::RenderLayer::Count); i++)
-        {
-            RenderComponent::SetLayerVisible(static_cast<RenderComponent::RenderLayer>(i), false);
-        }
+        for (int i = 0; i < NUM_NAMED_LAYERS; i++)
+            LayerManager::SetLayerEnabled(i, false);
     }
 
     ImGui::End();
@@ -4072,7 +4103,11 @@ void PopulateComponentList()
     // push_back to vector the component details
         // lambda for adding component checks if already has component
             // if dont have, then add
-    AllComponents.push_back({ ComponentType::Transform, "Transform Component" , ImTextureID(icon_active_ui), [](GameObject* go){ 
+    AllComponents.push_back({ ComponentType::Transform, "Layer Component"     , ImTextureID(icon_active_ui), [](GameObject* go){
+        if (!go->GetComponent<LayerComponent>()) {
+            go->AddComponent<LayerComponent>(); std::cout << "Added Layer Component to " << go->GetName() << std::endl; } } });
+
+    AllComponents.push_back({ ComponentType::Transform, "Transform Component" , ImTextureID(icon_active_ui), [](GameObject* go){
         if (!go->GetComponent<TransformComponent>()){
             go->AddComponent<TransformComponent>();     std::cout << "Added Transform Component to " << go->GetName() << std::endl; } } });
                 
@@ -4152,6 +4187,8 @@ const char* ImGuiSystem::GetCollisionLayerName(int layer)
     case 4:
         return "Platform";
     case 5:
+        return "Pickup";
+    case 6:
         return "Default";
     default:
         return "Unknown";

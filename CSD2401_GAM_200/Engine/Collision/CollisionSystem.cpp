@@ -18,8 +18,8 @@ Technology is prohibited.
 #include "Factory.h"
 #include "ColliderComponent.h"
 #include "Collision.h"
+#include "LayerManager.h"
 #include <iostream>
-#include <algorithm>
 
 /**
  * @brief Constructs collision system with null physics reference
@@ -102,12 +102,19 @@ void CollisionSystem::Update(float deltaTime)
     auto& factory = GameObjectFactory::Instance();
     const auto& gameObjects = factory.GetAllGameObjects();
 
+    // Advance collision tracking before detection so JustStopped/StillColliding are correct
+    previousCollisions = currentCollisions;
+    currentCollisions.clear();
+
     // Clear and rebuild spatial grid each frame
     spatialGrid.Clear();
 
     // Insert all objects with colliders into the grid
     for (const auto& obj : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue;
+
         auto* collider = obj->GetComponent<ColliderComponent>();
         if (collider && collider->IsEnabled())
         {
@@ -118,8 +125,20 @@ void CollisionSystem::Update(float deltaTime)
     // Use spatial grid for broad-phase collision detection
     for (const auto& obj1 : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj1->GetGameLayer()))
+            continue;
+
         auto* col1 = obj1->GetComponent<ColliderComponent>();
         if (!col1 || !col1->IsEnabled())
+            continue;
+
+        // Only dynamic objects and trigger volumes need to query the grid.
+        // Static/collider-only objects just need to be IN the grid so dynamic objects find them.
+        // This avoids 50+ static tiles each querying all their neighbors every frame.
+        auto* phys1 = obj1->GetComponent<PhysicsComponent>();
+        bool isDynamic = phys1 && !phys1->IsStatic();
+        bool hasTrigger = obj1->GetComponent<EventComponent>() != nullptr;
+        if (!isDynamic && !hasTrigger)
             continue;
 
         // Query nearby objects from spatial grid (MUCH FASTER than checking all)
@@ -168,27 +187,34 @@ void CollisionSystem::Update(float deltaTime)
                 }
             }
 
+            // Compute key once and reuse for all tracking (O(1) set operations)
+            std::string key = GetCollisionKey(obj1.get(), obj2);
+
             if (isColliding)
             {
-                bool wasActive = false;
-                for (auto& pair : activeCollisions)
-                {
-                    if ((pair.first == obj1.get() && pair.second == obj2) ||
-                        (pair.first == obj2 && pair.second == obj1.get()))
-                    {
-                        wasActive = true;
-                        break;
-                    }
-                }
+                // O(1) lookup - was this pair active last frame or already seen this frame?
+                bool wasActive = activeCollisions.count(key) > 0;
 
-                // If it's a new collision, publish a message and log it
+                // Track in currentCollisions for helper functions (JustStopped, StillColliding)
+                currentCollisions.insert(key);
+
                 if (!wasActive)
                 {
+                    // New collision: publish message and register as active (O(1) insert)
+                    activeCollisions.insert(key);
                     CollisionMessage msg(obj1.get(), obj2);
                     CORE->GetMessageBus().Publish(msg);
-                    std::cout << "Collision: " << obj1->GetName() << " <-> "
-                        << obj2->GetName() << std::endl;
-                    activeCollisions.push_back({ obj1.get(), obj2 });
+                }
+                else
+                {
+                    // Ongoing collision: fire OnCollisionStay
+                    auto RaiseIfNeeded = [&](GameObject* receiver, GameObject* other)
+                    {
+                        if (receiver->GetComponent<EventComponent>())
+                            EventSystem::Raise(EventType::OnCollisionStay, receiver, other);
+                    };
+                    RaiseIfNeeded(obj1.get(), obj2);
+                    RaiseIfNeeded(obj2, obj1.get());
                 }
 
                 // Report collision to PhysicsSystem for resolution
@@ -208,54 +234,14 @@ void CollisionSystem::Update(float deltaTime)
 
                     RaiseIfNeeded(obj1.get(), obj2);
                     RaiseIfNeeded(obj2, obj1.get());
-                }
 
-                // Remove from active collisions
-                activeCollisions.erase(
-                    std::remove_if(activeCollisions.begin(), activeCollisions.end(),
-                        [&](const auto& pair)
-                        {
-                            return (pair.first == obj1.get() && pair.second == obj2) ||
-                                (pair.first == obj2 && pair.second == obj1.get());
-                        }),
-                    activeCollisions.end());
+                    // Remove from active collisions (O(1) erase)
+                    activeCollisions.erase(key);
+                }
             }
         }
     }
 
-    // Update collision tracking for helper functions
-    previousCollisions = currentCollisions;
-    currentCollisions.clear();
-
-    // Rebuild current collisions set
-    for (const auto& obj1 : gameObjects) {
-        auto* col1 = obj1->GetComponent<ColliderComponent>();
-        if (!col1) continue;
-
-        std::vector<GameObject*> nearbyObjects = spatialGrid.Query(obj1.get(), col1);
-
-        for (GameObject* obj2 : nearbyObjects) {
-            auto* col2 = obj2->GetComponent<ColliderComponent>();
-            if (!col2) continue;
-
-            if (AreColliding(obj1.get(), obj2)) {
-                std::string key = GetCollisionKey(obj1.get(), obj2);
-                currentCollisions.insert(key);
-
-                if (StillColliding(obj1.get(), obj2)) {
-                    auto RaiseIfNeeded = [&](GameObject* receiver, GameObject* other)
-                        {
-                            if (receiver->GetComponent<EventComponent>())
-                                EventSystem::Raise(EventType::OnCollisionStay, receiver, other);
-                        };
-
-                    RaiseIfNeeded(obj1.get(), obj2);
-                    RaiseIfNeeded(obj2, obj1.get());
-                }
-
-            }
-        }
-    }
 }
 // ===== Helper Functions for Specific Object Collision Queries =====
 
@@ -392,6 +378,22 @@ bool CollisionSystem::IsCollidingWithLayer(GameObject* obj, CollisionLayer targe
     return false;
 }
 
+std::string CollisionSystem::GetCollidingObjectNameOnLayer(GameObject* obj, CollisionLayer targetLayer)
+{
+    GameObject* hitObject = nullptr;
+    if (IsCollidingWithLayer(obj, targetLayer, &hitObject) && hitObject)
+        return hitObject->GetName();
+    return "";
+}
+
+EntityID CollisionSystem::GetCollidingObjectIDOnLayer(GameObject* obj, CollisionLayer targetLayer)
+{
+    GameObject* hitObject = nullptr;
+    if (IsCollidingWithLayer(obj, targetLayer, &hitObject) && hitObject)
+        return hitObject->GetID();
+    return 0; // 0 = invalid (IDs start at 1)
+}
+
 /*HOW TO USE FOR ASHFER :
 Without getting the hit object - just a yes / no check
  
@@ -445,6 +447,9 @@ bool CollisionSystem::Raycast(const vec2& origin, const vec2& direction, float d
         if (obj.get() == self) {
             continue; // Skip the object that is casting the ray
         }
+
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue; // Skip objects on disabled layers
 
         auto* collider = obj->GetComponent<ColliderComponent>();
         if (!collider) continue;

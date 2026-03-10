@@ -15,7 +15,7 @@ Technology is prohibited.
 
 #include "GraphicsSystem.h"
 #include "Animator.hpp"
-
+#include "LayerManager.h"
 #include "ResourceManager.h"
 
 // Global constant for configuration file path (currently unused in this file)
@@ -608,9 +608,14 @@ void GraphicsSystem::Update(float)
             continue;
         }
 
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+        {
+            continue;
+        }
+
         auto *rend = obj->GetComponent<RenderComponent>();
 
-        if (!rend || !rend->IsEnabled() || !rend->IsLayerEnabled())
+        if (!rend || !rend->IsEnabled())
         {
             continue;
         }
@@ -774,8 +779,13 @@ void GraphicsSystem::Update(float)
             continue;
         }
 
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+        {
+            continue;
+        }
+
         auto *rend = obj->GetComponent<RenderComponent>();
-        if (rend && rend->IsEnabled() && rend->IsLayerEnabled())
+        if (rend && rend->IsEnabled())
         {
             // Draw Lines and Points (not batched, drawn via immediate-mode-like temporary buffers)
             switch (rend->GetShapeType())
@@ -936,31 +946,43 @@ void GraphicsSystem::Update(float)
         DrawRectOutline(currentSelection.x, currentSelection.y, currentSelection.sx, currentSelection.sy, {1, 1, 1, 1}, vp); // draw white outline
     }
 
-    // === Vignette Post-Processing Pass ===
-    if (vignetteEnabled && vignetteShader && !editorMode)
+// === Post-Processing / Blit to Screen Pass ===
+if (!editorMode)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if (vignetteEnabled && vignetteShader)
     {
-        // Step 1: switch to the default framebuffer (the actual screen)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
-
+        // Vignette pass
         vignetteShader->Use();
-
-        // Bind the scene texture (what we just rendered into the FBO)
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
+        vignetteShader->SetUniform("uSceneTexture",  0);
+        vignetteShader->SetUniform("uInnerRadius",   vignetteInnerRadius);
+        vignetteShader->SetUniform("uOuterRadius",   vignetteOuterRadius);
+        vignetteShader->SetUniform("uIntensity",     vignetteIntensity);
+        vignetteShader->SetUniform("uVignetteColor", vignetteColor);
+    }
+    else
+    {
+        // Plain blit — just draw the scene texture as-is using vignette shader
+        // with intensity 0, or reuse debug shader, or add a simple blit shader
+        vignetteShader->Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, frameBufferTexture);
         vignetteShader->SetUniform("uSceneTexture", 0);
-        vignetteShader->SetUniform("uInnerRadius", vignetteInnerRadius);
-        vignetteShader->SetUniform("uOuterRadius", vignetteOuterRadius);
-        vignetteShader->SetUniform("uIntensity", vignetteIntensity);
-        vignetteShader->SetUniform("uVignetteColor", vignetteColor);
-
-        // Reuse the existing fullscreen quad
-        glBindVertexArray(flashVAO);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glBindVertexArray(0);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
+        vignetteShader->SetUniform("uInnerRadius",  1.0f);
+        vignetteShader->SetUniform("uOuterRadius",  1.0f);
+        vignetteShader->SetUniform("uIntensity",    0.0f); // no effect
+        vignetteShader->SetUniform("uVignetteColor", vec4(0,0,0,1));
     }
+
+    glBindVertexArray(flashVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
     // Unbind the custom framebuffer to prevent accidental drawing to it
     if (editorMode)
@@ -1674,8 +1696,6 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     clonedComponent->SetUVOffset(this->uvOffset);
     clonedComponent->SetScreenSpace(this->screenSpace);
     clonedComponent->SetColor(this->color);
-    clonedComponent->SetRenderLayer(this->renderLayer);
-
     return clonedComponent;
 }
 

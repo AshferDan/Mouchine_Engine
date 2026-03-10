@@ -18,8 +18,8 @@
 	</ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Message Text="Copying GameScripts.dll to Build folder..." Importance="high" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\Build\Scripts\" />
+    <Message Text="Copying GameScripts.dll to Build\bin\$(Configuration)\Scripts\ ..." Importance="high" />
+	  <Copy SourceFiles="$(TargetPath)" DestinationFolder="..\Build\Scripts\" />
   </Target>
 
 </Project>

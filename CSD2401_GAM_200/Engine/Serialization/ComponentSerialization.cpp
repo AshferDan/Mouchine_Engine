@@ -65,7 +65,6 @@ void ComponentSerialization::SerializeRender(json &j, RenderComponent *r)
         {"texturePath", texPath},
         {"color", {r->GetColor().x, r->GetColor().y, r->GetColor().z, r->GetColor().w}},
         {"layer", r->GetLayer()},
-        {"renderLayer", r->GetRenderLayerInt()},
         {"screenSpace", r->isScreenSpace()}};
 }
 
@@ -372,10 +371,6 @@ void ComponentSerialization::DeserializeRender(const json &j, GameObject *go)
     int layer = r.value("layer", 0);
     render->SetLayer(layer);
 
-    int rl = r.value("renderLayer", 0);
-    rl = std::clamp(rl, 0, (int)RenderComponent::RenderLayer::Count - 1);
-    render->SetRenderLayer(static_cast<RenderComponent::RenderLayer>(rl));
-        
     bool screenSpace = r.value("screenSpace", false);
     render->SetScreenSpace(screenSpace);
 
@@ -825,6 +820,18 @@ void ComponentSerialization::DeserializeTilemap(const json& j, GameObject* go)
     {
         tilemap->LoadTilemapFromFile(filepath);
     }
+
+    // AUTO-ADD RENDERCOMPONENT IF IT DOESN'T EXIST (because im too lazy to reload the tilemap)
+    if (!go->GetComponent<RenderComponent>())
+    {
+        auto* renderComp = go->AddComponent<RenderComponent>();
+        if (renderComp)
+        {
+            renderComp->SetShapeType(RenderComponent::ShapeType::Empty);
+            renderComp->SetEnabled(true);
+            std::cout << "[Tilemap] Auto-added RenderComponent to tilemap" << std::endl;
+        }
+    }
 }
 void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
 {
@@ -921,6 +928,13 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
               << sc->GetScripts().size() << " scripts" << std::endl;
 }
 
+void ComponentSerialization::DeserializeLayerComponent(const json& j, GameObject* go)
+{
+    if (!j.contains("LayerComponent")) return;
+    go->AddComponent<LayerComponent>();
+    go->SetGameLayer(j["LayerComponent"].value("layer", 0));
+}
+
 // ------------------- Serialize / Deserialize All Componenents -------------------
 /**
  * @brief Serializes all components attached to a GameObject.
@@ -949,6 +963,8 @@ void ComponentSerialization::SerializeAllComponents(GameObject *go, json &j)
         SerializeTilemap(j, tilemap);
     if (auto *sc = go->GetComponent<ScriptComponent>())
         SerializeScript(j, sc, go);
+    if (go->GetComponent<LayerComponent>())
+        j["LayerComponent"] = { {"layer", go->GetGameLayer()} };
 }
 
 /**
@@ -968,4 +984,5 @@ void ComponentSerialization::DeserializeAllComponents(GameObject *go, const json
     DeserializeEvent(j, go);
     DeserializeTilemap(j, go);
     DeserializeScript(j, go);
+    DeserializeLayerComponent(j, go);
 }

@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "WinLoseLogic.h"
+#include "GhostSystem.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
 #include "InputManager.h"
@@ -37,6 +38,8 @@ void WinLoseLogicSystem::Initialize()
     pendingSceneTimer = 0.0f;
     pendingScenePath = "";
     isPlayingCredits = false;
+    m_playerInSafeZone = true;
+    m_recordingActive  = false;
 }
 
 /**
@@ -57,6 +60,8 @@ void WinLoseLogicSystem::Update(float dt)
         winDelayTimer = 0.0f;
         pendingSceneChange = false;
         isPlayingCredits = false;
+        m_playerInSafeZone = true;
+        m_recordingActive  = false;
     }
 
     totalFrames++;
@@ -216,7 +221,78 @@ void WinLoseLogicSystem::Update(float dt)
         return;
     }
 
+    CheckSafeZoneExit();
     CheckWinZoneCollision();
+}
+
+/**
+ * @brief Detects when the player leaves the SafeZone and starts the ghost recording.
+ *        Recording begins the first time the player exits the SafeZone AABB.
+ */
+void WinLoseLogicSystem::CheckSafeZoneExit()
+{
+    // Only need to check while the player is still considered to be in the safe zone
+    if (!m_playerInSafeZone)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* safeZone = factory.FindGameObject("SafeZone");
+    GameObject* player   = factory.FindGameObject("Hero");
+
+    if (!safeZone || !player || !safeZone->IsActive() || !player->IsActive())
+        return;
+
+    auto* szCollider = safeZone->GetComponent<ColliderComponent>();
+    auto* plCollider = player->GetComponent<ColliderComponent>();
+
+    if (!szCollider || !plCollider)
+        return;
+
+    AABB szAABB = szCollider->GetAABB();
+    AABB plAABB = plCollider->GetAABB();
+
+    float szCX = (szAABB.min.x + szAABB.max.x) / 2.0f;
+    float szCY = (szAABB.min.y + szAABB.max.y) / 2.0f;
+    float plCX = (plAABB.min.x + plAABB.max.x) / 2.0f;
+    float plCY = (plAABB.min.y + plAABB.max.y) / 2.0f;
+
+    float halfW = (szAABB.max.x - szAABB.min.x) / 2.0f + (plAABB.max.x - plAABB.min.x) / 2.0f;
+    float halfH = (szAABB.max.y - szAABB.min.y) / 2.0f + (plAABB.max.y - plAABB.min.y) / 2.0f;
+
+    bool overlapping = (std::abs(plCX - szCX) < halfW) && (std::abs(plCY - szCY) < halfH);
+
+    if (!overlapping)
+    {
+        // Player has left the SafeZone — start recording
+        m_playerInSafeZone = false;
+        m_recordingActive  = true;
+
+        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+        if (ghost)
+        {
+            ghost->StartRecording("Hero");
+            std::cout << "[WinLoseLogic] Player left SafeZone — recording started.\n";
+        }
+    }
+}
+
+/**
+ * @brief Stops and discards any in-progress recording (player lost or restarted).
+ */
+void WinLoseLogicSystem::AbandonRecording()
+{
+    if (!m_recordingActive)
+        return;
+
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    if (ghost)
+    {
+        ghost->StopRecording();
+        ghost->ResetRecording();
+    }
+
+    m_recordingActive  = false;
+    m_playerInSafeZone = true;  // next load starts fresh
 }
 
 /**
@@ -273,6 +349,20 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
         if (!hasPlayerWon && !isWaitingForWin)
         {
             std::cout << "[WinZone] Player reached the win zone!" << std::endl;
+
+            // Stop recording and save if a run was being recorded
+            if (m_recordingActive)
+            {
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost)
+                {
+                    ghost->StopRecording();
+                    ghost->SaveCurrentRun("Level1_testing");
+                    std::cout << "[WinLoseLogic] Recording stopped and saved as Level1_testing.json\n";
+                }
+                m_recordingActive = false;
+            }
+
             hasPlayerWon = true;
             isWaitingForWin = true;
             winDelayTimer = 0.5f;
@@ -463,6 +553,8 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         {
             std::cout << "[WinZone] Replay clicked - Restarting level" << std::endl;
 
+            AbandonRecording();
+
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Restart");
@@ -590,6 +682,8 @@ void WinLoseLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered
 void WinLoseLogicSystem::TriggerLose()
 {
     std::cout << "[WinLoseLogic] YOU LOSE!" << std::endl;
+
+    AbandonRecording();
 
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
@@ -726,6 +820,8 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         if (hoveredButtonName == "YesButton")
         {
             std::cout << "[WinLoseLogic] Yes clicked - Restarting level" << std::endl;
+
+            AbandonRecording();
 
             if (audioManager)
             {

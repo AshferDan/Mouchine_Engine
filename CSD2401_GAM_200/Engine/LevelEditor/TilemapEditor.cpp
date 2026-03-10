@@ -1377,7 +1377,6 @@ GameObject* TilemapEditor::LoadTilemapAsGameObject(
     {
         std::cout << "[TilemapEditor] Loading tilemap: " << filepath << std::endl;
 
-        // Create ONE GameObject
         auto& factory = GameObjectFactory::Instance();
         GameObject* tilemapObj = factory.CreateGameObject(name);
 
@@ -1397,6 +1396,14 @@ GameObject* TilemapEditor::LoadTilemapAsGameObject(
         else
         {
             transform->SetPosition(tilemapPosition.x, tilemapPosition.y);
+        }
+
+        // ADD RENDERCOMPONENT
+        auto* renderComp = tilemapObj->AddComponent<RenderComponent>();
+        if (renderComp)
+        {
+            renderComp->SetShapeType(RenderComponent::ShapeType::Empty); // Not rendering a shape
+            renderComp->SetEnabled(true); // Enabled by default
         }
 
         // Add TilemapDataHolder component
@@ -1436,6 +1443,10 @@ GameObject* TilemapEditor::LoadTilemapAsGameObject(
 void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
 {
     if (!tilemapObj) return;
+    if (!tilemapObj->IsActive()) return;
+
+    auto* renderComp = tilemapObj->GetComponent<RenderComponent>();
+    if (!renderComp || !renderComp->IsEnabled()) return;
 
     auto* holder = tilemapObj->GetComponent<TilemapDataHolder>();
     if (!holder || !holder->data) return;

@@ -25,6 +25,7 @@ Technology is prohibited.
 
 #include "Message.h"
 #include "IMessageHandler.h"
+#include "LayerManager.h"
 
 /**
  * @brief Default constructor
@@ -61,6 +62,9 @@ void PhysicsSystem::Update(float deltaTime)
     // Integrate physics for all objects
     for (const auto& obj : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue;
+
         auto* physics = obj->GetComponent<PhysicsComponent>();
         if (physics && physics->IsEnabled())
         {
@@ -71,6 +75,9 @@ void PhysicsSystem::Update(float deltaTime)
     // Clear grounded state for ALL objects before resolving collisions
     for (const auto& obj : gameObjects)
     {
+        if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            continue;
+
         auto* physics = obj->GetComponent<PhysicsComponent>();
         if (physics && !physics->IsStatic())
         {
@@ -477,7 +484,7 @@ void PhysicsSystem::ResolveMixed(GameObject* obj1, GameObject* obj2,
                         squarePhysics->velocity.y = 0.0f;
                     }
 
-                    std::cout << "[Grounded] Player standing on enemy!" << std::endl;
+                    //std::cout << "[Grounded] Player standing on enemy!" << std::endl;
                 }
                 // NOTE: Knockback is now handled in InputManager, not here!
                 // PhysicsSystem only detects collision, game script decides response
