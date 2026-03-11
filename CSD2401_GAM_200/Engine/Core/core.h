@@ -307,6 +307,11 @@ public:
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
+
+        if (screenTransitionSystem && sceneName != "../Assets/Scenes/MainMenu.json")
+        {
+            screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
+        }
     }
 
     /**

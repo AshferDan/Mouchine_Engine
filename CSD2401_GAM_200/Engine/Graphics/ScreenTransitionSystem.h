@@ -47,6 +47,8 @@ public:
 
     bool IsTransitioning() const { return m_State != TransitionState::Idle; }
 
+    TransitionState GetState() const { return m_State; }
+
 private:
     void InitGL();
     void LoadGif(const std::string& path);
