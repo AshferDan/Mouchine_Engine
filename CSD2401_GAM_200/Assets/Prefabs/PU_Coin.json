@@ -1,0 +1,62 @@
+{
+    "GameObjects": [
+        {
+            "name": "PU_Coin",
+            "localID": 9,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    370.9999694824219,
+                    -15.499998092651367
+                ],
+                "scale": [
+                    125.0,
+                    125.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                    {
+                        "name": "Pickup_Coin",
+                        "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                        "rows": 3,
+                        "cols": 8,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 7,
+                        "fps": 12.0
+                    }
+                ]
+            },
+            "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Default",
+                "size": [
+                    125.0,
+                    125.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}

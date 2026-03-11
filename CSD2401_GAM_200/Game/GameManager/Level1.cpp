@@ -15,7 +15,10 @@ Technology is prohibited.
 #include "PauseState.h"
 //#include "Level2.h"
 #include <iostream>
-#include <Windows.h> // Just a helper for now
+//#include <Windows.h> // Just a helper for now
+#include "Utils.h"
+
+PickupSystem pickupSys1;
 
 void Level1::Load() {
 	std::cout << "[LEVEL 1] Load Assets\n";
@@ -25,17 +28,20 @@ void Level1::Load() {
 
 void Level1::Init() {
     std::cout << "[LEVEL 1] Initialize\n";
+    pickupSys1.InitPickups();
 }
+
+// wait for a start() to add initpickups to 
 
 void Level1::Update(float dt) {
 	timer += dt;
 
     // Press P to enter pause -- for testing, will have to be place in inputmanager
-    if (GetAsyncKeyState('P') & 1)
-    {
-        GameManager::Instance().PushState(
-            std::unique_ptr<GameState>(new PauseState()));
-    }
+    //if (GetAsyncKeyState('P') & 1)
+    //{
+    //    GameManager::Instance().PushState(
+    //        std::unique_ptr<GameState>(new PauseState()));
+    //}
 
     // Proceed to level 2th
     //if (true) {

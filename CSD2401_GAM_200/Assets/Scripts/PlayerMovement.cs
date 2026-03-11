@@ -185,19 +185,22 @@ namespace CSharpScript
             }
             ResetVars();
 
-            CSharpScript.GameObject.CreateAnimatedImage(
-                vfx,
-                0, 0,
-                Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
-                "../Assets/spritesheet_player_vfx.png",
-                15, 11,
-                0, 0, 0, 1,
-                12.0f,
-                (int)CSharpScript.CollisionLayer.Player,
-                false,
-                false,
-                false
-            );
+            if (GameObject.FindGameObjectByName(vfx) == "")
+            {
+                CSharpScript.GameObject.CreateAnimatedImage(
+                    vfx,
+                    0, 0,
+                    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
+                    "../Assets/spritesheet_player_vfx.png",
+                    15, 11,
+                    0, 0, 0, 1,
+                    12.0f,
+                    (int)CSharpScript.CollisionLayer.Player,
+                    false,
+                    false,
+                    false
+                );
+            }
 
             // wip to fix the vfx issue
             //CSharpScript.GameObject.CreateAnimatedImage(
@@ -226,6 +229,7 @@ namespace CSharpScript
             Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
             Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.05f, 1.1f, "sfx");
             Audio.AddSound("hurt_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.3f, 1.0f, "sfx");
+            Audio.AddSound("pickup_sfx", "../Assets/audio/Player/Pickup.wav", false, 0.3f, 1.0f, "sfx");
             //footsteps
             Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.15f, 1.0f, "sfx");
             Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.15f, 1.0f, "sfx");

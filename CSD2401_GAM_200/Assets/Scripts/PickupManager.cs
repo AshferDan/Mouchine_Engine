@@ -26,6 +26,10 @@ namespace CSharpScript
 {
     public class PickupManager : GameScript
     {
+        public string Pickup_Coin_Name = "PU_Coin";
+        public string Pickup_Shell_Name = "PU_Shell";
+        public string Pickup_PowerUp_Name = "PU_Powerup";
+
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
@@ -47,7 +51,7 @@ namespace CSharpScript
 
         public void OnUpdate(float deltaTime)
         {
-            if (OwnerName == null || OwnerName == "") { Debug.Log("no name"); return; }
+            if (OwnerName == null || OwnerName == "") { Debug.Log("[PickupManager Script] no name"); return; }
 
             OnFixedUpdate(fixeddt);
             //likely can remove
@@ -73,15 +77,15 @@ namespace CSharpScript
                 int goID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
                 if (goID <= 0) return;
 
-                if (GameObject.FindGameObjectByID(goID).Contains("PU_Coin"))
+                if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Coin_Name))
                 {
                     // coin effect
                 }
-                else if (GameObject.FindGameObjectByID(goID).Contains("PU_Shell"))
+                else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Shell_Name))
                 {
                     // shell effect
                 }
-                else if (GameObject.FindGameObjectByID(goID).Contains("PU_Powerup"))
+                else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_PowerUp_Name))
                 {
                     // powerup effect
                 }
@@ -90,6 +94,7 @@ namespace CSharpScript
                     // Mismatched name but still of type Pickup?
                 }
 
+                Audio.PlaySound("pickup_sfx", "sfx");               // abit bugged bc of stopsound(sfx) in playermovement, need jon to take a look at c# api
                 // destroy regardless of pickup type
                 GameObject.DestroyByID(goID);
                 Debug.Log("destroyed go id: " + goID.ToString());            // works
