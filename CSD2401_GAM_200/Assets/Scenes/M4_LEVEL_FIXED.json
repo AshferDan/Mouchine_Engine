@@ -9745,6 +9745,14 @@
         "volume": 0.10000000149011612,
         "pitch": 0.8999999761581421,
         "category": "sfx"
+      },
+      {
+        "name": "scissors_snip",
+        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
+        "loop": true,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
       }
     ],
     "events": [

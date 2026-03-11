@@ -30,6 +30,14 @@ void PauseMenuLogicSystem::Initialize()
     DestroyPauseSettingsUI();
     DestroyPauseMenuUI();
 
+    // Remove any lingering low pass filter from previous scene/restart
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->SetMasterLowPassFilter(false);
+        std::cout << "[PauseMenu] Initialize - low pass filter cleaned up" << std::endl;
+    }
+
     isPauseMenuActive = false;
     hasCreatedUI = false;
     hoveredButtonName = "";
@@ -243,8 +251,9 @@ void PauseMenuLogicSystem::Update(float dt)
         pendingTimer -= dt;
         if (pendingTimer <= 0.0f)
         {
-            // Check if fade is still active for Main Menu button - if so, wait a bit longer
-            if (hoveredButtonName == "PauseMainMenuButton" && audioManager && audioManager->IsAnyFadeActive())
+            // Check if fade is still active for buttons that fade - if so, wait a bit longer
+            if ((hoveredButtonName == "PauseMainMenuButton" || hoveredButtonName == "PauseRestartButton")
+                && audioManager && audioManager->IsAnyFadeActive())
             {
                 //std::cout << "[PauseMenu] Fade still active, waiting..." << std::endl;
                 pendingTimer = 0.1f; // Wait another 100ms and check again
@@ -260,7 +269,10 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseRestartButton")
             {
-                std::cout << "[PauseMenu] Restart clicked" << std::endl;
+                std::cout << "[PauseMenu] Restart - fade complete, reloading level" << std::endl;
+
+                // DON'T remove low pass filter here - keep audio muffled during fade
+                // It will be cleaned up after scene loads
 
                 // Discard any in-progress recording before restarting
                 if (GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr)
@@ -280,6 +292,7 @@ void PauseMenuLogicSystem::Update(float dt)
                     isPauseMenuActive = false;
                     CORE->SetGamePaused(false, false); // don't unpause audio when pause, use low pass
                 }
+
                 // restart the current level
                 if (!currentScenePath.empty())
                 {
@@ -757,6 +770,9 @@ void PauseMenuLogicSystem::Update(float dt)
             if (hoveredButtonName == "PauseRestartButton")
             {
                 audioManager->TriggerEvent("UI_Restart");
+                // Start audio fade when Restart button is clicked
+                audioManager->FadeOutAll(1.5f);
+                std::cout << "[PauseMenu] Started fade out for restart (1.5 seconds)" << std::endl;
             }
             else
             {
@@ -773,8 +789,19 @@ void PauseMenuLogicSystem::Update(float dt)
 
         // start delay before executing action
         pendingSceneChange = true;
-        // Longer delay for Main Menu to allow fade to complete
-        pendingTimer = (hoveredButtonName == "PauseMainMenuButton") ? 2.2f : 0.20f;
+        // Set timer based on button type to allow fades to complete
+        if (hoveredButtonName == "PauseMainMenuButton")
+        {
+            pendingTimer = 2.2f; // Main Menu: 2.0s fade + 0.2s buffer
+        }
+        else if (hoveredButtonName == "PauseRestartButton")
+        {
+            pendingTimer = 1.7f; // Restart: 1.5s fade + 0.2s buffer
+        }
+        else
+        {
+            pendingTimer = 0.20f; // Other buttons: immediate
+        }
     }
 }
 

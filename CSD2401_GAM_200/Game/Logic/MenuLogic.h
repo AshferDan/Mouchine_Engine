@@ -66,6 +66,7 @@ private:
     std::string pressedButtonName = "";   ///< The name of the currently pressed button
     bool pendingSceneChange = false;
     float pendingTimer = 0.0f;
+    bool creditsWerePlayed = false;       ///< Flag to restart BGM after credits finish
     //bool testFadeTriggered = false;       ///< Flag for test fade out button
 
     /**

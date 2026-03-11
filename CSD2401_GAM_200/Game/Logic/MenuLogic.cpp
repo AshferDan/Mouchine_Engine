@@ -38,6 +38,39 @@ void MenuLogicSystem::Update(float dt)
         audioManager->UpdateFade(dt);
     }
 
+    // Check if credits were played and have finished, then restart BGM
+    if (creditsWerePlayed)
+    {
+        CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+        if (cutscene && !cutscene->IsPlaying())
+        {
+            // Credits finished, restart BGM
+            std::cout << "[MenuLogic] Credits finished - Restarting main menu BGM" << std::endl;
+            if (audioManager)
+            {
+                const auto& sounds = audioManager->GetSoundDatabase();
+                if (sounds.find("MainMenuBGM") != sounds.end())
+                {
+                    std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
+                    audioManager->StopSound("bgm_channel");
+                    audioManager->PlaySound("MainMenuBGM", "bgm_channel");
+                    audioManager->FadeInCategory("music", 3.0f);
+                    std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
+                }
+                else
+                {
+                    std::cout << "[MenuLogic] ERROR: MainMenuBGM not found in sound database!" << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "[MenuLogic] ERROR: AudioManager is null!" << std::endl;
+            }
+
+            creditsWerePlayed = false;  // Reset flag
+        }
+    }
+
     // if a scene change is pending, count down timer first so the click sound can be played
     if (pendingSceneChange)
     {
@@ -355,6 +388,8 @@ void MenuLogicSystem::Update(float dt)
                 CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
                 if (!cutscene->IsPlaying()) {
                     cutscene->PlayVideo(creditsPath, "CreditsAudio");
+                    creditsWerePlayed = true;  // Set flag to restart BGM after credits
+                    std::cout << "[MenuLogic] Credits flag set - will restart BGM when finished" << std::endl;
                 }
             }
         }
