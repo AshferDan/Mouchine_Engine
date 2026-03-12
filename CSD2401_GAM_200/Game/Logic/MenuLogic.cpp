@@ -125,6 +125,13 @@ void MenuLogicSystem::Update(float dt)
             musicText->SetActive(false);
         if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(false);
+        // Hide level select text labels when on settings screen
+        if (auto* rText = GameObjectFactory::Instance().FindGameObject("Rating"))
+            rText->SetActive(false);
+        if (auto* rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
+            rText2->SetActive(false);
+        if (auto* rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
+            rText3->SetActive(false);
     }
     else if (currScreen == MenuScreens::Settings)
     {
@@ -149,7 +156,14 @@ void MenuLogicSystem::Update(float dt)
             musicText->SetActive(true);
         if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(true);
-        //return;
+        
+        // Hide level select text labels when on settings screen
+        if (auto* rText = GameObjectFactory::Instance().FindGameObject("Rating"))
+            rText->SetActive(false);
+        if (auto* rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
+            rText2->SetActive(false);
+        if (auto* rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
+            rText3->SetActive(false);
     }
     else if (currScreen == MenuScreens::LevelSelect) 
     {
@@ -173,6 +187,14 @@ void MenuLogicSystem::Update(float dt)
             musicText->SetActive(false);
         if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(false);
+
+        // Show level select text labels when on settings screen
+        if (auto* rText = GameObjectFactory::Instance().FindGameObject("Rating"))
+            rText->SetActive(true);
+        if (auto* rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
+            rText2->SetActive(true);
+        if (auto* rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
+            rText3->SetActive(true);
     }
 
     double mouseX = InputManager::GetMouseWorldX();
@@ -180,75 +202,9 @@ void MenuLogicSystem::Update(float dt)
     bool isClicked = InputManager::IsMouseLeftClicked();
     bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
-    auto& factory = GameObjectFactory::Instance();
-    std::string currentHover = "";
-    std::string currentPressed = "";
-
     // Depending on scene, check for which buttons have been pressed
-    switch (currScreen)
-    {
-    case MenuScreens::Home:
-        if (IsMouseOver(factory.FindGameObject("PlayButton"), mouseX, mouseY))
-        {
-            currentHover = "PlayButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("SettingsButton"), mouseX, mouseY))
-        {
-            currentHover = "SettingsButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("CreditsButton"), mouseX, mouseY))
-        {
-            currentHover = "CreditsButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))
-        {
-            currentHover = "QuitButton";
-        }
-        break;
-    case MenuScreens::Settings:
-        // do settings stuff here
-        if (IsMouseOver(factory.FindGameObject("MasterMuteButton"), mouseX, mouseY))
-        {
-            currentHover = "MasterMuteButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("MusicMuteButton"), mouseX, mouseY))
-        {
-            currentHover = "MusicMuteButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("SFXMuteButton"), mouseX, mouseY))
-        {
-            currentHover = "SFXMuteButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("BackButton"), mouseX, mouseY))
-        {
-            currentHover = "BackButton";
-        }
-        break;
-    case MenuScreens::LevelSelect:
-        if (IsMouseOver(factory.FindGameObject("Level1Button"), mouseX, mouseY))
-        {
-            currentHover = "Level1Button";
-        }
-        else if (IsMouseOver(factory.FindGameObject("Level2Button"), mouseX, mouseY))
-        {
-            currentHover = "Level2Button";
-        }
-        else if (IsMouseOver(factory.FindGameObject("Level3Button"), mouseX, mouseY))
-        {
-            currentHover = "Level3Button";
-        }
-        else if (IsMouseOver(factory.FindGameObject("LevelSelectedButton"), mouseX, mouseY))
-        {
-            currentHover = "LevelSelectedButton";
-        }
-        else if (IsMouseOver(factory.FindGameObject("Level_BackButton"), mouseX, mouseY))
-        {
-            currentHover = "Level_BackButton";
-        }
-        break;
-    default:
-        break;
-    }
+    std::string currentHover = FindHoveredButton(mouseX, mouseY);
+    std::string currentPressed = "";
 
     // Check if mouse is being pressed on the hovered button
     if (isMouseDown && !currentHover.empty())
@@ -311,135 +267,65 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        AudioManager* localAudioManager = CORE->GetAudioManager();
+        const std::string button = hoveredButtonName;
 
-        if (currScreen == MenuScreens::LevelSelect)
+        // Handle level select screen buttons first
+        if (HandleLevelSelectClick(button))
         {
-            if (hoveredButtonName == "Level1Button")
-            {
-                if (localAudioManager) localAudioManager->TriggerEvent("UI_Click");
-                SelectLevel("Level1Button", "../Assets/Scenes/M4_LEVEL_FIXED.json"); 
-                return;
-            }
-            else if (hoveredButtonName == "Level2Button")
-            {
-                if (localAudioManager) localAudioManager->TriggerEvent("UI_Click");
-                SelectLevel("Level2Button", "../Assets/Scenes/Level2.json");
-                return;
-            }
-            else if (hoveredButtonName == "Level3Button")
-            {
-                if (localAudioManager) localAudioManager->TriggerEvent("UI_Click");
-                SelectLevel("Level3Button", "../Assets/Scenes/Level3.json");
-                return;
-            }
-            else if (hoveredButtonName == "LevelSelectedButton")
-            {
-                // Start only works if a level was selected first
-                if (selectedLevelButtonName.empty() || selectedLevelScenePath.empty())
-                {               
-                    std::cout << "No level selected yet.\n";
-                    SetButtonTexture("LevelSelectedButton", false, false);
-                    return;
-                }
-
-                if (localAudioManager) localAudioManager->TriggerEvent("UI_Press");
-
-                pendingSceneChange = true;
-                pendingTimer = 0.2f; // just enough for button sound
-                return;
-            }
-            else if (hoveredButtonName == "Level_BackButton")
-            {
-                if (localAudioManager) localAudioManager->TriggerEvent("UI_Click");
-
-                currScreen = MenuScreens::Home;
-                selectedLevelButtonName.clear();
-                selectedLevelScenePath.clear();
-                hoveredButtonName.clear();
-                pressedButtonName.clear();
-                RefreshLevelSelectButtons();
-                return;
-            }
+            return;
         }
 
-        if (localAudioManager)
+        // Play general UI sound
+        TriggerUISound(button);
+
+        // Handle buttons that act immediately
+        if (HandleImmediateButtonClick(button))
         {
-            if (hoveredButtonName == "PlayButton")
-            {
-                localAudioManager->TriggerEvent("UI_Press");
-            }
-            else if (hoveredButtonName == "QuitButton")
-            {
-                localAudioManager->TriggerEvent("UI_Quit");
-            }
-            else
-            {
-                localAudioManager->TriggerEvent("UI_Click");
-            }
-            std::cout << "menu button clicking sound is triggered" << std::endl;
+            return;
         }
 
-        // Start small delay before loading scene
-        if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MasterMuteButton" &&
-            hoveredButtonName != "MusicMuteButton" && hoveredButtonName != "SFXMuteButton" &&
-            hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton" &&
-            hoveredButtonName != "Level_BackButton")
+        // Delayed transition buttons
+        if (button == "LevelSelectedButton" && audioManager)
         {
-            // Start audio fade out for scene transitions
-            if (hoveredButtonName == "PlayButton" && audioManager)
-            {
-                //currScreen = MenuScreens::LevelSelect;
-                audioManager->FadeOutCategory("music", 1.0f);  // Fade out over 1.0 sec
-                std::cout << "[MenuLogic] Started music fade out" << std::endl;
-            }
-
-            pendingSceneChange = true;
-            pendingTimer = 2.0f;                       // Wait 3.0s so 2.5s fade completes before scene loads
+            audioManager->FadeOutCategory("music", 1.0f);
+            std::cout << "[MenuLogic] Started music fade out" << std::endl;
         }
-        else
-        {
-            if (hoveredButtonName == "MasterMuteButton")
-            {
-                //AudioManager* audioManager = CORE->GetAudioManager();
-                if (audioManager)
-                {
-                    audioManager->ToggleMasterMute();
 
-                }
-                SetButtonTexture("MasterMuteButton", true, false); // Update texture after toggling
-            }
-            else if (hoveredButtonName == "MusicMuteButton")
-            {
-                if (audioManager)
-                {
-                    audioManager->ToggleCategoryMute("music");
-                }
-                SetButtonTexture("MusicMuteButton", true, false); // Update texture after toggling
-            }
-            else if (hoveredButtonName == "SFXMuteButton")
-            {
-                if (audioManager)
-                {
-                    audioManager->ToggleCategoryMute("sfx");
-                }
-                SetButtonTexture("SFXMuteButton", true, false); // Update texture after toggling
-            }
-            else if (hoveredButtonName == "BackButton" || hoveredButtonName == "Level_BackButton")
-            {
-                currScreen = MenuScreens::Home;
-            }
-            else if (hoveredButtonName == "SettingsButton")
-            {
-                currScreen = MenuScreens::Settings;
-            }
-            else if (hoveredButtonName == "CreditsButton")
-            {
-                std::cout << "CreditsButton Clicked!" << std::endl;
-                pendingSceneChange = true;
-            }
-        }
+        pendingSceneChange = true;
+        pendingTimer = 2.0f;
     }
+}
+
+std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
+{
+    auto& factory = GameObjectFactory::Instance();
+
+    switch (currScreen)
+    {
+    case MenuScreens::Home:
+        if (IsMouseOver(factory.FindGameObject("PlayButton"), mouseX, mouseY))       return "PlayButton";
+        if (IsMouseOver(factory.FindGameObject("SettingsButton"), mouseX, mouseY))   return "SettingsButton";
+        if (IsMouseOver(factory.FindGameObject("CreditsButton"), mouseX, mouseY))    return "CreditsButton";
+        if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))       return "QuitButton";
+        break;
+
+    case MenuScreens::Settings:
+        if (IsMouseOver(factory.FindGameObject("MasterMuteButton"), mouseX, mouseY)) return "MasterMuteButton";
+        if (IsMouseOver(factory.FindGameObject("MusicMuteButton"), mouseX, mouseY))  return "MusicMuteButton";
+        if (IsMouseOver(factory.FindGameObject("SFXMuteButton"), mouseX, mouseY))    return "SFXMuteButton";
+        if (IsMouseOver(factory.FindGameObject("BackButton"), mouseX, mouseY))       return "BackButton";
+        break;
+
+    case MenuScreens::LevelSelect:
+        if (IsMouseOver(factory.FindGameObject("Level1Button"), mouseX, mouseY))         return "Level1Button";
+        if (IsMouseOver(factory.FindGameObject("Level2Button"), mouseX, mouseY))         return "Level2Button";
+        if (IsMouseOver(factory.FindGameObject("Level3Button"), mouseX, mouseY))         return "Level3Button";
+        if (IsMouseOver(factory.FindGameObject("LevelSelectedButton"), mouseX, mouseY))  return "LevelSelectedButton";
+        if (IsMouseOver(factory.FindGameObject("Level_BackButton"), mouseX, mouseY))     return "Level_BackButton";
+        break;
+    }
+
+    return "";
 }
 
 bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mouseY)
@@ -449,6 +335,28 @@ bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mous
     if (!tx) return false;
 
     return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, static_cast<float>(mouseX), static_cast<float>(mouseY));
+}
+
+void MenuLogicSystem::TriggerUISound(const std::string& buttonName)
+{
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (!audioManager)
+        return;
+
+    if (buttonName == "LevelSelectedButton")
+    {
+        audioManager->TriggerEvent("UI_Press");
+    }
+    else if (buttonName == "QuitButton")
+    {
+        audioManager->TriggerEvent("UI_Quit");
+    }
+    else
+    {
+        audioManager->TriggerEvent("UI_Click");
+    }
+
+    std::cout << "menu button clicking sound is triggered" << std::endl;
 }
 
 void MenuLogicSystem::RefreshLevelSelectButtons()
@@ -475,6 +383,116 @@ void MenuLogicSystem::SelectLevel(const std::string& buttonName, const std::stri
     selectedLevelButtonName = buttonName;
     selectedLevelScenePath = scenePath;
     RefreshLevelSelectButtons();
+}
+bool MenuLogicSystem::HandleLevelSelectClick(const std::string& buttonName)
+{
+    if (currScreen != MenuScreens::LevelSelect)
+        return false;
+
+    if (buttonName == "Level1Button")
+    {
+        TriggerUISound(buttonName);
+        SelectLevel("Level1Button", "../Assets/Scenes/M4_LEVEL_FIXED.json");
+        return true;
+    }
+
+    if (buttonName == "Level2Button")
+    {
+        TriggerUISound(buttonName);
+        SelectLevel("Level2Button", "../Assets/Scenes/Level2.json"); // to change to proper scene
+        return true;
+    }
+
+    if (buttonName == "Level3Button")
+    {
+        TriggerUISound(buttonName);
+        SelectLevel("Level3Button", "../Assets/Scenes/Level3.json"); // to change to proper scene
+        return true;
+    }
+
+    if (buttonName == "LevelSelectedButton")
+    {
+        // Start only works after a level has been selected.
+        if (selectedLevelButtonName.empty() || selectedLevelScenePath.empty())
+        {
+            SetButtonTexture("LevelSelectedButton", false, false);
+            return true;
+        }
+
+        TriggerUISound(buttonName);
+        pendingSceneChange = true;
+        pendingTimer = 0.2f;
+        return true;
+    }
+
+    if (buttonName == "Level_BackButton")
+    {
+        TriggerUISound(buttonName);
+        currScreen = MenuScreens::Home;
+        ClearLevelSelection();
+        return true;
+    }
+
+    return false;
+}
+
+bool MenuLogicSystem::HandleImmediateButtonClick(const std::string& buttonName)
+{
+    AudioManager* audioManager = CORE->GetAudioManager();
+
+    if (buttonName == "MasterMuteButton")
+    {
+        if (audioManager)
+            audioManager->ToggleMasterMute();
+
+        SetButtonTexture("MasterMuteButton", true, false);
+        return true;
+    }
+
+    if (buttonName == "MusicMuteButton")
+    {
+        if (audioManager)
+            audioManager->ToggleCategoryMute("music");
+
+        SetButtonTexture("MusicMuteButton", true, false);
+        return true;
+    }
+
+    if (buttonName == "SFXMuteButton")
+    {
+        if (audioManager)
+            audioManager->ToggleCategoryMute("sfx");
+
+        SetButtonTexture("SFXMuteButton", true, false);
+        return true;
+    }
+
+    if (buttonName == "BackButton")
+    {
+        currScreen = MenuScreens::Home;
+        return true;
+    }
+
+    if (buttonName == "PlayButton")
+    {
+        currScreen = MenuScreens::LevelSelect;
+        return true;
+    }
+
+    if (buttonName == "SettingsButton")
+    {
+        currScreen = MenuScreens::Settings;
+        return true;
+    }
+
+    if (buttonName == "CreditsButton")
+    {
+        pendingSceneChange = true;
+        pendingTimer = 0.2f;
+        return true;
+    }
+
+    return false;
 }
 
 //  swap textures
@@ -614,14 +632,16 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
     rc->SetTextureID(newtex);
 }
 
+void MenuLogicSystem::ClearLevelSelection()
+{
+    selectedLevelButtonName.clear();
+    selectedLevelScenePath.clear();
+    hoveredButtonName.clear();
+    pressedButtonName.clear();
+    RefreshLevelSelectButtons();
+}
+
 void MenuLogicSystem::Reset()
 {
     currScreen = MenuScreens::Home;
-
-    hoveredButtonName.clear();
-    pressedButtonName.clear();
-    selectedLevelButtonName.clear();
-    selectedLevelScenePath.clear();
-    pendingSceneChange = false;
-    pendingTimer = 0.0f;
 }

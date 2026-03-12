@@ -89,7 +89,30 @@ private:
      */
     void SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed = false);
 
-    void RefreshLevelSelectButtons();
+    /**
+     * @brief Returns the button currently under the mouse for the active menu screen.
+     */
+    std::string FindHoveredButton(double mouseX, double mouseY);
 
+    void RefreshLevelSelectButtons();
     void SelectLevel(const std::string& buttonName, const std::string& scenePath);
+
+    /**
+     * @brief Plays the correct UI sound for the clicked button.
+     */
+    void TriggerUISound(const std::string& buttonName);
+
+    void ClearLevelSelection();
+
+    /**
+     * @brief Handles level select screen buttons only.
+     * Returns true if the click was handled here.
+     */
+    bool HandleLevelSelectClick(const std::string& buttonName);
+
+    /**
+     * @brief Handles buttons that should act immediately instead of using delayed scene change.
+     * Returns true if the click was handled here.
+     */
+    bool HandleImmediateButtonClick(const std::string& buttonName);
 };

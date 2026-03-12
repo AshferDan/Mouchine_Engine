@@ -983,40 +983,40 @@
                 ]
               },
               "children": []
+            },
+            {
+              "name": "Level_BackButton",
+              "localID": 26,
+              "parentID": 20,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  806.7764282226563,
+                  398.40484619140625
+                ],
+                "scale": [
+                  200.0,
+                  180.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Back_Button.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "children": []
             }
           ]
-        },
-        {
-          "name": "Level_BackButton",
-          "localID": 26,
-          "parentID": 11,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              806.7764282226563,
-              398.40484619140625
-            ],
-            "scale": [
-              200.0,
-              180.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Back_Button.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "children": []
         },
         {
           "name": "Level2Button",
@@ -1341,7 +1341,7 @@
               0.5,
               1.0
             ],
-            "layer": 503,
+            "layer": 1,
             "screenSpace": false
           },
           "TextComponent": {
@@ -1358,107 +1358,151 @@
             "scale": 1.0,
             "screenSpace": false
           },
-          "children": []
-        },
-        {
-          "name": "Slider_Bar_Master",
-          "localID": 35,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              50.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 2,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "Slider_Bar_Back_Master",
-          "localID": 36,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              50.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "Slider_Knob_Master",
-          "localID": 37,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              50.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 3,
-            "screenSpace": false
-          },
-          "children": []
+          "children": [
+            {
+              "name": "Slider_Bar_Master",
+              "localID": 35,
+              "parentID": 34,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  50.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Bar_Back_Master",
+              "localID": 36,
+              "parentID": 34,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  50.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Knob_Master",
+              "localID": 37,
+              "parentID": 34,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  50.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "MasterMuteButton",
+              "localID": 38,
+              "parentID": 34,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  -200.0,
+                  50.5
+                ],
+                "scale": [
+                  125.0,
+                  100.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "PhysicsComponent": {
+                "enabled": true,
+                "mass": 0.0,
+                "isStatic": true,
+                "useGravity": false,
+                "isGrounded": false,
+                "velocity": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "children": []
+            }
+          ]
         },
         {
           "name": "MusicText",
-          "localID": 38,
+          "localID": 39,
           "parentID": 33,
           "active": true,
           "TransformComponent": {
@@ -1483,7 +1527,7 @@
               0.5,
               1.0
             ],
-            "layer": 503,
+            "layer": 1,
             "screenSpace": false
           },
           "TextComponent": {
@@ -1500,107 +1544,151 @@
             "scale": 1.0,
             "screenSpace": false
           },
-          "children": []
-        },
-        {
-          "name": "Slider_Bar_Music",
-          "localID": 39,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              -75.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 2,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "Slider_Bar_Back_Music",
-          "localID": 40,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              -75.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "Slider_Knob_Music",
-          "localID": 41,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              -75.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 3,
-            "screenSpace": false
-          },
-          "children": []
+          "children": [
+            {
+              "name": "Slider_Bar_Music",
+              "localID": 40,
+              "parentID": 39,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -75.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Bar_Back_Music",
+              "localID": 41,
+              "parentID": 39,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -75.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Knob_Music",
+              "localID": 42,
+              "parentID": 39,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -75.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "MusicMuteButton",
+              "localID": 43,
+              "parentID": 39,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  -200.0,
+                  -74.5
+                ],
+                "scale": [
+                  125.0,
+                  100.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "PhysicsComponent": {
+                "enabled": true,
+                "mass": 0.0,
+                "isStatic": true,
+                "useGravity": false,
+                "isGrounded": false,
+                "velocity": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "children": []
+            }
+          ]
         },
         {
           "name": "SFXText",
-          "localID": 42,
+          "localID": 44,
           "parentID": 33,
           "active": true,
           "TransformComponent": {
@@ -1625,7 +1713,7 @@
               0.5,
               1.0
             ],
-            "layer": 503,
+            "layer": 1,
             "screenSpace": false
           },
           "TextComponent": {
@@ -1642,193 +1730,151 @@
             "scale": 1.0,
             "screenSpace": false
           },
-          "children": []
-        },
-        {
-          "name": "Slider_Bar_SFX",
-          "localID": 43,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              -200.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 2,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "Slider_Bar_Back_SFX",
-          "localID": 44,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              -200.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "Slider_Knob_SFX",
-          "localID": 45,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              200.0,
-              -200.0
-            ],
-            "scale": [
-              670.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 3,
-            "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "MasterMuteButton",
-          "localID": 46,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -200.0,
-              50.5
-            ],
-            "scale": [
-              125.0,
-              100.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "PhysicsComponent": {
-            "enabled": true,
-            "mass": 0.0,
-            "isStatic": true,
-            "useGravity": false,
-            "isGrounded": false,
-            "velocity": [
-              0.0,
-              0.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "SFXMuteButton",
-          "localID": 47,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -200.0,
-              -199.5
-            ],
-            "scale": [
-              125.0,
-              100.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "PhysicsComponent": {
-            "enabled": true,
-            "mass": 0.0,
-            "isStatic": true,
-            "useGravity": false,
-            "isGrounded": false,
-            "velocity": [
-              0.0,
-              0.0
-            ]
-          },
-          "children": []
+          "children": [
+            {
+              "name": "Slider_Bar_SFX",
+              "localID": 45,
+              "parentID": 44,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -200.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Bar_Back_SFX",
+              "localID": 46,
+              "parentID": 44,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -200.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Knob_SFX",
+              "localID": 47,
+              "parentID": 44,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -200.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "SFXMuteButton",
+              "localID": 48,
+              "parentID": 44,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  -200.0,
+                  -199.5
+                ],
+                "scale": [
+                  125.0,
+                  100.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "PhysicsComponent": {
+                "enabled": true,
+                "mass": 0.0,
+                "isStatic": true,
+                "useGravity": false,
+                "isGrounded": false,
+                "velocity": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "children": []
+            }
+          ]
         },
         {
           "name": "BackButton",
-          "localID": 48,
+          "localID": 49,
           "parentID": 33,
           "active": true,
           "TransformComponent": {
@@ -1855,49 +1901,6 @@
             ],
             "layer": 1,
             "screenSpace": false
-          },
-          "children": []
-        },
-        {
-          "name": "MusicMuteButton",
-          "localID": 49,
-          "parentID": 33,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -200.0,
-              -74.5
-            ],
-            "scale": [
-              125.0,
-              100.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 1,
-            "screenSpace": false
-          },
-          "PhysicsComponent": {
-            "enabled": true,
-            "mass": 0.0,
-            "isStatic": true,
-            "useGravity": false,
-            "isGrounded": false,
-            "velocity": [
-              0.0,
-              0.0
-            ]
           },
           "children": []
         }
