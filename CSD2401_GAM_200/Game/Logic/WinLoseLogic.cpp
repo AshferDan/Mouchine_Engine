@@ -97,7 +97,17 @@ void WinLoseLogicSystem::Update(float dt)
         pendingSceneTimer -= dt;
         if (pendingSceneTimer <= 0.0f)
         {
+            // Check if fade is still active - if so, wait a bit longer
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager && audioManager->IsAnyFadeActive())
+            {
+                std::cout << "[WinLoseLogic] Fade still active, waiting..." << std::endl;
+                pendingSceneTimer = 0.1f; // Wait another 100ms and check again
+                return;
+            }
+
             pendingSceneChange = false;
+            std::cout << "[WinLoseLogic] Fade complete! Loading scene..." << std::endl;
             // unpause right before loading to avoid showing game world
             CORE->SetGamePaused(false);
             CORE->RequestSceneLoad(pendingScenePath, true);
@@ -388,6 +398,19 @@ void WinLoseLogicSystem::TriggerWin()
     if (timerFrame) timerFrame->SetActive(false);
     if (pauseBtn) pauseBtn->SetActive(false);
 
+    // Hide shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(false);
+    if (shellIcon2) shellIcon2->SetActive(false);
+    if (shellIcon3) shellIcon3->SetActive(false);
+    if (coinIcon) coinIcon->SetActive(false);
+    if (coinText) coinText->SetActive(false);
+
     // stop all music and play victory sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
@@ -395,7 +418,7 @@ void WinLoseLogicSystem::TriggerWin()
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
         audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", 2.0f); // Fade in over 1 second
+        audioManager->FadeInCategory("music", 2.0f); // Fade in over 2 second
     }
 
     // win screen background
@@ -525,7 +548,8 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Press");
                 // Fade out music before credits
-                audioManager->FadeOutCategory("music", 0.5f);
+                audioManager->FadeOutCategory("music", 1.5f);
+                std::cout << "[WinZone] Started music fade out (1.5 seconds)" << std::endl;
             }
 
             // Play credits cutscene with audio
@@ -548,13 +572,14 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Restart");
                 // Fade out music before restarting
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 1.5f);
+                std::cout << "[WinZone] Started music fade out (1.5 seconds)" << std::endl;
             }
 
             DestroyWinScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 1.7f;  // Wait for 1.5s fade + small buffer
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -566,11 +591,12 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Quit");
                 // Fade out music before going to main menu
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 2.0f);
+                std::cout << "[WinZone] Started music fade out (2.0 seconds)" << std::endl;
             }
 
             DestroyWinScreen();
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 2.2f;  // Wait for 2.0s fade + small buffer
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -614,6 +640,19 @@ void WinLoseLogicSystem::DestroyWinScreen()
     if (timerBar) timerBar->SetActive(true);
     if (timerFrame) timerFrame->SetActive(true);
     if (pauseBtn) pauseBtn->SetActive(true);
+
+    // Re-show shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(true);
+    if (shellIcon2) shellIcon2->SetActive(true);
+    if (shellIcon3) shellIcon3->SetActive(true);
+    if (coinIcon) coinIcon->SetActive(true);
+    if (coinText) coinText->SetActive(true);
 
     hasCreatedWinScreen = false;
     hasPlayerWon = false;
@@ -691,6 +730,19 @@ void WinLoseLogicSystem::TriggerLose()
     if (timerBar) timerBar->SetActive(false);
     if (timerFrame) timerFrame->SetActive(false);
     if (pauseBtn) pauseBtn->SetActive(false);
+
+    // Hide shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(false);
+    if (shellIcon2) shellIcon2->SetActive(false);
+    if (shellIcon3) shellIcon3->SetActive(false);
+    if (coinIcon) coinIcon->SetActive(false);
+    if (coinText) coinText->SetActive(false);
 
     // stop all music and play game over sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
@@ -814,13 +866,14 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Click");
                 // Fade out music before restarting
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 1.5f);
+                std::cout << "[WinLoseLogic] Started music fade out (1.5 seconds)" << std::endl;
             }
 
             DestroyLoseScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 1.7f;  // Wait for 1.5s fade + small buffer
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -832,11 +885,12 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Click");
                 // Fade out music before going to main menu
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 2.0f);
+                std::cout << "[WinLoseLogic] Started music fade out (2.0 seconds)" << std::endl;
             }
 
             DestroyLoseScreen();
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 2.2f;  // Wait for 2.0s fade + small buffer
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -879,6 +933,19 @@ void WinLoseLogicSystem::DestroyLoseScreen()
     if (timerBar) timerBar->SetActive(true);
     if (timerFrame) timerFrame->SetActive(true);
     if (pauseBtn) pauseBtn->SetActive(true);
+
+    // Re-show shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(true);
+    if (shellIcon2) shellIcon2->SetActive(true);
+    if (shellIcon3) shellIcon3->SetActive(true);
+    if (coinIcon) coinIcon->SetActive(true);
+    if (coinText) coinText->SetActive(true);
 
     hasCreatedLoseScreen = false;
     hoveredButtonName.clear();

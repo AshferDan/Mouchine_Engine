@@ -105,6 +105,17 @@ public:
      */
     bool IsHowToPlayOpen() const { return isHowToPlayOpen; }
 
+    /**
+     * @brief Checks if the pause settings screen is currently open.
+     * @return True if settings is active.
+     */
+    bool IsPauseSettingsOpen() const { return isPauseSettingsOpen; }
+
+    /**
+     * @brief Closes the pause settings screen.
+     */
+    void ClosePauseSettings();
+
 private:
     bool isPauseMenuActive = false;        // whether the pause menu is currently displayed
     std::string hoveredButtonName = "";    // name of the currently hovered button

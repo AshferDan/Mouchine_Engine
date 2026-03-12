@@ -541,6 +541,12 @@ void CoreEngine::update_time(double fps_calc_interval)
 
 void CoreEngine::SetGamePaused(bool paused)
 {
+    SetGamePaused(paused, true);
+}
+
+// check if audio needs to be pause
+void CoreEngine::SetGamePaused(bool paused, bool pauseAudio)
+{
     std::cout << (paused ? "Game is paused\n" : "Game is resuming\n");
     if (m_gamePause == paused)
     {
@@ -549,8 +555,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    // Don't pause audio if a cutscene is playing (cutscene has its own audio)
-    if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+    // only pause audio if requested and not in cutscene
+    if (pauseAudio && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(paused);
     }

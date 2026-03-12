@@ -63,6 +63,10 @@ namespace CSharpScript
         #region Variables
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
 
+        // scissors sound flags
+        private bool _lobster1SoundPlaying = false;
+        private bool _lobster2SoundPlaying = false;
+
         // movement variables
         private vec2 _moveVelocity = new vec2(0, 0);
         private bool _isFacingRight = true;
@@ -226,6 +230,10 @@ namespace CSharpScript
             Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
             Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.05f, 1.1f, "sfx");
             Audio.AddSound("hurt_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.3f, 1.0f, "sfx");
+
+            // load 3D spatial sound for NPCs (scissors snip for lobster)
+            Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
+
             //footsteps
             Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.15f, 1.0f, "sfx");
             Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.15f, 1.0f, "sfx");
@@ -303,6 +311,90 @@ namespace CSharpScript
         public void OnUpdate(float deltaTime)
         {
             if (OwnerName == null || OwnerName == "") return;
+
+            #region LOBSTER 3D SCISSORS SOUND
+            // HARDCODDED LOBSTER SNIPPING SOUND FOR NOW
+            // update 3D audio listener position to follow player
+            vec2 playerPos = Transform.GetPosition(OwnerName);
+            Audio.Set3DListenerPosition(playerPos.x, playerPos.y);
+
+            // lobster positions
+            float lobster1X = 25684.0f;
+            float lobster1Y = 698.46f;
+            float lobster2X = 13370.0f;
+            float lobster2Y = 700.0f;
+
+            // calculate distances to lobsters
+            float dist1X = playerPos.x - lobster1X;
+            float dist1Y = playerPos.y - lobster1Y;
+            float distance1 = (float)Math.Sqrt(dist1X * dist1X + dist1Y * dist1Y);
+
+            float dist2X = playerPos.x - lobster2X;
+            float dist2Y = playerPos.y - lobster2Y;
+            float distance2 = (float)Math.Sqrt(dist2X * dist2X + dist2Y * dist2Y);
+
+            // lobster 1 sound within max distance of 3000
+            if (distance1 < 3000.0f)
+            {
+                if (!_lobster1SoundPlaying)
+                {
+                    Audio.PlaySound("scissors_snip", "lobster1_scissors");
+                    _lobster1SoundPlaying = true;
+                    Debug.Log("=== LOBSTER 1 SCISSORS SOUND STARTED ===");
+                }
+
+                // update position, no spatial if above or below
+                float horizontalDist1 = Math.Abs(dist1X);
+                if (horizontalDist1 < 500.0f)
+                {
+                    Audio.Set3DSoundPosition("lobster1_scissors", playerPos.x, lobster1Y);
+                }
+                else
+                {
+                    Audio.Set3DSoundPosition("lobster1_scissors", lobster1X, lobster1Y);
+                }
+            }
+            else
+            {
+                if (_lobster1SoundPlaying)
+                {
+                    Audio.StopSound("lobster1_scissors");
+                    _lobster1SoundPlaying = false;
+                    Debug.Log("=== LOBSTER 1 SCISSORS SOUND STOPPED ===");
+                }
+            }
+
+            // lobster 2 sound
+            if (distance2 < 3000.0f)
+            {
+                if (!_lobster2SoundPlaying)
+                {
+                    Audio.PlaySound("scissors_snip", "lobster2_scissors");
+                    _lobster2SoundPlaying = true;
+                    Debug.Log("=== LOBSTER 2 SCISSORS SOUND STARTED ===");
+                }
+
+                // update position - center if above/below
+                float horizontalDist2 = Math.Abs(dist2X);
+                if (horizontalDist2 < 500.0f)
+                {
+                    Audio.Set3DSoundPosition("lobster2_scissors", playerPos.x, lobster2Y);
+                }
+                else
+                {
+                    Audio.Set3DSoundPosition("lobster2_scissors", lobster2X, lobster2Y);
+                }
+            }
+            else
+            {
+                if (_lobster2SoundPlaying)
+                {
+                    Audio.StopSound("lobster2_scissors");
+                    _lobster2SoundPlaying = false;
+                    Debug.Log("=== LOBSTER 2 SCISSORS SOUND STOPPED ===");
+                }
+            }
+            #endregion
 
             // Handle all timers
             _jumpBufferTimer -= deltaTime;
@@ -1728,6 +1820,7 @@ namespace CSharpScript
             // ^ im commenting this out for now cause its stopping the level bgm
 
             Audio.StopSound("sfx");
+            Audio.StopSound("sfx_loop");
             if (_isGrounded || nonTrackingVFX.Contains(state))
                 staticVfxPos = Transform.GetPosition(OwnerName);
 
@@ -1772,7 +1865,7 @@ namespace CSharpScript
                     break;
                 case PlayerState.GroundPounding_Falling:
                     if (enableDebug) Debug.Log("CurrState: " + "Groundpound_falling");
-                    Audio.PlaySound("groundpound_falling_sfx", "sfx");
+                    Audio.PlaySound("groundpound_falling_sfx", "sfx_loop");
                 break;
                 case PlayerState.Rolling:
                     if (enableDebug) Debug.Log("CurrState: " + "Roll");

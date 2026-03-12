@@ -319,24 +319,35 @@ void InputManager::Update(float)
         // In play mode: ESC exits replay mode if active, otherwise toggles pause menu
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
-            bool isReplayMode = ghostSys && ghostSys->IsReplayMode();
-
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE])
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu)
             {
-                if (isReplayMode)
+                // check if how to play is open and if so, handle it in PauseMenuLogic
+                bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
+                if (isHowToPlayOpen)
                 {
-                    ghostSys->ExitReplayMode();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                }
+                // Check if settings screen is open - if so, close it
+                else if (gameCb && gameCb->IsPauseMenuActive() && gameCb->IsPauseSettingsOpen())
+                {
+                    std::cout << "[InputManager] ESC - Closing Pause Settings" << std::endl;
+                    if (gameCb) gameCb->ClosePauseSettings();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
                 }
                 else
                 {
-                    // Don't toggle pause menu if How To Play screen is open
-                    bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
-                    if (!winScreenActive && !loseScreenActive && !isMainMenu && !isHowToPlayOpen)
-                    {
-                        if (gameCb) gameCb->TogglePauseMenu();
-                    }
+                    // Otherwise toggle pause menu normally
+                    if (gameCb) gameCb->TogglePauseMenu();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
                 }
+            }
+            GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
+            bool isReplayMode = ghostSys && ghostSys->IsReplayMode();
+            
+            // in replay mode, ESC exits the replay
+            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && isReplayMode)
+            {
+                ghostSys->ExitReplayMode();
                 singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
             }
         }
