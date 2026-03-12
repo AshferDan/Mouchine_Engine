@@ -129,8 +129,8 @@
           375.0
         ],
         "scale": [
-          325.0,
-          47.0
+          292.5,
+          231.51312255859375
         ],
         "rotation": 0.0
       },
@@ -351,41 +351,44 @@
             "screenSpace": false
           },
           "children": []
-        },
-        {
-          "name": "ReplayButton",
-          "localID": 12,
-          "parentID": 6,
-          "active": true,
-          "TransformComponent": {
-            "pos": [
-              890,
-              340
-            ],
-            "scale": [
-              120,
-              110
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Replay_Button.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 0
-          },
-          "children": []
         }
       ]
     },
     {
-      "name": "Screen_LevelSelect",
+      "name": "ReplayButton",
       "localID": 11,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          890.0,
+          340.0
+        ],
+        "scale": [
+          120.0,
+          110.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Icons/Replay_Button.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "Screen_LevelSelect",
+      "localID": 12,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -425,8 +428,8 @@
       "children": [
         {
           "name": "LevelSelectedButton",
-          "localID": 12,
-          "parentID": 11,
+          "localID": 13,
+          "parentID": 12,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -465,8 +468,8 @@
           "children": [
             {
               "name": "StartText",
-              "localID": 13,
-              "parentID": 12,
+              "localID": 14,
+              "parentID": 13,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -513,8 +516,8 @@
         },
         {
           "name": "Level1Button",
-          "localID": 14,
-          "parentID": 11,
+          "localID": 15,
+          "parentID": 12,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -553,8 +556,8 @@
           "children": [
             {
               "name": "Letterscore_B",
-              "localID": 15,
-              "parentID": 14,
+              "localID": 16,
+              "parentID": 15,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -594,8 +597,8 @@
             },
             {
               "name": "Rating",
-              "localID": 16,
-              "parentID": 14,
+              "localID": 17,
+              "parentID": 15,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -640,8 +643,8 @@
             },
             {
               "name": "Shell_icon_dark",
-              "localID": 17,
-              "parentID": 14,
+              "localID": 18,
+              "parentID": 15,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -681,8 +684,8 @@
             },
             {
               "name": "Shell_icon_dark(1)",
-              "localID": 18,
-              "parentID": 14,
+              "localID": 19,
+              "parentID": 15,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -722,8 +725,8 @@
             },
             {
               "name": "Shell_icon_dark(2)",
-              "localID": 19,
-              "parentID": 14,
+              "localID": 20,
+              "parentID": 15,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -765,8 +768,8 @@
         },
         {
           "name": "Level3Button",
-          "localID": 20,
-          "parentID": 11,
+          "localID": 21,
+          "parentID": 12,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -805,8 +808,8 @@
           "children": [
             {
               "name": "Rating(2)",
-              "localID": 21,
-              "parentID": 20,
+              "localID": 22,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -851,8 +854,8 @@
             },
             {
               "name": "Letterscore_dash",
-              "localID": 22,
-              "parentID": 20,
+              "localID": 23,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -892,8 +895,8 @@
             },
             {
               "name": "Shell_icon_dark(6)",
-              "localID": 23,
-              "parentID": 20,
+              "localID": 24,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -933,8 +936,8 @@
             },
             {
               "name": "Shell_icon_dark(7)",
-              "localID": 24,
-              "parentID": 20,
+              "localID": 25,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -974,8 +977,8 @@
             },
             {
               "name": "Shell_icon_dark(8)",
-              "localID": 25,
-              "parentID": 20,
+              "localID": 26,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1015,8 +1018,8 @@
             },
             {
               "name": "Level_BackButton",
-              "localID": 26,
-              "parentID": 20,
+              "localID": 27,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1049,8 +1052,8 @@
         },
         {
           "name": "Level2Button",
-          "localID": 27,
-          "parentID": 11,
+          "localID": 28,
+          "parentID": 12,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1089,8 +1092,8 @@
           "children": [
             {
               "name": "Rating(1)",
-              "localID": 28,
-              "parentID": 27,
+              "localID": 29,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1135,8 +1138,8 @@
             },
             {
               "name": "Letterscore_A",
-              "localID": 29,
-              "parentID": 27,
+              "localID": 30,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1176,8 +1179,8 @@
             },
             {
               "name": "Shell_icon_dark(3)",
-              "localID": 30,
-              "parentID": 27,
+              "localID": 31,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1217,8 +1220,8 @@
             },
             {
               "name": "Shell_icon_dark(4)",
-              "localID": 31,
-              "parentID": 27,
+              "localID": 32,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1258,8 +1261,8 @@
             },
             {
               "name": "Shell_icon_dark(5)",
-              "localID": 32,
-              "parentID": 27,
+              "localID": 33,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1303,7 +1306,7 @@
     },
     {
       "name": "Screen_Settings",
-      "localID": 33,
+      "localID": 34,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1345,8 +1348,8 @@
       "children": [
         {
           "name": "MasterText",
-          "localID": 34,
-          "parentID": 33,
+          "localID": 35,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1387,338 +1390,183 @@
             "scale": 1.0,
             "screenSpace": false
           },
-          "children": [
-            {
-              "name": "Slider_Bar_Master",
-              "localID": 35,
-              "parentID": 34,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  200.0,
-                  50.0
-                ],
-                "scale": [
-                  670.0,
-                  110.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 2,
-                "screenSpace": false
-              },
-              "children": []
-            },
-            {
-              "name": "Slider_Bar_Back_Master",
-              "localID": 36,
-              "parentID": 34,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  200.0,
-                  50.0
-                ],
-                "scale": [
-                  670.0,
-                  110.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 1,
-                "screenSpace": false
-              },
-              "children": []
-            },
-            {
-              "name": "Slider_Knob_Master",
-              "localID": 37,
-              "parentID": 34,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  200.0,
-                  50.0
-                ],
-                "scale": [
-                  670.0,
-                  110.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 2,
-                "screenSpace": false
-              },
-              "children": []
-            },
-            {
-              "name": "MasterMuteButton",
-              "localID": 38,
-              "parentID": 34,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  -200.0,
-                  50.5
-                ],
-                "scale": [
-                  125.0,
-                  100.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 1,
-                "screenSpace": false
-              },
-              "PhysicsComponent": {
-                "enabled": true,
-                "mass": 0.0,
-                "isStatic": true,
-                "useGravity": false,
-                "isGrounded": false,
-                "velocity": [
-                  0.0,
-                  0.0
-                ]
-              },
-              "children": []
-            }
-          ]
+          "children": []
         },
         {
-          "name": "MusicText",
-          "localID": 39,
-          "parentID": 33,
+          "name": "Slider_Bar_Master",
+          "localID": 36,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -340.0,
-              -75.0
+              200.0,
+              50.0
             ],
             "scale": [
-              1.0,
-              1.0
+              670.0,
+              110.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
             "enabled": true,
             "shapeType": "Square",
-            "texturePath": "",
+            "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
             "color": [
               1.0,
-              0.5,
-              0.5,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 2,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Slider_Bar_Back_Master",
+          "localID": 37,
+          "parentID": 34,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              200.0,
+              50.0
+            ],
+            "scale": [
+              670.0,
+              110.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
               1.0
             ],
             "layer": 1,
             "screenSpace": false
           },
-          "TextComponent": {
+          "children": []
+        },
+        {
+          "name": "Slider_Knob_Master",
+          "localID": 38,
+          "parentID": 34,
+          "active": true,
+          "TransformComponent": {
             "enabled": true,
-            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-            "fontSize": 48,
-            "text": "Music",
+            "pos": [
+              200.0,
+              50.0
+            ],
+            "scale": [
+              670.0,
+              110.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
             "color": [
-              0.0,
-              0.0,
-              0.0,
+              1.0,
+              1.0,
+              1.0,
               1.0
             ],
-            "scale": 1.0,
+            "layer": 2,
             "screenSpace": false
           },
-          "children": [
-            {
-              "name": "Slider_Bar_Music",
-              "localID": 40,
-              "parentID": 39,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  200.0,
-                  -75.0
-                ],
-                "scale": [
-                  670.0,
-                  110.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 2,
-                "screenSpace": false
-              },
-              "children": []
-            },
-            {
-              "name": "Slider_Bar_Back_Music",
-              "localID": 41,
-              "parentID": 39,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  200.0,
-                  -75.0
-                ],
-                "scale": [
-                  670.0,
-                  110.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 1,
-                "screenSpace": false
-              },
-              "children": []
-            },
-            {
-              "name": "Slider_Knob_Music",
-              "localID": 42,
-              "parentID": 39,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  200.0,
-                  -75.0
-                ],
-                "scale": [
-                  670.0,
-                  110.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 2,
-                "screenSpace": false
-              },
-              "children": []
-            },
-            {
-              "name": "MusicMuteButton",
-              "localID": 43,
-              "parentID": 39,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  -200.0,
-                  -74.5
-                ],
-                "scale": [
-                  125.0,
-                  100.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 1,
-                "screenSpace": false
-              },
-              "PhysicsComponent": {
-                "enabled": true,
-                "mass": 0.0,
-                "isStatic": true,
-                "useGravity": false,
-                "isGrounded": false,
-                "velocity": [
-                  0.0,
-                  0.0
-                ]
-              },
-              "children": []
-            }
-          ]
+          "children": []
+        },
+        {
+          "name": "MasterMuteButton",
+          "localID": 39,
+          "parentID": 34,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -200.0,
+              50.5
+            ],
+            "scale": [
+              125.0,
+              100.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 1,
+            "screenSpace": false
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 0.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "BackButton",
+          "localID": 50,
+          "parentID": 34,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              650.0,
+              -250.0
+            ],
+            "scale": [
+              200.0,
+              180.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Back_Button.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 1,
+            "screenSpace": false
+          },
+          "children": []
         },
         {
           "name": "SFXText",
-          "localID": 44,
-          "parentID": 33,
+          "localID": 45,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1762,8 +1610,8 @@
           "children": [
             {
               "name": "Slider_Bar_SFX",
-              "localID": 45,
-              "parentID": 44,
+              "localID": 46,
+              "parentID": 45,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1794,8 +1642,8 @@
             },
             {
               "name": "Slider_Bar_Back_SFX",
-              "localID": 46,
-              "parentID": 44,
+              "localID": 47,
+              "parentID": 45,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1826,8 +1674,8 @@
             },
             {
               "name": "Slider_Knob_SFX",
-              "localID": 47,
-              "parentID": 44,
+              "localID": 48,
+              "parentID": 45,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1858,8 +1706,8 @@
             },
             {
               "name": "SFXMuteButton",
-              "localID": 48,
-              "parentID": 44,
+              "localID": 49,
+              "parentID": 45,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1902,42 +1750,196 @@
           ]
         },
         {
-          "name": "BackButton",
-          "localID": 49,
-          "parentID": 33,
+          "name": "MusicText",
+          "localID": 40,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              650.0,
-              -250.0
+              -340.0,
+              -75.0
             ],
             "scale": [
-              200.0,
-              180.0
+              1.0,
+              1.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
             "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Back_Button.png",
+            "texturePath": "",
             "color": [
               1.0,
-              1.0,
-              1.0,
+              0.5,
+              0.5,
               1.0
             ],
             "layer": 1,
             "screenSpace": false
           },
-          "children": []
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 48,
+            "text": "Music",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": [
+            {
+              "name": "Slider_Bar_Music",
+              "localID": 41,
+              "parentID": 40,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -75.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Bar_Back_Music",
+              "localID": 42,
+              "parentID": 40,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -75.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Bar_Back.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "Slider_Knob_Music",
+              "localID": 43,
+              "parentID": 40,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  200.0,
+                  -75.0
+                ],
+                "scale": [
+                  670.0,
+                  110.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Slider_Icon.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 2,
+                "screenSpace": false
+              },
+              "children": []
+            },
+            {
+              "name": "MusicMuteButton",
+              "localID": 44,
+              "parentID": 40,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  -200.0,
+                  -74.5
+                ],
+                "scale": [
+                  125.0,
+                  100.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Volume_Unmute.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 1,
+                "screenSpace": false
+              },
+              "PhysicsComponent": {
+                "enabled": true,
+                "mass": 0.0,
+                "isStatic": true,
+                "useGravity": false,
+                "isGrounded": false,
+                "velocity": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "children": []
+            }
+          ]
         }
       ]
     },
     {
       "name": "Screen_QuitButton",
-      "localID": 33,
+      "localID": 51,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1968,8 +1970,8 @@
       "children": [
         {
           "name": "YesButton",
-          "localID": 34,
-          "parentID": 33,
+          "localID": 52,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2000,8 +2002,8 @@
         },
         {
           "name": "NoButton",
-          "localID": 35,
-          "parentID": 33,
+          "localID": 53,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2032,8 +2034,8 @@
         },
         {
           "name": "AreYouSureText",
-          "localID": 36,
-          "parentID": 33,
+          "localID": 54,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2078,14 +2080,14 @@
         },
         {
           "name": "YesText",
-          "localID": 37,
-          "parentID": 33,
+          "localID": 55,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -100,
-              -10
+              -100.0,
+              -10.0
             ],
             "scale": [
               1.0,
@@ -2124,14 +2126,14 @@
         },
         {
           "name": "NoText",
-          "localID": 38,
-          "parentID": 33,
+          "localID": 56,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              100,
-              -10
+              100.0,
+              -10.0
             ],
             "scale": [
               1.0,

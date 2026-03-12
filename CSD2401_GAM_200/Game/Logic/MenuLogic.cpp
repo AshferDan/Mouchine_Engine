@@ -35,7 +35,8 @@ enum MenuScreens
     Home = 0, // Normal landing page
     Settings,
     LevelSelect,
-    ReplayPicker
+    ReplayPicker,
+    QUIT
 };
 MenuScreens currScreen = MenuScreens::Home;
 
@@ -145,7 +146,6 @@ void MenuLogicSystem::Update(float dt)
                     CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
                     m_selectedReplay.clear();
                     currScreen = MenuScreens::Home;
-#endif
                 }
             }
             else if (currScreen == MenuScreens::LevelSelect)
@@ -242,6 +242,17 @@ void MenuLogicSystem::Update(float dt)
             sfxText->SetActive(true);
         // return;
     }
+    else if (currScreen == MenuScreens::LevelSelect)
+    {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
+            GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
+            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(true);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
+            GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
+            GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+    }
     else if (currScreen == MenuScreens::QUIT)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
@@ -250,7 +261,7 @@ void MenuLogicSystem::Update(float dt)
         }
         if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
         {
-            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(true);
+            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(false);
         }
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
         {
@@ -294,79 +305,6 @@ void MenuLogicSystem::Update(float dt)
     double mouseY = InputManager::GetMouseWorldY();
     bool isClicked = InputManager::IsMouseLeftClicked();
     bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-
-    // auto &factory = GameObjectFactory::Instance();
-    // std::string currentHover = "";
-    // std::string currentPressed = "";
-
-    // // Depending on scene, check for which buttons have been pressed
-    // switch (currScreen)
-    // {
-    // case MenuScreens::Home:
-    //     if (IsMouseOver(factory.FindGameObject("PlayButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "PlayButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("SettingsButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "SettingsButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("CreditsButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "CreditsButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "QuitButton";
-    //     }
-
-    //     else if (IsMouseOver(factory.FindGameObject("ReplayButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "ReplayButton";
-    //     }
-    //     break;
-    // case MenuScreens::Settings:
-    //     // do settings stuff here
-    //     if (IsMouseOver(factory.FindGameObject("MasterMuteButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "MasterMuteButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("MusicMuteButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "MusicMuteButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("SFXMuteButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "SFXMuteButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("BackButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "BackButton";
-    //     }
-    //     break;
-    // case MenuScreens::QUIT:
-    //     if (IsMouseOver(factory.FindGameObject("YesButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "YesButton";
-    //     }
-    //     else if (IsMouseOver(factory.FindGameObject("NoButton"), mouseX, mouseY))
-    //     {
-    //         currentHover = "NoButton";
-    //     }
-    //     break;
-    // case MenuScreens::ReplayPicker:
-    //     if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot0"), mouseX, mouseY))
-    //         currentHover = "ReplayPicker_Slot0";
-    //     else if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot1"), mouseX, mouseY))
-    //         currentHover = "ReplayPicker_Slot1";
-    //     else if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot2"), mouseX, mouseY))
-    //         currentHover = "ReplayPicker_Slot2";
-    //     else if (IsMouseOver(factory.FindGameObject("ReplayPicker_Back"), mouseX, mouseY))
-    //         currentHover = "ReplayPicker_Back";
-    //     break;
-    // default:
-    //     break;
-    // }
 
     // Depending on scene, check for which buttons have been pressed
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
@@ -433,43 +371,7 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        // AudioManager *localAudioManager = CORE->GetAudioManager();
-        // if (localAudioManager)
-        // {
-        //     if (hoveredButtonName == "PlayButton")
-        //     {
-        //         localAudioManager->TriggerEvent("UI_Press");
-        //     }
-        //     else if (hoveredButtonName == "QuitButton" || hoveredButtonName == "YesButton")
-        //     {
-        //         localAudioManager->TriggerEvent("UI_Quit");
-        //     }
-        //     else
-        //     {
-        //         localAudioManager->TriggerEvent("UI_Click");
-        //     }
-        //     std::cout << "menu button clicking sound is triggered" << std::endl;
-        // }
-
-        // // Start small delay before loading scene
-        // if (hoveredButtonName != "SettingsButton" && hoveredButtonName != "MasterMuteButton" &&
-        //     hoveredButtonName != "MusicMuteButton" && hoveredButtonName != "SFXMuteButton" &&
-        //     hoveredButtonName != "BackButton" && hoveredButtonName != "CreditsButton" &&
-        //     hoveredButtonName != "QuitButton" && hoveredButtonName != "YesButton" && hoveredButtonName != "NoButton" &&
-        //     hoveredButtonName != "ReplayButton" && hoveredButtonName != "ReplayPicker_Back" &&
-        //     hoveredButtonName != "ReplayPicker_Slot0" && hoveredButtonName != "ReplayPicker_Slot1" &&
-        //     hoveredButtonName != "ReplayPicker_Slot2")
-        // {
-        //     // Start audio fade out for scene transitions
-        //     if (hoveredButtonName == "PlayButton" && audioManager)
-        //     {
-        //         audioManager->FadeOutCategory("music", 2.5f);
-        //         std::cout << "[MenuLogic] Started music fade out (2.5 seconds)" << std::endl;
-        //     }
-
-        //     pendingSceneChange = true;
-        //     pendingTimer = 2.6f;
-        // const std::string button = hoveredButtonName;
+   const std::string button = hoveredButtonName;
 
         // Handle level select screen buttons first
         if (HandleLevelSelectClick(button))
@@ -489,113 +391,6 @@ void MenuLogicSystem::Update(float dt)
         // Delayed transition buttons
         if (button == "LevelSelectedButton" && audioManager)
         {
-            //             if (hoveredButtonName == "MasterMuteButton")
-            //             {
-            //                 // AudioManager* audioManager = CORE->GetAudioManager();
-            //                 if (audioManager)
-            //                 {
-            //                     audioManager->ToggleMasterMute();
-            //                 }
-            //                 SetButtonTexture("MasterMuteButton", true, false); // Update texture after toggling
-            //             }
-            //             else if (hoveredButtonName == "MusicMuteButton")
-            //             {
-            //                 if (audioManager)
-            //                 {
-            //                     audioManager->ToggleCategoryMute("music");
-            //                 }
-            //                 SetButtonTexture("MusicMuteButton", true, false); // Update texture after toggling
-            //             }
-            //             else if (hoveredButtonName == "SFXMuteButton")
-            //             {
-            //                 if (audioManager)
-            //                 {
-            //                     audioManager->ToggleCategoryMute("sfx");
-            //                 }
-            //                 SetButtonTexture("SFXMuteButton", true, false); // Update texture after toggling
-            //             }
-            //             else if (hoveredButtonName == "BackButton")
-            //             {
-            //                 currScreen = MenuScreens::Home;
-            //             }
-            //             else if (hoveredButtonName == "SettingsButton")
-            //             {
-            //                 currScreen = MenuScreens::Settings;
-            //             }
-            //             else if (hoveredButtonName == "ReplayButton")
-            //             {
-            //                 std::cout << "ReplayButton Clicked! Opening replay picker..." << std::endl;
-            //                 ShowReplayPicker();
-            //             }
-            //             else if (hoveredButtonName == "ReplayPicker_Back")
-            //             {
-            //                 HideReplayPicker();
-            //                 currScreen = MenuScreens::Home;
-            //             }
-            //             else if (hoveredButtonName == "ReplayPicker_Slot0" ||
-            //                      hoveredButtonName == "ReplayPicker_Slot1" ||
-            //                      hoveredButtonName == "ReplayPicker_Slot2")
-            //             {
-            //                 int idx = hoveredButtonName.back() - '0';
-            //                 if (idx >= 0 && idx < static_cast<int>(m_replayNames.size()))
-            //                 {
-            //                     m_selectedReplay = m_replayNames[idx];
-            //                     std::cout << "[MenuLogic] Replay selected: " << m_selectedReplay << std::endl;
-            //                     if (audioManager)
-            //                         audioManager->FadeOutCategory("music", 2.5f);
-            //                     pendingSceneChange = true;
-            //                     pendingTimer = 2.6f;
-            //                 }
-            //                 else
-            //                 {
-            //                     std::cout << "[MenuLogic] Clicked empty replay slot." << std::endl;
-            //                 }
-            //             }
-            //             // else if (hoveredButtonName == "TestFadeButton")
-            //             //{
-            //             //     std::cout << "[TEST] TestFadeButton Clicked - Starting fade out!" << std::endl;
-            //             //     if (audioManager)
-            //             //     {
-            //             //         audioManager->FadeOutCategory("music", 2.0f);  // Fade out over 2 seconds
-            //             //         std::cout << "[TEST] Music fade out started (2 seconds duration)" << std::endl;
-            //             //         testFadeTriggered = true;
-            //             //     }
-            //             //     else
-            //             //     {
-            //             //         std::cout << "[TEST] ERROR: AudioManager is null!" << std::endl;
-            //             //     }
-            //             // }
-            //             else if (hoveredButtonName == "CreditsButton")
-            //             {
-            //                 std::cout << "CreditsButton Clicked!" << std::endl;
-
-            //                 CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
-            //                 if (!cutscene->IsPlaying())
-            //                 {
-            //                     cutscene->PlayVideo(creditsPath, "CreditsAudio");
-            //                     creditsWerePlayed = true; // Set flag to restart BGM after credits
-            //                     std::cout << "[MenuLogic] Credits flag set - will restart BGM when finished" << std::endl;
-            //                 }
-            //             }
-            //             else if (hoveredButtonName == "QuitButton")
-            //             {
-            //                 std::cout << "QuitButton Clicked! Showing confirmation..." << std::endl;
-            //                 currScreen = MenuScreens::QUIT;
-            //             }
-            //             else if (hoveredButtonName == "YesButton")
-            //             {
-            //                 std::cout << "YesButton Clicked! Quitting..." << std::endl;
-            // #ifndef _DEBUG
-            //                 glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
-            // #else
-            //                 CORE->GetLevelEditor()->StopPlayMode();
-            // #endif
-            //             }
-            //             else if (hoveredButtonName == "NoButton")
-            //             {
-            //                 std::cout << "NoButton Clicked! Returning to menu..." << std::endl;
-            //                 currScreen = MenuScreens::Home;
-            //             }
             audioManager->FadeOutCategory("music", 1.0f);
             std::cout << "[MenuLogic] Started music fade out" << std::endl;
         }
@@ -620,6 +415,15 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
             return "CreditsButton";
         if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))
             return "QuitButton";
+        if (IsMouseOver(factory.FindGameObject("ReplayButton"), mouseX, mouseY))
+            return "ReplayButton";
+        break;
+
+    case MenuScreens::QUIT:
+        if (IsMouseOver(factory.FindGameObject("YesButton"), mouseX, mouseY))
+            return "YesButton";
+        if (IsMouseOver(factory.FindGameObject("NoButton"), mouseX, mouseY))
+            return "NoButton";
         break;
 
     case MenuScreens::Settings:
@@ -816,6 +620,36 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
         return true;
     }
 
+    if (buttonName == "QuitButton")
+    {
+        currScreen = MenuScreens::QUIT;
+        return true;
+    }
+
+    if (buttonName == "YesButton")
+    {
+        std::cout << "YesButton Clicked! Quitting..." << std::endl;
+#ifndef _DEBUG
+        glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
+#else
+        CORE->GetLevelEditor()->StopPlayMode();
+#endif
+        return true;
+    }
+
+    if (buttonName == "NoButton")
+    {
+        currScreen = MenuScreens::Home;
+        return true;
+    }
+
+    if (buttonName == "ReplayButton")
+    {
+        std::cout << "ReplayButton Clicked! Opening replay picker..." << std::endl;
+        ShowReplayPicker();
+        return true;
+    }
+
     return false;
 }
 
@@ -988,7 +822,7 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
     else if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" ||
              buttonName == "ReplayPicker_Slot2" || buttonName == "ReplayPicker_Back")
     {
-        // Colored quads — no texture swap needed.
+        
         return;
     }
     else if (buttonName == "Level1Button")
