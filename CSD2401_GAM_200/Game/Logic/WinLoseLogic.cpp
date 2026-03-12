@@ -398,6 +398,19 @@ void WinLoseLogicSystem::TriggerWin()
     if (timerFrame) timerFrame->SetActive(false);
     if (pauseBtn) pauseBtn->SetActive(false);
 
+    // Hide shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(false);
+    if (shellIcon2) shellIcon2->SetActive(false);
+    if (shellIcon3) shellIcon3->SetActive(false);
+    if (coinIcon) coinIcon->SetActive(false);
+    if (coinText) coinText->SetActive(false);
+
     // stop all music and play victory sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
@@ -628,6 +641,19 @@ void WinLoseLogicSystem::DestroyWinScreen()
     if (timerFrame) timerFrame->SetActive(true);
     if (pauseBtn) pauseBtn->SetActive(true);
 
+    // Re-show shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(true);
+    if (shellIcon2) shellIcon2->SetActive(true);
+    if (shellIcon3) shellIcon3->SetActive(true);
+    if (coinIcon) coinIcon->SetActive(true);
+    if (coinText) coinText->SetActive(true);
+
     hasCreatedWinScreen = false;
     hasPlayerWon = false;
     isWaitingForWin = false;
@@ -704,6 +730,19 @@ void WinLoseLogicSystem::TriggerLose()
     if (timerBar) timerBar->SetActive(false);
     if (timerFrame) timerFrame->SetActive(false);
     if (pauseBtn) pauseBtn->SetActive(false);
+
+    // Hide shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(false);
+    if (shellIcon2) shellIcon2->SetActive(false);
+    if (shellIcon3) shellIcon3->SetActive(false);
+    if (coinIcon) coinIcon->SetActive(false);
+    if (coinText) coinText->SetActive(false);
 
     // stop all music and play game over sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
@@ -894,6 +933,19 @@ void WinLoseLogicSystem::DestroyLoseScreen()
     if (timerBar) timerBar->SetActive(true);
     if (timerFrame) timerFrame->SetActive(true);
     if (pauseBtn) pauseBtn->SetActive(true);
+
+    // Re-show shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(true);
+    if (shellIcon2) shellIcon2->SetActive(true);
+    if (shellIcon3) shellIcon3->SetActive(true);
+    if (coinIcon) coinIcon->SetActive(true);
+    if (coinText) coinText->SetActive(true);
 
     hasCreatedLoseScreen = false;
     hoveredButtonName.clear();

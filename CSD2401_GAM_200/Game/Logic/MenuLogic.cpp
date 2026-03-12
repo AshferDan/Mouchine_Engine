@@ -75,11 +75,10 @@ void MenuLogicSystem::Update(float dt)
     if (pendingSceneChange)
     {
         pendingTimer -= dt;
-        if (pendingTimer <= 0.0f)                       // timer delay to play the sound effect before loading into scene
+        if (pendingTimer <= 0.0f) // timer delay to play the sound effect before loading into scene
         {
             if (audioManager && audioManager->IsAnyFadeActive())
             {
-                std::cout << "[MenuLogic] Fade still active, waiting..." << std::endl;
                 pendingTimer = 0.1f; // wait another 100ms and check again
                 return;
             }
@@ -95,12 +94,10 @@ void MenuLogicSystem::Update(float dt)
 
                     if (!cutscene->IsPlaying()) {
                         cutscene->PlayVideo(introPath, "CutsceneAudio");
-                        // Don't fade back in - let the fade out complete
-                        std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                     }
 
-                    std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                    std::cout << "[MenuLogic] Music should already be faded out" << std::endl;
+                    //std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                    //std::cout << "[MenuLogic] Music should already be faded out" << std::endl;
                     CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
                     std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                 }

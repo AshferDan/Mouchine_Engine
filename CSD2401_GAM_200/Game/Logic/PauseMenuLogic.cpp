@@ -144,7 +144,7 @@ void PauseMenuLogicSystem::Update(float dt)
 
                 // Toggle pause menu
                 TogglePauseMenu();
-                std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
+                //std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
                 }
                 else if (isHoveringPauseBtn)
                 {
@@ -159,7 +159,7 @@ void PauseMenuLogicSystem::Update(float dt)
                     {
                         audioManager->TriggerEvent("UI_Hover");
                     }
-                    std::cout << "[InGamePauseButton] HOVER START" << std::endl;
+                    //std::cout << "[InGamePauseButton] HOVER START" << std::endl;
                 }
                 wasHoveringLastFrame = true;
                 }
@@ -189,6 +189,19 @@ void PauseMenuLogicSystem::Update(float dt)
     {
         pauseBtn->SetActive(!shouldHidePauseButton);
     }
+
+    // Hide shell/coin UI when pause menu is active or win/lose screens are showing
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(!shouldHidePauseButton);
+    if (shellIcon2) shellIcon2->SetActive(!shouldHidePauseButton);
+    if (shellIcon3) shellIcon3->SetActive(!shouldHidePauseButton);
+    if (coinIcon) coinIcon->SetActive(!shouldHidePauseButton);
+    if (coinText) coinText->SetActive(!shouldHidePauseButton);
 
     // update pause menu position to follow camera (only when menu is active)
     if (isPauseMenuActive)
@@ -877,8 +890,6 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     restartRender->SetLayer(602);
     restartBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-    //auto* restartText = restartBtn->AddComponent<TextComponent>(
-    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // settings button
     GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
@@ -893,8 +904,6 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     settingsRender->SetLayer(602);
     settingsBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-    //auto* settingsText = settingsBtn->AddComponent<TextComponent>(
-    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // quit button
     GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
@@ -1402,7 +1411,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         if (audioManager)
         {
             audioManager->SetMasterLowPassFilter(false);
-            std::cout << "[PauseMenu] Low pass filter disabled" << std::endl;
+            //std::cout << "[PauseMenu] Low pass filter disabled" << std::endl;
         }
     }
     else
@@ -1411,15 +1420,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         if (audioManager)
         {
             audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
-            std::cout << "[PauseMenu] Low pass filter enabled" << std::endl;
+            //std::cout << "[PauseMenu] Low pass filter enabled" << std::endl;
         }
     }
 
     // pause/unpause the game but don't pause audio, using low pass filter instead
     CORE->SetGamePaused(isPauseMenuActive, false);
-    //CORE->GameTimerSystem();
-
-    std::cout << "[PauseMenu] Pause menu " << (isPauseMenuActive ? "opened" : "closed") << std::endl;
 }
 
 /**
@@ -1667,17 +1673,17 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     auto* howToPlayTransform = howToPlayScreen->AddComponent<TransformComponent>();
     howToPlayTransform->posX = 0.0f;
     howToPlayTransform->posY = 0.0f;
-    howToPlayTransform->scaleX = 1755.0f * uiScale;
-    howToPlayTransform->scaleY = 945.0f * uiScale;
+    howToPlayTransform->scaleX = 1920.0f * uiScale;
+    howToPlayTransform->scaleY = 1080.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/HowToPlay.png"));
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M5_Control_Panel.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 
     GameObject* backBtn = factory.CreateGameObject("HowToPlayBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
-    backBtnTransform->posX = 750.0f * uiScale;
-    backBtnTransform->posY = -275.0f * uiScale;
+    backBtnTransform->posX = 625.0f * uiScale;
+    backBtnTransform->posY = -235.0f * uiScale;
     backBtnTransform->scaleX = 200.0f * uiScale;
     backBtnTransform->scaleY = 180.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
