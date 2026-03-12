@@ -34,7 +34,7 @@ void PauseMenuLogicSystem::Initialize()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->SetMasterLowPassFilter(false);
+        audioManager->SetLowPassFilter("bgm", false);
         //std::cout << "[PauseMenu] Initialize - low pass filter cleaned up" << std::endl;
     }
 
@@ -391,7 +391,7 @@ void PauseMenuLogicSystem::Update(float dt)
             // how to play opens has low pass
             if (audioManager)
             {
-                audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
+                audioManager->SetLowPassFilter("bgm", true, 800.0f, 1.0f);
                 //std::cout << "[PauseMenu] Low pass filter enabled for How To Play" << std::endl;
             }
 
@@ -424,7 +424,7 @@ void PauseMenuLogicSystem::Update(float dt)
             // no low pass filter when how to play closes
             if (audioManager)
             {
-                audioManager->SetMasterLowPassFilter(false);
+                audioManager->SetLowPassFilter("bgm", false);
                 //std::cout << "[PauseMenu] Low pass filter disabled for How To Play" << std::endl;
             }
 
@@ -1412,8 +1412,9 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         // remove low pass filter when pause menu closes
         if (audioManager)
         {
-            audioManager->SetMasterLowPassFilter(false);
-            //std::cout << "[PauseMenu] Low pass filter disabled" << std::endl;
+            // Remove low pass filter from BGM sources
+            audioManager->SetLowPassFilter("bgm", false);
+            //audioManager->SetLowPassFilter("MainMenuBGM", false);
         }
     }
     else
@@ -1421,7 +1422,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         // apply low pass filter when pause menu opens
         if (audioManager)
         {
-            audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
+            audioManager->SetLowPassFilter("bgm", true, 800.0f, 1.0f);
             //std::cout << "[PauseMenu] Low pass filter enabled" << std::endl;
         }
     }
@@ -1616,7 +1617,7 @@ void PauseMenuLogicSystem::OpenHowToPlay()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
+        audioManager->SetLowPassFilter("bgm", false);
         // std::cout << "[PauseMenu] Low pass filter enabled for How To Play (TAB)" << std::endl;
     }
 
@@ -1635,7 +1636,7 @@ void PauseMenuLogicSystem::CloseHowToPlay()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->SetMasterLowPassFilter(false);
+        audioManager->SetLowPassFilter("bgm", false);
         //std::cout << "[PauseMenu] Low pass filter disabled for How To Play" << std::endl;
     }
 
