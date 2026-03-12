@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "MathLib.h"
 #include "ColliderComponent.h"
 #include "Collision.h"
+#include "TextInputSystem.h"
 #include <iostream>
 
 /**
@@ -62,6 +63,14 @@ void WinLoseLogicSystem::Update(float dt)
         isPlayingCredits = false;
         m_playerInSafeZone = true;
         m_recordingActive  = false;
+
+        // Configure the engine text-input system with this game's font
+        TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+        if (textInput)
+        {
+            textInput->SetFont("../Assets/FrederickatheGreat-Regular.ttf", 50);
+            textInput->Hide(); // ensure no stale dialog from a previous session
+        }
 
         // Pre-configure ghost system and load best run so key-0 toggle works from frame 1
         GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
@@ -359,22 +368,77 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
         {
             std::cout << "[WinZone] Player reached the win zone!" << std::endl;
 
-            // Stop recording and save if a run was being recorded
+            // Stop recording; player will name the run in the dialog
             if (m_recordingActive)
             {
                 GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
                 if (ghost)
                 {
                     ghost->StopRecording();
-                    ghost->SaveCurrentRun("Level1_testing");
-                    std::cout << "[WinLoseLogic] Recording stopped and saved as Level1_testing.json\n";
+                    std::cout << "[WinLoseLogic] Recording stopped — awaiting run name.\n";
                 }
                 m_recordingActive = false;
             }
 
             hasPlayerWon = true;
-            isWaitingForWin = true;
-            winDelayTimer = 0.5f;
+
+            // Hide timer UI while the dialog is open
+            auto& factory = GameObjectFactory::Instance();
+            if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
+            if (auto* o = factory.FindGameObject("LevelTimerBar"))           o->SetActive(false);
+            if (auto* o = factory.FindGameObject("LevelTimerBarFrame"))      o->SetActive(false);
+            if (auto* o = factory.FindGameObject("InGamePauseButton"))       o->SetActive(false);
+
+            CORE->SetGamePaused(true);
+
+            // Show the engine-level name-input dialog
+            TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+            if (textInput)
+            {
+                textInput->Show(
+                    "Name Your Run!", 20,
+                    // --- onConfirm ---
+                    [this](const std::string& rawName)
+                    {
+                        // Sanitise: trim whitespace, replace spaces with underscores
+                        std::string runName = rawName;
+                        while (!runName.empty() && runName.front() == ' ')
+                            runName.erase(runName.begin());
+                        while (!runName.empty() && runName.back() == ' ')
+                            runName.pop_back();
+                        for (char& c : runName) if (c == ' ') c = '_';
+                        if (runName.empty()) runName = "Level1_testing";
+
+                        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                        if (ghost)
+                        {
+                            ghost->SaveCurrentRun(runName);
+                            std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json\n";
+                        }
+
+                        // Hand off to the normal win sequence
+                        CORE->SetGamePaused(false);
+                        isWaitingForWin = true;
+                        winDelayTimer   = 0.5f;
+                    },
+                    // --- onCancel (Escape) — proceed to win screen without saving ---
+                    [this]()
+                    {
+                        std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
+                        CORE->SetGamePaused(false);
+                        isWaitingForWin = true;
+                        winDelayTimer   = 0.5f;
+                    });
+            }
+            else
+            {
+                // TextInputSystem unavailable — fall back to default name
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost) ghost->SaveCurrentRun("Level1_testing");
+                CORE->SetGamePaused(false);
+                isWaitingForWin = true;
+                winDelayTimer   = 0.5f;
+            }
         }
     }
 
@@ -904,3 +968,4 @@ void WinLoseLogicSystem::DestroyLoseScreen()
 
     std::cout << "[WinLoseLogic] Lose screen destroyed and state reset" << std::endl;
 }
+
