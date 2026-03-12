@@ -48,7 +48,6 @@ namespace CSharpScript
         private string[] layerNames_L;  // "<name>_L" side copies
         private string[] layerNames_R;  // "<name>_R" side copies
         private float[]  factors;
-        private float[]  tileWidths;
         private vec2[]   startPos = new vec2[LayerCount];
         private bool[]   inited   = new bool[LayerCount];
         private bool[]   inited_L = new bool[LayerCount];
@@ -58,7 +57,6 @@ namespace CSharpScript
         {
             layerNames = new string[] { LayerFarBack, LayerBack, LayerMid, LayerFront };
             factors    = new float[]  { FactorFarBack, FactorBack, FactorMid, FactorFront };
-            tileWidths = new float[]  { TileWidthFarBack, TileWidthBack, TileWidthMid, TileWidthFront };
 
             layerNames_L = new string[LayerCount];
             layerNames_R = new string[LayerCount];
@@ -71,6 +69,20 @@ namespace CSharpScript
             // Try to init layers that are already loaded at this point
             foreach (Layer layer in Enum.GetValues(typeof(Layer)))
                 TryInitLayer((int)layer);
+        }
+
+        // Reads the tile width for layer i directly from the public fields
+        // (avoids caching issues when OnStart runs before scene field overrides are applied).
+        private float GetTileWidth(int i)
+        {
+            switch (i)
+            {
+                case (int)Layer.FarBack: return TileWidthFarBack;
+                case (int)Layer.Back:    return TileWidthBack;
+                case (int)Layer.Mid:     return TileWidthMid;
+                case (int)Layer.Front:   return TileWidthFront;
+                default:                 return 0f;
+            }
         }
 
         // Attempts to initialize a layer (and its side copies) if the objects
@@ -91,7 +103,7 @@ namespace CSharpScript
             }
 
             // Side copies — only checked when tiling is enabled
-            if (tileWidths != null && tileWidths[i] > 0f)
+            if (GetTileWidth(i) > 0f)
             {
                 if (!inited_L[i] && Transform.GetScale(layerNames_L[i]).x != 0f)
                     inited_L[i] = true;
@@ -102,6 +114,9 @@ namespace CSharpScript
 
         public override void OnUpdate(float dt)
         {
+            // Defensive: if OnStart was skipped by the engine, run it now.
+            if (layerNames == null) OnStart();
+
             vec2 camPos = Camera.GetPosition();
 
             foreach (Layer layer in Enum.GetValues(typeof(Layer)))
@@ -116,7 +131,7 @@ namespace CSharpScript
                 }
 
                 float f  = factors[i];
-                float tw = tileWidths[i];
+                float tw = GetTileWidth(i);
                 float posY = startPos[i].y + camPos.y * f;
                 float posX;
 
