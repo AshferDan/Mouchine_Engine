@@ -31,19 +31,18 @@ static const char* IRIS_FRAG = R"(
 in vec2 vUV;
 out vec4 FragColor;
 
-uniform float u_Radius;         // current iris radius in UV space (0  1.41)
-uniform vec2  u_Resolution;     // viewport size in pixels
-uniform vec2  u_Center;         // iris center in UV (0..1), default (0.5, 0.5)
+uniform float u_Radius;
+uniform vec2  u_Resolution;
+uniform vec2  u_Center;
 
 void main() {
-    // aspect-correct distance from center
     vec2 aspect = vec2(u_Resolution.x / u_Resolution.y, 1.0);
     vec2 uv     = vUV - u_Center;
     float dist  = length(uv * aspect);
 
-    // smooth edge (antialiased ring)
+    // alpha=1 (black) OUTSIDE the circle, alpha=0 (transparent) INSIDE
     float edge  = 0.015;
-    float alpha = 1.0 - smoothstep(u_Radius - edge, u_Radius + edge, dist);
+    float alpha = smoothstep(u_Radius - edge, u_Radius + edge, dist);
 
     FragColor = vec4(0.0, 0.0, 0.0, alpha);
 }
@@ -102,9 +101,7 @@ ScreenTransitionSystem::~ScreenTransitionSystem() {
 //  InitGL  build the fullscreen quad + shaders once
 // 
 void ScreenTransitionSystem::InitGL() {
-    // NDC quad: positions + UVs
     float verts[] = {
-        // pos          uv
         -1.f, -1.f,   0.f, 0.f,
          1.f, -1.f,   1.f, 0.f,
          1.f,  1.f,   1.f, 1.f,
@@ -112,16 +109,23 @@ void ScreenTransitionSystem::InitGL() {
          1.f,  1.f,   1.f, 1.f,
         -1.f,  1.f,   0.f, 1.f,
     };
-    glGenVertexArrays(1, &m_QuadVAO);
-    glGenBuffers(1, &m_QuadVBO);
-    glBindVertexArray(m_QuadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-    glBindVertexArray(0);
+
+    glCreateVertexArrays(1, &m_QuadVAO);
+    glCreateBuffers(1, &m_QuadVBO);
+
+    glNamedBufferStorage(m_QuadVBO, sizeof(verts), verts, 0);
+
+    glVertexArrayVertexBuffer(m_QuadVAO, 0, m_QuadVBO, 0, 4 * sizeof(float));
+
+    // Attribute 0: position (vec2)
+    glEnableVertexArrayAttrib(m_QuadVAO, 0);
+    glVertexArrayAttribFormat(m_QuadVAO, 0, 2, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(m_QuadVAO, 0, 0);
+
+    // Attribute 1: UV (vec2)
+    glEnableVertexArrayAttrib(m_QuadVAO, 1);
+    glVertexArrayAttribFormat(m_QuadVAO, 1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float));
+    glVertexArrayAttribBinding(m_QuadVAO, 1, 0);
 
     // Iris shader
     m_IrisShader = CompileProgram(QUAD_VERT, IRIS_FRAG);
@@ -144,22 +148,28 @@ void ScreenTransitionSystem::LoadGif(const std::string& path) {
     m_CurrentFrame = 0;
     m_FrameTimer = 0.0f;
 
-    // Read the whole file into memory first
     FILE* fp = fopen(path.c_str(), "rb");
-    if (!fp) return;
+    if (!fp) {
+        std::cout << "[ScreenTransition] Failed to open: " << path << std::endl;
+        return;
+    }
 
     fseek(fp, 0, SEEK_END);
     long fileSize = ftell(fp);
     rewind(fp);
 
+    std::cout << "[ScreenTransition] Opened GIF: " << path << " size: " << fileSize << " bytes" << std::endl;
+
     std::vector<unsigned char> buffer(fileSize);
     if (fread(buffer.data(), 1, fileSize, fp) != static_cast<size_t>(fileSize)) {
+        std::cout << "[ScreenTransition] Failed to read GIF into buffer" << std::endl;
         fclose(fp);
         return;
     }
     fclose(fp);
 
-    // Decode all GIF frames from memory
+    stbi_set_flip_vertically_on_load(false);
+
     int width, height, frameCount;
     int* delays = nullptr;
     unsigned char* data = stbi_load_gif_from_memory(
@@ -167,20 +177,47 @@ void ScreenTransitionSystem::LoadGif(const std::string& path) {
         &delays, &width, &height, &frameCount, nullptr, 4
     );
 
-    if (!data || frameCount <= 0) return;
+    stbi_set_flip_vertically_on_load(true);
+
+    if (!data || frameCount <= 0) {
+        std::cout << "[ScreenTransition] stbi error: " << stbi_failure_reason() << std::endl;
+        return;
+    }
+
+    std::cout << "[ScreenTransition] Loaded " << frameCount << " frames (" << width << "x" << height << ")" << std::endl;
 
     int frameSize = width * height * 4;
+    int rowSize = width * 4;
+    std::vector<unsigned char> flipped(frameSize);
+
     for (int i = 0; i < frameCount; ++i) {
         GifFrame gf;
-        gf.delay = (delays ? delays[i] : 10) * 0.01f; // centisec to sec
+        gf.delay = (delays ? delays[i] : 10) * 0.01f;
+        gf.delay = (gf.delay < 0.05f) ? 0.1f : gf.delay; // clamp bad values
+        // If delay is unreasonably long, override it
+        if (gf.delay > 0.5f) gf.delay = 0.1f;
+
+        // Flip vertically - stb returns top-down, OpenGL expects bottom-up
+        unsigned char* src = data + i * frameSize;
+        for (int row = 0; row < height; ++row) {
+            memcpy(
+                flipped.data() + row * rowSize,
+                src + (height - 1 - row) * rowSize,
+                rowSize
+            );
+        }
+
         glGenTextures(1, &gf.textureID);
         glBindTexture(GL_TEXTURE_2D, gf.textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE, data + i * frameSize);
+            GL_RGBA, GL_UNSIGNED_BYTE, flipped.data());
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         m_GifFrames.push_back(gf);
     }
+
     stbi_image_free(data);
     if (delays) free(delays);
 }
@@ -223,6 +260,7 @@ void ScreenTransitionSystem::Update(float deltaTime) {
 
     case TransitionState::LoadScreen:
         AdvanceGif(deltaTime);
+        std::cout << "[ScreenTransition] LoadScreen timer: " << m_Timer << "/" << LOAD_MIN_DUR << std::endl;
         if (m_Timer >= LOAD_MIN_DUR) {
             // You can add an "isLoaded" flag check here if loading is async
             m_Timer = 0.0f;
@@ -231,6 +269,7 @@ void ScreenTransitionSystem::Update(float deltaTime) {
         break;
 
     case TransitionState::IrisOpen:
+        std::cout << "[ScreenTransition] IrisOpen timer: " << m_Timer << "/" << IRIS_OPEN_DUR << std::endl;
         if (m_Timer >= IRIS_OPEN_DUR) {
             m_Timer = 0.0f;
             m_State = TransitionState::Idle;
@@ -243,6 +282,8 @@ void ScreenTransitionSystem::Update(float deltaTime) {
 
 void ScreenTransitionSystem::AdvanceGif(float deltaTime) {
     if (m_GifFrames.empty()) return;
+    std::cout << "[GIF] dt=" << deltaTime << " frame=" << m_CurrentFrame
+        << " timer=" << m_FrameTimer << " delay=" << m_GifFrames[m_CurrentFrame].delay << std::endl;
     m_FrameTimer += deltaTime;
     float frameDur = m_GifFrames[m_CurrentFrame].delay;
     if (m_FrameTimer >= frameDur) {
@@ -297,6 +338,16 @@ void ScreenTransitionSystem::Render() {
     }
 
     glDisable(GL_BLEND);
+    glUseProgram(0);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glDepthMask(GL_TRUE);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void ScreenTransitionSystem::RenderIris(float radius) {
@@ -321,4 +372,18 @@ void ScreenTransitionSystem::RenderGif() {
     glBindVertexArray(m_QuadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+}
+
+void ScreenTransitionSystem::StartLoadScreenOnly(const std::string& gifPath,
+    std::function<void()> onMidpoint) {
+    if (m_State != TransitionState::Idle) return;
+
+    LoadGif(gifPath);
+    m_OnMidpoint = onMidpoint;
+    m_MidpointFired = true; // already fired — skip IrisClose midpoint logic
+    m_Timer = 0.0f;
+    m_State = TransitionState::LoadScreen; // jump straight to load screen
+
+    // Fire callback immediately
+    if (m_OnMidpoint) m_OnMidpoint();
 }

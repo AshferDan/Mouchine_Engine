@@ -49,6 +49,9 @@ public:
 
     TransitionState GetState() const { return m_State; }
 
+    void StartLoadScreenOnly(const std::string& gifPath,
+        std::function<void()> onMidpoint);
+
 private:
     void InitGL();
     void LoadGif(const std::string& path);
@@ -61,8 +64,8 @@ private:
     float                   m_Timer = 0.0f;
 
     //  Iris timing (seconds) 
-    static constexpr float  IRIS_CLOSE_DUR = 0.55f;
-    static constexpr float  LOAD_MIN_DUR = 1.0f;   // minimum gif display time
+    static constexpr float  IRIS_CLOSE_DUR = 1.55f;
+    static constexpr float  LOAD_MIN_DUR = 2.0f;   // minimum gif display time
     static constexpr float  IRIS_OPEN_DUR = 0.55f;
 
     //  Easing 

@@ -192,6 +192,7 @@ void CoreEngine::GameLoop()
             }    
             // Wait for iris to fully close before loading scene
             else if (screenTransitionSystem &&
+                screenTransitionSystem->IsTransitioning() &&
                 screenTransitionSystem->GetState() != TransitionState::LoadScreen)
             {
                 // Transition still closing - delay scene load
@@ -471,13 +472,13 @@ void CoreEngine::GameLoop()
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
 
-        if (screenTransitionSystem)
-            screenTransitionSystem->Render();
-
         // Update cutscene
         if (cutsceneSystem && cutsceneSystem->IsPlaying()) {
             cutsceneSystem->Update(static_cast<float>(delta_time));         
         }
+
+        if (screenTransitionSystem)
+            screenTransitionSystem->Render();
 
         // Swap buffers and poll events
         glfwSwapBuffers(graphicsSystem->getWindow());

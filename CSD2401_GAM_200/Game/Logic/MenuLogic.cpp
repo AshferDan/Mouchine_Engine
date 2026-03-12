@@ -51,17 +51,23 @@ void MenuLogicSystem::Update(float dt)
                     std::cout << "PlayButton Clicked!" << std::endl;
 
                     CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+                    ScreenTransitionSystem* trans = CORE->GetScreenTransitionSystem();
 
                     if (!cutscene->IsPlaying()) {
-                        cutscene->PlayVideo(introPath, "CutsceneAudio");
-                        // Don't fade back in - let the fade out complete
-                        std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
+                        if (trans) {
+                            // Iris closes first, then cutscene starts at midpoint (screen already black)
+                            trans->StartTransition("../Assets/loading.gif", [cutscene]() {
+                                cutscene->PlayVideo("../Assets/Cutscene.mpeg", "CutsceneAudio");
+                                std::cout << "[MenuLogic] Cutscene started at transition midpoint" << std::endl;
+                                });
+                            std::cout << "[MenuLogic] Transition started, cutscene will play at midpoint" << std::endl;
+                        }
+                        else {
+                            // Fallback: no transition system, just play cutscene directly
+                            cutscene->PlayVideo(introPath, "CutsceneAudio");
+                            std::cout << "[MenuLogic] Playing cutscene (no transition system)" << std::endl;
+                        }
                     }
-                    
-                    std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                    std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
-                    CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
-                    std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                 }
                 else if (hoveredButtonName == "SettingsButton")
                 {

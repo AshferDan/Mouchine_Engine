@@ -302,14 +302,15 @@ public:
      * @brief Requests a scene to be loaded on the next frame.
      * @param sceneName The name of the scene file to load.
      */
-    void RequestSceneLoad(const std::string &sceneName, bool autoPlay = false)
+    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false)
     {
+        std::cout << "[RequestSceneLoad] scene: " << sceneName << std::endl;
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
-
         if (screenTransitionSystem && sceneName != "../Assets/Scenes/MainMenu.json")
         {
+            std::cout << "[RequestSceneLoad] Starting transition" << std::endl;
             screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
         }
     }
