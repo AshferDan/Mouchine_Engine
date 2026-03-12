@@ -64,6 +64,11 @@ public:
 private:
     std::string hoveredButtonName = "";   ///< The name of the currently hovered button
     std::string pressedButtonName = "";   ///< The name of the currently pressed button
+    
+    // Persistent level selection state
+    std::string selectedLevelButtonName = "";
+    std::string selectedLevelScenePath = "";
+
     bool pendingSceneChange = false;
     float pendingTimer = 0.0f;
 
@@ -83,4 +88,8 @@ private:
      * @param isPressed Whether the button is currently being pressed.
      */
     void SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed = false);
+
+    void RefreshLevelSelectButtons();
+
+    void SelectLevel(const std::string& buttonName, const std::string& scenePath);
 };
