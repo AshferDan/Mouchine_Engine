@@ -144,6 +144,12 @@ public:
     /** @return True while in the dedicated replay watch mode. */
     bool IsReplayMode() const { return m_isReplayMode; }
 
+    /** @return True if the ghost is currently toggled visible (key-0 toggle). */
+    bool IsGhostVisible() const { return m_ghostVisible; }
+
+    /** @brief Reset ghost toggle to hidden. Call at the start of each level session. */
+    void ResetGhostToggle() { m_ghostVisible = false; }
+
     /**
      * @brief Save the current recording to disk unconditionally (no best-time check).
      *        Useful for test recordings where you always want the run saved.

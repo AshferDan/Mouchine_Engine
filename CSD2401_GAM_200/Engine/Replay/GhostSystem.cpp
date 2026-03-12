@@ -165,8 +165,20 @@ void GhostSystem::ToggleGhost()
 
         if (ghost)    ghost->SetActive(true);
         if (ghostVfx) ghostVfx->SetActive(true);
-        m_player.StartPlayback(m_ghostTarget, m_bestRecording);
-        std::cout << "[GhostSystem] Ghost toggled ON.\n";
+
+        // Park ghost at the first recorded frame — playback starts when the player leaves SafeZone
+        if (ghost && !m_bestRecording.empty())
+        {
+            auto* tf = ghost->GetComponent<TransformComponent>();
+            if (tf)
+            {
+                tf->posX   = m_bestRecording[0].posX;
+                tf->posY   = m_bestRecording[0].posY;
+                tf->scaleX = m_bestRecording[0].scaleX;
+                tf->scaleY = m_bestRecording[0].scaleY;
+            }
+        }
+        std::cout << "[GhostSystem] Ghost toggled ON — waiting for SafeZone exit to begin playback.\n";
     }
     else
     {

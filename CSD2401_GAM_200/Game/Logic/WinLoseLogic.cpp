@@ -62,6 +62,15 @@ void WinLoseLogicSystem::Update(float dt)
         isPlayingCredits = false;
         m_playerInSafeZone = true;
         m_recordingActive  = false;
+
+        // Pre-configure ghost system and load best run so key-0 toggle works from frame 1
+        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+        if (ghost)
+        {
+            ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+            ghost->LoadRecording("Level1_testing");
+            ghost->ResetGhostToggle();  // ghost is hidden by default each session
+        }
     }
 
     totalFrames++;
@@ -262,6 +271,11 @@ void WinLoseLogicSystem::CheckSafeZoneExit()
         {
             ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
             ghost->StartRecording("Hero");
+
+            // If the ghost is already toggled on, start playback now that the run has begun
+            if (ghost->IsGhostAvailable() && ghost->IsGhostVisible())
+                ghost->StartPlayback();
+
             std::cout << "[WinLoseLogic] Player left SafeZone — recording started.\n";
         }
     }
@@ -280,6 +294,10 @@ void WinLoseLogicSystem::AbandonRecording()
     {
         ghost->StopRecording();
         ghost->ResetRecording();
+
+        // Stop ghost playback and park it at frame 0 so it's ready for the next run
+        if (ghost->IsGhostPlaying())
+            ghost->StopPlayback();
     }
 
     m_recordingActive  = false;
