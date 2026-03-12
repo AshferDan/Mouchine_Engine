@@ -326,6 +326,7 @@ public:
     MessageBus &GetMessageBus() { return messageBus; }
 
     void SetGamePaused(bool paused);
+    void SetGamePaused(bool paused, bool pauseAudio);
 
     bool IsGamePaused() const { return m_gamePause; }
 

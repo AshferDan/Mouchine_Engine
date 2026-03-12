@@ -878,7 +878,8 @@ void GraphicsSystem::Update(float)
                         {
                             float rHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
                             // float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
-                            float offsetFromTop = 110.0f; // distance from top edge
+                            // Use the Y position from transform as offset from top
+                            float offsetFromTop = rHeight - screenSpacePositions[textComp].y;
                             y = rHeight - offsetFromTop;
                         }
                         else

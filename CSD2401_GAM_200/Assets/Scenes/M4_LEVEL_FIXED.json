@@ -9447,7 +9447,7 @@
           "TransformComponent": {
             "pos": [
               1800.0,
-              281298.09375
+              150.0
             ],
             "scale": [
               125.0,
@@ -9465,6 +9465,169 @@
               1.0
             ],
             "layer": 700,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "ShellIcon1",
+          "localID": 211,
+          "parentID": 205,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1750.0,
+              920.0
+            ],
+            "scale": [
+              70.0,
+              70.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 700,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "ShellIcon2",
+          "localID": 212,
+          "parentID": 205,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1800.0,
+              920.0
+            ],
+            "scale": [
+              70.0,
+              70.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 700,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "ShellIcon3",
+          "localID": 213,
+          "parentID": 205,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1850.0,
+              920.0
+            ],
+            "scale": [
+              70.0,
+              70.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 700,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "CoinIcon",
+          "localID": 214,
+          "parentID": 205,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1750.0,
+              850.0
+            ],
+            "scale": [
+              80.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Coin_icon.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 700,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "CoinCountText",
+          "localID": 215,
+          "parentID": 205,
+          "active": true,
+          "TransformComponent": {
+            "pos": [
+              1800.0,
+              830.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": true
+          },
+          "TextComponent": {
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 60,
+            "text": "0",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "scale": 1.0,
             "screenSpace": true
           },
           "children": []
@@ -9744,6 +9907,14 @@
         "loop": false,
         "volume": 0.10000000149011612,
         "pitch": 0.8999999761581421,
+        "category": "sfx"
+      },
+      {
+        "name": "scissors_snip",
+        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
+        "loop": true,
+        "volume": 0.4,
+        "pitch": 1.0,
         "category": "sfx"
       }
     ],

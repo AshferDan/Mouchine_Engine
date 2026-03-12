@@ -24,8 +24,9 @@ std::string introPath = "../Assets/Cutscene.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
-enum MenuScreens {
-    Home = 0,       // Normal landing page
+enum MenuScreens
+{
+    Home = 0, // Normal landing page
     Settings,
     QUIT
 };
@@ -34,34 +35,73 @@ MenuScreens currScreen = MenuScreens::Home;
 void MenuLogicSystem::Update(float dt)
 {
     // Update audio fade
-    AudioManager* audioManager = CORE->GetAudioManager();
+    AudioManager *audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
         audioManager->UpdateFade(dt);
+    }
+
+    // Check if credits were played and have finished, then restart BGM
+    if (creditsWerePlayed)
+    {
+        CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+        if (cutscene && !cutscene->IsPlaying())
+        {
+            // Credits finished, restart BGM
+            std::cout << "[MenuLogic] Credits finished - Restarting main menu BGM" << std::endl;
+            if (audioManager)
+            {
+                const auto &sounds = audioManager->GetSoundDatabase();
+                if (sounds.find("MainMenuBGM") != sounds.end())
+                {
+                    std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
+                    audioManager->StopSound("bgm_channel");
+                    audioManager->PlaySound("MainMenuBGM", "bgm_channel");
+                    audioManager->FadeInCategory("music", 3.0f);
+                    std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
+                }
+                else
+                {
+                    std::cout << "[MenuLogic] ERROR: MainMenuBGM not found in sound database!" << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "[MenuLogic] ERROR: AudioManager is null!" << std::endl;
+            }
+
+            creditsWerePlayed = false; // Reset flag
+        }
     }
 
     // if a scene change is pending, count down timer first so the click sound can be played
     if (pendingSceneChange)
     {
         pendingTimer -= dt;
-        if (pendingTimer <= 0.0f)                       // timer delay to play the sound effect before loading into scene
+        if (pendingTimer <= 0.0f) // timer delay to play the sound effect before loading into scene
         {
+            if (audioManager && audioManager->IsAnyFadeActive())
+            {
+                pendingTimer = 0.1f; // wait another 100ms and check again
+                return;
+            }
+
             if (currScreen == MenuScreens::Home)
             {
                 if (hoveredButtonName == "PlayButton")
                 {
                     std::cout << "PlayButton Clicked!" << std::endl;
+                    std::cout << "[MenuLogic] Fade complete! Loading scene..." << std::endl;
 
-                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
+                    CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
 
-                    if (!cutscene->IsPlaying()) {
+                    if (!cutscene->IsPlaying())
+                    {
                         cutscene->PlayVideo(introPath, "CutsceneAudio");
-                        // Don't fade back in - let the fade out complete
-                        std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                     }
-                    
-                    std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
-                    std::cout << "[MenuLogic] Music should already be fading out from earlier" << std::endl;
+
+                    // std::cout << "[MenuLogic] Requesting scene load with AUTO-PLAY = TRUE" << std::endl;
+                    // std::cout << "[MenuLogic] Music should already be faded out" << std::endl;
                     CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
                     std::cout << "[MenuLogic] RequestSceneLoad called" << std::endl;
                 }
@@ -70,18 +110,18 @@ void MenuLogicSystem::Update(float dt)
                     std::cout << "SettingsButton Clicked!" << std::endl;
 
                     currScreen = MenuScreens::Settings;
-                    //CORE->RequestSceneLoad("../Assets/Scenes/Scene2.json", true);
+                    // CORE->RequestSceneLoad("../Assets/Scenes/Scene2.json", true);
                 }
                 else if (hoveredButtonName == "CreditsButton")
                 {
                     std::cout << "CreditsButton Clicked!" << std::endl;
                     // to add credits screen here
-                    //CORE->RequestSceneLoad("../Assets/Scenes/Credits.json", true);
+                    // CORE->RequestSceneLoad("../Assets/Scenes/Credits.json", true);
                 }
                 else if (hoveredButtonName == "ReplayButton")
                 {
                     std::cout << "ReplayButton Clicked! Loading replay..." << std::endl;
-                    if (GhostSystem* ghost = CORE->GetGhostSystem())
+                    if (GhostSystem *ghost = CORE->GetGhostSystem())
                     {
                         ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
                         ghost->RequestReplayOnLoad("Level1_testing");
@@ -91,11 +131,12 @@ void MenuLogicSystem::Update(float dt)
                 else if (hoveredButtonName == "YesButton")
                 {
                     std::cout << "YesButton Clicked! Quitting..." << std::endl;
-                #ifndef _DEBUG
+#ifndef _DEBUG
                     glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
-                #else
+#else
                     CORE->GetLevelEditor()->StopPlayMode();
-                #endif
+                    // CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
+#endif
                 }
             }
 
@@ -116,25 +157,25 @@ void MenuLogicSystem::Update(float dt)
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
         {
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(true);
-        }   
+        }
 
-        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")) {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
+        {
 
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
         }
-        
 
         // Hide settings text labels when not on settings screen
-        if (auto* masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
+        if (auto *masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
             masterText->SetActive(false);
-        if (auto* musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
+        if (auto *musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
             musicText->SetActive(false);
-        if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
+        if (auto *sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(false);
     }
     else if (currScreen == MenuScreens::Settings)
     {
-        //hoveredButtonName.clear();
+        // hoveredButtonName.clear();
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
         {
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(true);
@@ -143,20 +184,22 @@ void MenuLogicSystem::Update(float dt)
         {
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         }
-        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")) {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
+        {
 
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
         }
         // Show settings text labels when on settings screen
-        if (auto* masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
+        if (auto *masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
             masterText->SetActive(true);
-        if (auto* musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
+        if (auto *musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
             musicText->SetActive(true);
-        if (auto* sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
+        if (auto *sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(true);
-        //return;
+        // return;
     }
-    else if (currScreen == MenuScreens::QUIT) {
+    else if (currScreen == MenuScreens::QUIT)
+    {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
         {
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
@@ -165,7 +208,8 @@ void MenuLogicSystem::Update(float dt)
         {
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         }
-        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")) {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
+        {
 
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(true);
         }
@@ -176,7 +220,7 @@ void MenuLogicSystem::Update(float dt)
     bool isClicked = InputManager::IsMouseLeftClicked();
     bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
-    auto& factory = GameObjectFactory::Instance();
+    auto &factory = GameObjectFactory::Instance();
     std::string currentHover = "";
     std::string currentPressed = "";
 
@@ -276,7 +320,7 @@ void MenuLogicSystem::Update(float dt)
             SetButtonTexture(currentHover, true, isCurrentPressed);
             // Play hover sound once when entering the button
 
-            AudioManager* localAudioManager = CORE->GetAudioManager();
+            AudioManager *localAudioManager = CORE->GetAudioManager();
             if (localAudioManager)
             {
                 localAudioManager->TriggerEvent("UI_Hover");
@@ -300,7 +344,7 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-        AudioManager* localAudioManager = CORE->GetAudioManager();
+        AudioManager *localAudioManager = CORE->GetAudioManager();
         if (localAudioManager)
         {
             if (hoveredButtonName == "PlayButton")
@@ -327,23 +371,21 @@ void MenuLogicSystem::Update(float dt)
             // Start audio fade out for scene transitions
             if ((hoveredButtonName == "PlayButton" || hoveredButtonName == "ReplayButton") && audioManager)
             {
-                audioManager->FadeOutCategory("music", 1.0f);
-                std::cout << "[MenuLogic] Started music fade out" << std::endl;
+                audioManager->FadeOutCategory("music", 2.5f); // Fade out over 3.0 sec
+                std::cout << "[MenuLogic] Started music fade out (3.0 seconds)" << std::endl;
             }
 
             pendingSceneChange = true;
-            pendingTimer = 2.0f;                       // Wait 3.0s so 2.5s fade completes before scene loads
+            pendingTimer = 2.6f;
         }
         else
         {
             if (hoveredButtonName == "MasterMuteButton")
             {
-                //AudioManager* audioManager = CORE->GetAudioManager();
+                // AudioManager* audioManager = CORE->GetAudioManager();
                 if (audioManager)
                 {
                     audioManager->ToggleMasterMute();
-
-
                 }
                 SetButtonTexture("MasterMuteButton", true, false); // Update texture after toggling
             }
@@ -371,13 +413,30 @@ void MenuLogicSystem::Update(float dt)
             {
                 currScreen = MenuScreens::Settings;
             }
+            // else if (hoveredButtonName == "TestFadeButton")
+            //{
+            //     std::cout << "[TEST] TestFadeButton Clicked - Starting fade out!" << std::endl;
+            //     if (audioManager)
+            //     {
+            //         audioManager->FadeOutCategory("music", 2.0f);  // Fade out over 2 seconds
+            //         std::cout << "[TEST] Music fade out started (2 seconds duration)" << std::endl;
+            //         testFadeTriggered = true;
+            //     }
+            //     else
+            //     {
+            //         std::cout << "[TEST] ERROR: AudioManager is null!" << std::endl;
+            //     }
+            // }
             else if (hoveredButtonName == "CreditsButton")
             {
                 std::cout << "CreditsButton Clicked!" << std::endl;
 
-                CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
-                if (!cutscene->IsPlaying()) {
+                CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+                if (!cutscene->IsPlaying())
+                {
                     cutscene->PlayVideo(creditsPath, "CreditsAudio");
+                    creditsWerePlayed = true; // Set flag to restart BGM after credits
+                    std::cout << "[MenuLogic] Credits flag set - will restart BGM when finished" << std::endl;
                 }
             }
             else if (hoveredButtonName == "QuitButton")
@@ -388,11 +447,11 @@ void MenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "YesButton")
             {
                 std::cout << "YesButton Clicked! Quitting..." << std::endl;
-            #ifndef _DEBUG
+#ifndef _DEBUG
                 glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
-            #else
+#else
                 CORE->GetLevelEditor()->StopPlayMode();
-            #endif
+#endif
             }
             else if (hoveredButtonName == "NoButton")
             {
@@ -403,11 +462,13 @@ void MenuLogicSystem::Update(float dt)
     }
 }
 
-bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mouseY)
+bool MenuLogicSystem::IsMouseOver(GameObject *button, double mouseX, double mouseY)
 {
-    if (!button) return false;
-    auto* tx = button->GetComponent<TransformComponent>();
-    if (!tx) return false;
+    if (!button)
+        return false;
+    auto *tx = button->GetComponent<TransformComponent>();
+    if (!tx)
+        return false;
 
     return IsAreaClicked(tx->posX, tx->posY, tx->scaleX, tx->scaleY, static_cast<float>(mouseX), static_cast<float>(mouseY));
 }
@@ -415,121 +476,166 @@ bool MenuLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mous
 //  swap textures
 void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed)
 {
-    auto& factory = GameObjectFactory::Instance();
-    GameObject* btn = factory.FindGameObject(buttonName);
-    if (!btn) return;
+    auto &factory = GameObjectFactory::Instance();
+    GameObject *btn = factory.FindGameObject(buttonName);
+    if (!btn)
+        return;
 
-    auto* rc = btn->GetComponent<RenderComponent>();
-    if (!rc) return;
+    auto *rc = btn->GetComponent<RenderComponent>();
+    if (!rc)
+        return;
 
     std::string texturePath;
 
-    if (buttonName == "PlayButton") {
-        if (isPressed) {
+    if (buttonName == "PlayButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_play_NEW_HOVER.png";
-        } else if (isHovered) {
+        }
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_play_NEW_bright.png";
-        } else {
+        }
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_play.png";
         }
     }
-    else if (buttonName == "SettingsButton") {
-        if (isPressed) {
+    else if (buttonName == "SettingsButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_settings_NEW_HOVER.png";
-        } else if (isHovered) {
+        }
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_settings_NEW_bright.png";
-        } else {
+        }
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_settings.png";
         }
     }
-    else if (buttonName == "QuitButton") {
-        if (isPressed) {
+    else if (buttonName == "QuitButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_quit_NEW_HOVER.png";
         }
-        else if (isHovered) {
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_quit_NEW_bright.png";
         }
-        else {
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_quit.png";
         }
     }
 
-    else if (buttonName == "ReplayButton") {
-        if (isPressed) {
+    else if (buttonName == "ReplayButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Replay_button_dark.png";
         }
-        else if (isHovered) {
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Replay_button_light.png";
         }
-        else {
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/Replay_button.png";
         }
     }
 
-    else if (buttonName == "CreditsButton") {
-        if (isPressed) {
+    else if (buttonName == "CreditsButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW_HOVER.png";
-        } else if (isHovered) {
+        }
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW_bright.png";
-        } else {
+        }
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW.png";
         }
     }
-    else if (buttonName == "MasterMuteButton") {
+    else if (buttonName == "MasterMuteButton")
+    {
         bool isMuted = false;
-        AudioManager* audioManager = CORE->GetAudioManager();
+        AudioManager *audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
             isMuted = audioManager->IsMuted();
         }
         texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
     }
-    else if (buttonName == "MusicMuteButton") {
+    else if (buttonName == "MusicMuteButton")
+    {
         bool isMuted = false;
-        AudioManager* audioManager = CORE->GetAudioManager();
+        AudioManager *audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
             isMuted = audioManager->IsCategoryMuted("music");
         }
         texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
     }
-    else if (buttonName == "SFXMuteButton") {
+    else if (buttonName == "SFXMuteButton")
+    {
         bool isMuted = false;
-        AudioManager* audioManager = CORE->GetAudioManager();
+        AudioManager *audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
             isMuted = audioManager->IsCategoryMuted("sfx");
         }
         texturePath = isMuted ? "../Assets/Sprites/Icons/Volume_Mute.png" : "../Assets/Sprites/Icons/Volume_Unmute.png";
     }
-    else if (buttonName == "YesButton") {
-        if (isPressed) {
+    else if (buttonName == "YesButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Hovering_button_dark.png";
         }
-        else if (isHovered) {
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Hovering_button_light.png";
         }
-        else {
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/blankbtn.png";
         }
     }
-    else if (buttonName == "NoButton") {
-        if (isPressed) {
+    else if (buttonName == "NoButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Hovering_button_dark.png";
         }
-        else if (isHovered) {
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Hovering_button_light.png";
         }
-        else {
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/blankbtn.png";
         }
     }
-    else if (buttonName == "BackButton") {
-        if (isPressed) {
+    else if (buttonName == "BackButton")
+    {
+        if (isPressed)
+        {
             texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
-        } else if (isHovered) {
+        }
+        else if (isHovered)
+        {
             texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
-        } else {
+        }
+        else
+        {
             texturePath = "../Assets/Sprites/Icons/Back_button.png";
         }
     }

@@ -611,6 +611,10 @@ void Serialization::DeserializeAudioManager(const json& j, AudioManager* audioMa
 
 	audioManager->Clear();
 
+	// Reset fade states to ensure audio plays at proper volume in new scene
+	audioManager->ResetFadeStates();
+	std::cout << "[DeserializeAudioManager] Fade states reset for new scene" << std::endl;
+
 	// deserialise sounds
 	if (audioJson.contains("sounds")) 
 	{

@@ -30,6 +30,14 @@ void PauseMenuLogicSystem::Initialize()
     DestroyPauseSettingsUI();
     DestroyPauseMenuUI();
 
+    // Remove any lingering low pass filter from previous scene/restart
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->SetMasterLowPassFilter(false);
+        std::cout << "[PauseMenu] Initialize - low pass filter cleaned up" << std::endl;
+    }
+
     isPauseMenuActive = false;
     hasCreatedUI = false;
     hoveredButtonName = "";
@@ -136,7 +144,7 @@ void PauseMenuLogicSystem::Update(float dt)
 
                 // Toggle pause menu
                 TogglePauseMenu();
-                std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
+                //std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
                 }
                 else if (isHoveringPauseBtn)
                 {
@@ -151,7 +159,7 @@ void PauseMenuLogicSystem::Update(float dt)
                     {
                         audioManager->TriggerEvent("UI_Hover");
                     }
-                    std::cout << "[InGamePauseButton] HOVER START" << std::endl;
+                    //std::cout << "[InGamePauseButton] HOVER START" << std::endl;
                 }
                 wasHoveringLastFrame = true;
                 }
@@ -181,6 +189,19 @@ void PauseMenuLogicSystem::Update(float dt)
     {
         pauseBtn->SetActive(!shouldHidePauseButton);
     }
+
+    // Hide shell/coin UI when pause menu is active or win/lose screens are showing
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(!shouldHidePauseButton);
+    if (shellIcon2) shellIcon2->SetActive(!shouldHidePauseButton);
+    if (shellIcon3) shellIcon3->SetActive(!shouldHidePauseButton);
+    if (coinIcon) coinIcon->SetActive(!shouldHidePauseButton);
+    if (coinText) coinText->SetActive(!shouldHidePauseButton);
 
     // update pause menu position to follow camera (only when menu is active)
     if (isPauseMenuActive)
@@ -243,6 +264,15 @@ void PauseMenuLogicSystem::Update(float dt)
         pendingTimer -= dt;
         if (pendingTimer <= 0.0f)
         {
+            // Check if fade is still active for buttons that fade - if so, wait a bit longer
+            if ((hoveredButtonName == "PauseMainMenuButton" || hoveredButtonName == "PauseRestartButton")
+                && audioManager && audioManager->IsAnyFadeActive())
+            {
+                //std::cout << "[PauseMenu] Fade still active, waiting..." << std::endl;
+                pendingTimer = 0.1f; // Wait another 100ms and check again
+                return;
+            }
+
             if (hoveredButtonName == "PauseResumeButton")
             {
                 std::cout << "[PauseMenu] Resume clicked" << std::endl;
@@ -252,7 +282,10 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseRestartButton")
             {
-                std::cout << "[PauseMenu] Restart clicked" << std::endl;
+                std::cout << "[PauseMenu] Restart - fade complete, reloading level" << std::endl;
+
+                // DON'T remove low pass filter here - keep audio muffled during fade
+                // It will be cleaned up after scene loads
 
                 // Discard any in-progress recording before restarting
                 if (GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr)
@@ -270,8 +303,9 @@ void PauseMenuLogicSystem::Update(float dt)
                 if (isPauseMenuActive)
                 {
                     isPauseMenuActive = false;
-                    CORE->SetGamePaused(false);
+                    CORE->SetGamePaused(false, false); // don't unpause audio when pause, use low pass
                 }
+
                 // restart the current level
                 if (!currentScenePath.empty())
                 {
@@ -280,7 +314,7 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseSettingsButton")
             {
-                std::cout << "[PauseMenu] Settings clicked - opening settings" << std::endl;
+                //std::cout << "[PauseMenu] Settings clicked - opening settings" << std::endl;
 
                 // Create settings UI if not created yet
                 if (!hasCreatedSettingsUI)
@@ -296,7 +330,7 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseMainMenuButton")
             {
-                std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
+                //std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
 
                 // Destroy UI before scene change
                 DestroyHowToPlayUI();
@@ -307,7 +341,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 if (isPauseMenuActive)
                 {
                     isPauseMenuActive = false;
-                    CORE->SetGamePaused(false);
+                    CORE->SetGamePaused(false, false);
                 }
                 // back to main menu
                 CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
@@ -350,6 +384,13 @@ void PauseMenuLogicSystem::Update(float dt)
             // Clear any hover state
             hoveredButtonName.clear();
 
+            // how to play opens has low pass
+            if (audioManager)
+            {
+                audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
+                //std::cout << "[PauseMenu] Low pass filter enabled for How To Play" << std::endl;
+            }
+
             // Show how to play UI
             SetHowToPlayVisible(true);
 
@@ -376,6 +417,13 @@ void PauseMenuLogicSystem::Update(float dt)
         }
         else
         {
+            // no low pass filter when how to play closes
+            if (audioManager)
+            {
+                audioManager->SetMasterLowPassFilter(false);
+                //std::cout << "[PauseMenu] Low pass filter disabled for How To Play" << std::endl;
+            }
+
             // Hide how to play UI
             SetHowToPlayVisible(false);
 
@@ -456,7 +504,7 @@ void PauseMenuLogicSystem::Update(float dt)
     // Handle pause settings screen interactions
     if (isPauseSettingsOpen)
     {
-        // Handle pending settings close (back button was clicked)
+        // Handle pending settings close (back button was clicked or ESC pressed)
         if (pendingSettingsClose)
         {
             settingsCloseTimer -= dt;
@@ -590,21 +638,31 @@ void PauseMenuLogicSystem::Update(float dt)
         bool isClicked = InputManager::IsMouseLeftClicked();
 
         // Check if user pressed ESC to close
+        static bool escWasPressedHowToPlay = false;
         if (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
-            static bool escWasPressed = false;
-            if (!escWasPressed)
+            if (!escWasPressedHowToPlay)
             {
-                std::cout << "[PauseMenu] ESC pressed - closing how to play" << std::endl;
-                pendingHowToPlayClose = true;
-                howToPlayCloseTimer = 0.15f;
-                escWasPressed = true;
+                //std::cout << "[PauseMenu] ESC pressed - closing how to play" << std::endl;
+
+                // if opened via TAB, close immediately without opening pause menu
+                if (howToPlayOpenedViaTab)
+                {
+                    //std::cout << "[PauseMenu] How To Play opened via TAB - closing completely" << std::endl;
+                    CloseHowToPlay();
+                }
+                else
+                {
+                    // otherwise just close how to play and return to pause menu
+                    pendingHowToPlayClose = true;
+                    howToPlayCloseTimer = 0.15f;
+                }
+                escWasPressedHowToPlay = true;
             }
         }
         else
         {
-            static bool escWasPressed = false;
-            escWasPressed = false;
+            escWasPressedHowToPlay = false;
         }
 
         // Check for back button hover and click
@@ -646,8 +704,16 @@ void PauseMenuLogicSystem::Update(float dt)
                 audioManager->TriggerEvent("UI_Click");
             }
             std::cout << "[PauseMenu] How To Play back button clicked" << std::endl;
-            pendingHowToPlayClose = true;
-            howToPlayCloseTimer = 0.15f;
+
+            if (howToPlayOpenedViaTab)
+            {
+                CloseHowToPlay();
+            }
+            else
+            {
+                pendingHowToPlayClose = true;
+                howToPlayCloseTimer = 0.15f;
+            }
         }
 
         return; // Don't process normal pause menu interactions
@@ -717,6 +783,9 @@ void PauseMenuLogicSystem::Update(float dt)
             if (hoveredButtonName == "PauseRestartButton")
             {
                 audioManager->TriggerEvent("UI_Restart");
+                // Start audio fade when Restart button is clicked
+                audioManager->FadeOutAll(1.5f);
+                std::cout << "[PauseMenu] Started fade out for restart (1.5 seconds)" << std::endl;
             }
             else
             {
@@ -726,15 +795,26 @@ void PauseMenuLogicSystem::Update(float dt)
             // Start audio fade when Main Menu button is clicked
             if (hoveredButtonName == "PauseMainMenuButton")
             {
-                audioManager->FadeOutCategory("music", 0.5f);
-                std::cout << "[PauseMenu] Started music fade out on button click" << std::endl;
+                audioManager->FadeOutCategory("music", 2.0f);
+                std::cout << "[PauseMenu] Started music fade out (2.0 seconds)" << std::endl;
             }
         }
 
         // start delay before executing action
         pendingSceneChange = true;
-        // Longer delay for Main Menu to allow fade to complete
-        pendingTimer = (hoveredButtonName == "PauseMainMenuButton") ? 0.6f : 0.20f;
+        // Set timer based on button type to allow fades to complete
+        if (hoveredButtonName == "PauseMainMenuButton")
+        {
+            pendingTimer = 2.2f; // Main Menu: 2.0s fade + 0.2s buffer
+        }
+        else if (hoveredButtonName == "PauseRestartButton")
+        {
+            pendingTimer = 1.7f; // Restart: 1.5s fade + 0.2s buffer
+        }
+        else
+        {
+            pendingTimer = 0.20f; // Other buttons: immediate
+        }
     }
 }
 
@@ -810,8 +890,6 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     restartRender->SetLayer(602);
     restartBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-    //auto* restartText = restartBtn->AddComponent<TextComponent>(
-    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // settings button
     GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
@@ -826,8 +904,6 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     settingsRender->SetLayer(602);
     settingsBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-    //auto* settingsText = settingsBtn->AddComponent<TextComponent>(
-    //    "../Assets/FrederickatheGreat-Regular.ttf", 32, "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // quit button
     GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
@@ -881,10 +957,10 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 1755.0f * uiScale;
-    settingsTransform->scaleY = 945.0f * uiScale;
+    settingsTransform->scaleX = 1920.0f * uiScale;
+    settingsTransform->scaleY = 1080.0f * uiScale;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
-    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings.png"));
+    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings_New.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     settingsRender->SetLayer(601);
 
@@ -1312,6 +1388,9 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
+    // Get audio manager for low pass filter
+    AudioManager* audioManager = CORE->GetAudioManager();
+
     // Reset pause settings and how to play state when closing pause menu
     if (!isPauseMenuActive)
     {
@@ -1327,13 +1406,26 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
         SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
         SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
+
+        // remove low pass filter when pause menu closes
+        if (audioManager)
+        {
+            audioManager->SetMasterLowPassFilter(false);
+            //std::cout << "[PauseMenu] Low pass filter disabled" << std::endl;
+        }
+    }
+    else
+    {
+        // apply low pass filter when pause menu opens
+        if (audioManager)
+        {
+            audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
+            //std::cout << "[PauseMenu] Low pass filter enabled" << std::endl;
+        }
     }
 
-    // pause/unpause the game
-    CORE->SetGamePaused(isPauseMenuActive);
-    //CORE->GameTimerSystem();
-
-    std::cout << "[PauseMenu] Pause menu " << (isPauseMenuActive ? "opened" : "closed") << std::endl;
+    // pause/unpause the game but don't pause audio, using low pass filter instead
+    CORE->SetGamePaused(isPauseMenuActive, false);
 }
 
 /**
@@ -1504,10 +1596,18 @@ void PauseMenuLogicSystem::OpenHowToPlay()
     // Show how to play screen
     SetHowToPlayVisible(true);
 
+    // apply low pass filter when how to play opens
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->SetMasterLowPassFilter(true, 800.0f, 1.0f);
+        // std::cout << "[PauseMenu] Low pass filter enabled for How To Play (TAB)" << std::endl;
+    }
+
     // Open how to play screen
     isHowToPlayOpen = true;
-    howToPlayOpenedViaTab = true; // Mark that it was opened via TAB
-    std::cout << "[PauseMenu] How To Play opened via TAB" << std::endl;
+    howToPlayOpenedViaTab = true;
+    //std::cout << "[PauseMenu] How To Play opened via TAB" << std::endl;
 }
 
 /**
@@ -1515,6 +1615,14 @@ void PauseMenuLogicSystem::OpenHowToPlay()
  */
 void PauseMenuLogicSystem::CloseHowToPlay()
 {
+    // remove low pass filter when how to play closes
+    AudioManager* audioManager = CORE->GetAudioManager();
+    if (audioManager)
+    {
+        audioManager->SetMasterLowPassFilter(false);
+        //std::cout << "[PauseMenu] Low pass filter disabled for How To Play" << std::endl;
+    }
+
     isHowToPlayOpen = false;
     wasHowToPlayOpenLastFrame = false; // Reset state tracking
 
@@ -1529,13 +1637,23 @@ void PauseMenuLogicSystem::CloseHowToPlay()
             isPauseMenuActive = false;
             SetPauseMenuVisible(false);
             SetHowToPlayVisible(false);
-            CORE->SetGamePaused(false);
+            CORE->SetGamePaused(false, false); // Don't unpause audio (using low pass filter)
         }
     }
     else
     {
         std::cout << "[PauseMenu] How To Play closed" << std::endl;
     }
+}
+
+/**
+ * @brief Closes the pause settings screen.
+ */
+void PauseMenuLogicSystem::ClosePauseSettings()
+{
+    std::cout << "[PauseMenu] Closing settings screen (ESC pressed)" << std::endl;
+    pendingSettingsClose = true;
+    settingsCloseTimer = 0.15f; // 150ms delay to match back button behavior
 }
 
 /**
@@ -1555,17 +1673,17 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     auto* howToPlayTransform = howToPlayScreen->AddComponent<TransformComponent>();
     howToPlayTransform->posX = 0.0f;
     howToPlayTransform->posY = 0.0f;
-    howToPlayTransform->scaleX = 1755.0f * uiScale;
-    howToPlayTransform->scaleY = 945.0f * uiScale;
+    howToPlayTransform->scaleX = 1920.0f * uiScale;
+    howToPlayTransform->scaleY = 1080.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/HowToPlay.png"));
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M5_Control_Panel.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 
     GameObject* backBtn = factory.CreateGameObject("HowToPlayBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
-    backBtnTransform->posX = 750.0f * uiScale;
-    backBtnTransform->posY = -275.0f * uiScale;
+    backBtnTransform->posX = 625.0f * uiScale;
+    backBtnTransform->posY = -235.0f * uiScale;
     backBtnTransform->scaleX = 200.0f * uiScale;
     backBtnTransform->scaleY = 180.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
