@@ -119,8 +119,9 @@ void CoreEngine::InitSystems()
     // 11. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
-    timerSystem = AddSystem<TimerSystem>();
-    ghostSystem = AddSystem<GhostSystem>();
+    timerSystem      = AddSystem<TimerSystem>();
+    ghostSystem      = AddSystem<GhostSystem>();
+    textInputSystem  = AddSystem<TextInputSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
@@ -435,6 +436,12 @@ void CoreEngine::GameLoop()
         if (timerSystem)
         {
             timerSystem->Update(static_cast<float>(delta_time));
+        }
+
+        // TextInputSystem: modal dialog input — runs every frame regardless of pause
+        if (textInputSystem)
+        {
+            textInputSystem->Update(static_cast<float>(delta_time));
         }
 
         // Game-specific variable-timestep update (game timer, state machine, etc.)

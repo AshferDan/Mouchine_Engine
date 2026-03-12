@@ -31,7 +31,7 @@ struct AnimationData {
 	int col, row;
 	int startframe, endframe;
 	float fps;
-
+	bool pingPong = false;
 };
 
 
@@ -80,7 +80,7 @@ public:
 	 */
 	GLuint GetTextureID() const { return textureID; }
 
-	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps);
+	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong = false);
 
 	void PlayAnimation(const std::string& name, bool isLooping = true);
 
@@ -170,4 +170,7 @@ private:
 	GLuint textureID;		// Personalised ID for the texture
 	float alpha;			// Transparency
 	bool ownsTexture;
+
+	int animationDirection = 1;
+	bool pingPongMode = false;
 };

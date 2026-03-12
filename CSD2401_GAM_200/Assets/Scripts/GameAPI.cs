@@ -1516,6 +1516,10 @@ namespace CSharpScript
     public static class Ghost
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void Configure(string liveTarget, string ghostTarget,
+                                             string liveVfx, string ghostVfx);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void StartRecording(string targetName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -1568,6 +1572,18 @@ namespace CSharpScript
 
         /// <summary>Best run time in seconds. Returns float.MaxValue if no run recorded yet.</summary>
         public static float BestTime() => GetBestRunTime();
+
+        /// <summary>
+        /// Set the live player and ghost object names the system will use.
+        /// Call once before Load() / BeginRecording() / BeginPlayback().
+        /// </summary>
+        /// <param name="liveTarget">Live player object name, e.g. "Hero".</param>
+        /// <param name="ghostTarget">Ghost object name, e.g. "GhostHero".</param>
+        /// <param name="liveVfx">Optional VFX companion of the live player.</param>
+        /// <param name="ghostVfx">Optional VFX companion of the ghost.</param>
+        public static void Setup(string liveTarget, string ghostTarget,
+                                 string liveVfx = "", string ghostVfx = "")
+            => Configure(liveTarget, ghostTarget, liveVfx, ghostVfx);
     }
 
 

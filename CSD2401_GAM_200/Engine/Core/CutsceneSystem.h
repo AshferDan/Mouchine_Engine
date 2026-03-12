@@ -91,7 +91,7 @@ public:
 	 * @brief Returns true if this specific file has finished playing before
 	 * @param videoPath Path to the .mpeg file.
 	 */
-	bool HasFinished(const std::string& videoPath) const {
+	bool HasPlayed(const std::string& videoPath) const {
 		return m_finishedVideos.find(videoPath) != m_finishedVideos.end();
 	}
 

@@ -162,11 +162,6 @@ void ActionRespawn::Execute(GameObject *owner, GameObject *other)
 
     std::cout << "[Action] Respawning Object: " << owner->GetName() << std::endl;
 
-    // Reset velocity so they don't keep flying after respawning
-    // auto* physics = owner->GetComponent<PhysicsComponent>();
-    // if (physics) {
-    //    physics->SetVelocity(0.0f, 0.0f);
-    //}
 }
 
 // ========== EvENT COMPONENT ==========

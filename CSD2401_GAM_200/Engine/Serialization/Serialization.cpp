@@ -173,17 +173,16 @@ void Serialization::ResolveHierarchy()
 		EntityID oldChildID = info.localID;
 		EntityID oldParentID = info.parentID;
 
-		// 1. Find the Child: 
 		// If it was remapped, use the new ID. Otherwise, use the original ID.
 		EntityID actualChildID = (g_OldToNewID.count(oldChildID) > 0) ? g_OldToNewID[oldChildID] : oldChildID;
 
-		// 2. Find the Parent:
+		
 		EntityID actualParentID = -1;
 		if (oldParentID != -1) {
 			actualParentID = (g_OldToNewID.count(oldParentID) > 0) ? g_OldToNewID[oldParentID] : oldParentID;
 		}
 
-		// 3. Get the Pointers
+		
 		// During Undo, idToObject might be empty for existing objects, we fall back to the Factory.
 		GameObject* child = (idToObject.count(actualChildID) > 0) ? idToObject[actualChildID] : GameObjectFactory::Instance().GetGameObject(actualChildID);
 

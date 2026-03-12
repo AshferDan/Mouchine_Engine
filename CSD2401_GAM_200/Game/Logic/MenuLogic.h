@@ -16,11 +16,13 @@ Technology is prohibited.
 #include "System.h"
 #include "factory.h"
 #include "Serialization.h"
-#include "InputManager.h" //
+#include "InputManager.h"
 #include "transform.h"
 #include "MathLib.h"
 #include "GraphicsSystem.h"
 #include "LevelEditor.h"
+#include <vector>
+#include <string>
 
 class LevelEditor;
 class GraphicsSystem;
@@ -64,10 +66,35 @@ public:
 private:
     std::string hoveredButtonName = "";   ///< The name of the currently hovered button
     std::string pressedButtonName = "";   ///< The name of the currently pressed button
+    
+    // Persistent level selection state
+    std::string selectedLevelButtonName = "";
+    std::string selectedLevelScenePath = "";
+
     bool pendingSceneChange = false;
     float pendingTimer = 0.0f;
     bool creditsWerePlayed = false;       ///< Flag to restart BGM after credits finish
-    //bool testFadeTriggered = false;       ///< Flag for test fade out button
+
+    // ===== Replay Picker =====
+    std::vector<std::string> m_replayNames;   ///< Base names of replay files shown in the picker.
+    std::vector<std::string> m_replayLevels;  ///< Level name stored inside each replay (parallel to m_replayNames).
+    std::string              m_selectedReplay; ///< Replay chosen by the player; consumed on scene load.
+    bool                     m_hasCreatedReplayPicker = false;
+
+    /**
+     * @brief Scans ../Assets/Replay/ and fills m_replayNames with up to 3
+     *        base names (no .json extension), sorted newest-first.
+     */
+    void ScanReplays();
+
+    /** @brief Creates the picker overlay GameObjects and sets the screen to ReplayPicker. */
+    void ShowReplayPicker();
+
+    /** @brief Destroys the picker overlay GameObjects. */
+    void HideReplayPicker();
+
+    /** @brief Repositions picker elements to follow the camera each frame. */
+    void UpdateReplayPickerPositions();
 
     // Slider state tracking
     struct SliderState {
@@ -135,4 +162,29 @@ private:
      * @param isMouseDown Whether mouse button is pressed.
      */
     void HandleSliderInput(double mouseX, double mouseY, bool isMouseDown);
+     * @brief Returns the button currently under the mouse for the active menu screen.
+     */
+    std::string FindHoveredButton(double mouseX, double mouseY);
+
+    void RefreshLevelSelectButtons();
+    void SelectLevel(const std::string& buttonName, const std::string& scenePath);
+
+    /**
+     * @brief Plays the correct UI sound for the clicked button.
+     */
+    void TriggerUISound(const std::string& buttonName);
+
+    void ClearLevelSelection();
+
+    /**
+     * @brief Handles level select screen buttons only.
+     * Returns true if the click was handled here.
+     */
+    bool HandleLevelSelectClick(const std::string& buttonName);
+
+    /**
+     * @brief Handles buttons that should act immediately instead of using delayed scene change.
+     * Returns true if the click was handled here.
+     */
+    bool HandleImmediateButtonClick(const std::string& buttonName);
 };

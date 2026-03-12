@@ -45,6 +45,7 @@ Technology is prohibited.
 #include "IMessageHandler.h"
 #include "TimerSystem.h"
 #include "GhostSystem.h"
+#include "TextInputSystem.h"
 #include "GameCallbacks.h"
 
 // Inside CoreEngine class
@@ -250,6 +251,12 @@ public:
     GhostSystem *GetGhostSystem() const { return ghostSystem; }
 
     /**
+     * @brief Gets a pointer to the TextInputSystem.
+     * @return A pointer to the TextInputSystem.
+     */
+    TextInputSystem *GetTextInputSystem() const { return textInputSystem; }
+
+    /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
      */
@@ -346,6 +353,7 @@ private:
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
     GhostSystem *ghostSystem = nullptr;
+    TextInputSystem *textInputSystem = nullptr;
     IGameCallbacksSystem *gameCallbacks = nullptr;
 
     unsigned LastTime;

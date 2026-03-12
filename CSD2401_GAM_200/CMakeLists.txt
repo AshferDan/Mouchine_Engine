@@ -54,6 +54,7 @@ set(Core_DIR          ./Engine/Core)
 set(Resource_DIR      ./Engine/ResourceManager)
 set(Scripting_DIR     ./Engine/Scripting)
 set(Replay_DIR        ./Engine/Replay)
+set(UI_DIR            ./Engine/UI)
 
 # External dependencies
 set(Extern_DIR        ./Engine/Extern)
@@ -113,6 +114,9 @@ file(GLOB_RECURSE Scripting_HEAD    "${Scripting_DIR}/*.h" "${Scripting_DIR}/*.h
 file(GLOB_RECURSE Replay_SRC       "${Replay_DIR}/*.cpp")
 file(GLOB_RECURSE Replay_HEAD      "${Replay_DIR}/*.h" "${Replay_DIR}/*.hpp")
 
+file(GLOB_RECURSE UI_SRC           "${UI_DIR}/*.cpp")
+file(GLOB_RECURSE UI_HEAD          "${UI_DIR}/*.h" "${UI_DIR}/*.hpp")
+
 # External files (if any cpp/h files exist in Extern)
 file(GLOB_RECURSE Extern_SRC       "${Extern_DIR}/*.cpp")
 file(GLOB_RECURSE Extern_HEAD      "${Extern_DIR}/*.h" "${Extern_DIR}/*.hpp")
@@ -136,6 +140,7 @@ set(ENGINE_SOURCES
     ${Resource_SRC}
     ${Scripting_SRC}
     ${Replay_SRC}
+    ${UI_SRC}
 )
 
 set(ENGINE_HEADERS
@@ -155,6 +160,7 @@ set(ENGINE_HEADERS
     ${Resource_HEAD}
     ${Scripting_HEAD}
     ${Replay_HEAD}
+    ${UI_HEAD}
 )
 
 # ======================= Create Engine Static Library ===============
@@ -213,6 +219,9 @@ source_group("Scripting\\Header Files" FILES ${Scripting_HEAD})
 source_group("Replay\\Source Files" FILES ${Replay_SRC})
 source_group("Replay\\Header Files" FILES ${Replay_HEAD})
 
+source_group("UI\\Source Files" FILES ${UI_SRC})
+source_group("UI\\Header Files" FILES ${UI_HEAD})
+
 source_group("Extern\\Source Files" FILES ${Extern_SRC})
 source_group("Extern\\Header Files" FILES ${Extern_HEAD})
 
@@ -233,6 +242,7 @@ target_include_directories(Engine PUBLIC
     ${Resource_DIR}
     ${Scripting_DIR}
     ${Replay_DIR}
+    ${UI_DIR}
     ${Extern_DIR}
 )
 
