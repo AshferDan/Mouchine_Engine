@@ -100,7 +100,6 @@ void TextInputSystem::SetFont(const std::string& fontPath, int fontSize)
 {
     m_fontPath = fontPath;
     m_fontSize = fontSize;
-    m_hasFont  = !fontPath.empty();
 }
 
 // ===== Dialog control =====
@@ -112,6 +111,15 @@ void TextInputSystem::Show(const std::string& title,
                            const std::string&                      defaultText)
 {
     if (m_isActive) return;   // already open
+
+    // Font must be supplied by game code via SetFont() — the engine has no default.
+    if (m_fontPath.empty() || m_fontSize <= 0)
+    {
+        std::cerr << "[TextInputSystem] ERROR: Show() called before SetFont(). "
+                     "Call CORE->GetTextInputSystem()->SetFont(path, size) "
+                     "from game code before opening the dialog.\n";
+        return;
+    }
 
     m_maxLength        = std::max(1, std::min(maxLength, 64));
     m_onConfirm        = onConfirm;
@@ -185,15 +193,12 @@ void TextInputSystem::CreateUI(const std::string& title)
     auto* titleR = titleObj->AddComponent<RenderComponent>(
         RenderComponent::ShapeType::Square, vec4(0.1f, 0.1f, 0.25f, 0.95f));
     titleR->SetLayer(baseLayer + 1);
-    if (m_hasFont)
-    {
-        titleObj->AddComponent<TextComponent>(
-            m_fontPath.c_str(),
-            static_cast<int>(m_fontSize * s),
-            title,
-            vec4(1.0f, 1.0f, 1.0f, 1.0f),
-            false);
-    }
+    titleObj->AddComponent<TextComponent>(
+        m_fontPath.c_str(),
+        static_cast<int>(m_fontSize * s),
+        title,
+        vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        false);
 
     // --- Input field (lighter panel + live text) ---
     GameObject* fieldObj = factory.CreateGameObject("TextInput_Field");
@@ -205,15 +210,12 @@ void TextInputSystem::CreateUI(const std::string& title)
     auto* fieldR = fieldObj->AddComponent<RenderComponent>(
         RenderComponent::ShapeType::Square, vec4(0.85f, 0.85f, 0.9f, 1.0f));
     fieldR->SetLayer(baseLayer + 1);
-    if (m_hasFont)
-    {
-        fieldObj->AddComponent<TextComponent>(
-            m_fontPath.c_str(),
-            static_cast<int>(m_fontSize * s),
-            s_buffer + "_",
-            vec4(0.05f, 0.05f, 0.1f, 1.0f),
-            false);
-    }
+    fieldObj->AddComponent<TextComponent>(
+        m_fontPath.c_str(),
+        static_cast<int>(m_fontSize * s),
+        s_buffer + "_",
+        vec4(0.05f, 0.05f, 0.1f, 1.0f),
+        false);
 
     // --- Hint bar ---
     std::string hintText = "ENTER = confirm";
@@ -229,15 +231,12 @@ void TextInputSystem::CreateUI(const std::string& title)
     auto* hintR = hintObj->AddComponent<RenderComponent>(
         RenderComponent::ShapeType::Square, vec4(0.1f, 0.1f, 0.25f, 0.85f));
     hintR->SetLayer(baseLayer + 1);
-    if (m_hasFont)
-    {
-        hintObj->AddComponent<TextComponent>(
-            m_fontPath.c_str(),
-            static_cast<int>(m_fontSize * 0.55f * s),
-            hintText,
-            vec4(0.8f, 0.8f, 0.8f, 1.0f),
-            false);
-    }
+    hintObj->AddComponent<TextComponent>(
+        m_fontPath.c_str(),
+        static_cast<int>(m_fontSize * 0.55f * s),
+        hintText,
+        vec4(0.8f, 0.8f, 0.8f, 1.0f),
+        false);
 
     m_hasUI = true;
 }

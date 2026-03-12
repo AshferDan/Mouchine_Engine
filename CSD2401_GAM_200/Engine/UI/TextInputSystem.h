@@ -120,9 +120,9 @@ private:
     bool m_escapeWasHeld    = false;
 
     // ===== Appearance =====
+    // NOTE: No engine-side defaults for font. Game code MUST call SetFont() before Show().
     std::string m_fontPath;
-    int         m_fontSize = 50;
-    bool        m_hasFont  = false;
+    int         m_fontSize = 0;   ///< 0 = not yet configured by game code.
     float       m_uiScale  = 2.0f;
 
     // ===== Static GLFW char-callback state =====
