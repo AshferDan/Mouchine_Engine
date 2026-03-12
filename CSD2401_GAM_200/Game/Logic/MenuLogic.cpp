@@ -26,7 +26,7 @@ Technology is prohibited.
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-std::string introPath = "../Assets/Cutscene.mpeg";
+std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
