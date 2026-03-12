@@ -69,6 +69,33 @@ private:
     bool creditsWerePlayed = false;       ///< Flag to restart BGM after credits finish
     //bool testFadeTriggered = false;       ///< Flag for test fade out button
 
+    // Slider state tracking
+    struct SliderState {
+        float originalScaleX = 0.0f;
+        float originalScaleY = 0.0f;
+        float originalCenterX = 0.0f;
+        float originalCenterY = 0.0f;
+        float leftEdge = 0.0f;
+        float rightEdge = 0.0f;
+        bool uvBoundsReady = false;
+        float uvBarMin = 0.0f;
+        float uvBarMax = 1.0f;
+        float uvBarWidth = 1.0f;
+        float currentVolume = 1.0f;
+    };
+
+    SliderState masterSlider;
+    SliderState musicSlider;
+    SliderState sfxSlider;
+
+    bool isDraggingSlider = false;
+    std::string currentSliderCategory = "";  // "master", "music", or "sfx"
+
+    // save last known volumes to restore visuals
+    float savedMasterVolume = 1.0f;
+    float savedMusicVolume = 1.0f;
+    float savedSfxVolume = 1.0f;
+
     /**
      * @brief Checks if the mouse cursor is over a button GameObject.
      * @param button The button GameObject to check.
@@ -85,4 +112,27 @@ private:
      * @param isPressed Whether the button is currently being pressed.
      */
     void SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed = false);
+
+    /**
+     * @brief Computes the UV bounds for a slider bar by analyzing the texture.
+     * @param renderComp The render component containing the texture.
+     * @param sliderState The slider state to update with UV bounds.
+     */
+    void ComputeSliderUVBounds(RenderComponent* renderComp, SliderState& sliderState);
+
+    /**
+     * @brief Updates a slider's visual appearance based on volume percentage.
+     * @param barName Name of the slider bar GameObject.
+     * @param sliderState The slider state to update.
+     * @param volumePercent Volume percentage (0.0 to 1.0).
+     */
+    void UpdateSlider(const std::string& barName, SliderState& sliderState, float volumePercent);
+
+    /**
+     * @brief Handles mouse interaction with audio sliders.
+     * @param mouseX Current mouse X position.
+     * @param mouseY Current mouse Y position.
+     * @param isMouseDown Whether mouse button is pressed.
+     */
+    void HandleSliderInput(double mouseX, double mouseY, bool isMouseDown);
 };

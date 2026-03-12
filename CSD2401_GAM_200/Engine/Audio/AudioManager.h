@@ -119,6 +119,13 @@ public:
     void SetCategoryVolume(const std::string& category, float volume);
 
     /**
+     * @brief Gets the volume of a sound category.
+     * @param category Category name (music, sfx, etc.)
+     * @return Current volume (0.0�1.0), or 1.0 if category not found.
+     */
+    float GetCategoryVolume(const std::string& category) const;
+
+    /**
      * @brief Sets pitch for a specific sound.
      * @param soundName Name of the sound.
      * @param pitch Pitch multiplier.

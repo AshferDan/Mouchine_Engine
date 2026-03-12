@@ -308,7 +308,7 @@ void AudioManager::SetSoundVolume(const std::string& soundName, float volume)
 /**
  * @brief Sets volume for an entire category and updates active channels.
  */
-void AudioManager::SetCategoryVolume(const std::string& category, float volume) 
+void AudioManager::SetCategoryVolume(const std::string& category, float volume)
 {
     float clampedVolume = std::max(0.0f, std::min(1.0f, volume));
 
@@ -357,6 +357,16 @@ void AudioManager::SetCategoryVolume(const std::string& category, float volume)
 /**
  * @brief Toggles master mute and restores previous category volumes.
  */
+float AudioManager::GetCategoryVolume(const std::string& category) const
+{
+    auto it = categoryVolumes.find(category);
+    if (it != categoryVolumes.end())
+    {
+        return it->second;
+    }
+    return 1.0f; // Default volume if category not found
+}
+
 void AudioManager::ToggleMasterMute()
 {
     m_isMuted = !m_isMuted;

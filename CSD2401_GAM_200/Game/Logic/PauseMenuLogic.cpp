@@ -283,14 +283,13 @@ void PauseMenuLogicSystem::Update(float dt)
             }
             else if (hoveredButtonName == "PauseResumeButton")
             {
-                std::cout << "[PauseMenu] Resume clicked" << std::endl;
                 // Reset button texture before closing
                 SetButtonTexture("PauseResumeButton", ButtonState::Normal);
                 TogglePauseMenu(); // close menu and unpause
             }
             else if (hoveredButtonName == "PauseRestartButton")
             {
-                std::cout << "[PauseMenu] Restart - fade complete, reloading level" << std::endl;
+                //std::cout << "[PauseMenu] Restart - fade complete, reloading level" << std::endl;
 
                 // Discard any in-progress recording before restarting
                 if (GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr)
@@ -515,7 +514,7 @@ void PauseMenuLogicSystem::Update(float dt)
             settingsCloseTimer -= dt;
             if (settingsCloseTimer <= 0.0f)
             {
-                std::cout << "[PauseMenu] Closing settings after delay" << std::endl;
+                //std::cout << "[PauseMenu] Closing settings after delay" << std::endl;
                 isPauseSettingsOpen = false;
                 pendingSettingsClose = false;
                 hoveredButtonName.clear();
@@ -583,7 +582,7 @@ void PauseMenuLogicSystem::Update(float dt)
 
             if (hoveredButtonName == "PauseBackButton")
             {
-                std::cout << "[PauseMenu] Back button clicked - starting close delay" << std::endl;
+                //std::cout << "[PauseMenu] Back button clicked - starting close delay" << std::endl;
                 pendingSettingsClose = true;
                 settingsCloseTimer = 0.15f; // 150ms delay to show pressed state
             }
@@ -625,7 +624,7 @@ void PauseMenuLogicSystem::Update(float dt)
             howToPlayCloseTimer -= dt;
             if (howToPlayCloseTimer <= 0.0f)
             {
-                std::cout << "[PauseMenu] Closing how to play after delay" << std::endl;
+                //std::cout << "[PauseMenu] Closing how to play after delay" << std::endl;
 
                 // Reset back button texture to normal before closing
                 SetButtonTexture("HowToPlayBackButton", ButtonState::Normal);
@@ -708,7 +707,6 @@ void PauseMenuLogicSystem::Update(float dt)
             {
                 audioManager->TriggerEvent("UI_Click");
             }
-            std::cout << "[PauseMenu] How To Play back button clicked" << std::endl;
 
             if (howToPlayOpenedViaTab)
             {
@@ -1238,7 +1236,6 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
     }
 
     hasCreatedUI = false;
-    std::cout << "[PauseMenu] UI destroyed" << std::endl;
 }
 
 /**
@@ -1281,7 +1278,7 @@ void PauseMenuLogicSystem::DestroyPauseSettingsUI()
     }
 
     hasCreatedSettingsUI = false;
-    std::cout << "[PauseMenu] Settings UI destroyed" << std::endl;
+    //std::cout << "[PauseMenu] Settings UI destroyed" << std::endl;
 }
 
 /**
@@ -1321,7 +1318,7 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
             {
                 // check if when in main menu
                 bool isMainMenu = (currentScenePath.find("MainMenu") != std::string::npos);
-                std::cout << "[PauseMenu] Current scene: " << currentScenePath << ", isMainMenu: " << isMainMenu << std::endl;
+                //std::cout << "[PauseMenu] Current scene: " << currentScenePath << ", isMainMenu: " << isMainMenu << std::endl;
                 if (isMainMenu)
                 {
                     overlayRender->SetColor(vec4(0.5f, 0.5f, 0.5f, 1.0f)); // medium grey solid background
@@ -1558,9 +1555,9 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
         }
     }
 
-    std::cout << "[SetButtonTexture] Button: " << buttonName << " | State: "
+    /*std::cout << "[SetButtonTexture] Button: " << buttonName << " | State: "
               << (state == ButtonState::Normal ? "Normal" : state == ButtonState::Hover ? "Hover" : "Pressed")
-              << " | Texture: " << texturePath << std::endl;
+              << " | Texture: " << texturePath << std::endl;*/
 
     unsigned int newtex = GraphicsSystem::LoadTexture(texturePath.c_str());
     rc->SetTextureID(newtex);
@@ -1596,8 +1593,6 @@ void PauseMenuLogicSystem::OpenHowToPlay()
         // Show overlay only (not board, since we're showing How To Play instead)
         if (auto* overlay = factory.FindGameObject("PauseOverlay"))
             overlay->SetActive(true);
-
-        std::cout << "[PauseMenu] Pause menu auto-opened for How To Play (game NOT paused)" << std::endl;
     }
 
     // Hide pause menu buttons and board
