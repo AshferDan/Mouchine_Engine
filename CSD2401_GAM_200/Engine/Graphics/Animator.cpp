@@ -116,27 +116,63 @@ void Spritesheet::Update(float dt)
 		currentFrameTime -= timePerFrame;
 
 		int currentFrameIndex = currRow * cols + currCol; // Readjust rows and cols
-		int nextFrameIndex = currentFrameIndex + 1;
+		int nextFrameIndex = currentFrameIndex;
 
-		if (nextFrameIndex > endFrame)
+		if (pingPongMode && startFrame < endFrame)
 		{
-            if (!animationQueue.empty())
-            {
-                std::string nextAnimation = animationQueue.front();
-                animationQueue.pop();
-                PlayAnimation(nextAnimation);
-                return; // Exit early since PlayAnimation resets the state
-            }
-            else if (looping)
-            {
-                nextFrameIndex = startFrame;
-            }
-            else
-            {
-                // Stay on the last frame if not looping
-                nextFrameIndex = endFrame;
-            }
+			nextFrameIndex = currentFrameIndex + animationDirection;
+
+			if (nextFrameIndex > endFrame)
+			{
+				animationDirection = -1;
+				nextFrameIndex = endFrame - 1;
+			}
+			else if (nextFrameIndex < startFrame)
+			{
+				if (!animationQueue.empty())
+				{
+					std::string nextAnimation = animationQueue.front();
+					animationQueue.pop();
+					PlayAnimation(nextAnimation);
+					return;
+				}
+				else if (looping)
+				{
+					animationDirection = 1;
+					nextFrameIndex = startFrame + 1;
+				}
+				else
+				{
+					nextFrameIndex = startFrame;
+				}
+			}
 		}
+
+		else
+		{
+			nextFrameIndex = currentFrameIndex + 1;
+
+			if (nextFrameIndex > endFrame)
+			{
+				if (!animationQueue.empty())
+				{
+					std::string nextAnimation = animationQueue.front();
+					animationQueue.pop();
+					PlayAnimation(nextAnimation);
+					return; // Exit early since PlayAnimation resets the state
+				}
+				else if (looping)
+				{
+					nextFrameIndex = startFrame;
+				}
+				else
+				{
+					// Stay on the last frame if not looping
+					nextFrameIndex = endFrame;
+				}
+			}
+		}
+		
 		currRow = nextFrameIndex / cols; // Reassign new rows and cols, showing the next frame of animation
 		currCol = nextFrameIndex % cols;
 	}
@@ -311,7 +347,7 @@ bool SupportedImageFile(const std::string& path) {
 	return (ext == ".png" || ext == ".jpeg");
 }
 
-void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps)
+void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong)
 {
 	
 	if (startRow >= numRows || startCol >= numCols || endRow >= numRows || endCol >= numCols) {
@@ -329,6 +365,7 @@ void Spritesheet::RegisterAnimation(const std::string& name, const std::string& 
 	newState.startframe = startIdx;
 	newState.endframe = endIdx;
 	newState.fps = fps;
+	newState.pingPong = pingPong;
 
 	animation_mList[name] = newState;
 }
@@ -354,6 +391,8 @@ void Spritesheet::PlayAnimation(const std::string& name, bool isLooping)
 
 	// Set looping state
 	looping = isLooping;
+	pingPongMode = state.pingPong;
+	animationDirection = 1; // always start forward
 
 	// Update current name
 	currentAnimName = name;

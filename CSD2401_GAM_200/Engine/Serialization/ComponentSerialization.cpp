@@ -107,7 +107,10 @@ void ComponentSerialization::SerializeSpritesheet(json &j, Spritesheet *s)
             {"startCol", startCol},
             {"endRow", endRow},
             {"endCol", endCol},
-            {"fps", data.fps}};
+            {"fps", data.fps},
+            {"pingPong", data.pingPong}
+        };
+
 
         animArray.push_back(animNode);
     }
@@ -518,9 +521,10 @@ void ComponentSerialization::DeserializeSpritesheet(const json &j, GameObject *g
             int endCol = anim.value("endCol", 0);
 
             float fps = anim.value("fps", 1.0f);
+            bool pingPong = anim.value("pingPong", false);
 
             // Register using the new function
-            spr->RegisterAnimation(name, path, rows, cols, startRow, startCol, endRow, endCol, fps);
+            spr->RegisterAnimation(name, path, rows, cols, startRow, startCol, endRow, endCol, fps, pingPong);
         }
     }
 

@@ -66,6 +66,11 @@ public:
 private:
     std::string hoveredButtonName = "";   ///< The name of the currently hovered button
     std::string pressedButtonName = "";   ///< The name of the currently pressed button
+    
+    // Persistent level selection state
+    std::string selectedLevelButtonName = "";
+    std::string selectedLevelScenePath = "";
+
     bool pendingSceneChange = false;
     float pendingTimer = 0.0f;
     bool creditsWerePlayed = false;       ///< Flag to restart BGM after credits finish
@@ -107,4 +112,31 @@ private:
      * @param isPressed Whether the button is currently being pressed.
      */
     void SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed = false);
+
+    /**
+     * @brief Returns the button currently under the mouse for the active menu screen.
+     */
+    std::string FindHoveredButton(double mouseX, double mouseY);
+
+    void RefreshLevelSelectButtons();
+    void SelectLevel(const std::string& buttonName, const std::string& scenePath);
+
+    /**
+     * @brief Plays the correct UI sound for the clicked button.
+     */
+    void TriggerUISound(const std::string& buttonName);
+
+    void ClearLevelSelection();
+
+    /**
+     * @brief Handles level select screen buttons only.
+     * Returns true if the click was handled here.
+     */
+    bool HandleLevelSelectClick(const std::string& buttonName);
+
+    /**
+     * @brief Handles buttons that should act immediately instead of using delayed scene change.
+     * Returns true if the click was handled here.
+     */
+    bool HandleImmediateButtonClick(const std::string& buttonName);
 };
