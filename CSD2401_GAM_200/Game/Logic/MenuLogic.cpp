@@ -335,67 +335,12 @@ void MenuLogicSystem::Update(float dt)
                         knobTransform->SetPosition(knobX, barCenterY);
                     }
                 }
-            }
-
-            auto& factory = GameObjectFactory::Instance();
-            GameObject* masterBar = factory.FindGameObject("Slider_Bar_Master");
-            GameObject* masterKnob = factory.FindGameObject("Slider_Knob_Master");
-            if (masterBar && masterKnob)
-            {
-                auto* barTransform = masterBar->GetComponent<TransformComponent>();
-                auto* knobTransform = masterKnob->GetComponent<TransformComponent>();
-                if (barTransform && knobTransform)
-                {
-                    float barCenterX, barCenterY, barScaleX, barScaleY;
-                    barTransform->GetPosition(barCenterX, barCenterY);
-                    barTransform->GetScale(barScaleX, barScaleY);
-                    // position knob at the right edge of the filled slider bar with offset cause idky its offset
-                    float knobX = barCenterX + barScaleX * 0.5f - 285.0f;
-                    knobTransform->SetPosition(knobX, barCenterY);
-                }
-            }
-
-            GameObject* musicBar = factory.FindGameObject("Slider_Bar_Music");
-            GameObject* musicKnob = factory.FindGameObject("Slider_Knob_Music");
-            if (musicBar && musicKnob)
-            {
-                auto* barTransform = musicBar->GetComponent<TransformComponent>();
-                auto* knobTransform = musicKnob->GetComponent<TransformComponent>();
-                if (barTransform && knobTransform)
-                {
-                    float barCenterX, barCenterY, barScaleX, barScaleY;
-                    barTransform->GetPosition(barCenterX, barCenterY);
-                    barTransform->GetScale(barScaleX, barScaleY);
-                    float knobX = barCenterX + barScaleX * 0.5f - 285.0f;
-                    knobTransform->SetPosition(knobX, barCenterY);
-                }
-            }
-
-            GameObject* sfxBar = factory.FindGameObject("Slider_Bar_SFX");
-            GameObject* sfxKnob = factory.FindGameObject("Slider_Knob_SFX");
-            if (sfxBar && sfxKnob)
-            {
-                auto* barTransform = sfxBar->GetComponent<TransformComponent>();
-                auto* knobTransform = sfxKnob->GetComponent<TransformComponent>();
-                if (barTransform && knobTransform)
-                {
-                    float barCenterX, barCenterY, barScaleX, barScaleY;
-                    barTransform->GetPosition(barCenterX, barCenterY);
-                    barTransform->GetScale(barScaleX, barScaleY);
-                    float knobX = barCenterX + barScaleX * 0.5f - 285.0f;
-                    knobTransform->SetPosition(knobX, barCenterY);
-                }
-            }
+            } 
 
             justEnteredSettings = false;
         }
     }
-    else
-    {
-        static bool justEnteredSettings = false;
-        justEnteredSettings = false;
-        // return;
-    }
+
     else if (currScreen == MenuScreens::LevelSelect)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
@@ -467,10 +412,6 @@ void MenuLogicSystem::Update(float dt)
     }
 
     auto& factory = GameObjectFactory::Instance();
-    std::string currentHover = "";
-    std::string currentPressed = "";
-
-    // Depending on scene, check for which buttons have been pressed
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
     std::string currentPressed = "";
 
@@ -535,7 +476,7 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-   const std::string button = hoveredButtonName;
+        const std::string button = hoveredButtonName;
 
         // Handle level select screen buttons first
         if (HandleLevelSelectClick(button))
@@ -553,71 +494,6 @@ void MenuLogicSystem::Update(float dt)
         }
 
         // Delayed transition buttons
-        if (button == "LevelSelectedButton" && audioManager)
-        {
-            if (hoveredButtonName == "MasterMuteButton")
-            {
-                //AudioManager* audioManager = CORE->GetAudioManager();
-                if (audioManager)
-                {
-                    audioManager->ToggleMasterMute();
-
-
-                }
-                SetButtonTexture("MasterMuteButton", true, false); // Update texture after toggling
-            }
-            else if (hoveredButtonName == "MusicMuteButton")
-            {
-                if (audioManager)
-                {
-                    audioManager->ToggleCategoryMute("music");
-                }
-                SetButtonTexture("MusicMuteButton", true, false); // Update texture after toggling
-            }
-            else if (hoveredButtonName == "SFXMuteButton")
-            {
-                if (audioManager)
-                {
-                    audioManager->ToggleCategoryMute("sfx");
-                }
-                SetButtonTexture("SFXMuteButton", true, false); // Update texture after toggling
-            }
-            else if (hoveredButtonName == "BackButton")
-            {
-                currScreen = MenuScreens::Home;
-            }
-            else if (hoveredButtonName == "SettingsButton")
-            {
-                currScreen = MenuScreens::Settings;
-            }
-            //else if (hoveredButtonName == "TestFadeButton")
-            //{
-            //    std::cout << "[TEST] TestFadeButton Clicked - Starting fade out!" << std::endl;
-            //    if (audioManager)
-            //    {
-            //        audioManager->FadeOutCategory("music", 2.0f);  // Fade out over 2 seconds
-            //        std::cout << "[TEST] Music fade out started (2 seconds duration)" << std::endl;
-            //        testFadeTriggered = true;
-            //    }
-            //    else
-            //    {
-            //        std::cout << "[TEST] ERROR: AudioManager is null!" << std::endl;
-            //    }
-            //}
-            else if (hoveredButtonName == "CreditsButton")
-            {
-                std::cout << "CreditsButton Clicked!" << std::endl;
-
-                CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
-                if (!cutscene->IsPlaying()) {
-                    cutscene->PlayVideo(creditsPath, "CreditsAudio");
-                    creditsWerePlayed = true;  // Set flag to restart BGM after credits
-                }
-            }
-            audioManager->FadeOutCategory("music", 1.0f);
-            std::cout << "[MenuLogic] Started music fade out" << std::endl;
-        }
-
         pendingSceneChange = true;
         pendingTimer = 2.0f;
     }

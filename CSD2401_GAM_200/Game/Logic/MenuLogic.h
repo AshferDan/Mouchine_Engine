@@ -162,6 +162,8 @@ private:
      * @param isMouseDown Whether mouse button is pressed.
      */
     void HandleSliderInput(double mouseX, double mouseY, bool isMouseDown);
+
+     /**
      * @brief Returns the button currently under the mouse for the active menu screen.
      */
     std::string FindHoveredButton(double mouseX, double mouseY);
