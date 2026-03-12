@@ -16,11 +16,13 @@ Technology is prohibited.
 #include "System.h"
 #include "factory.h"
 #include "Serialization.h"
-#include "InputManager.h" //
+#include "InputManager.h"
 #include "transform.h"
 #include "MathLib.h"
 #include "GraphicsSystem.h"
 #include "LevelEditor.h"
+#include <vector>
+#include <string>
 
 class LevelEditor;
 class GraphicsSystem;
@@ -67,7 +69,27 @@ private:
     bool pendingSceneChange = false;
     float pendingTimer = 0.0f;
     bool creditsWerePlayed = false;       ///< Flag to restart BGM after credits finish
-    //bool testFadeTriggered = false;       ///< Flag for test fade out button
+
+    // ===== Replay Picker =====
+    std::vector<std::string> m_replayNames;   ///< Base names of replay files shown in the picker.
+    std::vector<std::string> m_replayLevels;  ///< Level name stored inside each replay (parallel to m_replayNames).
+    std::string              m_selectedReplay; ///< Replay chosen by the player; consumed on scene load.
+    bool                     m_hasCreatedReplayPicker = false;
+
+    /**
+     * @brief Scans ../Assets/Replay/ and fills m_replayNames with up to 3
+     *        base names (no .json extension), sorted newest-first.
+     */
+    void ScanReplays();
+
+    /** @brief Creates the picker overlay GameObjects and sets the screen to ReplayPicker. */
+    void ShowReplayPicker();
+
+    /** @brief Destroys the picker overlay GameObjects. */
+    void HideReplayPicker();
+
+    /** @brief Repositions picker elements to follow the camera each frame. */
+    void UpdateReplayPickerPositions();
 
     /**
      * @brief Checks if the mouse cursor is over a button GameObject.

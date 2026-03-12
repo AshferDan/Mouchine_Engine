@@ -61,6 +61,17 @@ public:
         m_ghostVfx    = ghostVfx;
     }
 
+    /**
+     * @brief Sets the human-readable level name that is embedded into saved replays.
+     *        Call this from game code before SaveCurrentRun / SaveBestRun so the
+     *        replay picker can display which level a recording belongs to.
+     * @param levelName  e.g. "M4_LEVEL_FIXED"
+     */
+    void SetLevelName(const std::string& levelName) { m_levelName = levelName; }
+
+    /** @return The level name stored in the most recently loaded recording (empty if none). */
+    std::string GetLevelName() const { return m_levelName; }
+
     // ===== Recording =====
 
     /**
@@ -193,6 +204,7 @@ private:
     std::string m_ghostTarget;  ///< e.g. "GhostHero"
     std::string m_liveVfx;      ///< e.g. "Hero_vfx"  (optional)
     std::string m_ghostVfx;     ///< e.g. "GhostHero_vfx" (optional)
+    std::string m_levelName;    ///< Human-readable level name serialised into replay JSON
 
     // Replay watch mode
     bool        m_isReplayMode = false;

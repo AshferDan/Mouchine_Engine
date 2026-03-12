@@ -422,8 +422,16 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
                         if (ghost)
                         {
+                            // Derive a friendly level name from the scene path (strip dir + ext)
+                            std::string lvl = currentScenePath;
+                            size_t slash = lvl.find_last_of("/\\");
+                            if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+                            size_t dot = lvl.rfind('.');
+                            if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
+                            ghost->SetLevelName(lvl);
+
                             ghost->SaveCurrentRun(runName);
-                            std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json\n";
+                            std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
                         }
 
                         // Hand off to the normal win sequence
@@ -444,7 +452,16 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
             {
                 // TextInputSystem unavailable — fall back to default name
                 GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-                if (ghost) ghost->SaveCurrentRun("Level1_testing");
+                if (ghost)
+                {
+                    std::string lvl = currentScenePath;
+                    size_t slash = lvl.find_last_of("/\\");
+                    if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+                    size_t dot = lvl.rfind('.');
+                    if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
+                    ghost->SetLevelName(lvl);
+                    ghost->SaveCurrentRun("Level1_testing");
+                }
                 CORE->SetGamePaused(false);
                 isWaitingForWin = true;
                 winDelayTimer   = 0.5f;

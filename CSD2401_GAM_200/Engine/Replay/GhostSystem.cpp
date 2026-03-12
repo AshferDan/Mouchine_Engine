@@ -303,6 +303,7 @@ void GhostSystem::SaveToDisk(const std::string& levelName)
     }
 
     json root;
+    root["level"]    = m_levelName;
     root["bestTime"] = m_bestTime;
 
     json frames = json::array();
@@ -368,7 +369,8 @@ bool GhostSystem::LoadFromDisk(const std::string& levelName)
         return false;
     }
 
-    float bestTime = root.value("bestTime", FLT_MAX);
+    m_levelName      = root.value("level",    std::string{});
+    float bestTime   = root.value("bestTime", FLT_MAX);
     const auto& frames = root["frames"];
 
     if (frames.empty())

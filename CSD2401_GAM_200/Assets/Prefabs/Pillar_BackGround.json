@@ -372,7 +372,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 0,
+                        "layer": -10,
                         "screenSpace": false
                     },
                     "children": []
