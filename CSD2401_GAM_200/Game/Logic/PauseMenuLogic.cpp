@@ -35,7 +35,7 @@ void PauseMenuLogicSystem::Initialize()
     if (audioManager)
     {
         audioManager->SetMasterLowPassFilter(false);
-        std::cout << "[PauseMenu] Initialize - low pass filter cleaned up" << std::endl;
+        //std::cout << "[PauseMenu] Initialize - low pass filter cleaned up" << std::endl;
     }
 
     isPauseMenuActive = false;
@@ -130,10 +130,10 @@ void PauseMenuLogicSystem::Update(float dt)
 
             static bool wasHoveringLastFrame = false;
 
-            if (isClicked && isHoveringPauseBtn)
+            if (isClicked && isHoveringPauseBtn && !pendingSceneChange)
             {
                 // Pressed state (dark)
-                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_dark.png"));
+                SetButtonTexture("InGamePauseButton", ButtonState::Pressed);
 
                 // Play click sound
                 AudioManager* audioManager = CORE->GetAudioManager();
@@ -142,14 +142,16 @@ void PauseMenuLogicSystem::Update(float dt)
                     audioManager->TriggerEvent("UI_Click");
                 }
 
-                // Toggle pause menu
-                TogglePauseMenu();
-                //std::cout << "[InGamePauseButton] CLICKED! Opening pause menu" << std::endl;
+                // Set pending flag to delay pause menu opening
+                pendingSceneChange = true;
+                hoveredButtonName = "InGamePauseButton";
+                pendingTimer = 0.15f; // 150ms delay to show pressed state
+                //std::cout << "[InGamePauseButton] CLICKED! Opening pause menu after delay" << std::endl;
                 }
-                else if (isHoveringPauseBtn)
+                else if (isHoveringPauseBtn && !pendingSceneChange)
                 {
                 // Hover state (light)
-                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_light.png"));
+                SetButtonTexture("InGamePauseButton", ButtonState::Hover);
 
                 // Play hover sound only on hover state change
                 if (!wasHoveringLastFrame)
@@ -159,14 +161,13 @@ void PauseMenuLogicSystem::Update(float dt)
                     {
                         audioManager->TriggerEvent("UI_Hover");
                     }
-                    //std::cout << "[InGamePauseButton] HOVER START" << std::endl;
                 }
                 wasHoveringLastFrame = true;
                 }
-            else
+            else if (!pendingSceneChange)
             {
                 // Normal state
-                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/paused_button.png"));
+                SetButtonTexture("InGamePauseButton", ButtonState::Normal);
                 wasHoveringLastFrame = false;
             }
         }
@@ -273,7 +274,14 @@ void PauseMenuLogicSystem::Update(float dt)
                 return;
             }
 
-            if (hoveredButtonName == "PauseResumeButton")
+            if (hoveredButtonName == "InGamePauseButton")
+            {
+                // Open pause menu after delay
+                TogglePauseMenu();
+                pendingSceneChange = false;
+                hoveredButtonName.clear();
+            }
+            else if (hoveredButtonName == "PauseResumeButton")
             {
                 std::cout << "[PauseMenu] Resume clicked" << std::endl;
                 // Reset button texture before closing
@@ -283,9 +291,6 @@ void PauseMenuLogicSystem::Update(float dt)
             else if (hoveredButtonName == "PauseRestartButton")
             {
                 std::cout << "[PauseMenu] Restart - fade complete, reloading level" << std::endl;
-
-                // DON'T remove low pass filter here - keep audio muffled during fade
-                // It will be cleaned up after scene loads
 
                 // Discard any in-progress recording before restarting
                 if (GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr)
@@ -1456,7 +1461,23 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
 
     std::string texturePath;
 
-    if (buttonName == "PauseResumeButton")
+    if (buttonName == "InGamePauseButton")
+    {
+        // In-game pause button: playing_button (normal), Playing button_light (hover), Playing button_dark (pressed)
+        switch (state)
+        {
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/playing_button.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Playing button_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Playing button_dark.png";
+                break;
+        }
+    }
+    else if (buttonName == "PauseResumeButton")
     {
         // Resume button: back button (default), back button light (hover), back button dark (pressed)
         switch (state)
@@ -1629,7 +1650,7 @@ void PauseMenuLogicSystem::CloseHowToPlay()
     // If How To Play was opened via TAB, close the entire pause menu
     if (howToPlayOpenedViaTab)
     {
-        std::cout << "[PauseMenu] How To Play closed via TAB - closing pause menu" << std::endl;
+        //std::cout << "[PauseMenu] How To Play closed via TAB - closing pause menu" << std::endl;
         howToPlayOpenedViaTab = false;
 
         if (isPauseMenuActive)
@@ -1651,7 +1672,7 @@ void PauseMenuLogicSystem::CloseHowToPlay()
  */
 void PauseMenuLogicSystem::ClosePauseSettings()
 {
-    std::cout << "[PauseMenu] Closing settings screen (ESC pressed)" << std::endl;
+    //std::cout << "[PauseMenu] Closing settings screen (ESC pressed)" << std::endl;
     pendingSettingsClose = true;
     settingsCloseTimer = 0.15f; // 150ms delay to match back button behavior
 }
@@ -1722,7 +1743,7 @@ void PauseMenuLogicSystem::DestroyHowToPlayUI()
     }
 
     hasCreatedHowToPlayUI = false;
-    std::cout << "[PauseMenu] How To Play UI destroyed" << std::endl;
+    //std::cout << "[PauseMenu] How To Play UI destroyed" << std::endl;
 }
 
 /**

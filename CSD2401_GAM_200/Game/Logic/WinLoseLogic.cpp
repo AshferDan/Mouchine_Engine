@@ -79,7 +79,7 @@ void WinLoseLogicSystem::Update(float dt)
         CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
         if (cutscene && !cutscene->IsPlaying())
         {
-            std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
+            //std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
             isPlayingCredits = false;
             CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
 
