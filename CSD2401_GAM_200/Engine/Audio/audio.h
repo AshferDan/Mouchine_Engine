@@ -40,6 +40,8 @@ private:
 	FMOD::System* system;
 	std::map<std::string, FMOD::Sound*> sounds;
 	std::map<std::string, FMOD::Channel*> channels;
+	std::map<std::string, FMOD::DSP*> lowPassFilters;
+	FMOD::DSP* masterLowPassFilter;
 
 public:
 	/**
@@ -194,6 +196,41 @@ public:
 	 * @return True if loading was successful
 	 */
 	bool load3DSound(const std::string& name, const std::string& filepath, bool loop = false, float minDistance = 100.0f, float maxDistance = 1000.0f);
+
+	/*  DSP Effects  */
+	/**
+	 * @brief Enables or disables a low pass filter on a specific channel
+	 * @param channelName Name of the channel to apply the filter to
+	 * @param enable True to enable the filter, false to disable
+	 * @param cutoffFrequency Frequency in Hz above which sounds are attenuated (default: 5000 Hz, range: 10-22000)
+	 * @param resonance Filter resonance or Q factor (default: 1.0, range: 1.0-10.0)
+	 * @return True if the operation was successful, false otherwise
+	 */
+	bool setLowPassFilter(const std::string& channelName, bool enable, float cutoffFrequency = 5000.0f, float resonance = 1.0f);
+
+	/**
+	 * @brief Updates the cutoff frequency of an existing low pass filter on a channel
+	 * @param channelName Name of the channel with the filter
+	 * @param cutoffFrequency New cutoff frequency in Hz (range: 10-22000)
+	 * @return True if the operation was successful, false otherwise
+	 */
+	bool updateLowPassFilterFrequency(const std::string& channelName, float cutoffFrequency);
+
+	/**
+	 * @brief Enables or disables a low pass filter on the master channel group (affects all audio)
+	 * @param enable True to enable the filter, false to disable
+	 * @param cutoffFrequency Frequency in Hz above which sounds are attenuated (default: 5000 Hz)
+	 * @param resonance Filter resonance or Q factor (default: 1.0)
+	 * @return True if the operation was successful, false otherwise
+	 */
+	bool setMasterLowPassFilter(bool enable, float cutoffFrequency = 5000.0f, float resonance = 1.0f);
+
+	/**
+	 * @brief Updates the cutoff frequency of the master low pass filter
+	 * @param cutoffFrequency New cutoff frequency in Hz (range: 10-22000)
+	 * @return True if the operation was successful, false otherwise
+	 */
+	bool updateMasterLowPassFilterFrequency(float cutoffFrequency);
 
 	/*  Error Handling  */
 	/**

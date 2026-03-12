@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "MathLib.h"
 #include "ColliderComponent.h"
 #include "Collision.h"
+#include "TextInputSystem.h"
 #include <iostream>
 
 /**
@@ -62,6 +63,23 @@ void WinLoseLogicSystem::Update(float dt)
         isPlayingCredits = false;
         m_playerInSafeZone = true;
         m_recordingActive  = false;
+
+        // Configure the engine text-input system with this game's font
+        TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+        if (textInput)
+        {
+            textInput->SetFont("../Assets/FrederickatheGreat-Regular.ttf", 50);
+            textInput->Hide(); // ensure no stale dialog from a previous session
+        }
+
+        // Pre-configure ghost system and load best run so key-0 toggle works from frame 1
+        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+        if (ghost)
+        {
+            ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+            ghost->LoadRecording("Level1_testing");
+            ghost->ResetGhostToggle();  // ghost is hidden by default each session
+        }
     }
 
     totalFrames++;
@@ -97,7 +115,17 @@ void WinLoseLogicSystem::Update(float dt)
         pendingSceneTimer -= dt;
         if (pendingSceneTimer <= 0.0f)
         {
+            // Check if fade is still active - if so, wait a bit longer
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager && audioManager->IsAnyFadeActive())
+            {
+                std::cout << "[WinLoseLogic] Fade still active, waiting..." << std::endl;
+                pendingSceneTimer = 0.1f; // Wait another 100ms and check again
+                return;
+            }
+
             pendingSceneChange = false;
+            std::cout << "[WinLoseLogic] Fade complete! Loading scene..." << std::endl;
             // unpause right before loading to avoid showing game world
             CORE->SetGamePaused(false);
             CORE->RequestSceneLoad(pendingScenePath, true);
@@ -260,7 +288,13 @@ void WinLoseLogicSystem::CheckSafeZoneExit()
         GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
         if (ghost)
         {
+            ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
             ghost->StartRecording("Hero");
+
+            // If the ghost is already toggled on, start playback now that the run has begun
+            if (ghost->IsGhostAvailable() && ghost->IsGhostVisible())
+                ghost->StartPlayback();
+
             std::cout << "[WinLoseLogic] Player left SafeZone — recording started.\n";
         }
     }
@@ -279,6 +313,10 @@ void WinLoseLogicSystem::AbandonRecording()
     {
         ghost->StopRecording();
         ghost->ResetRecording();
+
+        // Stop ghost playback and park it at frame 0 so it's ready for the next run
+        if (ghost->IsGhostPlaying())
+            ghost->StopPlayback();
     }
 
     m_recordingActive  = false;
@@ -340,22 +378,94 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
         {
             std::cout << "[WinZone] Player reached the win zone!" << std::endl;
 
-            // Stop recording and save if a run was being recorded
+            // Stop recording; player will name the run in the dialog
             if (m_recordingActive)
             {
                 GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
                 if (ghost)
                 {
                     ghost->StopRecording();
-                    ghost->SaveCurrentRun("Level1_testing");
-                    std::cout << "[WinLoseLogic] Recording stopped and saved as Level1_testing.json\n";
+                    std::cout << "[WinLoseLogic] Recording stopped — awaiting run name.\n";
                 }
                 m_recordingActive = false;
             }
 
             hasPlayerWon = true;
-            isWaitingForWin = true;
-            winDelayTimer = 0.5f;
+
+            // Hide timer UI while the dialog is open
+            auto& factory = GameObjectFactory::Instance();
+            if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
+            if (auto* o = factory.FindGameObject("LevelTimerBar"))           o->SetActive(false);
+            if (auto* o = factory.FindGameObject("LevelTimerBarFrame"))      o->SetActive(false);
+            if (auto* o = factory.FindGameObject("InGamePauseButton"))       o->SetActive(false);
+
+            CORE->SetGamePaused(true);
+
+            // Show the engine-level name-input dialog
+            TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+            if (textInput)
+            {
+                textInput->Show(
+                    "Name Your Run!", 20,
+                    // --- onConfirm ---
+                    [this](const std::string& rawName)
+                    {
+                        // Sanitise: trim whitespace, replace spaces with underscores
+                        std::string runName = rawName;
+                        while (!runName.empty() && runName.front() == ' ')
+                            runName.erase(runName.begin());
+                        while (!runName.empty() && runName.back() == ' ')
+                            runName.pop_back();
+                        for (char& c : runName) if (c == ' ') c = '_';
+                        if (runName.empty()) runName = "Level1_testing";
+
+                        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                        if (ghost)
+                        {
+                            // Derive a friendly level name from the scene path (strip dir + ext)
+                            std::string lvl = currentScenePath;
+                            size_t slash = lvl.find_last_of("/\\");
+                            if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+                            size_t dot = lvl.rfind('.');
+                            if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
+                            ghost->SetLevelName(lvl);
+
+                            ghost->SaveCurrentRun(runName);
+                            std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
+                        }
+
+                        // Hand off to the normal win sequence
+                        CORE->SetGamePaused(false);
+                        isWaitingForWin = true;
+                        winDelayTimer   = 0.5f;
+                    },
+                    // --- onCancel (Escape) — proceed to win screen without saving ---
+                    [this]()
+                    {
+                        std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
+                        CORE->SetGamePaused(false);
+                        isWaitingForWin = true;
+                        winDelayTimer   = 0.5f;
+                    });
+            }
+            else
+            {
+                // TextInputSystem unavailable — fall back to default name
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost)
+                {
+                    std::string lvl = currentScenePath;
+                    size_t slash = lvl.find_last_of("/\\");
+                    if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+                    size_t dot = lvl.rfind('.');
+                    if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
+                    ghost->SetLevelName(lvl);
+                    ghost->SaveCurrentRun("Level1_testing");
+                }
+                CORE->SetGamePaused(false);
+                isWaitingForWin = true;
+                winDelayTimer   = 0.5f;
+            }
         }
     }
 
@@ -388,6 +498,19 @@ void WinLoseLogicSystem::TriggerWin()
     if (timerFrame) timerFrame->SetActive(false);
     if (pauseBtn) pauseBtn->SetActive(false);
 
+    // Hide shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(false);
+    if (shellIcon2) shellIcon2->SetActive(false);
+    if (shellIcon3) shellIcon3->SetActive(false);
+    if (coinIcon) coinIcon->SetActive(false);
+    if (coinText) coinText->SetActive(false);
+
     // stop all music and play victory sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
@@ -395,7 +518,7 @@ void WinLoseLogicSystem::TriggerWin()
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
         audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", 2.0f); // Fade in over 1 second
+        audioManager->FadeInCategory("music", 2.0f); // Fade in over 2 second
     }
 
     // win screen background
@@ -525,7 +648,8 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Press");
                 // Fade out music before credits
-                audioManager->FadeOutCategory("music", 0.5f);
+                audioManager->FadeOutCategory("music", 1.5f);
+                std::cout << "[WinZone] Started music fade out (1.5 seconds)" << std::endl;
             }
 
             // Play credits cutscene with audio
@@ -548,13 +672,14 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Restart");
                 // Fade out music before restarting
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 1.5f);
+                std::cout << "[WinZone] Started music fade out (1.5 seconds)" << std::endl;
             }
 
             DestroyWinScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 1.7f;  // Wait for 1.5s fade + small buffer
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -566,11 +691,12 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Quit");
                 // Fade out music before going to main menu
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 2.0f);
+                std::cout << "[WinZone] Started music fade out (2.0 seconds)" << std::endl;
             }
 
             DestroyWinScreen();
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 2.2f;  // Wait for 2.0s fade + small buffer
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -614,6 +740,19 @@ void WinLoseLogicSystem::DestroyWinScreen()
     if (timerBar) timerBar->SetActive(true);
     if (timerFrame) timerFrame->SetActive(true);
     if (pauseBtn) pauseBtn->SetActive(true);
+
+    // Re-show shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(true);
+    if (shellIcon2) shellIcon2->SetActive(true);
+    if (shellIcon3) shellIcon3->SetActive(true);
+    if (coinIcon) coinIcon->SetActive(true);
+    if (coinText) coinText->SetActive(true);
 
     hasCreatedWinScreen = false;
     hasPlayerWon = false;
@@ -691,6 +830,19 @@ void WinLoseLogicSystem::TriggerLose()
     if (timerBar) timerBar->SetActive(false);
     if (timerFrame) timerFrame->SetActive(false);
     if (pauseBtn) pauseBtn->SetActive(false);
+
+    // Hide shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(false);
+    if (shellIcon2) shellIcon2->SetActive(false);
+    if (shellIcon3) shellIcon3->SetActive(false);
+    if (coinIcon) coinIcon->SetActive(false);
+    if (coinText) coinText->SetActive(false);
 
     // stop all music and play game over sound with fade in
     AudioManager* audioManager = CORE->GetAudioManager();
@@ -814,13 +966,14 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Click");
                 // Fade out music before restarting
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 1.5f);
+                std::cout << "[WinLoseLogic] Started music fade out (1.5 seconds)" << std::endl;
             }
 
             DestroyLoseScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 1.7f;  // Wait for 1.5s fade + small buffer
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -832,11 +985,12 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Click");
                 // Fade out music before going to main menu
-                audioManager->FadeOutCategory("music", 0.3f);
+                audioManager->FadeOutCategory("music", 2.0f);
+                std::cout << "[WinLoseLogic] Started music fade out (2.0 seconds)" << std::endl;
             }
 
             DestroyLoseScreen();
-            pendingSceneTimer = 0.4f;  // Delay for fade and sound to play
+            pendingSceneTimer = 2.2f;  // Wait for 2.0s fade + small buffer
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -880,8 +1034,22 @@ void WinLoseLogicSystem::DestroyLoseScreen()
     if (timerFrame) timerFrame->SetActive(true);
     if (pauseBtn) pauseBtn->SetActive(true);
 
+    // Re-show shell/coin UI
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon = factory.FindGameObject("CoinIcon");
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+
+    if (shellIcon1) shellIcon1->SetActive(true);
+    if (shellIcon2) shellIcon2->SetActive(true);
+    if (shellIcon3) shellIcon3->SetActive(true);
+    if (coinIcon) coinIcon->SetActive(true);
+    if (coinText) coinText->SetActive(true);
+
     hasCreatedLoseScreen = false;
     hoveredButtonName.clear();
 
     std::cout << "[WinLoseLogic] Lose screen destroyed and state reset" << std::endl;
 }
+

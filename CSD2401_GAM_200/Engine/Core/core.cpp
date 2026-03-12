@@ -119,9 +119,9 @@ void CoreEngine::InitSystems()
     // 11. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
-    timerSystem = AddSystem<TimerSystem>();
-
-    ghostSystem = AddSystem<GhostSystem>();
+    timerSystem      = AddSystem<TimerSystem>();
+    ghostSystem      = AddSystem<GhostSystem>();
+    textInputSystem  = AddSystem<TextInputSystem>();
 
     screenTransitionSystem = AddSystem<ScreenTransitionSystem>();
 
@@ -451,6 +451,12 @@ void CoreEngine::GameLoop()
             timerSystem->Update(static_cast<float>(delta_time));
         }
 
+        // TextInputSystem: modal dialog input — runs every frame regardless of pause
+        if (textInputSystem)
+        {
+            textInputSystem->Update(static_cast<float>(delta_time));
+        }
+
         // Game-specific variable-timestep update (game timer, state machine, etc.)
         if (gameCallbacks)
             gameCallbacks->VariableUpdate(static_cast<float>(delta_time));
@@ -558,6 +564,12 @@ void CoreEngine::update_time(double fps_calc_interval)
 
 void CoreEngine::SetGamePaused(bool paused)
 {
+    SetGamePaused(paused, true);
+}
+
+// check if audio needs to be pause
+void CoreEngine::SetGamePaused(bool paused, bool pauseAudio)
+{
     std::cout << (paused ? "Game is paused\n" : "Game is resuming\n");
     if (m_gamePause == paused)
     {
@@ -566,8 +578,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    // Don't pause audio if a cutscene is playing (cutscene has its own audio)
-    if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+    // only pause audio if requested and not in cutscene
+    if (pauseAudio && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(paused);
     }

@@ -610,6 +610,17 @@ namespace API {
 #pragma region Ghost
     namespace Ghost
     {
+        /**
+         * @brief Supply the game-specific object names the ghost system operates on.
+         *        Call once before any recording or playback. Mirrors GhostSystem::Configure().
+         * @param liveTarget   Name of the live player GameObject (e.g. "Hero").
+         * @param ghostTarget  Name of the ghost GameObject to create/drive (e.g. "GhostHero").
+         * @param liveVfx      Optional VFX companion of the live player.
+         * @param ghostVfx     Optional VFX companion of the ghost.
+         */
+        void Configure(const std::string& liveTarget, const std::string& ghostTarget,
+                       const std::string& liveVfx = "", const std::string& ghostVfx = "");
+
         /** @brief Begin recording the named target's position and animation each fixed tick. */
         void StartRecording(const std::string& targetName);
 

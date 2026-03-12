@@ -2193,6 +2193,13 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
 #pragma region Ghost
     namespace Ghost
     {
+        void Configure(const std::string& liveTarget, const std::string& ghostTarget,
+                       const std::string& liveVfx, const std::string& ghostVfx)
+        {
+            if (CORE && CORE->GetGhostSystem())
+                CORE->GetGhostSystem()->Configure(liveTarget, ghostTarget, liveVfx, ghostVfx);
+        }
+
         void StartRecording(const std::string& targetName)
         {
             if (CORE && CORE->GetGhostSystem())

@@ -45,6 +45,7 @@ Technology is prohibited.
 #include "IMessageHandler.h"
 #include "TimerSystem.h"
 #include "GhostSystem.h"
+#include "TextInputSystem.h"
 #include "GameCallbacks.h"
 #include "ScreenTransitionSystem.h"
 
@@ -256,6 +257,11 @@ public:
      * @return A pointer to the GhostSystem.
      */
     ScreenTransitionSystem* GetScreenTransitionSystem() const { return screenTransitionSystem; }
+    
+     /* @brief Gets a pointer to the TextInputSystem.
+     * @return A pointer to the TextInputSystem.
+     */
+    TextInputSystem *GetTextInputSystem() const { return textInputSystem; }
 
     /**
      * @brief Reads and applies configuration settings from a file.
@@ -333,6 +339,7 @@ public:
     MessageBus &GetMessageBus() { return messageBus; }
 
     void SetGamePaused(bool paused);
+    void SetGamePaused(bool paused, bool pauseAudio);
 
     bool IsGamePaused() const { return m_gamePause; }
 
@@ -359,6 +366,7 @@ private:
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
     GhostSystem *ghostSystem = nullptr;
+    TextInputSystem *textInputSystem = nullptr;
     IGameCallbacksSystem *gameCallbacks = nullptr;
     ScreenTransitionSystem* screenTransitionSystem = nullptr;
 
