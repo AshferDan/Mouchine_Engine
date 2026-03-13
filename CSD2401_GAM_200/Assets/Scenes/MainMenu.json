@@ -2185,7 +2185,7 @@
       },
       {
         "name": "CutsceneAudio",
-        "filepath": "../Assets/CutsceneAudio.wav",
+        "filepath": "../Assets/Audio/Cutscene_M5_Audio.wav",
         "loop": false,
         "volume": 1.0,
         "pitch": 1.0,

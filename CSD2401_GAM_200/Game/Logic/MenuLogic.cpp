@@ -26,7 +26,7 @@ Technology is prohibited.
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-std::string introPath = "../Assets/Cutscene.mpeg";
+std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
@@ -449,6 +449,17 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
         if (IsMouseOver(factory.FindGameObject("Level_BackButton"), mouseX, mouseY))
             return "Level_BackButton";
         break;
+
+    case MenuScreens::ReplayPicker:
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot0"), mouseX, mouseY))
+            return "ReplayPicker_Slot0";
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot1"), mouseX, mouseY))
+            return "ReplayPicker_Slot1";
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot2"), mouseX, mouseY))
+            return "ReplayPicker_Slot2";
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Back"), mouseX, mouseY))
+            return "ReplayPicker_Back";
+        break;
     }
 
     return "";
@@ -647,6 +658,32 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
     {
         std::cout << "ReplayButton Clicked! Opening replay picker..." << std::endl;
         ShowReplayPicker();
+        return true;
+    }
+
+    if (buttonName == "ReplayPicker_Back")
+    {
+        HideReplayPicker();
+        currScreen = MenuScreens::Home;
+        return true;
+    }
+
+    if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" || buttonName == "ReplayPicker_Slot2")
+    {
+        int idx = buttonName.back() - '0';
+        if (idx >= 0 && idx < static_cast<int>(m_replayNames.size()))
+        {
+            m_selectedReplay = m_replayNames[idx];
+            std::cout << "[MenuLogic] Replay selected: " << m_selectedReplay << std::endl;
+            if (audioManager)
+                audioManager->FadeOutCategory("music", 2.5f);
+            pendingSceneChange = true;
+            pendingTimer = 2.6f;
+        }
+        else
+        {
+            std::cout << "[MenuLogic] Clicked empty replay slot." << std::endl;
+        }
         return true;
     }
 
