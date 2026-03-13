@@ -200,6 +200,16 @@ vec2 Spritesheet::GetUVOffset() const
 }
 
 /**
+ * @brief UV offset with row flip to compensate for stbi_set_flip_vertically_on_load.
+ *        Use this for spritesheets where row 0 is visually the top row of the image.
+ */
+vec2 Spritesheet::GetFlipUVOffset() const
+{
+	int flippedRow = (rows - 1) - currRow;
+	return vec2(uv_width * currCol, uv_height * flippedRow);
+}
+
+/**
  * @brief Loading new spritesheet
  */
 void Spritesheet::LoadNewSpritesheet(const char *textureFile, int numRows, int numCols)
@@ -347,7 +357,7 @@ bool SupportedImageFile(const std::string& path) {
 	return (ext == ".png" || ext == ".jpeg");
 }
 
-void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong)
+void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong, bool flipRows)
 {
 	
 	if (startRow >= numRows || startCol >= numCols || endRow >= numRows || endCol >= numCols) {
@@ -366,6 +376,7 @@ void Spritesheet::RegisterAnimation(const std::string& name, const std::string& 
 	newState.endframe = endIdx;
 	newState.fps = fps;
 	newState.pingPong = pingPong;
+	newState.flipRows = flipRows;
 
 	animation_mList[name] = newState;
 }
@@ -392,6 +403,7 @@ void Spritesheet::PlayAnimation(const std::string& name, bool isLooping)
 	// Set looping state
 	looping = isLooping;
 	pingPongMode = state.pingPong;
+	flipRows = state.flipRows;
 	animationDirection = 1; // always start forward
 
 	// Update current name

@@ -969,16 +969,37 @@ namespace CSharpScript
         public static extern void SetLooping(string objectName, bool isLooping);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsLooping(string objectName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void AddToQueue(string objectName, string animationName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void RegisterAnimation(string objectName, string animationName, string texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps);
+        public static extern void RegisterAnimation(string objectName, string animationName, string texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong = false, bool flipRows = false);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetAnimation(string objectName, int startFrame, int endFrame, float fps);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string GetCurrentAnimationName(string objectName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void LoadNewSpritesheet(string objectName, string texturePath, int rows, int cols);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetCurrentFrame(string objectName, int row, int col);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetRows(string objectName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetCols(string objectName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetCurrentRow(string objectName);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetCurrentCol(string objectName);
     }
 
     /// <summary>
@@ -1584,6 +1605,24 @@ namespace CSharpScript
         public static void Setup(string liveTarget, string ghostTarget,
                                  string liveVfx = "", string ghostVfx = "")
             => Configure(liveTarget, ghostTarget, liveVfx, ghostVfx);
+    }
+
+    /// <summary>
+    /// Pickup system functions. Coin and shell counts are managed by C++ PickupSystem.
+    /// </summary>
+    public static class Pickups
+    {
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void CollectCoin();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void CollectShell();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetCurrentCoins();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetCurrentShells();
     }
 
 

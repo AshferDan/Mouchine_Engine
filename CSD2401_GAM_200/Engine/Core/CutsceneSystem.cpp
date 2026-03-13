@@ -192,8 +192,7 @@ void CutsceneSystem::StopCutscene() {
 
 	// After cutscene ends, load the level with transition
 	// Only do this for the intro cutscene, not credits
-	if (m_currentVideoPath == "../Assets/Cutscene.mpeg") {
-		std::cout << "[CutsceneSystem] Intro cutscene done - loading level" << std::endl;
+	if (m_currentVideoPath == "../Assets/cutscene_M5.mpeg") {
 		ScreenTransitionSystem* trans = CORE->GetScreenTransitionSystem();
 		if (trans) {
 			trans->StartLoadScreenOnly("../Assets/loading.gif", []() {

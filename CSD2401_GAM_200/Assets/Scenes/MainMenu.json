@@ -75,8 +75,9 @@
             "startCol": 0,
             "endRow": 2,
             "endCol": 3,
-            "fps": 6.0,
-            "pingPong": false
+            "fps": 10.0,
+            "pingPong": false,
+            "flipRows": true
           }
         ]
       },

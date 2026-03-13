@@ -47,6 +47,7 @@ Technology is prohibited.
 #include "WinLoseLogic.h"
 #include "GameTimerSystem.h"
 #include "GameCallbacks.h"
+#include "Utils.h"
 
 /**
  * @brief Initializes all main systems and resources for the game.

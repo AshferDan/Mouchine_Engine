@@ -790,6 +790,14 @@ static void Internal_SetAnimationLooping(MonoString* objectName, bool isLooping)
     mono_free(objName);
 }
 
+static bool Internal_IsAnimationLooping(MonoString* objectName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    bool result = API::IsAnimationLooping(objName);
+    mono_free(objName);
+    return result;
+}
+
 static void Internal_AddAnimationToQueue(MonoString* objectName, MonoString* animationName)
 {
     char* objName = mono_string_to_utf8(objectName);
@@ -799,12 +807,12 @@ static void Internal_AddAnimationToQueue(MonoString* objectName, MonoString* ani
     mono_free(animName);
 }
 
-static void Internal_RegisterAnimation(MonoString* objectName, MonoString* animationName, MonoString* texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps)
+static void Internal_RegisterAnimation(MonoString* objectName, MonoString* animationName, MonoString* texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong, bool flipRows)
 {
     char* objName = mono_string_to_utf8(objectName);
     char* animName = mono_string_to_utf8(animationName);
     char* texPath = mono_string_to_utf8(texturePath);
-    API::RegisterAnimation(objName, animName, texPath, rows, cols, startRow, startCol, endRow, endCol, fps);
+    API::RegisterAnimation(objName, animName, texPath, rows, cols, startRow, startCol, endRow, endCol, fps, pingPong, flipRows);
     mono_free(objName);
     mono_free(animName);
     mono_free(texPath);
@@ -823,6 +831,54 @@ static MonoString* Internal_GetCurrentAnimationName(MonoString* objectName)
     std::string animName = API::GetCurrentAnimationName(objName);
     mono_free(objName);
     return mono_string_new(mono_domain_get(), animName.c_str());
+}
+
+static void Internal_LoadNewSpritesheet(MonoString* objectName, MonoString* texturePath, int rows, int cols)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    char* texPath = mono_string_to_utf8(texturePath);
+    API::LoadNewSpritesheet(objName, texPath, rows, cols);
+    mono_free(objName);
+    mono_free(texPath);
+}
+
+static void Internal_SetCurrentFrame(MonoString* objectName, int row, int col)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    API::SetCurrentFrame(objName, row, col);
+    mono_free(objName);
+}
+
+static int Internal_GetRows(MonoString* objectName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    int result = API::GetRows(objName);
+    mono_free(objName);
+    return result;
+}
+
+static int Internal_GetCols(MonoString* objectName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    int result = API::GetCols(objName);
+    mono_free(objName);
+    return result;
+}
+
+static int Internal_GetCurrentRow(MonoString* objectName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    int result = API::GetCurrentRow(objName);
+    mono_free(objName);
+    return result;
+}
+
+static int Internal_GetCurrentCol(MonoString* objectName)
+{
+    char* objName = mono_string_to_utf8(objectName);
+    int result = API::GetCurrentCol(objName);
+    mono_free(objName);
+    return result;
 }
 
 // === Misc ===
@@ -886,6 +942,33 @@ static float Internal_GetMouseWorldX()
 static float Internal_GetMouseWorldY()
 {
     return API::GetMouseWorldY();
+}
+
+// === Pickup System ===
+static void Internal_CollectCoin()
+{
+    if (CORE && CORE->GetGameCallbacks())
+        CORE->GetGameCallbacks()->CollectCoin();
+}
+
+static void Internal_CollectShell()
+{
+    if (CORE && CORE->GetGameCallbacks())
+        CORE->GetGameCallbacks()->CollectShell();
+}
+
+static int Internal_GetCurrentCoins()
+{
+    if (CORE && CORE->GetGameCallbacks())
+        return CORE->GetGameCallbacks()->GetCurrentCoins();
+    return 0;
+}
+
+static int Internal_GetCurrentShells()
+{
+    if (CORE && CORE->GetGameCallbacks())
+        return CORE->GetGameCallbacks()->GetCurrentShells();
+    return 0;
 }
 
 // === WinLose System ===
@@ -1487,10 +1570,17 @@ void ScriptSystem::RegisterInternalCalls()
     // === Animation ===
     mono_add_internal_call("CSharpScript.Animation::PlayAnimation", (void*)Internal_PlayAnimation);
     mono_add_internal_call("CSharpScript.Animation::SetLooping", (void*)Internal_SetAnimationLooping);
+    mono_add_internal_call("CSharpScript.Animation::IsLooping", (void*)Internal_IsAnimationLooping);
     mono_add_internal_call("CSharpScript.Animation::AddToQueue", (void*)Internal_AddAnimationToQueue);
     mono_add_internal_call("CSharpScript.Animation::RegisterAnimation", (void*)Internal_RegisterAnimation);
     mono_add_internal_call("CSharpScript.Animation::SetAnimation", (void*)Internal_SetAnimation);
     mono_add_internal_call("CSharpScript.Animation::GetCurrentAnimationName", (void*)Internal_GetCurrentAnimationName);
+    mono_add_internal_call("CSharpScript.Animation::LoadNewSpritesheet", (void*)Internal_LoadNewSpritesheet);
+    mono_add_internal_call("CSharpScript.Animation::SetCurrentFrame", (void*)Internal_SetCurrentFrame);
+    mono_add_internal_call("CSharpScript.Animation::GetRows", (void*)Internal_GetRows);
+    mono_add_internal_call("CSharpScript.Animation::GetCols", (void*)Internal_GetCols);
+    mono_add_internal_call("CSharpScript.Animation::GetCurrentRow", (void*)Internal_GetCurrentRow);
+    mono_add_internal_call("CSharpScript.Animation::GetCurrentCol", (void*)Internal_GetCurrentCol);
 
 
     // === Camera ===
@@ -1530,6 +1620,12 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldY", (void*)Internal_GetMouseWorldY);
+
+    // === Pickup System ===
+    mono_add_internal_call("CSharpScript.Pickups::CollectCoin",      (void*)Internal_CollectCoin);
+    mono_add_internal_call("CSharpScript.Pickups::CollectShell",     (void*)Internal_CollectShell);
+    mono_add_internal_call("CSharpScript.Pickups::GetCurrentCoins",  (void*)Internal_GetCurrentCoins);
+    mono_add_internal_call("CSharpScript.Pickups::GetCurrentShells", (void*)Internal_GetCurrentShells);
 
     // === WinLose System ===
     mono_add_internal_call("CSharpScript.WinLoseSystem::TriggerLose", (void*)Internal_TriggerLoseZone);
