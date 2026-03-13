@@ -27,6 +27,11 @@ void Level1::Init() {
     std::cout << "[LEVEL 1] Initialize\n";
 }
 
+void Level1::Start()
+{
+    std::cout << "[LEVEL 1] Start - called once on Play\n";
+}
+
 void Level1::Update(float dt) {
 	timer += dt;
 
