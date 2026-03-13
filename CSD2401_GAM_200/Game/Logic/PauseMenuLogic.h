@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "transform.h"
 #include "MathLib.h"
 #include "GraphicsSystem.h"
+#include <vector>
+#include <string>
 
 class GraphicsSystem;
 
@@ -116,6 +118,17 @@ public:
      */
     void ClosePauseSettings();
 
+    /**
+     * @brief Checks if the Ghost menu screen is currently open.
+     * @return True if the ghost menu is active.
+     */
+    bool IsGhostMenuOpen() const { return isGhostMenuOpen; }
+
+    /**
+     * @brief Closes the Ghost menu screen (with short press-delay).
+     */
+    void CloseGhostMenu();
+
 private:
     bool isPauseMenuActive = false;        // whether the pause menu is currently displayed
     std::string hoveredButtonName = "";    // name of the currently hovered button
@@ -134,6 +147,15 @@ private:
     bool pendingHowToPlayClose = false;    // whether how to play back button was clicked
     float howToPlayCloseTimer = 0.0f;      // timer for how to play close delay
     bool howToPlayOpenedViaTab = false;    // tracks if how to play was opened via TAB key
+
+    // Ghost menu state
+    bool isGhostMenuOpen = false;               // whether ghost menu window is open
+    bool wasGhostMenuOpenLastFrame = false;      // tracks ghost menu open state for delta detection
+    bool hasCreatedGhostMenuUI = false;          // whether ghost menu UI has been created
+    bool pendingGhostMenuClose = false;          // whether back button was clicked and waiting
+    float ghostMenuCloseTimer = 0.0f;            // timer for close delay
+    std::vector<std::string> m_ghostReplayNames; // scanned replay file stems
+    std::vector<std::string> m_ghostReplayLevels;// level names from replay headers
 
     /**
      * @brief Creates all pause menu UI elements (overlay, buttons, title).
@@ -182,6 +204,26 @@ private:
      * @param show Whether to enable or disable how to play UI visibility.
      */
     void SetHowToPlayVisible(bool show);
+
+    /**
+     * @brief Creates the Ghost menu screen UI (toggle + replay slots + back button).
+     */
+    void CreateGhostMenuUI();
+
+    /**
+     * @brief Destroys the Ghost menu screen UI objects.
+     */
+    void DestroyGhostMenuUI();
+
+    /**
+     * @brief Sets Ghost menu UI objects active or inactive.
+     */
+    void SetGhostMenuVisible(bool show);
+
+    /**
+     * @brief Scans the replay directory and populates m_ghostReplayNames / m_ghostReplayLevels.
+     */
+    void ScanReplaysForGhost();
 
     /**
      * @brief Checks if the mouse cursor is within a button's area.

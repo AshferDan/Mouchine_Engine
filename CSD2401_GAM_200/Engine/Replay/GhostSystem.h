@@ -161,6 +161,9 @@ public:
     /** @brief Reset ghost toggle to hidden. Call at the start of each level session. */
     void ResetGhostToggle() { m_ghostVisible = false; }
 
+    /** @brief Programmatically toggle ghost visibility (same as pressing key-0). */
+    void ToggleGhostVisible() { ToggleGhost(); }
+
     /**
      * @brief Save the current recording to disk unconditionally (no best-time check).
      *        Useful for test recordings where you always want the run saved.
