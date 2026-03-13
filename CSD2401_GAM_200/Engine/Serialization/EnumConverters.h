@@ -65,7 +65,9 @@ namespace EnumConverters
         case CollisionLayer::Ground:   return "Ground";
         case CollisionLayer::Enemy:    return "Enemy";
         case CollisionLayer::Platform: return "Platform";
-        default:                       return "Default";
+        case CollisionLayer::Pickup:   return "Pickup";
+        case CollisionLayer::Default:  return "Default";
+        default:                       return "Unknown";
         }
     }
 
@@ -81,6 +83,8 @@ namespace EnumConverters
         if (s == "Ground")   return CollisionLayer::Ground;
         if (s == "Enemy")    return CollisionLayer::Enemy;
         if (s == "Platform") return CollisionLayer::Platform;
+        if (s == "Pickup") return CollisionLayer::Pickup;
+        if (s == "Default") return CollisionLayer::Default;
         return CollisionLayer::Default;
     }
 } // namespace EnumConverters

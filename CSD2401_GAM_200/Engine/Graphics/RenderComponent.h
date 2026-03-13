@@ -1,6 +1,6 @@
 /* Start Header ************************************************************************/
 /*!
-\file       GraphicsSystem.h
+\file       RenderComponent.h
 \author     Guan Shao Jun [50%]
 \co-author
 \par        shaojun.g@digipen.edu,
@@ -198,6 +198,12 @@ public:
     void SetScreenSpace(bool sSpace) { screenSpace = sSpace; }
     bool isScreenSpace() const { return screenSpace; }
 
+    void SetTileable(bool t) { tileable = t; }
+    bool IsTileable() const { return tileable; }
+
+    void SetTileCount(const vec2& count) { tileCount = count; }
+    vec2 GetTileCount() const { return tileCount; }
+
 private:
     ShapeType shape;  /*!< Shape type of this component */
     GLuint textureID; /*!< OpenGL texture ID */
@@ -209,6 +215,8 @@ private:
     LineData line;   /*!< Line data if ShapeType::Line */
     PointData point; /*!< Point data if ShapeType::Point */
     bool screenSpace = false;
+    bool tileable = false;
+    vec2 tileCount = {1.0f, 1.0f};
 };
 
 namespace RenderComponentTools

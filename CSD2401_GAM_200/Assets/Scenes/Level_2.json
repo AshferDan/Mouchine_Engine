@@ -1,0 +1,1522 @@
+{
+  "GameObjects": [
+    {
+      "name": "MainCamera",
+      "localID": 1,
+      "parentID": 4294967295,
+      "active": true,
+      "CameraComponent": {
+        "enabled": true,
+        "mode": "FOLLOW_TARGET",
+        "zoom": 0.5,
+        "position": [
+          60.3634147644043,
+          -4.326995849609375
+        ],
+        "followOffset": [
+          0.0,
+          0.0
+        ],
+        "smoothing": true,
+        "smoothingSpeed": 5.0,
+        "followTargetName": "Hero"
+      },
+      "children": []
+    },
+    {
+      "name": "Hero",
+      "localID": 2,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          192.0,
+          192.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "enabled": true,
+        "defaultAnimation": "Idle",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 0,
+            "endRow": 2,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 1,
+            "startCol": 0,
+            "endRow": 1,
+            "endCol": 2,
+            "fps": 8.0,
+            "pingPong": false
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 9,
+            "startCol": 3,
+            "endRow": 9,
+            "endCol": 4,
+            "fps": 10.0,
+            "pingPong": false
+          },
+          {
+            "name": "Groundpound_Init",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 1,
+            "fps": 10.0,
+            "pingPong": false
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 3.0,
+            "pingPong": false
+          },
+          {
+            "name": "Idle",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 11,
+            "startCol": 4,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 12.0,
+            "pingPong": false
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 10,
+            "startCol": 3,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 5,
+            "fps": 14.0,
+            "pingPong": false
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 12.0,
+            "pingPong": false
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 16.0,
+            "pingPong": false
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 22.0,
+            "pingPong": false
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 6.0,
+            "pingPong": false
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 8.0,
+            "pingPong": false
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 4,
+            "startCol": 3,
+            "endRow": 4,
+            "endCol": 4,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Wallslide",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false
+          }
+        ]
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 9.999999747378752e-05,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          168.0,
+          192.0
+        ]
+      },
+      "ScriptComponent": {
+        "enabled": true,
+        "scripts": [
+          "PlayerMovement",
+          "PlayerMovementStats",
+          "ParallaxBackground"
+        ],
+        "fields": {
+          "PlayerMovement": {
+            "fRun": false,
+            "fJump": true,
+            "fIdle": false,
+            "fZipline": false,
+            "fGroundPound": false,
+            "fGlide": false,
+            "fRoll": false,
+            "fWallKick": true,
+            "hitDirectionForce": 10.0,
+            "constForce": 5.0,
+            "inputForce": 7.5,
+            "vfx": "Hero_vfx",
+            "vfx_nontracking": "Hero_vfx_nontracking"
+          },
+          "PlayerMovementStats": {
+            "Clamp_MaxRunSpeed": 1562.5,
+            "Clamp_MaxJumpHeight": 2500.0,
+            "T0_BaseSpeed": 31.25,
+            "T0_MaxSpeed": 375.0,
+            "T1_Threshold": 562.5,
+            "T2_Threshold": 750.0,
+            "T3_Threshold": 937.5,
+            "T3_MaxSpeed": 1000.0,
+            "UseToggleRun": false,
+            "RunBaseSpeed": 468.75,
+            "RunCoastDeceleration": 468.75,
+            "GroundAcceleration": 625.0,
+            "GroundDeceleration": 1562.5,
+            "AirAcceleration": 625.0,
+            "AirDeceleration": 156.25,
+            "TurnResetSpeed": 156.25,
+            "TentAcceleration": 312.5,
+            "SkidSpeedRetained": 0.25,
+            "T1_SkidDuration": 0.44999998807907104,
+            "T2_SkidDuration": 0.550000011920929,
+            "T3_SkidDuration": 0.800000011920929,
+            "SkidExitSpeed": 100.0,
+            "T3_BonkDuration": 0.6499999761581421,
+            "GroundDetectionRayLength": 10.0,
+            "HeadDetectionRayLength": 0.019999999552965164,
+            "HeadWidth": 0.75,
+            "WallDetectionBoxLength": 100.0,
+            "EnableVariableJumpHeight": false,
+            "JumpHeight": 185.0,
+            "T1_JumpMultiplier": 1.0499999523162842,
+            "T2_JumpMultiplier": 1.0800000429153442,
+            "T3_JumpMultiplier": 1.149999976158142,
+            "JumpHeightCompensationFactor": 1.0540000200271606,
+            "TimeTillJumpApex": 0.3499999940395355,
+            "GravityOnReleaseMultiplier": 3.0,
+            "MaxFallSpeed": 1250.0,
+            "NumberOfJumpsAllowed": 1,
+            "TimeForUpwardsCancel": 0.019999999552965164,
+            "LandAnimationLength": 0.20000000298023224,
+            "ApexThreshold": 0.8999999761581421,
+            "ApexHangTime": 0.03999999910593033,
+            "JumpBufferTime": 0.10000000149011612,
+            "JumpCoyoteTime": 0.10000000149011612,
+            "GPCooldown": 1.0,
+            "RollCooldown": 1.0,
+            "WKCooldown": 0.5,
+            "GlideCooldown": 0.20000000298023224,
+            "WallCoyoteTime": 0.10000000149011612,
+            "WallSlidingSpeed": 125.0,
+            "WallSlidingTimeToTriggerSound": 0.25,
+            "WallSlideRestickCooldown": 0.5,
+            "WKBaseDuration": 0.25,
+            "WKSpeedModifier": 1093.75,
+            "WKVerticalModifier": 218.75,
+            "WKDurationMultiplier": 0.75,
+            "BaseRollDuration": 0.30000001192092896,
+            "MidRollDuration": 0.44999998807907104,
+            "MaxRollDuration": 0.699999988079071,
+            "BaseRollSpeed": 1000.0,
+            "MidRollSpeed": 1093.75,
+            "MaxRollSpeed": 1250.0,
+            "GPPauseTime": 0.30000001192092896,
+            "GPFallSpeed": 1562.5,
+            "RollHeightToDurationDivisor": 2343.75,
+            "GroundPoundMaxSpeedHeightThreshold": 80.0,
+            "GPMaxDuration": 2.5,
+            "GlideFallSpeedMultiplier": 0.5,
+            "knockbackTime": 0.30000001192092896,
+            "hurtStunDuration": 0.75,
+            "ZiplineSpeed": 937.5,
+            "ZiplineAttachDuration": 0.15000000596046448,
+            "ZiplineLaunchDuration": 0.25,
+            "ZiplineCoyoteTime": 0.20000000298023224,
+            "HazardTimeDeduction": 1.0,
+            "HurtImmunityLength": 2.0,
+            "JumpTimeDeduction": 1.0,
+            "RunTimeDeduction": 0.10000000149011612,
+            "ZiplineTimeDeduction": 3.0,
+            "ZiplineDeductionInterval": 0.20000000298023224,
+            "GroundPoundTimeDeduction": 3.0,
+            "RollTimeDeduction": 2.0,
+            "GlideTimeDeduction": 1.0,
+            "GlideDeductionInterval": 0.5,
+            "WallKickTimeDeduction": 2.5
+          },
+          "ParallaxBackground": {
+            "LayerFarBack": "Parallax_BG_2",
+            "LayerBack": "",
+            "LayerMid": "MIdlayer_BackGround2",
+            "LayerFront": "Frontlayer_BackGround2",
+            "FactorFarBack": 0.800000011920929,
+            "FactorBack": 0.30000001192092896,
+            "FactorMid": 0.699999988079071,
+            "FactorFront": 0.8999999761581421,
+            "TileWidthFarBack": 4200.0,
+            "TileWidthBack": 0.0,
+            "TileWidthMid": 4200.0,
+            "TileWidthFront": 4200.0
+          }
+        }
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 3,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          192.0,
+          192.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "Spritesheet": {
+        "enabled": true,
+        "defaultAnimation": "Clear",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0,
+            "pingPong": false
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0,
+            "pingPong": false
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0,
+            "pingPong": false
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0,
+            "pingPong": false
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0,
+            "pingPong": false
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0,
+            "pingPong": false
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0,
+            "pingPong": false
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0,
+            "pingPong": false
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0,
+            "pingPong": false
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0,
+            "pingPong": false
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0,
+            "pingPong": false
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0,
+            "pingPong": false
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Platform",
+      "localID": 4,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          -200.0
+        ],
+        "scale": [
+          100000.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          0.6000000238418579
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 1.0,
+        "isStatic": true,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Ground",
+        "size": [
+          100000.0,
+          200.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Platform",
+      "localID": 5,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -200.0,
+          0.0
+        ],
+        "scale": [
+          100.0,
+          1000.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          0.6000000238418579
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 1.0,
+        "isStatic": true,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Ground",
+        "size": [
+          100.0,
+          1000.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Platform",
+      "localID": 6,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          200.0,
+          0.0
+        ],
+        "scale": [
+          100.0,
+          1000.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          0.6000000238418579
+        ],
+        "layer": 0,
+        "screenSpace": false
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 1.0,
+        "isStatic": true,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Ground",
+        "size": [
+          100.0,
+          1000.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Parallax_BG_2",
+      "localID": 7,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          -100.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false
+      },
+      "children": [
+        {
+          "name": "Below",
+          "localID": 8,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              -2020.0
+            ],
+            "scale": [
+              4200.0,
+              1920.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": -109,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Below(1)",
+          "localID": 9,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -4200.0,
+              -2020.0
+            ],
+            "scale": [
+              4200.0,
+              1920.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": -109,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Below(2)",
+          "localID": 10,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              4200.0,
+              -2020.0
+            ],
+            "scale": [
+              4200.0,
+              1920.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": -109,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Top",
+          "localID": 11,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              1820.0
+            ],
+            "scale": [
+              4200.0,
+              1920.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": -109,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Top(1)",
+          "localID": 12,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -4200.0,
+              1820.0
+            ],
+            "scale": [
+              4200.0,
+              1920.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": -109,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Top(2)",
+          "localID": 13,
+          "parentID": 7,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              4200.0,
+              1820.0
+            ],
+            "scale": [
+              4200.0,
+              1920.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": -109,
+            "screenSpace": false
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "Parallax_BG_2_L",
+      "localID": 14,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4200.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "Parallax_BG_2_R",
+      "localID": 15,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4200.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "Frontlayer_BackGround2",
+      "localID": 16,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          -750.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "Frontlayer_BackGround2_L",
+      "localID": 17,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4200.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "Frontlayer_BackGround2_R",
+      "localID": 18,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4200.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "MIdlayer_BackGround2_L",
+      "localID": 19,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4200.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -111,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "MIdlayer_BackGround2",
+      "localID": 20,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -111,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "MIdlayer_BackGround2_R",
+      "localID": 21,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4200.0,
+          0.0
+        ],
+        "scale": [
+          4200.0,
+          1920.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -111,
+        "screenSpace": false
+      },
+      "children": []
+    }
+  ],
+  "AudioManager": {
+    "sounds": [
+      {
+        "name": "airglide_sfx",
+        "filepath": "../Assets/audio/Player/AirGlide.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.5,
+        "category": "sfx_loop"
+      },
+      {
+        "name": "bonk_sfx",
+        "filepath": "../Assets/audio/Player/WallBonk.wav",
+        "loop": false,
+        "volume": 0.05000000074505806,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx1",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep1.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx2",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep2.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx3",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep3.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx4",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep4.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx5",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep5.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx6",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep6.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx7",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep7.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx8",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep8.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx9",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep9.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "groundpound_falling_sfx",
+        "filepath": "../Assets/audio/Player/Groundpound_falling.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 2.0,
+        "category": "sfx_loop"
+      },
+      {
+        "name": "groundpound_sfx",
+        "filepath": "../Assets/audio/Player/Groundpound.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.5,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx",
+        "filepath": "../Assets/audio/Player/Hurt-Damage.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "jump_sfx",
+        "filepath": "../Assets/Audio/Player/Jump.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx1",
+        "filepath": "../Assets/audio/Player/Land/Land1.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx2",
+        "filepath": "../Assets/audio/Player/Land/Land2.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx3",
+        "filepath": "../Assets/audio/Player/Land/Land3.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx4",
+        "filepath": "../Assets/audio/Player/Land/Land4.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "roll_sfx",
+        "filepath": "../Assets/audio/Player/Roll.wav",
+        "loop": false,
+        "volume": 0.10000000149011612,
+        "pitch": 1.25,
+        "category": "sfx"
+      },
+      {
+        "name": "scissors_snip",
+        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
+        "loop": true,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "turnskid_sfx",
+        "filepath": "../Assets/audio/Player/TurnSkid.wav",
+        "loop": false,
+        "volume": 0.05000000074505806,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "wallkick_fast_sfx",
+        "filepath": "../Assets/audio/Player/Dash.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.350000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "wallslide_impact_sfx",
+        "filepath": "../Assets/audio/Player/Wallkick.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "wallslide_sfx",
+        "filepath": "../Assets/audio/Player/WallSlide.wav",
+        "loop": false,
+        "volume": 0.10000000149011612,
+        "pitch": 0.8999999761581421,
+        "category": "sfx"
+      }
+    ],
+    "events": []
+  }
+}

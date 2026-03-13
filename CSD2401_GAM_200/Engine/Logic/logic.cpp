@@ -130,7 +130,7 @@ LogicChain &LogicChain::operator=(const LogicChain &other)
 }
 
 // ========== ACTIONS IMPLEMENTATION ===========
-void ActionPlaySound::Execute(GameObject *owner, GameObject *other)
+void ActionPlaySound::Execute(GameObject *owner, [[maybe_unused]] GameObject *other)
 {
     if (soundName.empty())
         return;
@@ -141,18 +141,18 @@ void ActionPlaySound::Execute(GameObject *owner, GameObject *other)
     std::cout << "[Action] Playing Sound: " << soundName << " on " << owner->GetName() << std::endl;
 }
 
-void ActionDestroy::Execute(GameObject *owner, GameObject *other)
+void ActionDestroy::Execute(GameObject *owner, [[maybe_unused]] GameObject *other)
 {
     GameObjectFactory::Instance().DestroyGameObject(owner->GetID());
     std::cout << "[Action] Destroying Object: " << owner->GetName() << std::endl;
 }
 
-void ActionToggleActive::Execute(GameObject *owner, GameObject *other)
+void ActionToggleActive::Execute(GameObject *owner, [[maybe_unused]] GameObject *other)
 {
     owner->SetActive(setState);
 }
 
-void ActionRespawn::Execute(GameObject *owner, GameObject *other)
+void ActionRespawn::Execute(GameObject *owner, [[maybe_unused]] GameObject *other)
 {
     auto *transform = owner->GetComponent<TransformComponent>();
     if (transform)

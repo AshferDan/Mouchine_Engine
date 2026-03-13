@@ -57,6 +57,7 @@ public:
     virtual bool IsLoseScreenActive() const { return false; }
     virtual bool IsHowToPlayOpen()    const { return false; }
     virtual bool IsPauseSettingsOpen() const { return false; }
+    virtual bool IsGhostMenuOpen()    const { return false; }
     virtual bool IsOnMainMenu()       const { return false; }
     virtual std::string GetCurrentScenePath() const { return ""; }
 
@@ -65,6 +66,14 @@ public:
     virtual void OpenHowToPlay()       {}
     virtual void CloseHowToPlay()      {}
     virtual void ClosePauseSettings()  {}
+    virtual void CloseGhostMenu()      {}
     virtual void TriggerWin()          {}
     virtual void TriggerLose()         {}
+
+    // ── Pickup system ─────────────────────────────────────────────────────────
+    virtual void CollectCoin()           {}
+    virtual void CollectShell()          {}
+    virtual int  GetCurrentCoins()  const { return 0; }
+    virtual int  GetCurrentShells() const { return 0; }
+    virtual void ReinitPickups()         {}
 };

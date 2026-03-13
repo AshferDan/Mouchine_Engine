@@ -24,6 +24,7 @@ Technology is prohibited.
 #include "Collision.h"
 #include "TextInputSystem.h"
 #include <iostream>
+#include <cmath>
 
 /**
  * @brief Initializes all win/lose state variables.
@@ -40,7 +41,29 @@ void WinLoseLogicSystem::Initialize()
     pendingScenePath = "";
     isPlayingCredits = false;
     m_playerInSafeZone = true;
-    m_recordingActive  = false;
+    m_recordingActive = false;
+    m_elapsedTime = 0.0f;
+    m_timerRunning = false;
+
+    // Re-park the ghost at frame 0 if it was toggled ON before the restart.
+    // The old GhostHero object was destroyed by the scene reload, so we reset
+    // the toggle (clears the stale visible state) then re-enable it to recreate
+    // and park the ghost.  WinLoseLogic::CheckSafeZoneExit() will start playback
+    // when the player leaves the SafeZone.
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    if (ghost)
+    {
+        bool wasVisible = ghost->IsGhostVisible();
+        ghost->ResetGhostToggle(); // marks ghost as hidden (m_ghostVisible = false)
+        ghost->StopPlayback();     // stop any lingering playback
+
+        if (wasVisible && ghost->IsGhostAvailable())
+        {
+            // Re-enable: clones Hero → GhostHero and parks at frame 0
+            ghost->ToggleGhostVisible();
+            std::cout << "[WinLoseLogic] Ghost re-parked at start after restart.\n";
+        }
+    }
 }
 
 /**
@@ -62,7 +85,9 @@ void WinLoseLogicSystem::Update(float dt)
         pendingSceneChange = false;
         isPlayingCredits = false;
         m_playerInSafeZone = true;
-        m_recordingActive  = false;
+        m_recordingActive = false;
+        m_elapsedTime = 0.0f;
+        m_timerRunning = false;
 
         // Configure the engine text-input system with this game's font
         TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
@@ -83,6 +108,12 @@ void WinLoseLogicSystem::Update(float dt)
     }
 
     totalFrames++;
+
+    // Tick elapsed level timer (starts when player leaves SafeZone, stops on win/lose)
+    if (m_timerRunning)
+    {
+        m_elapsedTime += dt;
+    }
 
     // Update audio fade
     AudioManager* audioManager = CORE->GetAudioManager();
@@ -116,7 +147,7 @@ void WinLoseLogicSystem::Update(float dt)
         if (pendingSceneTimer <= 0.0f)
         {
             // Check if fade is still active - if so, wait a bit longer
-            AudioManager* audioManager = CORE->GetAudioManager();
+            //AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager && audioManager->IsAnyFadeActive())
             {
                 std::cout << "[WinLoseLogic] Fade still active, waiting..." << std::endl;
@@ -175,11 +206,21 @@ void WinLoseLogicSystem::Update(float dt)
 
         // update all win screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
-            {"WinScreen", vec2(0.0f, 0.0f)},
-            {"NextLevelLogo", vec2(550.0f * uiScale, 250.0f * uiScale)},
-            {"NextButton", vec2(550.0f * uiScale, 50.0f * uiScale)},
-            {"ReplayButton", vec2(550.0f * uiScale, -100.0f * uiScale)},
-            {"QuitButton", vec2(550.0f * uiScale, -250.0f * uiScale)}
+            {"WinScreen",       vec2(0.0f, 0.0f)},
+            {"WinTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
+            {"WinLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
+            {"WinLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
+            {"WinClockIcon",    vec2((550.0f - 120.0f) * uiScale,  210.0f * uiScale)},
+            {"WinTimeText",     vec2((550.0f + 50.0f) * uiScale,  210.0f * uiScale)},
+            {"WinCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  100.0f * uiScale)},
+            {"WinCoinText",     vec2((550.0f - 90.0f) * uiScale,  100.0f * uiScale)},
+            {"WinShellIcon",    vec2((550.0f + 60.0f) * uiScale,  100.0f * uiScale)},
+            {"WinShellText",    vec2((550.0f + 155.0f) * uiScale,  100.0f * uiScale)},
+            {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -20.0f * uiScale)},
+            {"WinRatingBadge",  vec2((550.0f + 170.0f) * uiScale,  -20.0f * uiScale)},
+            {"NextButton",      vec2(550.0f * uiScale, -160.0f * uiScale)},
+            {"ReplayButton",    vec2(550.0f * uiScale, -280.0f * uiScale)},
+            {"QuitButton",      vec2(550.0f * uiScale, -400.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -208,12 +249,21 @@ void WinLoseLogicSystem::Update(float dt)
 
         float uiScale = 2.0f;
 
-        // update all lose screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
-            {"LoseScreen", vec2(0.0f, 0.0f)},
-            {"LoseReplayLogo", vec2(550.0f * uiScale, 125.0f * uiScale)},
-            {"YesButton", vec2(550.0f * uiScale, -50.0f * uiScale)},
-            {"LoseQuitButton", vec2(550.0f * uiScale, -200.0f * uiScale)}
+            {"LoseScreen",       vec2(0.0f, 0.0f)},
+            {"LoseTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
+            {"LoseLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
+            {"LoseLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
+            {"LoseClockIcon",    vec2((550.0f - 120.0f) * uiScale,  210.0f * uiScale)},
+            {"LoseTimeText",     vec2((550.0f + 50.0f) * uiScale,  210.0f * uiScale)},
+            {"LoseCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  100.0f * uiScale)},
+            {"LoseCoinText",     vec2((550.0f - 90.0f) * uiScale,  100.0f * uiScale)},
+            {"LoseShellIcon",    vec2((550.0f + 60.0f) * uiScale,  100.0f * uiScale)},
+            {"LoseShellText",    vec2((550.0f + 155.0f) * uiScale,  100.0f * uiScale)},
+            {"LoseRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -20.0f * uiScale)},
+            {"LoseRatingBadge",  vec2((550.0f + 170.0f) * uiScale,  -20.0f * uiScale)},
+            {"YesButton",        vec2(550.0f * uiScale, -170.0f * uiScale)},
+            {"LoseQuitButton",   vec2(550.0f * uiScale, -300.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -255,7 +305,7 @@ void WinLoseLogicSystem::CheckSafeZoneExit()
 
     auto& factory = GameObjectFactory::Instance();
     GameObject* safeZone = factory.FindGameObject("SafeZone");
-    GameObject* player   = factory.FindGameObject("Hero");
+    GameObject* player = factory.FindGameObject("Hero");
 
     if (!safeZone || !player || !safeZone->IsActive() || !player->IsActive())
         return;
@@ -283,7 +333,8 @@ void WinLoseLogicSystem::CheckSafeZoneExit()
     {
         // Player has left the SafeZone — start recording
         m_playerInSafeZone = false;
-        m_recordingActive  = true;
+        m_recordingActive = true;
+        m_timerRunning = true;
 
         GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
         if (ghost)
@@ -319,7 +370,7 @@ void WinLoseLogicSystem::AbandonRecording()
             ghost->StopPlayback();
     }
 
-    m_recordingActive  = false;
+    m_recordingActive = false;
     m_playerInSafeZone = true;  // next load starts fresh
 }
 
@@ -393,7 +444,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
             hasPlayerWon = true;
 
             // Hide timer UI while the dialog is open
-            auto& factory = GameObjectFactory::Instance();
+            //auto& factory = GameObjectFactory::Instance();
             if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
             if (auto* o = factory.FindGameObject("LevelTimerBar"))           o->SetActive(false);
             if (auto* o = factory.FindGameObject("LevelTimerBarFrame"))      o->SetActive(false);
@@ -437,7 +488,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         // Hand off to the normal win sequence
                         CORE->SetGamePaused(false);
                         isWaitingForWin = true;
-                        winDelayTimer   = 0.5f;
+                        winDelayTimer = 0.5f;
                     },
                     // --- onCancel (Escape) — proceed to win screen without saving ---
                     [this]()
@@ -445,7 +496,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
                         CORE->SetGamePaused(false);
                         isWaitingForWin = true;
-                        winDelayTimer   = 0.5f;
+                        winDelayTimer = 0.5f;
                     });
             }
             else
@@ -464,7 +515,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                 }
                 CORE->SetGamePaused(false);
                 isWaitingForWin = true;
-                winDelayTimer   = 0.5f;
+                winDelayTimer = 0.5f;
             }
         }
     }
@@ -474,11 +525,23 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
 
 // ============ WIN ============
 /**
+ * @brief Formats elapsed seconds into MM:SS.cc string.
+ */
+static std::string FormatElapsedTime(float seconds)
+{
+    int mins = static_cast<int>(seconds) / 60;
+    int secs = static_cast<int>(seconds) % 60;
+    int centis = static_cast<int>((seconds - std::floor(seconds)) * 100.0f);
+    char buf[16];
+    std::snprintf(buf, sizeof(buf), "%02d:%02d.%02d", mins, secs, centis);
+    return std::string(buf);
+}
+
+/**
  * @brief Creates win UI elements and pauses the game.
  */
 void WinLoseLogicSystem::TriggerWin()
 {
-    //std::cout << "you win!!!" << std::endl;
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
@@ -516,16 +579,27 @@ void WinLoseLogicSystem::TriggerWin()
     if (audioManager)
     {
         audioManager->StopSound("bgm_channel");
-        audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
+        audioManager->SetCategoryVolume("music", 0.0f);
         audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", 2.0f); // Fade in over 2 second
+        audioManager->FadeInCategory("music", 2.0f);
     }
+
+    // stats for the right-side panel
+    m_timerRunning = false; // stop timer on win
+    std::string statTime = FormatElapsedTime(m_elapsedTime);
+    std::string statCoins = "0";
+    std::string statShells = "0/3";
+    std::string statLevelNum = "Level 1";
+    std::string statLevelName = "Barbershop";
+
+    // Right panel X anchor (right third of screen)
+    float panelX = 550.0f * uiScale;
 
     // win screen background
     GameObject* board = factory.CreateGameObject("WinScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
-    boardTransform->posX = camPos.x + 0.0f;
-    boardTransform->posY = camPos.y + 0.0f;
+    boardTransform->posX = camPos.x;
+    boardTransform->posY = camPos.y;
     boardTransform->scaleX = 1920.0f * uiScale;
     boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
@@ -533,61 +607,177 @@ void WinLoseLogicSystem::TriggerWin()
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     boardRender->SetLayer(101);
 
-    // next level logo
-    GameObject* bigLogo = factory.CreateGameObject("NextLevelLogo");
-    auto* logoTransform = bigLogo->AddComponent<TransformComponent>();
-    logoTransform->posX = camPos.x + 550.0f * uiScale;
-    logoTransform->posY = camPos.y + 250.0f * uiScale;
-    logoTransform->scaleX = 600.0f * uiScale;
-    logoTransform->scaleY = 175.0f * uiScale;
-    auto* logoRender = bigLogo->AddComponent<RenderComponent>();
-    logoRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
-    logoRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    logoRender->SetLayer(102);
-    bigLogo->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(72 * uiScale), "Next Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    // ---- Bracket background behind level title ----
+    GameObject* winTitleBracket = factory.CreateGameObject("WinTitleBracket");
+    auto* winBracketT = winTitleBracket->AddComponent<TransformComponent>();
+    winBracketT->posX = camPos.x + panelX;
+    winBracketT->posY = camPos.y + 350.0f * uiScale;
+    winBracketT->scaleX = 550.0f * uiScale;
+    winBracketT->scaleY = 200.0f * uiScale;
+    auto* winBracketR = winTitleBracket->AddComponent<RenderComponent>();
+    winBracketR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
+    winBracketR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    winBracketR->SetLayer(102);
 
-    // next button which goes to next level
+    // ---- Level title: "Level 1" ----
+    GameObject* levelNumObj = factory.CreateGameObject("WinLevelNumber");
+    auto* levelNumT = levelNumObj->AddComponent<TransformComponent>();
+    levelNumT->posX = camPos.x + panelX;
+    levelNumT->posY = camPos.y + 380.0f * uiScale;
+    levelNumT->scaleX = 500.0f * uiScale;
+    levelNumT->scaleY = 100.0f * uiScale;
+    levelNumObj->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(60 * uiScale),
+        statLevelNum, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Level subtitle: "Barbershop" ----
+    GameObject* levelNameObj = factory.CreateGameObject("WinLevelName");
+    auto* levelNameT = levelNameObj->AddComponent<TransformComponent>();
+    levelNameT->posX = camPos.x + panelX;
+    levelNameT->posY = camPos.y + 310.0f * uiScale;
+    levelNameT->scaleX = 500.0f * uiScale;
+    levelNameT->scaleY = 70.0f * uiScale;
+    levelNameObj->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(36 * uiScale),
+        statLevelName, vec4(0.2f, 0.15f, 0.1f, 1.0f), false);
+
+    // ---- Clock icon ----
+    GameObject* clockIcon = factory.CreateGameObject("WinClockIcon");
+    auto* clockT = clockIcon->AddComponent<TransformComponent>();
+    clockT->posX = camPos.x + (panelX - 120.0f * uiScale);
+    clockT->posY = camPos.y + 210.0f * uiScale;
+    clockT->scaleX = 110.0f * uiScale;
+    clockT->scaleY = 110.0f * uiScale;
+    auto* clockR = clockIcon->AddComponent<RenderComponent>();
+    clockR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Clock_icon.png"));
+    clockR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    clockR->SetLayer(102);
+
+    // ---- Time text ----
+    GameObject* timeText = factory.CreateGameObject("WinTimeText");
+    auto* timeT = timeText->AddComponent<TransformComponent>();
+    timeT->posX = camPos.x + (panelX + 50.0f * uiScale);
+    timeT->posY = camPos.y + 210.0f * uiScale;
+    timeT->scaleX = 300.0f * uiScale;
+    timeT->scaleY = 70.0f * uiScale;
+    timeText->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        statTime, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Coin icon ----
+    GameObject* coinIconWin = factory.CreateGameObject("WinCoinIcon");
+    auto* coinIconT = coinIconWin->AddComponent<TransformComponent>();
+    coinIconT->posX = camPos.x + (panelX - 180.0f * uiScale);
+    coinIconT->posY = camPos.y + 100.0f * uiScale;
+    coinIconT->scaleX = 110.0f * uiScale;
+    coinIconT->scaleY = 110.0f * uiScale;
+    auto* coinIconR = coinIconWin->AddComponent<RenderComponent>();
+    coinIconR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Coin_icon.png"));
+    coinIconR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    coinIconR->SetLayer(102);
+
+    // ---- Coin count text ----
+    GameObject* coinCountWin = factory.CreateGameObject("WinCoinText");
+    auto* coinCountT = coinCountWin->AddComponent<TransformComponent>();
+    coinCountT->posX = camPos.x + (panelX - 90.0f * uiScale);
+    coinCountT->posY = camPos.y + 100.0f * uiScale;
+    coinCountT->scaleX = 150.0f * uiScale;
+    coinCountT->scaleY = 70.0f * uiScale;
+    coinCountWin->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        statCoins, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Shell icon ----
+    GameObject* shellIconWin = factory.CreateGameObject("WinShellIcon");
+    auto* shellIconT = shellIconWin->AddComponent<TransformComponent>();
+    shellIconT->posX = camPos.x + (panelX + 60.0f * uiScale);
+    shellIconT->posY = camPos.y + 100.0f * uiScale;
+    shellIconT->scaleX = 110.0f * uiScale;
+    shellIconT->scaleY = 110.0f * uiScale;
+    auto* shellIconR = shellIconWin->AddComponent<RenderComponent>();
+    shellIconR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Shell_icon.png"));
+    shellIconR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    shellIconR->SetLayer(102);
+
+    // ---- Shell count text ----
+    GameObject* shellCountWin = factory.CreateGameObject("WinShellText");
+    auto* shellCountT = shellCountWin->AddComponent<TransformComponent>();
+    shellCountT->posX = camPos.x + (panelX + 155.0f * uiScale);
+    shellCountT->posY = camPos.y + 100.0f * uiScale;
+    shellCountT->scaleX = 150.0f * uiScale;
+    shellCountT->scaleY = 70.0f * uiScale;
+    shellCountWin->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        statShells, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Shop Rating: label ----
+    // ---- Shop Rating: label ----
+    GameObject* ratingLabel = factory.CreateGameObject("WinRatingLabel");
+    auto* ratingLabelT = ratingLabel->AddComponent<TransformComponent>();
+    ratingLabelT->posX = camPos.x + (panelX - 80.0f * uiScale);
+    ratingLabelT->posY = camPos.y + -20.0f * uiScale;
+    ratingLabelT->scaleX = 320.0f * uiScale;
+    ratingLabelT->scaleY = 70.0f * uiScale;
+    ratingLabel->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "Shop Rating:", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
+    GameObject* ratingBadge = factory.CreateGameObject("WinRatingBadge");
+    auto* ratingBadgeT = ratingBadge->AddComponent<TransformComponent>();
+    ratingBadgeT->posX = camPos.x + (panelX + 170.0f * uiScale);
+    ratingBadgeT->posY = camPos.y + -20.0f * uiScale;
+    ratingBadgeT->scaleX = 160.0f * uiScale;
+    ratingBadgeT->scaleY = 140.0f * uiScale;
+    auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
+    ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
+    ratingBadgeR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    ratingBadgeR->SetLayer(102);
+
+    // ---- Continue button (goes to next level / credits) ----
     GameObject* nextBtn = factory.CreateGameObject("NextButton");
     auto* nextTransform = nextBtn->AddComponent<TransformComponent>();
-    nextTransform->posX = camPos.x + 550.0f * uiScale;
-    nextTransform->posY = camPos.y + 50.0f * uiScale;
-    nextTransform->scaleX = 550.0f * uiScale;
-    nextTransform->scaleY = 140.0f * uiScale;
+    nextTransform->posX = camPos.x + panelX;
+    nextTransform->posY = camPos.y + -160.0f * uiScale;
+    nextTransform->scaleX = 420.0f * uiScale;
+    nextTransform->scaleY = 100.0f * uiScale;
     auto* nextRender = nextBtn->AddComponent<RenderComponent>();
     nextRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     nextRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     nextRender->SetLayer(102);
     nextBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Next", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Continue", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // replay button which restarts level
+    // ---- Replay button ----
     GameObject* replayBtn = factory.CreateGameObject("ReplayButton");
     auto* replayTransform = replayBtn->AddComponent<TransformComponent>();
-    replayTransform->posX = camPos.x + 550.0f * uiScale;
-    replayTransform->posY = camPos.y + -100.0f * uiScale;
-    replayTransform->scaleX = 550.0f * uiScale;
-    replayTransform->scaleY = 140.0f * uiScale;
+    replayTransform->posX = camPos.x + panelX;
+    replayTransform->posY = camPos.y + -280.0f * uiScale;
+    replayTransform->scaleX = 420.0f * uiScale;
+    replayTransform->scaleY = 100.0f * uiScale;
     auto* replayRender = replayBtn->AddComponent<RenderComponent>();
     replayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     replayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     replayRender->SetLayer(102);
     replayBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // quit button which goes bk to main menu
+    // ---- Quit button ----
     GameObject* quitBtn = factory.CreateGameObject("QuitButton");
     auto* quitTransform = quitBtn->AddComponent<TransformComponent>();
-    quitTransform->posX = camPos.x + 550.0f * uiScale;
-    quitTransform->posY = camPos.y + -250.0f * uiScale;
-    quitTransform->scaleX = 550.0f * uiScale;
-    quitTransform->scaleY = 140.0f * uiScale;
+    quitTransform->posX = camPos.x + panelX;
+    quitTransform->posY = camPos.y + -400.0f * uiScale;
+    quitTransform->scaleX = 420.0f * uiScale;
+    quitTransform->scaleY = 100.0f * uiScale;
     auto* quitRender = quitBtn->AddComponent<RenderComponent>();
     quitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     quitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     quitRender->SetLayer(102);
     quitBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedWinScreen = true;
 }
@@ -715,7 +905,17 @@ void WinLoseLogicSystem::DestroyWinScreen()
 
     std::vector<std::string> uiElements = {
         "WinScreen",
-        "NextLevelLogo",
+        "WinTitleBracket",
+        "WinLevelNumber",
+        "WinLevelName",
+        "WinClockIcon",
+        "WinTimeText",
+        "WinCoinIcon",
+        "WinCoinText",
+        "WinShellIcon",
+        "WinShellText",
+        "WinRatingLabel",
+        "WinRatingBadge",
         "NextButton",
         "ReplayButton",
         "QuitButton"
@@ -854,11 +1054,21 @@ void WinLoseLogicSystem::TriggerLose()
         audioManager->FadeInCategory("music", 2.0f); // Fade in over 1 second
     }
 
+    // ---- Gather stats for the right-side panel ----
+    m_timerRunning = false; // stop timer on lose
+    std::string statTime = FormatElapsedTime(m_elapsedTime);
+    std::string statCoins = "0";       // TODO: replace with real coin count
+    std::string statShells = "0/3";     // TODO: replace with real shell count
+    std::string statLevelNum = "Level 1"; // TODO: replace with real level number
+    std::string statLevelName = "Barbershop"; // TODO: replace with real level name
+
+    float panelX = 550.0f * uiScale;
+
     // lose screen background
     GameObject* board = factory.CreateGameObject("LoseScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
-    boardTransform->posX = camPos.x + 0.0f;
-    boardTransform->posY = camPos.y + 0.0f;
+    boardTransform->posX = camPos.x;
+    boardTransform->posY = camPos.y;
     boardTransform->scaleX = 1920.0f * uiScale;
     boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
@@ -866,47 +1076,161 @@ void WinLoseLogicSystem::TriggerLose()
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     boardRender->SetLayer(101);
 
-    // retry level logo
-    GameObject* loseLogo = factory.CreateGameObject("LoseReplayLogo");
-    auto* loseTransform = loseLogo->AddComponent<TransformComponent>();
-    loseTransform->posX = camPos.x + 550.0f * uiScale;
-    loseTransform->posY = camPos.y + 125.0f * uiScale;
-    loseTransform->scaleX = 600.0f * uiScale;
-    loseTransform->scaleY = 175.0f * uiScale;
-    auto* loseRender = loseLogo->AddComponent<RenderComponent>();
-    loseRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
-    loseRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    loseRender->SetLayer(102);
-    loseLogo->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(72 * uiScale), "Retry Level?", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    // ---- Bracket background behind level title ----
+    GameObject* loseTitleBracket = factory.CreateGameObject("LoseTitleBracket");
+    auto* loseBracketT = loseTitleBracket->AddComponent<TransformComponent>();
+    loseBracketT->posX = camPos.x + panelX;
+    loseBracketT->posY = camPos.y + 350.0f * uiScale;
+    loseBracketT->scaleX = 550.0f * uiScale;
+    loseBracketT->scaleY = 200.0f * uiScale;
+    auto* loseBracketR = loseTitleBracket->AddComponent<RenderComponent>();
+    loseBracketR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
+    loseBracketR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    loseBracketR->SetLayer(102);
 
-    // yes button which restarts level
+    // ---- Level title: "Level 1" ----
+    GameObject* levelNumObj = factory.CreateGameObject("LoseLevelNumber");
+    auto* levelNumT = levelNumObj->AddComponent<TransformComponent>();
+    levelNumT->posX = camPos.x + panelX;
+    levelNumT->posY = camPos.y + 380.0f * uiScale;
+    levelNumT->scaleX = 500.0f * uiScale;
+    levelNumT->scaleY = 100.0f * uiScale;
+    levelNumObj->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(60 * uiScale),
+        statLevelNum, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Level subtitle: "Barbershop" ----
+    GameObject* levelNameObj = factory.CreateGameObject("LoseLevelName");
+    auto* levelNameT = levelNameObj->AddComponent<TransformComponent>();
+    levelNameT->posX = camPos.x + panelX;
+    levelNameT->posY = camPos.y + 310.0f * uiScale;
+    levelNameT->scaleX = 500.0f * uiScale;
+    levelNameT->scaleY = 70.0f * uiScale;
+    levelNameObj->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(36 * uiScale),
+        statLevelName, vec4(0.2f, 0.15f, 0.1f, 1.0f), false);
+
+    // ---- Clock icon ----
+    GameObject* clockIcon = factory.CreateGameObject("LoseClockIcon");
+    auto* clockT = clockIcon->AddComponent<TransformComponent>();
+    clockT->posX = camPos.x + (panelX - 120.0f * uiScale);
+    clockT->posY = camPos.y + 210.0f * uiScale;
+    clockT->scaleX = 110.0f * uiScale;
+    clockT->scaleY = 110.0f * uiScale;
+    auto* clockR = clockIcon->AddComponent<RenderComponent>();
+    clockR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Clock_icon.png"));
+    clockR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    clockR->SetLayer(102);
+
+    // ---- Time text ----
+    GameObject* timeText = factory.CreateGameObject("LoseTimeText");
+    auto* timeT = timeText->AddComponent<TransformComponent>();
+    timeT->posX = camPos.x + (panelX + 50.0f * uiScale);
+    timeT->posY = camPos.y + 210.0f * uiScale;
+    timeT->scaleX = 300.0f * uiScale;
+    timeT->scaleY = 70.0f * uiScale;
+    timeText->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        statTime, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Coin icon ----
+    GameObject* coinIconLose = factory.CreateGameObject("LoseCoinIcon");
+    auto* coinIconT = coinIconLose->AddComponent<TransformComponent>();
+    coinIconT->posX = camPos.x + (panelX - 180.0f * uiScale);
+    coinIconT->posY = camPos.y + 100.0f * uiScale;
+    coinIconT->scaleX = 110.0f * uiScale;
+    coinIconT->scaleY = 110.0f * uiScale;
+    auto* coinIconR = coinIconLose->AddComponent<RenderComponent>();
+    coinIconR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Coin_icon.png"));
+    coinIconR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    coinIconR->SetLayer(102);
+
+    // ---- Coin count text ----
+    GameObject* coinCountLose = factory.CreateGameObject("LoseCoinText");
+    auto* coinCountT = coinCountLose->AddComponent<TransformComponent>();
+    coinCountT->posX = camPos.x + (panelX - 90.0f * uiScale);
+    coinCountT->posY = camPos.y + 100.0f * uiScale;
+    coinCountT->scaleX = 150.0f * uiScale;
+    coinCountT->scaleY = 70.0f * uiScale;
+    coinCountLose->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        statCoins, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Shell icon ----
+    GameObject* shellIconLose = factory.CreateGameObject("LoseShellIcon");
+    auto* shellIconT = shellIconLose->AddComponent<TransformComponent>();
+    shellIconT->posX = camPos.x + (panelX + 60.0f * uiScale);
+    shellIconT->posY = camPos.y + 100.0f * uiScale;
+    shellIconT->scaleX = 110.0f * uiScale;
+    shellIconT->scaleY = 110.0f * uiScale;
+    auto* shellIconR = shellIconLose->AddComponent<RenderComponent>();
+    shellIconR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Shell_icon.png"));
+    shellIconR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    shellIconR->SetLayer(102);
+
+    // ---- Shell count text ----
+    GameObject* shellCountLose = factory.CreateGameObject("LoseShellText");
+    auto* shellCountT = shellCountLose->AddComponent<TransformComponent>();
+    shellCountT->posX = camPos.x + (panelX + 155.0f * uiScale);
+    shellCountT->posY = camPos.y + 100.0f * uiScale;
+    shellCountT->scaleX = 150.0f * uiScale;
+    shellCountT->scaleY = 70.0f * uiScale;
+    shellCountLose->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        statShells, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Shop Rating: label ----
+    GameObject* ratingLabel = factory.CreateGameObject("LoseRatingLabel");
+    auto* ratingLabelT = ratingLabel->AddComponent<TransformComponent>();
+    ratingLabelT->posX = camPos.x + (panelX - 80.0f * uiScale);
+    ratingLabelT->posY = camPos.y + -20.0f * uiScale;
+    ratingLabelT->scaleX = 320.0f * uiScale;
+    ratingLabelT->scaleY = 70.0f * uiScale;
+    ratingLabel->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "Shop Rating:", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+
+    // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
+    GameObject* ratingBadge = factory.CreateGameObject("LoseRatingBadge");
+    auto* ratingBadgeT = ratingBadge->AddComponent<TransformComponent>();
+    ratingBadgeT->posX = camPos.x + (panelX + 170.0f * uiScale);
+    ratingBadgeT->posY = camPos.y + -20.0f * uiScale;
+    ratingBadgeT->scaleX = 160.0f * uiScale;
+    ratingBadgeT->scaleY = 140.0f * uiScale;
+    auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
+    ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
+    ratingBadgeR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    ratingBadgeR->SetLayer(102);
+
+    // ---- Replay button ----
     GameObject* yesBtn = factory.CreateGameObject("YesButton");
     auto* yesTransform = yesBtn->AddComponent<TransformComponent>();
-    yesTransform->posX = camPos.x + 550.0f * uiScale;
-    yesTransform->posY = camPos.y + -50.0f * uiScale;
-    yesTransform->scaleX = 550.0f * uiScale;
-    yesTransform->scaleY = 140.0f * uiScale;
+    yesTransform->posX = camPos.x + panelX;
+    yesTransform->posY = camPos.y + -170.0f * uiScale;
+    yesTransform->scaleX = 420.0f * uiScale;
+    yesTransform->scaleY = 100.0f * uiScale;
     auto* yesRender = yesBtn->AddComponent<RenderComponent>();
     yesRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     yesRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     yesRender->SetLayer(102);
     yesBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Yes", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // quit button which goes back to main menu
+    // ---- Quit button ----
     GameObject* loseQuitBtn = factory.CreateGameObject("LoseQuitButton");
     auto* loseQuitTransform = loseQuitBtn->AddComponent<TransformComponent>();
-    loseQuitTransform->posX = camPos.x + 550.0f * uiScale;
-    loseQuitTransform->posY = camPos.y + -200.0f * uiScale;
-    loseQuitTransform->scaleX = 550.0f * uiScale;
-    loseQuitTransform->scaleY = 140.0f * uiScale;
+    loseQuitTransform->posX = camPos.x + panelX;
+    loseQuitTransform->posY = camPos.y + -300.0f * uiScale;
+    loseQuitTransform->scaleX = 420.0f * uiScale;
+    loseQuitTransform->scaleY = 100.0f * uiScale;
     auto* loseQuitRender = loseQuitBtn->AddComponent<RenderComponent>();
     loseQuitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     loseQuitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     loseQuitRender->SetLayer(102);
     loseQuitBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(50 * uiScale), "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedLoseScreen = true;
 }
@@ -1009,7 +1333,17 @@ void WinLoseLogicSystem::DestroyLoseScreen()
 
     std::vector<std::string> uiElements = {
         "LoseScreen",
-        "LoseReplayLogo",
+        "LoseTitleBracket",
+        "LoseLevelNumber",
+        "LoseLevelName",
+        "LoseClockIcon",
+        "LoseTimeText",
+        "LoseCoinIcon",
+        "LoseCoinText",
+        "LoseShellIcon",
+        "LoseShellText",
+        "LoseRatingLabel",
+        "LoseRatingBadge",
         "YesButton",
         "LoseQuitButton"
     };
@@ -1052,4 +1386,3 @@ void WinLoseLogicSystem::DestroyLoseScreen()
 
     std::cout << "[WinLoseLogic] Lose screen destroyed and state reset" << std::endl;
 }
-

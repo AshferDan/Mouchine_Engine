@@ -61,7 +61,7 @@ void CameraComponent::Update(float dt) {
 			transform->GetPosition(targetX, targetY);
 
 			// Calculate the final desired position including the offset.
-			vec2 targetPos(targetX + followOffset.x, targetY + followOffset.y);
+			vec2 targetPos(targetX - followOffset.x, targetY - followOffset.y);
 
 			if (enableSmoothing) {
 				// Exponential smoothing (Lerp) for frame rate independent dampening:

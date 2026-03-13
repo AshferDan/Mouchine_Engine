@@ -28,7 +28,7 @@ Technology is prohibited.
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-std::string introPath = "../Assets/Cutscene.mpeg";
+std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
 
 // abit overkill but if we want more screens in the menu this is better
@@ -154,19 +154,22 @@ void MenuLogicSystem::Update(float dt)
                 if (hoveredButtonName == "LevelSelectedButton" && !selectedLevelScenePath.empty())
                 {
                     std::cout << "Starting level: " << selectedLevelScenePath << std::endl;
-
-                    CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
                     if (!cutscene->HasPlayed(introPath))
                     {
                         if (!cutscene->IsPlaying())
                         {
                             cutscene->PlayVideo(introPath, "CutsceneAudio");
                             currScreen = MenuScreens::Home;
-                            // Don't fade back in - let the fade out complete
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
+                        // Don't call RequestSceneLoad yet - StopCutscene will handle it
                     }
-                    CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    else
+                    {
+                        // Cutscene already played, load normally with transition
+                        CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    }
                 }
             }
 
@@ -390,11 +393,11 @@ void MenuLogicSystem::Update(float dt)
 
         // Show level select text labels when on settings screen
         if (auto *rText = GameObjectFactory::Instance().FindGameObject("Rating"))
-            rText->SetActive(true);
+            rText->SetActive(false);
         if (auto *rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
-            rText2->SetActive(true);
+            rText2->SetActive(false);
         if (auto *rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
-            rText3->SetActive(true);
+            rText3->SetActive(false);
     }
 
     double mouseX = InputManager::GetMouseWorldX();
@@ -557,6 +560,17 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
         if (IsMouseOver(factory.FindGameObject("Level_BackButton"), mouseX, mouseY))
             return "Level_BackButton";
         break;
+
+    case MenuScreens::ReplayPicker:
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot0"), mouseX, mouseY))
+            return "ReplayPicker_Slot0";
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot1"), mouseX, mouseY))
+            return "ReplayPicker_Slot1";
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot2"), mouseX, mouseY))
+            return "ReplayPicker_Slot2";
+        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Back"), mouseX, mouseY))
+            return "ReplayPicker_Back";
+        break;
     }
 
     return "";
@@ -635,7 +649,7 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     if (buttonName == "Level2Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level2Button", "../Assets/Scenes/Level2.json"); // to change to proper scene
+        SelectLevel("Level2Button", "../Assets/Scenes/Level_2.json"); 
         return true;
     }
 
@@ -755,6 +769,32 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
     {
         std::cout << "ReplayButton Clicked! Opening replay picker..." << std::endl;
         ShowReplayPicker();
+        return true;
+    }
+
+    if (buttonName == "ReplayPicker_Back")
+    {
+        HideReplayPicker();
+        currScreen = MenuScreens::Home;
+        return true;
+    }
+
+    if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" || buttonName == "ReplayPicker_Slot2")
+    {
+        int idx = buttonName.back() - '0';
+        if (idx >= 0 && idx < static_cast<int>(m_replayNames.size()))
+        {
+            m_selectedReplay = m_replayNames[idx];
+            std::cout << "[MenuLogic] Replay selected: " << m_selectedReplay << std::endl;
+            if (audioManager)
+                audioManager->FadeOutCategory("music", 2.5f);
+            pendingSceneChange = true;
+            pendingTimer = 2.6f;
+        }
+        else
+        {
+            std::cout << "[MenuLogic] Clicked empty replay slot." << std::endl;
+        }
         return true;
     }
 
@@ -928,10 +968,35 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
         }
     }
     else if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" ||
-             buttonName == "ReplayPicker_Slot2" || buttonName == "ReplayPicker_Back")
+             buttonName == "ReplayPicker_Slot2")
     {
-        
-        return;
+        if (isPressed)
+        {
+            texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
+        }
+        else if (isHovered)
+        {
+            texturePath = "../Assets/Sprites/Icons/Button_Large_light.png";
+        }
+        else
+        {
+            texturePath = "../Assets/Sprites/Icons/blankbtnL.png";
+        }
+    }
+    else if (buttonName == "ReplayPicker_Back")
+    {
+        if (isPressed)
+        {
+            texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
+        }
+        else if (isHovered)
+        {
+            texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
+        }
+        else
+        {
+            texturePath = "../Assets/Sprites/Icons/Back_button.png";
+        }
     }
     else if (buttonName == "Level1Button")
     {
@@ -1374,11 +1439,12 @@ void MenuLogicSystem::ShowReplayPicker()
     titleT->posY = camPos.y + 300.0f;
     titleT->scaleX = 700.0f;
     titleT->scaleY = 100.0f;
-    auto *titleR = titleObj->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.1f, 0.1f, 0.28f, 0.95f));
+    auto *titleR = titleObj->AddComponent<RenderComponent>();
+    titleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    titleR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     titleR->SetLayer(baseLayer + 1);
     titleObj->AddComponent<TextComponent>(font.c_str(), titleSize, "CHOOSE A REPLAY",
-                                          vec4(1.0f, 1.0f, 1.0f, 1.0f), false);
+                                          vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // Slot buttons (3 slots, stacked vertically)
     const float slotStartY = camPos.y + 130.0f;
@@ -1406,16 +1472,12 @@ void MenuLogicSystem::ShowReplayPicker()
         slotT->scaleX = 620.0f;
         slotT->scaleY = 110.0f;
 
-        vec4 color = hasReplay
-                         ? vec4(0.15f, 0.15f, 0.38f, 0.92f)
-                         : vec4(0.10f, 0.10f, 0.15f, 0.55f);
-        auto *slotR = slot->AddComponent<RenderComponent>(
-            RenderComponent::ShapeType::Square, color);
+        auto *slotR = slot->AddComponent<RenderComponent>();
+        slotR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+        slotR->SetColor(hasReplay ? vec4(1.0f, 1.0f, 1.0f, 1.0f) : vec4(0.55f, 0.55f, 0.55f, 1.0f));
         slotR->SetLayer(baseLayer + 1);
 
-        vec4 textColor = hasReplay
-                             ? vec4(1.0f, 1.0f, 1.0f, 1.0f)
-                             : vec4(0.5f, 0.5f, 0.5f, 1.0f);
+        vec4 textColor = hasReplay ? vec4(0.0f, 0.0f, 0.0f, 1.0f) : vec4(0.3f, 0.3f, 0.3f, 1.0f);
         slot->AddComponent<TextComponent>(font.c_str(), slotSize, displayName, textColor, false);
     }
 
@@ -1424,13 +1486,12 @@ void MenuLogicSystem::ShowReplayPicker()
     auto *backT = backBtn->AddComponent<TransformComponent>();
     backT->posX = camPos.x;
     backT->posY = camPos.y - 300.0f;
-    backT->scaleX = 280.0f;
-    backT->scaleY = 90.0f;
-    auto *backR = backBtn->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.28f, 0.10f, 0.10f, 0.92f));
+    backT->scaleX = 200.0f;
+    backT->scaleY = 175.0f;
+    auto *backR = backBtn->AddComponent<RenderComponent>();
+    backR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
+    backR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     backR->SetLayer(baseLayer + 1);
-    backBtn->AddComponent<TextComponent>(font.c_str(), slotSize, "BACK",
-                                         vec4(1.0f, 1.0f, 1.0f, 1.0f), false);
 
     m_hasCreatedReplayPicker = true;
     currScreen = MenuScreens::ReplayPicker;

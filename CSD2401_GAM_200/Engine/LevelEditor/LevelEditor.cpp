@@ -29,6 +29,7 @@ Technology is prohibited.
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "../../Game/GameManager/GameManager.h"
 
 namespace fs = std::filesystem;
 
@@ -317,6 +318,8 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
+    // fire Start() once on all active game states
+    //GameManager::Instance().StartActiveState();
 
     // start bgm when play is click
     if (audioManager)

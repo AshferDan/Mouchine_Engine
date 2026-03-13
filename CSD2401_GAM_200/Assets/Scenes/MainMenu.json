@@ -75,8 +75,9 @@
             "startCol": 0,
             "endRow": 2,
             "endCol": 3,
-            "fps": 6.0,
-            "pingPong": false
+            "fps": 10.0,
+            "pingPong": false,
+            "flipRows": true
           }
         ]
       },
@@ -2185,7 +2186,7 @@
       },
       {
         "name": "CutsceneAudio",
-        "filepath": "../Assets/CutsceneAudio.wav",
+        "filepath": "../Assets/Audio/Cutscene_M5_Audio.wav",
         "loop": false,
         "volume": 1.0,
         "pitch": 1.0,

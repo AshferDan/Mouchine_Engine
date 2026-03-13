@@ -1,0 +1,36 @@
+{
+    "GameObjects": [
+        {
+            "name": "Frontlayer_BackGround2",
+            "localID": 11,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    0.0,
+                    -630.0
+                ],
+                "scale": [
+                    4200.0,
+                    1920.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": -109,
+                "screenSpace": false
+            },
+            "children": []
+        }
+    ]
+}
