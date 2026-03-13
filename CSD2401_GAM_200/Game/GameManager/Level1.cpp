@@ -40,6 +40,10 @@ void Level1::Init() {
 void Level1::Update(float dt) {
 	timer += dt;
     auto& factory = GameObjectFactory::Instance();
+    //std::cout << pickupSys1.currCoins << '\n';
+
+    /*int currCoins = CORE->GetGameCallbacks()->GetCurrentCoins();
+    int currShells = CORE->GetGameCallbacks()->GetCurrentShells();*/
 
     GameObject* coinText = factory.FindGameObject("CoinCountText");
     GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");

@@ -48,12 +48,12 @@ namespace CSharpScript
                 return;
             }
 
-            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.8f, 1.0f, "pickup");
+            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.8f, 1.0f, "pickup");
+            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.8f, 1.0f, "pickup");
+            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.8f, 1.0f, "pickup");
+            Audio.AddSound("PU_Coin_sfx2", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.8f, 1.0f, "pickup");
+            Audio.AddSound("PU_Coin_sfx3", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.8f, 1.0f, "pickup");
         }
 
         public void OnUpdate(float deltaTime)
@@ -73,6 +73,7 @@ namespace CSharpScript
         {
             if (Collision.IsCollidingWithLayer(OwnerName, (int)CollisionLayer.Pickup))
             {
+                Debug.Log("aaaaaaa");
                 int goID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
                 if (goID <= 0) return;
 
@@ -80,19 +81,21 @@ namespace CSharpScript
                 {
                     // coin effect
                     Random rnd = new Random();
-                    int variation = rnd.Next(1, 3);             // 9 diff running sounds
-                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "sfx");
+                    int variation = rnd.Next(1, 4);
+                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "pickup");
+
+                    Pickups.CollectCoin();
                 }
                 else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Shell_Name))
                 {
                     // shell effect
-                    Audio.PlaySound("PU_Shell_sfx", "sfx");
+                    Audio.PlaySound("PU_Shell_sfx", "pickup");
                 }
                 else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_PowerUp_Name))
                 {
                     // powerup effect
                     //check if time or speed
-                    Audio.PlaySound("PU_Time_sfx", "sfx");
+                    Audio.PlaySound("PU_Time_sfx", "pickup");
                 }
                 else
                 {

@@ -1806,7 +1806,7 @@ namespace CSharpScript
                 {
                     //playfootstep
                     Random rnd = new Random();
-                    int variation = rnd.Next(1, 9);             // 9 diff running sounds
+                    int variation = rnd.Next(1, 10);             // 9 diff running sounds
                     Audio.PlaySound("footstep_sfx" + variation.ToString(), "sfx");
                     footstepTimer = 0.0f;
                 }
@@ -1860,7 +1860,7 @@ namespace CSharpScript
                 case PlayerState.Land:
                     if (enableDebug) Debug.Log("CurrState: " + "Landed");
                     Random rnd = new Random();
-                    int variation = rnd.Next(1, 4);                     // 4 diff landing sounds
+                    int variation = rnd.Next(1, 5);                     // 4 diff landing sounds
                     Audio.PlaySound("land_sfx" + variation.ToString(), "sfx");
                     break;
                 case PlayerState.GroundPounding:

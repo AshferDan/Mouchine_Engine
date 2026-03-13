@@ -2,14 +2,14 @@
     "GameObjects": [
         {
             "name": "PU_Coin",
-            "localID": 9,
+            "localID": 7,
             "parentID": 4294967295,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    370.9999694824219,
-                    -15.499998092651367
+                    389.0,
+                    -27.5
                 ],
                 "scale": [
                     125.0,
@@ -28,7 +28,12 @@
                     1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
             },
             "Spritesheet": {
                 "enabled": true,
@@ -43,14 +48,16 @@
                         "startCol": 0,
                         "endRow": 0,
                         "endCol": 7,
-                        "fps": 12.0
+                        "fps": 12.0,
+                        "pingPong": false,
+                        "flipRows": false
                     }
                 ]
             },
             "ColliderComponent": {
                 "enabled": true,
                 "shape": "Square",
-                "layer": "Default",
+                "layer": "Pickup",
                 "size": [
                     125.0,
                     125.0

@@ -37,7 +37,7 @@ public:
 		//InitPickups();
 	}
 
-	void CollectCoin() { currCoins++; }
+	void CollectCoin() { currCoins++; std::cout << "\n\n\n\n\n\n"; }
 	void CollectShell() { currShells++; }
 
 	void SetTotalCoins(int val) { _coins = val; }
