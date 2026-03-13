@@ -444,9 +444,6 @@ void GraphicsSystem::Update(float)
         }
     }
 
-	auto* cam = CameraManager::Instance().GetActiveCamera();
-	std::cout << "Camera Offset: " << cam->GetFollowOffset().x << ", " << cam->GetFollowOffset().y << std::endl;
-
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
     if (!cachedBackground)
     {
@@ -555,6 +552,10 @@ void GraphicsSystem::Update(float)
     if (textObj)
     {
         auto *textFPS = textObj->GetComponent<TextComponent>();
+  //      auto* textPos = textObj->GetComponent<TransformComponent>();
+  //      float x, y;
+		//textPos->GetPosition(x, y);
+		//std::cout << "Text Position is X: " << x << " Y: " << y << std::endl;
         if (InputManager::ShowFPS && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play)
         {
             textFPS->SetEnabled(true);
@@ -873,50 +874,17 @@ void GraphicsSystem::Update(float)
         }
 
         // Text rendering
-        if (auto *textComp = obj->GetComponent<TextComponent>())
+        if (auto* textComp = obj->GetComponent<TextComponent>())
         {
             if (textComp->IsEnabled())
             {
-                if (auto *transform = obj->GetComponent<TransformComponent>())
+                if (auto* transform = obj->GetComponent<TransformComponent>())
                 {
                     float x, y;
                     transform->GetPosition(x, y);
 
-                    // for screen-space text, position is fixed screen coordinates
-                    // but for objects like timers that should stay at top-left, adjust for viewport height
-                    if (textComp->isScreenSpace())
-                    {
-                        static std::map<TextComponent *, vec2> screenSpacePositions;
-                        static std::map<TextComponent *, bool> needsTopAlignment;
-
-                        if (screenSpacePositions.find(textComp) == screenSpacePositions.end())
-                        {
-                            // store the original position as screen coordinates
-                            screenSpacePositions[textComp] = vec2(x, y);
-                            // if y > 500 suggests top positioning)
-                            needsTopAlignment[textComp] = (y > 500.0f);
-                        }
-
-                        x = screenSpacePositions[textComp].x;
-
-                        // calculate y relative to viewport height
-                        if (needsTopAlignment[textComp])
-                        {
-                            float rHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
-                            // float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
-                            // Use the Y position from transform as offset from top
-                            float offsetFromTop = rHeight - screenSpacePositions[textComp].y;
-                            y = rHeight - offsetFromTop;
-                        }
-                        else
-                        {
-                            y = screenSpacePositions[textComp].y;
-                        }
-                    }
-
-                    // Render text using the dedicated text rendering function
                     RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
-                               textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
+                        textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
                 }
             }
         }

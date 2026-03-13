@@ -329,7 +329,7 @@ private:
 	bool    vignetteEnabled = true;
 	float   vignetteInnerRadius = 0.25f;
 	float   vignetteOuterRadius = 0.75f;
-	float   vignetteIntensity = 0.5f;
+	float   vignetteIntensity = 0.25f;
 	vec4    vignetteColor = vec4(0.f, 0.f, 0.f, 1.f);
 
 	// --- Single Quad Rendering (Legacy/Test) Buffers ---
