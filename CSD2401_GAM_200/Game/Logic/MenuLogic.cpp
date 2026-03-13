@@ -153,19 +153,22 @@ void MenuLogicSystem::Update(float dt)
                 if (hoveredButtonName == "LevelSelectedButton" && !selectedLevelScenePath.empty())
                 {
                     std::cout << "Starting level: " << selectedLevelScenePath << std::endl;
-
-                    CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
                     if (!cutscene->HasPlayed(introPath))
                     {
                         if (!cutscene->IsPlaying())
                         {
                             cutscene->PlayVideo(introPath, "CutsceneAudio");
                             currScreen = MenuScreens::Home;
-                            // Don't fade back in - let the fade out complete
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
+                        // Don't call RequestSceneLoad yet - StopCutscene will handle it
                     }
-                    CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    else
+                    {
+                        // Cutscene already played, load normally with transition
+                        CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    }
                 }
             }
 
