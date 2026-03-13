@@ -55,7 +55,7 @@ namespace CSharpScript
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
-        private string audioFilepath = "..Assets/Audio/";
+        // Not use yet: private string audioFilepath = "..Assets/Audio/";
 
         public PlayerMovementStats MoveStats;
         public PickupManager pickupManager;
@@ -77,7 +77,7 @@ namespace CSharpScript
 
         // public facing right for other scripts
         public bool IsFacingRight => _isFacingRight;        // public facing right for other scripts
-        private int _queuedDirection = 0;                   // remembers input while airborne
+        // Not use yet: private int _queuedDirection = 0;                   // remembers input while airborne
         private int _facingDirection = 1;                   // visual direction
 
         // collision check variables
@@ -115,12 +115,14 @@ namespace CSharpScript
 
         // wall kick variables
         private bool _isWallKicking = false;
-        private int wallKickFrameCounter = 0;           // [WIP] for cayote time 
+        //private int wallKickFrameCounter = 0;           // [WIP] for cayote time 
         private bool canWallKick = false;                   // Checks if touching a wall, and can perform a wall kick
+#pragma warning disable CS0414
         private bool blockMovement = false;         // Prevents player from controlling character
+#pragma warning restore CS0414
         private float _wallKickTimer = 0;
         private float _wallKickCooldownTimer = 0;
-        private bool _startedWallKickInAir = false;
+        // Not use yet: private bool _startedWallKickInAir = false;
         private float _wallKickTotalDuration = 0;
 
         // wall slide variables
@@ -147,9 +149,9 @@ namespace CSharpScript
 
         // zipline variables
         private bool _isZiplining = false;
-        private bool _isBeingLaunched = false;
+        // Not use yet: private bool _isBeingLaunched = false;
         private float _ziplineCoyoteTimer = 0;
-        private float _ziplineHeadOffset = 0;
+        // Not use yet: private float _ziplineHeadOffset = 0;
 
         // knockback
         bool IsBeingKnockedBack = false;
@@ -161,7 +163,7 @@ namespace CSharpScript
         // movement penalties - bonk & skid & hurt
         private float _bonkTimer = 0f;
         private bool _isSkidding;
-        private int _skidTargetDirection;
+        // Not use yet: private int _skidTargetDirection;
         private float _skidTimer = 0f;
         private float _calculatedSkidDecel;
         private float _hurtTimer = 0f;
@@ -179,7 +181,7 @@ namespace CSharpScript
             Debug.Log("PlayerMovement instantiated with new stats.");
         }
 
-        public void OnStart()
+        public override void OnStart()
         {
             // It's crucial that OwnerName is set by the C++ engine before OnStart is called.
             if (OwnerName == null)
@@ -308,7 +310,7 @@ namespace CSharpScript
         bool vfxTracksPlayer;
         bool vfxInitialized;
         vec2 staticVfxPos;
-        public void OnUpdate(float deltaTime)
+        public override void OnUpdate(float deltaTime)
         {
             if (OwnerName == null || OwnerName == "") return;
 
@@ -1428,7 +1430,7 @@ namespace CSharpScript
             // reset Y velocity but keep X momentum
             Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Physics.GetVelocity(OwnerName).y);
 
-            wallKickFrameCounter = 0;
+            //wallKickFrameCounter = 0;
         }
         #endregion
 
@@ -1779,7 +1781,7 @@ namespace CSharpScript
 
         #endregion
 
-        public void OnDestroy()
+        public override void OnDestroy()
         {
             Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
         }
@@ -2050,7 +2052,7 @@ namespace CSharpScript
             movespeed = 0;
 
             // public facing right for other scripts
-            _queuedDirection = 0;
+            // Not use yet: _queuedDirection = 0;
             _facingDirection = 1;
 
             // collision check variables
@@ -2087,12 +2089,12 @@ namespace CSharpScript
 
             // wall kick variables
             _isWallKicking = false;
-            wallKickFrameCounter = 0;
+            //wallKickFrameCounter = 0;
             canWallKick = false;
             blockMovement = false;
             _wallKickTimer = 0;
             _wallKickCooldownTimer = 0;
-            _startedWallKickInAir = false;
+            // Not use yet: _startedWallKickInAir = false;
             _wallKickTotalDuration = 0;
 
             // wall slide variables
@@ -2114,14 +2116,14 @@ namespace CSharpScript
 
             // zipline variables
             _isZiplining = false;
-            _isBeingLaunched = false;
+            // Not use yet: _isBeingLaunched = false;
             _ziplineCoyoteTimer = 0;
-            _ziplineHeadOffset = 0;
+            // Not use yet: _ziplineHeadOffset = 0;
 
             // movement penalties - bonk & skid
             _bonkTimer = 0;
             _isSkidding = false;
-            _skidTargetDirection = 0;
+            // Not use yet: _skidTargetDirection = 0;
             _skidTimer = 0;
             _calculatedSkidDecel = 0;
         }

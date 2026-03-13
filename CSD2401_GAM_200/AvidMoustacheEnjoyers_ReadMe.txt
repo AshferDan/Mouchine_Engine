@@ -29,7 +29,10 @@ Player Controls
   J			Dash
   K			Roll
   L			Wall Kick
-
+  F                     Rewind (Replay)
+  G                     Play (Replay)
+  H                     Forward (Replay)
+ 
 System
 
 - IMGUI

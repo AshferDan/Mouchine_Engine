@@ -22,7 +22,7 @@ namespace CSharpScript
 {
     public class PlayerMovementStats : GameScript
     {
-        private static float mod = 31.25f;          // 12.5f * 2.5f
+        //private static float mod = 31.25f;          // 12.5f * 2.5f
         // CLAMPS - Max values 
         public float Clamp_MaxRunSpeed = 1562.5f;   // 50.0f * mod
         public float Clamp_MaxJumpHeight = 2500f;   // 80f * mod

@@ -35,7 +35,7 @@ namespace CSharpScript
             Debug.Log("PickupManager instantiated with new stats.");
         }
 
-        public void OnStart()
+        public override void OnStart()
         {
             // It's crucial that OwnerName is set by the C++ engine before OnStart is called.
             if (OwnerName == null)
@@ -45,7 +45,7 @@ namespace CSharpScript
             }
         }
 
-        public void OnUpdate(float deltaTime)
+        public override void OnUpdate(float deltaTime)
         {
             if (OwnerName == null || OwnerName == "") { Debug.Log("no name"); return; }
 
@@ -68,7 +68,7 @@ namespace CSharpScript
             }
         }
 
-        public void OnDestroy()
+        public override void OnDestroy()
         {
             Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
         }
