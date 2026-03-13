@@ -117,6 +117,8 @@ private:
 
     bool isDraggingSlider = false;
     std::string currentSliderCategory = "";  // "master", "music", or "sfx"
+    bool justEnteredSettings = false;  // prevents slider input on first frame
+    bool wasMouseDownOnSlider = false;  // tracks previous mouse state for click detection
 
     // save last known volumes to restore visuals
     float savedMasterVolume = 1.0f;

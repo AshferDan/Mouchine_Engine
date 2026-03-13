@@ -66,7 +66,7 @@ void MenuLogicSystem::Update(float dt)
                     //std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
                     audioManager->StopSound("bgm_channel");
                     audioManager->PlaySound("MainMenuBGM", "bgm_channel");
-                    audioManager->FadeInCategory("music", 3.0f);
+                    audioManager->FadeInCategory("music", 3.0f, 0.8f); // fade to 80% volume instead of 100% cause too loud
                     //std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
                 }
                 else
@@ -217,7 +217,6 @@ void MenuLogicSystem::Update(float dt)
     else if (currScreen == MenuScreens::Settings)
     {
         //hoveredButtonName.clear();
-        static bool justEnteredSettings = false;
 
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
         {
@@ -335,9 +334,7 @@ void MenuLogicSystem::Update(float dt)
                         knobTransform->SetPosition(knobX, barCenterY);
                     }
                 }
-            } 
-
-            justEnteredSettings = false;
+            }
         }
     }
 
@@ -408,7 +405,19 @@ void MenuLogicSystem::Update(float dt)
     // handle slider input when on settings screen
     if (currScreen == MenuScreens::Settings)
     {
-        HandleSliderInput(mouseX, mouseY, isMouseDown);
+        if (!justEnteredSettings)
+        {
+            HandleSliderInput(mouseX, mouseY, isMouseDown);
+        }
+        else
+        {
+            // First frame entering settings - update mouse state but don't process input
+            // This prevents the next frame from thinking the mouse was just clicked
+            wasMouseDownOnSlider = isMouseDown;
+            isDraggingSlider = false;
+            currentSliderCategory = "";
+            justEnteredSettings = false;
+        }
     }
 
     auto& factory = GameObjectFactory::Instance();
@@ -1109,14 +1118,13 @@ void MenuLogicSystem::UpdateSlider(const std::string& barName, SliderState& slid
     // crop inside the painted slider bar
     float croppedUWidth = sliderState.uvBarWidth * safeFill;
     renderComp->SetUVScale(vec2(croppedUWidth, 1.0f));
-    renderComp->SetUVOffset(vec2(sliderState.uvBarMax - croppedUWidth, 0.0f));
+    renderComp->SetUVOffset(vec2(sliderState.uvBarMin, 0.0f));
 }
 
 void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMouseDown)
 {
     auto& factory = GameObjectFactory::Instance();
-    static bool wasMouseDown = false;
-    bool isMouseClicked = isMouseDown && !wasMouseDown;
+    bool isMouseClicked = isMouseDown && !wasMouseDownOnSlider;
 
     if (isMouseClicked && !isDraggingSlider)
     {
@@ -1141,7 +1149,7 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
         }
     }
 
-    wasMouseDown = isMouseDown;
+    wasMouseDownOnSlider = isMouseDown;
 
     if (!isMouseDown)
     {
@@ -1188,14 +1196,15 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                     barTransform->GetPosition(barCenterX, barCenterY);
                     barTransform->GetScale(barScaleX, barScaleY);
 
-                    float leftBound = barCenterX - barScaleX * 0.5f;
-                    float rightBound = barCenterX + barScaleX * 0.5f;
+                    float leftBound = (barCenterX - barScaleX * 0.5f) + (barScaleX * sliderState->uvBarMin);
+                    float usableWidth = barScaleX * sliderState->uvBarWidth;
+                    float rightBound = leftBound + usableWidth;
                     float mouseXf = static_cast<float>(mouseX);
 
                     mouseXf = std::clamp(mouseXf, leftBound, rightBound);
 
-                    // calculate volume based on mouse position
-                    float volumePercent = (mouseXf - leftBound) / barScaleX;
+                    // calculate volume based on mouse position within the usable slider area
+                    float volumePercent = (mouseXf - leftBound) / usableWidth;
                     volumePercent = std::clamp(volumePercent, 0.0f, 1.0f);
 
                     sliderState->currentVolume = volumePercent;

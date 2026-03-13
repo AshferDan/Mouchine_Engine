@@ -18,6 +18,7 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "CameraManager.h"
 #include "GameCallbacks.h"
+#include "stb_image.h"
 #include <iostream>
 
 /**
@@ -221,15 +222,15 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseMasterText",
             "PauseMusicText",
             "PauseSFXText",
-            "PauseSlider_Bar_Master",
-            "PauseSlider_Bar_Back_Master",
-            "PauseSlider_Knob_Master",
-            "PauseSlider_Bar_Music",
+            //"PauseSlider_Bar_Master",
+            "PauseSlider_Bar_Back_Master",  // background bars follow camera normally
+            //"PauseSlider_Knob_Master",
+            //"PauseSlider_Bar_Music",
             "PauseSlider_Bar_Back_Music",
-            "PauseSlider_Knob_Music",
-            "PauseSlider_Bar_SFX",
+            //"PauseSlider_Knob_Music",
+            //"PauseSlider_Bar_SFX",
             "PauseSlider_Bar_Back_SFX",
-            "PauseSlider_Knob_SFX",
+            //"PauseSlider_Knob_SFX",
             "PauseMasterMuteButton",
             "PauseMusicMuteButton",
             "PauseSFXMuteButton",
@@ -459,6 +460,97 @@ void PauseMenuLogicSystem::Update(float dt)
             // Clear any hover state from previous menu
             hoveredButtonName.clear();
 
+            // load current volume values from audio manager
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
+            {
+                // get current actual volumes from the audio manager
+                float currentMusicVol = audioManager->GetCategoryVolume("music");
+                float currentSfxVol = audioManager->GetCategoryVolume("sfx");
+
+                //std::cout << "[PauseMenu Init] Current volumes from AudioManager - Music: " << currentMusicVol
+                //          << ", SFX: " << currentSfxVol << std::endl;
+                //std::cout << "[PauseMenu Init] Saved volumes - Master: " << savedMasterVolume
+                //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume << std::endl;
+
+                if (savedMasterVolume == 1.0f && currentMusicVol < 1.0f)
+                {
+                    savedMasterVolume = currentMusicVol;
+                    savedMusicVolume = 1.0f;
+                    savedSfxVolume = currentSfxVol / savedMasterVolume;
+                    std::cout << "[PauseMenu Init] Inferred master volume: " << savedMasterVolume << std::endl;
+                }
+                else
+                {
+                    // reverse the master multiplication to get base volumes
+                    if (savedMasterVolume > 0.001f)
+                    {
+                        savedMusicVolume = currentMusicVol / savedMasterVolume;
+                        savedSfxVolume = currentSfxVol / savedMasterVolume;
+                    }
+                }
+
+                masterSlider.currentVolume = savedMasterVolume;
+                musicSlider.currentVolume = savedMusicVolume;
+                sfxSlider.currentVolume = savedSfxVolume;
+
+                //std::cout << "[PauseMenu Init] Final slider values - Master: " << masterSlider.currentVolume
+                //          << ", Music: " << musicSlider.currentVolume << ", SFX: " << sfxSlider.currentVolume << std::endl;
+
+                // only initialize if not already initialized
+                if (masterSlider.originalScaleX <= 0.0f)
+                {
+                    masterSlider.uvBoundsReady = false;
+                    musicSlider.uvBoundsReady = false;
+                    sfxSlider.uvBoundsReady = false;
+
+                    // update slider visuals to match saved volumes
+                    UpdateSlider("PauseSlider_Bar_Master", masterSlider, savedMasterVolume);
+                    UpdateSlider("PauseSlider_Bar_Music", musicSlider, savedMusicVolume);
+                    UpdateSlider("PauseSlider_Bar_SFX", sfxSlider, savedSfxVolume);
+                }
+                else
+                {
+                    UpdateSlider("PauseSlider_Bar_Master", masterSlider, savedMasterVolume);
+                    UpdateSlider("PauseSlider_Bar_Music", musicSlider, savedMusicVolume);
+                    UpdateSlider("PauseSlider_Bar_SFX", sfxSlider, savedSfxVolume);
+                }
+
+                auto updateKnobPosition = [&factory](const std::string& barName, const std::string& knobName) {
+                    std::string barBackName = barName;
+                    size_t pos = barBackName.find("_Bar_");
+                    if (pos != std::string::npos) 
+                    {
+                        barBackName.insert(pos + 5, "Back_");
+                    }
+
+                    GameObject* sliderBar = factory.FindGameObject(barName);
+                    GameObject* barBack = factory.FindGameObject(barBackName);
+                    GameObject* knob = factory.FindGameObject(knobName);
+
+                    if (sliderBar && barBack && knob)
+                    {
+                        auto* sliderTransform = sliderBar->GetComponent<TransformComponent>();
+                        auto* barBackTransform = barBack->GetComponent<TransformComponent>();
+                        auto* knobTransform = knob->GetComponent<TransformComponent>();
+
+                        if (sliderTransform && knobTransform)
+                        {
+                            float sliderCenterX, sliderCenterY, sliderScaleX, sliderScaleY;
+                            sliderTransform->GetPosition(sliderCenterX, sliderCenterY);
+                            sliderTransform->GetScale(sliderScaleX, sliderScaleY);
+
+                            float knobX = sliderCenterX + sliderScaleX * 0.5f - 570.0f;
+                            knobTransform->SetPosition(knobX, sliderCenterY);
+                        }
+                    }
+                };
+
+                updateKnobPosition("PauseSlider_Bar_Master", "PauseSlider_Knob_Master");
+                updateKnobPosition("PauseSlider_Bar_Music", "PauseSlider_Knob_Music");
+                updateKnobPosition("PauseSlider_Bar_SFX", "PauseSlider_Knob_SFX");
+            }
+
             // Show settings UI
             SetPauseSettingsVisible(true);
 
@@ -515,6 +607,9 @@ void PauseMenuLogicSystem::Update(float dt)
             if (settingsCloseTimer <= 0.0f)
             {
                 //std::cout << "[PauseMenu] Closing settings after delay" << std::endl;
+                // reset back button texture to normal before closing
+                SetButtonTexture("PauseBackButton", ButtonState::Normal);
+
                 isPauseSettingsOpen = false;
                 pendingSettingsClose = false;
                 hoveredButtonName.clear();
@@ -611,6 +706,10 @@ void PauseMenuLogicSystem::Update(float dt)
                 SetButtonTexture("PauseSFXMuteButton", ButtonState::Hover);
             }
         }
+
+        // handle slider input
+        bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        HandleSliderInput(mouseX, mouseY, isMouseDown);
 
         return; // Don't process normal pause menu interactions
     }
@@ -1006,17 +1105,22 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     sfxText->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(48 * uiScale), "SFX", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
+    // get camera position for initial positioning
+    vec2 initialCamPos = CameraManager::Instance().GetCameraPosition();
+
     // Master Slider - Bar
     GameObject* masterBar = factory.CreateGameObject("PauseSlider_Bar_Master");
     auto* masterBarTransform = masterBar->AddComponent<TransformComponent>();
-    masterBarTransform->posX = 200.0f * uiScale;
-    masterBarTransform->posY = 50.0f * uiScale;
+    masterBarTransform->posX = initialCamPos.x + 200.0f * uiScale;
+    masterBarTransform->posY = initialCamPos.y + 50.0f * uiScale;
     masterBarTransform->scaleX = 670.0f * uiScale;
     masterBarTransform->scaleY = 110.0f * uiScale;
     auto* masterBarRender = masterBar->AddComponent<RenderComponent>();
     masterBarRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar.png"));
     masterBarRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     masterBarRender->SetLayer(602);
+    masterBarRender->SetUVScale(vec2(1.0f, 1.0f));
+    masterBarRender->SetUVOffset(vec2(0.0f, 0.0f));
 
     // Master Slider - Back
     GameObject* masterBarBack = factory.CreateGameObject("PauseSlider_Bar_Back_Master");
@@ -1045,14 +1149,16 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Music Slider - Bar
     GameObject* musicBar = factory.CreateGameObject("PauseSlider_Bar_Music");
     auto* musicBarTransform = musicBar->AddComponent<TransformComponent>();
-    musicBarTransform->posX = 200.0f * uiScale;
-    musicBarTransform->posY = -75.0f * uiScale;
+    musicBarTransform->posX = initialCamPos.x + 200.0f * uiScale;
+    musicBarTransform->posY = initialCamPos.y + -75.0f * uiScale;
     musicBarTransform->scaleX = 670.0f * uiScale;
     musicBarTransform->scaleY = 110.0f * uiScale;
     auto* musicBarRender = musicBar->AddComponent<RenderComponent>();
     musicBarRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar.png"));
     musicBarRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     musicBarRender->SetLayer(602);
+    musicBarRender->SetUVScale(vec2(1.0f, 1.0f));
+    musicBarRender->SetUVOffset(vec2(0.0f, 0.0f));
 
     // Music Slider - Back
     GameObject* musicBarBack = factory.CreateGameObject("PauseSlider_Bar_Back_Music");
@@ -1081,14 +1187,16 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // SFX Slider - Bar
     GameObject* sfxBar = factory.CreateGameObject("PauseSlider_Bar_SFX");
     auto* sfxBarTransform = sfxBar->AddComponent<TransformComponent>();
-    sfxBarTransform->posX = 200.0f * uiScale;
-    sfxBarTransform->posY = -200.0f * uiScale;
+    sfxBarTransform->posX = initialCamPos.x + 200.0f * uiScale;
+    sfxBarTransform->posY = initialCamPos.y + -200.0f * uiScale;
     sfxBarTransform->scaleX = 670.0f * uiScale;
     sfxBarTransform->scaleY = 110.0f * uiScale;
     auto* sfxBarRender = sfxBar->AddComponent<RenderComponent>();
     sfxBarRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Slider_Bar.png"));
     sfxBarRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     sfxBarRender->SetLayer(602);
+    sfxBarRender->SetUVScale(vec2(1.0f, 1.0f));
+    sfxBarRender->SetUVOffset(vec2(0.0f, 0.0f));
 
     // SFX Slider - Back
     GameObject* sfxBarBack = factory.CreateGameObject("PauseSlider_Bar_Back_SFX");
@@ -1760,6 +1868,345 @@ void PauseMenuLogicSystem::SetHowToPlayVisible(bool show)
         if (obj)
         {
             obj->SetActive(show);
+        }
+    }
+}
+
+/**
+ * @brief Computes the UV bounds for a slider bar by analyzing the texture.
+ */
+void PauseMenuLogicSystem::ComputeSliderUVBounds(RenderComponent* renderComp, SliderState& sliderState)
+{
+    std::string texturePath = renderComp->GetTexturePath();
+
+    // if texture path is empty, use the known slider bar texture path
+    if (texturePath.empty())
+    {
+        texturePath = "../Assets/Sprites/Icons/Slider_Bar.png";
+    }
+
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    unsigned char* pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
+
+    if (pixels && width > 0 && height > 0)
+    {
+        int minX = width;
+        int maxX = -1;
+        int pixelsWithAlpha = 0;
+
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                int index = (y * width + x) * 4;
+                unsigned char alpha = pixels[index + 3];
+
+                if (alpha > 0)
+                {
+                    pixelsWithAlpha++;
+                    minX = std::min(minX, x);
+                    maxX = std::max(maxX, x);
+                }
+            }
+        }
+
+        if (maxX >= minX)
+        {
+            sliderState.uvBarMin = static_cast<float>(minX) / static_cast<float>(width);
+            sliderState.uvBarMax = static_cast<float>(maxX + 1) / static_cast<float>(width);
+            sliderState.uvBarWidth = sliderState.uvBarMax - sliderState.uvBarMin;
+        }
+        else
+        {
+            sliderState.uvBarMin = 0.0f;
+            sliderState.uvBarMax = 1.0f;
+            sliderState.uvBarWidth = 1.0f;
+        }
+
+        stbi_image_free(pixels);
+    }
+    else
+    {
+        sliderState.uvBarMin = 0.0f;
+        sliderState.uvBarMax = 1.0f;
+        sliderState.uvBarWidth = 1.0f;
+    }
+
+    sliderState.uvBoundsReady = true;
+}
+
+/**
+ * @brief Updates a slider's visual appearance based on volume percentage.
+ */
+void PauseMenuLogicSystem::UpdateSlider(const std::string& barName, SliderState& sliderState, float volumePercent)
+{
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* sliderBarGO = factory.FindGameObject(barName);
+
+    if (!sliderBarGO)
+    {
+        return;
+    }
+
+    auto* renderComp = sliderBarGO->GetComponent<RenderComponent>();
+    auto* transformComp = sliderBarGO->GetComponent<TransformComponent>();
+
+    if (!renderComp || !transformComp)
+    {
+        return;
+    }
+
+    // get background bar to use its current position
+    std::string barBackName = barName;
+    size_t pos = barBackName.find("_Bar_");
+    if (pos != std::string::npos) {
+        barBackName.insert(pos + 5, "Back_");
+    }
+    GameObject* barBack = factory.FindGameObject(barBackName);
+
+    if (!barBack)
+    {
+        return;
+    }
+
+    auto* barBackTransform = barBack->GetComponent<TransformComponent>();
+    if (!barBackTransform)
+    {
+        return;
+    }
+
+    // compute the visible UV range once from the actual slider texture
+    if (!sliderState.uvBoundsReady)
+    {
+        ComputeSliderUVBounds(renderComp, sliderState);
+    }
+
+    // get current background bar position and scale
+    float barBackCenterX, barBackCenterY, barBackScaleX, barBackScaleY;
+    barBackTransform->GetPosition(barBackCenterX, barBackCenterY);
+    barBackTransform->GetScale(barBackScaleX, barBackScaleY);
+
+    if (sliderState.originalScaleX <= 0.0f)
+    {
+        transformComp->GetScale(sliderState.originalScaleX, sliderState.originalScaleY);
+    }
+
+    float fillPercentage = std::clamp(volumePercent, 0.0f, 1.0f);
+    float safeFill = std::max(fillPercentage, 0.001f);
+
+    // calculate the usable slider width from the background bar
+    float usableWidth = barBackScaleX * sliderState.uvBarWidth;
+
+    // calculate new width based on fill percentage
+    float newScaleX = usableWidth * safeFill;
+
+    // calculate the FIXED left edge position based on background bar
+    float leftEdge = (barBackCenterX - barBackScaleX * 0.5f) + (barBackScaleX * sliderState.uvBarMin);
+
+    // center position is left edge + half of the NEW width
+    float newCenterX = leftEdge + (newScaleX * 0.5f);
+
+    transformComp->SetScale(newScaleX, sliderState.originalScaleY);
+    transformComp->SetPosition(newCenterX, barBackCenterY);
+
+    // crop inside the painted slider bar show from LEFT side of texture
+    float croppedUWidth = sliderState.uvBarWidth * safeFill;
+    renderComp->SetUVScale(vec2(croppedUWidth, 1.0f));
+    renderComp->SetUVOffset(vec2(sliderState.uvBarMin, 0.0f));
+
+    // update knob(scissors icon) position
+    std::string knobName;
+    if (barName == "PauseSlider_Bar_Master")
+        knobName = "PauseSlider_Knob_Master";
+    else if (barName == "PauseSlider_Bar_Music")
+        knobName = "PauseSlider_Knob_Music";
+    else if (barName == "PauseSlider_Bar_SFX")
+        knobName = "PauseSlider_Knob_SFX";
+
+    if (!knobName.empty())
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* knob = factory.FindGameObject(knobName);
+        if (knob)
+        {
+            auto* knobTransform = knob->GetComponent<TransformComponent>();
+            if (knobTransform)
+            {
+                float knobX = newCenterX + newScaleX * 0.5f - 570.0f;
+                knobTransform->SetPosition(knobX, barBackCenterY);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Handles mouse interaction with audio sliders.
+ */
+void PauseMenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMouseDown)
+{
+    auto& factory = GameObjectFactory::Instance();
+    static bool wasMouseDown = false;
+    bool isMouseClicked = isMouseDown && !wasMouseDown;
+
+    if (isMouseClicked && !isDraggingSlider)
+    {
+        GameObject* masterBarBack = factory.FindGameObject("PauseSlider_Bar_Back_Master");
+        GameObject* musicBarBack = factory.FindGameObject("PauseSlider_Bar_Back_Music");
+        GameObject* sfxBarBack = factory.FindGameObject("PauseSlider_Bar_Back_SFX");
+
+        if (IsMouseOver(masterBarBack, mouseX, mouseY))
+        {
+            isDraggingSlider = true;
+            currentSliderCategory = "master";
+        }
+        else if (IsMouseOver(musicBarBack, mouseX, mouseY))
+        {
+            isDraggingSlider = true;
+            currentSliderCategory = "music";
+        }
+        else if (IsMouseOver(sfxBarBack, mouseX, mouseY))
+        {
+            isDraggingSlider = true;
+            currentSliderCategory = "sfx";
+        }
+    }
+
+    wasMouseDown = isMouseDown;
+
+    if (!isMouseDown)
+    {
+        isDraggingSlider = false;
+        currentSliderCategory = "";
+    }
+
+    // update slider position while dragging
+    if (isDraggingSlider && !currentSliderCategory.empty())
+    {
+        std::string barBackName;
+        SliderState* sliderState = nullptr;
+        std::string category;
+
+        if (currentSliderCategory == "master")
+        {
+            barBackName = "PauseSlider_Bar_Back_Master";
+            sliderState = &masterSlider;
+            category = "";
+        }
+        else if (currentSliderCategory == "music")
+        {
+            barBackName = "PauseSlider_Bar_Back_Music";
+            sliderState = &musicSlider;
+            category = "music";
+        }
+        else if (currentSliderCategory == "sfx")
+        {
+            barBackName = "PauseSlider_Bar_Back_SFX";
+            sliderState = &sfxSlider;
+            category = "sfx";
+        }
+
+        if (sliderState)
+        {
+            // get background bar to determine the slider range
+            GameObject* barBack = factory.FindGameObject(barBackName);
+            if (barBack)
+            {
+                auto* barTransform = barBack->GetComponent<TransformComponent>();
+                if (barTransform)
+                {
+                    float barCenterX, barCenterY, barScaleX, barScaleY;
+                    barTransform->GetPosition(barCenterX, barCenterY);
+                    barTransform->GetScale(barScaleX, barScaleY);
+
+                    float leftBound = (barCenterX - barScaleX * 0.5f) + (barScaleX * sliderState->uvBarMin);
+                    float usableWidth = barScaleX * sliderState->uvBarWidth;
+                    float rightBound = leftBound + usableWidth;
+                    float mouseXf = static_cast<float>(mouseX);
+
+                    mouseXf = std::clamp(mouseXf, leftBound, rightBound);
+
+                    // calculate volume based on mouse position within the usable slider area
+                    float volumePercent = (mouseXf - leftBound) / usableWidth;
+                    volumePercent = std::clamp(volumePercent, 0.0f, 1.0f);
+
+                    sliderState->currentVolume = volumePercent;
+
+                    // update the visual slider
+                    std::string barName;
+                    if (currentSliderCategory == "master")
+                        barName = "PauseSlider_Bar_Master";
+                    else if (currentSliderCategory == "music")
+                        barName = "PauseSlider_Bar_Music";
+                    else if (currentSliderCategory == "sfx")
+                        barName = "PauseSlider_Bar_SFX";
+
+                    UpdateSlider(barName, *sliderState, volumePercent);
+
+                    // this for the scissors icon
+                    std::string knobName;
+                    if (currentSliderCategory == "master")
+                        knobName = "PauseSlider_Knob_Master";
+                    else if (currentSliderCategory == "music")
+                        knobName = "PauseSlider_Knob_Music";
+                    else if (currentSliderCategory == "sfx")
+                        knobName = "PauseSlider_Knob_SFX";
+
+                    // position knob at right edge of filled bar
+                    GameObject* sliderBar = factory.FindGameObject(barName);
+                    GameObject* knob = factory.FindGameObject(knobName);
+                    if (sliderBar && knob)
+                    {
+                        auto* sliderTransform = sliderBar->GetComponent<TransformComponent>();
+                        auto* knobTransform = knob->GetComponent<TransformComponent>();
+                        if (sliderTransform && knobTransform)
+                        {
+                            float sliderCenterX, sliderCenterY, sliderScaleX, sliderScaleY;
+                            sliderTransform->GetPosition(sliderCenterX, sliderCenterY);
+                            sliderTransform->GetScale(sliderScaleX, sliderScaleY);
+
+                            float knobX = sliderCenterX + sliderScaleX * 0.5f - 570.0f;
+                            knobTransform->SetPosition(knobX, sliderCenterY);
+                        }
+                    }
+
+                    // update audio volume and save it
+                    AudioManager* audioManager = CORE->GetAudioManager();
+                    if (audioManager)
+                    {
+                        if (currentSliderCategory == "master")
+                        {
+                            savedMasterVolume = volumePercent;
+                            float finalMusicVol = savedMusicVolume * savedMasterVolume;
+                            float finalSfxVol = savedSfxVolume * savedMasterVolume;
+
+                            audioManager->SetCategoryVolume("music", finalMusicVol);
+                            audioManager->SetCategoryVolume("sfx", finalSfxVol);
+
+                            //std::cout << "[PauseMenu] Master slider - Final volumes: Music=" << finalMusicVol
+                            //          << ", SFX=" << finalSfxVol << std::endl;
+                        }
+                        else
+                        {
+                            if (currentSliderCategory == "music")
+                            {
+                                savedMusicVolume = volumePercent;
+                            }
+                            else if (currentSliderCategory == "sfx")
+                            {
+                                savedSfxVolume = volumePercent;
+                            }
+
+                            float finalVolume = volumePercent * savedMasterVolume;
+                            //std::cout << "[PauseMenu] " << currentSliderCategory << " slider - category='" << category
+                            //          << "', base=" << volumePercent << ", master=" << savedMasterVolume
+                            //          << ", final=" << finalVolume << std::endl;
+                            audioManager->SetCategoryVolume(category, finalVolume);
+                        }
+                    }
+                }
+            }
         }
     }
 }
