@@ -50,18 +50,16 @@ REM -----------------------------------------------
 echo.
 echo [2/5] Copying Editor_Icons...
 
-if not exist "Assets\Editor_Icons" mkdir "Assets\Editor_Icons"
-
-if exist "Assets\Editor_Icons" (
-    xcopy /E /I /Y "Assets\Editor_Icons\*" "Assets\Editor_Icons\" >nul 2>&1
-    echo    Editor_Icons already in place, verifying contents...
-) else (
-    echo    ERROR: Source Editor_Icons folder not found
+REM Editor_Icons lives at Assets\Editor_Icons\ - just verify it exists
+if not exist "Assets\Editor_Icons" (
+    echo    ERROR: Assets\Editor_Icons not found - make sure it is checked out from the repo
     pause
     exit /b 1
+) else (
+    echo    Editor_Icons verified at Assets\Editor_Icons\
 )
 
-REM Count copied icons
+REM Count icons
 set ICON_COUNT=0
 for %%F in ("Assets\Editor_Icons\*.png") do set /a ICON_COUNT+=1
 echo    Icons found: %ICON_COUNT% PNG file(s)
@@ -73,7 +71,7 @@ echo.
 echo [3/5] Setting up Game folder...
 
 if not exist Game mkdir Game
-echo    Created: Game\
+echo    Game\ directory ready
 
 if exist "Engine\default\main.cpp" (
     if not exist "Game\main.cpp" (
@@ -140,10 +138,10 @@ echo ===============================================
 echo   Installation completed successfully!
 echo ===============================================
 echo.
-echo   Assets\           - Asset directories created
+echo   Assets\              - Asset directories created
 echo   Assets\Editor_Icons\ - Editor icons ready
-echo   Game\main.cpp     - Default entry point ready
-echo   Build\            - CMake build configured
+echo   Game\main.cpp        - Default entry point ready
+echo   Build\               - CMake build configured
 echo.
 echo Press any key to exit...
 pause >nul

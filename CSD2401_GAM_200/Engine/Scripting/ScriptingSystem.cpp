@@ -971,6 +971,20 @@ static int Internal_GetCurrentShells()
     return 0;
 }
 
+static int Internal_GetTotalCoins()
+{
+    if (CORE && CORE->GetGameCallbacks())
+        return CORE->GetGameCallbacks()->GetTotalCoins();
+    return 0;
+}
+
+static int Internal_GetTotalShells()
+{
+    if (CORE && CORE->GetGameCallbacks())
+        return CORE->GetGameCallbacks()->GetTotalShells();
+    return 0;
+}
+
 // === WinLose System ===
 static void Internal_TriggerLoseZone()
 {
@@ -1626,6 +1640,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Pickups::CollectShell",     (void*)Internal_CollectShell);
     mono_add_internal_call("CSharpScript.Pickups::GetCurrentCoins",  (void*)Internal_GetCurrentCoins);
     mono_add_internal_call("CSharpScript.Pickups::GetCurrentShells", (void*)Internal_GetCurrentShells);
+    mono_add_internal_call("CSharpScript.Pickups::GetTotalCoins",    (void*)Internal_GetTotalCoins);
+    mono_add_internal_call("CSharpScript.Pickups::GetTotalShells",   (void*)Internal_GetTotalShells);
 
     // === WinLose System ===
     mono_add_internal_call("CSharpScript.WinLoseSystem::TriggerLose", (void*)Internal_TriggerLoseZone);

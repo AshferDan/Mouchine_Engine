@@ -18,6 +18,16 @@ GameManager& GameManager::Instance() {
 	return instance;
 }
 
+void GameManager::StartActiveState()
+{
+	if (!m_stateStack.empty() && !m_hasStarted)
+	{
+		std::cout << "[GAME MANAGER] START - " << m_stateStack.top()->GetName() << "\n";
+		m_stateStack.top()->Start();
+		m_hasStarted = true;
+	}
+}
+
 /**
  * @brief Replace the current active state with a new one.
  */
@@ -29,6 +39,7 @@ void GameManager::ChangeState(std::unique_ptr<GameState> state) {
 		m_stateStack.pop();
 	}
 
+	m_hasStarted = false;
 	std::cout << "[GAME MANAGER] CHANGE TO " << state->GetName() << "\n";
 	state->Load();
 	state->Init();
@@ -39,6 +50,7 @@ void GameManager::ChangeState(std::unique_ptr<GameState> state) {
  * @brief Overlay a new state without removing the existing one. (eg PauseState)
  */
 void GameManager::PushState(std::unique_ptr<GameState> state) {
+	m_hasStarted = false;
 	std::cout << "[GAME MANAGER] PUSH - " << state->GetName() << "\n";
 	state->Load();
 	state->Init();
@@ -55,6 +67,7 @@ void GameManager::PopState() {
 		m_stateStack.top()->Unload();
 		m_stateStack.pop();
 	}
+	m_hasStarted = false;
 }
 
 void GameManager::Update(float dt) {

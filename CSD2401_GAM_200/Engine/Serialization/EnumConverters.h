@@ -67,6 +67,7 @@ namespace EnumConverters
         case CollisionLayer::Platform: return "Platform";
         case CollisionLayer::Pickup:   return "Pickup";
         case CollisionLayer::Default:  return "Default";
+        default:                       return "Unknown";
         }
     }
 

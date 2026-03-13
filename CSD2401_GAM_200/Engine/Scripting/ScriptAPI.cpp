@@ -2292,7 +2292,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     }
 #pragma endregion
 
-#pragma region Ghost
+#pragma region Ghost/Recording
     namespace Ghost
     {
         void Configure(const std::string& liveTarget, const std::string& ghostTarget,
@@ -2353,6 +2353,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
                 return CORE->GetGhostSystem()->GetBestRunTime();
             return FLT_MAX;
         }
+
     }
 #pragma endregion
 

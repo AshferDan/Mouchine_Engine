@@ -553,7 +553,12 @@ void CoreEngine::update_time(double fps_calc_interval)
     iostream << CoreEngine::fixed_dt;
     tempfixeddt = iostream.str();
 
+#ifdef DEBUG
     title_str = "Game Engine | FPS:" + tempfps + " | DT: " + tempdt + " | Fixed DT: " + tempfixeddt;
+#else
+    title_str = "Moustach've been the wind";
+#endif // DEBUG
+
 
     GLFWwindow *Wind = CORE->GetGraphicsSystem()->getWindow();
     if (Wind)

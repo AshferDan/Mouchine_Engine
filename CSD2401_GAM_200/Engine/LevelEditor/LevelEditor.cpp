@@ -29,6 +29,7 @@ Technology is prohibited.
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "../../Game/GameManager/GameManager.h"
 
 namespace fs = std::filesystem;
 
@@ -317,6 +318,8 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
+    // fire Start() once on all active game states
+    //GameManager::Instance().StartActiveState();
 
     // start bgm when play is click
     if (audioManager)
@@ -342,7 +345,7 @@ void LevelEditor::EnterPlayMode()
             // Main menu scene - play menu BGM with fade in
             std::cout << "[LevelEditor] Playing main menu BGM\n";
             audioManager->PlaySound("MainMenuBGM", "bgm_channel");
-            audioManager->FadeInCategory("music", 3.0f);  // Fade in menu music over 3 seconds
+            audioManager->FadeInCategory("music", 3.0f, 0.8f);  // Fade in menu music to 80% over 3 seconds
             std::cout << "[LevelEditor] Started menu music fade in over 3 seconds\n";
         }
         else

@@ -29,6 +29,10 @@ void Level1::Init() {
 }
 
 // wait for a start() to add initpickups to 
+void Level1::Start()
+{
+    std::cout << "[LEVEL 1] Start - called once on Play\n";
+}
 
 void Level1::Update(float dt) {
 	timer += dt;

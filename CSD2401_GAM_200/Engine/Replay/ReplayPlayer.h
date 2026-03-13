@@ -36,29 +36,41 @@ public:
      */
     void StartPlayback(const std::string& ghostObjectName, const GhostRecording& recording);
 
-    /** @brief Stop playback and release the recording reference. */
+    /**
+     * @brief Stops playback and releases the recording reference.
+     */
     void StopPlayback();
 
     /**
-     * @brief Advance the playback clock and update the ghost object.
-     *        Call once per fixed-timestep tick.
+     * @brief Advances the playback clock and updates the ghost object's state.
+     *        Should be called once per fixed-timestep tick.
      * @param dt Fixed delta time for this tick.
      */
     void Update(float dt);
 
-    /** @brief Toggle pause — clock stops advancing but ghost stays visible. */
+    /**
+     * @brief Toggles the pause state of playback.
+     *        When paused, the clock stops advancing but the ghost remains visible.
+     */
     void TogglePause();
 
     /**
-     * @brief Shift the playback clock by deltaSeconds (negative = rewind).
+     * @brief Shifts the playback clock by the specified delta time.
      *        Clamps to [0, recording end]. Safe to call while paused.
+     * @param deltaSeconds The amount of time to shift (negative to rewind).
      */
     void Seek(float deltaSeconds);
 
-    /** @return True while actively playing back (including when paused). */
+    /**
+     * @brief Checks if playback is currently active.
+     * @return True while actively playing back (even if paused).
+     */
     bool IsPlaying() const { return m_isPlaying; }
 
-    /** @return True if playback is paused. */
+    /**
+     * @brief Checks if playback is currently paused.
+     * @return True if playback is paused.
+     */
     bool IsPaused()  const { return m_isPaused; }
 
 private:

@@ -322,7 +322,7 @@ void GameTimerSystem::UpdateBar(int )
     // find timer bar by name
     auto& factory = GameObjectFactory::Instance();
     GameObject* timerGO = factory.FindGameObject(timerObjectName);
-    GameObject* timerBackground = factory.FindGameObject("LevelTimerBarBackground");
+    //GameObject* timerBackground = factory.FindGameObject("LevelTimerBarBackground");
 
     if (!timerGO)
     {
@@ -332,7 +332,7 @@ void GameTimerSystem::UpdateBar(int )
 
     auto* renderComp = timerGO->GetComponent<RenderComponent>();
     auto* transformComp = timerGO->GetComponent<TransformComponent>();
-    auto* bgTransform = timerBackground->GetComponent<TransformComponent>();
+    //auto* bgTransform = timerBackground->GetComponent<TransformComponent>();
 
     if (!renderComp || !transformComp)
     {

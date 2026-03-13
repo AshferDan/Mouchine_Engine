@@ -24,31 +24,40 @@ class ReplayRecorder
 {
 public:
     /**
-     * @brief Begin recording the named GameObject.
+     * @brief Begins recording the state of the target GameObject.
      *        Clears any previous recording and resets the clock.
-     * @param targetName Name of the GameObject to track.
+     * @param targetName Name of the GameObject to record.
      */
     void StartRecording(const std::string& targetName);
 
     /**
-     * @brief Stop recording. The current recording remains accessible via GetRecording().
+     * @brief Stops the current recording process.
+     *        The accumulated recording remains accessible via GetRecording().
      */
     void StopRecording();
 
     /**
-     * @brief Sample the target this frame and store a keyframe.
-     *        Call once per fixed-timestep tick.
+     * @brief Samples the target's transform and animation state and stores a keyframe.
+     *        Should be called once per fixed-timestep tick.
      * @param dt Fixed delta time for this tick.
      */
     void Update(float dt);
 
-    /** @brief Clear the recording buffer and reset the clock. */
+    /**
+     * @brief Clears the recording buffer and resets the clock to zero.
+     */
     void Reset();
 
-    /** @return True while actively recording. */
+    /**
+     * @brief Checks if the recorder is currently active.
+     * @return True while actively recording.
+     */
     bool IsRecording() const { return m_isRecording; }
 
-    /** @return The recording accumulated so far. */
+    /**
+     * @brief Gets a reference to the accumulated recording.
+     * @return A constant reference to the GhostRecording vector.
+     */
     const GhostRecording& GetRecording() const { return m_recording; }
 
 private:

@@ -27,6 +27,7 @@ public:
 
 	virtual void Load() {}
 	virtual void Init() {}
+	virtual void Start() {}   // <-- NEW: called once on Play
 	virtual void Update(float dt) { (void)dt; }
 	virtual void Draw() {}
 	virtual void Free() {}
@@ -52,8 +53,9 @@ public:
 
 	const char* GetActiveStateName() const;
 	unsigned int GetStackSize() const;
-
+	void StartActiveState();
 private:
 	GameManager() {}
 	std::stack<std::unique_ptr<GameState>> m_stateStack;
+	bool m_hasStarted = false;
 };
