@@ -359,20 +359,20 @@ void PauseMenuLogicSystem::Update(float dt)
             {
                 //std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
 
-                // Destroy UI before scene change
-                DestroyHowToPlayUI();
-                DestroyGhostMenuUI();
-                DestroyPauseSettingsUI();
-                DestroyPauseMenuUI();
-
-                // close menu first
-                if (isPauseMenuActive)
-                {
-                    isPauseMenuActive = false;
-                    CORE->SetGamePaused(false, false);
-                }
-                // back to main menu
                 CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+                // Destroy UI before scene change
+                //DestroyHowToPlayUI();
+                //DestroyGhostMenuUI();
+                //DestroyPauseSettingsUI();
+                //DestroyPauseMenuUI();
+
+                //// close menu first
+                //if (isPauseMenuActive)
+                //{
+                //    isPauseMenuActive = false;
+                //    CORE->SetGamePaused(false, false);
+                //}
+                // back to main menu
             }
             else if (hoveredButtonName == "PauseHowToPlayButton")
             {
