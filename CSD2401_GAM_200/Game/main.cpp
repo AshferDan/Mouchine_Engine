@@ -122,6 +122,8 @@ int main()
             void CollectShell()         override { pickupSystem.CollectShell(); }
             int  GetCurrentCoins()  const override { return pickupSystem.GetCurrentCoins(); }
             int  GetCurrentShells() const override { return pickupSystem.GetCurrentShells(); }
+            int  GetTotalCoins()    const override { return pickupSystem.GetTotalCoins(); }
+            int  GetTotalShells()   const override { return pickupSystem.GetTotalShells(); }
             void ReinitPickups()        override { pickupSystem = PickupSystem(); }
         };
 

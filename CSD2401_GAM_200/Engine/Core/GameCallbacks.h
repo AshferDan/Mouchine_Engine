@@ -75,5 +75,7 @@ public:
     virtual void CollectShell()          {}
     virtual int  GetCurrentCoins()  const { return 0; }
     virtual int  GetCurrentShells() const { return 0; }
+    virtual int  GetTotalCoins()    const { return 0; }
+    virtual int  GetTotalShells()   const { return 0; }
     virtual void ReinitPickups()         {}
 };
