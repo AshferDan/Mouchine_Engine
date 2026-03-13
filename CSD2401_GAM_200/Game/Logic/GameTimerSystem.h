@@ -100,6 +100,7 @@ private:
     int         lastDisplayedSeconds = -1;          // last whole second shown on HUD
     std::string timerObjectName = "LevelTimerBar";
     bool        hasTriggeredTimeUp = false;         // prevent multiple scene loads
+    bool        hasTriggeredPanicSound = false;
 
     // Bar scaling variables
     float       originalScaleX = 0.0f;              // original bar width

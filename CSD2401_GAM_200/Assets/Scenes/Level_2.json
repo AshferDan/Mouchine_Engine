@@ -5,6 +5,18 @@
       "localID": 1,
       "parentID": 4294967295,
       "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
       "CameraComponent": {
         "enabled": true,
         "mode": "FOLLOW_TARGET",
@@ -31,7 +43,7 @@
       "TransformComponent": {
         "enabled": true,
         "pos": [
-          32499.90234375,
+          32705.78515625,
           1140.0
         ],
         "scale": [
@@ -336,7 +348,8 @@
         "scripts": [
           "PlayerMovement",
           "PlayerMovementStats",
-          "ParallaxBackground"
+          "ParallaxBackground",
+          "PickupManager"
         ],
         "fields": {
           "PlayerMovement": {
@@ -461,6 +474,11 @@
             "OffsetYMid": 0.0,
             "OffsetXFront": 0.0,
             "OffsetYFront": 0.0
+          },
+          "PickupManager": {
+            "Pickup_Coin_Name": "PU_Coin",
+            "Pickup_Shell_Name": "PU_Shell",
+            "Pickup_PowerUp_Name": "PU_Powerup"
           }
         }
       },
@@ -1147,11 +1165,11 @@
             "enabled": true,
             "pos": [
               36191.08984375,
-              2909.880615234375
+              2883.41015625
             ],
             "scale": [
               1394.4990234375,
-              758.3350219726563
+              957.1749877929688
             ],
             "rotation": 0.0
           },
@@ -1172,7 +1190,7 @@
             "layer": "Ground",
             "size": [
               1394.4990234375,
-              758.3350219726563
+              957.1749877929688
             ]
           },
           "children": []
@@ -1575,12 +1593,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              10744.6435546875,
-              5985.43212890625
+              10494.6416015625,
+              5954.47998046875
             ],
             "scale": [
-              597.3889770507813,
-              499.9849853515625
+              585.8889770507813,
+              570.0872802734375
             ],
             "rotation": 0.0
           },
@@ -1600,8 +1618,8 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              597.3889770507813,
-              499.9849853515625
+              585.8889770507813,
+              570.0872802734375
             ]
           },
           "children": []
@@ -1614,7 +1632,7 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              8543.4697265625,
+              8408.8544921875,
               6240.13818359375
             ],
             "scale": [
@@ -1653,12 +1671,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5396.93212890625,
+              5569.1572265625,
               7649.185546875
             ],
             "scale": [
-              5639.4599609375,
-              246.3914794921875
+              5931.544921875,
+              246.39146423339844
             ],
             "rotation": 0.0
           },
@@ -1678,8 +1696,8 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              5639.4599609375,
-              246.3914794921875
+              5931.544921875,
+              246.39146423339844
             ]
           },
           "children": []
@@ -1965,11 +1983,11 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5645.81884765625,
-              2736.229736328125
+              4965.55517578125,
+              2747.341064453125
             ],
             "scale": [
-              2357.31103515625,
+              1007.7160034179688,
               5437.60693359375
             ],
             "rotation": 0.0
@@ -1990,7 +2008,7 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              2357.31103515625,
+              1007.7160034179688,
               5437.60693359375
             ]
           },
@@ -2193,7 +2211,7 @@
         },
         {
           "name": "C_Ground(3)",
-          "localID": 64,
+          "localID": 42,
           "parentID": 4,
           "active": true,
           "TransformComponent": {
@@ -2213,7 +2231,7 @@
             "mass": 1.0,
             "isStatic": true,
             "useGravity": true,
-            "isGrounded": true,
+            "isGrounded": false,
             "velocity": [
               0.0,
               0.0
@@ -2232,7 +2250,7 @@
         },
         {
           "name": "C_Ground(4)",
-          "localID": 65,
+          "localID": 43,
           "parentID": 4,
           "active": true,
           "TransformComponent": {
@@ -2252,7 +2270,7 @@
             "mass": 1.0,
             "isStatic": true,
             "useGravity": true,
-            "isGrounded": true,
+            "isGrounded": false,
             "velocity": [
               0.0,
               0.0
@@ -2271,14 +2289,14 @@
         },
         {
           "name": "C_Ground(5)",
-          "localID": 66,
+          "localID": 44,
           "parentID": 4,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
               32771.67578125,
-              4196.73291015625
+              4278.49755859375
             ],
             "scale": [
               55.198001861572266,
@@ -2291,7 +2309,7 @@
             "mass": 1.0,
             "isStatic": true,
             "useGravity": true,
-            "isGrounded": true,
+            "isGrounded": false,
             "velocity": [
               0.0,
               0.0
@@ -2311,48 +2329,99 @@
       ]
     },
     {
-      "name": "Tilemap",
-      "localID": 42,
+      "name": "Starfish_Hazard(10)",
+      "localID": 45,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
         "enabled": true,
         "pos": [
-          0.0,
-          0.0
+          793.3448486328125,
+          8723.7509765625
         ],
         "scale": [
-          1.0,
-          1.0
+          347.6549987792969,
+          296.66558837890625
         ],
         "rotation": 0.0
       },
       "RenderComponent": {
         "enabled": true,
         "shapeType": "Square",
-        "texturePath": "",
+        "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
         "color": [
           1.0,
-          0.0,
-          0.0,
+          1.0,
+          1.0,
           1.0
         ],
         "layer": 0,
         "screenSpace": false,
-        "tileable": false,
+        "tileable": true,
         "tileCount": [
           1.0,
           1.0
         ]
       },
-      "TilemapDataHolder": {
-        "filepath": "../Assets/Tiles/Level2.tilemap"
+      "Spritesheet": {
+        "enabled": true,
+        "defaultAnimation": "Candle",
+        "animations": [
+          {
+            "name": "Candle",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Starfish",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 5.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Urchin",
+            "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "rows": 1,
+            "cols": 4,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 5.0,
+            "pingPong": false,
+            "flipRows": false
+          }
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Enemy",
+        "size": [
+          278.0,
+          243.0
+        ]
       },
       "children": []
     },
     {
       "name": "Parallax",
-      "localID": 43,
+      "localID": 46,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2370,8 +2439,8 @@
       "children": [
         {
           "name": "MIdlayer_BackGround2",
-          "localID": 44,
-          "parentID": 43,
+          "localID": 47,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2407,8 +2476,8 @@
         },
         {
           "name": "MIdlayer_BackGround2_L",
-          "localID": 45,
-          "parentID": 43,
+          "localID": 48,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2444,8 +2513,8 @@
         },
         {
           "name": "Frontlayer_BackGround2_R",
-          "localID": 46,
-          "parentID": 43,
+          "localID": 49,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2481,8 +2550,8 @@
         },
         {
           "name": "Frontlayer_BackGround2_L",
-          "localID": 47,
-          "parentID": 43,
+          "localID": 50,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2518,8 +2587,8 @@
         },
         {
           "name": "Frontlayer_BackGround2",
-          "localID": 48,
-          "parentID": 43,
+          "localID": 51,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2555,8 +2624,8 @@
         },
         {
           "name": "Parallax_BG_2_R",
-          "localID": 49,
-          "parentID": 43,
+          "localID": 52,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2592,8 +2661,8 @@
         },
         {
           "name": "Parallax_BG_2_L",
-          "localID": 50,
-          "parentID": 43,
+          "localID": 53,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2629,8 +2698,8 @@
         },
         {
           "name": "Parallax_BG_2",
-          "localID": 51,
-          "parentID": 43,
+          "localID": 54,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2665,8 +2734,8 @@
           "children": [
             {
               "name": "Below",
-              "localID": 52,
-              "parentID": 51,
+              "localID": 55,
+              "parentID": 54,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2702,8 +2771,8 @@
             },
             {
               "name": "Below(1)",
-              "localID": 53,
-              "parentID": 51,
+              "localID": 56,
+              "parentID": 54,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2739,8 +2808,8 @@
             },
             {
               "name": "Below(2)",
-              "localID": 54,
-              "parentID": 51,
+              "localID": 57,
+              "parentID": 54,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2776,8 +2845,8 @@
             },
             {
               "name": "Top",
-              "localID": 55,
-              "parentID": 51,
+              "localID": 58,
+              "parentID": 54,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2813,8 +2882,8 @@
             },
             {
               "name": "Top(1)",
-              "localID": 56,
-              "parentID": 51,
+              "localID": 59,
+              "parentID": 54,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2850,8 +2919,8 @@
             },
             {
               "name": "Top(2)",
-              "localID": 57,
-              "parentID": 51,
+              "localID": 60,
+              "parentID": 54,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2889,8 +2958,8 @@
         },
         {
           "name": "MIdlayer_BackGround2_R",
-          "localID": 58,
-          "parentID": 43,
+          "localID": 61,
+          "parentID": 46,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2928,7 +2997,7 @@
     },
     {
       "name": "StartEndZones",
-      "localID": 59,
+      "localID": 62,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2957,13 +3026,13 @@
       "children": [
         {
           "name": "SZ_Asset",
-          "localID": 60,
-          "parentID": 59,
+          "localID": 63,
+          "parentID": 62,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              32723.4296875,
+              32776.37109375,
               1268.5882568359375
             ],
             "scale": [
@@ -2994,13 +3063,13 @@
         },
         {
           "name": "EZ_Asset",
-          "localID": 61,
-          "parentID": 59,
+          "localID": 64,
+          "parentID": 62,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1644.2978515625,
+              1794.2989501953125,
               287.4565734863281
             ],
             "scale": [
@@ -3031,13 +3100,13 @@
         },
         {
           "name": "WinZone",
-          "localID": 62,
-          "parentID": 59,
+          "localID": 65,
+          "parentID": 62,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1712.6248779296875,
+              1834.0533447265625,
               269.3706359863281
             ],
             "scale": [
@@ -3077,13 +3146,13 @@
         },
         {
           "name": "SafeZone",
-          "localID": 63,
-          "parentID": 59,
+          "localID": 66,
+          "parentID": 62,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              32714.296875,
+              32773.12109375,
               1125.899169921875
             ],
             "scale": [
@@ -3122,10 +3191,4209 @@
           "children": []
         }
       ]
+    },
+    {
+      "name": "Hazards",
+      "localID": 67,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "children": [
+        {
+          "name": "Spike_Hazard(11)",
+          "localID": 68,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              3241.722412109375,
+              3415.1689453125
+            ],
+            "scale": [
+              742.5,
+              150.00009155273438
+            ],
+            "rotation": -1.5709999799728394
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              742.5,
+              150.00009155273438
+            ]
+          },
+          "children": [
+            {
+              "name": "HazardColl(28)",
+              "localID": 69,
+              "parentID": 68,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3157.98583984375,
+                  3422.424072265625
+                ],
+                "scale": [
+                  50.0,
+                  80.007568359375
+                ],
+                "rotation": -1.5709999799728394
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  158.0,
+                  604.0
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Spike_Hazard(1)",
+          "localID": 70,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              36164.37890625,
+              744.2713012695313
+            ],
+            "scale": [
+              495.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              469.0,
+              152.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(2)",
+          "localID": 71,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              38214.37890625,
+              744.2713012695313
+            ],
+            "scale": [
+              495.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              500.0,
+              142.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(3)",
+          "localID": 72,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              40264.37890625,
+              744.2713012695313
+            ],
+            "scale": [
+              495.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              512.0,
+              148.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(4)",
+          "localID": 73,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              37217.48046875,
+              2795.285400390625
+            ],
+            "scale": [
+              728.0401611328125,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              721.0,
+              154.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(5)",
+          "localID": 74,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              35059.7890625,
+              2792.37451171875
+            ],
+            "scale": [
+              742.5,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              844.0,
+              170.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(6)",
+          "localID": 75,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              32272.388671875,
+              2792.527587890625
+            ],
+            "scale": [
+              247.5,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              253.0,
+              154.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(7)",
+          "localID": 76,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              23706.427734375,
+              4136.77880859375
+            ],
+            "scale": [
+              727.74169921875,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              697.0,
+              153.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(8)",
+          "localID": 77,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              19861.76171875,
+              4136.77880859375
+            ],
+            "scale": [
+              728.2622680664063,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              725.0,
+              151.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(9)",
+          "localID": 78,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              15651.5283203125,
+              4204.39794921875
+            ],
+            "scale": [
+              1237.5,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              5.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              1180.0,
+              151.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Starfish_Hazard(9)",
+          "localID": 79,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              2764.7744140625,
+              169.89169311523438
+            ],
+            "scale": [
+              420.0,
+              357.5413513183594
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                "rows": 1,
+                "cols": 4,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Starfish",
+                "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                "rows": 1,
+                "cols": 4,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 3,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                "rows": 1,
+                "cols": 4,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              341.0,
+              275.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(24)",
+          "localID": 80,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              9100.8681640625,
+              5228.4892578125
+            ],
+            "scale": [
+              495.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              459.0,
+              146.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Spike_Hazard(25)",
+          "localID": 81,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              4372.6455078125,
+              5023.1953125
+            ],
+            "scale": [
+              742.5,
+              150.00009155273438
+            ],
+            "rotation": 1.5707999467849731
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "HazardColl",
+              "localID": 82,
+              "parentID": 81,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  4429.7890625,
+                  5023.19580078125
+                ],
+                "scale": [
+                  50.0,
+                  80.007568359375
+                ],
+                "rotation": 1.5707999467849731
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  158.0,
+                  604.0
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Spike_Hazard(26)",
+          "localID": 83,
+          "parentID": 67,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              4372.6455078125,
+              1781.591552734375
+            ],
+            "scale": [
+              742.5,
+              150.00009155273438
+            ],
+            "rotation": 1.5707999467849731
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              3.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Enemy",
+            "size": [
+              742.5,
+              150.00009155273438
+            ]
+          },
+          "children": [
+            {
+              "name": "HazardColl(27)",
+              "localID": 84,
+              "parentID": 83,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  4434.96142578125,
+                  1777.95751953125
+                ],
+                "scale": [
+                  50.0,
+                  80.007568359375
+                ],
+                "rotation": 1.5707999467849731
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  158.0,
+                  604.0
+                ]
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pickups",
+      "localID": 85,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "children": [
+        {
+          "name": "Coins",
+          "localID": 86,
+          "parentID": 85,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              0.0
+            ],
+            "scale": [
+              50.0,
+              50.0
+            ],
+            "rotation": 0.0
+          },
+          "children": [
+            {
+              "name": "PU_Coin",
+              "localID": 87,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  36446.37109375,
+                  1467.941162109375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(1)",
+              "localID": 88,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  21508.46875,
+                  4703.6279296875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(2)",
+              "localID": 89,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  36078.72265625,
+                  1353.2352294921875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin",
+              "localID": 90,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  38572.52734375,
+                  1603.94091796875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(1)",
+              "localID": 91,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  37863.69921875,
+                  1218.64697265625
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(2)",
+              "localID": 92,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  38204.87109375,
+                  1489.2353515625
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin",
+              "localID": 93,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  42282.54296875,
+                  2169.260498046875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(1)",
+              "localID": 94,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  39912.546875,
+                  1385.64697265625
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(2)",
+              "localID": 95,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  40253.7265625,
+                  1656.2352294921875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(4)",
+              "localID": 96,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  40621.3671875,
+                  1770.941162109375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(5)",
+              "localID": 97,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  42691.3671875,
+                  2494.470458984375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(6)",
+              "localID": 98,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  42691.3671875,
+                  1822.761962890625
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(7)",
+              "localID": 99,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  35737.546875,
+                  1082.64697265625
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(8)",
+              "localID": 100,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  36508.13671875,
+                  3467.35302734375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(9)",
+              "localID": 101,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  36261.078125,
+                  3467.35302734375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(10)",
+              "localID": 102,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  35981.66796875,
+                  3467.35302734375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(11)",
+              "localID": 103,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  32237.875,
+                  3527.156982421875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(12)",
+              "localID": 104,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  32679.052734375,
+                  3930.09814453125
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(13)",
+              "localID": 105,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  31973.171875,
+                  4238.921875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(14)",
+              "localID": 106,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  22511.40625,
+                  4703.6279296875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(15)",
+              "localID": 107,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  22031.998046875,
+                  4703.6279296875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin",
+              "localID": 108,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3275.316650390625,
+                  1954.251953125
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(16)",
+              "localID": 109,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3275.31591796875,
+                  5376.474609375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(17)",
+              "localID": 110,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3275.31591796875,
+                  5076.474609375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(18)",
+              "localID": 111,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3275.31591796875,
+                  4726.474609375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(19)",
+              "localID": 112,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  4353.0908203125,
+                  4143.14111328125
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(20)",
+              "localID": 113,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  4353.0908203125,
+                  3787.585693359375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(21)",
+              "localID": 114,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  4353.0908203125,
+                  3476.474609375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(22)",
+              "localID": 115,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3275.316650390625,
+                  2737.585693359375
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Coin(23)",
+              "localID": 116,
+              "parentID": 86,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  3275.316650390625,
+                  2337.58544921875
+                ],
+                "scale": [
+                  125.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  125.0,
+                  125.0
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Shells",
+          "localID": 117,
+          "parentID": 85,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              0.0
+            ],
+            "scale": [
+              50.0,
+              50.0
+            ],
+            "rotation": 0.0
+          },
+          "children": [
+            {
+              "name": "PU_Shell",
+              "localID": 118,
+              "parentID": 117,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  32268.435546875,
+                  4653.2177734375
+                ],
+                "scale": [
+                  200.0,
+                  200.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/seashell_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  200.0,
+                  200.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Shell",
+              "localID": 119,
+              "parentID": 117,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  8925.083984375,
+                  4567.37158203125
+                ],
+                "scale": [
+                  200.0,
+                  200.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/seashell_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  200.0,
+                  200.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "PU_Shell",
+              "localID": 120,
+              "parentID": 117,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  269.93695068359375,
+                  8745.306640625
+                ],
+                "scale": [
+                  200.0,
+                  200.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/seashell_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                  {
+                    "name": "Pickup_Coin",
+                    "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                    "rows": 3,
+                    "cols": 8,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 2,
+                    "endCol": 7,
+                    "fps": 12.0,
+                    "pingPong": true,
+                    "flipRows": true
+                  }
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                  200.0,
+                  200.0
+                ]
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tilemap",
+      "localID": 121,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TilemapDataHolder": {
+        "filepath": "../Assets/Tiles/Level2.tilemap"
+      },
+      "children": []
+    },
+    {
+      "name": "UI",
+      "localID": 122,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 0.0,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "children": [
+        {
+          "name": "Text FPS",
+          "localID": 123,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              100.0,
+              100.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": false,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 50,
+            "text": "FPS",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "InGamePauseButton",
+          "localID": 124,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1825.0,
+              70.0
+            ],
+            "scale": [
+              125.0,
+              110.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/playing_button.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 700,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "ShellIcon1",
+          "localID": 125,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1700.0,
+              920.0
+            ],
+            "scale": [
+              90.0,
+              90.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              0.30000001192092896
+            ],
+            "layer": 700,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "ShellIcon2",
+          "localID": 126,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1770.0,
+              920.0
+            ],
+            "scale": [
+              90.0,
+              90.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              0.30000001192092896
+            ],
+            "layer": 700,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "ShellIcon3",
+          "localID": 127,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1840.0,
+              920.0
+            ],
+            "scale": [
+              90.0,
+              90.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              0.30000001192092896
+            ],
+            "layer": 700,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "CoinIcon",
+          "localID": 128,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1700.0,
+              830.0
+            ],
+            "scale": [
+              100.0,
+              105.5
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Coin_icon.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 700,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "CoinCountText",
+          "localID": 129,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1750.0,
+              810.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 60,
+            "text": "0",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": true
+          },
+          "children": []
+        },
+        {
+          "name": "Timer Bar",
+          "localID": 130,
+          "parentID": 122,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -38.0,
+              0.0
+            ],
+            "scale": [
+              50.0,
+              50.0
+            ],
+            "rotation": 0.0
+          },
+          "children": [
+            {
+              "name": "LevelTimerBarFrame",
+              "localID": 131,
+              "parentID": 130,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  512.0,
+                  920.0
+                ],
+                "scale": [
+                  1000.0,
+                  125.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Time bar.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 11,
+                "screenSpace": true,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "LevelTimerBar",
+              "localID": 132,
+              "parentID": 130,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  520.6439819335938,
+                  920.0
+                ],
+                "scale": [
+                  977.6099853515625,
+                  100.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 10,
+                "screenSpace": true,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "LevelTimerBarBackground",
+              "localID": 133,
+              "parentID": 130,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  512.0,
+                  920.0
+                ],
+                "scale": [
+                  1000.0,
+                  100.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 9,
+                "screenSpace": true,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bench_dark",
+      "localID": 134,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5710.9716796875,
+          7922.0439453125
+        ],
+        "scale": [
+          633.9310302734375,
+          323.8152770996094
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Bench_dark.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Ground",
+        "size": [
+          633.9310302734375,
+          323.8152770996094
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Outdoor_plant_dark",
+      "localID": 135,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          32275.267578125,
+          1133.2381591796875
+        ],
+        "scale": [
+          226.95748901367188,
+          453.91497802734375
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Outdoor_plant_dark.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          25.0,
+          50.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Bench_dark",
+      "localID": 136,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          33372.140625,
+          1024.3486328125
+        ],
+        "scale": [
+          455.9359436035156,
+          227.9679718017578
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Bench_dark.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          64.0,
+          32.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Telephone_Booth_dark",
+      "localID": 137,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1438.882080078125,
+          257.582275390625
+        ],
+        "scale": [
+          280.72796630859375,
+          499.07196044921875
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Telephone_Booth_dark.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          36.0,
+          64.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Shophouse_red_dark",
+      "localID": 138,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          36193.46484375,
+          2922.37548828125
+        ],
+        "scale": [
+          2008.1871337890625,
+          954.6888427734375
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/Sprites/Props/Shophouse_red_dark.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Default",
+        "size": [
+          128.0,
+          64.0
+        ]
+      },
+      "children": []
     }
   ],
   "AudioManager": {
     "sounds": [
+      {
+        "name": "AirGlide",
+        "filepath": "../Assets/audio/Player/AirGlide.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.5,
+        "category": "sfx"
+      },
+      {
+        "name": "CreditsAudio",
+        "filepath": "../Assets/CreditsAudio.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "PU_Coin_sfx1",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx2",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin2.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx3",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin3.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Shell_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Shell.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Speed_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Speed.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Time_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "TurnSkid",
+        "filepath": "../Assets/audio/Player/TurnSkid.wav",
+        "loop": false,
+        "volume": 0.05000000074505806,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
       {
         "name": "airglide_sfx",
         "filepath": "../Assets/audio/Player/AirGlide.wav",
@@ -3133,6 +7401,14 @@
         "volume": 0.5,
         "pitch": 1.5,
         "category": "sfx_loop"
+      },
+      {
+        "name": "bgm",
+        "filepath": "../Assets/audio/sneaky_bgm.wav",
+        "loop": true,
+        "volume": 0.08000000566244125,
+        "pitch": 1.0,
+        "category": "bgm"
       },
       {
         "name": "bonk_sfx",
@@ -3215,6 +7491,14 @@
         "category": "sfx"
       },
       {
+        "name": "gameover",
+        "filepath": "../Assets/audio/gameover.wav",
+        "loop": true,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
         "name": "groundpound_falling_sfx",
         "filepath": "../Assets/audio/Player/Groundpound_falling.wav",
         "loop": false,
@@ -3279,6 +7563,30 @@
         "category": "sfx"
       },
       {
+        "name": "menu_click",
+        "filepath": "../Assets/audio/press_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_hover",
+        "filepath": "../Assets/audio/hover_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "menu_restart",
+        "filepath": "../Assets/audio/restart_button.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "roll_sfx",
         "filepath": "../Assets/audio/Player/Roll.wav",
         "loop": false,
@@ -3295,6 +7603,14 @@
         "category": "sfx"
       },
       {
+        "name": "timer_ending",
+        "filepath": "../Assets/Audio/Timer_Ending.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "turnskid_sfx",
         "filepath": "../Assets/audio/Player/TurnSkid.wav",
         "loop": false,
@@ -3303,11 +7619,27 @@
         "category": "sfx"
       },
       {
+        "name": "victory",
+        "filepath": "../Assets/audio/victory.wav",
+        "loop": true,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
         "name": "wallkick_fast_sfx",
         "filepath": "../Assets/audio/Player/Dash.wav",
         "loop": false,
         "volume": 0.5,
         "pitch": 1.350000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "wallkick_sfx",
+        "filepath": "../Assets/audio/Player/Wallkick.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
         "category": "sfx"
       },
       {
@@ -3327,6 +7659,19 @@
         "category": "sfx"
       }
     ],
-    "events": []
+    "events": [
+      {
+        "event": "UI_Click",
+        "sound": "menu_click"
+      },
+      {
+        "event": "UI_Hover",
+        "sound": "menu_hover"
+      },
+      {
+        "event": "UI_Restart",
+        "sound": "menu_restart"
+      }
+    ]
   }
 }

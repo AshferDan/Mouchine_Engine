@@ -1,0 +1,453 @@
+{
+    "GameObjects": [
+        {
+            "name": "UI",
+            "localID": 150,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    50.0,
+                    50.0
+                ],
+                "rotation": 0.0
+            },
+            "PhysicsComponent": {
+                "enabled": true,
+                "mass": 0.0,
+                "isStatic": false,
+                "useGravity": true,
+                "isGrounded": false,
+                "velocity": [
+                    0.0,
+                    0.0
+                ]
+            },
+            "children": [
+                {
+                    "name": "Text FPS",
+                    "localID": 151,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            100.0,
+                            100.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": false,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 50,
+                        "text": "FPS",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": true
+                    },
+                    "children": []
+                },
+                {
+                    "name": "InGamePauseButton",
+                    "localID": 152,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1825.0,
+                            70.0
+                        ],
+                        "scale": [
+                            125.0,
+                            110.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/playing_button.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 700,
+                        "screenSpace": true,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "ShellIcon1",
+                    "localID": 153,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1700.0,
+                            920.0
+                        ],
+                        "scale": [
+                            90.0,
+                            90.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.30000001192092896
+                        ],
+                        "layer": 700,
+                        "screenSpace": true,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "ShellIcon2",
+                    "localID": 154,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1770.0,
+                            920.0
+                        ],
+                        "scale": [
+                            90.0,
+                            90.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.30000001192092896
+                        ],
+                        "layer": 700,
+                        "screenSpace": true,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "ShellIcon3",
+                    "localID": 155,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1840.0,
+                            920.0
+                        ],
+                        "scale": [
+                            90.0,
+                            90.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.30000001192092896
+                        ],
+                        "layer": 700,
+                        "screenSpace": true,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "CoinIcon",
+                    "localID": 156,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1700.0,
+                            830.0
+                        ],
+                        "scale": [
+                            100.0,
+                            105.5
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Coin_icon.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 700,
+                        "screenSpace": true,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "CoinCountText",
+                    "localID": 157,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1750.0,
+                            810.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": true,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 60,
+                        "text": "0",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": true
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Timer Bar",
+                    "localID": 158,
+                    "parentID": 150,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -38.0,
+                            0.0
+                        ],
+                        "scale": [
+                            50.0,
+                            50.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "children": [
+                        {
+                            "name": "LevelTimerBarFrame",
+                            "localID": 159,
+                            "parentID": 158,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    512.0,
+                                    920.0
+                                ],
+                                "scale": [
+                                    1000.0,
+                                    125.0
+                                ],
+                                "rotation": 0.0
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Sprites/Icons/Time bar.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": 11,
+                                "screenSpace": true,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "LevelTimerBar",
+                            "localID": 160,
+                            "parentID": 158,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    520.6439819335938,
+                                    920.0
+                                ],
+                                "scale": [
+                                    977.6099853515625,
+                                    100.0
+                                ],
+                                "rotation": 0.0
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": 10,
+                                "screenSpace": true,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "LevelTimerBarBackground",
+                            "localID": 161,
+                            "parentID": 158,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    512.0,
+                                    920.0
+                                ],
+                                "scale": [
+                                    1000.0,
+                                    100.0
+                                ],
+                                "rotation": 0.0
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": 9,
+                                "screenSpace": true,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
