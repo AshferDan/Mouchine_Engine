@@ -2,14 +2,14 @@
     "GameObjects": [
         {
             "name": "PU_Coin",
-            "localID": 7,
-            "parentID": 4294967295,
+            "localID": 179,
+            "parentID": 178,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    389.0,
-                    -27.5
+                    3850.0,
+                    3880.0
                 ],
                 "scale": [
                     125.0,
@@ -46,11 +46,11 @@
                         "cols": 8,
                         "startRow": 0,
                         "startCol": 0,
-                        "endRow": 0,
+                        "endRow": 2,
                         "endCol": 7,
                         "fps": 12.0,
-                        "pingPong": false,
-                        "flipRows": false
+                        "pingPong": true,
+                        "flipRows": true
                     }
                 ]
             },

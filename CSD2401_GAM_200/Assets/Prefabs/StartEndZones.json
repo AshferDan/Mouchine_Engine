@@ -1,0 +1,201 @@
+{
+    "GameObjects": [
+        {
+            "name": "StartEndZones",
+            "localID": 73,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    50.0,
+                    50.0
+                ],
+                "rotation": 0.0
+            },
+            "PhysicsComponent": {
+                "enabled": true,
+                "mass": 0.0,
+                "isStatic": false,
+                "useGravity": true,
+                "isGrounded": false,
+                "velocity": [
+                    0.0,
+                    0.0
+                ]
+            },
+            "children": [
+                {
+                    "name": "SZ_Asset",
+                    "localID": 74,
+                    "parentID": 73,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            548.0,
+                            4149.82763671875
+                        ],
+                        "scale": [
+                            1000.0,
+                            746.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Props/Safe_zone.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "EZ_Asset",
+                    "localID": 75,
+                    "parentID": 73,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            38988.12109375,
+                            481.238037109375
+                        ],
+                        "scale": [
+                            400.0,
+                            512.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Props/Exit zone.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "WinZone",
+                    "localID": 76,
+                    "parentID": 73,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            39007.6953125,
+                            518.6154174804688
+                        ],
+                        "scale": [
+                            321.7770080566406,
+                            600.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0
+                        ],
+                        "layer": 10,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Default",
+                        "size": [
+                            321.7770080566406,
+                            600.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "SafeZone",
+                    "localID": 77,
+                    "parentID": 73,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            547.7000122070313,
+                            3843.43408203125
+                        ],
+                        "scale": [
+                            800.5,
+                            515.6822509765625
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0
+                        ],
+                        "layer": 10,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Platform",
+                        "size": [
+                            800.5,
+                            515.6822509765625
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}
