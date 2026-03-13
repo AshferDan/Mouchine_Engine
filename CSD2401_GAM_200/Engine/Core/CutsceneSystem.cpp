@@ -197,6 +197,7 @@ void CutsceneSystem::StopCutscene() {
 		ScreenTransitionSystem* trans = CORE->GetScreenTransitionSystem();
 		if (trans) {
 			trans->StartLoadScreenOnly("../Assets/loading.gif", []() {
+				CameraManager::Instance().ResetState();
 				LevelEditor* level = CORE->GetLevelEditor();
 				level->LoadLevel("../Assets/Scenes/M4_LEVEL_FIXED.json");
 				if (CORE->GetGameCallbacks()) CORE->GetGameCallbacks()->OnSceneLoadReinit();
@@ -204,7 +205,6 @@ void CutsceneSystem::StopCutscene() {
 				CORE->SetGamePaused(false);
 				EventSystem::Clear();
 				if (CORE->GetInputManager()) CORE->GetInputManager()->ResetState();
-				CameraManager::Instance().ResetState();
 				});
 		}
 	}

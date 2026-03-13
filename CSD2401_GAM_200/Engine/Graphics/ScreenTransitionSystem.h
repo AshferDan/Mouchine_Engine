@@ -66,7 +66,7 @@ private:
     //  Iris timing (seconds) 
     static constexpr float  IRIS_CLOSE_DUR = 1.55f;
     static constexpr float  LOAD_MIN_DUR = 2.0f;   // minimum gif display time
-    static constexpr float  IRIS_OPEN_DUR = 0.55f;
+    static constexpr float  IRIS_OPEN_DUR = 1.55f;
 
     //  Easing 
     float EaseInQuart(float t)  const { return t * t * t * t; }

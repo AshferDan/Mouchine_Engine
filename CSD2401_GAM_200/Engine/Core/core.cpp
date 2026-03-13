@@ -204,6 +204,7 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
 
                 LevelEditor *level = GetLevelEditor();
+                CameraManager::Instance().ResetState();
                 level->LoadLevel(m_pendingScene);
                 std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
@@ -242,7 +243,6 @@ void CoreEngine::GameLoop()
 
                 if (inputManager)
                     inputManager->ResetState();
-                CameraManager::Instance().ResetState();
                 accumulator = 0.0;
             }
         }
