@@ -314,11 +314,12 @@ public:
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
-        if (screenTransitionSystem && sceneName != "../Assets/Scenes/MainMenu.json")
+        if (screenTransitionSystem && !firstTimeLoad)
         {
             std::cout << "[RequestSceneLoad] Starting transition" << std::endl;
             screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
         }
+        firstTimeLoad = false;
     }
 
     /**
@@ -382,6 +383,7 @@ private:
     bool m_hasPendingLoad = false;
     bool m_autoPlayAfterLoad = false;
     bool m_gamePause = false;
+	bool firstTimeLoad = true;
 
     /**
      * @brief Updates the FPS and Delta Time counters.
