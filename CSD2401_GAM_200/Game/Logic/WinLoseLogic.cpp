@@ -89,11 +89,26 @@ void WinLoseLogicSystem::Update(float dt)
         m_elapsedTime = 0.0f;
         m_timerRunning = false;
 
-        // Configure the engine text-input system with this game's font
+        // Configure the engine text-input system with this game's font and UI style
         TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
         if (textInput)
         {
             textInput->SetFont("../Assets/FrederickatheGreat-Regular.ttf", 50);
+
+            // Match the win/lose screen visual style
+            DialogStyle style;
+            style.titleTexPath    = "../Assets/Sprites/Icons/win_lose_bracket.png";
+            style.fieldTexPath    = "../Assets/Sprites/Icons/win_lose_button_dark.png";
+            style.hintTexPath     = "../Assets/Sprites/Icons/win_lose_button_dark.png";
+            style.overlayColor    = { 0.0f,  0.0f,  0.0f,  0.7f  };
+            style.titlePanelColor = { 1.0f,  1.0f,  1.0f,  1.0f  };
+            style.fieldPanelColor = { 1.0f,  1.0f,  1.0f,  1.0f  };
+            style.hintPanelColor  = { 1.0f,  1.0f,  1.0f,  1.0f  };
+            style.titleTextColor  = { 0.1f,  0.05f, 0.0f,  1.0f  };
+            style.fieldTextColor  = { 0.1f,  0.05f, 0.0f,  1.0f  };
+            style.hintTextColor   = { 0.0f,  0.0f,  0.0f,  1.0f  };
+            textInput->SetStyle(style);
+
             textInput->Hide(); // ensure no stale dialog from a previous session
         }
 

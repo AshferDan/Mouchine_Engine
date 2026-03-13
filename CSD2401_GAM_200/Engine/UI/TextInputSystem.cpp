@@ -17,6 +17,7 @@ Technology is prohibited.
 #include "factory.h"
 #include "transform.h"
 #include "GraphicsSystem.h"
+#include "RenderComponent.h"
 #include "TextComponent.h"
 #include "core.h"
 #include <algorithm>
@@ -167,10 +168,22 @@ void TextInputSystem::CreateUI(const std::string& title)
 {
     if (m_hasUI) return;
 
-    auto&       factory  = GameObjectFactory::Instance();
-    const vec2  camPos   = CameraManager::Instance().GetCameraPosition();
-    const float s        = m_uiScale;
+    auto&       factory   = GameObjectFactory::Instance();
+    const vec2  camPos    = CameraManager::Instance().GetCameraPosition();
+    const float s         = m_uiScale;
     const int   baseLayer = 200;   // draws on top of all game objects
+
+    // Helper: build a panel RenderComponent with optional texture
+    auto applyPanel = [&](RenderComponent* r,
+                          const std::string& texPath,
+                          vec4 color,
+                          int layer)
+    {
+        if (!texPath.empty())
+            r->SetTextureID(GraphicsSystem::LoadTexture(texPath.c_str()));
+        r->SetColor(color);
+        r->SetLayer(layer);
+    };
 
     // --- Full-screen semi-transparent dark overlay ---
     GameObject* overlay = factory.CreateGameObject("TextInput_Overlay");
@@ -179,42 +192,39 @@ void TextInputSystem::CreateUI(const std::string& title)
     ovT->posY   = camPos.y;
     ovT->scaleX = 1920.0f * s;
     ovT->scaleY = 1080.0f * s;
-    auto* ovR = overlay->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.0f, 0.0f, 0.05f, 0.75f));
-    ovR->SetLayer(baseLayer);
+    auto* ovR = overlay->AddComponent<RenderComponent>();
+    applyPanel(ovR, {}, m_style.overlayColor, baseLayer);
 
-    // --- Title bar (coloured panel + text) ---
+    // --- Title bar ---
     GameObject* titleObj = factory.CreateGameObject("TextInput_Title");
     auto* titleT = titleObj->AddComponent<TransformComponent>();
     titleT->posX   = camPos.x;
     titleT->posY   = camPos.y + 200.0f * s;
     titleT->scaleX = 800.0f * s;
-    titleT->scaleY = 160.0f * s;
-    auto* titleR = titleObj->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.1f, 0.1f, 0.25f, 0.95f));
-    titleR->SetLayer(baseLayer + 1);
+    titleT->scaleY = 180.0f * s;
+    auto* titleR = titleObj->AddComponent<RenderComponent>();
+    applyPanel(titleR, m_style.titleTexPath, m_style.titlePanelColor, baseLayer + 1);
     titleObj->AddComponent<TextComponent>(
         m_fontPath.c_str(),
         static_cast<int>(m_fontSize * s),
         title,
-        vec4(1.0f, 1.0f, 1.0f, 1.0f),
+        m_style.titleTextColor,
         false);
 
-    // --- Input field (lighter panel + live text) ---
+    // --- Input field ---
     GameObject* fieldObj = factory.CreateGameObject("TextInput_Field");
     auto* fieldT = fieldObj->AddComponent<TransformComponent>();
     fieldT->posX   = camPos.x;
     fieldT->posY   = camPos.y;
     fieldT->scaleX = 800.0f * s;
     fieldT->scaleY = 130.0f * s;
-    auto* fieldR = fieldObj->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.85f, 0.85f, 0.9f, 1.0f));
-    fieldR->SetLayer(baseLayer + 1);
+    auto* fieldR = fieldObj->AddComponent<RenderComponent>();
+    applyPanel(fieldR, m_style.fieldTexPath, m_style.fieldPanelColor, baseLayer + 1);
     fieldObj->AddComponent<TextComponent>(
         m_fontPath.c_str(),
         static_cast<int>(m_fontSize * s),
         s_buffer + "_",
-        vec4(0.05f, 0.05f, 0.1f, 1.0f),
+        m_style.fieldTextColor,
         false);
 
     // --- Hint bar ---
@@ -227,15 +237,14 @@ void TextInputSystem::CreateUI(const std::string& title)
     hintT->posX   = camPos.x;
     hintT->posY   = camPos.y - 200.0f * s;
     hintT->scaleX = 800.0f * s;
-    hintT->scaleY = 90.0f * s;
-    auto* hintR = hintObj->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.1f, 0.1f, 0.25f, 0.85f));
-    hintR->SetLayer(baseLayer + 1);
+    hintT->scaleY = 100.0f * s;
+    auto* hintR = hintObj->AddComponent<RenderComponent>();
+    applyPanel(hintR, m_style.hintTexPath, m_style.hintPanelColor, baseLayer + 1);
     hintObj->AddComponent<TextComponent>(
         m_fontPath.c_str(),
         static_cast<int>(m_fontSize * 0.55f * s),
         hintText,
-        vec4(0.8f, 0.8f, 0.8f, 1.0f),
+        m_style.hintTextColor,
         false);
 
     m_hasUI = true;

@@ -14,7 +14,8 @@
 ENGINE_FILES = ./Engine
 MATH_FILE = ./Extern/MathLib.cpp ./Extern/MathLib.h
 GAME_FILES = ./Game
-CSHARP_FILES = ./Scripts
+CSHARP_FILES = ./Assets/Scripts
+
 
 # Compiler and flags (For C++)
 COUNTER_CHECK = cloc

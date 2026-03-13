@@ -20,6 +20,33 @@ Technology is prohibited.
 #include <GLFW/glfw3.h>
 
 /**
+ * @struct DialogStyle
+ * @brief Visual configuration for the TextInputSystem modal dialog.
+ *
+ * Game code fills this in and passes it to TextInputSystem::SetStyle().
+ * Texture paths are relative paths (e.g. "../Assets/Sprites/...").
+ * Leave a texture path empty to fall back to a plain coloured quad.
+ */
+struct DialogStyle
+{
+    // --- Texture paths (empty = use plain colour quad) ---
+    std::string titleTexPath;   ///< Header bar background texture.
+    std::string fieldTexPath;   ///< Input field background texture.
+    std::string hintTexPath;    ///< Hint bar background texture.
+
+    // --- Panel colours (used as colour tint when a texture is set) ---
+    vec4 overlayColor    = {0.0f,  0.0f,  0.05f, 0.75f};
+    vec4 titlePanelColor = {0.1f,  0.1f,  0.25f, 0.95f};
+    vec4 fieldPanelColor = {0.85f, 0.85f, 0.9f,  1.0f };
+    vec4 hintPanelColor  = {0.1f,  0.1f,  0.25f, 0.85f};
+
+    // --- Text colours ---
+    vec4 titleTextColor  = {1.0f,  1.0f,  1.0f,  1.0f };
+    vec4 fieldTextColor  = {0.05f, 0.05f, 0.1f,  1.0f };
+    vec4 hintTextColor   = {0.8f,  0.8f,  0.8f,  1.0f };
+};
+
+/**
  * @class TextInputSystem
  * @brief Engine-level modal text-input dialog.
  *
@@ -67,6 +94,12 @@ public:
      *        elements (default 2.0, matching the project's existing UI scale).
      */
     void SetUIScale(float scale) { m_uiScale = scale; }
+
+    /**
+     * @brief Override the visual style of the dialog (textures and colours).
+     *        Call before Show(). Safe to call multiple times.
+     */
+    void SetStyle(const DialogStyle& style) { m_style = style; }
 
     // ===== Dialog control =====
 
@@ -124,6 +157,7 @@ private:
     std::string m_fontPath;
     int         m_fontSize = 0;   ///< 0 = not yet configured by game code.
     float       m_uiScale  = 2.0f;
+    DialogStyle m_style;          ///< Visual style (textures + colours). Defaults to plain quads.
 
     // ===== Static GLFW char-callback state =====
     static std::string  s_buffer;      ///< Accumulates typed characters.
