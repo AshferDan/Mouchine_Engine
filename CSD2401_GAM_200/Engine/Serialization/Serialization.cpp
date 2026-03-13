@@ -177,7 +177,7 @@ void Serialization::ResolveHierarchy()
 		EntityID actualChildID = (g_OldToNewID.count(oldChildID) > 0) ? g_OldToNewID[oldChildID] : oldChildID;
 
 		
-		EntityID actualParentID = -1;
+		EntityID actualParentID = static_cast<EntityID>(-1);
 		if (oldParentID != -1) {
 			actualParentID = (g_OldToNewID.count(oldParentID) > 0) ? g_OldToNewID[oldParentID] : oldParentID;
 		}

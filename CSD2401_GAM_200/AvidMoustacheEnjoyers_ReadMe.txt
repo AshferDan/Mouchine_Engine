@@ -43,10 +43,6 @@ System
   F3			When in step mode, advances frame by frame
   F4			FPS counter in game 
 
-- Batch Rendering
-  1                  	Spawn 2500 entities on screen
-  2                   	Destroy all entities
-
 - Audio
   M			Pause the BGM sound
 

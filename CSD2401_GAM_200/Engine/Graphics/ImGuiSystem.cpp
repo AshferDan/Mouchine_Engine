@@ -36,6 +36,8 @@ Technology is prohibited.
 #include "AudioManager.h"
 #include "logic.h"
 #include "ScriptComponent.h"
+#include "imgui.h"
+#include "imgui_internal.h"
 
 // Keep externs as ImGuiSystem::Update now correctly relies on these globals
 // being populated by CoreEngine *before* ImGui's display pass.
@@ -110,6 +112,9 @@ static bool g_showAudioErrorPopup = false;
 static std::string g_audioErrorMessage;
 static bool showTilemapEditor = true;
 static std::unique_ptr<TilemapEditor> tilemapEditor = nullptr;
+static std::string g_editorErrorMessage;
+static bool g_showEditorErrorPopup = false;
+
 
 // VIEWPORT
 bool isHoveringOverViewport;
@@ -296,6 +301,87 @@ struct UndoTracker
     }
 };
 
+static void RenderEditorErrorPopup()
+{
+    // Only call OpenPopup once per trigger   not every frame
+    if (g_showEditorErrorPopup)
+    {
+        ImGui::OpenPopup("Editor Error##Crash");
+        g_showEditorErrorPopup = false;
+    }
+
+    if (ImGui::BeginPopupModal("Editor Error##Crash", nullptr,
+        ImGuiWindowFlags_AlwaysAutoResize |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse))
+    {
+        // Pin to center   safe to call here, inside the modal
+        ImGui::SetWindowPos(
+            ImVec2(
+                ImGui::GetMainViewport()->GetCenter().x - 250.0f,
+                ImGui::GetMainViewport()->GetCenter().y - 80.0f
+            ),
+            ImGuiCond_Appearing
+        );
+        ImGui::SetWindowSize(ImVec2(500.0f, 0.0f), ImGuiCond_Appearing);
+
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
+            "An error occurred in the editor:");
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::TextWrapped("%s", g_editorErrorMessage.c_str());
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextDisabled("The editor is still running. No data was lost.");
+        ImGui::Spacing();
+
+        // Centre the OK button
+        float regionW = ImGui::GetContentRegionAvail().x;
+        ImGui::SetCursorPosX((regionW - 120.0f) * 0.5f);
+        if (ImGui::Button("OK", ImVec2(120.0f, 0.0f)))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+    }
+}
+
+// Repairs ImGui's internal stack after a mid-frame exception.
+// Without this, unclosed Begin/PushStyleColor/PushStyleVar calls cause
+// IM_ASSERT - abort() before the catch block can show the popup.
+static void RepairImGuiStack(int savedColorDepth,
+    int savedStyleVarDepth,
+    int savedWindowDepth)
+{
+    ImGuiContext* ctx = ImGui::GetCurrentContext();
+    if (!ctx) return;
+
+    // Close any unclosed ImGui::Begin() windows
+    while (ctx->CurrentWindowStack.Size > savedWindowDepth)
+    {
+        std::cerr << "[ImGuiRepair] Closing unclosed window: "
+            << (ctx->CurrentWindow ? ctx->CurrentWindow->Name : "?") << "\n";
+        ImGui::End();
+    }
+
+    // Pop any unclosed PushStyleColor()
+    int colorExcess = ctx->ColorStack.Size - savedColorDepth;
+    if (colorExcess > 0)
+    {
+        std::cerr << "[ImGuiRepair] Popping " << colorExcess
+            << " unclosed PushStyleColor.\n";
+        ImGui::PopStyleColor(colorExcess);
+    }
+
+    // Pop any unclosed PushStyleVar()
+    int styleVarExcess = ctx->StyleVarStack.Size - savedStyleVarDepth;
+    if (styleVarExcess > 0)
+    {
+        std::cerr << "[ImGuiRepair] Popping " << styleVarExcess
+            << " unclosed PushStyleVar.\n";
+        ImGui::PopStyleVar(styleVarExcess);
+    }
+}
 
 /**
  * @brief Ctor - Inits window variable
@@ -375,243 +461,282 @@ void ImGuiSystem::Update(float dt)
         openLayoutLoadPopup = true;
         return;
     }
-    if (InputManager::KeyStateImgui)
+
+    if (!InputManager::KeyStateImgui)
+        return;
+
+    int savedColorDepth = 0;
+    int savedStyleVarDepth = 0;
+    int savedWindowDepth = 0;
+
+    if (ImGuiContext* ctx = ImGui::GetCurrentContext())
     {
-        // KEPT HERE FOR OUR REFERENCE - BUT MOVED THIS TO CORE ALREADY
-        // ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
-        // ImGui_ImplGlfw_NewFrame();    // Start new GLFW frame
-        // ImGui::NewFrame();        // Start ImGui frame
-        if (ImGui::IsKeyPressed(ImGuiKey_T) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
-        {
-            showTilemapEditor = !showTilemapEditor;
-        }
-        // Full window docking
-        ImGuiViewport *viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->WorkPos);
-        ImGui::SetNextWindowSize(viewport->WorkSize);
-        ImGui::SetNextWindowViewport(viewport->ID);
-
-        // Flags & Docking Settings
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
-                                        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
-                                        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
-                                        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-        ImGui::Begin("Window Dock", nullptr, window_flags);
-        ImGui::PopStyleVar(3);
-
-        ImGuiID dockspace_id = ImGui::GetID("DockSpace");
-        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
-        ImGui::End();
-#ifndef _DEBUG
-#else
-        TopMenuBar_Render();
-#endif
-
-        LevelEditor* levelEditor = CORE->GetLevelEditor();
-        bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
-
-        if (!isPlaying)
-        {
-            CORE->GetGraphicsSystem()->SetEditorMode(true);
-            // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
-            {
-                TileMap_Render(dt);                       // Rendering first so viewport shows first by default
-                RenderAnimationPreviewer();
-
-                ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
-                ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
-
-                ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus);
-                viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
-                CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
-
-                //ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
-                ImGui::Image((void *)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport 
-
-                // Render gizmos on viewport
-                if (!isTileMapFocused && !isAnimPreviewFocused)
-                {
-                    // RENDER SECTION
-                    Viewport_RenderGizmoToolbar();
-                }
-                // LOGIC SECTION
-                Viewport_ManageGizmos();
-
-                // If hovering over viewport, you can click to select a GO
-                // TODO implement outline for selected GO
-                if (ImGui::IsItemHovered())
-                {
-                    Viewport_ClickToSelect();
-                    isHoveringOverViewport = true;
-                }
-                else
-                {
-                    isHoveringOverViewport = false;
-                }
-
-                std::string draggedPrefab{};
-                // Viewport accepts Prefabs for drag and drop
-                ReceiveDragAndDrop(PrefabPayloadID, draggedPrefab);
-
-                if (!draggedPrefab.empty())
-                {
-                    // filter for type of data here
-                    //std::cout << draggedPrefab << std::endl;                         // Prints the data sent via drag and drop
-                    //Serialization::LoadPrefab(draggedPrefab);
-
-                   // Load prefab AND retrieve the root object created
-                    GameObject* root = Serialization::LoadPrefabWithReturn(draggedPrefab);
-
-                    if (root)
-                    {
-                        LevelEditor* editor = CORE->GetLevelEditor();
-                        if (editor)
-                            UndoTracker::RecordCreation(root, editor, factory);
-                    }
-                
-                }
-
-                // Viewport accepts Sprites for drag and drop
-                std::string draggedSprite{};
-                ReceiveDragAndDrop(SpritePayloadID, draggedSprite);
-
-                if (!draggedSprite.empty())
-                {
-                    std::cout << "[Viewport] Dropped sprite: " << draggedSprite << std::endl;
-
-                    // Extract sprite name from path
-                    fs::path spritePath(draggedSprite);
-                    std::string spriteName = spritePath.stem().string();
-
-                    // Create GameObject
-                    GameObject* newGO = factory.CreateGameObject(spriteName);
-
-                    if (newGO)
-                    {
-                        float defaultVal{ 64.f };
-                        vec2 size{ defaultVal, defaultVal };           // default
-                        // Add Transform at cursor position
-                        auto* transform = newGO->AddComponent<TransformComponent>();
-                        // checks and adjustments below to let everything load before changing pos and scale
-
-                        // Add Render with texture
-                        auto* render = newGO->AddComponent<RenderComponent>();
-                        if (render)
-                        {
-                            auto& resourceMgr = ResourceManager::Instance();
-                            std::string textureKey = spriteName + "_texture";
-
-                            if (resourceMgr.LoadTexture(textureKey, draggedSprite))
-                            {
-                                TextureResource* texRes = resourceMgr.GetTexture(textureKey);
-                                if (texRes && texRes->IsLoaded())
-                                {
-                                    render->SetTextureID(texRes->GetTextureID());
-                                    render->SetTexturePath(draggedSprite);
-                                    render->SetShapeType(RenderComponent::ShapeType::Square);
-                                    render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-                                }
-                                size = render->GetTextureResolution(3);
-                                if (!size.x && !size.y)                                         // If invalid value found, set back to default value of 64,64. Else keep the aspect ratio of texture
-                                    size = { defaultVal , defaultVal };
-                                //std::cout << "\nMIP LEVEL 3 res: " << size.x << ' ' << size.y << "\n";
-                            }
-                        }
-
-                        if (transform)
-                        {
-                            transform->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
-                            transform->SetScale(size.x, size.y); // Default size
-                        }
-
-                        // Add Square Collider - CORRECTED CONSTRUCTOR CALL!
-                        // Constructor: ColliderComponent(owner, type, width, height, layer)
-                        newGO->AddComponent<ColliderComponent>(
-                            ColliderComponent::Type::Square,
-                            size.x,
-                            size.y,
-                            CollisionLayer::Default
-                        );
-
-                        // Select the new GameObject
-                        SetSelectedGameObject(newGO->GetID());
-
-                        LevelEditor* editor = CORE->GetLevelEditor();
-                        if (editor)
-                            UndoTracker::RecordCreation(newGO, editor, factory);
-
-                        std::cout << "[Viewport] Created sprite GameObject: " << spriteName << std::endl;
-                    }
-                }
-                // gets cursor pos WRT world pos
-                viewportPos = ImGui::GetItemRectMin();
-                viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
-
-                ImGui::Text("(World Space) Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
-                ImGui::End();
-            }
-
-            // Only show editor UI when not in play mode
-            Hierarchy_Render();
-            AssetBrowserWindow.RenderImGui();
-
-            // drawing highlight when a GO is selected
-            if (selectedGameObjectID != 0)
-            {
-                Viewport_HighlightGO();
-            }
-            
-            // only show audio assets if toggled on
-            if (showAudioAssetsPanel)
-            {
-                AudioAssetsPanel_Render();
-            }
-
-            // render property editor for selected game object
-            if (showPropertyEditor)
-            {
-                RenderPropertyEditor();
-            }
-
-            // Render layer visibility panel
-            LayerPanel_Render();
-
-            Profiler_Render();
-        }
-        // if IS in play mode
-        else
-        {
-            // toggle off other debug/ editor stuff.
-            CORE->GetGraphicsSystem()->ClearEditorSelection();
-        }
-
-        if (CORE->GetLevelEditor()->GetEditorMode() != EditorMode::Play)
-        {
-            /**
-             * @brief Game Object Creator Menu IMGui Window
-             */
-            if (ShowCreateGOMenu)
-            {
-                GOCreationMenu_Render();
-            }
-
-            /**
-                * @brief Prefab Loader Menu IMGui Window
-                */
-            if (ShowLoadPrefabMenu)
-            {
-                PrefabMenu_Render();
-            }
-        }
-        
-        // Flag with 1 frame delay on whether something is being drag and dropped, used for spawning prefabs via DND
-        Serialization::Prefab_DragAndDropped = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
+        savedColorDepth = ctx->ColorStack.Size;
+        savedStyleVarDepth = ctx->StyleVarStack.Size;
+        savedWindowDepth = ctx->CurrentWindowStack.Size;
     }
+
+    try
+    {
+        if (InputManager::KeyStateImgui)
+        {
+            // KEPT HERE FOR OUR REFERENCE - BUT MOVED THIS TO CORE ALREADY
+            // ImGui_ImplOpenGL3_NewFrame(); // Start new OpenGL frame
+            // ImGui_ImplGlfw_NewFrame();    // Start new GLFW frame
+            // ImGui::NewFrame();        // Start ImGui frame
+            if (ImGui::IsKeyPressed(ImGuiKey_T) && ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+            {
+                showTilemapEditor = !showTilemapEditor;
+            }
+            // Full window docking
+            ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImGui::SetNextWindowPos(viewport->WorkPos);
+            ImGui::SetNextWindowSize(viewport->WorkSize);
+            ImGui::SetNextWindowViewport(viewport->ID);
+
+            // Flags & Docking Settings
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+                ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
+                ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+            ImGui::Begin("Window Dock", nullptr, window_flags);
+            ImGui::PopStyleVar(3);
+
+            ImGuiID dockspace_id = ImGui::GetID("DockSpace");
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+            ImGui::End();
+    #ifndef _DEBUG
+    #else
+            TopMenuBar_Render();
+    #endif
+
+            LevelEditor* levelEditor = CORE->GetLevelEditor();
+            bool isPlaying = (levelEditor && levelEditor->GetEditorMode() == EditorMode::Play);
+
+            if (!isPlaying)
+            {
+                CORE->GetGraphicsSystem()->SetEditorMode(true);
+                // GAME VIEWPORT - Always visible (outside conditional so it shows even in play mode)
+                {
+                    TileMap_Render(dt);                       // Rendering first so viewport shows first by default
+                    RenderAnimationPreviewer();
+
+                    ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
+                    ImGui::SetNextWindowPos(ImVec2(50.0f, 50.0f), ImGuiCond_FirstUseEver);
+
+                    ImGui::Begin("Game Viewport", nullptr, ImGuiWindowFlags_NoBringToFrontOnFocus);
+                    viewportSize = ImGui::GetContentRegionAvail();                                   // Viewport checks how much space there is at sets it as size
+                    CORE->GetGraphicsSystem()->RenderGameViewportImGui(viewportSize.x, viewportSize.y);
+
+                    //ImGui::SetItemAllowOverlap();                                                           // to drag and click without moving window
+                    ImGui::Image((void*)(intptr_t)CORE->GetGraphicsSystem()->GetFrameBufferTexture(), viewportSize, ImVec2(0, 1), ImVec2(1, 0));           // Viewport 
+
+                    // Render gizmos on viewport
+                    if (!isTileMapFocused && !isAnimPreviewFocused)
+                    {
+                        // RENDER SECTION
+                        Viewport_RenderGizmoToolbar();
+                    }
+                    // LOGIC SECTION
+                    Viewport_ManageGizmos();
+
+                    // If hovering over viewport, you can click to select a GO
+                    // TODO implement outline for selected GO
+                    if (ImGui::IsItemHovered())
+                    {
+                        Viewport_ClickToSelect();
+                        isHoveringOverViewport = true;
+                    }
+                    else
+                    {
+                        isHoveringOverViewport = false;
+                    }
+
+                    std::string draggedPrefab{};
+                    // Viewport accepts Prefabs for drag and drop
+                    ReceiveDragAndDrop(PrefabPayloadID, draggedPrefab);
+
+                    if (!draggedPrefab.empty())
+                    {
+                        // filter for type of data here
+                        //std::cout << draggedPrefab << std::endl;                         // Prints the data sent via drag and drop
+                        //Serialization::LoadPrefab(draggedPrefab);
+
+                       // Load prefab AND retrieve the root object created
+                        GameObject* root = Serialization::LoadPrefabWithReturn(draggedPrefab);
+
+                        if (root)
+                        {
+                            LevelEditor* editor = CORE->GetLevelEditor();
+                            if (editor)
+                                UndoTracker::RecordCreation(root, editor, factory);
+                        }
+
+                    }
+
+                    // Viewport accepts Sprites for drag and drop
+                    std::string draggedSprite{};
+                    ReceiveDragAndDrop(SpritePayloadID, draggedSprite);
+
+                    if (!draggedSprite.empty())
+                    {
+                        std::cout << "[Viewport] Dropped sprite: " << draggedSprite << std::endl;
+
+                        // Extract sprite name from path
+                        fs::path spritePath(draggedSprite);
+                        std::string spriteName = spritePath.stem().string();
+
+                        // Create GameObject
+                        GameObject* newGO = factory.CreateGameObject(spriteName);
+
+                        if (newGO)
+                        {
+                            float defaultVal{ 64.f };
+                            vec2 size{ defaultVal, defaultVal };           // default
+                            // Add Transform at cursor position
+                            auto* transform = newGO->AddComponent<TransformComponent>();
+                            // checks and adjustments below to let everything load before changing pos and scale
+
+                            // Add Render with texture
+                            auto* render = newGO->AddComponent<RenderComponent>();
+                            if (render)
+                            {
+                                auto& resourceMgr = ResourceManager::Instance();
+                                std::string textureKey = spriteName + "_texture";
+
+                                if (resourceMgr.LoadTexture(textureKey, draggedSprite))
+                                {
+                                    TextureResource* texRes = resourceMgr.GetTexture(textureKey);
+                                    if (texRes && texRes->IsLoaded())
+                                    {
+                                        render->SetTextureID(texRes->GetTextureID());
+                                        render->SetTexturePath(draggedSprite);
+                                        render->SetShapeType(RenderComponent::ShapeType::Square);
+                                        render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                                    }
+                                    size = render->GetTextureResolution(3);
+                                    if (!size.x && !size.y)                                         // If invalid value found, set back to default value of 64,64. Else keep the aspect ratio of texture
+                                        size = { defaultVal , defaultVal };
+                                    //std::cout << "\nMIP LEVEL 3 res: " << size.x << ' ' << size.y << "\n";
+                                }
+                            }
+
+                            if (transform)
+                            {
+                                transform->SetPosition(viewportCursorPos.x, viewportCursorPos.y);
+                                transform->SetScale(size.x, size.y); // Default size
+                            }
+
+                            // Add Square Collider - CORRECTED CONSTRUCTOR CALL!
+                            // Constructor: ColliderComponent(owner, type, width, height, layer)
+                            newGO->AddComponent<ColliderComponent>(
+                                ColliderComponent::Type::Square,
+                                size.x,
+                                size.y,
+                                CollisionLayer::Default
+                            );
+
+                            // Select the new GameObject
+                            SetSelectedGameObject(newGO->GetID());
+
+                            LevelEditor* editor = CORE->GetLevelEditor();
+                            if (editor)
+                                UndoTracker::RecordCreation(newGO, editor, factory);
+
+                            std::cout << "[Viewport] Created sprite GameObject: " << spriteName << std::endl;
+                        }
+                    }
+                    // gets cursor pos WRT world pos
+                    viewportPos = ImGui::GetItemRectMin();
+                    viewportCursorPos = CursorToWorldPos(viewportPos, viewportSize);
+
+                    ImGui::Text("(World Space) Hovering at: (%.1f, %.1f)", viewportCursorPos.x, viewportCursorPos.y);
+                    ImGui::End();
+                }
+
+                // Only show editor UI when not in play mode
+                Hierarchy_Render();
+                AssetBrowserWindow.RenderImGui();
+
+                // drawing highlight when a GO is selected
+                if (selectedGameObjectID != 0)
+                {
+                    Viewport_HighlightGO();
+                }
+
+                // only show audio assets if toggled on
+                if (showAudioAssetsPanel)
+                {
+                    AudioAssetsPanel_Render();
+                }
+
+                // render property editor for selected game object
+                if (showPropertyEditor)
+                {
+                    RenderPropertyEditor();
+                }
+
+                // Render layer visibility panel
+                LayerPanel_Render();
+
+                Profiler_Render();
+            }
+            // if IS in play mode
+            else
+            {
+                // toggle off other debug/ editor stuff.
+                CORE->GetGraphicsSystem()->ClearEditorSelection();
+            }
+
+            if (CORE->GetLevelEditor()->GetEditorMode() != EditorMode::Play)
+            {
+                /**
+                 * @brief Game Object Creator Menu IMGui Window
+                 */
+                if (ShowCreateGOMenu)
+                {
+                    GOCreationMenu_Render();
+                }
+
+                /**
+                    * @brief Prefab Loader Menu IMGui Window
+                    */
+                if (ShowLoadPrefabMenu)
+                {
+                    PrefabMenu_Render();
+                }
+            }
+
+            // Flag with 1 frame delay on whether something is being drag and dropped, used for spawning prefabs via DND
+            Serialization::Prefab_DragAndDropped = ImGui::IsMouseDragging(ImGuiMouseButton_Left);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        RepairImGuiStack(savedColorDepth, savedStyleVarDepth, savedWindowDepth);
+        g_editorErrorMessage = std::string("[Exception] ") + e.what();
+        g_showEditorErrorPopup = true;
+        Serialization::Prefab_DragAndDropped = false;
+
+        std::cerr << "[ImGuiSystem] Caught std::exception: " << e.what() << "\n";
+    }
+    catch (...)
+    {
+        RepairImGuiStack(savedColorDepth, savedStyleVarDepth, savedWindowDepth);
+        g_editorErrorMessage = "An unknown error occurred inside the editor update.";
+        g_showEditorErrorPopup = true;
+        Serialization::Prefab_DragAndDropped = false;
+
+        std::cerr << "[ImGuiSystem] Caught unknown exception.\n";
+    }
+
+    // Must be called every frame after try/catch so the modal can open and stay visible
+    RenderEditorErrorPopup();
 }
 
 /**
@@ -1005,7 +1130,7 @@ void ImGuiSystem::Hierarchy_Render()
             {
                 json beforeUnparentJson = Serialization::SerializeGameObject(go);
                 goParent->RemoveChild(go);
-                LevelEditor* editor = CORE->GetLevelEditor();
+                //LevelEditor* editor = CORE->GetLevelEditor();
                 if (editor)
                     UndoTracker::RecordInstantChange(go, editor, beforeUnparentJson);
             }
@@ -1036,7 +1161,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     if (!obj) return;
     EntityID id = obj->GetID();
     LevelEditor* editor = CORE->GetLevelEditor();
-    json propertyBeforeJson;
+    //json propertyBeforeJson;
 
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -1480,9 +1605,17 @@ void ImGuiSystem::PrefabMenu_Render()
     else
     {
         std::string goName{}, prefabName{};
+        //if (selectedGameObjectID) { goName = factory.GetGameObject(selectedGameObjectID)->GetName(); }
+        //else goName = "_____";
 
-        if (selectedGameObjectID) { goName = factory.GetGameObject(selectedGameObjectID)->GetName(); }
-            else goName = "_____";
+        if (selectedGameObjectID)
+        {
+            GameObject* selectedGO = factory.GetGameObject(selectedGameObjectID);
+            goName = selectedGO ? selectedGO->GetName() : "_____";  // safe even if object was deleted
+        }
+        else goName = "_____";
+
+        
         if (current_prefab) { prefabName = prefabList[current_prefab]; }
             else prefabName = "_____";
 
@@ -1648,7 +1781,18 @@ void ImGuiSystem::Viewport_ManageGizmos()
         {
             float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
             float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
-            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CameraManager::Instance().GetViewProjectMatrix(CORE->GetGraphicsSystem()->GetWindowWidth(), CORE->GetGraphicsSystem()->GetWindowHeight())), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
+            float windowWidth = static_cast<float>(CORE->GetGraphicsSystem()->GetWindowWidth());
+            float windowHeight = static_cast<float>(CORE->GetGraphicsSystem()->GetWindowHeight());
+            ImGuizmo::Manipulate(
+                value_ptr(view),
+                value_ptr(CameraManager::Instance().GetViewProjectMatrix(windowWidth, windowHeight)),
+                ImGuizmo::OPERATION::BOUNDS,
+                ImGuizmo::WORLD,
+                value_ptr(mtx),
+                deltaMat,
+                deltaMat,
+                bounds
+            ); // manipulate with bounds in mind
         }
 
         if (ImGuizmo::IsUsing())
@@ -1723,9 +1867,13 @@ void ImGuiSystem::Viewport_RenderGizmoToolbar()
 void ImGuiSystem::Viewport_HighlightGO()
 {
     // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
-    if (!selectedGameObjectID) return;
-    auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
-    auto* collider = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<ColliderComponent>();
+    //if (!selectedGameObjectID) return;
+    auto* go = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID);
+    if (!go) return;
+    auto* transform = go->GetComponent<TransformComponent>();
+    auto* collider = go->GetComponent<ColliderComponent>();
+    //auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
+    //auto* collider = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<ColliderComponent>();
 
     if (transform)
     {
@@ -2286,8 +2434,8 @@ void ImGuiSystem::RenderPropertyEditor()
         return;
     }
 
-    static bool isEditingProperty = false;
-    static json propertyBeforeJson;
+    //static bool isEditingProperty = false;
+    //static json propertyBeforeJson;
     LevelEditor* editor = CORE->GetLevelEditor();
 
     ImGui::Text("GameObject: %s", obj->GetName().c_str());
@@ -2442,9 +2590,13 @@ void ImGuiSystem::RenderPropertyEditor()
 
                             std::cout << draggedSprite << std::endl;
                             render->SetTexturePath(draggedSprite);
+
+                            GLuint oldTexID = render->GetTextureID();               // get old tex before overwriting
                             GLuint newTexID = CORE->GetGraphicsSystem()->LoadTexture(draggedSprite.c_str());
+
                             if (newTexID)
                             {
+                                if (oldTexID) glDeleteTextures(1, &oldTexID);           // free the old one first
                                 render->SetColor(1.0f);                                 // removes colour and makes way for loading image
                                 render->SetTextureID(newTexID);
                                 strcpy(draggedSprite_str, "<Drag Image Here>");                   // reset
@@ -2903,8 +3055,8 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
     if (ImGui::CollapsingHeader("Event", ImGuiTreeNodeFlags_DefaultOpen)) {
 
         LevelEditor* editor = CORE->GetLevelEditor();
-        static bool isEditingProperty = false;
-        static json propertyBeforeJson;
+        //static bool isEditingProperty = false;
+        //static json propertyBeforeJson;
 
         bool isEventEnabled = ec->IsEnabled();
         if (ImGui::Checkbox("Component Enabled ##Event", &isEventEnabled))
@@ -2959,7 +3111,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 }
 
                 // Convert vector of strings to vector of char* for ImGui
-                std::vector<const char*> cStrNames;
+               // std::vector<const char*> cStrNames;
                 for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
                 if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
@@ -3515,6 +3667,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         float fps = 12.0f;
         bool  loop = true;
         bool pingPong = false;
+        bool flipRows = false;
     };
 
     // All statics
@@ -3546,6 +3699,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     static float actionFPS = 12.0f;
     static bool  actionLoop = true;
     static bool  actionPingPong = false;
+    static bool  actionFlipRows = false;
     static int   frameCount = 1;
     static int   rowPick = 0;
 
@@ -3644,6 +3798,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         c.fps = cj.value("fps", 12.0f);
                         c.loop = cj.value("loop", true);
                         c.pingPong = cj.value("pingPong", false);
+                        c.flipRows = cj.value("flipRows", false);
                         if (!c.name.empty()) draftClips.push_back(c);
                     }
                     std::cout << "[AnimPreview] Loaded "
@@ -3672,7 +3827,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         {"startR",   c.startR},  {"startC",   c.startC},
                         {"endR",     c.endR},    {"endC",     c.endC},
                         {"fps",      c.fps},     {"loop",     c.loop},
-                        {"pingPong", c.pingPong}
+                        {"pingPong", c.pingPong},{"flipRows", c.flipRows}
                         });
                 }
                 std::ofstream f(DRAFT_CLIPS_FILE);
@@ -3799,7 +3954,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                     if (it != reg.end())
                     {
                         const auto& animData = it->second;
-                        float fps = (animData.fps > 0.001f) ? animData.fps : 12.0f;
+                        float fps = (animData.fps > 0.001f) ? animData.fps : 6.0f;
                         float frameDur = 1.0f / fps;
 
                         goFrameTimer += ImGui::GetIO().DeltaTime;
@@ -3849,8 +4004,11 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 float uW = 1.0f / (float)goCols;
                 float vH = 1.0f / (float)goRows;
 
-                ImVec2 uv0 = ImVec2(goFrameCol * uW, (goFrameRow + 1) * vH);
-                ImVec2 uv1 = ImVec2((goFrameCol + 1) * uW, goFrameRow * vH);
+                // Mirror the row when flipRows is active, matching GetFlipUVOffset() at runtime.
+                    int goUVRow = ss->GetFlipRows() ? (goRows - 1) - goFrameRow : goFrameRow;
+
+                ImVec2 uv0 = ImVec2(goFrameCol * uW, (goUVRow + 1) * vH);
+                ImVec2 uv1 = ImVec2((goFrameCol + 1) * uW, goUVRow * vH);
 
                 ImGui::Image(
                     (void*)(intptr_t)ss->GetTextureID(),
@@ -3990,11 +4148,15 @@ void ImGuiSystem::RenderAnimationPreviewer()
         float duW = 1.0f / (float)std::max(1, draftCols);
         float dvH = 1.0f / (float)std::max(1, draftRows);
 
+        // When flipRows is on, mirror the row so row 0 = top of the image,
+        // matching what GetFlipUVOffset() does at runtime.
+        int uvRow = actionFlipRows ? (std::max(1, draftRows) - 1) - showRow : showRow;
+
         ImGui::BeginGroup();
         ImGui::Image(
             (void*)(intptr_t)draftTexID, ImVec2(180, 180),
-            ImVec2(showCol * duW, (showRow + 1) * dvH),
-            ImVec2((showCol + 1) * duW, showRow * dvH),
+            ImVec2(showCol * duW, (uvRow + 1) * dvH),
+            ImVec2((showCol + 1) * duW, uvRow* dvH),
             ImVec4(1, 1, 1, 1), ImVec4(1, 1, 0, 1)
         );
         ImGui::EndGroup();
@@ -4009,8 +4171,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 draftTimer = 0.0f;
                 draftPreviewDir = 1;
 
-                int startIdx = (startR * draftCols) + startC;
-                draftFrameLinear = startIdx;
+                int startIdxPlay = (startR * draftCols) + startC;
+                draftFrameLinear = startIdxPlay;
             }
             else
             {
@@ -4033,7 +4195,10 @@ void ImGuiSystem::RenderAnimationPreviewer()
     if (!dropped.empty() && SupportedImageFile(dropped))
     {
         draftPath = dropped;
+
+        if (draftTexID) glDeleteTextures(1, &draftTexID);
         draftTexID = GraphicsSystem::LoadTexture(dropped.c_str());
+
         draftRows = 1;  draftCols = 1;
         startR = startC = endR = endC = 0;
         rowPick = 0;  frameCount = 1;
@@ -4122,6 +4287,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 actionFPS = c.fps;
                 actionLoop = c.loop;
                 actionPingPong = c.pingPong;
+                actionFlipRows = c.flipRows;
 
                 rowPick = startR;
                 frameCount = std::max(1, (endC - startC) + 1);
@@ -4157,7 +4323,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::NewLine();
         ImGui::Checkbox("Loop", &actionLoop);
         ImGui::SameLine();
-        ImGui::Checkbox("Ping-Pong", &actionPingPong);
+        ImGui::Checkbox("Ping-Pong", &actionPingPong);        
+        ImGui::SameLine();
+        ImGui::Checkbox("Flip Rows", &actionFlipRows);
         ImGui::PushItemWidth(120);
         ImGui::InputFloat("FPS", &actionFPS, 0.5f, 1.0f, "%.2f");
         actionFPS = std::max(0.001f, actionFPS);
@@ -4165,12 +4333,18 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::NewLine();
 
         rowPick = std::clamp(rowPick, 0, draftRows - 1);
+        endR = std::clamp(endR, 0, draftRows - 1);
         startC = std::clamp(startC, 0, draftCols - 1);
         frameCount = std::max(1, frameCount);
 
-        if (ImGui::SliderInt("Row", &rowPick, 0, draftRows - 1))
+        if (ImGui::SliderInt("Start Row", &rowPick, 0, draftRows - 1))
             ResetDraftPlayback();
         startR = rowPick;
+
+        // Allow end row to span multiple rows for multi-row animations
+        endR = std::clamp(endR, startR, draftRows - 1);
+        if (ImGui::SliderInt("End Row", &endR, startR, draftRows - 1))
+            ResetDraftPlayback();
 
         if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1))
             ResetDraftPlayback();
@@ -4181,7 +4355,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         if (ImGui::SliderInt("End Col", &frameCount, 1, maxCount))
             ResetDraftPlayback();
 
-        endR = startR;
+        //endR = startR;
         endC = std::clamp(startC + frameCount - 1, 0, draftCols - 1);
 
         ImGui::TextDisabled("Range: row %d  cols %d->%d  (%d frames)", startR, startC, endC, frameCount);
@@ -4205,6 +4379,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
             c.endR = endR;      c.endC = endC;
             c.fps = actionFPS; c.loop = actionLoop;
             c.pingPong = actionPingPong;
+            c.flipRows = actionFlipRows;
 
             if (idx >= 0)
             {
@@ -4256,7 +4431,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 beforeJson = Serialization::SerializeGameObject(obj);
 
             // Capture whether a Spritesheet existed before apply.
-            const bool hadSpritesheetBefore = (ss != nullptr);
+            //const bool hadSpritesheetBefore = (ss != nullptr);
 
             try
             {
@@ -4309,7 +4484,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                         c.rows, c.cols,
                                         c.startR, c.startC,
                                         c.endR, c.endC,
-                                        c.fps, c.pingPong);
+                                        c.fps, c.pingPong, 
+                                        c.flipRows);
                                     ss->PlayAnimation(c.name);
                                     std::cout << "[AnimPreview] Applied clip '" << c.name
                                         << "' to '" << obj->GetName() << "'.\n";
@@ -4326,7 +4502,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                         draftRows, draftCols,
                                         startR, startC,
                                         endR, endC,
-                                        actionFPS, actionPingPong);
+                                        actionFPS, actionPingPong,
+                                        actionFlipRows);
                                     ss->PlayAnimation(oneName);
                                     std::cout << "[AnimPreview] Applied unsaved clip '" << oneName
                                         << "' to '" << obj->GetName() << "'.\n";
@@ -4371,8 +4548,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
             {
                 std::cerr << "[AnimPreview] Apply exception: "
                     << e.what() << "\n";
-                //g_showEditorErrorPopup = true;
-                //g_editorErrorMessage =
+                g_showEditorErrorPopup = true;
+                g_editorErrorMessage = 
                     std::string("[AnimPreview] Apply failed: ") + e.what();
             }
 

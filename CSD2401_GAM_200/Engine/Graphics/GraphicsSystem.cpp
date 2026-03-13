@@ -35,7 +35,7 @@ const double two_pi = 6.28318530717958647692528676655900576;
 GraphicsSystem::GraphicsSystem()
     : window(nullptr), vao(0), vbo(0), Wwidth(800), Wheight(600), tex(0), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
       frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+	frameBufferWidth(800), frameBufferHeight(600), editorMode(true), windowedWidth(0), windowedHeight(0), windowedPosX(0), windowedPosY(0), shader(nullptr), textShader(nullptr), debugShader(nullptr)
 {
     // Initialize GLFW library (required before creating a window/context).
     if (!glfwInit())
@@ -98,7 +98,7 @@ GraphicsSystem::GraphicsSystem()
 GraphicsSystem::GraphicsSystem(GLint w, GLint h)
     : window(nullptr), vao(0), vbo(0), Wwidth(w), Wheight(h), vp(), batchVAO(0), batchVBO(0), batchEBO(0), textVAO(0), textVBO(0),
       frameBuffer(0), frameBufferTexture(0), depthRenderBuffer(0),
-      frameBufferWidth(800), frameBufferHeight(600), editorMode(true)
+      frameBufferWidth(800), frameBufferHeight(600), editorMode(true), windowedWidth(0), windowedHeight(0), windowedPosX(0), windowedPosY(0), shader(nullptr), textShader(nullptr), debugShader(nullptr)
 // Same as default constructor, but allows user to specify window size.
 {
     if (!glfwInit())
@@ -648,7 +648,10 @@ void GraphicsSystem::Update(float)
         int layer = rend->GetLayer(); // For draw order sorting
         bool screenSpace = rend->isScreenSpace();
 
-        if (hasCamBounds && !screenSpace && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play )
+#ifdef _DEBUG
+        if (hasCamBounds && !screenSpace &&
+            CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play /* &&
+            rend->GetLayer() >= -100*/)
         {
             float halfSX = sx * 0.5f;
 			float halfSY = sy * 0.5f;
@@ -658,6 +661,9 @@ void GraphicsSystem::Update(float)
 				continue; // Skip objects outside camera bounds
             }
         }
+
+#endif // _DEBUG
+
 
         //if (obj->GetName() == "MyTestSquare") {
         //    std::cout << "MyTestSquare - screenSpace: " << screenSpace

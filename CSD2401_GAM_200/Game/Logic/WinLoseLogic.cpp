@@ -147,7 +147,7 @@ void WinLoseLogicSystem::Update(float dt)
         if (pendingSceneTimer <= 0.0f)
         {
             // Check if fade is still active - if so, wait a bit longer
-            AudioManager* audioManager = CORE->GetAudioManager();
+            //AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager && audioManager->IsAnyFadeActive())
             {
                 std::cout << "[WinLoseLogic] Fade still active, waiting..." << std::endl;
@@ -444,7 +444,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
             hasPlayerWon = true;
 
             // Hide timer UI while the dialog is open
-            auto& factory = GameObjectFactory::Instance();
+            //auto& factory = GameObjectFactory::Instance();
             if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
             if (auto* o = factory.FindGameObject("LevelTimerBar"))           o->SetActive(false);
             if (auto* o = factory.FindGameObject("LevelTimerBarFrame"))      o->SetActive(false);

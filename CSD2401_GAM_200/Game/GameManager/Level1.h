@@ -25,6 +25,7 @@ public:
 
 	void Load();
 	void Init();
+	void Start() override;
 	void Update(float dt);
 	void Draw();
 	void Free();
