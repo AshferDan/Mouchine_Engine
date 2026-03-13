@@ -44,8 +44,11 @@ MenuScreens currScreen = MenuScreens::Home;
 
 void MenuLogicSystem::Update(float dt)
 {
-    // Update audio fade
+    // Get commonly used singletons
     AudioManager *audioManager = CORE->GetAudioManager();
+    auto& factory = GameObjectFactory::Instance();
+
+    // Update audio fade
     if (audioManager)
     {
         audioManager->UpdateFade(dt);
@@ -259,7 +262,6 @@ void MenuLogicSystem::Update(float dt)
             sfxText->SetActive(true);
 
         // update sliders based on saved base volumes
-        AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
             //std::cout << "[MenuLogic Settings] Saved base volumes - Master: " << savedMasterVolume
@@ -285,7 +287,6 @@ void MenuLogicSystem::Update(float dt)
                 UpdateSlider("Slider_Bar_SFX", sfxSlider, sfxSlider.currentVolume);
 
                 // update knob(aka scissors) positions to match
-                auto& factory = GameObjectFactory::Instance();
 
                 // master knob
                 GameObject* masterBar = factory.FindGameObject("Slider_Bar_Master");
@@ -423,7 +424,6 @@ void MenuLogicSystem::Update(float dt)
         }
     }
 
-    auto& factory = GameObjectFactory::Instance();
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
     std::string currentPressed = "";
 
@@ -464,10 +464,9 @@ void MenuLogicSystem::Update(float dt)
             SetButtonTexture(currentHover, true, isCurrentPressed);
             // Play hover sound once when entering the button
 
-            AudioManager *localAudioManager = CORE->GetAudioManager();
-            if (localAudioManager)
+            if (audioManager)
             {
-                localAudioManager->TriggerEvent("UI_Hover");
+                audioManager->TriggerEvent("UI_Hover");
             }
         }
 
@@ -589,21 +588,21 @@ bool MenuLogicSystem::IsMouseOver(GameObject *button, double mouseX, double mous
 
 void MenuLogicSystem::TriggerUISound(const std::string &buttonName)
 {
-    AudioManager *audioManager = CORE->GetAudioManager();
-    if (!audioManager)
+    AudioManager *audio = CORE->GetAudioManager();
+    if (!audio)
         return;
 
     if (buttonName == "LevelSelectedButton")
     {
-        audioManager->TriggerEvent("UI_Press");
+        audio->TriggerEvent("UI_Press");
     }
     else if (buttonName == "QuitButton")
     {
-        audioManager->TriggerEvent("UI_Quit");
+        audio->TriggerEvent("UI_Quit");
     }
     else
     {
-        audioManager->TriggerEvent("UI_Click");
+        audio->TriggerEvent("UI_Click");
     }
 
     std::cout << "menu button clicking sound is triggered" << std::endl;
@@ -1189,6 +1188,7 @@ void MenuLogicSystem::UpdateSlider(const std::string& barName, SliderState& slid
 void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMouseDown)
 {
     auto& factory = GameObjectFactory::Instance();
+    AudioManager* audioManager = CORE->GetAudioManager();
     bool isMouseClicked = isMouseDown && !wasMouseDownOnSlider;
 
     if (isMouseClicked && !isDraggingSlider)
@@ -1311,7 +1311,6 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                     }
 
                     // update audio volume and save it
-                    AudioManager* audioManager = CORE->GetAudioManager();
                     if (audioManager)
                     {
                         if (currentSliderCategory == "master")

@@ -548,7 +548,6 @@ void PauseMenuLogicSystem::Update(float dt)
             hoveredButtonName.clear();
 
             // load current volume values from audio manager
-            AudioManager* audioManager = CORE->GetAudioManager();
             if (audioManager)
             {
                 // get current actual volumes from the audio manager
@@ -618,7 +617,6 @@ void PauseMenuLogicSystem::Update(float dt)
                     if (sliderBar && barBack && knob)
                     {
                         auto* sliderTransform = sliderBar->GetComponent<TransformComponent>();
-                        auto* barBackTransform = barBack->GetComponent<TransformComponent>();
                         auto* knobTransform = knob->GetComponent<TransformComponent>();
 
                         if (sliderTransform && knobTransform)
@@ -2362,7 +2360,6 @@ void PauseMenuLogicSystem::UpdateSlider(const std::string& barName, SliderState&
 
     if (!knobName.empty())
     {
-        auto& factory = GameObjectFactory::Instance();
         GameObject* knob = factory.FindGameObject(knobName);
         if (knob)
         {
