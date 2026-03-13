@@ -50,13 +50,15 @@ REM -----------------------------------------------
 echo.
 echo [2/5] Copying Editor_Icons...
 
-REM Editor_Icons lives at Assets\Editor_Icons\ - just verify it exists
-if not exist "Assets\Editor_Icons" (
-    echo    ERROR: Assets\Editor_Icons not found - make sure it is checked out from the repo
+if not exist "Assets\Editor_Icons" mkdir "Assets\Editor_Icons"
+
+if exist "Logs\default\Editor_Icons" (
+    xcopy /E /I /Y "Logs\default\Editor_Icons\*" "Assets\Editor_Icons\" >nul 2>&1
+    echo    Copied Editor_Icons from Logs\default\Editor_Icons
+) else (
+    echo    ERROR: Logs\default\Editor_Icons not found
     pause
     exit /b 1
-) else (
-    echo    Editor_Icons verified at Assets\Editor_Icons\
 )
 
 REM Count icons
@@ -73,26 +75,26 @@ echo [3/5] Setting up Game folder...
 if not exist Game mkdir Game
 echo    Game\ directory ready
 
-if exist "Engine\default\main.cpp" (
+if exist "Logs\default\main.cpp" (
     if not exist "Game\main.cpp" (
-        copy "Engine\default\main.cpp" "Game\main.cpp" >nul
-        echo    Copied: Engine\default\main.cpp -> Game\main.cpp
+        copy "Logs\default\main.cpp" "Game\main.cpp" >nul
+        echo    Copied: Logs\default\main.cpp -> Game\main.cpp
     ) else (
         echo    Already exists: Game\main.cpp (skipping)
     )
 ) else (
-    echo    WARNING: Engine\default\main.cpp not found, skipping
+    echo    WARNING: Logs\default\main.cpp not found, skipping
 )
 
-if exist "Engine\default\main.h" (
+if exist "Logs\default\main.h" (
     if not exist "Game\main.h" (
-        copy "Engine\default\main.h" "Game\main.h" >nul
-        echo    Copied: Engine\default\main.h -> Game\main.h
+        copy "Logs\default\main.h" "Game\main.h" >nul
+        echo    Copied: Logs\default\main.h -> Game\main.h
     ) else (
         echo    Already exists: Game\main.h (skipping)
     )
 ) else (
-    echo    WARNING: Engine\default\main.h not found, skipping
+    echo    WARNING: Logs\default\main.h not found, skipping
 )
 
 REM -----------------------------------------------
