@@ -1299,7 +1299,6 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         AudioManager* audioManager = CORE->GetAudioManager();
         if (audioManager)
         {
-            audioManager->LoadSound({ "jump", "../Assets/Audio/jump.wav", false, 0.4f, 1.0f, "sfx" });
             audioManager->LoadSound(newSound);
             audioManager->AddSound(newSound);
         }

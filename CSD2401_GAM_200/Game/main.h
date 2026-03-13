@@ -36,6 +36,7 @@ Technology is prohibited.
 #include "PrefabManager.h"
 #include "LevelEditor.h"
 #include "ScriptComponent.h"
+#include "Utils.h"
 
 
 // Game-specific systems (now in Game/Logic and Game/GameManager)

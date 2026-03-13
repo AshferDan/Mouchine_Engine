@@ -104,7 +104,6 @@ GameObject *GameObjectFactory::CreateEmptyGO(const std::string &name, float x, f
 
     auto *transform = obj->AddComponent<TransformComponent>(x, y);
     transform->SetScale(w, h);
-    obj->AddComponent<PhysicsComponent>(0.0f, false);
 
     return obj;
 }

@@ -92,7 +92,10 @@ public:
      */
     void ComputeBarUVBounds(RenderComponent* renderComp);
 
+    float GetLevelTimerLength() const { return LevelTimerLength; }
+
 private:
+    float       LevelTimerLength = 60.0f;
     float       remainingTime = 30.0f;              // remaining time in 30 seconds for now
     int         lastDisplayedSeconds = -1;          // last whole second shown on HUD
     std::string timerObjectName = "LevelTimerBar";

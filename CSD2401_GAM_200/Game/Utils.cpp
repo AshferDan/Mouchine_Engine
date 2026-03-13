@@ -11,16 +11,19 @@ Technology is prohibited.
 */
 /* End Header **************************************************************************/
 
-#include "Utils.h"
-
-//void Pickups::PopulatePickups(std::vector<Pickup>& LevelPickups)
+//#include "Utils.h"
+//
+//void PickupSystem::InitPickups()
 //{
 //	for (auto const& go : GameObjectFactory::Instance().GetAllGameObjects())
 //	{
-//		if (go.get()->GetName() == "Coin")
+//		if (go.get()->GetName() == "PU_Coin")
 //		{
-//			Pickup temp{};
-//			LevelPickups.push_back(temp);
+//			_coins++;
+//		}
+//		else if (go.get()->GetName() == "PU_Shell")
+//		{
+//			_shells++;
 //		}
 //	}
 //}

@@ -12,7 +12,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "main.h"
-
+PickupSystem pickupSys;
 
 namespace CrashHandler
 {
@@ -187,6 +187,7 @@ int main()
             {
                 scriptComp->AddScript("PlayerMovement");
                 scriptComp->AddScript("PlayerMovementStats");
+                scriptComp->AddScript("PickupManager");
                 
 
                 std::cout << "[Main] Created 'PlayerMovement' and attached 'Hero_cs'.\n";
@@ -294,6 +295,7 @@ int main()
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }
+
 #endif
         // Initialise Game State Manager (Level1)
         GameManager::Instance().ChangeState(std::make_unique<Level1>());

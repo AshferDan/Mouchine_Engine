@@ -383,6 +383,7 @@ void LevelEditor::StopPlayMode()
         {
             std::cout << "[LevelEditor] Notifying game of editor stop.\n";
             CORE->GetGameCallbacks()->OnEditorStop();
+            CORE->GetGameCallbacks()->ReinitPickups();
         }
     }
 

@@ -29,7 +29,7 @@ Technology is prohibited.
  */
 void GameTimerSystem::Initialize()
 {
-    remainingTime = 60.0f;
+    remainingTime = LevelTimerLength;
     lastDisplayedSeconds = 60;
     hasTriggeredTimeUp = false;
 

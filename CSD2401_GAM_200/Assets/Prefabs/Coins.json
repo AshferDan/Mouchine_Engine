@@ -1,0 +1,219 @@
+{
+    "GameObjects": [
+        {
+            "name": "Coins",
+            "localID": 181,
+            "parentID": 180,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    50.0,
+                    50.0
+                ],
+                "rotation": 0.0
+            },
+            "children": [
+                {
+                    "name": "PU_Coin",
+                    "localID": 177,
+                    "parentID": 181,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            3850.0,
+                            3880.0
+                        ],
+                        "scale": [
+                            125.0,
+                            125.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pickup_Coin",
+                        "animations": [
+                            {
+                                "name": "Pickup_Coin",
+                                "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                                "rows": 3,
+                                "cols": 8,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 0,
+                                "endCol": 7,
+                                "fps": 12.0,
+                                "pingPong": false,
+                                "flipRows": false
+                            }
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Pickup",
+                        "size": [
+                            125.0,
+                            125.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "PU_Coin",
+                    "localID": 178,
+                    "parentID": 181,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            4450.0,
+                            3880.0
+                        ],
+                        "scale": [
+                            125.0,
+                            125.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pickup_Coin",
+                        "animations": [
+                            {
+                                "name": "Pickup_Coin",
+                                "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                                "rows": 3,
+                                "cols": 8,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 0,
+                                "endCol": 7,
+                                "fps": 12.0,
+                                "pingPong": false,
+                                "flipRows": false
+                            }
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Pickup",
+                        "size": [
+                            125.0,
+                            125.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "PU_Coin",
+                    "localID": 179,
+                    "parentID": 181,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            4150.0,
+                            3880.0
+                        ],
+                        "scale": [
+                            125.0,
+                            125.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pickup_Coin",
+                        "animations": [
+                            {
+                                "name": "Pickup_Coin",
+                                "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                                "rows": 3,
+                                "cols": 8,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 0,
+                                "endCol": 7,
+                                "fps": 12.0,
+                                "pingPong": false,
+                                "flipRows": false
+                            }
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Pickup",
+                        "size": [
+                            125.0,
+                            125.0
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

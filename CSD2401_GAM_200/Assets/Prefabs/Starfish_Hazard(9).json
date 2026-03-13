@@ -1,0 +1,86 @@
+{
+    "GameObjects": [
+        {
+            "name": "Starfish_Hazard(9)",
+            "localID": 127,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    16106.0,
+                    1168.5
+                ],
+                "scale": [
+                    150.0,
+                    128.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                    {
+                        "name": "Candle",
+                        "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                        "rows": 1,
+                        "cols": 4,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 2,
+                        "fps": 5.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Starfish",
+                        "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                        "rows": 1,
+                        "cols": 4,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 3,
+                        "fps": 5.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Urchin",
+                        "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                        "rows": 1,
+                        "cols": 4,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 2,
+                        "fps": 5.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    }
+                ]
+            },
+            "children": []
+        }
+    ]
+}
