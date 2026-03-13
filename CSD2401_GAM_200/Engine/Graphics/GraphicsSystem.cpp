@@ -648,6 +648,7 @@ void GraphicsSystem::Update(float)
         int layer = rend->GetLayer(); // For draw order sorting
         bool screenSpace = rend->isScreenSpace();
 
+#ifdef _DEBUG
         if (hasCamBounds && !screenSpace &&
             CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play /* &&
             rend->GetLayer() >= -100*/)
@@ -660,6 +661,9 @@ void GraphicsSystem::Update(float)
 				continue; // Skip objects outside camera bounds
             }
         }
+
+#endif // _DEBUG
+
 
         //if (obj->GetName() == "MyTestSquare") {
         //    std::cout << "MyTestSquare - screenSpace: " << screenSpace
