@@ -99,6 +99,8 @@ int main()
             bool IsWinScreenActive()  const override { return winLoseLogic   && winLoseLogic->IsWinScreenActive(); }
             bool IsLoseScreenActive() const override { return winLoseLogic   && winLoseLogic->IsLoseScreenActive(); }
             bool IsHowToPlayOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsHowToPlayOpen(); }
+            bool IsPauseSettingsOpen() const override { return pauseMenuLogic && pauseMenuLogic->IsPauseSettingsOpen(); }
+            bool IsGhostMenuOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsGhostMenuOpen(); }
             bool IsOnMainMenu()       const override {
                 return pauseMenuLogic &&
                        pauseMenuLogic->GetCurrentScene().find("MainMenu") != std::string::npos;
@@ -106,10 +108,12 @@ int main()
             std::string GetCurrentScenePath() const override {
                 return pauseMenuLogic ? pauseMenuLogic->GetCurrentScene() : "";
             }
-            void TogglePauseMenu() override { if (pauseMenuLogic) pauseMenuLogic->TogglePauseMenu(); }
-            void OpenHowToPlay()   override { if (pauseMenuLogic) pauseMenuLogic->OpenHowToPlay(); }
-            void CloseHowToPlay()  override { if (pauseMenuLogic) pauseMenuLogic->CloseHowToPlay(); }
-            void TriggerLose()     override { if (winLoseLogic)   winLoseLogic->TriggerLose(); }
+            void TogglePauseMenu()     override { if (pauseMenuLogic) pauseMenuLogic->TogglePauseMenu(); }
+            void OpenHowToPlay()       override { if (pauseMenuLogic) pauseMenuLogic->OpenHowToPlay(); }
+            void CloseHowToPlay()      override { if (pauseMenuLogic) pauseMenuLogic->CloseHowToPlay(); }
+            void ClosePauseSettings()  override { if (pauseMenuLogic) pauseMenuLogic->ClosePauseSettings(); }
+            void CloseGhostMenu()      override { if (pauseMenuLogic) pauseMenuLogic->CloseGhostMenu(); }
+            void TriggerLose()         override { if (winLoseLogic)   winLoseLogic->TriggerLose(); }
         };
 
         static GameApp gameApp;
@@ -213,9 +217,6 @@ int main()
                 }
             }
         }
-
-        // Stop recording + save best run when Hero crosses x = 3000
-        CORE->GetGhostSystem()->SetFinishTrigger("Hero", 3000.f, "DebugLevel");
 
         GameObject* Platform = GameObjectFactory::Instance().CreateShape(
             "Platform",                  // <--- NAME MUST MATCH C#

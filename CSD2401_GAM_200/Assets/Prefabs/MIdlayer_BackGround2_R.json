@@ -1,0 +1,36 @@
+{
+    "GameObjects": [
+        {
+            "name": "MIdlayer_BackGround2_R",
+            "localID": 18,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    4200.0,
+                    0.0
+                ],
+                "scale": [
+                    4200.0,
+                    1920.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": -111,
+                "screenSpace": false
+            },
+            "children": []
+        }
+    ]
+}

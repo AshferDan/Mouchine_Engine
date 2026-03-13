@@ -829,3 +829,69 @@ bool AudioManager::Load3DSound(const std::string& name, const std::string& filep
 
     return success;
 }
+
+/*  DSP EFFECT  */
+/**
+ * @brief Enables or disables a low pass filter on a specific sound
+ */
+bool AudioManager::SetLowPassFilter(const std::string& soundName, bool enable, float cutoffFrequency, float resonance)
+{
+    if (!audioEngine)
+    {
+        std::cerr << "AudioEngine not available" << std::endl;
+        return false;
+    }
+
+    auto it = soundDatabase.find(soundName);
+    if (it == soundDatabase.end())
+    {
+        std::cerr << "Sound not found in database: " << soundName << std::endl;
+        return false;
+    }
+
+    std::string channelName = soundName + "_channel";
+    return audioEngine->setLowPassFilter(channelName, enable, cutoffFrequency, resonance);
+}
+
+/**
+ * @brief Updates the cutoff frequency of an existing low pass filter on a sound
+ */
+bool AudioManager::UpdateLowPassFilterFrequency(const std::string& soundName, float cutoffFrequency)
+{
+    if (!audioEngine)
+    {
+        std::cerr << "AudioEngine not available" << std::endl;
+        return false;
+    }
+
+    std::string channelName = soundName + "_channel";
+    return audioEngine->updateLowPassFilterFrequency(channelName, cutoffFrequency);
+}
+
+/**
+ * @brief Enables or disables a low pass filter on ALL audio
+ */
+bool AudioManager::SetMasterLowPassFilter(bool enable, float cutoffFrequency, float resonance)
+{
+    if (!audioEngine)
+    {
+        std::cerr << "AudioEngine not available" << std::endl;
+        return false;
+    }
+
+    return audioEngine->setMasterLowPassFilter(enable, cutoffFrequency, resonance);
+}
+
+/**
+ * @brief Updates the cutoff frequency of the master low pass filter
+ */
+bool AudioManager::UpdateMasterLowPassFilterFrequency(float cutoffFrequency)
+{
+    if (!audioEngine)
+    {
+        std::cerr << "AudioEngine not available" << std::endl;
+        return false;
+    }
+
+    return audioEngine->updateMasterLowPassFilterFrequency(cutoffFrequency);
+}

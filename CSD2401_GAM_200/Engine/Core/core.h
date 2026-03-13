@@ -45,7 +45,9 @@ Technology is prohibited.
 #include "IMessageHandler.h"
 #include "TimerSystem.h"
 #include "GhostSystem.h"
+#include "TextInputSystem.h"
 #include "GameCallbacks.h"
+#include "ScreenTransitionSystem.h"
 
 // Inside CoreEngine class
 
@@ -62,6 +64,7 @@ class ScriptSystem;
 class LevelEditor;
 class AudioManager;
 class CutsceneSystem;
+class ScreenTransitionSystem;
 
 class CoreEngine : public IMessageHandler
 {
@@ -250,6 +253,17 @@ public:
     GhostSystem *GetGhostSystem() const { return ghostSystem; }
 
     /**
+     * @brief Gets a pointer to the Screen Transition.
+     * @return A pointer to the GhostSystem.
+     */
+    ScreenTransitionSystem* GetScreenTransitionSystem() const { return screenTransitionSystem; }
+    
+     /* @brief Gets a pointer to the TextInputSystem.
+     * @return A pointer to the TextInputSystem.
+     */
+    TextInputSystem *GetTextInputSystem() const { return textInputSystem; }
+
+    /**
      * @brief Reads and applies configuration settings from a file.
      * @param configF The file path to the configuration file.
      */
@@ -294,11 +308,17 @@ public:
      * @brief Requests a scene to be loaded on the next frame.
      * @param sceneName The name of the scene file to load.
      */
-    void RequestSceneLoad(const std::string &sceneName, bool autoPlay = false)
+    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false)
     {
+        std::cout << "[RequestSceneLoad] scene: " << sceneName << std::endl;
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
+        if (screenTransitionSystem && sceneName != "../Assets/Scenes/MainMenu.json")
+        {
+            std::cout << "[RequestSceneLoad] Starting transition" << std::endl;
+            screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
+        }
     }
 
     /**
@@ -319,6 +339,7 @@ public:
     MessageBus &GetMessageBus() { return messageBus; }
 
     void SetGamePaused(bool paused);
+    void SetGamePaused(bool paused, bool pauseAudio);
 
     bool IsGamePaused() const { return m_gamePause; }
 
@@ -345,7 +366,9 @@ private:
     AudioManager *audioManager = nullptr;
     TimerSystem *timerSystem = nullptr;
     GhostSystem *ghostSystem = nullptr;
+    TextInputSystem *textInputSystem = nullptr;
     IGameCallbacksSystem *gameCallbacks = nullptr;
+    ScreenTransitionSystem* screenTransitionSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;

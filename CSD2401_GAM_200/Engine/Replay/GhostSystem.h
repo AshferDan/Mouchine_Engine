@@ -22,12 +22,16 @@ Technology is prohibited.
 /**
  * @brief Engine system that coordinates ghost player recording and playback.
  *
- * Usage flow (driven from C# scripts via the Ghost API):
- *   1. Call StartRecording("Hero")    at run start.
- *   2. Call StopRecording()           when the run ends.
- *   3. Call SaveBestRun(finishTime)   to persist if it's a new best.
- *   4. Call LoadRecording("M4_LEVEL") on the next run to load the saved ghost.
- *   5. Call StartPlayback("GhostHero") to drive the ghost object.
+ * Usage flow:
+ *   1. Call Configure("Player", "GhostPlayer")  once after the system is created.
+ *   2. Call StartRecording()    at run start.
+ *   3. Call StopRecording()     when the run ends.
+ *   4. Call SaveBestRun(levelName, finishTime) to persist if it's a new best.
+ *   5. Call LoadRecording(levelName) on the next run to load the saved ghost.
+ *   6. Call StartPlayback()     to drive the ghost object.
+ *
+ * No game-specific object names are hardcoded in the engine.
+ * All names are supplied by the game via Configure().
  */
 class GhostSystem : public ISystem
 {
@@ -36,10 +40,45 @@ public:
     void Update(float dt) override;
     std::string GetName() override { return "GhostSystem"; }
 
+    // ===== Configuration =====
+
+    /**
+     * @brief Supply the game-specific object names the ghost system operates on.
+     *        Call this once from game code before using EnterReplayMode / ToggleGhost.
+     * @param liveTarget   Name of the live player GameObject (e.g. "Hero").
+     * @param ghostTarget  Name of the ghost GameObject to create/drive (e.g. "GhostHero").
+     * @param liveVfx      Optional VFX companion of the live player (e.g. "Hero_vfx").
+     * @param ghostVfx     Optional VFX companion of the ghost (e.g. "GhostHero_vfx").
+     */
+    void Configure(const std::string& liveTarget,
+                   const std::string& ghostTarget,
+                   const std::string& liveVfx  = "",
+                   const std::string& ghostVfx = "")
+    {
+        m_liveTarget  = liveTarget;
+        m_ghostTarget = ghostTarget;
+        m_liveVfx     = liveVfx;
+        m_ghostVfx    = ghostVfx;
+    }
+
+    /**
+     * @brief Sets the human-readable level name that is embedded into saved replays.
+     *        Call this from game code before SaveCurrentRun / SaveBestRun so the
+     *        replay picker can display which level a recording belongs to.
+     * @param levelName  e.g. "M4_LEVEL_FIXED"
+     */
+    void SetLevelName(const std::string& levelName) { m_levelName = levelName; }
+
+    /** @return The level name stored in the most recently loaded recording (empty if none). */
+    std::string GetLevelName() const { return m_levelName; }
+
     // ===== Recording =====
 
-    /** @brief Begin recording targetName's transform and animation each frame. */
-    void StartRecording(const std::string& targetName);
+    /**
+     * @brief Begin recording targetName's transform and animation each frame.
+     *        If omitted, uses the liveTarget set in Configure().
+     */
+    void StartRecording(const std::string& targetName = "");
 
     /** @brief Stop recording. Recording is kept in memory until SaveBestRun or StartRecording. */
     void StopRecording();
@@ -55,8 +94,11 @@ public:
 
     // ===== Playback =====
 
-    /** @brief Start driving ghostObjectName from the best recording. */
-    void StartPlayback(const std::string& ghostObjectName);
+    /**
+     * @brief Start driving the ghost object from the best recording.
+     *        If omitted, uses the ghostTarget set in Configure().
+     */
+    void StartPlayback(const std::string& ghostObjectName = "");
 
     /** @brief Stop driving the ghost object. */
     void StopPlayback();
@@ -97,21 +139,30 @@ public:
     // ===== Replay Watch Mode =====
 
     /**
-     * @brief Enter a dedicated replay watch mode.
-     *        Hides the live Hero, switches the camera to follow GhostHero,
-     *        and starts playback from the beginning. Only F7/F8/F9/ESC respond.
-     *        No-op if no recording is available.
+     * @brief Enter replay watch mode using the names set in Configure().
+     *        Clones liveTarget → ghostTarget if the ghost doesn't exist,
+     *        hides the live player, switches camera to the ghost, starts playback.
+     *        No-op if no recording is available or Configure() was not called.
      */
     void EnterReplayMode();
 
     /**
      * @brief Exit replay watch mode.
-     *        Restores the live Hero, switches camera back to Hero, stops playback.
+     *        Destroys the cloned ghost, restores the live player, resets camera.
      */
     void ExitReplayMode();
 
     /** @return True while in the dedicated replay watch mode. */
     bool IsReplayMode() const { return m_isReplayMode; }
+
+    /** @return True if the ghost is currently toggled visible (key-0 toggle). */
+    bool IsGhostVisible() const { return m_ghostVisible; }
+
+    /** @brief Reset ghost toggle to hidden. Call at the start of each level session. */
+    void ResetGhostToggle() { m_ghostVisible = false; }
+
+    /** @brief Programmatically toggle ghost visibility (same as pressing key-0). */
+    void ToggleGhostVisible() { ToggleGhost(); }
 
     /**
      * @brief Save the current recording to disk unconditionally (no best-time check).
@@ -126,17 +177,19 @@ public:
      */
     void ResetRecording();
 
-    // ===== Finish Trigger =====
-
     /**
-     * @brief Auto-stop recording and save the run when targetName's X position
-     *        reaches or exceeds xThreshold. Fires once per recording session.
-     * @param targetName  The GameObject to watch (e.g. "Hero").
-     * @param xThreshold  X position that marks the finish line.
-     * @param levelName   Level identifier used for the save file.
+     * @brief Flag the ghost system to auto-load a recording and enter replay watch
+     *        mode as soon as the next scene finishes loading.
+     *        Call Configure() and then this before RequestSceneLoad() from the menu.
+     * @param recordingName  The recording file to load (e.g. "Level1_testing").
      */
-    void SetFinishTrigger(const std::string& targetName, float xThreshold,
-                          const std::string& levelName);
+    void RequestReplayOnLoad(const std::string& recordingName)
+    {
+        m_pendingRecordingName = recordingName;
+        m_pendingReplayLoad    = true;
+    }
+
+    // ===== Finish Trigger =====
 
 private:
     void SaveToDisk(const std::string& levelName);
@@ -149,11 +202,12 @@ private:
     GhostRecording m_bestRecording;
     float          m_bestTime = FLT_MAX;
 
-    // Finish trigger state
-    std::string m_finishTarget;
-    float       m_finishX    = FLT_MAX;
-    std::string m_finishLevel;
-    bool        m_finishDone = false;
+    // Game-supplied object names (set via Configure())
+    std::string m_liveTarget;   ///< e.g. "Hero"
+    std::string m_ghostTarget;  ///< e.g. "GhostHero"
+    std::string m_liveVfx;      ///< e.g. "Hero_vfx"  (optional)
+    std::string m_ghostVfx;     ///< e.g. "GhostHero_vfx" (optional)
+    std::string m_levelName;    ///< Human-readable level name serialised into replay JSON
 
     // Replay watch mode
     bool        m_isReplayMode = false;
@@ -162,4 +216,8 @@ private:
     bool        m_ghostVisible  = false;
     bool        m_key0WasHeld   = false;
     void        ToggleGhost();
+
+    // Deferred replay: set before scene load, fires once liveTarget exists in the new scene
+    bool        m_pendingReplayLoad    = false;
+    std::string m_pendingRecordingName;
 };

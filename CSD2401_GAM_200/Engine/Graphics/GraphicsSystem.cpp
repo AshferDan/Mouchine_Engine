@@ -362,6 +362,12 @@ void GraphicsSystem::Initialize()
     glVertexArrayAttribFormat(batchVAO, 6, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, scale));
     glVertexArrayAttribBinding(batchVAO, 6, 0);
 
+    // Attribute 7: Tile Count (vec2)
+    glEnableVertexArrayAttrib(batchVAO, 7);
+    glVertexArrayAttribFormat(batchVAO, 7, 2, GL_FLOAT, GL_FALSE, offsetof(BatchVertex, tileCount));
+    glVertexArrayAttribBinding(batchVAO, 7, 0);
+
+
     // === Text Rendering Buffers Setup ===
     // Load the text shader through ResourceManager
     ShaderResource *textShaderResource = ResourceManager::Instance().LoadShader(
@@ -437,6 +443,9 @@ void GraphicsSystem::Update(float)
             }
         }
     }
+
+	auto* cam = CameraManager::Instance().GetActiveCamera();
+	std::cout << "Camera Offset: " << cam->GetFollowOffset().x << ", " << cam->GetFollowOffset().y << std::endl;
 
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;
     if (!cachedBackground)
@@ -638,7 +647,7 @@ void GraphicsSystem::Update(float)
         int layer = rend->GetLayer(); // For draw order sorting
         bool screenSpace = rend->isScreenSpace();
 
-        if (hasCamBounds && !screenSpace)
+        if (hasCamBounds && !screenSpace && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play )
         {
             float halfSX = sx * 0.5f;
 			float halfSY = sy * 0.5f;
@@ -658,6 +667,7 @@ void GraphicsSystem::Update(float)
         // Gather UV data for spritesheets/animation/tiles
         vec2 uvScale = vec2(1.0f);
         vec2 uvOffset = vec2(0.0f);
+        vec2 tileCount = vec2(1.0f);
 
         if (auto *animator = obj->GetComponent<Spritesheet>())
         {
@@ -673,15 +683,30 @@ void GraphicsSystem::Update(float)
         else if (auto *renderComp = obj->GetComponent<RenderComponent>())
         {
             // Use RenderComponent UV (for tiles/static sprites)
-            uvScale = renderComp->GetUVScale();
-            uvOffset = renderComp->GetUVOffset();
+            if (renderComp->IsTileable())
+            {
+                uvScale = renderComp->GetTileCount();
+                uvOffset = vec2(0.0f, 0.0f);
+            }
+            else
+            {
+                uvScale = renderComp->GetUVScale();
+                uvOffset = renderComp->GetUVOffset();
+            }
         }
+
+        if (rend->IsTileable())
+        {
+            tileCount = rend->GetTileCount();
+        }
+        
 
         // Find an existing batch that matches the criteria (TextureID, ShapeType, Layer)
         RenderBatch *targetBatch = nullptr;
+        bool isTileable = rend->IsTileable();
         for (auto &batch : batches)
         {
-            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer && batch.screenSpace == screenSpace)
+            if (batch.textureID == texID && batch.isCircle == isCircle && batch.layer == layer && batch.screenSpace == screenSpace && batch.tileable == isTileable)
             {
                 targetBatch = &batch;
                 break;
@@ -691,7 +716,7 @@ void GraphicsSystem::Update(float)
         // If no matching batch found, create a new one
         if (!targetBatch)
         {
-            batches.emplace_back(texID, isCircle, layer, screenSpace);
+            batches.emplace_back(texID, isCircle, layer, screenSpace, isTileable);
             targetBatch = &batches.back();
 
             // Reserve space to minimize reallocations
@@ -733,6 +758,7 @@ void GraphicsSystem::Update(float)
             vert.uvOffset = uvOffset;
             vert.transform = vec3(x, y, rot); // Translation (x,y) and Rotation (rot)
             vert.scale = vec2(sx, sy);        // Scale (sx, sy)
+            vert.tileCount = tileCount;
 
             targetBatch->vertices.push_back(vert);
         }
@@ -878,7 +904,8 @@ void GraphicsSystem::Update(float)
                         {
                             float rHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
                             // float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
-                            float offsetFromTop = 110.0f; // distance from top edge
+                            // Use the Y position from transform as offset from top
+                            float offsetFromTop = rHeight - screenSpacePositions[textComp].y;
                             y = rHeight - offsetFromTop;
                         }
                         else
@@ -1205,6 +1232,22 @@ void GraphicsSystem::DrawBatches()
             shader->SetUniform("uHasTexture", 1);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, batch.textureID);
+
+            GLint wrapMode = batch.tileable ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+
+            if (batch.tileable)
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); // use nearest mip instead of linear blend between mips
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.0f); // clamp to mip 0 only
+            }
+            else
+            {
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.0f); // restore default
+            }
+
             shader->SetUniform("uTexture", 0); // Set sampler to texture unit 0
         }
         else
@@ -1696,6 +1739,9 @@ std::unique_ptr<IComponent> RenderComponent::Clone(GameObject *NewClone) const
     clonedComponent->SetUVOffset(this->uvOffset);
     clonedComponent->SetScreenSpace(this->screenSpace);
     clonedComponent->SetColor(this->color);
+    clonedComponent->SetTileable(this->tileable);
+    clonedComponent->SetTileCount(this->tileCount);
+
     return clonedComponent;
 }
 

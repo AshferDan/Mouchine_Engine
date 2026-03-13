@@ -1640,7 +1640,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
         {
             float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
             float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
-            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
+            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CameraManager::Instance().GetViewProjectMatrix(CORE->GetGraphicsSystem()->GetWindowWidth(), CORE->GetGraphicsSystem()->GetWindowHeight())), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
         }
 
         if (ImGuizmo::IsUsing())
@@ -3506,6 +3506,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         int  endR = 0, endC = 0;
         float fps = 12.0f;
         bool  loop = true;
+        bool pingPong = false;
     };
 
     // All statics
@@ -3519,6 +3520,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     static int         draftFrameLinear = 0;
     static float       draftTimer = 0.0f;
     static bool        isPlayingDraft = false;
+    static int         draftPreviewDir = 1;   // 1 forward, -1 backward
 
     // Left-column GO preview state — kept as statics so playback advances
     static int         goFrameRow = 0;
@@ -3527,6 +3529,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     static bool        isPlayingCurrent = false;
     static EntityID    lastPreviewedGOID = 0;        // detect GO switch
     static std::string lastPreviewedAnim;            // detect animation switch
+    static int         goPreviewDir = 1;      // 1 forward, -1 backward
 
     // Clip authoring inputs
     static char  actionName[64] = "Idle";
@@ -3534,8 +3537,74 @@ void ImGuiSystem::RenderAnimationPreviewer()
     static int   endR = 0, endC = 0;
     static float actionFPS = 12.0f;
     static bool  actionLoop = true;
+    static bool  actionPingPong = false;
     static int   frameCount = 1;
     static int   rowPick = 0;
+
+    auto StepPreviewFrame = [](int& linear,
+        int startIdx,
+        int endIdx,
+        bool loop,
+        bool pingPong,
+        int& direction,
+        bool& isPlaying)
+        {
+            if (endIdx < startIdx)
+                std::swap(startIdx, endIdx);
+
+            if (linear < startIdx || linear > endIdx)
+                linear = startIdx;
+
+            // Single-frame animation
+            if (startIdx == endIdx)
+            {
+                linear = startIdx;
+                if (!loop)
+                    isPlaying = false;
+                return;
+            }
+
+            if (!pingPong)
+            {
+                ++linear;
+
+                if (linear > endIdx)
+                {
+                    if (loop)
+                    {
+                        linear = startIdx;
+                    }
+                    else
+                    {
+                        linear = endIdx;
+                        isPlaying = false;
+                    }
+                }
+                return;
+            }
+
+            // Ping-pong mode
+            linear += direction;
+
+            if (direction > 0 && linear > endIdx)
+            {
+                direction = -1;
+                linear = endIdx - 1;
+            }
+            else if (direction < 0 && linear < startIdx)
+            {
+                if (loop)
+                {
+                    direction = 1;
+                    linear = startIdx + 1;
+                }
+                else
+                {
+                    linear = startIdx;
+                    isPlaying = false;
+                }
+            }
+        };
 
     // Draft-clip JSON
     static const std::string DRAFT_CLIPS_FILE = "../Assets/AnimPreview/draft_clips.json";
@@ -3566,6 +3635,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         c.endC = cj.value("endC", 0);
                         c.fps = cj.value("fps", 12.0f);
                         c.loop = cj.value("loop", true);
+                        c.pingPong = cj.value("pingPong", false);
                         if (!c.name.empty()) draftClips.push_back(c);
                     }
                     std::cout << "[AnimPreview] Loaded "
@@ -3593,7 +3663,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         {"rows",     c.rows},    {"cols",     c.cols},
                         {"startR",   c.startR},  {"startC",   c.startC},
                         {"endR",     c.endR},    {"endC",     c.endC},
-                        {"fps",      c.fps},     {"loop",     c.loop}
+                        {"fps",      c.fps},     {"loop",     c.loop},
+                        {"pingPong", c.pingPong}
                         });
                 }
                 std::ofstream f(DRAFT_CLIPS_FILE);
@@ -3611,6 +3682,17 @@ void ImGuiSystem::RenderAnimationPreviewer()
             isPlayingDraft = false;
             draftTimer = 0.0f;
             draftFrameLinear = 0;
+            draftPreviewDir = 1;
+        };
+
+    // Reset left-column preview playback to the first valid frame.
+    auto ResetGoPlayback = [&](Spritesheet* ss)
+        {
+            isPlayingCurrent = false;
+            goFrameTimer = 0.0f;
+            goPreviewDir = 1;
+            goFrameRow = ss ? ss->GetCurrentRow() : 0;
+            goFrameCol = ss ? ss->GetCurrentCol() : 0;
         };
 
     // Find a saved draft clip by name.
@@ -3635,12 +3717,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
     if (currentGOID != lastPreviewedGOID)
     {
         lastPreviewedGOID = currentGOID;
-        isPlayingCurrent = false;
-        goFrameTimer = 0.0f;
         lastPreviewedAnim = "";
-        // Sync frame position from spritesheet if available
-        goFrameRow = ss ? ss->GetCurrentRow() : 0;
-        goFrameCol = ss ? ss->GetCurrentCol() : 0;
+        ResetGoPlayback(ss);
     }
 
     bool hasStaticTexture = (rc && rc->GetTextureID() != 0 && !rc->GetTexturePath().empty());
@@ -3648,16 +3726,19 @@ void ImGuiSystem::RenderAnimationPreviewer()
 
     // Preview Window
     ImGui::Begin("Animation Preview");
-    isAnimPreviewFocused =
-        ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+    isAnimPreviewFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
     static bool fromFile = true;
     static bool fromGO = false;
-    if (ImGui::Checkbox("From File", &fromFile))
+    if (ImGui::Checkbox("From File", &fromFile)) 
+    {
         if (fromFile) fromGO = false;
+    }
     ImGui::SameLine();
     if (ImGui::Checkbox("From Game Object", &fromGO))
+    {
         if (fromGO) fromFile = false;
+    }
 
     ImGui::Separator();
 
@@ -3699,6 +3780,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                     goFrameRow = ss->GetCurrentRow();
                     goFrameCol = ss->GetCurrentCol();
                     goFrameTimer = 0.0f;
+                    goPreviewDir = 1;
                 }
 
                 // playback for the preview image.
@@ -3718,9 +3800,16 @@ void ImGuiSystem::RenderAnimationPreviewer()
                             goFrameTimer -= frameDur;
 
                             int linear = goFrameRow * goCols + goFrameCol;
-                            ++linear;
-                            if (linear > animData.endframe)
-                                linear = animData.startframe;  // loop
+
+                            StepPreviewFrame(
+                                linear,
+                                animData.startframe,
+                                animData.endframe,
+                                true,                    // or animData.loop if store loop there too
+                                animData.pingPong,
+                                goPreviewDir,
+                                isPlayingCurrent
+                            );
 
                             goFrameRow = linear / std::max(1, goCols);
                             goFrameCol = linear % std::max(1, goCols);
@@ -3758,30 +3847,36 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 ImGui::Image(
                     (void*)(intptr_t)ss->GetTextureID(),
                     ImVec2(180, 180), uv0, uv1,
-                    ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.2f));
+                    ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.2f)
+                );
 
                 // Animation dropdown — lists registered clips on the spritesheet.
                 {
                     const auto& reg = ss->GetAnimationRegistry();
                     std::vector<const char*> names;
                     names.reserve(reg.size());
-                    for (const auto& kv : reg)
+
+                    for (const auto& kv : reg) 
+                    {
                         names.push_back(kv.first.c_str());
+                    }
 
                     if (!names.empty())
                     {
                         int curIdx = 0;
-                        for (int i = 0; i < (int)names.size(); ++i)
+                        for (int i = 0; i < (int)names.size(); ++i) 
+                        {
                             if (curAnimName == names[i]) { curIdx = i; break; }
+                        }
 
-                        if (ImGui::Combo("Action##GO", &curIdx,
-                            names.data(), (int)names.size()))
+                        if (ImGui::Combo("Action##GO", &curIdx, names.data(), (int)names.size()))
                         {
                             ss->PlayAnimation(names[curIdx]);
                             lastPreviewedAnim = names[curIdx];
                             goFrameRow = ss->GetCurrentRow();
                             goFrameCol = ss->GetCurrentCol();
                             goFrameTimer = 0.0f;
+                            goPreviewDir = 1;
                         }
                     }
                     else
@@ -3790,18 +3885,24 @@ void ImGuiSystem::RenderAnimationPreviewer()
                     }
                 }
 
-                if (ImGui::Button(
-                    isPlayingCurrent ? "STOP##Cur" : "PLAY##Cur",
-                    ImVec2(180, 0)))
+                if (ImGui::Button(isPlayingCurrent ? "STOP##Cur" : "PLAY##Cur", ImVec2(180, 0)))
                 {
-                    isPlayingCurrent = !isPlayingCurrent;
                     if (!isPlayingCurrent)
                     {
-                        // On stop — re-sync frame position
-                        goFrameRow = ss->GetCurrentRow();
-                        goFrameCol = ss->GetCurrentCol();
+                        isPlayingCurrent = true;
+                        goFrameTimer = 0.0f;
+                        goPreviewDir = 1;
+                        goFrameRow = ss ? ss->GetCurrentRow() : 0;
+                        goFrameCol = ss ? ss->GetCurrentCol() : 0;
                     }
-                    goFrameTimer = 0.0f;
+                    else
+                    {
+                        isPlayingCurrent = false;
+                        goFrameRow = ss ? ss->GetCurrentRow() : 0;
+                        goFrameCol = ss ? ss->GetCurrentCol() : 0;
+                        goFrameTimer = 0.0f;
+                        goPreviewDir = 1;
+                    }
                 }
             }
             else if (hasStaticTexture)
@@ -3814,10 +3915,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         (void*)(intptr_t)rc->GetTextureID(),
                         ImVec2(180, 180),
                         ImVec2(0.0f, 1.0f), ImVec2(1.0f, 0.0f),
-                        ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.2f));
-                    ImGui::TextDisabled("Texture: %s",
-                        rc->GetTexturePath()
-                        .substr(rc->GetTexturePath().find_last_of("\\/") + 1).c_str());
+                        ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.2f)
+                    );
+                    ImGui::TextDisabled("Texture: %s", rc->GetTexturePath().substr(rc->GetTexturePath().find_last_of("\\/") + 1).c_str());
                 }
             }
             else
@@ -3834,9 +3934,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     }
 
     // RIGHT COLUMN — draft preview + authoring
-    ImGui::TextColored(
-        ImVec4(1.0f, 0.8f, 0.4f, 1.0f),
-        draftTexID ? "EDIT / PREVIEW" : "DRAG SPRITE HERE");
+    ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.4f, 1.0f), draftTexID ? "EDIT / PREVIEW" : "DRAG SPRITE HERE");
 
     std::string dropped;
 
@@ -3844,29 +3942,36 @@ void ImGuiSystem::RenderAnimationPreviewer()
     {
         int activeStartR = std::clamp(startR, 0, std::max(0, draftRows - 1));
         int activeStartC = std::clamp(startC, 0, std::max(0, draftCols - 1));
-        int activeEndR = std::clamp(endR, 0, std::max(0, draftRows - 1));
-        int activeEndC = std::clamp(endC, 0, std::max(0, draftCols - 1));
+        int activeEndR   = std::clamp(endR  , 0, std::max(0, draftRows - 1));
+        int activeEndC   = std::clamp(endC  , 0, std::max(0, draftCols - 1));
 
         int startIdx = (activeStartR * draftCols) + activeStartC;
-        int endIdx = (activeEndR * draftCols) + activeEndC;
+        int endIdx   = (activeEndR * draftCols) + activeEndC;
         if (endIdx < startIdx) std::swap(startIdx, endIdx);
 
-        if (draftFrameLinear < startIdx || draftFrameLinear > endIdx)
+        if (draftFrameLinear < startIdx || draftFrameLinear > endIdx) 
+        {
             draftFrameLinear = startIdx;
+        }         
 
         if (isPlayingDraft)
         {
             float fps = std::max(0.001f, actionFPS);
             draftTimer += ImGui::GetIO().DeltaTime;
+
             while (draftTimer >= 1.0f / fps)
             {
                 draftTimer -= 1.0f / fps;
-                ++draftFrameLinear;
-                if (draftFrameLinear > endIdx)
-                {
-                    if (actionLoop) draftFrameLinear = startIdx;
-                    else { draftFrameLinear = endIdx; isPlayingDraft = false; }
-                }
+
+                StepPreviewFrame(
+                    draftFrameLinear,
+                    startIdx,
+                    endIdx,
+                    actionLoop,
+                    actionPingPong,
+                    draftPreviewDir,
+                    isPlayingDraft
+                );
             }
         }
 
@@ -3882,22 +3987,31 @@ void ImGuiSystem::RenderAnimationPreviewer()
             (void*)(intptr_t)draftTexID, ImVec2(180, 180),
             ImVec2(showCol * duW, (showRow + 1) * dvH),
             ImVec2((showCol + 1) * duW, showRow * dvH),
-            ImVec4(1, 1, 1, 1), ImVec4(1, 1, 0, 1));
+            ImVec4(1, 1, 1, 1), ImVec4(1, 1, 0, 1)
+        );
         ImGui::EndGroup();
 
         ReceiveDragAndDrop(SpritePayloadID, dropped);
 
-        if (ImGui::Button(
-            isPlayingDraft ? "STOP PREVIEW##Drf" : "PLAY PREVIEW##Drf",
-            ImVec2(180, 0)))
+        if (ImGui::Button( isPlayingDraft ? "STOP PREVIEW##Drf" : "PLAY PREVIEW##Drf", ImVec2(180, 0)))
         {
-            isPlayingDraft = !isPlayingDraft;
-            if (isPlayingDraft) draftTimer = 0.0f;
+            if(!isPlayingDraft)
+            {
+                isPlayingDraft = true;
+                draftTimer = 0.0f;
+                draftPreviewDir = 1;
+
+                int startIdx = (startR * draftCols) + startC;
+                draftFrameLinear = startIdx;
+            }
+            else
+            {
+                isPlayingDraft = false;
+            }
         }
 
         ImGui::NewLine();
-        ImGui::Text("FILE: %s",
-            draftPath.substr(draftPath.find_last_of("\\/") + 1).c_str());
+        ImGui::Text("FILE: %s", draftPath.substr(draftPath.find_last_of("\\/") + 1).c_str());
     }
     else
     {
@@ -3959,31 +4073,31 @@ void ImGuiSystem::RenderAnimationPreviewer()
         std::vector<std::string>  clipLabels;
         clipLabels.reserve(draftClips.size() + 1);
         clipLabels.push_back("<New / Unsaved>");
-        for (const auto& c : draftClips)
-            clipLabels.push_back(c.name.empty() ? "<unnamed>" : c.name);
+        for (const auto& c : draftClips) 
+        {
+            clipLabels.push_back(c.name.empty() ? "<unnamed>" : c.name);       
+        }
 
         std::vector<const char*> clipPtrs;
         clipPtrs.reserve(clipLabels.size());
-        for (const auto& s : clipLabels)
+        for (const auto& s : clipLabels) 
+        {
             clipPtrs.push_back(s.c_str());
+        }        
 
-        int comboIndex = std::clamp(selectedDraftClip + 1, 0,
-            (int)clipPtrs.size() - 1);
+        int comboIndex = std::clamp(selectedDraftClip + 1, 0, (int)clipPtrs.size() - 1);
 
-        if (ImGui::Combo("Draft Clip", &comboIndex,
-            clipPtrs.data(), (int)clipPtrs.size()))
+        if (ImGui::Combo("Draft Clip", &comboIndex, clipPtrs.data(), (int)clipPtrs.size()))
         {
             selectedDraftClip = comboIndex - 1;
 
-            if (selectedDraftClip >= 0 &&
-                selectedDraftClip < (int)draftClips.size())
+            if (selectedDraftClip >= 0 && selectedDraftClip < (int)draftClips.size())
             {
                 const auto& c = draftClips[selectedDraftClip];
                 draftRows = std::max(1, c.rows);
                 draftCols = std::max(1, c.cols);
 
-                std::strncpy(actionName, c.name.c_str(),
-                    sizeof(actionName) - 1);
+                std::strncpy(actionName, c.name.c_str(), sizeof(actionName) - 1);
                 actionName[sizeof(actionName) - 1] = '\0';
 
                 if (!c.filepath.empty() && c.filepath != draftPath)
@@ -3999,6 +4113,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
 
                 actionFPS = c.fps;
                 actionLoop = c.loop;
+                actionPingPong = c.pingPong;
 
                 rowPick = startR;
                 frameCount = std::max(1, (endC - startC) + 1);
@@ -4006,6 +4121,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 draftFrameLinear = (startR * draftCols) + startC;
                 isPlayingDraft = false;
                 draftTimer = 0.0f;
+                draftPreviewDir = 1;
             }
             else
             {
@@ -4033,6 +4149,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::NewLine();
         ImGui::Checkbox("Loop", &actionLoop);
         ImGui::SameLine();
+        ImGui::Checkbox("Ping-Pong", &actionPingPong);
         ImGui::PushItemWidth(120);
         ImGui::InputFloat("FPS", &actionFPS, 0.5f, 1.0f, "%.2f");
         actionFPS = std::max(0.001f, actionFPS);
@@ -4059,8 +4176,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         endR = startR;
         endC = std::clamp(startC + frameCount - 1, 0, draftCols - 1);
 
-        ImGui::TextDisabled("Range: row %d  cols %d->%d  (%d frames)",
-            startR, startC, endC, frameCount);
+        ImGui::TextDisabled("Range: row %d  cols %d->%d  (%d frames)", startR, startC, endC, frameCount);
         ImGui::NewLine();
 
         std::string nameStr(actionName);
@@ -4080,6 +4196,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
             c.startR = startR;    c.startC = startC;
             c.endR = endR;      c.endC = endC;
             c.fps = actionFPS; c.loop = actionLoop;
+            c.pingPong = actionPingPong;
 
             if (idx >= 0)
             {
@@ -4184,7 +4301,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                         c.rows, c.cols,
                                         c.startR, c.startC,
                                         c.endR, c.endC,
-                                        c.fps);
+                                        c.fps, c.pingPong);
                                     ss->PlayAnimation(c.name);
                                     std::cout << "[AnimPreview] Applied clip '" << c.name
                                         << "' to '" << obj->GetName() << "'.\n";
@@ -4201,7 +4318,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                         draftRows, draftCols,
                                         startR, startC,
                                         endR, endC,
-                                        actionFPS);
+                                        actionFPS, actionPingPong);
                                     ss->PlayAnimation(oneName);
                                     std::cout << "[AnimPreview] Applied unsaved clip '" << oneName
                                         << "' to '" << obj->GetName() << "'.\n";

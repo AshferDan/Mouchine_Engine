@@ -317,7 +317,7 @@ void GameTimerSystem::ComputeBarUVBounds(RenderComponent* renderComp) {
 /**
  * @brief Updates the timer bar fill amount based on remaining time.
  */
-void GameTimerSystem::UpdateBar(int totalSeconds)
+void GameTimerSystem::UpdateBar(int )
 {
     // find timer bar by name
     auto& factory = GameObjectFactory::Instance();

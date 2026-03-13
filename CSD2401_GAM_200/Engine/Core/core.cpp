@@ -119,8 +119,11 @@ void CoreEngine::InitSystems()
     // 11. ScriptSystem - C# Script System
     scriptSystem = AddSystem<ScriptSystem>();
 
-    timerSystem = AddSystem<TimerSystem>();
-    ghostSystem = AddSystem<GhostSystem>();
+    timerSystem      = AddSystem<TimerSystem>();
+    ghostSystem      = AddSystem<GhostSystem>();
+    textInputSystem  = AddSystem<TextInputSystem>();
+
+    screenTransitionSystem = AddSystem<ScreenTransitionSystem>();
 
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
@@ -186,6 +189,13 @@ void CoreEngine::GameLoop()
             {
                 // Cutscene still playing - delay scene load
                 // (scene will load on next frame after cutscene ends)
+            }    
+            // Wait for iris to fully close before loading scene
+            else if (screenTransitionSystem &&
+                screenTransitionSystem->IsTransitioning() &&
+                screenTransitionSystem->GetState() != TransitionState::LoadScreen)
+            {
+                // Transition still closing - delay scene load
             }
             else
             {
@@ -194,6 +204,7 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
 
                 LevelEditor *level = GetLevelEditor();
+                CameraManager::Instance().ResetState();
                 level->LoadLevel(m_pendingScene);
                 std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
@@ -232,7 +243,6 @@ void CoreEngine::GameLoop()
 
                 if (inputManager)
                     inputManager->ResetState();
-                CameraManager::Instance().ResetState();
                 accumulator = 0.0;
             }
         }
@@ -407,6 +417,10 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
+
+        if (screenTransitionSystem)
+            screenTransitionSystem->Update(static_cast<float>(delta_time));
+
         if (debugSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -437,6 +451,12 @@ void CoreEngine::GameLoop()
             timerSystem->Update(static_cast<float>(delta_time));
         }
 
+        // TextInputSystem: modal dialog input — runs every frame regardless of pause
+        if (textInputSystem)
+        {
+            textInputSystem->Update(static_cast<float>(delta_time));
+        }
+
         // Game-specific variable-timestep update (game timer, state machine, etc.)
         if (gameCallbacks)
             gameCallbacks->VariableUpdate(static_cast<float>(delta_time));
@@ -462,6 +482,9 @@ void CoreEngine::GameLoop()
         if (cutsceneSystem && cutsceneSystem->IsPlaying()) {
             cutsceneSystem->Update(static_cast<float>(delta_time));         
         }
+
+        if (screenTransitionSystem)
+            screenTransitionSystem->Render();
 
         // Swap buffers and poll events
         glfwSwapBuffers(graphicsSystem->getWindow());
@@ -541,6 +564,12 @@ void CoreEngine::update_time(double fps_calc_interval)
 
 void CoreEngine::SetGamePaused(bool paused)
 {
+    SetGamePaused(paused, true);
+}
+
+// check if audio needs to be pause
+void CoreEngine::SetGamePaused(bool paused, bool pauseAudio)
+{
     std::cout << (paused ? "Game is paused\n" : "Game is resuming\n");
     if (m_gamePause == paused)
     {
@@ -549,8 +578,8 @@ void CoreEngine::SetGamePaused(bool paused)
 
     m_gamePause = paused;
 
-    // Don't pause audio if a cutscene is playing (cutscene has its own audio)
-    if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+    // only pause audio if requested and not in cutscene
+    if (pauseAudio && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(paused);
     }
