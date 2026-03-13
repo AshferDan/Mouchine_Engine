@@ -68,8 +68,8 @@ public:
 
 	void SetTotalCoins(int val) { _coins = val; }
 	void SetTotalShells(int val) { _shells = val; }
-	int GetTotalCoins(int val) const { return _coins; }
-	int GetTotalShells(int val) const { return _shells; }
+	int GetTotalCoins(int) const { return _coins; }
+	int GetTotalShells(int) const { return _shells; }
 
 	void SetCurrentCoins(int val) { currCoins = val; }
 	void SetCurrentShells(int val) { currShells = val; }

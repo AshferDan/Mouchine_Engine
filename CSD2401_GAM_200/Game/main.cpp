@@ -163,7 +163,7 @@ int main()
         {
             ColliderComponent* colComp = Hero->AddComponent<ColliderComponent>();
             PhysicsComponent* phyComp = Hero->AddComponent<PhysicsComponent>();
-            TransformComponent* TransComp = Hero->GetComponent<TransformComponent>();
+            //TransformComponent* TransComp = Hero->GetComponent<TransformComponent>();
 
             if (colComp && phyComp)
             {

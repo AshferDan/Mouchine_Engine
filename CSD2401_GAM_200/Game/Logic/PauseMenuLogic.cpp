@@ -153,7 +153,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_dark.png"));
 
                 // Play click sound
-                AudioManager* audioManager = CORE->GetAudioManager();
+                //AudioManager* audioManager = CORE->GetAudioManager();
                 if (audioManager)
                 {
                     audioManager->TriggerEvent("UI_Click");
@@ -171,7 +171,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 // Play hover sound only on hover state change
                 if (!wasHoveringLastFrame)
                 {
-                    AudioManager* audioManager = CORE->GetAudioManager();
+                    //AudioManager* audioManager = CORE->GetAudioManager();
                     if (audioManager)
                     {
                         audioManager->TriggerEvent("UI_Hover");

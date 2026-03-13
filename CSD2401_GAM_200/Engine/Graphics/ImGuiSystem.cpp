@@ -1005,7 +1005,7 @@ void ImGuiSystem::Hierarchy_Render()
             {
                 json beforeUnparentJson = Serialization::SerializeGameObject(go);
                 goParent->RemoveChild(go);
-                LevelEditor* editor = CORE->GetLevelEditor();
+                //LevelEditor* editor = CORE->GetLevelEditor();
                 if (editor)
                     UndoTracker::RecordInstantChange(go, editor, beforeUnparentJson);
             }
@@ -1036,7 +1036,7 @@ void ImGuiSystem::Hierarchy_GameObjectTree_Renderer(GameObject *obj, int depth, 
     if (!obj) return;
     EntityID id = obj->GetID();
     LevelEditor* editor = CORE->GetLevelEditor();
-    json propertyBeforeJson;
+    //json propertyBeforeJson;
 
     // Set tree node flags
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -1480,9 +1480,17 @@ void ImGuiSystem::PrefabMenu_Render()
     else
     {
         std::string goName{}, prefabName{};
+        //if (selectedGameObjectID) { goName = factory.GetGameObject(selectedGameObjectID)->GetName(); }
+        //else goName = "_____";
 
-        if (selectedGameObjectID) { goName = factory.GetGameObject(selectedGameObjectID)->GetName(); }
-            else goName = "_____";
+        if (selectedGameObjectID)
+        {
+            GameObject* selectedGO = factory.GetGameObject(selectedGameObjectID);
+            goName = selectedGO ? selectedGO->GetName() : "_____";  // safe even if object was deleted
+        }
+        else goName = "_____";
+
+        
         if (current_prefab) { prefabName = prefabList[current_prefab]; }
             else prefabName = "_____";
 
@@ -1648,7 +1656,18 @@ void ImGuiSystem::Viewport_ManageGizmos()
         {
             float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
             float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
-            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CameraManager::Instance().GetViewProjectMatrix(CORE->GetGraphicsSystem()->GetWindowWidth(), CORE->GetGraphicsSystem()->GetWindowHeight())), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
+            float windowWidth = static_cast<float>(CORE->GetGraphicsSystem()->GetWindowWidth());
+            float windowHeight = static_cast<float>(CORE->GetGraphicsSystem()->GetWindowHeight());
+            ImGuizmo::Manipulate(
+                value_ptr(view),
+                value_ptr(CameraManager::Instance().GetViewProjectMatrix(windowWidth, windowHeight)),
+                ImGuizmo::OPERATION::BOUNDS,
+                ImGuizmo::WORLD,
+                value_ptr(mtx),
+                deltaMat,
+                deltaMat,
+                bounds
+            ); // manipulate with bounds in mind
         }
 
         if (ImGuizmo::IsUsing())
@@ -1723,9 +1742,13 @@ void ImGuiSystem::Viewport_RenderGizmoToolbar()
 void ImGuiSystem::Viewport_HighlightGO()
 {
     // TODO WIP FOR HIGHLIGHTING SELECTED GO, I GOT SO LOST IN THE SAUCE LMAO ITS ALMOST DONE THO I JUST DK HOW TO GET VP MATRIX
-    if (!selectedGameObjectID) return;
-    auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
-    auto* collider = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<ColliderComponent>();
+    //if (!selectedGameObjectID) return;
+    auto* go = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID);
+    if (!go) return;
+    auto* transform = go->GetComponent<TransformComponent>();
+    auto* collider = go->GetComponent<ColliderComponent>();
+    //auto* transform = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<TransformComponent>();
+    //auto* collider = GameObjectFactory::Instance().GetGameObject(selectedGameObjectID)->GetComponent<ColliderComponent>();
 
     if (transform)
     {
@@ -2286,8 +2309,8 @@ void ImGuiSystem::RenderPropertyEditor()
         return;
     }
 
-    static bool isEditingProperty = false;
-    static json propertyBeforeJson;
+    //static bool isEditingProperty = false;
+    //static json propertyBeforeJson;
     LevelEditor* editor = CORE->GetLevelEditor();
 
     ImGui::Text("GameObject: %s", obj->GetName().c_str());
@@ -2442,9 +2465,13 @@ void ImGuiSystem::RenderPropertyEditor()
 
                             std::cout << draggedSprite << std::endl;
                             render->SetTexturePath(draggedSprite);
+
+                            GLuint oldTexID = render->GetTextureID();               // get old tex before overwriting
                             GLuint newTexID = CORE->GetGraphicsSystem()->LoadTexture(draggedSprite.c_str());
+
                             if (newTexID)
                             {
+                                if (oldTexID) glDeleteTextures(1, &oldTexID);           // free the old one first
                                 render->SetColor(1.0f);                                 // removes colour and makes way for loading image
                                 render->SetTextureID(newTexID);
                                 strcpy(draggedSprite_str, "<Drag Image Here>");                   // reset
@@ -2903,8 +2930,8 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
     if (ImGui::CollapsingHeader("Event", ImGuiTreeNodeFlags_DefaultOpen)) {
 
         LevelEditor* editor = CORE->GetLevelEditor();
-        static bool isEditingProperty = false;
-        static json propertyBeforeJson;
+        //static bool isEditingProperty = false;
+        //static json propertyBeforeJson;
 
         bool isEventEnabled = ec->IsEnabled();
         if (ImGui::Checkbox("Component Enabled ##Event", &isEventEnabled))
@@ -2959,7 +2986,7 @@ void ImGuiSystem::RenderEventComponent(EventComponent* ec, GameObject* obj) {
                 }
 
                 // Convert vector of strings to vector of char* for ImGui
-                std::vector<const char*> cStrNames;
+               // std::vector<const char*> cStrNames;
                 for (const auto& name : objectNames) cStrNames.push_back(name.c_str());
 
                 if (ImGui::Combo("Filter: Triggered By", &currentIndex, cStrNames.data(), (int)cStrNames.size())) {
@@ -4009,8 +4036,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 draftTimer = 0.0f;
                 draftPreviewDir = 1;
 
-                int startIdx = (startR * draftCols) + startC;
-                draftFrameLinear = startIdx;
+                int startIdxPlay = (startR * draftCols) + startC;
+                draftFrameLinear = startIdxPlay;
             }
             else
             {
@@ -4033,7 +4060,10 @@ void ImGuiSystem::RenderAnimationPreviewer()
     if (!dropped.empty() && SupportedImageFile(dropped))
     {
         draftPath = dropped;
+
+        if (draftTexID) glDeleteTextures(1, &draftTexID);
         draftTexID = GraphicsSystem::LoadTexture(dropped.c_str());
+
         draftRows = 1;  draftCols = 1;
         startR = startC = endR = endC = 0;
         rowPick = 0;  frameCount = 1;
@@ -4256,7 +4286,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 beforeJson = Serialization::SerializeGameObject(obj);
 
             // Capture whether a Spritesheet existed before apply.
-            const bool hadSpritesheetBefore = (ss != nullptr);
+            //const bool hadSpritesheetBefore = (ss != nullptr);
 
             try
             {
@@ -4372,8 +4402,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 std::cerr << "[AnimPreview] Apply exception: "
                     << e.what() << "\n";
                 //g_showEditorErrorPopup = true;
-                //g_editorErrorMessage =
-                    std::string("[AnimPreview] Apply failed: ") + e.what();
+                //g_editorErrorMessage = 
+                //    std::string("[AnimPreview] Apply failed: ") + e.what();
             }
 
             ResetDraftPlayback();

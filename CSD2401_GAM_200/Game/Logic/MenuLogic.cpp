@@ -538,7 +538,7 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     if (buttonName == "Level2Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level2Button", "../Assets/Scenes/Level2.json"); // to change to proper scene
+        SelectLevel("Level2Button", "../Assets/Scenes/Level_2.json"); 
         return true;
     }
 
