@@ -36,8 +36,24 @@ Technology is prohibited.
 class GhostSystem : public ISystem
 {
 public:
+    /**
+     * @brief Called once by the engine at system startup. 
+     *        Resets the recorder, player, and all internal flags.
+     */
     void Initialize() override;
+
+    /**
+     * @brief Called each fixed-timestep tick.
+     *        Advances the recorder (if recording) or player (if playing back),
+     *        and handles the key-0 ghost-visibility toggle.
+     * @param dt Fixed delta time for this tick (seconds).
+     */
     void Update(float dt) override;
+
+    /**
+     * @brief Gets the system identifier name.
+     * @return The string "GhostSystem".
+     */
     std::string GetName() override { return "GhostSystem"; }
 
     // ===== Configuration =====
@@ -63,125 +79,154 @@ public:
 
     /**
      * @brief Sets the human-readable level name that is embedded into saved replays.
-     *        Call this from game code before SaveCurrentRun / SaveBestRun so the
-     *        replay picker can display which level a recording belongs to.
-     * @param levelName  e.g. "M4_LEVEL_FIXED"
+     *        Call this from game code before SaveCurrentRun / SaveBestRun.
+     * @param levelName The name of the level (e.g. "M4_LEVEL_FIXED").
      */
     void SetLevelName(const std::string& levelName) { m_levelName = levelName; }
 
-    /** @return The level name stored in the most recently loaded recording (empty if none). */
+    /**
+     * @brief Gets the level name stored in the most recently loaded recording.
+     * @return The level name as a string (empty if none).
+     */
     std::string GetLevelName() const { return m_levelName; }
 
     // ===== Recording =====
 
     /**
-     * @brief Begin recording targetName's transform and animation each frame.
-     *        If omitted, uses the liveTarget set in Configure().
+     * @brief Begin recording the specified target's transform and animation each frame.
+     * @param targetName Name of the target to record. If empty, uses the liveTarget set in Configure().
      */
     void StartRecording(const std::string& targetName = "");
 
-    /** @brief Stop recording. Recording is kept in memory until SaveBestRun or StartRecording. */
+    /**
+     * @brief Stops the current recording process. 
+     *        The recording is kept in memory until SaveBestRun or the next StartRecording.
+     */
     void StopRecording();
 
     /**
-     * @brief Compare finishTime against the current best. If better, replace the best
-     *        recording, save it to disk, and return true.
+     * @brief Compares finishTime against the current best. If better, replaces the best
+     *        recording, saves it to disk, and returns true.
      * @param levelName  Used to derive the save file path (e.g. "M4_LEVEL").
      * @param finishTime The player's completion time in seconds.
-     * @return True if this run is the new best.
+     * @return True if this run is the new best and was saved.
      */
     bool SaveBestRun(const std::string& levelName, float finishTime);
 
     // ===== Playback =====
 
     /**
-     * @brief Start driving the ghost object from the best recording.
-     *        If omitted, uses the ghostTarget set in Configure().
+     * @brief Starts driving the ghost object from the best recording.
+     * @param ghostObjectName Name of the ghost object. If empty, uses the ghostTarget set in Configure().
      */
     void StartPlayback(const std::string& ghostObjectName = "");
 
-    /** @brief Stop driving the ghost object. */
+    /**
+     * @brief Stops driving the ghost object and ends playback.
+     */
     void StopPlayback();
 
-    /** @brief Toggle pause — ghost freezes in place but stays visible. */
+    /**
+     * @brief Toggles the pause state of the replay playback.
+     *        When paused, the ghost freezes in place but remains visible.
+     */
     void ToggleReplayPause() { m_player.TogglePause(); }
 
     /**
-     * @brief Shift the replay clock by deltaSeconds (negative = rewind).
+     * @brief Shifts the replay clock by the specified delta time.
      *        Clamps to [0, recording end]. Safe to call while paused.
+     * @param deltaSeconds The amount of time to shift (negative to rewind).
      */
     void SeekReplay(float deltaSeconds) { m_player.Seek(deltaSeconds); }
 
-    /** @return True if the replay is currently paused. */
+    /**
+     * @brief Checks if the replay playback is currently paused.
+     * @return True if the replay is paused.
+     */
     bool IsReplayPaused() const { return m_player.IsPaused(); }
 
     // ===== Persistence =====
 
     /**
-     * @brief Load the best recording from disk for the given level.
+     * @brief Loads the best recording from disk for the given level.
      *        Call this before StartPlayback on a new session.
-     * @param levelName  Level identifier matching what was used in SaveBestRun.
+     * @param levelName Level identifier matching what was used in SaveBestRun.
      * @return True if a file was found and loaded successfully.
      */
     bool LoadRecording(const std::string& levelName);
 
     // ===== Queries =====
 
-    /** @return True if a best recording is available (in memory or loaded from disk). */
+    /**
+     * @brief Checks if a best recording is available in memory or loaded from disk.
+     * @return True if a ghost recording is available.
+     */
     bool IsGhostAvailable() const;
 
-    /** @return The best run time, or FLT_MAX if none recorded yet. */
+    /**
+     * @brief Gets the best run time recorded so far.
+     * @return The best run time in seconds, or FLT_MAX if none.
+     */
     float GetBestRunTime() const { return m_bestTime; }
 
-    /** @return True while the ghost is actively playing back. */
+    /**
+     * @brief Checks if the ghost is actively playing back.
+     * @return True while the ghost is playing.
+     */
     bool IsGhostPlaying() const { return m_player.IsPlaying(); }
 
     // ===== Replay Watch Mode =====
 
     /**
-     * @brief Enter replay watch mode using the names set in Configure().
-     *        Clones liveTarget → ghostTarget if the ghost doesn't exist,
-     *        hides the live player, switches camera to the ghost, starts playback.
-     *        No-op if no recording is available or Configure() was not called.
+     * @brief Enters the dedicated replay watch mode using configured object names.
+     *        Clones liveTarget to ghostTarget, hides live player, and switches camera.
      */
     void EnterReplayMode();
 
     /**
-     * @brief Exit replay watch mode.
-     *        Destroys the cloned ghost, restores the live player, resets camera.
+     * @brief Exits the replay watch mode and restores the original scene state.
+     *        Destroys the ghost clone, restores the live player, and resets camera.
      */
     void ExitReplayMode();
 
-    /** @return True while in the dedicated replay watch mode. */
+    /**
+     * @brief Checks if the system is currently in replay watch mode.
+     * @return True while in replay watch mode.
+     */
     bool IsReplayMode() const { return m_isReplayMode; }
 
-    /** @return True if the ghost is currently toggled visible (key-0 toggle). */
+    /**
+     * @brief Checks if the ghost is currently toggled visible (via key-0 toggle).
+     * @return True if the ghost is visible.
+     */
     bool IsGhostVisible() const { return m_ghostVisible; }
 
-    /** @brief Reset ghost toggle to hidden. Call at the start of each level session. */
+    /**
+     * @brief Resets the ghost visibility toggle to hidden.
+     *        Should be called at the start of each level session.
+     */
     void ResetGhostToggle() { m_ghostVisible = false; }
 
-    /** @brief Programmatically toggle ghost visibility (same as pressing key-0). */
+    /**
+     * @brief Programmatically toggles ghost visibility (identical to pressing key-0).
+     */
     void ToggleGhostVisible() { ToggleGhost(); }
 
     /**
-     * @brief Save the current recording to disk unconditionally (no best-time check).
-     *        Useful for test recordings where you always want the run saved.
-     * @param levelName  Used to derive the save file path (e.g. "Level1_testing").
+     * @brief Saves the current recording to disk unconditionally (no best-time check).
+     * @param levelName Used to derive the save file path.
      */
     void SaveCurrentRun(const std::string& levelName);
 
     /**
-     * @brief Discard any in-progress recording and reset the recorder to a clean state.
-     *        Call this when the player dies or restarts so the next run starts fresh.
+     * @brief Discards any in-progress recording and resets the recorder state.
+     *        Call this when the player dies or restarts.
      */
     void ResetRecording();
 
     /**
-     * @brief Flag the ghost system to auto-load a recording and enter replay watch
-     *        mode as soon as the next scene finishes loading.
-     *        Call Configure() and then this before RequestSceneLoad() from the menu.
-     * @param recordingName  The recording file to load (e.g. "Level1_testing").
+     * @brief Flags the system to auto-load a recording and enter replay mode after scene load.
+     * @param recordingName The name of the recording file to load.
      */
     void RequestReplayOnLoad(const std::string& recordingName)
     {

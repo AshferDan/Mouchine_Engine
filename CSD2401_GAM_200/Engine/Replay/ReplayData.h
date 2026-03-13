@@ -16,24 +16,26 @@ Technology is prohibited.
 #include <vector>
 
 /**
- * @brief One sampled frame of player state for ghost playback.
- *        Captured after the game update so it reflects the frame's result.
+ * @brief Represents a single sampled frame of player state for ghost playback.
+ *        Captured after the game update to ensure it reflects the frame's final state.
  */
 struct GhostKeyframe
 {
-    float timestamp; // seconds since recording started
+    float timestamp;
 
-    float posX, posY;     // world position
-    float scaleX, scaleY; // transform scale (negative scaleX = facing left)
+    float posX, posY;
+    float scaleX, scaleY;
 
-    std::string animName; // registered animation name (empty if no Spritesheet)
-    int animRow, animCol; // exact spritesheet frame within that animation
+    std::string animName;
+    int animRow, animCol;
 
-    // VFX companion object (e.g. "Hero_vfx" recorded alongside "Hero")
+    // VFX companion object state
     std::string vfxAnimName;
     int vfxAnimRow = 0;
     int vfxAnimCol = 0;
 };
 
-/** @brief A full run recording — ordered by timestamp ascending. */
+/** 
+ * @brief A collection of keyframes representing a full run, ordered by ascending timestamp. 
+ */
 using GhostRecording = std::vector<GhostKeyframe>;

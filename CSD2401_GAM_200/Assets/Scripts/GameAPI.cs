@@ -1623,6 +1623,12 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int GetCurrentShells();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetTotalCoins();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetTotalShells();
     }
 
 
