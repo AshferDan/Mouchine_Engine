@@ -342,10 +342,17 @@ void InputManager::Update(float)
         {
             if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu && !textInputActive)
             {
+                GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
                 bool isPauseActive = gameCb && gameCb->IsPauseMenuActive();
 
                 // Priority order (highest first) — only one action fires per press
-                if (isPauseActive && gameCb->IsHowToPlayOpen())
+                if (ghostSys && ghostSys->IsReplayMode())
+                {
+                    std::cout << "[InputManager] ESC - Exiting Replay Mode" << std::endl;
+                    ghostSys->ExitReplayMode();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                }
+                else if (isPauseActive && gameCb->IsHowToPlayOpen())
                 {
                     // Delegate to PauseMenuLogic's own ESC handler in its HowToPlay loop
                     singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
@@ -368,15 +375,6 @@ void InputManager::Update(float)
                     if (gameCb) gameCb->TogglePauseMenu();
                     singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
                 }
-            }
-            GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
-            bool isReplayMode = ghostSys && ghostSys->IsReplayMode();
-            
-            // in replay mode, ESC exits the replay
-            if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && isReplayMode)
-            {
-                ghostSys->ExitReplayMode();
-                singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
             }
         }
         else

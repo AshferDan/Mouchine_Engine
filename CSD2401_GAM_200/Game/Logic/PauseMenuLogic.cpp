@@ -461,6 +461,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
+            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton"))
+                ghostBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(false);
         }
@@ -490,6 +492,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
+            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton"))
+                ghostBtn->SetActive(true);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(true);
         }
