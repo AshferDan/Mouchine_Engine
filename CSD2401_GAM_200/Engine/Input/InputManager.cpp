@@ -580,16 +580,16 @@ void InputManager::Update(float)
     /**
      * @brief Destroy 2500 Game Objects on screen, if ENTER key is pressed
      */
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
-    {
-        DemoM1_DestroyGameObjects();
-    }
-    else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && isPlayMode) 
-    {
-        CameraManager::Instance().AddCameraTrauma(1.f);
-        CameraManager::Instance().FlashActiveCamera(0.3f, vec4(1.f, 0.f, 0.f, 0.7f));
-        //CORE->SetGamePaused(!CORE->IsGamePaused());
-    }
+    //if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    //{
+    //    DemoM1_DestroyGameObjects();
+    //}
+    //else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && isPlayMode) 
+    //{
+    //    CameraManager::Instance().AddCameraTrauma(1.f);
+    //    CameraManager::Instance().FlashActiveCamera(0.3f, vec4(1.f, 0.f, 0.f, 0.7f));
+    //    //CORE->SetGamePaused(!CORE->IsGamePaused());
+    //}
 }
 
     void InputManager::ResetState()

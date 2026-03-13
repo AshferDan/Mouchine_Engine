@@ -605,7 +605,7 @@ namespace CSharpScript
                 }
 
                 // wall bonk trigger
-                if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold)
+                if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold && currState != PlayerState.WallJumping)
                 {
                     HandleWallBonk();
                     return;
@@ -1822,20 +1822,10 @@ namespace CSharpScript
         private void EnterState(PlayerState state)
         {
             Debug.Log(state.ToString());
-            //Audio.StopAllSounds();          // idealy have a system in place to stop LOOPING sounds only, but thisll do for now
-            // ^ im commenting this out for now cause its stopping the level bgm
 
-            Audio.StopSound("sfx");
             Audio.StopSound("sfx_loop");
             if (_isGrounded || nonTrackingVFX.Contains(state))
                 staticVfxPos = Transform.GetPosition(OwnerName);
-
-            // doesnt work for some reason
-            //if (loopingSounds.Contains(state))
-            //{
-            //    Debug.Log("FOUD");
-            //    Audio.StopAllSounds();
-            //}
 
             bool enableDebug = false;           // change this to true if u wanna test states
 

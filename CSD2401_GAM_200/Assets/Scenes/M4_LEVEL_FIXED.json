@@ -7247,7 +7247,7 @@
           "ColliderComponent": {
             "enabled": true,
             "shape": "Square",
-            "layer": "Default",
+            "layer": "Enemy",
             "size": [
               985.0,
               98.0
@@ -7521,7 +7521,7 @@
           "ColliderComponent": {
             "enabled": true,
             "shape": "Square",
-            "layer": "Default",
+            "layer": "Enemy",
             "size": [
               482.0,
               146.0
@@ -7596,7 +7596,36 @@
               }
             ]
           },
-          "children": []
+          "children": [
+            {
+              "name": "Hazard Collider nuh",
+              "localID": 171,
+              "parentID": 170,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  11417.977,
+                  4170.271
+                ],
+                "scale": [
+                  495.000,
+                  143.450
+                ],
+                "rotation": 0.0
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  434.000,
+                  110.452
+                ]
+              },
+              "children": []
+            }
+          ]
         },
         {
           "name": "Spike_Hazard(13)",
@@ -7746,7 +7775,7 @@
           "ColliderComponent": {
             "enabled": true,
             "shape": "Square",
-            "layer": "Default",
+            "layer": "Enemy",
             "size": [
               548.0,
               163.0
@@ -9026,7 +9055,7 @@
         "name": "bgm",
         "filepath": "../Assets/audio/sneaky_bgm.wav",
         "loop": true,
-        "volume": 0.20000000298023224,
+        "volume": 0.08000000298023224,
         "pitch": 1.0,
         "category": "bgm"
       },
@@ -9215,14 +9244,6 @@
         "category": "sfx"
       },
       {
-        "name": "scissors_snip",
-        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
-        "loop": true,
-        "volume": 0.4000000059604645,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
         "name": "turnskid_sfx",
         "filepath": "../Assets/audio/Player/TurnSkid.wav",
         "loop": false,
@@ -9269,6 +9290,70 @@
         "volume": 0.10000000149011612,
         "pitch": 0.8999999761581421,
         "category": "sfx"
+      },
+      {
+        "name": "scissors_snip",
+        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
+        "loop": true,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "timer_ending",
+        "filepath": "../Assets/Audio/Timer_Ending.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "PU_Time_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Speed_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Speed.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Shell_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Shell.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx1",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx2",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin2.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx3",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin3.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
       }
     ],
     "events": [

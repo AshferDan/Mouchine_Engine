@@ -2,55 +2,81 @@
     "GameObjects": [
         {
             "name": "Hero",
-            "localID": 3,
+            "localID": 2,
             "parentID": 4294967295,
             "active": true,
             "TransformComponent": {
+                "enabled": true,
                 "pos": [
-                    0.0,
-                    0.0
+                    419.7012634277344,
+                    3969.44775390625
                 ],
                 "scale": [
-                    100.0,
-                    100.0
+                    192.0,
+                    192.0
                 ],
                 "rotation": 0.0
             },
             "RenderComponent": {
+                "enabled": true,
                 "shapeType": "Square",
-                "texturePath": "",
+                "texturePath": "../Assets/spritesheet_R.png",
                 "color": [
                     1.0,
                     1.0,
                     1.0,
                     1.0
                 ],
-                "layer": 0
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
             },
             "Spritesheet": {
-                "defaultAnimation": "",
+                "enabled": true,
+                "defaultAnimation": "Idle",
                 "animations": [
+                    {
+                        "name": "Bonk",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 2,
+                        "startCol": 0,
+                        "endRow": 2,
+                        "endCol": 2,
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
                     {
                         "name": "Dash",
                         "filepath": "../Assets/spritesheet_R.png",
                         "rows": 13,
                         "cols": 10,
-                        "startRow": 3,
+                        "startRow": 0,
                         "startCol": 0,
-                        "endRow": 3,
-                        "endCol": 2,
-                        "fps": 4.0
+                        "endRow": 0,
+                        "endCol": 3,
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Falling",
-                        "filepath": "../Assets/spritesheet_L.png",
+                        "filepath": "../Assets/spritesheet_R.png",
                         "rows": 13,
                         "cols": 10,
                         "startRow": 10,
                         "startCol": 0,
                         "endRow": 10,
                         "endCol": 1,
-                        "fps": 4.0
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Glide",
@@ -61,7 +87,9 @@
                         "startCol": 0,
                         "endRow": 1,
                         "endCol": 2,
-                        "fps": 8.0
+                        "fps": 8.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Groundpound",
@@ -72,7 +100,22 @@
                         "startCol": 3,
                         "endRow": 9,
                         "endCol": 4,
-                        "fps": 10.0
+                        "fps": 10.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Hurt",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 2,
+                        "fps": 3.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Idle",
@@ -83,7 +126,9 @@
                         "startCol": 0,
                         "endRow": 7,
                         "endCol": 2,
-                        "fps": 4.0
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Jump",
@@ -94,18 +139,22 @@
                         "startCol": 4,
                         "endRow": 11,
                         "endCol": 5,
-                        "fps": 12.0
+                        "fps": 12.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Land",
-                        "filepath": "../Assets/spritesheet_L.png",
+                        "filepath": "../Assets/spritesheet_R.png",
                         "rows": 13,
                         "cols": 10,
                         "startRow": 10,
                         "startCol": 3,
                         "endRow": 10,
                         "endCol": 4,
-                        "fps": 4.0
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Roll",
@@ -116,7 +165,9 @@
                         "startCol": 0,
                         "endRow": 8,
                         "endCol": 5,
-                        "fps": 12.0
+                        "fps": 14.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Run",
@@ -127,7 +178,74 @@
                         "startCol": 0,
                         "endRow": 12,
                         "endCol": 7,
-                        "fps": 16.0
+                        "fps": 16.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Run1",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 12,
+                        "startCol": 0,
+                        "endRow": 12,
+                        "endCol": 7,
+                        "fps": 12.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Run2",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 12,
+                        "startCol": 0,
+                        "endRow": 12,
+                        "endCol": 7,
+                        "fps": 16.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Run3",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 12,
+                        "startCol": 0,
+                        "endRow": 12,
+                        "endCol": 7,
+                        "fps": 22.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Skidding",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 3,
+                        "startCol": 0,
+                        "endRow": 3,
+                        "endCol": 2,
+                        "fps": 6.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Walk",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 12,
+                        "startCol": 0,
+                        "endRow": 12,
+                        "endCol": 7,
+                        "fps": 8.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Wallkick",
@@ -138,7 +256,9 @@
                         "startCol": 3,
                         "endRow": 4,
                         "endCol": 4,
-                        "fps": 4.0
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
                     },
                     {
                         "name": "Wallslide",
@@ -149,29 +269,183 @@
                         "startCol": 0,
                         "endRow": 4,
                         "endCol": 1,
-                        "fps": 4.0
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Zipline",
+                        "filepath": "../Assets/spritesheet_R.png",
+                        "rows": 13,
+                        "cols": 10,
+                        "startRow": 6,
+                        "startCol": 0,
+                        "endRow": 6,
+                        "endCol": 1,
+                        "fps": 4.0,
+                        "pingPong": false,
+                        "flipRows": false
                     }
                 ]
             },
             "PhysicsComponent": {
+                "enabled": true,
                 "mass": 9.999999747378752e-05,
                 "isStatic": false,
                 "useGravity": true,
-                "isGrounded": true,
+                "isGrounded": false,
                 "velocity": [
                     0.0,
                     0.0
                 ]
             },
             "ColliderComponent": {
+                "enabled": true,
                 "shape": "Square",
-                "layer": "Default"
+                "layer": "Player",
+                "size": [
+                    168.0,
+                    192.0
+                ]
             },
             "ScriptComponent": {
+                "enabled": true,
                 "scripts": [
                     "PlayerMovement",
-                    "PlayerMovementStats"
-                ]
+                    "PlayerMovementStats",
+                    "ParallaxBackground",
+                    "PickupManager"
+                ],
+                "fields": {
+                    "PlayerMovement": {
+                        "fRun": false,
+                        "fJump": true,
+                        "fIdle": false,
+                        "fZipline": false,
+                        "fGroundPound": true,
+                        "fGlide": false,
+                        "fRoll": true,
+                        "fWallKick": true,
+                        "hitDirectionForce": 10.0,
+                        "constForce": 5.0,
+                        "inputForce": 7.5,
+                        "vfx": "Hero_vfx",
+                        "vfx_nontracking": "Hero_vfx_nontracking"
+                    },
+                    "PlayerMovementStats": {
+                        "Clamp_MaxRunSpeed": 1562.5,
+                        "Clamp_MaxJumpHeight": 2500.0,
+                        "T0_BaseSpeed": 31.25,
+                        "T0_MaxSpeed": 375.0,
+                        "T1_Threshold": 562.5,
+                        "T2_Threshold": 750.0,
+                        "T3_Threshold": 937.5,
+                        "T3_MaxSpeed": 1000.0,
+                        "UseToggleRun": false,
+                        "RunBaseSpeed": 468.75,
+                        "RunCoastDeceleration": 468.75,
+                        "GroundAcceleration": 625.0,
+                        "GroundDeceleration": 1562.5,
+                        "AirAcceleration": 625.0,
+                        "AirDeceleration": 156.25,
+                        "TurnResetSpeed": 156.25,
+                        "TentAcceleration": 312.5,
+                        "SkidSpeedRetained": 0.25,
+                        "T1_SkidDuration": 0.44999998807907104,
+                        "T2_SkidDuration": 0.550000011920929,
+                        "T3_SkidDuration": 0.800000011920929,
+                        "SkidExitSpeed": 100.0,
+                        "T3_BonkDuration": 0.6499999761581421,
+                        "GroundDetectionRayLength": 10.0,
+                        "HeadDetectionRayLength": 0.019999999552965164,
+                        "HeadWidth": 0.75,
+                        "WallDetectionBoxLength": 100.0,
+                        "EnableVariableJumpHeight": false,
+                        "JumpHeight": 185.0,
+                        "T1_JumpMultiplier": 1.0499999523162842,
+                        "T2_JumpMultiplier": 1.0800000429153442,
+                        "T3_JumpMultiplier": 1.149999976158142,
+                        "JumpHeightCompensationFactor": 1.0540000200271606,
+                        "TimeTillJumpApex": 0.3499999940395355,
+                        "GravityOnReleaseMultiplier": 3.0,
+                        "MaxFallSpeed": 1250.0,
+                        "NumberOfJumpsAllowed": 1,
+                        "TimeForUpwardsCancel": 0.019999999552965164,
+                        "LandAnimationLength": 0.20000000298023224,
+                        "ApexThreshold": 0.8999999761581421,
+                        "ApexHangTime": 0.03999999910593033,
+                        "JumpBufferTime": 0.10000000149011612,
+                        "JumpCoyoteTime": 0.10000000149011612,
+                        "GPCooldown": 1.0,
+                        "RollCooldown": 0.5,
+                        "WKCooldown": 0.5,
+                        "GlideCooldown": 0.20000000298023224,
+                        "WallCoyoteTime": 0.10000000149011612,
+                        "WallSlidingSpeed": 125.0,
+                        "WallSlidingTimeToTriggerSound": 0.25,
+                        "WallSlideRestickCooldown": 0.5,
+                        "WKBaseDuration": 0.25,
+                        "WKSpeedModifier": 1093.75,
+                        "WKVerticalModifier": 218.75,
+                        "WKDurationMultiplier": 0.75,
+                        "BaseRollDuration": 0.4000000059604645,
+                        "MidRollDuration": 0.550000011920929,
+                        "MaxRollDuration": 0.699999988079071,
+                        "BaseRollSpeed": 1000.0,
+                        "MidRollSpeed": 1093.75,
+                        "MaxRollSpeed": 1250.0,
+                        "GPPauseTime": 0.30000001192092896,
+                        "GPFallSpeed": 1562.5,
+                        "RollHeightToDurationDivisor": 2343.75,
+                        "GroundPoundMaxSpeedHeightThreshold": 80.0,
+                        "GPMaxDuration": 2.5,
+                        "GlideFallSpeedMultiplier": 0.5,
+                        "knockbackTime": 0.30000001192092896,
+                        "hurtStunDuration": 0.75,
+                        "ZiplineSpeed": 937.5,
+                        "ZiplineAttachDuration": 0.15000000596046448,
+                        "ZiplineLaunchDuration": 0.25,
+                        "ZiplineCoyoteTime": 0.20000000298023224,
+                        "HazardTimeDeduction": 1.0,
+                        "HurtImmunityLength": 2.0,
+                        "JumpTimeDeduction": 1.0,
+                        "RunTimeDeduction": 0.10000000149011612,
+                        "ZiplineTimeDeduction": 3.0,
+                        "ZiplineDeductionInterval": 0.20000000298023224,
+                        "GroundPoundTimeDeduction": 3.0,
+                        "RollTimeDeduction": 2.0,
+                        "GlideTimeDeduction": 1.0,
+                        "GlideDeductionInterval": 0.5,
+                        "WallKickTimeDeduction": 2.5
+                    },
+                    "ParallaxBackground": {
+                        "LayerFarBack": "",
+                        "LayerBack": "",
+                        "LayerMid": "ƈ",
+                        "LayerFront": "",
+                        "FactorFarBack": 0.800000011920929,
+                        "FactorBack": 0.30000001192092896,
+                        "FactorMid": 0.699999988079071,
+                        "FactorFront": 0.8999999761581421,
+                        "TileWidthFarBack": 4200.0,
+                        "TileWidthBack": 0.0,
+                        "TileWidthMid": 4150.0,
+                        "TileWidthFront": 0.0,
+                        "OffsetXFarBack": 0.0,
+                        "OffsetYFarBack": 0.0,
+                        "OffsetXBack": 0.0,
+                        "OffsetYBack": 0.0,
+                        "OffsetXMid": 0.0,
+                        "OffsetYMid": 0.0,
+                        "OffsetXFront": 0.0,
+                        "OffsetYFront": 0.0
+                    },
+                    "PickupManager": {
+                        "Pickup_Coin_Name": "PU_Coin",
+                        "Pickup_Shell_Name": "PU_Shell",
+                        "Pickup_PowerUp_Name": ""
+                    }
+                }
             },
             "children": []
         }
