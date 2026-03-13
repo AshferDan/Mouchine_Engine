@@ -444,7 +444,7 @@ void GraphicsSystem::Update(float)
         }
     }
 
-	auto* cam = CameraManager::Instance().GetActiveCamera();
+	//auto* cam = CameraManager::Instance().GetActiveCamera();
 	//std::cout << "Camera Offset: " << cam->GetFollowOffset().x << ", " << cam->GetFollowOffset().y << std::endl;
 
     // std::cout << "Debug Mode: " << (debugMode ? "ON" : "OFF") << std::endl;

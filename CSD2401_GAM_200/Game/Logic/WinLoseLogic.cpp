@@ -1425,9 +1425,9 @@ float WinLoseLogicSystem::CalculateRating() const
 {
     //(10000 / elapsedTime) * 1000 + (pickups * 500)
     // HARD CODED FOR NOW
-    int scorepercentage = 60 - m_elapsedTime / 60;
-    float currScore = (scorepercentage * 100) + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50);
-    float totalScore = 100 + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50);
+    int scorepercentage = 60 - static_cast<int>(m_elapsedTime / 60);
+    float currScore = (scorepercentage * 100.f) + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
+    float totalScore = 100.f + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
     std::cout << "CalculateRating(): " << (currScore / totalScore) * 100 << '\n';
     return (currScore / totalScore) * 100;
 }
