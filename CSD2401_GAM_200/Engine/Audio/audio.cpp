@@ -221,13 +221,8 @@ bool AudioEngine::playSound(const std::string& name, const std::string& channelN
 void AudioEngine::stopSound(const std::string& channelName) {
 	auto it = channels.find(channelName);
 	if (it != channels.end() && it->second) {
-		bool isPlaying = false;
-
-		it->second->isPlaying(&isPlaying);
-		if (isPlaying) {
-			it->second->stop();
-			std::cout << "Stopped sound on channel: " << channelName << std::endl;
-		}
+		it->second->stop();
+		std::cout << "Stopped sound on channel: " << channelName << std::endl;
 		channels.erase(it);
 	}
 	else
