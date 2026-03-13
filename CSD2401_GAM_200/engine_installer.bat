@@ -4,6 +4,9 @@ REM ===============================================
 REM Windows Install and Setup Script
 REM ===============================================
 
+REM Always run from the directory where this script lives
+cd /d "%~dp0"
+
 echo.
 echo ===============================================
 echo   GAM_200 Engine Installer - Windows
