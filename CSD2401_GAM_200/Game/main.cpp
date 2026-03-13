@@ -100,6 +100,7 @@ int main()
             bool IsLoseScreenActive() const override { return winLoseLogic   && winLoseLogic->IsLoseScreenActive(); }
             bool IsHowToPlayOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsHowToPlayOpen(); }
             bool IsPauseSettingsOpen() const override { return pauseMenuLogic && pauseMenuLogic->IsPauseSettingsOpen(); }
+            bool IsGhostMenuOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsGhostMenuOpen(); }
             bool IsOnMainMenu()       const override {
                 return pauseMenuLogic &&
                        pauseMenuLogic->GetCurrentScene().find("MainMenu") != std::string::npos;
@@ -111,6 +112,7 @@ int main()
             void OpenHowToPlay()       override { if (pauseMenuLogic) pauseMenuLogic->OpenHowToPlay(); }
             void CloseHowToPlay()      override { if (pauseMenuLogic) pauseMenuLogic->CloseHowToPlay(); }
             void ClosePauseSettings()  override { if (pauseMenuLogic) pauseMenuLogic->ClosePauseSettings(); }
+            void CloseGhostMenu()      override { if (pauseMenuLogic) pauseMenuLogic->CloseGhostMenu(); }
             void TriggerLose()         override { if (winLoseLogic)   winLoseLogic->TriggerLose(); }
         };
 

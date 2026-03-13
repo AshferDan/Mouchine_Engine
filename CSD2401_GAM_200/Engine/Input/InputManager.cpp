@@ -321,17 +321,24 @@ void InputManager::Update(float)
         {
             if (!singleTriggerKeys[GLFW_KEY_ESCAPE] && !winScreenActive && !loseScreenActive && !isMainMenu)
             {
-                // check if how to play is open and if so, handle it in PauseMenuLogic
-                bool isHowToPlayOpen = gameCb && gameCb->IsPauseMenuActive() && gameCb->IsHowToPlayOpen();
-                if (isHowToPlayOpen)
+                bool isPauseActive = gameCb && gameCb->IsPauseMenuActive();
+
+                // Priority order (highest first) — only one action fires per press
+                if (isPauseActive && gameCb->IsHowToPlayOpen())
                 {
+                    // Delegate to PauseMenuLogic's own ESC handler in its HowToPlay loop
                     singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
                 }
-                // Check if settings screen is open - if so, close it
-                else if (gameCb && gameCb->IsPauseMenuActive() && gameCb->IsPauseSettingsOpen())
+                else if (isPauseActive && gameCb->IsGhostMenuOpen())
+                {
+                    std::cout << "[InputManager] ESC - Closing Ghost Menu" << std::endl;
+                    gameCb->CloseGhostMenu();
+                    singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
+                }
+                else if (isPauseActive && gameCb->IsPauseSettingsOpen())
                 {
                     std::cout << "[InputManager] ESC - Closing Pause Settings" << std::endl;
-                    if (gameCb) gameCb->ClosePauseSettings();
+                    gameCb->ClosePauseSettings();
                     singleTriggerKeys[GLFW_KEY_ESCAPE] = true;
                 }
                 else

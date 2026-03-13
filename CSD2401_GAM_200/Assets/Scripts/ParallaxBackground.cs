@@ -44,6 +44,16 @@ namespace CSharpScript
         public float TileWidthMid     = 0f;
         public float TileWidthFront   = 0f;
 
+        // --- Per-layer position offsets (added on top of the parallax position each frame) ---
+        public float OffsetXFarBack = 0f;
+        public float OffsetYFarBack = 0f;
+        public float OffsetXBack    = 0f;
+        public float OffsetYBack    = 0f;
+        public float OffsetXMid     = 0f;
+        public float OffsetYMid     = 0f;
+        public float OffsetXFront   = 0f;
+        public float OffsetYFront   = 0f;
+
         private string[] layerNames;
         private string[] layerNames_L;  // "<name>_L" side copies
         private string[] layerNames_R;  // "<name>_R" side copies
@@ -69,6 +79,19 @@ namespace CSharpScript
             // Try to init layers that are already loaded at this point
             foreach (Layer layer in Enum.GetValues(typeof(Layer)))
                 TryInitLayer((int)layer);
+        }
+
+        // Reads the per-layer offset directly from the public fields.
+        private vec2 GetOffset(int i)
+        {
+            switch (i)
+            {
+                case (int)Layer.FarBack: return new vec2(OffsetXFarBack, OffsetYFarBack);
+                case (int)Layer.Back:    return new vec2(OffsetXBack,    OffsetYBack);
+                case (int)Layer.Mid:     return new vec2(OffsetXMid,     OffsetYMid);
+                case (int)Layer.Front:   return new vec2(OffsetXFront,   OffsetYFront);
+                default:                 return new vec2(0f, 0f);
+            }
         }
 
         // Reads the tile width for layer i directly from the public fields
@@ -132,7 +155,8 @@ namespace CSharpScript
 
                 float f  = factors[i];
                 float tw = GetTileWidth(i);
-                float posY = startPos[i].y + camPos.y * f;
+                vec2  off = GetOffset(i);
+                float posY = startPos[i].y + camPos.y * f + off.y;
                 float posX;
 
                 if (tw > 0f)
@@ -145,7 +169,7 @@ namespace CSharpScript
                     if (wrapped < 0f) wrapped += tw;
 
                     // World position that produces the wrapped screen position
-                    posX = startPos[i].x - wrapped + camPos.x;
+                    posX = startPos[i].x - wrapped + camPos.x + off.x;
 
                     // Lazy init side copies in case they loaded after OnStart
                     if (!inited_L[i] || !inited_R[i])
@@ -160,7 +184,7 @@ namespace CSharpScript
                 else
                 {
                     // No tiling — simple parallax drift
-                    posX = startPos[i].x + camPos.x * f;
+                    posX = startPos[i].x + camPos.x * f + off.x;
                 }
 
                 Transform.SetPosition(layerNames[i], posX, posY);

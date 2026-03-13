@@ -44,6 +44,26 @@ void WinLoseLogicSystem::Initialize()
     m_recordingActive = false;
     m_elapsedTime = 0.0f;
     m_timerRunning = false;
+
+    // Re-park the ghost at frame 0 if it was toggled ON before the restart.
+    // The old GhostHero object was destroyed by the scene reload, so we reset
+    // the toggle (clears the stale visible state) then re-enable it to recreate
+    // and park the ghost.  WinLoseLogic::CheckSafeZoneExit() will start playback
+    // when the player leaves the SafeZone.
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    if (ghost)
+    {
+        bool wasVisible = ghost->IsGhostVisible();
+        ghost->ResetGhostToggle(); // marks ghost as hidden (m_ghostVisible = false)
+        ghost->StopPlayback();     // stop any lingering playback
+
+        if (wasVisible && ghost->IsGhostAvailable())
+        {
+            // Re-enable: clones Hero → GhostHero and parks at frame 0
+            ghost->ToggleGhostVisible();
+            std::cout << "[WinLoseLogic] Ghost re-parked at start after restart.\n";
+        }
+    }
 }
 
 /**

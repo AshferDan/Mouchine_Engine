@@ -18,7 +18,15 @@ Technology is prohibited.
 #include "LevelEditor.h"
 #include "CameraManager.h"
 #include "GameCallbacks.h"
+#include "TextComponent.h"
 #include <iostream>
+#include <filesystem>
+#include <algorithm>
+#include <fstream>
+#include <cmath>
+#include <nlohmann/json.hpp>
+#include "ColliderComponent.h"
+#include "Collision.h"
 
 /**
  * @brief Initializes all pause menu state variables.
@@ -27,6 +35,7 @@ void PauseMenuLogicSystem::Initialize()
 {
     // Clean up any existing UI before resetting
     DestroyHowToPlayUI();
+    DestroyGhostMenuUI();
     DestroyPauseSettingsUI();
     DestroyPauseMenuUI();
 
@@ -53,6 +62,14 @@ void PauseMenuLogicSystem::Initialize()
     pendingHowToPlayClose = false;
     howToPlayCloseTimer = 0.0f;
     howToPlayOpenedViaTab = false;
+
+    isGhostMenuOpen = false;
+    wasGhostMenuOpenLastFrame = false;
+    hasCreatedGhostMenuUI = false;
+    pendingGhostMenuClose = false;
+    ghostMenuCloseTimer = 0.0f;
+    m_ghostReplayNames.clear();
+    m_ghostReplayLevels.clear();
 }
 
 /**
@@ -216,6 +233,7 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseSettingsButton",
             "PauseMainMenuButton",
             "PauseHowToPlayButton",
+            "PauseGhostButton",
             "PauseScreen_Settings",
             "PauseMasterText",
             "PauseMusicText",
@@ -234,7 +252,14 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseSFXMuteButton",
             "PauseBackButton",
             "PauseScreen_HowToPlay",
-            "HowToPlayBackButton"
+            "HowToPlayBackButton",
+            "PauseGhostBoard",
+            "PauseGhostTitle",
+            "PauseGhost_Toggle",
+            "PauseGhost_Slot0",
+            "PauseGhost_Slot1",
+            "PauseGhost_Slot2",
+            "PauseGhost_Back"
         };
 
         for (const auto& name : uiElements)
@@ -292,10 +317,12 @@ void PauseMenuLogicSystem::Update(float dt)
                 {
                     ghost->StopRecording();
                     ghost->ResetRecording();
+                    ghost->StopPlayback(); // stop current playback; WinLoseLogic::Initialize will re-park if toggle is ON
                 }
 
                 // Destroy UI before scene change
                 DestroyHowToPlayUI();
+                DestroyGhostMenuUI();
                 DestroyPauseSettingsUI();
                 DestroyPauseMenuUI();
 
@@ -334,6 +361,7 @@ void PauseMenuLogicSystem::Update(float dt)
 
                 // Destroy UI before scene change
                 DestroyHowToPlayUI();
+                DestroyGhostMenuUI();
                 DestroyPauseSettingsUI();
                 DestroyPauseMenuUI();
 
@@ -358,6 +386,22 @@ void PauseMenuLogicSystem::Update(float dt)
 
                 isHowToPlayOpen = true;
                 howToPlayOpenedViaTab = false; // Opened via button, not TAB
+
+                // Clear the pending state immediately
+                pendingSceneChange = false;
+                hoveredButtonName.clear();
+            }
+            else if (hoveredButtonName == "PauseGhostButton")
+            {
+                std::cout << "[PauseMenu] Ghost button clicked - opening ghost menu" << std::endl;
+
+                // Create ghost menu UI if not created yet
+                if (!hasCreatedGhostMenuUI)
+                {
+                    CreateGhostMenuUI();
+                }
+
+                isGhostMenuOpen = true;
 
                 // Clear the pending state immediately
                 pendingSceneChange = false;
@@ -445,6 +489,49 @@ void PauseMenuLogicSystem::Update(float dt)
                 board->SetActive(true);
         }
         wasHowToPlayOpenLastFrame = isHowToPlayOpen;
+    }
+
+    // Handle Ghost menu screen visibility - ONLY update when state changes
+    if (isGhostMenuOpen != wasGhostMenuOpenLastFrame)
+    {
+        if (isGhostMenuOpen)
+        {
+            hoveredButtonName.clear();
+
+            // Show ghost menu UI
+            SetGhostMenuVisible(true);
+
+            // Reset and hide pause menu buttons and board
+            SetButtonTexture("PauseResumeButton", ButtonState::Normal);
+            SetButtonTexture("PauseRestartButton", ButtonState::Normal);
+            SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
+            SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
+            SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
+            SetButtonTexture("PauseGhostButton", ButtonState::Normal);
+
+            if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))   resumeBtn->SetActive(false);
+            if (auto* restartBtn = factory.FindGameObject("PauseRestartButton")) restartBtn->SetActive(false);
+            if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton")) settingsBtn->SetActive(false);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton")) mainMenuBtn->SetActive(false);
+            if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(false);
+            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(false);
+            if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(false);
+        }
+        else
+        {
+            // Hide ghost menu UI
+            SetGhostMenuVisible(false);
+
+            // Show pause menu buttons and board
+            if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))   resumeBtn->SetActive(true);
+            if (auto* restartBtn = factory.FindGameObject("PauseRestartButton")) restartBtn->SetActive(true);
+            if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton")) settingsBtn->SetActive(true);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton")) mainMenuBtn->SetActive(true);
+            if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(true);
+            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(true);
+            if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(true);
+        }
+        wasGhostMenuOpenLastFrame = isGhostMenuOpen;
     }
 
     // Handle pause settings screen visibility - ONLY update when state changes
@@ -719,6 +806,185 @@ void PauseMenuLogicSystem::Update(float dt)
         return; // Don't process normal pause menu interactions
     }
 
+    // Handle Ghost menu screen interactions
+    if (isGhostMenuOpen)
+    {
+        // Handle pending ghost menu close
+        if (pendingGhostMenuClose)
+        {
+            ghostMenuCloseTimer -= dt;
+            if (ghostMenuCloseTimer <= 0.0f)
+            {
+                isGhostMenuOpen = false;
+                pendingGhostMenuClose = false;
+                hoveredButtonName.clear();
+            }
+            return;
+        }
+
+        double mouseX = InputManager::GetMouseWorldX();
+        double mouseY = InputManager::GetMouseWorldY();
+        bool isClicked = InputManager::IsMouseLeftClicked();
+
+        std::string currentHover = "";
+
+        if (IsMouseOver(factory.FindGameObject("PauseGhost_Toggle"), mouseX, mouseY))
+            currentHover = "PauseGhost_Toggle";
+        else if (IsMouseOver(factory.FindGameObject("PauseGhost_Slot0"), mouseX, mouseY))
+            currentHover = "PauseGhost_Slot0";
+        else if (IsMouseOver(factory.FindGameObject("PauseGhost_Slot1"), mouseX, mouseY))
+            currentHover = "PauseGhost_Slot1";
+        else if (IsMouseOver(factory.FindGameObject("PauseGhost_Slot2"), mouseX, mouseY))
+            currentHover = "PauseGhost_Slot2";
+        else if (IsMouseOver(factory.FindGameObject("PauseGhost_Back"), mouseX, mouseY))
+            currentHover = "PauseGhost_Back";
+
+        // Hover state changes
+        if (currentHover != hoveredButtonName)
+        {
+            if (!hoveredButtonName.empty())
+                SetButtonTexture(hoveredButtonName, ButtonState::Normal);
+            if (!currentHover.empty())
+            {
+                SetButtonTexture(currentHover, ButtonState::Hover);
+                AudioManager* localAudio = CORE->GetAudioManager();
+                if (localAudio) localAudio->TriggerEvent("UI_Hover");
+            }
+            hoveredButtonName = currentHover;
+        }
+
+        // Clicks
+        if (isClicked && !hoveredButtonName.empty())
+        {
+            SetButtonTexture(hoveredButtonName, ButtonState::Pressed);
+            audioManager = CORE->GetAudioManager();
+            if (audioManager) audioManager->TriggerEvent("UI_Click");
+
+            if (hoveredButtonName == "PauseGhost_Back")
+            {
+                pendingGhostMenuClose = true;
+                ghostMenuCloseTimer = 0.15f;
+            }
+            else if (hoveredButtonName == "PauseGhost_Toggle")
+            {
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost)
+                {
+                    // ToggleGhost() parks the ghost at frame 0 (ON) or destroys it (OFF).
+                    // It deliberately does NOT start playback — that is triggered by
+                    // WinLoseLogic::CheckSafeZoneExit() when the player leaves SafeZone.
+                    ghost->ToggleGhostVisible();
+                    bool nowVisible = ghost->IsGhostVisible();
+
+                    if (nowVisible)
+                    {
+                        // Ghost is parked at frame 0.
+                        // Only start playback immediately if the player is already past the SafeZone.
+                        // If still inside SafeZone, WinLoseLogic will call StartPlayback() on exit.
+                        bool playerInSafeZone = true;
+
+                        GameObject* safeZone = factory.FindGameObject("SafeZone");
+                        GameObject* player   = factory.FindGameObject("Hero");
+                        if (safeZone && player && safeZone->IsActive() && player->IsActive())
+                        {
+                            auto* szCol = safeZone->GetComponent<ColliderComponent>();
+                            auto* plCol = player->GetComponent<ColliderComponent>();
+                            if (szCol && plCol)
+                            {
+                                AABB szAABB = szCol->GetAABB();
+                                AABB plAABB = plCol->GetAABB();
+                                float szCX = (szAABB.min.x + szAABB.max.x) / 2.0f;
+                                float szCY = (szAABB.min.y + szAABB.max.y) / 2.0f;
+                                float plCX = (plAABB.min.x + plAABB.max.x) / 2.0f;
+                                float plCY = (plAABB.min.y + plAABB.max.y) / 2.0f;
+                                float halfW = (szAABB.max.x - szAABB.min.x) / 2.0f + (plAABB.max.x - plAABB.min.x) / 2.0f;
+                                float halfH = (szAABB.max.y - szAABB.min.y) / 2.0f + (plAABB.max.y - plAABB.min.y) / 2.0f;
+                                playerInSafeZone = (std::abs(plCX - szCX) < halfW) && (std::abs(plCY - szCY) < halfH);
+                            }
+                        }
+
+                        if (!playerInSafeZone)
+                        {
+                            // Player is mid-run past SafeZone — start ghost from the beginning now
+                            ghost->StopPlayback();
+                            ghost->StartPlayback();
+                        }
+                        // else: player is in SafeZone — ghost waits at frame 0,
+                        //       WinLoseLogic::CheckSafeZoneExit() will fire StartPlayback() on exit
+                    }
+                    // OFF path: ToggleGhost() already called StopPlayback() and destroyed the ghost
+
+                    // Refresh toggle button label
+                    GameObject* toggleBtn = factory.FindGameObject("PauseGhost_Toggle");
+                    if (toggleBtn)
+                    {
+                        auto* tc = toggleBtn->GetComponent<TextComponent>();
+                        if (tc) tc->SetText(std::string("Ghost: ") + (nowVisible ? "ON" : "OFF"));
+                    }
+                }
+                // Stay in hover state after toggle
+                SetButtonTexture("PauseGhost_Toggle", ButtonState::Hover);
+            }
+            else if (hoveredButtonName == "PauseGhost_Slot0" || hoveredButtonName == "PauseGhost_Slot1" || hoveredButtonName == "PauseGhost_Slot2")
+            {
+                int idx = hoveredButtonName.back() - '0';
+                if (idx >= 0 && idx < static_cast<int>(m_ghostReplayNames.size()))
+                {
+                    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                    if (ghost)
+                    {
+                        ghost->LoadRecording(m_ghostReplayNames[idx]);
+
+                        // Make sure ghost is toggled visible (ToggleGhost parks at frame 0)
+                        if (!ghost->IsGhostVisible())
+                            ghost->ToggleGhostVisible();
+
+                        // Same SafeZone logic: only start playback if player is already past SafeZone
+                        bool playerInSafeZone = true;
+                        GameObject* safeZone = factory.FindGameObject("SafeZone");
+                        GameObject* player   = factory.FindGameObject("Hero");
+                        if (safeZone && player && safeZone->IsActive() && player->IsActive())
+                        {
+                            auto* szCol = safeZone->GetComponent<ColliderComponent>();
+                            auto* plCol = player->GetComponent<ColliderComponent>();
+                            if (szCol && plCol)
+                            {
+                                AABB szAABB = szCol->GetAABB();
+                                AABB plAABB = plCol->GetAABB();
+                                float szCX = (szAABB.min.x + szAABB.max.x) / 2.0f;
+                                float szCY = (szAABB.min.y + szAABB.max.y) / 2.0f;
+                                float plCX = (plAABB.min.x + plAABB.max.x) / 2.0f;
+                                float plCY = (plAABB.min.y + plAABB.max.y) / 2.0f;
+                                float halfW = (szAABB.max.x - szAABB.min.x) / 2.0f + (plAABB.max.x - plAABB.min.x) / 2.0f;
+                                float halfH = (szAABB.max.y - szAABB.min.y) / 2.0f + (plAABB.max.y - plAABB.min.y) / 2.0f;
+                                playerInSafeZone = (std::abs(plCX - szCX) < halfW) && (std::abs(plCY - szCY) < halfH);
+                            }
+                        }
+                        if (!playerInSafeZone)
+                        {
+                            ghost->StopPlayback();
+                            ghost->StartPlayback();
+                        }
+
+                        // Refresh toggle label
+                        GameObject* toggleBtn = factory.FindGameObject("PauseGhost_Toggle");
+                        if (toggleBtn)
+                        {
+                            auto* tc = toggleBtn->GetComponent<TextComponent>();
+                            if (tc) tc->SetText("Ghost: ON");
+                        }
+                        std::cout << "[PauseMenu] Ghost replay loaded: " << m_ghostReplayNames[idx] << std::endl;
+                    }
+                    // Close ghost menu after selecting
+                    pendingGhostMenuClose = true;
+                    ghostMenuCloseTimer = 0.15f;
+                }
+            }
+        }
+
+        return; // Don't process normal pause menu interactions
+    }
+
     // Normal pause menu button handling
     double mouseX = InputManager::GetMouseWorldX();
     double mouseY = InputManager::GetMouseWorldY();
@@ -748,6 +1014,10 @@ void PauseMenuLogicSystem::Update(float dt)
         else if (IsMouseOver(factory.FindGameObject("PauseHowToPlayButton"), mouseX, mouseY))
         {
             currentHover = "PauseHowToPlayButton";
+        }
+        else if (IsMouseOver(factory.FindGameObject("PauseGhostButton"), mouseX, mouseY))
+        {
+            currentHover = "PauseGhostButton";
         }
     }
 
@@ -932,6 +1202,20 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     howToPlayRender->SetLayer(602);
     howToPlayBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "How To Play", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // ghost button — right side, above the resume/back button
+    GameObject* ghostBtn = factory.CreateGameObject("PauseGhostButton");
+    auto* ghostTransform = ghostBtn->AddComponent<TransformComponent>();
+    ghostTransform->posX = 650.0f * uiScale;
+    ghostTransform->posY = -100.0f * uiScale;
+    ghostTransform->scaleX = 260.0f * uiScale;
+    ghostTransform->scaleY = 100.0f * uiScale;
+    auto* ghostRender = ghostBtn->AddComponent<RenderComponent>();
+    ghostRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    ghostRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    ghostRender->SetLayer(602);
+    ghostBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Ghost", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
 
@@ -1220,7 +1504,8 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
         "PauseRestartButton",
         "PauseSettingsButton",
         "PauseMainMenuButton",
-        "PauseHowToPlayButton"
+        "PauseHowToPlayButton",
+        "PauseGhostButton"
     };
 
     for (const auto& name : uiElements)
@@ -1293,7 +1578,8 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
         "PauseRestartButton",
         "PauseSettingsButton",
         "PauseMainMenuButton",
-        "PauseHowToPlayButton"
+        "PauseHowToPlayButton",
+        "PauseGhostButton"
     };
 
     for (const auto& name : uiElements)
@@ -1385,6 +1671,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         CreateHowToPlayUI();
     }
 
+    // create ghost menu UI on first toggle to avoid delays later
+    if (!hasCreatedGhostMenuUI)
+    {
+        CreateGhostMenuUI();
+    }
+
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
@@ -1399,6 +1691,8 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         isHowToPlayOpen = false;
         wasHowToPlayOpenLastFrame = false;
         howToPlayOpenedViaTab = false;
+        isGhostMenuOpen = false;
+        wasGhostMenuOpenLastFrame = false;
 
         // Reset all button textures when closing pause menu
         SetButtonTexture("PauseResumeButton", ButtonState::Normal);
@@ -1406,6 +1700,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
         SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
         SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
+        SetButtonTexture("PauseGhostButton", ButtonState::Normal);
 
         // remove low pass filter when pause menu closes
         if (audioManager)
@@ -1517,6 +1812,39 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
                 break;
             case ButtonState::Pressed:
                 texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
+                break;
+        }
+    }
+    else if (buttonName == "PauseGhostButton" || buttonName == "PauseGhost_Toggle" ||
+             buttonName == "PauseGhost_Slot0" || buttonName == "PauseGhost_Slot1" ||
+             buttonName == "PauseGhost_Slot2")
+    {
+        // Ghost buttons: blank/light/dark
+        switch (state)
+        {
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/blankbtnL.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Button_Large_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
+                break;
+        }
+    }
+    else if (buttonName == "PauseGhost_Back")
+    {
+        switch (state)
+        {
+            case ButtonState::Normal:
+                texturePath = "../Assets/Sprites/Icons/Back_button.png";
+                break;
+            case ButtonState::Hover:
+                texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
+                break;
+            case ButtonState::Pressed:
+                texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
                 break;
         }
     }
@@ -1656,6 +1984,13 @@ void PauseMenuLogicSystem::ClosePauseSettings()
     settingsCloseTimer = 0.15f; // 150ms delay to match back button behavior
 }
 
+void PauseMenuLogicSystem::CloseGhostMenu()
+{
+    std::cout << "[PauseMenu] Closing ghost menu (ESC pressed)" << std::endl;
+    pendingGhostMenuClose = true;
+    ghostMenuCloseTimer = 0.15f;
+}
+
 /**
  * @brief Creates how to play screen UI.
  */
@@ -1744,5 +2079,201 @@ void PauseMenuLogicSystem::SetHowToPlayVisible(bool show)
         {
             obj->SetActive(show);
         }
+    }
+}
+
+/**
+ * @brief Scans the replay directory and fills m_ghostReplayNames / m_ghostReplayLevels.
+ */
+void PauseMenuLogicSystem::ScanReplaysForGhost()
+{
+    m_ghostReplayNames.clear();
+    m_ghostReplayLevels.clear();
+    namespace fs = std::filesystem;
+
+    const std::string replayDir = "../Assets/Replay/";
+    if (!fs::exists(replayDir))
+        return;
+
+    std::vector<std::pair<fs::file_time_type, std::string>> files;
+    for (const auto& entry : fs::directory_iterator(replayDir))
+    {
+        if (entry.is_regular_file() && entry.path().extension() == ".json")
+            files.push_back({entry.last_write_time(), entry.path().stem().string()});
+    }
+
+    std::sort(files.begin(), files.end(),
+              [](const auto& a, const auto& b) { return a.first > b.first; });
+
+    for (size_t i = 0; i < std::min(files.size(), size_t(3)); ++i)
+    {
+        const std::string& stem = files[i].second;
+        m_ghostReplayNames.push_back(stem);
+
+        std::string levelName;
+        std::ifstream f(replayDir + stem + ".json");
+        if (f)
+        {
+            try
+            {
+                nlohmann::json root;
+                f >> root;
+                levelName = root.value("level", std::string{});
+            }
+            catch (...) {}
+        }
+        m_ghostReplayLevels.push_back(levelName);
+    }
+}
+
+/**
+ * @brief Creates the Ghost menu screen UI.
+ */
+void PauseMenuLogicSystem::CreateGhostMenuUI()
+{
+    if (hasCreatedGhostMenuUI)
+        return;
+
+    ScanReplaysForGhost();
+
+    auto& factory = GameObjectFactory::Instance();
+    const float uiScale = 2.0f;
+    const std::string font = "../Assets/FrederickatheGreat-Regular.ttf";
+    const int baseLayer = 601;
+
+    // Background board (reuse pause menu texture)
+    GameObject* board = factory.CreateGameObject("PauseGhostBoard");
+    auto* boardT = board->AddComponent<TransformComponent>();
+    boardT->posX = 0.0f;
+    boardT->posY = 0.0f;
+    boardT->scaleX = 1920.0f * uiScale;
+    boardT->scaleY = 1080.0f * uiScale;
+    auto* boardR = board->AddComponent<RenderComponent>();
+    boardR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Pause_Menu_New.png"));
+    boardR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    boardR->SetLayer(baseLayer);
+
+    // Title text
+    GameObject* titleObj = factory.CreateGameObject("PauseGhostTitle");
+    auto* titleT = titleObj->AddComponent<TransformComponent>();
+    titleT->posX = 0.0f;
+    titleT->posY = 250.0f * uiScale;
+    titleT->scaleX = 420.0f * uiScale;
+    titleT->scaleY = 100.0f * uiScale;
+    auto* titleR = titleObj->AddComponent<RenderComponent>();
+    titleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    titleR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    titleR->SetLayer(baseLayer + 1);
+    titleObj->AddComponent<TextComponent>(
+        font.c_str(), static_cast<int>(42 * uiScale), "GHOST", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // Ghost ON/OFF toggle button
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    bool ghostVisible = ghost ? ghost->IsGhostVisible() : false;
+    std::string toggleLabel = std::string("Ghost: ") + (ghostVisible ? "ON" : "OFF");
+
+    GameObject* toggleBtn = factory.CreateGameObject("PauseGhost_Toggle");
+    auto* toggleT = toggleBtn->AddComponent<TransformComponent>();
+    toggleT->posX = 0.0f;
+    toggleT->posY = 100.0f * uiScale;
+    toggleT->scaleX = 420.0f * uiScale;
+    toggleT->scaleY = 100.0f * uiScale;
+    auto* toggleR = toggleBtn->AddComponent<RenderComponent>();
+    toggleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    toggleR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    toggleR->SetLayer(baseLayer + 1);
+    toggleBtn->AddComponent<TextComponent>(
+        font.c_str(), static_cast<int>(38 * uiScale), toggleLabel, vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // 3 replay slots
+    const float slotStartY = -30.0f * uiScale;
+    const float slotSpacing = 120.0f * uiScale;
+    for (int i = 0; i < 3; ++i)
+    {
+        std::string slotName = "PauseGhost_Slot" + std::to_string(i);
+        bool hasReplay = (i < static_cast<int>(m_ghostReplayNames.size()));
+        std::string displayName;
+        if (hasReplay)
+        {
+            displayName = m_ghostReplayNames[i];
+            if (i < static_cast<int>(m_ghostReplayLevels.size()) && !m_ghostReplayLevels[i].empty())
+                displayName += "  [" + m_ghostReplayLevels[i] + "]";
+        }
+        else
+        {
+            displayName = "(empty)";
+        }
+
+        GameObject* slot = factory.CreateGameObject(slotName);
+        auto* slotT = slot->AddComponent<TransformComponent>();
+        slotT->posX = 0.0f;
+        slotT->posY = slotStartY - i * slotSpacing;
+        slotT->scaleX = 420.0f * uiScale;
+        slotT->scaleY = 100.0f * uiScale;
+        auto* slotR = slot->AddComponent<RenderComponent>();
+        slotR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+        slotR->SetColor(hasReplay ? vec4(1.0f, 1.0f, 1.0f, 1.0f) : vec4(0.55f, 0.55f, 0.55f, 1.0f));
+        slotR->SetLayer(baseLayer + 1);
+        vec4 textColor = hasReplay ? vec4(0.0f, 0.0f, 0.0f, 1.0f) : vec4(0.3f, 0.3f, 0.3f, 1.0f);
+        slot->AddComponent<TextComponent>(
+            font.c_str(), static_cast<int>(30 * uiScale), displayName, textColor, false);
+    }
+
+    // Back button
+    GameObject* backBtn = factory.CreateGameObject("PauseGhost_Back");
+    auto* backT = backBtn->AddComponent<TransformComponent>();
+    backT->posX = 650.0f * uiScale;
+    backT->posY = -250.0f * uiScale;
+    backT->scaleX = 200.0f * uiScale;
+    backT->scaleY = 180.0f * uiScale;
+    auto* backR = backBtn->AddComponent<RenderComponent>();
+    backR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
+    backR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    backR->SetLayer(baseLayer + 1);
+
+    hasCreatedGhostMenuUI = true;
+
+    // Initially hidden
+    SetGhostMenuVisible(false);
+}
+
+/**
+ * @brief Destroys all Ghost menu UI elements.
+ */
+void PauseMenuLogicSystem::DestroyGhostMenuUI()
+{
+    if (!hasCreatedGhostMenuUI)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+    for (const std::string& name : {
+        "PauseGhostBoard", "PauseGhostTitle",
+        "PauseGhost_Toggle",
+        "PauseGhost_Slot0", "PauseGhost_Slot1", "PauseGhost_Slot2",
+        "PauseGhost_Back"})
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj) factory.DestroyGameObject(obj->GetID());
+    }
+
+    hasCreatedGhostMenuUI = false;
+    m_ghostReplayNames.clear();
+    m_ghostReplayLevels.clear();
+}
+
+/**
+ * @brief Shows or hides Ghost menu UI elements.
+ */
+void PauseMenuLogicSystem::SetGhostMenuVisible(bool show)
+{
+    auto& factory = GameObjectFactory::Instance();
+    for (const std::string& name : {
+        "PauseGhostBoard", "PauseGhostTitle",
+        "PauseGhost_Toggle",
+        "PauseGhost_Slot0", "PauseGhost_Slot1", "PauseGhost_Slot2",
+        "PauseGhost_Back"})
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj) obj->SetActive(show);
     }
 }
