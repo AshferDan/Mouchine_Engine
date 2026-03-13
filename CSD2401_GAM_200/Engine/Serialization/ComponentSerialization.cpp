@@ -718,6 +718,8 @@ void ComponentSerialization::DeserializeCamera(const json &j, GameObject *go)
     // Deserialize and set zoom
     float zoom = c.value("zoom", 1.0f); // Default to 1.0f if not specified
     cam->SetZoom(zoom);
+
+    CameraManager::Instance().SetActiveCamera(go);
 }
 
 void ComponentSerialization::DeserializeEvent(const json& j, GameObject* go)

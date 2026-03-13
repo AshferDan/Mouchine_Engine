@@ -644,7 +644,7 @@ void GraphicsSystem::Update(float)
         int layer = rend->GetLayer(); // For draw order sorting
         bool screenSpace = rend->isScreenSpace();
 
-        if (hasCamBounds && !screenSpace)
+        if (hasCamBounds && !screenSpace && CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play )
         {
             float halfSX = sx * 0.5f;
 			float halfSY = sy * 0.5f;
