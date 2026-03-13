@@ -68,6 +68,7 @@ int main()
             PauseMenuLogicSystem* pauseMenuLogic = nullptr;
             WinLoseLogicSystem*   winLoseLogic   = nullptr;
             GameTimerSystem*      gameTimer      = nullptr;
+            PickupSystem          pickupSystem;
 
             void FixedUpdatePlaying(float dt) override {
                 if (CORE->GetGhostSystem()->IsReplayMode()) return;
@@ -89,11 +90,13 @@ int main()
             void OnLevelLoaded(const std::string& path) override {
                 if (pauseMenuLogic) pauseMenuLogic->SetCurrentScene(path);
                 if (winLoseLogic)   winLoseLogic->SetCurrentScene(path);
+                pickupSystem = PickupSystem();
             }
             void OnSceneLoadReinit() override {
                 if (pauseMenuLogic) pauseMenuLogic->Initialize();
                 if (gameTimer)      gameTimer->Initialize();
                 if (winLoseLogic)   winLoseLogic->Initialize();
+                pickupSystem = PickupSystem();
             }
             bool IsPauseMenuActive()  const override { return pauseMenuLogic && pauseMenuLogic->IsPauseMenuActive(); }
             bool IsWinScreenActive()  const override { return winLoseLogic   && winLoseLogic->IsWinScreenActive(); }
@@ -114,6 +117,12 @@ int main()
             void ClosePauseSettings()  override { if (pauseMenuLogic) pauseMenuLogic->ClosePauseSettings(); }
             void CloseGhostMenu()      override { if (pauseMenuLogic) pauseMenuLogic->CloseGhostMenu(); }
             void TriggerLose()         override { if (winLoseLogic)   winLoseLogic->TriggerLose(); }
+
+            void CollectCoin()          override { pickupSystem.CollectCoin(); }
+            void CollectShell()         override { pickupSystem.CollectShell(); }
+            int  GetCurrentCoins()  const override { return pickupSystem.GetCurrentCoins(); }
+            int  GetCurrentShells() const override { return pickupSystem.GetCurrentShells(); }
+            void ReinitPickups()        override { pickupSystem = PickupSystem(); }
         };
 
         static GameApp gameApp;
