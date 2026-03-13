@@ -663,7 +663,7 @@ void GraphicsSystem::Update(float)
         {
             // Animator takes priority (for animated sprites)
             uvScale = animator->GetUVScale();
-            uvOffset = animator->GetUVOffset();
+            uvOffset = animator->GetFlipRows() ? animator->GetFlipUVOffset() : animator->GetUVOffset();
             // Use Spritesheet texture if RenderComponent has none
             if (texID == 0 && animator->GetTextureID() != 0)
             {
