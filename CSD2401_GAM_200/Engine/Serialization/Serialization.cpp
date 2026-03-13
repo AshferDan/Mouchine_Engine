@@ -429,21 +429,22 @@ void Serialization::LoadScene(const std::string& scenePath)
 	// Clear all audio resources from ResourceManager
 	ResourceManager::Instance().UnloadAllAudio();
 
+	// load audio manager configuration BEFORE GameObjects so OnStart() can use sounds
+	if (CORE && j.contains("AudioManager"))
+	{
+		AudioManager* audioMgr = CORE->GetAudioManager();
+		if (audioMgr)
+		{
+			DeserializeAudioManager(j, audioMgr);
+			std::cout << "[LoadScene] AudioManager configuration loaded" << std::endl;
+		}
+	}
+
 	if (j.contains("GameObjects"))
 	{
 		for (const auto& obj : j["GameObjects"])
 			Serialization::DeserializeGameObject(obj);
 
-		// load audio manager configuration
-		if (CORE && j.contains("AudioManager")) 
-		{
-			AudioManager* audioMgr = CORE->GetAudioManager();
-			if (audioMgr) 
-			{
-				DeserializeAudioManager(j, audioMgr);
-				std::cout << "[LoadScene] AudioManager configuration loaded" << std::endl;
-			}
-		}
 		std::cout << "[LoadScene] Scene loaded successfully: " << path << "\n";
 	}
 	ResolveHierarchy();
