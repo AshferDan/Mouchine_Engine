@@ -3667,6 +3667,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         float fps = 12.0f;
         bool  loop = true;
         bool pingPong = false;
+        bool flipRows = false;
     };
 
     // All statics
@@ -3698,6 +3699,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     static float actionFPS = 12.0f;
     static bool  actionLoop = true;
     static bool  actionPingPong = false;
+    static bool  actionFlipRows = false;
     static int   frameCount = 1;
     static int   rowPick = 0;
 
@@ -3796,6 +3798,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         c.fps = cj.value("fps", 12.0f);
                         c.loop = cj.value("loop", true);
                         c.pingPong = cj.value("pingPong", false);
+                        c.flipRows = cj.value("flipRows", false);
                         if (!c.name.empty()) draftClips.push_back(c);
                     }
                     std::cout << "[AnimPreview] Loaded "
@@ -3824,7 +3827,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                         {"startR",   c.startR},  {"startC",   c.startC},
                         {"endR",     c.endR},    {"endC",     c.endC},
                         {"fps",      c.fps},     {"loop",     c.loop},
-                        {"pingPong", c.pingPong}
+                        {"pingPong", c.pingPong},{"flipRows", c.flipRows}
                         });
                 }
                 std::ofstream f(DRAFT_CLIPS_FILE);
@@ -3951,7 +3954,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                     if (it != reg.end())
                     {
                         const auto& animData = it->second;
-                        float fps = (animData.fps > 0.001f) ? animData.fps : 12.0f;
+                        float fps = (animData.fps > 0.001f) ? animData.fps : 6.0f;
                         float frameDur = 1.0f / fps;
 
                         goFrameTimer += ImGui::GetIO().DeltaTime;
@@ -4001,8 +4004,11 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 float uW = 1.0f / (float)goCols;
                 float vH = 1.0f / (float)goRows;
 
-                ImVec2 uv0 = ImVec2(goFrameCol * uW, (goFrameRow + 1) * vH);
-                ImVec2 uv1 = ImVec2((goFrameCol + 1) * uW, goFrameRow * vH);
+                // Mirror the row when flipRows is active, matching GetFlipUVOffset() at runtime.
+                    int goUVRow = ss->GetFlipRows() ? (goRows - 1) - goFrameRow : goFrameRow;
+
+                ImVec2 uv0 = ImVec2(goFrameCol * uW, (goUVRow + 1) * vH);
+                ImVec2 uv1 = ImVec2((goFrameCol + 1) * uW, goUVRow * vH);
 
                 ImGui::Image(
                     (void*)(intptr_t)ss->GetTextureID(),
@@ -4142,11 +4148,15 @@ void ImGuiSystem::RenderAnimationPreviewer()
         float duW = 1.0f / (float)std::max(1, draftCols);
         float dvH = 1.0f / (float)std::max(1, draftRows);
 
+        // When flipRows is on, mirror the row so row 0 = top of the image,
+        // matching what GetFlipUVOffset() does at runtime.
+        int uvRow = actionFlipRows ? (std::max(1, draftRows) - 1) - showRow : showRow;
+
         ImGui::BeginGroup();
         ImGui::Image(
             (void*)(intptr_t)draftTexID, ImVec2(180, 180),
-            ImVec2(showCol * duW, (showRow + 1) * dvH),
-            ImVec2((showCol + 1) * duW, showRow * dvH),
+            ImVec2(showCol * duW, (uvRow + 1) * dvH),
+            ImVec2((showCol + 1) * duW, uvRow* dvH),
             ImVec4(1, 1, 1, 1), ImVec4(1, 1, 0, 1)
         );
         ImGui::EndGroup();
@@ -4277,6 +4287,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                 actionFPS = c.fps;
                 actionLoop = c.loop;
                 actionPingPong = c.pingPong;
+                actionFlipRows = c.flipRows;
 
                 rowPick = startR;
                 frameCount = std::max(1, (endC - startC) + 1);
@@ -4312,7 +4323,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::NewLine();
         ImGui::Checkbox("Loop", &actionLoop);
         ImGui::SameLine();
-        ImGui::Checkbox("Ping-Pong", &actionPingPong);
+        ImGui::Checkbox("Ping-Pong", &actionPingPong);        
+        ImGui::SameLine();
+        ImGui::Checkbox("Flip Rows", &actionFlipRows);
         ImGui::PushItemWidth(120);
         ImGui::InputFloat("FPS", &actionFPS, 0.5f, 1.0f, "%.2f");
         actionFPS = std::max(0.001f, actionFPS);
@@ -4320,12 +4333,18 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::NewLine();
 
         rowPick = std::clamp(rowPick, 0, draftRows - 1);
+        endR = std::clamp(endR, 0, draftRows - 1);
         startC = std::clamp(startC, 0, draftCols - 1);
         frameCount = std::max(1, frameCount);
 
-        if (ImGui::SliderInt("Row", &rowPick, 0, draftRows - 1))
+        if (ImGui::SliderInt("Start Row", &rowPick, 0, draftRows - 1))
             ResetDraftPlayback();
         startR = rowPick;
+
+        // Allow end row to span multiple rows for multi-row animations
+        endR = std::clamp(endR, startR, draftRows - 1);
+        if (ImGui::SliderInt("End Row", &endR, startR, draftRows - 1))
+            ResetDraftPlayback();
 
         if (ImGui::SliderInt("Start Col", &startC, 0, draftCols - 1))
             ResetDraftPlayback();
@@ -4336,7 +4355,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         if (ImGui::SliderInt("End Col", &frameCount, 1, maxCount))
             ResetDraftPlayback();
 
-        endR = startR;
+        //endR = startR;
         endC = std::clamp(startC + frameCount - 1, 0, draftCols - 1);
 
         ImGui::TextDisabled("Range: row %d  cols %d->%d  (%d frames)", startR, startC, endC, frameCount);
@@ -4360,6 +4379,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
             c.endR = endR;      c.endC = endC;
             c.fps = actionFPS; c.loop = actionLoop;
             c.pingPong = actionPingPong;
+            c.flipRows = actionFlipRows;
 
             if (idx >= 0)
             {
@@ -4464,7 +4484,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                         c.rows, c.cols,
                                         c.startR, c.startC,
                                         c.endR, c.endC,
-                                        c.fps, c.pingPong);
+                                        c.fps, c.pingPong, 
+                                        c.flipRows);
                                     ss->PlayAnimation(c.name);
                                     std::cout << "[AnimPreview] Applied clip '" << c.name
                                         << "' to '" << obj->GetName() << "'.\n";
@@ -4481,7 +4502,8 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                         draftRows, draftCols,
                                         startR, startC,
                                         endR, endC,
-                                        actionFPS, actionPingPong);
+                                        actionFPS, actionPingPong,
+                                        actionFlipRows);
                                     ss->PlayAnimation(oneName);
                                     std::cout << "[AnimPreview] Applied unsaved clip '" << oneName
                                         << "' to '" << obj->GetName() << "'.\n";
@@ -4526,9 +4548,9 @@ void ImGuiSystem::RenderAnimationPreviewer()
             {
                 std::cerr << "[AnimPreview] Apply exception: "
                     << e.what() << "\n";
-                //g_showEditorErrorPopup = true;
-                //g_editorErrorMessage = 
-                //    std::string("[AnimPreview] Apply failed: ") + e.what();
+                g_showEditorErrorPopup = true;
+                g_editorErrorMessage = 
+                    std::string("[AnimPreview] Apply failed: ") + e.what();
             }
 
             ResetDraftPlayback();
