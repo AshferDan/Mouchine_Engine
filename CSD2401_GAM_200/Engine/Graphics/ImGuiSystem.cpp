@@ -2359,11 +2359,6 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
-                if (ImGui::Button("Press Here to add DND Slot"))
-                {
-                    transform->AddDragDropSlot("todayisaBADday", PrefabPayloadID);
-                }
-
                 if (transform->GetPropertySlots().size())
                 {
                     for (auto& slot : transform->GetPropertySlots())

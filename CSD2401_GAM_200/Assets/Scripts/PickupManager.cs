@@ -47,6 +47,13 @@ namespace CSharpScript
                 Debug.Log("ERROR: OwnerName is not set in PlayerMovement script!");
                 return;
             }
+
+            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.8f, 1.0f, "sfx");
         }
 
         public void OnUpdate(float deltaTime)
@@ -54,14 +61,6 @@ namespace CSharpScript
             if (OwnerName == null || OwnerName == "") { Debug.Log("[PickupManager Script] no name"); return; }
 
             OnFixedUpdate(fixeddt);
-            //likely can remove
-            //if (Input.GetKeyPressed(Input.KeyCode.L))
-            //{
-            //    int test = Scripting.GetIntField(OwnerName, "pickupSys", "GetTotalCoins()");
-            //    int datamem = Scripting.GetIntField(OwnerName, "pickupSys", "_coins");
-            //    Debug.Log("test: " + test.ToString());
-            //    Debug.Log("datamem: " + datamem.ToString());
-            //}
         }
 
         public void OnFixedUpdate(float fixedDeltaTime)
@@ -80,21 +79,26 @@ namespace CSharpScript
                 if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Coin_Name))
                 {
                     // coin effect
+                    Random rnd = new Random();
+                    int variation = rnd.Next(1, 3);             // 9 diff running sounds
+                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "sfx");
                 }
                 else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Shell_Name))
                 {
                     // shell effect
+                    Audio.PlaySound("PU_Shell_sfx", "sfx");
                 }
                 else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_PowerUp_Name))
                 {
                     // powerup effect
+                    //check if time or speed
+                    Audio.PlaySound("PU_Time_sfx", "sfx");
                 }
                 else
                 {
                     // Mismatched name but still of type Pickup?
                 }
 
-                Audio.PlaySound("pickup_sfx", "sfx");               // abit bugged bc of stopsound(sfx) in playermovement, need jon to take a look at c# api
                 // destroy regardless of pickup type
                 GameObject.DestroyByID(goID);
                 Debug.Log("destroyed go id: " + goID.ToString());            // works

@@ -111,12 +111,12 @@ namespace CSharpScript
         public float WallCoyoteTime = 0.1f;
 
         // Wall Kick
-        public float WallSlidingSpeed = 125f;                           // 4f * mod
+        public float WallSlidingSpeed = 312.5f;                           // 10f * mod
         public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
         public float WallSlideRestickCooldown = 0.5f;                   // cooldown for remagnetising back to wall aft pressing S to cancel wallslide
         public float WKBaseDuration = 0.25f;
         public float WKSpeedModifier = 1093.75f;                        // 35f * mod
-        public float WKVerticalModifier = 218.75f;                      // 7f * mod
+        public float WKVerticalModifier = 312.5f;                      // 10f * mod
         public float WKDurationMultiplier = 0.75f;
         // dont have tht WKEase graph thing in unity
 

@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "Utils.h"
 
 PickupSystem pickupSys1;
+bool triggerPickupOnce = true;
+int coinTracker = 0;
 
 void Level1::Load() {
 	std::cout << "[LEVEL 1] Load Assets\n";
@@ -29,13 +31,48 @@ void Level1::Load() {
 void Level1::Init() {
     std::cout << "[LEVEL 1] Initialize\n";
     pickupSys1.InitPickups();
+    triggerPickupOnce = true;
+    coinTracker = 0;
 }
 
 // wait for a start() to add initpickups to 
 
 void Level1::Update(float dt) {
 	timer += dt;
+    auto& factory = GameObjectFactory::Instance();
 
+    GameObject* coinText = factory.FindGameObject("CoinCountText");
+    GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3 = factory.FindGameObject("ShellIcon3");
+
+    if (coinText)
+    {
+        if (coinText->IsActive())
+        {
+            int currCoins = pickupSys1.GetCurrentCoins();
+            //schizo method for detecting pickups 
+            if (triggerPickupOnce && currCoins > coinTracker)
+            {
+                triggerPickupOnce = false;
+            }
+
+            coinText->GetComponent<TextComponent>()->SetText(std::to_string(currCoins));
+        }
+    }
+
+    if (shellIcon1 && shellIcon2 && shellIcon3) 
+    {
+        if (shellIcon1->IsActive() && shellIcon1->GetComponent<RenderComponent>())          // only checking for optimisation but please make sure yall do the same for the other 2
+        {
+            int currShells = pickupSys1.GetCurrentShells();
+            shellIcon1->GetComponent<RenderComponent>()->setAlpha(currShells >= 1 ? 1.0f : 0.3f);
+            shellIcon2->GetComponent<RenderComponent>()->setAlpha(currShells >= 2 ? 1.0f : 0.3f);
+            shellIcon3->GetComponent<RenderComponent>()->setAlpha(currShells >= 3 ? 1.0f : 0.3f);
+        }
+    }
+
+    //old code
     // Press P to enter pause -- for testing, will have to be place in inputmanager
     //if (GetAsyncKeyState('P') & 1)
     //{
@@ -47,7 +84,6 @@ void Level1::Update(float dt) {
     //if (true) {
     //    GameManager::Instance().ChangeState(std::make_unique<Level2>());
     //}
-
 }
 
 void Level1::Draw() {

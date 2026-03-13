@@ -150,7 +150,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (isClicked && isHoveringPauseBtn)
             {
                 // Pressed state (dark)
-                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_dark.png"));
+                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Playing_button_dark.png"));
 
                 // Play click sound
                 AudioManager* audioManager = CORE->GetAudioManager();
@@ -166,7 +166,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 else if (isHoveringPauseBtn)
                 {
                 // Hover state (light)
-                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Paused_Button_light.png"));
+                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Playing_button_light.png"));
 
                 // Play hover sound only on hover state change
                 if (!wasHoveringLastFrame)
@@ -183,7 +183,7 @@ void PauseMenuLogicSystem::Update(float dt)
             else
             {
                 // Normal state
-                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/paused_button.png"));
+                rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/playing_button.png"));
                 wasHoveringLastFrame = false;
             }
         }
