@@ -17,6 +17,8 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "MenuLogic.h"
+#include "stb_image.h"
+#include <cmath>
 #include "GhostSystem.h"
 #include "CameraManager.h"
 #include "TextComponent.h"
@@ -42,8 +44,11 @@ MenuScreens currScreen = MenuScreens::Home;
 
 void MenuLogicSystem::Update(float dt)
 {
-    // Update audio fade
+    // Get commonly used singletons
     AudioManager *audioManager = CORE->GetAudioManager();
+    auto& factory = GameObjectFactory::Instance();
+
+    // Update audio fade
     if (audioManager)
     {
         audioManager->UpdateFade(dt);
@@ -56,17 +61,16 @@ void MenuLogicSystem::Update(float dt)
         if (cutscene && !cutscene->IsPlaying())
         {
             // Credits finished, restart BGM
-            std::cout << "[MenuLogic] Credits finished - Restarting main menu BGM" << std::endl;
             if (audioManager)
             {
                 const auto &sounds = audioManager->GetSoundDatabase();
                 if (sounds.find("MainMenuBGM") != sounds.end())
                 {
-                    std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
+                    //std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
                     audioManager->StopSound("bgm_channel");
                     audioManager->PlaySound("MainMenuBGM", "bgm_channel");
-                    audioManager->FadeInCategory("music", 3.0f);
-                    std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
+                    audioManager->FadeInCategory("music", 3.0f, 0.8f); // fade to 80% volume instead of 100% cause too loud
+                    //std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
                 }
                 else
                 {
@@ -218,10 +222,23 @@ void MenuLogicSystem::Update(float dt)
     }
     else if (currScreen == MenuScreens::Settings)
     {
-        // hoveredButtonName.clear();
+        //hoveredButtonName.clear();
+
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
         {
-            GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(true);
+            auto* settingsScreen = GameObjectFactory::Instance().FindGameObject("Screen_Settings");
+            if (!settingsScreen->IsActive())
+            {
+                settingsScreen->SetActive(true);
+                justEnteredSettings = true;
+
+                // load saved volumes into slider states
+                //std::cout << "[MenuLogic Enter Settings] Loading saved volumes - Master: " << savedMasterVolume
+                //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume << std::endl;
+                masterSlider.currentVolume = savedMasterVolume;
+                musicSlider.currentVolume = savedMusicVolume;
+                sfxSlider.currentVolume = savedSfxVolume;
+            }
         }
         if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
         {
@@ -244,8 +261,87 @@ void MenuLogicSystem::Update(float dt)
         if (auto *sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(true);
 
-        // return;
+        // update sliders based on saved base volumes
+        if (audioManager)
+        {
+            //std::cout << "[MenuLogic Settings] Saved base volumes - Master: " << savedMasterVolume
+            //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume
+            //          << " | Slider states - Master: " << masterSlider.currentVolume
+            //          << ", Music: " << musicSlider.currentVolume
+            //          << ", SFX: " << sfxSlider.currentVolume << std::endl;
+
+            // update if slider states don't match saved values OR if just entered settings
+            bool needsUpdate = justEnteredSettings ||
+                               std::abs(musicSlider.currentVolume - savedMusicVolume) > 0.01f ||
+                               std::abs(sfxSlider.currentVolume - savedSfxVolume) > 0.01f ||
+                               std::abs(masterSlider.currentVolume - savedMasterVolume) > 0.01f;
+            if (needsUpdate)
+            {
+                masterSlider.currentVolume = savedMasterVolume;
+                musicSlider.currentVolume = savedMusicVolume;
+                sfxSlider.currentVolume = savedSfxVolume;
+
+                // update visual sliders
+                UpdateSlider("Slider_Bar_Master", masterSlider, masterSlider.currentVolume);
+                UpdateSlider("Slider_Bar_Music", musicSlider, musicSlider.currentVolume);
+                UpdateSlider("Slider_Bar_SFX", sfxSlider, sfxSlider.currentVolume);
+
+                // update knob(aka scissors) positions to match
+
+                // master knob
+                GameObject* masterBar = factory.FindGameObject("Slider_Bar_Master");
+                GameObject* masterKnob = factory.FindGameObject("Slider_Knob_Master");
+                if (masterBar && masterKnob)
+                {
+                    auto* barTransform = masterBar->GetComponent<TransformComponent>();
+                    auto* knobTransform = masterKnob->GetComponent<TransformComponent>();
+                    if (barTransform && knobTransform)
+                    {
+                        float barCenterX, barCenterY, barScaleX, barScaleY;
+                        barTransform->GetPosition(barCenterX, barCenterY);
+                        barTransform->GetScale(barScaleX, barScaleY);
+                        float knobX = barCenterX + barScaleX * 0.5f - 285.0f;
+                        knobTransform->SetPosition(knobX, barCenterY);
+                    }
+                }
+
+                // music knob
+                GameObject* musicBar = factory.FindGameObject("Slider_Bar_Music");
+                GameObject* musicKnob = factory.FindGameObject("Slider_Knob_Music");
+                if (musicBar && musicKnob)
+                {
+                    auto* barTransform = musicBar->GetComponent<TransformComponent>();
+                    auto* knobTransform = musicKnob->GetComponent<TransformComponent>();
+                    if (barTransform && knobTransform)
+                    {
+                        float barCenterX, barCenterY, barScaleX, barScaleY;
+                        barTransform->GetPosition(barCenterX, barCenterY);
+                        barTransform->GetScale(barScaleX, barScaleY);
+                        float knobX = barCenterX + barScaleX * 0.5f - 285.0f;
+                        knobTransform->SetPosition(knobX, barCenterY);
+                    }
+                }
+
+                // SFX knob
+                GameObject* sfxBar = factory.FindGameObject("Slider_Bar_SFX");
+                GameObject* sfxKnob = factory.FindGameObject("Slider_Knob_SFX");
+                if (sfxBar && sfxKnob)
+                {
+                    auto* barTransform = sfxBar->GetComponent<TransformComponent>();
+                    auto* knobTransform = sfxKnob->GetComponent<TransformComponent>();
+                    if (barTransform && knobTransform)
+                    {
+                        float barCenterX, barCenterY, barScaleX, barScaleY;
+                        barTransform->GetPosition(barCenterX, barCenterY);
+                        barTransform->GetScale(barScaleX, barScaleY);
+                        float knobX = barCenterX + barScaleX * 0.5f - 285.0f;
+                        knobTransform->SetPosition(knobX, barCenterY);
+                    }
+                }
+            }
+        }
     }
+
     else if (currScreen == MenuScreens::LevelSelect)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
@@ -310,7 +406,24 @@ void MenuLogicSystem::Update(float dt)
     bool isClicked = InputManager::IsMouseLeftClicked();
     bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 
-    // Depending on scene, check for which buttons have been pressed
+    // handle slider input when on settings screen
+    if (currScreen == MenuScreens::Settings)
+    {
+        if (!justEnteredSettings)
+        {
+            HandleSliderInput(mouseX, mouseY, isMouseDown);
+        }
+        else
+        {
+            // First frame entering settings - update mouse state but don't process input
+            // This prevents the next frame from thinking the mouse was just clicked
+            wasMouseDownOnSlider = isMouseDown;
+            isDraggingSlider = false;
+            currentSliderCategory = "";
+            justEnteredSettings = false;
+        }
+    }
+
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
     std::string currentPressed = "";
 
@@ -351,10 +464,9 @@ void MenuLogicSystem::Update(float dt)
             SetButtonTexture(currentHover, true, isCurrentPressed);
             // Play hover sound once when entering the button
 
-            AudioManager *localAudioManager = CORE->GetAudioManager();
-            if (localAudioManager)
+            if (audioManager)
             {
-                localAudioManager->TriggerEvent("UI_Hover");
+                audioManager->TriggerEvent("UI_Hover");
             }
         }
 
@@ -375,7 +487,7 @@ void MenuLogicSystem::Update(float dt)
     // Only process clicks if we are actually hovering over a button
     if (isClicked && !hoveredButtonName.empty())
     {
-   const std::string button = hoveredButtonName;
+        const std::string button = hoveredButtonName;
 
         // Handle level select screen buttons first
         if (HandleLevelSelectClick(button))
@@ -393,12 +505,6 @@ void MenuLogicSystem::Update(float dt)
         }
 
         // Delayed transition buttons
-        if (button == "LevelSelectedButton" && audioManager)
-        {
-            audioManager->FadeOutCategory("music", 1.0f);
-            std::cout << "[MenuLogic] Started music fade out" << std::endl;
-        }
-
         pendingSceneChange = true;
         pendingTimer = 2.0f;
     }
@@ -482,21 +588,21 @@ bool MenuLogicSystem::IsMouseOver(GameObject *button, double mouseX, double mous
 
 void MenuLogicSystem::TriggerUISound(const std::string &buttonName)
 {
-    AudioManager *audioManager = CORE->GetAudioManager();
-    if (!audioManager)
+    AudioManager *audio = CORE->GetAudioManager();
+    if (!audio)
         return;
 
     if (buttonName == "LevelSelectedButton")
     {
-        audioManager->TriggerEvent("UI_Press");
+        audio->TriggerEvent("UI_Press");
     }
     else if (buttonName == "QuitButton")
     {
-        audioManager->TriggerEvent("UI_Quit");
+        audio->TriggerEvent("UI_Quit");
     }
     else
     {
-        audioManager->TriggerEvent("UI_Click");
+        audio->TriggerEvent("UI_Click");
     }
 
     std::cout << "menu button clicking sound is triggered" << std::endl;
@@ -964,6 +1070,289 @@ void MenuLogicSystem::ClearLevelSelection()
 void MenuLogicSystem::Reset()
 {
     currScreen = MenuScreens::Home;
+
+    // reset the bars
+    masterSlider = SliderState();
+    musicSlider = SliderState();
+    sfxSlider = SliderState();
+    isDraggingSlider = false;
+    currentSliderCategory = "";
+}
+
+void MenuLogicSystem::ComputeSliderUVBounds(RenderComponent* renderComp, SliderState& sliderState)
+{
+    std::string texturePath = renderComp->GetTexturePath();
+
+    int width = 0;
+    int height = 0;
+    int channels = 0;
+    unsigned char* pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
+
+    if (pixels && width > 0 && height > 0)
+    {
+        int minX = width;
+        int maxX = -1;
+
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                int index = (y * width + x) * 4;
+                unsigned char alpha = pixels[index + 3];
+
+                if (alpha > 0)
+                {
+                    minX = std::min(minX, x);
+                    maxX = std::max(maxX, x);
+                }
+            }
+        }
+
+        if (maxX >= minX)
+        {
+            sliderState.uvBarMin = static_cast<float>(minX) / static_cast<float>(width);
+            sliderState.uvBarMax = static_cast<float>(maxX + 1) / static_cast<float>(width);
+            sliderState.uvBarWidth = sliderState.uvBarMax - sliderState.uvBarMin;
+        }
+        else
+        {
+            sliderState.uvBarMin = 0.0f;
+            sliderState.uvBarMax = 1.0f;
+            sliderState.uvBarWidth = 1.0f;
+        }
+
+        stbi_image_free(pixels);
+    }
+    else
+    {
+        sliderState.uvBarMin = 0.0f;
+        sliderState.uvBarMax = 1.0f;
+        sliderState.uvBarWidth = 1.0f;
+    }
+
+    sliderState.uvBoundsReady = true;
+}
+
+void MenuLogicSystem::UpdateSlider(const std::string& barName, SliderState& sliderState, float volumePercent)
+{
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* sliderBarGO = factory.FindGameObject(barName);
+
+    if (!sliderBarGO)
+    {
+        return;
+    }
+
+    auto* renderComp = sliderBarGO->GetComponent<RenderComponent>();
+    auto* transformComp = sliderBarGO->GetComponent<TransformComponent>();
+
+    if (!renderComp || !transformComp)
+    {
+        return;
+    }
+
+    // compute the visible UV range once from the actual slider texture
+    if (!sliderState.uvBoundsReady)
+    {
+        ComputeSliderUVBounds(renderComp, sliderState);
+    }
+
+    if (sliderState.originalScaleX <= 0.0f)
+    {
+        transformComp->GetScale(sliderState.originalScaleX, sliderState.originalScaleY);
+        transformComp->GetPosition(sliderState.originalCenterX, sliderState.originalCenterY);
+
+        // world-space start of the ACTUAL visible slider bar
+        sliderState.leftEdge = (sliderState.originalCenterX - sliderState.originalScaleX * 0.5f) + (sliderState.originalScaleX * sliderState.uvBarMin);
+
+        // usable visible slider width only
+        sliderState.rightEdge = sliderState.originalScaleX * sliderState.uvBarWidth;
+    }
+
+    float fillPercentage = std::clamp(volumePercent, 0.0f, 1.0f);
+    float safeFill = std::max(fillPercentage, 0.001f);
+
+    // world width of remaining visible slider
+    float newScaleX = sliderState.rightEdge * safeFill;
+    float newCenterX = sliderState.leftEdge + (newScaleX * 0.5f);
+
+    transformComp->SetScale(newScaleX, sliderState.originalScaleY);
+    transformComp->SetPosition(newCenterX, sliderState.originalCenterY);
+
+    // crop inside the painted slider bar
+    float croppedUWidth = sliderState.uvBarWidth * safeFill;
+    renderComp->SetUVScale(vec2(croppedUWidth, 1.0f));
+    renderComp->SetUVOffset(vec2(sliderState.uvBarMin, 0.0f));
+}
+
+void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMouseDown)
+{
+    auto& factory = GameObjectFactory::Instance();
+    AudioManager* audioManager = CORE->GetAudioManager();
+    bool isMouseClicked = isMouseDown && !wasMouseDownOnSlider;
+
+    if (isMouseClicked && !isDraggingSlider)
+    {
+        GameObject* masterBarBack = factory.FindGameObject("Slider_Bar_Back_Master");
+        GameObject* musicBarBack = factory.FindGameObject("Slider_Bar_Back_Music");
+        GameObject* sfxBarBack = factory.FindGameObject("Slider_Bar_Back_SFX");
+
+        if (IsMouseOver(masterBarBack, mouseX, mouseY))
+        {
+            isDraggingSlider = true;
+            currentSliderCategory = "master";
+        }
+        else if (IsMouseOver(musicBarBack, mouseX, mouseY))
+        {
+            isDraggingSlider = true;
+            currentSliderCategory = "music";
+        }
+        else if (IsMouseOver(sfxBarBack, mouseX, mouseY))
+        {
+            isDraggingSlider = true;
+            currentSliderCategory = "sfx";
+        }
+    }
+
+    wasMouseDownOnSlider = isMouseDown;
+
+    if (!isMouseDown)
+    {
+        isDraggingSlider = false;
+        currentSliderCategory = "";
+    }
+
+    // update slider position while dragging
+    if (isDraggingSlider && !currentSliderCategory.empty())
+    {
+        std::string barBackName;
+        SliderState* sliderState = nullptr;
+        std::string category;
+
+        if (currentSliderCategory == "master")
+        {
+            barBackName = "Slider_Bar_Back_Master";
+            sliderState = &masterSlider;
+            category = "";
+        }
+        else if (currentSliderCategory == "music")
+        {
+            barBackName = "Slider_Bar_Back_Music";
+            sliderState = &musicSlider;
+            category = "music";
+        }
+        else if (currentSliderCategory == "sfx")
+        {
+            barBackName = "Slider_Bar_Back_SFX";
+            sliderState = &sfxSlider;
+            category = "sfx";
+        }
+
+        if (sliderState)
+        {
+            // get background bar to determine the slider range
+            GameObject* barBack = factory.FindGameObject(barBackName);
+            if (barBack)
+            {
+                auto* barTransform = barBack->GetComponent<TransformComponent>();
+                if (barTransform)
+                {
+                    float barCenterX, barCenterY, barScaleX, barScaleY;
+                    barTransform->GetPosition(barCenterX, barCenterY);
+                    barTransform->GetScale(barScaleX, barScaleY);
+
+                    float leftBound = (barCenterX - barScaleX * 0.5f) + (barScaleX * sliderState->uvBarMin);
+                    float usableWidth = barScaleX * sliderState->uvBarWidth;
+                    float rightBound = leftBound + usableWidth;
+                    float mouseXf = static_cast<float>(mouseX);
+
+                    mouseXf = std::clamp(mouseXf, leftBound, rightBound);
+
+                    // calculate volume based on mouse position within the usable slider area
+                    float volumePercent = (mouseXf - leftBound) / usableWidth;
+                    volumePercent = std::clamp(volumePercent, 0.0f, 1.0f);
+
+                    sliderState->currentVolume = volumePercent;
+
+                    // update the visual slider
+                    std::string barName;
+                    if (currentSliderCategory == "master")
+                        barName = "Slider_Bar_Master";
+                    else if (currentSliderCategory == "music")
+                        barName = "Slider_Bar_Music";
+                    else if (currentSliderCategory == "sfx")
+                        barName = "Slider_Bar_SFX";
+
+                    UpdateSlider(barName, *sliderState, volumePercent);
+
+                    // this for the scissors icon
+                    std::string knobName;
+                    if (currentSliderCategory == "master")
+                        knobName = "Slider_Knob_Master";
+                    else if (currentSliderCategory == "music")
+                        knobName = "Slider_Knob_Music";
+                    else if (currentSliderCategory == "sfx")
+                        knobName = "Slider_Knob_SFX";
+
+                    GameObject* sliderBar = factory.FindGameObject(barName);
+                    GameObject* knob = factory.FindGameObject(knobName);
+                    if (sliderBar && knob)
+                    {
+                        auto* sliderTransform = sliderBar->GetComponent<TransformComponent>();
+                        auto* knobTransform = knob->GetComponent<TransformComponent>();
+                        if (sliderTransform && knobTransform)
+                        {
+                            float sliderCenterX, sliderCenterY, sliderScaleX, sliderScaleY;
+                            sliderTransform->GetPosition(sliderCenterX, sliderCenterY);
+                            sliderTransform->GetScale(sliderScaleX, sliderScaleY);
+                            float knobX = sliderCenterX + sliderScaleX * 0.5f - 285.0f;
+                            knobTransform->SetPosition(knobX, sliderCenterY);
+                        }
+                    }
+
+                    // update audio volume and save it
+                    if (audioManager)
+                    {
+                        if (currentSliderCategory == "master")
+                        {
+                            savedMasterVolume = volumePercent;
+
+                            // apply master as a multiplier to individual category volumes
+                            float finalMusicVol = savedMusicVolume * savedMasterVolume;
+                            float finalSfxVol = savedSfxVolume * savedMasterVolume;
+
+                            audioManager->SetCategoryVolume("music", finalMusicVol);
+                            audioManager->SetCategoryVolume("sfx", finalSfxVol);
+
+                            //std::cout << "[MenuLogic] Final volumes - Music: " << finalMusicVol
+                            //          << " (base: " << savedMusicVolume << " * master: " << savedMasterVolume << ")"
+                            //          << ", SFX: " << finalSfxVol
+                            //          << " (base: " << savedSfxVolume << " * master: " << savedMasterVolume << ")" << std::endl;
+                        }
+                        else
+                        {
+                            // individual category, save base volume and apply master multiplier
+                            if (currentSliderCategory == "music")
+                            {
+                                savedMusicVolume = volumePercent;
+                            }
+                            else if (currentSliderCategory == "sfx")
+                            {
+                                savedSfxVolume = volumePercent;
+                            }
+
+                            // apply master multiplier to get final volume
+                            float finalVolume = volumePercent * savedMasterVolume;
+                            audioManager->SetCategoryVolume(category, finalVolume);
+
+                            //std::cout << "[MenuLogic] Final " << category << " volume: " << finalVolume
+                            //          << " (base: " << volumePercent << " * master: " << savedMasterVolume << ")" << std::endl;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void MenuLogicSystem::ScanReplays()

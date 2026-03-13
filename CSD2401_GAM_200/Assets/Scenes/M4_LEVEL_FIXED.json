@@ -9462,7 +9462,7 @@
           "TransformComponent": {
             "pos": [
               1800.0,
-              150.0
+              100.0
             ],
             "scale": [
               125.0,
@@ -9472,7 +9472,7 @@
           },
           "RenderComponent": {
             "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/paused_button.png",
+            "texturePath": "../Assets/Sprites/Icons/playing_button.png",
             "color": [
               1.0,
               1.0,
@@ -9491,12 +9491,12 @@
           "active": true,
           "TransformComponent": {
             "pos": [
-              1750.0,
+              1675.0,
               920.0
             ],
             "scale": [
-              70.0,
-              70.0
+              80.0,
+              80.0
             ],
             "rotation": 0.0
           },
@@ -9521,12 +9521,12 @@
           "active": true,
           "TransformComponent": {
             "pos": [
-              1800.0,
+              1750.0,
               920.0
             ],
             "scale": [
-              70.0,
-              70.0
+              80.0,
+              80.0
             ],
             "rotation": 0.0
           },
@@ -9551,12 +9551,12 @@
           "active": true,
           "TransformComponent": {
             "pos": [
-              1850.0,
+              1825.0,
               920.0
             ],
             "scale": [
-              70.0,
-              70.0
+              80.0,
+              80.0
             ],
             "rotation": 0.0
           },

@@ -128,7 +128,7 @@ void WinLoseLogicSystem::Update(float dt)
         CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
         if (cutscene && !cutscene->IsPlaying())
         {
-            std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
+            //std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
             isPlayingCredits = false;
             CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
 
@@ -1303,20 +1303,16 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         }
         else if (hoveredButtonName == "LoseQuitButton")
         {
-            std::cout << "[WinLoseLogic] Quit clicked - Going to main menu" << std::endl;
-
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Click");
-                // Fade out music before going to main menu
                 audioManager->FadeOutCategory("music", 2.0f);
-                std::cout << "[WinLoseLogic] Started music fade out (2.0 seconds)" << std::endl;
             }
-
-            DestroyLoseScreen();
-            pendingSceneTimer = 2.2f;  // Wait for 2.0s fade + small buffer
-            pendingScenePath = "../Assets/Scenes/MainMenu.json";
-            pendingSceneChange = true;
+            //DestroyLoseScreen();
+            //CORE->SetGamePaused(false);
+            //pendingSceneChange = true;
+            //pendingSceneTimer = 999.0f;  // never expires — transition handles the load
+            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
         }
     }
 }

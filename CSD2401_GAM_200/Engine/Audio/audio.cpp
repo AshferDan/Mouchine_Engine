@@ -285,6 +285,9 @@ void AudioEngine::setVolume(const std::string& channelName, float volume) {
 	if (it != channels.end() && it->second) {
 		volume = std::max(0.0f, std::min(1.0f, volume));
 		it->second->setVolume(volume); // set volume for only that channel
+		//if (channelName == "bgm_channel") {
+		//	std::cout << "[AudioEngine] Set bgm_channel FMOD volume to " << volume << std::endl;
+		//}
 	}
 }
 
