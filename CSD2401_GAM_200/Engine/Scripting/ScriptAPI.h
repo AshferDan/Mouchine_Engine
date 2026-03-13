@@ -501,10 +501,18 @@ namespace API {
 #pragma region Animator
     void PlayAnimation(const std::string& objectName, const std::string& animationName, bool isLooping = true);
     void SetAnimationLooping(const std::string& objectName, bool isLooping);
+    bool IsAnimationLooping(const std::string& objectName);
     void AddAnimationToQueue(const std::string& objectName, const std::string& animationName);
-    void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps);
+    void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong = false, bool flipRows = false);
     void SetAnimation(const std::string& objectName, int startFrame, int endFrame, float fps);
     std::string GetCurrentAnimationName(const std::string& objectName);
+    
+    void LoadNewSpritesheet(const std::string& objectName, const std::string& texturePath, int rows, int cols);
+    void SetCurrentFrame(const std::string& objectName, int row, int col);
+    int GetRows(const std::string& objectName);
+    int GetCols(const std::string& objectName);
+    int GetCurrentRow(const std::string& objectName);
+    int GetCurrentCol(const std::string& objectName);
 #pragma endregion
 
 

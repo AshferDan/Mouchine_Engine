@@ -1063,6 +1063,21 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         }
     }
 
+    bool IsAnimationLooping(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                return spritesheet->GetLooping();
+            }
+        }
+        return false;
+    }
+
     void AddAnimationToQueue(const std::string& objectName, const std::string& animationName)
     {
         auto& factory = GameObjectFactory::Instance();
@@ -1077,7 +1092,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         }
     }
 
-    void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps)
+    void RegisterAnimation(const std::string& objectName, const std::string& animationName, const std::string& texturePath, int rows, int cols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong, bool flipRows)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.FindGameObject(objectName);
@@ -1086,7 +1101,7 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             auto* spritesheet = obj->GetComponent<Spritesheet>();
             if (spritesheet)
             {
-                spritesheet->RegisterAnimation(animationName, texturePath, rows, cols, startRow, startCol, endRow, endCol, fps);
+                spritesheet->RegisterAnimation(animationName, texturePath, rows, cols, startRow, startCol, endRow, endCol, fps, pingPong, flipRows);
             }
         }
     }
@@ -1118,6 +1133,94 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
             }
         }
         return ""; // Return empty string if not found
+    }
+
+    void LoadNewSpritesheet(const std::string& objectName, const std::string& texturePath, int rows, int cols)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->LoadNewSpritesheet(texturePath.c_str(), rows, cols);
+            }
+        }
+    }
+
+    void SetCurrentFrame(const std::string& objectName, int row, int col)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                spritesheet->SetCurrentFrame(row, col);
+            }
+        }
+    }
+
+    int GetRows(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                return spritesheet->GetRows();
+            }
+        }
+        return 0;
+    }
+
+    int GetCols(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                return spritesheet->GetCols();
+            }
+        }
+        return 0;
+    }
+
+    int GetCurrentRow(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                return spritesheet->GetCurrentRow();
+            }
+        }
+        return 0;
+    }
+
+    int GetCurrentCol(const std::string& objectName)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.FindGameObject(objectName);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet)
+            {
+                return spritesheet->GetCurrentCol();
+            }
+        }
+        return 0;
     }
 #pragma endregion
 

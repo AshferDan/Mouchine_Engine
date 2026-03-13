@@ -69,4 +69,11 @@ public:
     virtual void CloseGhostMenu()      {}
     virtual void TriggerWin()          {}
     virtual void TriggerLose()         {}
+
+    // ── Pickup system ─────────────────────────────────────────────────────────
+    virtual void CollectCoin()           {}
+    virtual void CollectShell()          {}
+    virtual int  GetCurrentCoins()  const { return 0; }
+    virtual int  GetCurrentShells() const { return 0; }
+    virtual void ReinitPickups()         {}
 };
