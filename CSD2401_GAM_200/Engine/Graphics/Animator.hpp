@@ -32,6 +32,7 @@ struct AnimationData {
 	int startframe, endframe;
 	float fps;
 	bool pingPong = false;
+	bool flipRows = false;
 };
 
 
@@ -80,7 +81,7 @@ public:
 	 */
 	GLuint GetTextureID() const { return textureID; }
 
-	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong = false);
+	void RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong = false, bool flipRows = false);
 
 	void PlayAnimation(const std::string& name, bool isLooping = true);
 
@@ -114,6 +115,9 @@ public:
 	 */
 	vec2 GetUVScale() const;
 	vec2 GetUVOffset() const;
+	vec2 GetFlipUVOffset() const;
+	bool GetFlipRows() const { return flipRows; }
+	void SetFlipRows(bool val) { flipRows = val; }
 	float GetUVWidth() const { return uv_width; }
 	float GetUVHeight() const { return uv_height; }
 	/**
@@ -173,4 +177,5 @@ private:
 
 	int animationDirection = 1;
 	bool pingPongMode = false;
+	bool flipRows = false;
 };

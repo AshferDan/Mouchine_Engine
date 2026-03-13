@@ -861,10 +861,35 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
         }
     }
     else if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" ||
-             buttonName == "ReplayPicker_Slot2" || buttonName == "ReplayPicker_Back")
+             buttonName == "ReplayPicker_Slot2")
     {
-        
-        return;
+        if (isPressed)
+        {
+            texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
+        }
+        else if (isHovered)
+        {
+            texturePath = "../Assets/Sprites/Icons/Button_Large_light.png";
+        }
+        else
+        {
+            texturePath = "../Assets/Sprites/Icons/blankbtnL.png";
+        }
+    }
+    else if (buttonName == "ReplayPicker_Back")
+    {
+        if (isPressed)
+        {
+            texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
+        }
+        else if (isHovered)
+        {
+            texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
+        }
+        else
+        {
+            texturePath = "../Assets/Sprites/Icons/Back_button.png";
+        }
     }
     else if (buttonName == "Level1Button")
     {
@@ -1024,11 +1049,12 @@ void MenuLogicSystem::ShowReplayPicker()
     titleT->posY = camPos.y + 300.0f;
     titleT->scaleX = 700.0f;
     titleT->scaleY = 100.0f;
-    auto *titleR = titleObj->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.1f, 0.1f, 0.28f, 0.95f));
+    auto *titleR = titleObj->AddComponent<RenderComponent>();
+    titleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    titleR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     titleR->SetLayer(baseLayer + 1);
     titleObj->AddComponent<TextComponent>(font.c_str(), titleSize, "CHOOSE A REPLAY",
-                                          vec4(1.0f, 1.0f, 1.0f, 1.0f), false);
+                                          vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     // Slot buttons (3 slots, stacked vertically)
     const float slotStartY = camPos.y + 130.0f;
@@ -1056,16 +1082,12 @@ void MenuLogicSystem::ShowReplayPicker()
         slotT->scaleX = 620.0f;
         slotT->scaleY = 110.0f;
 
-        vec4 color = hasReplay
-                         ? vec4(0.15f, 0.15f, 0.38f, 0.92f)
-                         : vec4(0.10f, 0.10f, 0.15f, 0.55f);
-        auto *slotR = slot->AddComponent<RenderComponent>(
-            RenderComponent::ShapeType::Square, color);
+        auto *slotR = slot->AddComponent<RenderComponent>();
+        slotR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+        slotR->SetColor(hasReplay ? vec4(1.0f, 1.0f, 1.0f, 1.0f) : vec4(0.55f, 0.55f, 0.55f, 1.0f));
         slotR->SetLayer(baseLayer + 1);
 
-        vec4 textColor = hasReplay
-                             ? vec4(1.0f, 1.0f, 1.0f, 1.0f)
-                             : vec4(0.5f, 0.5f, 0.5f, 1.0f);
+        vec4 textColor = hasReplay ? vec4(0.0f, 0.0f, 0.0f, 1.0f) : vec4(0.3f, 0.3f, 0.3f, 1.0f);
         slot->AddComponent<TextComponent>(font.c_str(), slotSize, displayName, textColor, false);
     }
 
@@ -1074,13 +1096,12 @@ void MenuLogicSystem::ShowReplayPicker()
     auto *backT = backBtn->AddComponent<TransformComponent>();
     backT->posX = camPos.x;
     backT->posY = camPos.y - 300.0f;
-    backT->scaleX = 280.0f;
-    backT->scaleY = 90.0f;
-    auto *backR = backBtn->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.28f, 0.10f, 0.10f, 0.92f));
+    backT->scaleX = 200.0f;
+    backT->scaleY = 175.0f;
+    auto *backR = backBtn->AddComponent<RenderComponent>();
+    backR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
+    backR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     backR->SetLayer(baseLayer + 1);
-    backBtn->AddComponent<TextComponent>(font.c_str(), slotSize, "BACK",
-                                         vec4(1.0f, 1.0f, 1.0f, 1.0f), false);
 
     m_hasCreatedReplayPicker = true;
     currScreen = MenuScreens::ReplayPicker;
