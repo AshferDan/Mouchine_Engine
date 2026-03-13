@@ -357,7 +357,7 @@ bool SupportedImageFile(const std::string& path) {
 	return (ext == ".png" || ext == ".jpeg");
 }
 
-void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong, bool flipRows)
+void Spritesheet::RegisterAnimation(const std::string& name, const std::string& path, int numRows, int numCols, int startRow, int startCol, int endRow, int endCol, float fps, bool pingPong, bool flipRowsParam)
 {
 	
 	if (startRow >= numRows || startCol >= numCols || endRow >= numRows || endCol >= numCols) {
@@ -376,7 +376,7 @@ void Spritesheet::RegisterAnimation(const std::string& name, const std::string& 
 	newState.endframe = endIdx;
 	newState.fps = fps;
 	newState.pingPong = pingPong;
-	newState.flipRows = flipRows;
+	newState.flipRows = flipRowsParam;
 
 	animation_mList[name] = newState;
 }
