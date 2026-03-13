@@ -47,6 +47,7 @@ Technology is prohibited.
 #include "GhostSystem.h"
 #include "TextInputSystem.h"
 #include "GameCallbacks.h"
+#include "ScreenTransitionSystem.h"
 
 // Inside CoreEngine class
 
@@ -63,6 +64,7 @@ class ScriptSystem;
 class LevelEditor;
 class AudioManager;
 class CutsceneSystem;
+class ScreenTransitionSystem;
 
 class CoreEngine : public IMessageHandler
 {
@@ -251,7 +253,12 @@ public:
     GhostSystem *GetGhostSystem() const { return ghostSystem; }
 
     /**
-     * @brief Gets a pointer to the TextInputSystem.
+     * @brief Gets a pointer to the Screen Transition.
+     * @return A pointer to the GhostSystem.
+     */
+    ScreenTransitionSystem* GetScreenTransitionSystem() const { return screenTransitionSystem; }
+    
+     /* @brief Gets a pointer to the TextInputSystem.
      * @return A pointer to the TextInputSystem.
      */
     TextInputSystem *GetTextInputSystem() const { return textInputSystem; }
@@ -301,11 +308,17 @@ public:
      * @brief Requests a scene to be loaded on the next frame.
      * @param sceneName The name of the scene file to load.
      */
-    void RequestSceneLoad(const std::string &sceneName, bool autoPlay = false)
+    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false)
     {
+        std::cout << "[RequestSceneLoad] scene: " << sceneName << std::endl;
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
+        if (screenTransitionSystem && sceneName != "../Assets/Scenes/MainMenu.json")
+        {
+            std::cout << "[RequestSceneLoad] Starting transition" << std::endl;
+            screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
+        }
     }
 
     /**
@@ -355,6 +368,7 @@ private:
     GhostSystem *ghostSystem = nullptr;
     TextInputSystem *textInputSystem = nullptr;
     IGameCallbacksSystem *gameCallbacks = nullptr;
+    ScreenTransitionSystem* screenTransitionSystem = nullptr;
 
     unsigned LastTime;
     bool GameActive;

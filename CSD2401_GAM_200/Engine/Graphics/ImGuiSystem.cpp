@@ -541,6 +541,10 @@ void ImGuiSystem::Update(float dt)
                         // Select the new GameObject
                         SetSelectedGameObject(newGO->GetID());
 
+                        LevelEditor* editor = CORE->GetLevelEditor();
+                        if (editor)
+                            UndoTracker::RecordCreation(newGO, editor, factory);
+
                         std::cout << "[Viewport] Created sprite GameObject: " << spriteName << std::endl;
                     }
                 }
@@ -999,7 +1003,11 @@ void ImGuiSystem::Hierarchy_Render()
             GameObject* goParent = go->GetParent();
             if (goParent)
             {
+                json beforeUnparentJson = Serialization::SerializeGameObject(go);
                 goParent->RemoveChild(go);
+                LevelEditor* editor = CORE->GetLevelEditor();
+                if (editor)
+                    UndoTracker::RecordInstantChange(go, editor, beforeUnparentJson);
             }
         }
     }
@@ -1640,7 +1648,7 @@ void ImGuiSystem::Viewport_ManageGizmos()
         {
             float* deltaMat{};                                                  // we not gonna use this for anything, just a filler ptr so we can access bounds
             float bounds[6] = { -0.5f, -0.5f, 0.0f, 0.5f, 0.5f, 0.0f };         // plots the cross section so we can get the middle edges
-            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CORE->GetGraphicsSystem()->getVp()), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
+            ImGuizmo::Manipulate(value_ptr(view), value_ptr(CameraManager::Instance().GetViewProjectMatrix(CORE->GetGraphicsSystem()->GetWindowWidth(), CORE->GetGraphicsSystem()->GetWindowHeight())), ImGuizmo::OPERATION::BOUNDS, ImGuizmo::WORLD, value_ptr(mtx), deltaMat, deltaMat, bounds);     // manipulate with bounds in mind
         }
 
         if (ImGuizmo::IsUsing())
@@ -2359,10 +2367,10 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
-                if (ImGui::Button("Press Here to add DND Slot"))
+               /* if (ImGui::Button("Press Here to add DND Slot"))
                 {
                     transform->AddDragDropSlot("todayisaBADday", PrefabPayloadID);
-                }
+                }*/
 
                 if (transform->GetPropertySlots().size())
                 {

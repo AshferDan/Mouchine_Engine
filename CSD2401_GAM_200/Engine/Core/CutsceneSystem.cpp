@@ -174,34 +174,45 @@ void CutsceneSystem::StopCutscene() {
 
 	m_isPlaying = false;
 
-	// Cleanup Decoder
 	if (m_plm) {
 		plm_destroy(m_plm);
 		m_plm = nullptr;
 	}
 
-	// Stop cutscene audio
 	AudioManager* audioMgr = CORE->GetAudioManager();
 	if (audioMgr) {
-		// Stop the cutscene audio
 		if (!m_currentAudio.empty()) {
 			audioMgr->StopSound("cutscene_audio_channel");
 			m_currentAudio = "";
-			std::cout << "[CutsceneSystem] Stopped cutscene audio" << std::endl;
 		}
 	}
 
 	m_timeAccumulator = 0.0;
-
-	// Resume Game only if there's no pending scene load
-	// (if there's a pending load, the scene load will unpause after loading)
-	if (!CORE->HasPendingSceneLoad()) {
-		CORE->SetGamePaused(false);
-		std::cout << "[CutsceneSystem] No pending scene load - resuming game" << std::endl;
-	} else {
-		std::cout << "[CutsceneSystem] Pending scene load detected - keeping game paused" << std::endl;
-	}
 	m_canSkip = false;
+
+	// After cutscene ends, load the level with transition
+	// Only do this for the intro cutscene, not credits
+	if (m_currentVideoPath == "../Assets/cutscene_M5.mpeg") {
+		ScreenTransitionSystem* trans = CORE->GetScreenTransitionSystem();
+		if (trans) {
+			trans->StartLoadScreenOnly("../Assets/loading.gif", []() {
+				CameraManager::Instance().ResetState();
+				LevelEditor* level = CORE->GetLevelEditor();
+				level->LoadLevel("../Assets/Scenes/M4_LEVEL_FIXED.json");
+				if (CORE->GetGameCallbacks()) CORE->GetGameCallbacks()->OnSceneLoadReinit();
+				level->EnterPlayMode();
+				CORE->SetGamePaused(false);
+				EventSystem::Clear();
+				if (CORE->GetInputManager()) CORE->GetInputManager()->ResetState();
+				});
+		}
+	}
+	else {
+		// For credits or other cutscenes, just resume
+		if (!CORE->HasPendingSceneLoad()) {
+			CORE->SetGamePaused(false);
+		}
+	}
 }
 
 /**

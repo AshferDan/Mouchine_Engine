@@ -1658,6 +1658,7 @@ void TilemapEditor::RenderTilemapGameObject(GameObject* tilemapObj)
                     vertex.uvOffset = vec2(uv_x, uv_y);
                     vertex.transform = vec3(tileX, tileY, rotation);
                     vertex.scale = vec2(tileSX, tileSY);
+                    vertex.tileCount = vec2(1.0f, 1.0f);
 
                     batches[batchIndex].vertices.push_back(vertex);
                 }

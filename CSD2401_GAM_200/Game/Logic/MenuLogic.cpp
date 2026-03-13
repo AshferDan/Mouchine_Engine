@@ -153,19 +153,22 @@ void MenuLogicSystem::Update(float dt)
                 if (hoveredButtonName == "LevelSelectedButton" && !selectedLevelScenePath.empty())
                 {
                     std::cout << "Starting level: " << selectedLevelScenePath << std::endl;
-
-                    CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
                     if (!cutscene->HasPlayed(introPath))
                     {
                         if (!cutscene->IsPlaying())
                         {
                             cutscene->PlayVideo(introPath, "CutsceneAudio");
                             currScreen = MenuScreens::Home;
-                            // Don't fade back in - let the fade out complete
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
+                        // Don't call RequestSceneLoad yet - StopCutscene will handle it
                     }
-                    CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    else
+                    {
+                        // Cutscene already played, load normally with transition
+                        CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    }
                 }
             }
 
@@ -240,6 +243,7 @@ void MenuLogicSystem::Update(float dt)
             musicText->SetActive(true);
         if (auto *sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(true);
+
         // return;
     }
     else if (currScreen == MenuScreens::LevelSelect)
@@ -294,11 +298,11 @@ void MenuLogicSystem::Update(float dt)
 
         // Show level select text labels when on settings screen
         if (auto *rText = GameObjectFactory::Instance().FindGameObject("Rating"))
-            rText->SetActive(true);
+            rText->SetActive(false);
         if (auto *rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
-            rText2->SetActive(true);
+            rText2->SetActive(false);
         if (auto *rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
-            rText3->SetActive(true);
+            rText3->SetActive(false);
     }
 
     double mouseX = InputManager::GetMouseWorldX();

@@ -123,6 +123,8 @@ void CoreEngine::InitSystems()
     ghostSystem      = AddSystem<GhostSystem>();
     textInputSystem  = AddSystem<TextInputSystem>();
 
+    screenTransitionSystem = AddSystem<ScreenTransitionSystem>();
+
     // Connect GraphicsSystem to LevelEditor for editor camera
     graphicsSystem->SetLevelEditor(levelEditor);
 
@@ -187,6 +189,13 @@ void CoreEngine::GameLoop()
             {
                 // Cutscene still playing - delay scene load
                 // (scene will load on next frame after cutscene ends)
+            }    
+            // Wait for iris to fully close before loading scene
+            else if (screenTransitionSystem &&
+                screenTransitionSystem->IsTransitioning() &&
+                screenTransitionSystem->GetState() != TransitionState::LoadScreen)
+            {
+                // Transition still closing - delay scene load
             }
             else
             {
@@ -195,6 +204,7 @@ void CoreEngine::GameLoop()
                 std::cout << "[CoreEngine] Auto-play flag: " << (m_autoPlayAfterLoad ? "TRUE" : "FALSE") << std::endl;
 
                 LevelEditor *level = GetLevelEditor();
+                CameraManager::Instance().ResetState();
                 level->LoadLevel(m_pendingScene);
                 std::cout << "[CoreEngine] Scene loaded successfully" << std::endl;
 
@@ -233,7 +243,6 @@ void CoreEngine::GameLoop()
 
                 if (inputManager)
                     inputManager->ResetState();
-                CameraManager::Instance().ResetState();
                 accumulator = 0.0;
             }
         }
@@ -408,6 +417,10 @@ void CoreEngine::GameLoop()
             g_totalLoopTime += ms;
         }
 
+
+        if (screenTransitionSystem)
+            screenTransitionSystem->Update(static_cast<float>(delta_time));
+
         if (debugSystem)
         {
             std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
@@ -469,6 +482,9 @@ void CoreEngine::GameLoop()
         if (cutsceneSystem && cutsceneSystem->IsPlaying()) {
             cutsceneSystem->Update(static_cast<float>(delta_time));         
         }
+
+        if (screenTransitionSystem)
+            screenTransitionSystem->Render();
 
         // Swap buffers and poll events
         glfwSwapBuffers(graphicsSystem->getWindow());
