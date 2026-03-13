@@ -75,6 +75,8 @@ public:
      */
     void TriggerLose();
 
+    float CalculateRating() const;
+
 private:
     // ---------------- WIN STATE ----------------
     bool hasPlayerWon = false;

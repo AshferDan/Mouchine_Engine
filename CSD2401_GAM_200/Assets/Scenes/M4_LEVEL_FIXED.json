@@ -13497,6 +13497,54 @@
   "AudioManager": {
     "sounds": [
       {
+        "name": "PU_Time_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Speed_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Speed.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Shell_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Shell.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx1",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx2",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin2.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx3",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin3.wav",
+        "loop": false,
+        "volume": 0.8,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
         "name": "AirGlide",
         "filepath": "../Assets/audio/Player/AirGlide.wav",
         "loop": false,

@@ -587,8 +587,8 @@ void WinLoseLogicSystem::TriggerWin()
     // stats for the right-side panel
     m_timerRunning = false; // stop timer on win
     std::string statTime = FormatElapsedTime(m_elapsedTime);
-    std::string statCoins = "0";
-    std::string statShells = "0/3";
+    std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins());
+    std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells());
     std::string statLevelNum = "Level 1";
     std::string statLevelName = "Barbershop";
 
@@ -730,7 +730,29 @@ void WinLoseLogicSystem::TriggerWin()
     ratingBadgeT->scaleX = 160.0f * uiScale;
     ratingBadgeT->scaleY = 140.0f * uiScale;
     auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
-    ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
+
+    float score = CalculateRating();
+    if (score >= 85.0f)
+    {
+        ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_S.png"));
+    }
+    else if (score >= 75.0f)
+    {
+        ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_A.png"));
+    }
+    else if (score >= 65.0f)
+    {
+        ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_B.png"));
+    }
+    else if (score >= 50.0f)
+    {
+        ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_C.png"));
+    }
+    else
+    {
+        ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
+    }
+
     ratingBadgeR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     ratingBadgeR->SetLayer(102);
 
@@ -1385,4 +1407,16 @@ void WinLoseLogicSystem::DestroyLoseScreen()
     hoveredButtonName.clear();
 
     std::cout << "[WinLoseLogic] Lose screen destroyed and state reset" << std::endl;
+}
+
+// helper function
+float WinLoseLogicSystem::CalculateRating() const
+{
+    //(10000 / elapsedTime) * 1000 + (pickups * 500)
+    // HARD CODED FOR NOW
+    int scorepercentage = 60 - m_elapsedTime / 60;
+    float currScore = (scorepercentage * 100) + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50);
+    float totalScore = 100 + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50);
+    std::cout << "CalculateRating(): " << (currScore / totalScore) * 100 << '\n';
+    return (currScore / totalScore) * 100;
 }

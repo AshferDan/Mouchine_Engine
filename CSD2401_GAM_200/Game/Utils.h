@@ -31,13 +31,13 @@ Technology is prohibited.
 class PickupSystem
 {
 public:
-	PickupSystem() : _coins{}, _shells{}, currCoins{}, currShells{}
+	PickupSystem() : _coins{}, _shells{3}, currCoins{}, currShells{}
 	{
 		// prolly dont need this? bc it gets init on scene start anyw
 		//InitPickups();
 	}
 
-	void CollectCoin() { currCoins++; std::cout << "\n\n\n\n\n\n"; }
+	void CollectCoin() { currCoins++; }
 	void CollectShell() { currShells++; }
 
 	void SetTotalCoins(int val) { _coins = val; }
@@ -63,6 +63,12 @@ public:
 				_shells++;
 			}
 		}
+	}
+
+	~PickupSystem()
+	{
+		std::cout << "PickupSystem destructed\n";
+		currCoins = currShells = _coins = _shells = 0;
 	}
 public:
 	int _coins,  _shells;
