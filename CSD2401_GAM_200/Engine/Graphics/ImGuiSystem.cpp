@@ -541,6 +541,10 @@ void ImGuiSystem::Update(float dt)
                         // Select the new GameObject
                         SetSelectedGameObject(newGO->GetID());
 
+                        LevelEditor* editor = CORE->GetLevelEditor();
+                        if (editor)
+                            UndoTracker::RecordCreation(newGO, editor, factory);
+
                         std::cout << "[Viewport] Created sprite GameObject: " << spriteName << std::endl;
                     }
                 }
@@ -999,7 +1003,11 @@ void ImGuiSystem::Hierarchy_Render()
             GameObject* goParent = go->GetParent();
             if (goParent)
             {
+                json beforeUnparentJson = Serialization::SerializeGameObject(go);
                 goParent->RemoveChild(go);
+                LevelEditor* editor = CORE->GetLevelEditor();
+                if (editor)
+                    UndoTracker::RecordInstantChange(go, editor, beforeUnparentJson);
             }
         }
     }
@@ -2359,10 +2367,10 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
-                if (ImGui::Button("Press Here to add DND Slot"))
+               /* if (ImGui::Button("Press Here to add DND Slot"))
                 {
                     transform->AddDragDropSlot("todayisaBADday", PrefabPayloadID);
-                }
+                }*/
 
                 if (transform->GetPropertySlots().size())
                 {
