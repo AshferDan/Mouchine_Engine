@@ -539,11 +539,6 @@ namespace CSharpScript
         static bool resetSkid = false;
         public void OnFixedUpdate(float fixedDeltaTime)
         {
-            if (Input.GetKeyHeld(Input.KeyCode.V))
-            {
-                IsBeingKnockedBack = true;
-            }
-
             //Debug.Log(currState.ToString());
             //Debug.Log(_isGrounded.ToString());
             //if (_isFacingRight) Debug.Log("right");
@@ -607,7 +602,7 @@ namespace CSharpScript
                 }
 
                 // wall bonk trigger
-                if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold && currState != PlayerState.WallJumping)
+                if (_isTouchingWall && _isGrounded && movespeed >= MoveStats.T3_Threshold && currState != PlayerState.WallJumping && currState != PlayerState.WallSliding)
                 {
                     HandleWallBonk();
                     return;
@@ -1257,7 +1252,20 @@ namespace CSharpScript
         static float wallslideTime = 0f;
         private void WallSlide()
         {
-            if (_isGrounded || IsBeingKnockedBack || InputManager.FastDropWasPressed)
+            if (_isGrounded)                    // flip when grounded on wall slide
+            {
+                if (_isWallSliding)
+                {
+                    _isWallSliding = false;
+                    _facingDirection = _facingDirection == 1 ? -1 : 1;
+                    Turn(_facingDirection == 1);
+                    Physics.SetVelocity(OwnerName, 0f,0f);
+                    movespeed = 0;
+                }
+                return;
+            }
+
+            if (IsBeingKnockedBack || InputManager.FastDropWasPressed)
             {
                 if (_isWallSliding)
                 {
@@ -1277,6 +1285,7 @@ namespace CSharpScript
                     currState = PlayerState.WallSliding;
                     EnterState(currState);
                     StopRoll();
+                    Physics.SetVelocity(OwnerName, 0f, 0f);
 
                     // reset jumps if want wall sliding to refresh double jump
                     _numberOfJumpsUsed = 0;
@@ -1293,7 +1302,7 @@ namespace CSharpScript
                 wallslideTime += fixeddt;
 
                 // apply friction/slide speed
-                Physics.SetVelocity(OwnerName, Physics.GetVelocity(OwnerName).x, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
+                Physics.SetVelocity(OwnerName, 0f, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
             }
             else
             {

@@ -1,19 +1,19 @@
 {
     "GameObjects": [
         {
-            "name": "Spike_Hazard(11)",
-            "localID": 129,
+            "name": "HZ_Spike_Double",
+            "localID": 7,
             "parentID": 4294967295,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    9341.830078125,
-                    2639.0
+                    517.3479614257813,
+                    -24.267162322998047
                 ],
                 "scale": [
-                    168.0,
-                    100.0
+                    495.0,
+                    150.0
                 ],
                 "rotation": 0.0
             },
@@ -29,9 +29,9 @@
                 ],
                 "layer": 0,
                 "screenSpace": false,
-                "tileable": false,
+                "tileable": true,
                 "tileCount": [
-                    1.0,
+                    2.0,
                     1.0
                 ]
             },
@@ -67,7 +67,36 @@
                     }
                 ]
             },
-            "children": []
+            "children": [
+                {
+                    "name": "Spike_Collider",
+                    "localID": 8,
+                    "parentID": 7,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            517.3479614257813,
+                            -90.86384582519531
+                        ],
+                        "scale": [
+                            383.0,
+                            117.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Enemy",
+                        "size": [
+                            383.0,
+                            117.0
+                        ]
+                    },
+                    "children": []
+                }
+            ]
         }
     ]
 }
