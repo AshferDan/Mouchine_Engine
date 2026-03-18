@@ -577,6 +577,8 @@ namespace CSharpScript
             if (_isGrounded) _groundedTimer += fixeddt;
             else _groundedTimer = 0f;
 
+            HandleBlinkEffect();
+
             if (!_isZiplining || !IsBeingKnockedBack) // && !_isBeingLaunched)
             {
                 // gravity logic
@@ -1733,8 +1735,8 @@ namespace CSharpScript
 
         static float elapsedTime = 0f;
         static float stunTime = 0f;
-        static float currX = 200f;
-        static float currY = 400f;
+        static float currX = 340;
+        static float currY = 500f;
         static bool HurtTrigger = false;
         private void HandleKnockback()
         {
@@ -1751,8 +1753,8 @@ namespace CSharpScript
                 if (elapsedTime < MoveStats.knockbackTime)
                 {
                     elapsedTime += fixeddt;
-                    currX = Utils.MathfMoveTowards(currX, MoveStats.KnockbackForce.x, 1500f * fixeddt);
-                    currY = Utils.MathfMoveTowards(currY, MoveStats.KnockbackForce.y, 2500f * fixeddt);
+                    currX = Utils.MathfMoveTowards(currX, MoveStats.KnockbackForce.x, 2500f * fixeddt);
+                    currY = Utils.MathfMoveTowards(currY, MoveStats.KnockbackForce.y, 3500f * fixeddt);
                     float xDir = _isFacingRight ? -currX : currX;
                     Physics.SetVelocity(OwnerName, xDir, currY);
                     return;
@@ -1772,8 +1774,8 @@ namespace CSharpScript
                     {
                         IsBeingKnockedBack = false;
                         elapsedTime = stunTime = 0f;
-                        currX = 200f;
-                        currY = 400f;
+                        currX = 340f;
+                        currY = 500f;
                         _isFastFalling = false;
                         HurtTrigger = false;
                     }
@@ -1790,6 +1792,8 @@ namespace CSharpScript
                     // take dmg
                     IsBeingKnockedBack = true;
                     _hurtTimer = MoveStats.HurtImmunityLength;
+                    isVisible = true;
+                    intervalTimer = 0f;
                 }
             }
         }
@@ -1805,6 +1809,33 @@ namespace CSharpScript
         {
             t = Utils.MathfClamp(t, 0, 1);
             return new vec2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+        }
+
+        // when the player takes damage and become invuln for a few seconds
+        private float intervalTimer = 0f;
+        private bool isVisible = false;
+        private void HandleBlinkEffect()
+        {
+            float defaultAlpha = Graphics.GetColor(OwnerName).z;
+
+            if (_hurtTimer >= 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration)
+            {
+                intervalTimer += fixeddt;
+
+                if (intervalTimer >= MoveStats.hurtBlinkInterval)
+                {
+                    isVisible = !isVisible;
+                    Graphics.SetAlpha(OwnerName, isVisible ? defaultAlpha : defaultAlpha * 0.4f);
+                    intervalTimer = 0f;
+                }
+            }
+            else
+            {
+                // Immunity ended, restore alpha
+                isVisible = false;
+                intervalTimer = 0f;
+                Graphics.SetAlpha(OwnerName, defaultAlpha);
+            }
         }
 
         float footstepTimer = 0.0f;

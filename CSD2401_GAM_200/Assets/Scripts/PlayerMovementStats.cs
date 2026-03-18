@@ -142,8 +142,9 @@ namespace CSharpScript
         // Knockback
         public vec2 KnockbackForce = new vec2(937.5f, 1250f);           // 30f * mod, 40f * mod
         public vec2 KnockbackFriction = new vec2(2656.25f, 0f);         // 85f * mod
-        public float knockbackTime = 0.3f;
+        public float knockbackTime = 0.2f;
         public float hurtStunDuration = 0.75f;
+        public float hurtBlinkInterval = 0.2f;
 
         // Zipline
         public float ZiplineSpeed = 937.5f;                             // 30f * mod
@@ -156,7 +157,7 @@ namespace CSharpScript
 
         // Damage Taken/ Hurt
         public float HazardTimeDeduction = 1.0f;
-        public float HurtImmunityLength = 2.0f;
+        public float HurtImmunityLength = 4.0f;
 
         // Time Deduction Penalties
         public float JumpTimeDeduction = 1.0f;
