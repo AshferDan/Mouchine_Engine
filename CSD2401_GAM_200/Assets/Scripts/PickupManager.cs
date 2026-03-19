@@ -76,7 +76,10 @@ namespace CSharpScript
                 int goID = Scripting.GetCollidingObjectID(OwnerName, (int)CollisionLayer.Pickup);
                 if (goID <= 0) return;
 
-                if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Coin_Name))
+                string goName = GameObject.FindGameObjectByID(goID);
+                if (string.IsNullOrEmpty(goName)) return;   // object already destroyed or invalid
+
+                if (goName.Contains(Pickup_Coin_Name))
                 {
                     // coin effect
                     Pickups.CollectCoin();
@@ -85,13 +88,13 @@ namespace CSharpScript
                     int variation = rnd.Next(1, 4);
                     Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "sfx");
                 }
-                else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_Shell_Name))
+                else if (goName.Contains(Pickup_Shell_Name))
                 {
                     // shell effect
                     Pickups.CollectShell();
                     Audio.PlaySound("PU_Shell_sfx", "sfx");
                 }
-                else if (GameObject.FindGameObjectByID(goID).Contains(Pickup_PowerUp_Name))
+                else if (goName.Contains(Pickup_PowerUp_Name))
                 {
                     // powerup effect
                     //check if time or speed

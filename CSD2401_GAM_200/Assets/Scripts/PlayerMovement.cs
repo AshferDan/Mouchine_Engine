@@ -1814,12 +1814,15 @@ namespace CSharpScript
         // when the player takes damage and become invuln for a few seconds
         private float intervalTimer = 0f;
         private bool isVisible = false;
+        private bool _blinkRestoredAlpha = true;    // tracks whether alpha has been restored after immunity ended
         private void HandleBlinkEffect()
         {
-            float defaultAlpha = Graphics.GetColor(OwnerName).z;
+            bool inBlinkWindow = _hurtTimer > 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration;
 
-            if (_hurtTimer >= 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration)
+            if (inBlinkWindow)
             {
+                _blinkRestoredAlpha = false;
+                float defaultAlpha = Graphics.GetColor(OwnerName).w;
                 intervalTimer += fixeddt;
 
                 if (intervalTimer >= MoveStats.hurtBlinkInterval)
@@ -1829,12 +1832,14 @@ namespace CSharpScript
                     intervalTimer = 0f;
                 }
             }
-            else
+            else if (!_blinkRestoredAlpha)
             {
-                // Immunity ended, restore alpha
+                // Immunity ended — restore alpha only once
                 isVisible = false;
                 intervalTimer = 0f;
+                float defaultAlpha = Graphics.GetColor(OwnerName).w;
                 Graphics.SetAlpha(OwnerName, defaultAlpha);
+                _blinkRestoredAlpha = true;
             }
         }
 
@@ -2010,6 +2015,7 @@ namespace CSharpScript
         {
             if (Collision.Raycast(OwnerName, origin, direction, length, out string hitObject, out float hitDistance))
             {
+                if (string.IsNullOrEmpty(hitObject)) return false;
                 if (Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Ground || Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Enemy)
                 {
                     return true;
@@ -2069,6 +2075,7 @@ namespace CSharpScript
         {
             if (Collision.Raycast(OwnerName, origin, direction, length, out string hitObject, out float hitDistance))
             {
+                if (string.IsNullOrEmpty(hitObject)) return false;
                 // Assuming walls are also on the Ground layer as per the C++ enum comment
                 if (Collision.GetCollisionLayer(hitObject) == (int)CollisionLayer.Ground)
                 {

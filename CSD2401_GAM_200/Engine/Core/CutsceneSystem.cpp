@@ -198,7 +198,7 @@ void CutsceneSystem::StopCutscene() {
 			trans->StartLoadScreenOnly("../Assets/loading.gif", []() {
 				CameraManager::Instance().ResetState();
 				LevelEditor* level = CORE->GetLevelEditor();
-				level->LoadLevel("../Assets/Scenes/M4_LEVEL_FIXED.json");
+				level->LoadLevel("../Assets/Scenes/Level_1.json");
 				if (CORE->GetGameCallbacks()) CORE->GetGameCallbacks()->OnSceneLoadReinit();
 				level->EnterPlayMode();
 				CORE->SetGamePaused(false);
