@@ -183,12 +183,29 @@ static void Internal_SetColor(MonoString *objectName, float r, float g, float b,
     mono_free(name);
 }
 
-static vec4 Internal_GetColor(MonoString* objectName)
+static void Internal_GetColor(MonoString* objectName, float* r, float* g, float* b, float* a)
 {
+    if (!objectName)
+    {
+        std::cerr << "[ScriptSystem] ERROR: GetColor called with null objectName\n";
+        *r = 0.0f; *g = 0.0f; *b = 0.0f; *a = 1.0f;
+        return;
+    }
+
     char* name = mono_string_to_utf8(objectName);
+    if (!name)
+    {
+        std::cerr << "[ScriptSystem] ERROR: mono_string_to_utf8 returned null\n";
+        *r = 0.0f; *g = 0.0f; *b = 0.0f; *a = 1.0f;
+        return;
+    }
+
     vec4 result = API::GetColor(name);
+    *r = result.x;
+    *g = result.y;
+    *b = result.z;
+    *a = result.w;
     mono_free(name);
-    return result;
 }
 
 static void Internal_SetAlpha(MonoString *objectName, float alpha)
@@ -526,12 +543,29 @@ static void Internal_SetTextColor(MonoString* objectName, float r, float g, floa
     mono_free(name);
 }
 
-static vec4 Internal_GetTextColor(MonoString* objectName)
+static void Internal_GetTextColor(MonoString* objectName, float* r, float* g, float* b, float* a)
 {
+    if (!objectName)
+    {
+        std::cerr << "[ScriptSystem] ERROR: GetTextColor called with null objectName\n";
+        *r = 1.0f; *g = 1.0f; *b = 1.0f; *a = 1.0f;
+        return;
+    }
+
     char* name = mono_string_to_utf8(objectName);
+    if (!name)
+    {
+        std::cerr << "[ScriptSystem] ERROR: mono_string_to_utf8 returned null\n";
+        *r = 1.0f; *g = 1.0f; *b = 1.0f; *a = 1.0f;
+        return;
+    }
+
     vec4 result = API::GetTextColor(name);
+    *r = result.x;
+    *g = result.y;
+    *b = result.z;
+    *a = result.w;
     mono_free(name);
-    return result;
 }
 
 static void Internal_SetTextScale(MonoString* objectName, float scale)
@@ -738,6 +772,23 @@ static void Internal_SetCameraMode(int mode) {
 static void Internal_CameraFlash(float duration, float r, float g, float b, float a, bool fadeout, float camShakeStrength)
 {
     API::CameraFlash(duration, {r, g, b, a}, fadeout, camShakeStrength);
+}
+
+static void Internal_SetCameraFollowOffset(float x, float y)
+{
+    API::SetCameraFollowOffset(x, y);
+}
+
+static void Internal_GetCameraFollowOffset(float* outX, float* outY)
+{
+    vec2 offset = API::GetCameraFollowOffset();
+    if (outX) *outX = offset.x;
+    if (outY) *outY = offset.y;
+}
+
+static int Internal_CountAllGameObjects()
+{
+    return GameObjectFactory::Instance().CountAllGameObjects();
 }
 
 
@@ -1486,6 +1537,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::DestroyByName",       (void *)Internal_DestroyByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
+    mono_add_internal_call("CSharpScript.GameObject::CountAll",             (void *)Internal_CountAllGameObjects);
 
     // === Transform ===
     mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);
@@ -1502,7 +1554,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Graphics::SetTexture", (void *)Internal_SetTexture);
     mono_add_internal_call("CSharpScript.Graphics::SetColor", (void *)Internal_SetColor);
     mono_add_internal_call("CSharpScript.Graphics::SetAlpha", (void *)Internal_SetAlpha);
-    mono_add_internal_call("CSharpScript.Graphics::GetColor", (void*)Internal_GetColor);
+    mono_add_internal_call("CSharpScript.Graphics::GetColor_Internal", (void*)Internal_GetColor);
     mono_add_internal_call("CSharpScript.Graphics::SetRenderLayer", (void *)Internal_SetRenderLayer);
     mono_add_internal_call("CSharpScript.Graphics::GetRenderLayer", (void *)Internal_GetRenderLayer);
     mono_add_internal_call("CSharpScript.Graphics::SetLayerVisible", (void *)Internal_SetLayerVisible);
@@ -1551,7 +1603,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Text::SetText", (void*)Internal_SetText);
     mono_add_internal_call("CSharpScript.Text::GetText", (void*)Internal_GetText);
     mono_add_internal_call("CSharpScript.Text::SetTextColor", (void*)Internal_SetTextColor);
-    mono_add_internal_call("CSharpScript.Text::GetTextColor", (void*)Internal_GetTextColor);
+    mono_add_internal_call("CSharpScript.Text::GetTextColor_Internal", (void*)Internal_GetTextColor);
     mono_add_internal_call("CSharpScript.Text::SetTextScale", (void*)Internal_SetTextScale);
     mono_add_internal_call("CSharpScript.Text::GetTextScale", (void*)Internal_GetTextScale);
     mono_add_internal_call("CSharpScript.Text::SetTextScreenSpace", (void*)Internal_SetTextScreenSpace);
@@ -1605,6 +1657,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Camera::GetZoom", (void*)Internal_GetCameraZoom);
     mono_add_internal_call("CSharpScript.Camera::GetMode", (void*)Internal_GetCameraMode);
     mono_add_internal_call("CSharpScript.Camera::CameraFlash", (void*)Internal_CameraFlash);
+    mono_add_internal_call("CSharpScript.Camera::SetFollowOffset", (void*)Internal_SetCameraFollowOffset);
+    mono_add_internal_call("CSharpScript.Camera::GetFollowOffset_Internal", (void*)Internal_GetCameraFollowOffset);
 
     // === Collision Queries ===
     mono_add_internal_call("CSharpScript.Collision::Raycast_Internal", (void*)Internal_Raycast);
