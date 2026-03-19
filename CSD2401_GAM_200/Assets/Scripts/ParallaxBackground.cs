@@ -112,7 +112,7 @@ namespace CSharpScript
         // are present in the scene. Called from OnStart and lazily from OnUpdate.
         private void TryInitLayer(int i)
         {
-            if (layerNames == null || layerNames[i] == "") return;
+            if (layerNames == null || string.IsNullOrEmpty(layerNames[i])) return;
 
             // Main copy
             if (!inited[i])
