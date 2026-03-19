@@ -1,0 +1,69 @@
+{
+    "GameObjects": [
+        {
+            "name": "PU_Shell",
+            "localID": 192,
+            "parentID": 191,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    15893.451171875,
+                    2944.388916015625
+                ],
+                "scale": [
+                    200.0,
+                    200.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/seashell_spritesheet.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Coin",
+                "animations": [
+                    {
+                        "name": "Pickup_Coin",
+                        "filepath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                        "rows": 3,
+                        "cols": 8,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 2,
+                        "endCol": 7,
+                        "fps": 12.0,
+                        "pingPong": true,
+                        "flipRows": true
+                    }
+                ]
+            },
+            "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                    200.0,
+                    200.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}

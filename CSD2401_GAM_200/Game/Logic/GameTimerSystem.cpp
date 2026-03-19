@@ -29,9 +29,10 @@ Technology is prohibited.
  */
 void GameTimerSystem::Initialize()
 {
-    remainingTime = 60.0f;
+    remainingTime = LevelTimerLength;
     lastDisplayedSeconds = 60;
     hasTriggeredTimeUp = false;
+    hasTriggeredPanicSound = false;
 
     // Reset bar scaling variables
     originalScaleX = 0.0f;
@@ -158,6 +159,7 @@ void GameTimerSystem::Update(float dt)
             remainingTime = 60.0f;
             lastDisplayedSeconds = 60;
             hasTriggeredTimeUp = false;
+            hasTriggeredPanicSound = false;
 
             auto* renderComp = timerGO->GetComponent<RenderComponent>();
             auto* transformComp = timerGO->GetComponent<TransformComponent>();
@@ -198,6 +200,13 @@ void GameTimerSystem::Update(float dt)
             remainingTime -= dt;
         }
 
+        if (remainingTime <= 10.0f && !hasTriggeredPanicSound)
+        {
+            hasTriggeredPanicSound = true;
+            CORE->GetAudioManager()->PlaySound("timer_ending");
+            std::cout << "Triggered panic timer (10 seconds left)\n";
+        }
+
         // check for lose condition aka time ran out
         if (remainingTime <= 0.0f && !hasTriggeredTimeUp)
         {
@@ -232,6 +241,7 @@ void GameTimerSystem::ResetTimer()
     remainingTime = 30.0f;
     lastDisplayedSeconds = 30;
     hasTriggeredTimeUp = false;
+    hasTriggeredPanicSound = false;
 
     // Reset bar scaling variables
     originalScaleX = 0.0f;

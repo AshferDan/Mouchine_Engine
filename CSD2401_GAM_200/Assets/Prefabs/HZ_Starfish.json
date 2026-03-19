@@ -1,0 +1,115 @@
+{
+    "GameObjects": [
+        {
+            "name": "HZ_Starfish",
+            "localID": 10,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    1287.936279296875,
+                    27.0
+                ],
+                "scale": [
+                    364.4999694824219,
+                    311.03997802734375
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                    {
+                        "name": "Candle",
+                        "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                        "rows": 1,
+                        "cols": 4,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 2,
+                        "fps": 5.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Starfish",
+                        "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                        "rows": 1,
+                        "cols": 4,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 3,
+                        "fps": 5.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    },
+                    {
+                        "name": "Urchin",
+                        "filepath": "../Assets/Sprites/Sheets/Evil_Starfish_Spritesheet.png",
+                        "rows": 1,
+                        "cols": 4,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 2,
+                        "fps": 5.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    }
+                ]
+            },
+            "children": [
+                {
+                    "name": "Spike_Collider",
+                    "localID": 12,
+                    "parentID": 10,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            1263.111328125,
+                            -13.322591781616211
+                        ],
+                        "scale": [
+                            134.7570037841797,
+                            160.66400146484375
+                        ],
+                        "rotation": 0.0
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Enemy",
+                        "size": [
+                            134.7570037841797,
+                            160.66400146484375
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

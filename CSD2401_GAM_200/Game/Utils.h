@@ -25,30 +25,32 @@ Technology is prohibited.
 
 // Just a bunch of game related utility/ helper functions
 
-//namespace Pickups
-//{
-//	
-//
-//	struct Pickup
-//	{
-//		PickupType pickupType;
-//		float x, y;
-//		float value;
-//		bool collected = false;
-//	};
-//
-//	void PopulatePickups(std::vector<Pickup>& LevelPickups);
-//}
-//enum PickupType
-//{
-//	Coin = 0,
-//	Shell
-//};
-
+/**
+ * @brief System responsible for handling pickup data. Collisions are entirely handled in c#, this is in c++ for easier accessing and serialising.
+ */
 class PickupSystem
 {
 public:
-	PickupSystem() : _coins{}, _shells{}, currCoins{}, currShells{}
+	PickupSystem() : _coins{}, _shells{3}, currCoins{}, currShells{}
+	{
+		// prolly dont need this? bc it gets init on scene start anyw
+		//InitPickups();
+	}
+
+	void CollectCoin() { currCoins++; }
+	void CollectShell() { currShells++; }
+
+	void SetTotalCoins(int val) { _coins = val; }
+	void SetTotalShells(int val) { _shells = val; }
+	int GetTotalCoins() const { return _coins; }
+	int GetTotalShells() const { return _shells; }
+
+	void SetCurrentCoins(int val) { currCoins = val; }
+	void SetCurrentShells(int val) { currShells = val; }
+	int GetCurrentCoins() const { return currCoins; }
+	int GetCurrentShells() const { return currShells; }
+
+	void InitPickups()
 	{
 		for (auto const& go : GameObjectFactory::Instance().GetAllGameObjects())
 		{
@@ -63,19 +65,12 @@ public:
 		}
 	}
 
-	void CollectCoin() { currCoins++; }
-	void CollectShell() { currShells++; }
-
-	void SetTotalCoins(int val) { _coins = val; }
-	void SetTotalShells(int val) { _shells = val; }
-	int GetTotalCoins()  const { return _coins; }
-	int GetTotalShells() const { return _shells; }
-
-	void SetCurrentCoins(int val) { currCoins = val; }
-	void SetCurrentShells(int val) { currShells = val; }
-	int GetCurrentCoins() const { return currCoins; }
-	int GetCurrentShells() const { return currShells; }
-private:
+	~PickupSystem()
+	{
+		std::cout << "PickupSystem destructed\n";
+		currCoins = currShells = _coins = _shells = 0;
+	}
+public:
 	int _coins,  _shells;
 	int currCoins, currShells;
 };

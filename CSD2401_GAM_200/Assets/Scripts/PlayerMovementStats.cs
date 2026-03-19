@@ -107,16 +107,16 @@ namespace CSharpScript
         public float GlideCooldown = 0.2f;
 
         // Wall Jump
-        public vec2 WallJumpForce = new vec2(625f, 937.5f);             // 20f * mod, 30f * mod
+        public vec2 WallJumpForce = new vec2(1100.0f, 950.0f);             // 22f * mod, 35f * mod
         public float WallCoyoteTime = 0.1f;
 
         // Wall Kick
-        public float WallSlidingSpeed = 125f;                           // 4f * mod
+        public float WallSlidingSpeed = 250.0f;                           // 10f * mod
         public float WallSlidingTimeToTriggerSound = 0.25f;             // very long name i dont care i dont care i don
         public float WallSlideRestickCooldown = 0.5f;                   // cooldown for remagnetising back to wall aft pressing S to cancel wallslide
         public float WKBaseDuration = 0.25f;
         public float WKSpeedModifier = 1093.75f;                        // 35f * mod
-        public float WKVerticalModifier = 218.75f;                      // 7f * mod
+        public float WKVerticalModifier = 312.5f;                      // 10f * mod
         public float WKDurationMultiplier = 0.75f;
         // dont have tht WKEase graph thing in unity
 
@@ -142,8 +142,9 @@ namespace CSharpScript
         // Knockback
         public vec2 KnockbackForce = new vec2(937.5f, 1250f);           // 30f * mod, 40f * mod
         public vec2 KnockbackFriction = new vec2(2656.25f, 0f);         // 85f * mod
-        public float knockbackTime = 0.3f;
+        public float knockbackTime = 0.2f;
         public float hurtStunDuration = 0.75f;
+        public float hurtBlinkInterval = 0.2f;
 
         // Zipline
         public float ZiplineSpeed = 937.5f;                             // 30f * mod
@@ -156,7 +157,7 @@ namespace CSharpScript
 
         // Damage Taken/ Hurt
         public float HazardTimeDeduction = 1.0f;
-        public float HurtImmunityLength = 2.0f;
+        public float HurtImmunityLength = 4.0f;
 
         // Time Deduction Penalties
         public float JumpTimeDeduction = 1.0f;

@@ -65,7 +65,8 @@ bool CollisionSystem::ShouldCollide(CollisionLayer layer1, CollisionLayer layer2
         return (other == CollisionLayer::Ground ||
             other == CollisionLayer::Enemy ||
             other == CollisionLayer::Platform ||
-            other == CollisionLayer::Player);
+            other == CollisionLayer::Player ||
+            other == CollisionLayer::Pickup);
     }
 
     if (layer1 == CollisionLayer::Enemy || layer2 == CollisionLayer::Enemy)

@@ -404,6 +404,7 @@ void ImGuiSystem::Initialize()
     IMGUI_CHECKVERSION();   // Verify ImGui version
     ImGui::CreateContext(); // Create ImGui context
     // IO object (moved to EditorLayout_Load)
+    ImGui::GetIO().FontGlobalScale = 1.5f;
     ImGui::StyleColorsDark();                                     // Set dark theme
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);                 // Initialize GLFW backend
     ImGui_ImplOpenGL3_Init("#version 450");                       // Initialize OpenGL backend
@@ -2515,11 +2516,6 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
-               /* if (ImGui::Button("Press Here to add DND Slot"))
-                {
-                    transform->AddDragDropSlot("todayisaBADday", PrefabPayloadID);
-                }*/
-
                 if (transform->GetPropertySlots().size())
                 {
                     for (auto& slot : transform->GetPropertySlots())
@@ -3683,7 +3679,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     static bool        isPlayingDraft = false;
     static int         draftPreviewDir = 1;   // 1 forward, -1 backward
 
-    // Left-column GO preview state — kept as statics so playback advances
+    // Left-column GO preview state ï¿½ kept as statics so playback advances
     static int         goFrameRow = 0;
     static int         goFrameCol = 0;
     static float       goFrameTimer = 0.0f;
@@ -3908,7 +3904,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
     int columnCount = (fromGO && obj) ? 2 : 1;
     ImGui::Columns(columnCount, "PreviewSplit", true);
 
-    // LEFT COLUMN — current GameObject preview
+    // LEFT COLUMN ï¿½ current GameObject preview
     if (fromGO)
     {
         if (!obj)
@@ -4016,7 +4012,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                     ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 0.2f)
                 );
 
-                // Animation dropdown — lists registered clips on the spritesheet.
+                // Animation dropdown ï¿½ lists registered clips on the spritesheet.
                 {
                     const auto& reg = ss->GetAnimationRegistry();
                     std::vector<const char*> names;
@@ -4099,7 +4095,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
         ImGui::NextColumn();
     }
 
-    // RIGHT COLUMN — draft preview + authoring
+    // RIGHT COLUMN ï¿½ draft preview + authoring
     ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.4f, 1.0f), draftTexID ? "EDIT / PREVIEW" : "DRAG SPRITE HERE");
 
     std::string dropped;
@@ -4493,7 +4489,7 @@ void ImGuiSystem::RenderAnimationPreviewer()
                             }
                             else
                             {
-                                // No saved clip selected — apply from the live name/range inputs
+                                // No saved clip selected ï¿½ apply from the live name/range inputs
                                 std::string oneName(actionName);
                                 if (!oneName.empty())
                                 {
@@ -4510,14 +4506,14 @@ void ImGuiSystem::RenderAnimationPreviewer()
                                 }
                                 else
                                 {
-                                    std::cout << "[AnimPreview] No clip selected and no name entered — nothing applied.\n";
+                                    std::cout << "[AnimPreview] No clip selected and no name entered ï¿½ nothing applied.\n";
                                 }
                             }
                         }
                     }
                     else
                     {
-                        // Static texture — remove Spritesheet if it was there
+                        // Static texture ï¿½ remove Spritesheet if it was there
                         if (ss)
                         {
                             obj->RemoveComponent<Spritesheet>();
