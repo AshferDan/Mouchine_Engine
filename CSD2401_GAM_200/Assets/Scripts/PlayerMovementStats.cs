@@ -60,6 +60,10 @@ namespace CSharpScript
         public float T3_SkidDuration = 0.8f;
         public float SkidExitSpeed = 100f;
 
+        // Speed boost
+        public float Speed_Multiplier = 1.5f;
+        public float Speed_Duration = 5f;
+
         // Wall Bonk
         public float T3_BonkDuration = 0.65f;
         public Vector2 T3_BonkForce = new Vector2(562.5f, 312.5f);        // 18f * mod, 10f * mod

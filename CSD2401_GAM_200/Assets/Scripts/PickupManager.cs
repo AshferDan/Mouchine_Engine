@@ -28,7 +28,8 @@ namespace CSharpScript
     {
         public string Pickup_Coin_Name = "PU_Coin";
         public string Pickup_Shell_Name = "PU_Shell";
-        public string Pickup_PowerUp_Name = "PU_Powerup";
+        public string Pickup_Speed_Name = "PU_Speed";
+        public string Pickup_Time_Name = "PU_Time";
 
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
@@ -94,10 +95,15 @@ namespace CSharpScript
                     Pickups.CollectShell();
                     Audio.PlaySound("PU_Shell_sfx", "sfx");
                 }
-                else if (goName.Contains(Pickup_PowerUp_Name))
+                else if (goName.Contains(Pickup_Speed_Name))
                 {
                     // powerup effect
-                    //check if time or speed
+                    Audio.PlaySound("PU_Speed_sfx", "sfx");
+                    PlayerMovement.triggerSpeedBoost = true;
+                }
+                else if (goName.Contains(Pickup_Time_Name))
+                {
+                    // powerup effect
                     Audio.PlaySound("PU_Time_sfx", "sfx");
                 }
                 else

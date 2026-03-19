@@ -20,6 +20,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Resources;
+using System.Collections.Generic;
 
 namespace CSharpScript
 {
@@ -52,6 +53,10 @@ namespace CSharpScript
         private PlayerState[] nonTrackingVFX = { PlayerState.Jumping, PlayerState.WallJumping, PlayerState.WallKicking, PlayerState.Land, PlayerState.Rolling};
         private float[] footstepFrequencies = { 0.47f, 0.3f, 0.25f, 0.2f };       // walking - tier1 - tier2- tier3
         private float minFootstepDistance = 5.0f;
+        public static bool triggerSpeedBoost = false;
+        private bool speedBoostActive = false;
+
+        List<uint> NPCs = new List<uint>();
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
@@ -170,6 +175,7 @@ namespace CSharpScript
         private float _hurtTimer = 0f;
 
         public string vfx = "Hero_vfx";
+        public string pu_vfx = "Pickup_vfx";
         public string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
 
@@ -208,7 +214,41 @@ namespace CSharpScript
                     false
                 );
             }
+            if (GameObject.FindGameObjectByName(pu_vfx) == "")
+            {
+                CSharpScript.GameObject.CreateAnimatedImage(
+                    pu_vfx,
+                    0, 0,
+                    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
+                    "../Assets/spritesheet_player_vfx.png",
+                    15, 11,
+                    14, 10, 14, 10,
+                    12.0f,
+                    (int)CSharpScript.CollisionLayer.Player,
+                    false,
+                    false,
+                    false
+                );
+            }
 
+            // ts doesnt work at all btw LMFAOO I HATE THIS
+            int totalGOs = 1;
+            while (GameObject.FindGameObjectByID(totalGOs) != "")
+            {
+                totalGOs++;
+            }
+            Debug.Log("\n\n\n\n\n\n" + totalGOs.ToString());
+
+            for (int i = 0; i < totalGOs; i++)
+            {
+                string currGO = GameObject.FindGameObjectByName("NPC_Lobster");
+                Debug.Log("\n\n\n\n\nGAMEOBJS " + currGO.ToString());
+                if (currGO != "")
+                {
+                    NPCs.Add(uint.Parse(currGO));
+                    Debug.Log(currGO);
+                }
+            }
             // wip to fix the vfx issue
             //CSharpScript.GameObject.CreateAnimatedImage(
             //    vfx_nontracking,
@@ -299,6 +339,11 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero_vfx", "Bonk", "../Assets/spritesheet_player_vfx.png",         15, 11, 5, 0, 5, 2, 4.0f);
             Animation.RegisterAnimation("Hero_vfx", "Zipline", "../Assets/spritesheet_player_vfx.png",      15, 11, 7, 0, 7, 1, 4.0f);
 
+            // Pickup VFX
+            Animation.RegisterAnimation(pu_vfx, "Speed", "../Assets/spritesheet_player_vfx.png",            15, 11, 2, 4, 2, 10, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Time", "../Assets/spritesheet_player_vfx.png",             15, 11, 1, 4, 1, 10, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Clear", "../Assets/spritesheet_player_vfx.png",            15, 11, 14, 10, 14, 10, 0f);
+
             _isFacingRight = true;
 
             Physics.SetGravity(OwnerName, true);
@@ -310,6 +355,9 @@ namespace CSharpScript
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
             Camera.SetZoom(0.5f);
+
+            // starting anims
+            //Animation.PlayAnimation(pu_vfx, "Clear");
         }
 
         bool vfxTracksPlayer;
@@ -318,6 +366,20 @@ namespace CSharpScript
         public override void OnUpdate(float deltaTime)
         {
             if (OwnerName == null || OwnerName == "") return;
+
+            if (Input.GetKeyPressed(Input.KeyCode.L))
+            {
+                triggerSpeedBoost = true;
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.P))
+            {
+                Animation.PlayAnimation(pu_vfx, "Clear");
+            }
+
+            foreach (var a in NPCs)
+            {
+                Debug.Log(a.ToString());
+            }
 
             #region LOBSTER 3D SCISSORS SOUND
             // HARDCODDED LOBSTER SNIPPING SOUND FOR NOW
@@ -534,6 +596,7 @@ namespace CSharpScript
 
 
             Transform.SetPosition(vfx, finalPos.x, finalPos.y - 10f);
+            Transform.SetPosition(pu_vfx, pos.x, pos.y);
         }
 
         static bool resetSkid = false;
@@ -581,6 +644,18 @@ namespace CSharpScript
 
             if (!_isZiplining || !IsBeingKnockedBack) // && !_isBeingLaunched)
             {
+                //speed boost
+                if (triggerSpeedBoost)
+                {
+                    triggerSpeedBoost = false;
+                    speedBoostActive = true;
+                    speedTimer = MoveStats.Speed_Duration;
+                }
+                if (speedBoostActive)
+                {
+                    HandleSpeedBoost();
+                }
+
                 // gravity logic
                 Jump();
 
@@ -784,6 +859,8 @@ namespace CSharpScript
             }
             // determine max speed
             float currentMaxSpeed = isRunHeld ? MoveStats.T3_MaxSpeed : MoveStats.T0_MaxSpeed;
+            if (speedBoostActive) 
+                currentMaxSpeed *= MoveStats.Speed_Multiplier;
 
             // movement logic
             if (targetDirection != 0)
@@ -900,6 +977,11 @@ namespace CSharpScript
             }
 
             _moveVelocity.x = movespeed * moveDir;
+            if (speedBoostActive)
+            {
+                _moveVelocity.x *= MoveStats.Speed_Multiplier;
+                _moveVelocity.y *= MoveStats.Speed_Multiplier;
+            }
             Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
         }
 
@@ -1795,6 +1877,25 @@ namespace CSharpScript
                     isVisible = true;
                     intervalTimer = 0f;
                 }
+            }
+        }
+
+        #endregion
+
+        #region PickUp Effects
+
+        float speedTimer = 0.0f;
+        void HandleSpeedBoost()
+        {
+            if (speedTimer > 0f)
+            {
+                speedTimer -= fixeddt;
+                Animation.PlayAnimation(pu_vfx, "Speed", true);
+            }
+            else
+            {
+                speedBoostActive = false;
+                Animation.PlayAnimation(pu_vfx, "Clear");
             }
         }
 
