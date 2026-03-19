@@ -22,8 +22,8 @@
         "mode": "FOLLOW_TARGET",
         "zoom": 0.5,
         "position": [
-          1041.245849609375,
-          3901.723388671875
+          0.0,
+          0.0
         ],
         "followOffset": [
           -500.0,
@@ -437,6 +437,7 @@
             "GlideFallSpeedMultiplier": 0.5,
             "knockbackTime": 0.30000001192092896,
             "hurtStunDuration": 0.75,
+            "hurtBlinkInterval": 0.20000000298023224,
             "ZiplineSpeed": 937.5,
             "ZiplineAttachDuration": 0.15000000596046448,
             "ZiplineLaunchDuration": 0.25,
@@ -7011,11 +7012,11 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  520.644,
+                  520.6439819335938,
                   920.0
                 ],
                 "scale": [
-                  977.610,
+                  977.6099853515625,
                   100.0
                 ],
                 "rotation": 0.0
@@ -7596,40 +7597,11 @@
               }
             ]
           },
-          "children": [
-            {
-              "name": "Hazard Collider nuh",
-              "localID": 171,
-              "parentID": 170,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  11417.977,
-                  3800.392
-                ],
-                "scale": [
-                  495.000,
-                  143.450
-                ],
-                "rotation": 0.0
-              },
-              "ColliderComponent": {
-                "enabled": true,
-                "shape": "Square",
-                "layer": "Enemy",
-                "size": [
-                  434.000,
-                  110.452
-                ]
-              },
-              "children": []
-            }
-          ]
+          "children": []
         },
         {
           "name": "Spike_Hazard(13)",
-          "localID": 171,
+          "localID": 172,
           "parentID": 162,
           "active": true,
           "TransformComponent": {
@@ -7707,7 +7679,7 @@
         },
         {
           "name": "Spike_Hazard(14)",
-          "localID": 172,
+          "localID": 173,
           "parentID": 162,
           "active": true,
           "TransformComponent": {
@@ -7785,7 +7757,7 @@
         },
         {
           "name": "Spike_Hazard(15)",
-          "localID": 173,
+          "localID": 174,
           "parentID": 162,
           "active": true,
           "TransformComponent": {
@@ -7853,8 +7825,8 @@
           "children": [
             {
               "name": "Hazard Collider(3)",
-              "localID": 174,
-              "parentID": 173,
+              "localID": 175,
+              "parentID": 174,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7883,7 +7855,7 @@
         },
         {
           "name": "Spike_Hazard(16)",
-          "localID": 175,
+          "localID": 176,
           "parentID": 162,
           "active": true,
           "TransformComponent": {
@@ -7951,8 +7923,8 @@
           "children": [
             {
               "name": "Hazard Collider(1)",
-              "localID": 176,
-              "parentID": 175,
+              "localID": 177,
+              "parentID": 176,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7982,8 +7954,36 @@
       ]
     },
     {
+      "name": "Hazard Collider nuh",
+      "localID": 171,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          11417.9765625,
+          3800.39208984375
+        ],
+        "scale": [
+          495.0,
+          143.4499969482422
+        ],
+        "rotation": 0.0
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Enemy",
+        "size": [
+          434.0,
+          110.4520034790039
+        ]
+      },
+      "children": []
+    },
+    {
       "name": "Pickups",
-      "localID": 177,
+      "localID": 178,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8001,8 +8001,8 @@
       "children": [
         {
           "name": "Coins",
-          "localID": 178,
-          "parentID": 177,
+          "localID": 179,
+          "parentID": 178,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8019,8 +8019,8 @@
           "children": [
             {
               "name": "PU_Coin",
-              "localID": 179,
-              "parentID": 178,
+              "localID": 180,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8084,8 +8084,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 180,
-              "parentID": 178,
+              "localID": 181,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8149,8 +8149,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 181,
-              "parentID": 178,
+              "localID": 182,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8214,8 +8214,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 182,
-              "parentID": 178,
+              "localID": 183,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8279,8 +8279,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 183,
-              "parentID": 178,
+              "localID": 184,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8344,8 +8344,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 184,
-              "parentID": 178,
+              "localID": 185,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8409,8 +8409,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 185,
-              "parentID": 178,
+              "localID": 186,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8474,8 +8474,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 186,
-              "parentID": 178,
+              "localID": 187,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8539,8 +8539,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 187,
-              "parentID": 178,
+              "localID": 188,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8604,8 +8604,8 @@
             },
             {
               "name": "PU_Coin(2)",
-              "localID": 188,
-              "parentID": 178,
+              "localID": 189,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8669,8 +8669,8 @@
             },
             {
               "name": "PU_Coin(4)",
-              "localID": 189,
-              "parentID": 178,
+              "localID": 190,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8734,8 +8734,8 @@
             },
             {
               "name": "PU_Coin(5)",
-              "localID": 190,
-              "parentID": 178,
+              "localID": 191,
+              "parentID": 179,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8801,8 +8801,8 @@
         },
         {
           "name": "Shells",
-          "localID": 191,
-          "parentID": 177,
+          "localID": 192,
+          "parentID": 178,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8819,8 +8819,8 @@
           "children": [
             {
               "name": "PU_Shell",
-              "localID": 192,
-              "parentID": 191,
+              "localID": 193,
+              "parentID": 192,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8884,8 +8884,8 @@
             },
             {
               "name": "PU_Shell",
-              "localID": 193,
-              "parentID": 191,
+              "localID": 194,
+              "parentID": 192,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8949,8 +8949,8 @@
             },
             {
               "name": "PU_Shell",
-              "localID": 194,
-              "parentID": 191,
+              "localID": 195,
+              "parentID": 192,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9036,6 +9036,54 @@
         "category": "sfx"
       },
       {
+        "name": "PU_Coin_sfx1",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx2",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin2.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Coin_sfx3",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin3.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Shell_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Shell.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Speed_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Speed.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
+        "name": "PU_Time_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "pickup"
+      },
+      {
         "name": "TurnSkid",
         "filepath": "../Assets/audio/Player/TurnSkid.wav",
         "loop": false,
@@ -9055,7 +9103,7 @@
         "name": "bgm",
         "filepath": "../Assets/audio/sneaky_bgm.wav",
         "loop": true,
-        "volume": 0.08000000298023224,
+        "volume": 0.08000000566244125,
         "pitch": 1.0,
         "category": "bgm"
       },
@@ -9244,6 +9292,22 @@
         "category": "sfx"
       },
       {
+        "name": "scissors_snip",
+        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
+        "loop": true,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "timer_ending",
+        "filepath": "../Assets/Audio/Timer_Ending.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "turnskid_sfx",
         "filepath": "../Assets/audio/Player/TurnSkid.wav",
         "loop": false,
@@ -9290,70 +9354,6 @@
         "volume": 0.10000000149011612,
         "pitch": 0.8999999761581421,
         "category": "sfx"
-      },
-      {
-        "name": "scissors_snip",
-        "filepath": "../Assets/Audio/hairscissors_snip1.wav",
-        "loop": true,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "timer_ending",
-        "filepath": "../Assets/Audio/Timer_Ending.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "PU_Time_sfx",
-        "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
-        "loop": false,
-        "volume": 0.8,
-        "pitch": 1.0,
-        "category": "pickup"
-      },
-      {
-        "name": "PU_Speed_sfx",
-        "filepath": "../Assets/Audio/Pickups/PU_Speed.wav",
-        "loop": false,
-        "volume": 0.8,
-        "pitch": 1.0,
-        "category": "pickup"
-      },
-      {
-        "name": "PU_Shell_sfx",
-        "filepath": "../Assets/Audio/Pickups/PU_Shell.wav",
-        "loop": false,
-        "volume": 0.8,
-        "pitch": 1.0,
-        "category": "pickup"
-      },
-      {
-        "name": "PU_Coin_sfx1",
-        "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
-        "loop": false,
-        "volume": 0.8,
-        "pitch": 1.0,
-        "category": "pickup"
-      },
-      {
-        "name": "PU_Coin_sfx2",
-        "filepath": "../Assets/Audio/Pickups/PU_Coin2.wav",
-        "loop": false,
-        "volume": 0.8,
-        "pitch": 1.0,
-        "category": "pickup"
-      },
-      {
-        "name": "PU_Coin_sfx3",
-        "filepath": "../Assets/Audio/Pickups/PU_Coin3.wav",
-        "loop": false,
-        "volume": 0.8,
-        "pitch": 1.0,
-        "category": "pickup"
       }
     ],
     "events": [

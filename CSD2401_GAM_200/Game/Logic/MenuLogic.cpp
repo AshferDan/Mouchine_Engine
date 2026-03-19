@@ -147,7 +147,7 @@ void MenuLogicSystem::Update(float dt)
                         ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
                         ghost->RequestReplayOnLoad(m_selectedReplay);
                     }
-                    CORE->RequestSceneLoad("../Assets/Scenes/M4_LEVEL_FIXED.json", true);
+                    CORE->RequestSceneLoad("../Assets/Scenes/Level_1.json", true);
                     m_selectedReplay.clear();
                     currScreen = MenuScreens::Home;
                 }
@@ -641,7 +641,7 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     if (buttonName == "Level1Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level1Button", "../Assets/Scenes/M4_LEVEL_FIXED.json");
+        SelectLevel("Level1Button", "../Assets/Scenes/Level_1.json");
         return true;
     }
 
@@ -655,7 +655,7 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     if (buttonName == "Level3Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level3Button", "../Assets/Scenes/Level3.json"); // to change to proper scene
+        SelectLevel("Level3Button", "../Assets/Scenes/Level_2_V2.json");
         return true;
     }
 
