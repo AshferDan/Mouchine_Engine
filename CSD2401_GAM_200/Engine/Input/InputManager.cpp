@@ -396,7 +396,7 @@ void InputManager::Update(float)
     if (isPlayMode)
     {
         // In play mode: P toggles pause menu (unless in main menu)
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        /*if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
         {
             if (!singleTriggerKeys[GLFW_KEY_P] && !isMainMenu)
             {
@@ -407,7 +407,7 @@ void InputManager::Update(float)
         else
         {
             singleTriggerKeys[GLFW_KEY_P] = false;
-        }
+        }*/
 
         // Handle TAB key to toggle How To Play screen
         static bool tabWasPressed = false;
