@@ -94,6 +94,8 @@ public:
 
     float GetLevelTimerLength() const { return LevelTimerLength; }
 
+    void RestoreTimerBar(GameObject* timerGO);
+
 private:
     float       LevelTimerLength = 60.0f;
     float       remainingTime = 30.0f;              // remaining time in 30 seconds for now
