@@ -224,6 +224,9 @@ namespace CSharpScript
         /// </summary>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void DestroyByName(string name);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int CountAll();
     }
 
     /// <summary>
@@ -375,7 +378,13 @@ namespace CSharpScript
         public static extern void SetAlpha(string objectName, float alpha);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern vec4 GetColor(string objectName);
+        private static extern void GetColor_Internal(string objectName, out float r, out float g, out float b, out float a);
+
+        public static vec4 GetColor(string objectName)
+        {
+            GetColor_Internal(objectName, out float r, out float g, out float b, out float a);
+            return new vec4(r, g, b, a);
+        }
 
         /// <summary>
         /// Sets the render layer category for a GameObject.
@@ -732,7 +741,13 @@ namespace CSharpScript
         /// <param name="objectName">The name of the GameObject.</param>
         /// <returns>The text color as vec4.</returns>
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern vec4 GetTextColor(string objectName);
+        private static extern void GetTextColor_Internal(string objectName, out float r, out float g, out float b, out float a);
+
+        public static vec4 GetTextColor(string objectName)
+        {
+            GetTextColor_Internal(objectName, out float r, out float g, out float b, out float a);
+            return new vec4(r, g, b, a);
+        }
 
         /// <summary>
         /// Sets the scale of the text.
@@ -958,6 +973,18 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void CameraFlash(float duration, float r, float g, float b, float a, bool fadeout, float camShakeStrength);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetFollowOffset(float x, float y);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void GetFollowOffset_Internal(out float x, out float y);
+
+        public static vec2 GetFollowOffset()
+        {
+            GetFollowOffset_Internal(out float x, out float y);
+            return new vec2(x, y);
+        }
     }
 
     public static class Animation
