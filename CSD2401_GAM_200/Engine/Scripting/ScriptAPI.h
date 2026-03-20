@@ -496,6 +496,9 @@ namespace API {
     void setCameraMode(CameraComponent::CameraMode);
     void CameraFlash(float, const vec4&, bool, float camShakeStrength);
 
+    void SetCameraFollowOffset(float x, float y);
+    vec2 GetCameraFollowOffset();
+
 #pragma endregion
 
 #pragma region Animator
@@ -530,6 +533,7 @@ namespace API {
     const char* FindGameObjectByName(const std::string& name);
     const char* FindGameObjectByID(int id);
     void DestroyGameObject(const std::string& name);
+    int CountAllGameObjects();
 
 #pragma endregion
 

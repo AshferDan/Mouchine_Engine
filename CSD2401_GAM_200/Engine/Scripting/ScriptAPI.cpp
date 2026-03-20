@@ -1032,6 +1032,22 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         cam.FlashActiveCamera(duration, color, fadeout);
     }
 
+    void SetCameraFollowOffset(float x, float y)
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) return;
+        camtemp->SetFollowOffset(vec2(x, y));
+    }
+
+    vec2 GetCameraFollowOffset()
+    {
+        auto& cam = CameraManager::Instance();
+        CameraComponent* camtemp = cam.GetActiveCamera();
+        if (!camtemp) return vec2(0.0f, 0.0f);
+        return camtemp->GetFollowOffset();
+    }
+
     #pragma endregion
 
 #pragma region Animator
@@ -1288,6 +1304,11 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         {
             factory.QueueDestroyGameObject(obj->GetID());
         }
+    }
+
+    int CountAllGameObjects()
+    {
+        return GameObjectFactory::Instance().CountAllGameObjects();
     }
 #pragma endregion
 

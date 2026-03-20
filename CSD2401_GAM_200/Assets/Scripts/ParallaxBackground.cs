@@ -4,195 +4,231 @@ using CSharpScript;
 namespace CSharpScript
 {
     /// <summary>
-    /// Parallax background script. Attach to the player/hero.
-    /// Set LayerXxx to the name of each background GameObject.
+    /// Parallax background script. Attach to any GameObject in the scene (typically the Hero/Player).
     ///
-    /// Factor:
-    ///   0.0 = object stays in world space (scrolls fastest on screen)
-    ///   0.8 = subtle parallax drift
-    ///   1.0 = moves exactly with camera (appears FROZEN on screen)
+    /// HOW TO ADD THIS SCRIPT TO A NEW SCENE — follow these steps:
     ///
-    /// TileWidthXxx:
-    ///   0 (default) = no tiling (single image, no side copies)
-    ///   > 0          = enables 3-copy seamless tiling. Duplicate the layer
-    ///                  GameObject twice and name the copies:
-    ///                    <LayerName>_L   (left  copy)
-    ///                    <LayerName>_R   (right copy)
-    ///                  Set TileWidth to the visual width of one copy.
+    ///  1. BACKGROUND OBJECTS
+    ///     In the scene editor, create one Sprite/Image GameObject per background layer.
+    ///     Name them exactly as you will put in the LayerXxx fields below (e.g. "BG_Far").
+    ///     Position each one where it should appear on-screen at the START of the level.
+    ///     Set their render layers so they draw behind the level geometry.
+    ///
+    ///  2. TILING (optional — skip if your background is a single large image)
+    ///     If a layer should tile horizontally, duplicate the main object twice:
+    ///       "<LayerName>_L"  — left  copy
+    ///       "<LayerName>_R"  — right copy
+    ///     Place _L and _R at exactly ±TileWidth from the centre object along X.
+    ///     Set TileWidthXxx = the pixel width of ONE copy (e.g. 4200 if the sprite is 4200px wide).
+    ///     All three copies must have the same Y position and scale.
+    ///
+    ///  3. ATTACH THE SCRIPT
+    ///     Add a CSharpScript component to the Hero (or any persistent object).
+    ///     Set the Script Type to "ParallaxBackground".
+    ///     Fill in the LayerXxx names and adjust factors/offsets as needed.
+    ///
+    ///  4. FACTOR GUIDE
+    ///     FactorX controls how much a layer scrolls horizontally relative to the camera.
+    ///       0.0 = frozen in world-space (moves fastest across screen — use for close foreground)
+    ///       0.5 = scrolls at half camera speed (medium depth)
+    ///       1.0 = locked to camera (frozen on screen — use for sky / UI-like layers)
+    ///     FactorY controls vertical parallax.
+    ///       1.0 = locked to camera on Y (recommended — backgrounds don't drift when jumping)
+    ///       0.0 = fixed in world-space on Y
+    ///
+    ///  5. RECOMMENDED STARTING VALUES
+    ///     Far background (sky):  FactorX=0.1, FactorY=1.0, no tiling
+    ///     Mid background (hills): FactorX=0.4, FactorY=1.0, tiling if wide level
+    ///     Near background (trees/pillars): FactorX=0.7, FactorY=1.0, tiling
+    ///     Foreground detail:     FactorX=0.9, FactorY=1.0, tiling
     /// </summary>
     public class ParallaxBackground : GameScript
     {
-        public enum Layer { FarBack = 0, Back = 1, Mid = 2, Front = 3 }
         private const int LayerCount = 4;
 
-        // --- Layer names (GameObjects to move) ---
+        // --- Layer GameObject names ---
         public string LayerFarBack = "Parallax_BG";
         public string LayerBack    = "";
         public string LayerMid     = "Pillar_BackGround";
         public string LayerFront   = "";
 
-        // --- Scroll factors (how much of the camera movement the layer follows) ---
-        public float FactorFarBack = 0.8f;   // subtle drift — far wall
-        public float FactorBack    = 0.3f;
-        public float FactorMid     = 0.7f;   // pillars move mostly with camera
-        public float FactorFront   = 0.9f;
+        // --- Horizontal scroll factors (0 = world-fixed, 1 = camera-locked) ---
+        public float FactorFarBack = 0.15f;
+        public float FactorBack    = 0.30f;
+        public float FactorMid     = 0.55f;
+        public float FactorFront   = 0.80f;
 
-        // --- Tile widths. Set > 0 to enable 3-copy seamless tiling.
+        // --- Vertical scroll factors (keep at 1.0 to prevent Y drift when jumping) ---
+        public float FactorYFarBack = 1.0f;
+        public float FactorYBack    = 1.0f;
+        public float FactorYMid     = 1.0f;
+        public float FactorYFront   = 1.0f;
+
+        // --- Tile widths. Set > 0 to enable 3-copy seamless horizontal tiling.
         //     Side copies must be named "<LayerName>_L" and "<LayerName>_R". ---
         public float TileWidthFarBack = 0f;
         public float TileWidthBack    = 0f;
         public float TileWidthMid     = 0f;
         public float TileWidthFront   = 0f;
 
-        // --- Per-layer position offsets (added on top of the parallax position each frame) ---
-        public float OffsetXFarBack = 0f;
-        public float OffsetYFarBack = 0f;
-        public float OffsetXBack    = 0f;
-        public float OffsetYBack    = 0f;
-        public float OffsetXMid     = 0f;
-        public float OffsetYMid     = 0f;
-        public float OffsetXFront   = 0f;
-        public float OffsetYFront   = 0f;
+        // --- Per-layer world-space offsets applied on top of the parallax position ---
+        public float OffsetXFarBack = 0f; public float OffsetYFarBack = 0f;
+        public float OffsetXBack    = 0f; public float OffsetYBack    = 0f;
+        public float OffsetXMid     = 0f; public float OffsetYMid     = 0f;
+        public float OffsetXFront   = 0f; public float OffsetYFront   = 0f;
 
-        private string[] layerNames;
-        private string[] layerNames_L;  // "<name>_L" side copies
-        private string[] layerNames_R;  // "<name>_R" side copies
-        private float[]  factors;
-        private vec2[]   startPos = new vec2[LayerCount];
-        private bool[]   inited   = new bool[LayerCount];
-        private bool[]   inited_L = new bool[LayerCount];
-        private bool[]   inited_R = new bool[LayerCount];
+        // Internal state
+        private string[] _names;
+        private string[] _namesL;
+        private string[] _namesR;
+        private float[]  _factorsX;
+        private float[]  _factorsY;
+        private vec2[]   _startWorldPos = new vec2[LayerCount];   // world pos of bg at init
+        private vec2     _startCamPos;                            // camera pos at init
+        private bool[]   _inited  = new bool[LayerCount];
+        private bool[]   _initedL = new bool[LayerCount];
+        private bool[]   _initedR = new bool[LayerCount];
 
         public override void OnStart()
         {
-            layerNames = new string[] { LayerFarBack, LayerBack, LayerMid, LayerFront };
-            factors    = new float[]  { FactorFarBack, FactorBack, FactorMid, FactorFront };
+            _names = new string[] { LayerFarBack, LayerBack, LayerMid, LayerFront };
+            _factorsX = new float[] { FactorFarBack, FactorBack, FactorMid, FactorFront };
+            _factorsY = new float[] { FactorYFarBack, FactorYBack, FactorYMid, FactorYFront };
 
-            layerNames_L = new string[LayerCount];
-            layerNames_R = new string[LayerCount];
+            _namesL = new string[LayerCount];
+            _namesR = new string[LayerCount];
             for (int i = 0; i < LayerCount; i++)
             {
-                layerNames_L[i] = layerNames[i] + "_L";
-                layerNames_R[i] = layerNames[i] + "_R";
+                _namesL[i] = _names[i] + "_L";
+                _namesR[i] = _names[i] + "_R";
             }
 
-            // Try to init layers that are already loaded at this point
-            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
-                TryInitLayer((int)layer);
-        }
+            // Snapshot camera position so parallax is relative to level start,
+            // not world origin. This fixes backgrounds spawning offset when the
+            // level camera starts away from (0,0).
+            _startCamPos = Camera.GetPosition();
 
-        // Reads the per-layer offset directly from the public fields.
-        private vec2 GetOffset(int i)
-        {
-            switch (i)
-            {
-                case (int)Layer.FarBack: return new vec2(OffsetXFarBack, OffsetYFarBack);
-                case (int)Layer.Back:    return new vec2(OffsetXBack,    OffsetYBack);
-                case (int)Layer.Mid:     return new vec2(OffsetXMid,     OffsetYMid);
-                case (int)Layer.Front:   return new vec2(OffsetXFront,   OffsetYFront);
-                default:                 return new vec2(0f, 0f);
-            }
-        }
-
-        // Reads the tile width for layer i directly from the public fields
-        // (avoids caching issues when OnStart runs before scene field overrides are applied).
-        private float GetTileWidth(int i)
-        {
-            switch (i)
-            {
-                case (int)Layer.FarBack: return TileWidthFarBack;
-                case (int)Layer.Back:    return TileWidthBack;
-                case (int)Layer.Mid:     return TileWidthMid;
-                case (int)Layer.Front:   return TileWidthFront;
-                default:                 return 0f;
-            }
-        }
-
-        // Attempts to initialize a layer (and its side copies) if the objects
-        // are present in the scene. Called from OnStart and lazily from OnUpdate.
-        private void TryInitLayer(int i)
-        {
-            if (layerNames == null || string.IsNullOrEmpty(layerNames[i])) return;
-
-            // Main copy
-            if (!inited[i])
-            {
-                float scaleX = Transform.GetScale(layerNames[i]).x;
-                if (scaleX != 0f)
-                {
-                    startPos[i] = Transform.GetPosition(layerNames[i]);
-                    inited[i]   = true;
-                }
-            }
-
-            // Side copies — only checked when tiling is enabled
-            if (GetTileWidth(i) > 0f)
-            {
-                if (!inited_L[i] && Transform.GetScale(layerNames_L[i]).x != 0f)
-                    inited_L[i] = true;
-                if (!inited_R[i] && Transform.GetScale(layerNames_R[i]).x != 0f)
-                    inited_R[i] = true;
-            }
+            for (int i = 0; i < LayerCount; i++)
+                TryInitLayer(i);
         }
 
         public override void OnUpdate(float dt)
         {
-            // Defensive: if OnStart was skipped by the engine, run it now.
-            if (layerNames == null) OnStart();
+            if (_names == null) OnStart();
 
-            vec2 camPos = Camera.GetPosition();
+            vec2 cam = Camera.GetPosition();
 
-            foreach (Layer layer in Enum.GetValues(typeof(Layer)))
+            // How far the camera has moved since level start
+            float camDeltaX = cam.x - _startCamPos.x;
+            float camDeltaY = cam.y - _startCamPos.y;
+
+            for (int i = 0; i < LayerCount; i++)
             {
-                int i = (int)layer;
-
-                // Lazy init: retry until the object appears in the scene
-                if (!inited[i])
+                if (!_inited[i])
                 {
                     TryInitLayer(i);
-                    if (!inited[i]) continue; // still not ready
+                    if (!_inited[i]) continue;
                 }
 
-                float f  = factors[i];
-                float tw = GetTileWidth(i);
+                float fx  = _factorsX[i];
+                float fy  = _factorsY[i];
                 vec2  off = GetOffset(i);
-                float posY = startPos[i].y + camPos.y * f + off.y;
-                float posX;
+                float tw  = GetTileWidth(i);
 
+                // Y: background moves by (camDelta * fy).
+                //    fy=1.0 → locked to camera (no vertical drift when jumping).
+                float posY = _startWorldPos[i].y + camDeltaY * fy + off.y;
+
+                float posX;
                 if (tw > 0f)
                 {
-                    // How far the background has drifted on-screen total
-                    float drift = camPos.x * (1f - f);
-
-                    // Wrap drift into [0, tw) so the position cycles seamlessly
+                    // Tiling X:
+                    //   drift   = how far the background has lagged behind the camera.
+                    //   wrapped = drift wrapped within [0, tw) for seamless looping.
+                    //   posX    = start world pos + full camera delta - drift wrap.
+                    //   This is equivalent to the non-tiling formula when drift < tw,
+                    //   and seamlessly repeats after each full tile-width of camera travel.
+                    float drift   = camDeltaX * (1f - fx);
                     float wrapped = drift % tw;
                     if (wrapped < 0f) wrapped += tw;
 
-                    // World position that produces the wrapped screen position
-                    posX = startPos[i].x - wrapped + camPos.x + off.x;
+                    posX = _startWorldPos[i].x + camDeltaX - wrapped + off.x;
 
-                    // Lazy init side copies in case they loaded after OnStart
-                    if (!inited_L[i] || !inited_R[i])
+                    // Retry side-copy init in case they loaded after OnStart
+                    if (!_initedL[i] || !_initedR[i])
                         TryInitLayer(i);
 
-                    // L and R always flank the center by exactly one tile width
-                    if (inited_L[i])
-                        Transform.SetPosition(layerNames_L[i], posX - tw, posY);
-                    if (inited_R[i])
-                        Transform.SetPosition(layerNames_R[i], posX + tw, posY);
+                    if (_initedL[i])
+                        Transform.SetPosition(_namesL[i], posX - tw, posY);
+                    if (_initedR[i])
+                        Transform.SetPosition(_namesR[i], posX + tw, posY);
                 }
                 else
                 {
-                    // No tiling — simple parallax drift
-                    posX = startPos[i].x + camPos.x * f + off.x;
+                    // No tiling — simple drift: background moves by (camDelta * fx).
+                    // fx=0 → stays at start world pos. fx=1 → locked to camera.
+                    posX = _startWorldPos[i].x + camDeltaX * fx + off.x;
                 }
 
-                Transform.SetPosition(layerNames[i], posX, posY);
+                Transform.SetPosition(_names[i], posX, posY);
             }
         }
 
-        public override void OnDestroy()
+        public override void OnDestroy() { }
+
+        // -----------------------------------------------------------------------
+
+        private void TryInitLayer(int i)
         {
+            if (string.IsNullOrEmpty(_names[i])) return;
+
+            if (!_inited[i])
+            {
+                vec2 s = Transform.GetScale(_names[i]);
+                if (s.x != 0f || s.y != 0f)    // non-zero scale = object exists in scene
+                {
+                    _startWorldPos[i] = Transform.GetPosition(_names[i]);
+                    _inited[i] = true;
+                }
+            }
+
+            if (GetTileWidth(i) > 0f)
+            {
+                if (!_initedL[i] && !string.IsNullOrEmpty(_namesL[i]))
+                {
+                    vec2 s = Transform.GetScale(_namesL[i]);
+                    if (s.x != 0f || s.y != 0f) _initedL[i] = true;
+                }
+                if (!_initedR[i] && !string.IsNullOrEmpty(_namesR[i]))
+                {
+                    vec2 s = Transform.GetScale(_namesR[i]);
+                    if (s.x != 0f || s.y != 0f) _initedR[i] = true;
+                }
+            }
+        }
+
+        private vec2 GetOffset(int i)
+        {
+            switch (i)
+            {
+                case 0: return new vec2(OffsetXFarBack, OffsetYFarBack);
+                case 1: return new vec2(OffsetXBack,    OffsetYBack);
+                case 2: return new vec2(OffsetXMid,     OffsetYMid);
+                case 3: return new vec2(OffsetXFront,   OffsetYFront);
+                default: return new vec2(0f, 0f);
+            }
+        }
+
+        private float GetTileWidth(int i)
+        {
+            switch (i)
+            {
+                case 0: return TileWidthFarBack;
+                case 1: return TileWidthBack;
+                case 2: return TileWidthMid;
+                case 3: return TileWidthFront;
+                default: return 0f;
+            }
         }
     }
 }
