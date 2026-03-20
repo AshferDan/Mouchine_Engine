@@ -87,6 +87,11 @@ public:
     bool IsTimeUp() const { return remainingTime <= 0.0f; }
 
     /**
+     * @brief Gets remaining time
+     */
+    float GetRemainingTime() const { return remainingTime; }
+
+    /**
      * @brief Compute Bar UV Bounds for timer
      *  @param renderComp of the TimerGO
      */
@@ -99,6 +104,11 @@ public:
      * @param length Time in seconds for the level timer.
      */
     void SetLevelTimerLength(float length) { LevelTimerLength = length; }
+
+    /**
+     * @brief Adds time to remaining time. Will be used for Timer pickup
+     */
+    void AddTime(float length) { remainingTime += length; }
 
 private:
     float       LevelTimerLength = 60.0f;

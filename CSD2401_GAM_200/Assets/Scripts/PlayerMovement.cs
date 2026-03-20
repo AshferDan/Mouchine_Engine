@@ -231,24 +231,24 @@ namespace CSharpScript
                 );
             }
 
-            // ts doesnt work at all btw LMFAOO I HATE THIS
-            int totalGOs = 1;
-            while (GameObject.FindGameObjectByID(totalGOs) != "")
-            {
-                totalGOs++;
-            }
-            Debug.Log("\n\n\n\n\n\n" + totalGOs.ToString());
-
+            Debug.Log("\n\n\n\n\n");
+            int totalGOs = GameObject.CountAll();
             for (int i = 0; i < totalGOs; i++)
             {
                 string currGO = GameObject.FindGameObjectByName("NPC_Lobster");
-                Debug.Log("\n\n\n\n\nGAMEOBJS " + currGO.ToString());
+                Debug.Log("findbyname: " + currGO);
                 if (currGO != "")
                 {
                     NPCs.Add(uint.Parse(currGO));
                     Debug.Log(currGO);
                 }
             }
+
+            foreach (int a in NPCs)
+            {
+                Debug.Log("FOUND");
+            }
+
             // wip to fix the vfx issue
             //CSharpScript.GameObject.CreateAnimatedImage(
             //    vfx_nontracking,
@@ -374,6 +374,18 @@ namespace CSharpScript
             if (Input.GetKeyPressed(Input.KeyCode.P))
             {
                 Animation.PlayAnimation(pu_vfx, "Clear");
+
+                int totalGOs = GameObject.CountAll();
+                for (int i = 0; i < totalGOs; i++)
+                {
+                    string currGO = GameObject.FindGameObjectByName("NPC_Lobster");
+                    Debug.Log("findbyname: " + currGO);
+                    if (currGO != "")
+                    {
+                        NPCs.Add(uint.Parse(currGO));
+                        Debug.Log(currGO);
+                    }
+                }
             }
 
             foreach (var a in NPCs)

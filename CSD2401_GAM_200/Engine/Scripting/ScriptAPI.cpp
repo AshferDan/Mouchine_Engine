@@ -1280,7 +1280,12 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         GameObject* obj = factory.FindGameObject(name);
         if (obj)
         {
-            return std::to_string(obj->GetID()).c_str();
+            if (obj->GetID())
+            {
+                std::string ret = std::to_string(obj->GetID());
+                std::cout << "cout " << ret << '\n';
+                return ret.c_str();
+            }
         }
         return "";
     }

@@ -233,7 +233,7 @@ int main()
         }
 
         GameObject* Platform = GameObjectFactory::Instance().CreateShape(
-            "Platform",                  // <--- NAME MUST MATCH C#
+            "Ground",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             0.0f, -200.0f,                      // Center of screen
             100000.0f, 200.0f,                  // Size
@@ -278,7 +278,7 @@ int main()
 
 
         GameObject* Wall2 = GameObjectFactory::Instance().CreateShape(
-            "Platform",                  // <--- NAME MUST MATCH C#
+            "NPC_Lobster",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             200.0f, 0.0f,                      // Center of screen
             100.0f, 1000.0f,                  // Size
