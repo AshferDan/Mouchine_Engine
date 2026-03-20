@@ -360,6 +360,15 @@ void Serialization::SaveScene(const std::string &scenePath)
 		{
 			std::cerr << "[SaveScene] WARNING: AudioManager is NULL, no audio config saved" << std::endl;
 		}
+
+		// serialise game timer settings
+		IGameCallbacksSystem* gameCb = CORE->GetGameCallbacks();
+		if (gameCb)
+		{
+			j["GameSettings"] = json::object();
+			j["GameSettings"]["LevelTimerLength"] = gameCb->GetLevelTimerLength();
+			std::cout << "[SaveScene] Game settings saved (Timer: " << gameCb->GetLevelTimerLength() << "s)" << std::endl;
+		}
 	}
 	else
 	{
@@ -437,6 +446,22 @@ void Serialization::LoadScene(const std::string& scenePath)
 		{
 			DeserializeAudioManager(j, audioMgr);
 			std::cout << "[LoadScene] AudioManager configuration loaded" << std::endl;
+		}
+	}
+
+	// load game settings (timer length, etc.)
+	if (CORE && j.contains("GameSettings"))
+	{
+		IGameCallbacksSystem* gameCb = CORE->GetGameCallbacks();
+		if (gameCb)
+		{
+			const auto& settings = j["GameSettings"];
+			if (settings.contains("LevelTimerLength"))
+			{
+				float timerLength = settings["LevelTimerLength"].get<float>();
+				gameCb->SetLevelTimerLength(timerLength);
+				std::cout << "[LoadScene] Game settings loaded (Timer: " << timerLength << "s)" << std::endl;
+			}
 		}
 	}
 

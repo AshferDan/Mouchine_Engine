@@ -94,6 +94,12 @@ public:
 
     float GetLevelTimerLength() const { return LevelTimerLength; }
 
+    /**
+     * @brief Sets the level timer length (in seconds).
+     * @param length Time in seconds for the level timer.
+     */
+    void SetLevelTimerLength(float length) { LevelTimerLength = length; }
+
 private:
     float       LevelTimerLength = 60.0f;
     float       remainingTime = 30.0f;              // remaining time in 30 seconds for now
