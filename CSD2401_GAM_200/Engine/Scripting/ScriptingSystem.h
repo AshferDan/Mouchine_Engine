@@ -53,6 +53,7 @@ struct ScriptField {
 struct ScriptClass {
     MonoClass* monoClass = nullptr;
     MonoMethod* constructor = nullptr;
+    MonoMethod* onAwake = nullptr;
     MonoMethod* onStart = nullptr;
     MonoMethod* onUpdate = nullptr;
     MonoMethod* onDestroy = nullptr;
@@ -65,6 +66,7 @@ struct ScriptInstance {
     MonoObject* instance = nullptr;
     ScriptClass* scriptClass = nullptr;
     uint32_t gcHandle = 0;
+    bool isAwakened = false; // Track if OnAwake has been called
     bool isStarted = false;  // Track if OnStart has been called
 };
 
@@ -168,6 +170,7 @@ public:
      * @brief Calls the OnStart method for all scripts attached to a GameObject.
      * @param gameObject The GameObject whose scripts should have OnStart called.
      */
+    void CallOnAwake(GameObject* gameObject);
     void CallOnStart(GameObject* gameObject);
     
     /**
@@ -225,4 +228,5 @@ public:
         }
         return nullptr;
     }
+
 };

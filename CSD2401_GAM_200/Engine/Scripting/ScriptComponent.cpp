@@ -137,7 +137,8 @@ void ScriptComponent::AddScript(const std::string& scriptName) {
 			{
 				std::cout << "[ScriptComponent::AddScript] Successfully attached '" << scriptName << "' to " << owner->GetName() << std::endl;
 
-				// Call OnStart immediately after attachment
+				// Call OnAwake then OnStart immediately after attachment
+				scriptSys->CallOnAwake(owner);
 				scriptSys->CallOnStart(owner);
 			}
 			else

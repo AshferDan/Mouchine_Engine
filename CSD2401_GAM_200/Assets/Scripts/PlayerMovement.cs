@@ -172,7 +172,12 @@ namespace CSharpScript
         public string vfx = "Hero_vfx";
         public string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
+        public override void OnAwake()
+        {
 
+            Debug.Log("testing ON AWAKE");
+
+        }
 
         public PlayerMovement()
         {

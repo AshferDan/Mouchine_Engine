@@ -1400,6 +1400,7 @@ MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassNam
         // Cache the class
         auto sc = std::make_unique<ScriptClass>();
         sc->monoClass = monoClass;
+        sc->onAwake = mono_class_get_method_from_name(monoClass, "OnAwake", 0);
         sc->onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
         sc->onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
         sc->onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
@@ -1877,11 +1878,13 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
         // Cache it
         auto sc = std::make_unique<ScriptClass>();
         sc->monoClass = monoClass;
+        sc->onAwake = mono_class_get_method_from_name(monoClass, "OnAwake", 0);
         sc->onStart = mono_class_get_method_from_name(monoClass, "OnStart", 0);
         sc->onUpdate = mono_class_get_method_from_name(monoClass, "OnUpdate", 1);
         sc->onDestroy = mono_class_get_method_from_name(monoClass, "OnDestroy", 0);
 
         std::cout << "[ScriptSystem] Successfully cached class: " << scriptClassName << std::endl;
+        std::cout << "  OnAwake: " << (sc->onAwake ? "Found" : "Not Found") << std::endl;
         std::cout << "  OnStart: " << (sc->onStart ? "Found" : "Not Found") << std::endl;
         std::cout << "  OnUpdate: " << (sc->onUpdate ? "Found" : "Not Found") << std::endl;
         std::cout << "  OnDestroy: " << (sc->onDestroy ? "Found" : "Not Found") << std::endl;
@@ -1960,6 +1963,51 @@ void ScriptSystem::RemoveScript(GameObject *gameObject, const std::string &scrip
     }
 }
 
+void ScriptSystem::CallOnAwake(GameObject *gameObject)
+{
+    auto it = gameObjectScripts.find(gameObject);
+    if (it == gameObjectScripts.end())
+        return;
+
+    for (auto &scriptInstance : it->second)
+    {
+        if (scriptInstance.isAwakened)
+            continue;
+
+        if (!scriptInstance.scriptClass || !scriptInstance.instance)
+            continue;
+
+        scriptInstance.isAwakened = true;
+
+        if (!scriptInstance.scriptClass->onAwake)
+            continue;
+
+        MonoObject* exception = nullptr;
+        mono_runtime_invoke(scriptInstance.scriptClass->onAwake, scriptInstance.instance, nullptr, &exception);
+
+        if (exception)
+        {
+            MonoClass* exceptionClass = mono_object_get_class(exception);
+            const char* exceptionName = mono_class_get_name(exceptionClass);
+            MonoProperty* messageProp = mono_class_get_property_from_name(exceptionClass, "Message");
+            if (messageProp)
+            {
+                MonoMethod* getter = mono_property_get_get_method(messageProp);
+                MonoString* messageStr = (MonoString*)mono_runtime_invoke(getter, exception, nullptr, nullptr);
+                char* message = mono_string_to_utf8(messageStr);
+                std::cerr << "[ScriptSystem] Exception in OnAwake for " << gameObject->GetName()
+                          << ": " << exceptionName << " - " << message << std::endl;
+                mono_free(message);
+            }
+            else
+            {
+                std::cerr << "[ScriptSystem] Exception in OnAwake for " << gameObject->GetName()
+                          << ": " << exceptionName << std::endl;
+            }
+        }
+    }
+}
+
 void ScriptSystem::CallOnStart(GameObject *gameObject)
 {
     auto it = gameObjectScripts.find(gameObject);
@@ -1970,7 +2018,7 @@ void ScriptSystem::CallOnStart(GameObject *gameObject)
 
     for (auto &scriptInstance : it->second)
     {
-       
+
         if (scriptInstance.isStarted)
         {
             continue;
