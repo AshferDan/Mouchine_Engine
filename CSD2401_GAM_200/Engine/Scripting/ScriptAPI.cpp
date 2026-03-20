@@ -1312,6 +1312,32 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     }
 #pragma endregion
 
+#pragma region GameTimer
+    float GetRemainingTime()
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        return cb ? cb->GetRemainingTime() : 0.0f;
+    }
+
+    float GetLevelLength()
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        return cb ? cb->GetLevelTimerLength() : 60.0f;
+    }
+
+    void SetLevelTimerLength(float length)
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        if (cb) cb->SetLevelTimerLength(length);
+    }
+
+    void AddTime(float amount)
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        if (cb) cb->AddTime(amount);
+    }
+#pragma endregion
+
 #pragma region Audio
 
     void AddSound(const std::string name, const std::string filepath,

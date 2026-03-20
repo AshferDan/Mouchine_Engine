@@ -537,6 +537,13 @@ namespace API {
 
 #pragma endregion
 
+#pragma region GameTimer
+    float GetRemainingTime();
+    float GetLevelLength();
+    void  SetLevelTimerLength(float length);
+    void  AddTime(float amount);
+#pragma endregion
+
 #pragma region Scripting
     bool AttachScript(const std::string& objectName, const std::string& scriptClassName);
     std::string GetCollidingObjectNameOnLayer(const std::string& objectName, int targetLayer);

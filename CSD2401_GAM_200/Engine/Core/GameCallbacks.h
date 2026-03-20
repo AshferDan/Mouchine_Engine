@@ -80,6 +80,8 @@ public:
     virtual void ReinitPickups()         {}
 
     // ── Timer system ──────────────────────────────────────────────────────────
-    virtual float GetLevelTimerLength() const { return 60.0f; }
-    virtual void  SetLevelTimerLength(float) {}
+    virtual float GetRemainingTime()          const { return 0.0f; }
+    virtual float GetLevelTimerLength()       const { return 60.0f; }
+    virtual void  SetLevelTimerLength(float)        {}
+    virtual void  AddTime(float)                    {}
 };

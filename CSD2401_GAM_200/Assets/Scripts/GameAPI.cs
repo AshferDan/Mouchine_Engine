@@ -230,6 +230,28 @@ namespace CSharpScript
     }
 
     /// <summary>
+    /// Level timer functions.
+    /// </summary>
+    public static class GameTimer
+    {
+        /// <summary>Returns the current remaining time in seconds.</summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetRemainingTime();
+
+        /// <summary>Returns the total level timer length in seconds.</summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetLevelLength();
+
+        /// <summary>Sets the total level timer length in seconds.</summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetLevelTimerLength(float length);
+
+        /// <summary>Adds time (in seconds) to the remaining timer.</summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void AddTime(float amount);
+    }
+
+    /// <summary>
     /// Transform component functions (position, rotation, scale).
     /// </summary>
     public static class Transform

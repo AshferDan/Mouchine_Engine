@@ -791,6 +791,25 @@ static int Internal_CountAllGameObjects()
     return GameObjectFactory::Instance().CountAllGameObjects();
 }
 
+static float Internal_GetRemainingTime()
+{
+    return API::GetRemainingTime();
+}
+
+static float Internal_GetLevelLength()
+{
+    return API::GetLevelLength();
+}
+
+static void Internal_SetLevelTimerLength(float length)
+{
+    API::SetLevelTimerLength(length);
+}
+
+static void Internal_AddTime(float amount)
+{
+    API::AddTime(amount);
+}
 
 static bool Internal_Raycast(MonoString* selfName, float x, float y, float dx, float dy, float distance, MonoString** hitObjectName, float* hitDistance)
 {
@@ -1538,6 +1557,12 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
     mono_add_internal_call("CSharpScript.GameObject::CountAll",             (void *)Internal_CountAllGameObjects);
+
+    // === GameTimer ===
+    mono_add_internal_call("CSharpScript.GameTimer::GetRemainingTime",    (void *)Internal_GetRemainingTime);
+    mono_add_internal_call("CSharpScript.GameTimer::GetLevelLength",      (void *)Internal_GetLevelLength);
+    mono_add_internal_call("CSharpScript.GameTimer::SetLevelTimerLength", (void *)Internal_SetLevelTimerLength);
+    mono_add_internal_call("CSharpScript.GameTimer::AddTime",             (void *)Internal_AddTime);
 
     // === Transform ===
     mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);

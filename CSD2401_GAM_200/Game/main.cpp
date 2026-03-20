@@ -126,8 +126,10 @@ int main()
             int  GetTotalShells()   const override { return pickupSystem.GetTotalShells(); }
             void ReinitPickups()        override { pickupSystem = PickupSystem(); }
 
-            float GetLevelTimerLength() const override { return gameTimer ? gameTimer->GetLevelTimerLength() : 60.0f; }
-            void  SetLevelTimerLength(float length) override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
+            float GetRemainingTime()              const override { return gameTimer ? gameTimer->GetRemainingTime()       : 0.0f; }
+            float GetLevelTimerLength()           const override { return gameTimer ? gameTimer->GetLevelTimerLength()   : 60.0f; }
+            void  SetLevelTimerLength(float length)    override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
+            void  AddTime(float amount)                override { if (gameTimer) gameTimer->AddTime(amount); }
         };
 
         static GameApp gameApp;
