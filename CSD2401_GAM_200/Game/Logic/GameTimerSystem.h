@@ -87,11 +87,6 @@ public:
     bool IsTimeUp() const { return remainingTime <= 0.0f; }
 
     /**
-     * @brief Gets remaining time
-     */
-    float GetRemainingTime() const { return remainingTime; }
-
-    /**
      * @brief Compute Bar UV Bounds for timer
      *  @param renderComp of the TimerGO
      */

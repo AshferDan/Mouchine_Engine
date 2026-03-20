@@ -530,8 +530,8 @@ namespace API {
     float fClamp(float value, float min, float max);
     int iClamp(int value, int min, int max);
 
-    const char* FindGameObjectByName(const std::string& name);
-    const char* FindGameObjectByID(int id);
+    std::string FindGameObjectByName(const std::string& name);
+    std::string FindGameObjectByID(int id);
     void DestroyGameObject(const std::string& name);
     int CountAllGameObjects();
 

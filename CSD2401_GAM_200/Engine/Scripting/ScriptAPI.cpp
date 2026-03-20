@@ -1274,29 +1274,24 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
 		return MathiClamp(value, min, max);
 	}
-    const char* FindGameObjectByName(const std::string& name)
+    std::string FindGameObjectByName(const std::string& name)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.FindGameObject(name);
-        if (obj)
+        if (obj && obj->GetID())
         {
-            if (obj->GetID())
-            {
-                std::string ret = std::to_string(obj->GetID());
-                std::cout << "cout " << ret << '\n';
-                return ret.c_str();
-            }
+            return std::to_string(obj->GetID());
         }
         return "";
     }
 
-    const char* FindGameObjectByID(int id)
+    std::string FindGameObjectByID(int id)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.GetGameObject(id);
         if (obj)
         {
-            return obj->GetName().c_str();
+            return obj->GetName();
         }
         return "";
     }
