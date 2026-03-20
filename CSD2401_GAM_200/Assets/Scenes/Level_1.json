@@ -9587,5 +9587,8 @@
         "sound": "menu_restart"
       }
     ]
+  },
+  "GameSettings": {
+    "LevelTimerLength": 60.0
   }
 }

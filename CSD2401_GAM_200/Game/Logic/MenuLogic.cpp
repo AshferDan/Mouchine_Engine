@@ -69,7 +69,7 @@ void MenuLogicSystem::Update(float dt)
                     //std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
                     audioManager->StopSound("bgm_channel");
                     audioManager->PlaySound("MainMenuBGM", "bgm_channel");
-                    audioManager->FadeInCategory("music", 3.0f, 0.8f); // fade to 80% volume instead of 100% cause too loud
+                    audioManager->FadeInCategory("music", 3.0f, 0.5f); // fade to 50% volume instead of 100% cause too loud
                     //std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
                 }
                 else

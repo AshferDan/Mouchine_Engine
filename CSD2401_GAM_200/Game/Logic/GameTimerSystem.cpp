@@ -30,7 +30,7 @@ Technology is prohibited.
 void GameTimerSystem::Initialize()
 {
     remainingTime = LevelTimerLength;
-    lastDisplayedSeconds = 60;
+    lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
 
@@ -46,7 +46,7 @@ void GameTimerSystem::Initialize()
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
 
-    UpdateBar(60);
+    UpdateBar(static_cast<int>(LevelTimerLength));
 }
 
 /**
@@ -153,11 +153,11 @@ void GameTimerSystem::Update(float dt)
     // reset timer and bar
     if (mode == EditorMode::Stop)
     {
-        if (remainingTime != 60.0f || lastDisplayedSeconds != 60) 
+        if (remainingTime != LevelTimerLength || lastDisplayedSeconds != static_cast<int>(LevelTimerLength))
         {
 
-            remainingTime = 60.0f;
-            lastDisplayedSeconds = 60;
+            remainingTime = LevelTimerLength;
+            lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
             hasTriggeredTimeUp = false;
             hasTriggeredPanicSound = false;
 
@@ -185,7 +185,7 @@ void GameTimerSystem::Update(float dt)
             originalCenterY = 0.0f;
             leftEdge = 0.0f;
 
-            UpdateBar(60);
+            UpdateBar(static_cast<int>(LevelTimerLength));
         }
 
         return;
@@ -238,8 +238,8 @@ void GameTimerSystem::Update(float dt)
  */
 void GameTimerSystem::ResetTimer()
 {
-    remainingTime = 30.0f;
-    lastDisplayedSeconds = 30;
+    remainingTime = LevelTimerLength;
+    lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
 
@@ -255,7 +255,7 @@ void GameTimerSystem::ResetTimer()
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
 
-    UpdateBar(30);
+    UpdateBar(static_cast<int>(LevelTimerLength));
 }
 
 /**
@@ -382,7 +382,7 @@ void GameTimerSystem::UpdateBar(int )
         rightEdge = originalScaleX * uvBarWidth;
     }
 
-    float fillPercentage = std::clamp(remainingTime / 60.0f, 0.0f, 1.0f);
+    float fillPercentage = std::clamp(remainingTime / LevelTimerLength, 0.0f, 1.0f);
     float safeFill = std::max(fillPercentage, 0.001f);
 
     // world width of remaining visible blue
