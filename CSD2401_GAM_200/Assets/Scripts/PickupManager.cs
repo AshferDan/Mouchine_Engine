@@ -35,6 +35,7 @@ namespace CSharpScript
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
         public PlayerMovementStats MoveStats;
+        private bool triggeredTimePU = false;
 
         public PickupManager()
         {
@@ -70,6 +71,7 @@ namespace CSharpScript
         public void OnFixedUpdate(float fixedDeltaTime)
         {
             HandlePickup();
+            HandleTimePU();
         }
 
         // Script will only handle collision and effect. Tracking and counting will be handled in c++ because its easier to access from other systems, save to file etc.
@@ -108,7 +110,7 @@ namespace CSharpScript
                 {
                     // powerup effect
                     Audio.PlaySound("PU_Time_sfx", "sfx");
-                    GameTimer.AddTime(MoveStats.Time_PickupAmount);
+                    triggeredTimePU = true;
                 }
                 else
                 {
@@ -118,6 +120,31 @@ namespace CSharpScript
                 // destroy regardless of pickup type
                 GameObject.DestroyByID(goID);
                 Debug.Log("destroyed go id: " + goID.ToString());            // works
+            }
+        }
+
+        float timePUTimer = 0.0f;
+        bool timePUActive = false;
+        private void HandleTimePU()
+        {
+            if (triggeredTimePU)
+            {
+                GameTimer.AddTime(MoveStats.Time_PickupAmount);
+                timePUTimer = MoveStats.Time_PickupAmount;
+                Animation.PlayAnimation(PlayerMovement.pu_vfx, "Time", true);
+                triggeredTimePU = false;
+                timePUActive = true;
+            }
+
+            if (timePUActive)
+            {
+                timePUTimer -= fixeddt;
+                if (timePUTimer <= 0.0f)
+                {
+                    Animation.PlayAnimation(PlayerMovement.pu_vfx, "Clear");
+                    timePUActive = false;
+                    timePUTimer = 0.0f;
+                }
             }
         }
 

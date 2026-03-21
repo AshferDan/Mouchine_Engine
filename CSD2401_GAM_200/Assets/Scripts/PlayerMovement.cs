@@ -188,9 +188,9 @@ namespace CSharpScript
         private float _calculatedSkidDecel;
         private float _hurtTimer = 0f;
 
-        public string vfx = "Hero_vfx";
-        public string pu_vfx = "Pickup_vfx";
-        public string vfx_nontracking = "Hero_vfx_nontracking";
+        public static string vfx = "Hero_vfx";
+        public static string pu_vfx = "Pickup_vfx";
+        public static string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
         public override void OnAwake()
         {
@@ -356,7 +356,7 @@ namespace CSharpScript
 
             // Pickup VFX
             Animation.RegisterAnimation(pu_vfx, "Speed", "../Assets/spritesheet_player_vfx.png",            15, 11, 2, 4, 2, 10, 8.0f);
-            Animation.RegisterAnimation(pu_vfx, "Time", "../Assets/spritesheet_player_vfx.png",             15, 11, 1, 4, 1, 10, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Time", "../Assets/spritesheet_player_vfx.png",             15, 11, 1, 4, 1, 9, 8.0f);
             Animation.RegisterAnimation(pu_vfx, "Clear", "../Assets/spritesheet_player_vfx.png",            15, 11, 14, 10, 14, 10, 0f);
 
             _isFacingRight = true;
@@ -1907,7 +1907,7 @@ namespace CSharpScript
         private bool _blinkRestoredAlpha = true;    // tracks whether alpha has been restored after immunity ended
         private void HandleBlinkEffect()
         {
-            float defaultAlpha = 1f;// Graphics.GetColor(OwnerName).z;
+            float defaultAlpha = Graphics.GetColor(OwnerName).z;    //1.0f
 
             if (_hurtTimer >= 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration)
             {
