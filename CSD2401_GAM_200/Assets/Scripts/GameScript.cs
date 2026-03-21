@@ -31,6 +31,7 @@ namespace CSharpScript // Or your namespace
         }
 
         // Virtual methods that user scripts override
+        public virtual void OnAwake() { }
         public virtual void OnStart() { }
         public virtual void OnUpdate(float dt) { }
         public virtual void OnDestroy() { }

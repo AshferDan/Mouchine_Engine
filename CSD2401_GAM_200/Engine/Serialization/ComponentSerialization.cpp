@@ -937,11 +937,12 @@ void ComponentSerialization::DeserializeScript(const json &j, GameObject *go)
             }
         }
 
-        // Phase 3: Now call OnStart with the correct field values in place.
+        // Phase 3: Now call OnAwake then OnStart with the correct field values in place.
         //scriptSys->CallOnStart(go);
         if (CORE && CORE->GetLevelEditor() &&
             CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play)
         {
+            scriptSys->CallOnAwake(go);
             scriptSys->CallOnStart(go);
         }
     }

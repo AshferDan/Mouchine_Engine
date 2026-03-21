@@ -316,8 +316,19 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
-    // fire Start() once on all active game states
-    //GameManager::Instance().StartActiveState();
+
+    // Fire OnAwake then OnStart on all existing scripts
+    if (CORE && CORE->GetScriptSystem())
+    {
+        auto* scriptSys = CORE->GetScriptSystem();
+        const auto& gameObjects = factory.GetAllGameObjects();
+        for (const auto& go : gameObjects)
+        {
+            scriptSys->CallOnAwake(go.get());
+            scriptSys->CallOnStart(go.get());
+        }
+        std::cout << "[LevelEditor] Called OnAwake + OnStart on all scripts.\n";
+    }
 
     // start bgm when play is click
     if (audioManager)
