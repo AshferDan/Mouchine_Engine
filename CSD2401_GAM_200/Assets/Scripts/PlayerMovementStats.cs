@@ -64,6 +64,9 @@ namespace CSharpScript
         public float Speed_Multiplier = 1.5f;
         public float Speed_Duration = 5f;
 
+        // Time pickup
+        public float Time_PickupAmount = 5f;
+
         // Wall Bonk
         public float T3_BonkDuration = 0.65f;
         public Vector2 T3_BonkForce = new Vector2(562.5f, 312.5f);        // 18f * mod, 10f * mod
@@ -162,6 +165,9 @@ namespace CSharpScript
         // Damage Taken/ Hurt
         public float HazardTimeDeduction = 1.0f;
         public float HurtImmunityLength = 4.0f;
+
+        // 3D Audio
+        public float Audio3D_ActiveDistance = 3000.0f;
 
         // Time Deduction Penalties
         public float JumpTimeDeduction = 1.0f;

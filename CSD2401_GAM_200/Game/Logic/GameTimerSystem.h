@@ -101,9 +101,13 @@ public:
     void SetLevelTimerLength(float length) { LevelTimerLength = length; }
 
     /**
-     * @brief Adds time to remaining time. Will be used for Timer pickup
+     * @brief Adds time to remaining time. Handles clamping. Will be used for Timer pickup
      */
-    void AddTime(float length) { remainingTime += length; }
+    void AddTime(float length) { 
+        remainingTime += length; 
+        if (remainingTime > LevelTimerLength)           // clamp
+            remainingTime = LevelTimerLength; 
+    }
 
 private:
     float       LevelTimerLength = 60.0f;

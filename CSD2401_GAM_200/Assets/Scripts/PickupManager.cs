@@ -34,9 +34,12 @@ namespace CSharpScript
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
+        public PlayerMovementStats MoveStats;
+
         public PickupManager()
         {
             // When the script is created, instantiate its stats
+            MoveStats = new PlayerMovementStats();
             Debug.Log("PickupManager instantiated with new stats.");
         }
 
@@ -105,6 +108,7 @@ namespace CSharpScript
                 {
                     // powerup effect
                     Audio.PlaySound("PU_Time_sfx", "sfx");
+                    GameTimer.AddTime(MoveStats.Time_PickupAmount);
                 }
                 else
                 {

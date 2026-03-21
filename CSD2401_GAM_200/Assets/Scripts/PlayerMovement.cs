@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Resources;
 using System.Collections.Generic;
+using System.IO.Pipes;
 
 namespace CSharpScript
 {
@@ -56,7 +57,20 @@ namespace CSharpScript
         public static bool triggerSpeedBoost = false;
         private bool speedBoostActive = false;
 
-        List<uint> NPCs = new List<uint>();
+        // list contains (entityID, position, isAudioPlaying)
+        class NPCData
+        {
+            public uint ID;
+            public vec2 pos;
+            public bool audioPlaying;
+            public NPCData(uint id, vec2 position, bool soundPlaying)
+            {
+                ID = id;
+                pos = position;
+                audioPlaying = soundPlaying;
+            }
+        }
+        List<NPCData> NPCs = new List<NPCData>();     
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
@@ -181,7 +195,7 @@ namespace CSharpScript
         public override void OnAwake()
         {
 
-            Debug.Log("testing ON AWAKE");
+            Debug.Log("\n\ntesting ON AWAKE\n\n");
 
         }
 
@@ -236,23 +250,19 @@ namespace CSharpScript
                 );
             }
 
-            Debug.Log("\n\n\n\n\n");
-            int totalGOs = GameObject.CountAll();
-            for (int i = 0; i < totalGOs; i++)
-            {
-                string currGO = GameObject.FindGameObjectByName("NPC_Lobster");
-                Debug.Log("findbyname: " + currGO);
-                if (currGO != "")
-                {
-                    NPCs.Add(uint.Parse(currGO));
-                    Debug.Log(currGO);
-                }
-            }
-
-            foreach (int a in NPCs)
-            {
-                Debug.Log("FOUND");
-            }
+            // replace with onawake when it works
+            //Debug.Log("\n\n\n\n\n");
+            //int totalGOs = GameObject.CountAll();
+            //for (int i = 0; i < totalGOs; i++)
+            //{
+            //    string currGO = GameObject.FindGameObjectByName("NPC_Lobster");
+            //    Debug.Log("findbyname: " + currGO);
+            //    if (currGO != "")
+            //    {
+            //        NPCs.Add((uint.Parse(currGO), Transform.GetPosition(currGO), false));
+            //        Debug.Log(currGO);
+            //    }
+            //}
 
             // wip to fix the vfx issue
             //CSharpScript.GameObject.CreateAnimatedImage(
@@ -380,107 +390,69 @@ namespace CSharpScript
             {
                 Animation.PlayAnimation(pu_vfx, "Clear");
 
+                //clearing here bc in update
+                NPCs.Clear();
                 int totalGOs = GameObject.CountAll();
-                for (int i = 0; i < totalGOs; i++)
+                for (int i = 1; i <= totalGOs; i++)
                 {
-                    string currGO = GameObject.FindGameObjectByName("NPC_Lobster");
-                    Debug.Log("findbyname: " + currGO);
-                    if (currGO != "")
+                    string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
+                    if (currGO.Contains("NPC_Lobster"))
                     {
-                        NPCs.Add(uint.Parse(currGO));
-                        Debug.Log(currGO);
+                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
                     }
                 }
+
+
+                #region LOBSTER 3D SCISSORS SOUND
+                // HARDCODDED LOBSTER SNIPPING SOUND FOR NOW
+                // update 3D audio listener position to follow player
+
+                vec2 playerPos = Transform.GetPosition(OwnerName);
+                Audio.Set3DListenerPosition(playerPos.x, playerPos.y);
+                for (int i = 0; i < NPCs.Count(); i++)
+                {
+                    vec2 npcPos = NPCs[i].pos;
+                    Debug.Log("Pos of " + i.ToString() + "'s NPC: (" + npcPos.x.ToString() + ", " + npcPos.y.ToString() + ")");
+
+                    float distX = playerPos.x - npcPos.x;
+                    float distY = playerPos.y - npcPos.y;
+                    float distanceSq = (distX * distX + distY * distY);
+
+                    if (distanceSq < MoveStats.Audio3D_ActiveDistance * MoveStats.Audio3D_ActiveDistance)
+                    {
+                        if (!NPCs[i].audioPlaying)
+                        {
+                            Audio.PlaySound("scissors_snip", "lobster1_scissors");
+                            NPCs[i].audioPlaying = true;
+                            Debug.Log("=== LOBSTER 1 SCISSORS SOUND STARTED ===");
+                        }
+
+                        // update position, no spatial if above or below
+                        float horizontalDist1 = Math.Abs(distX);
+                        if (horizontalDist1 < 500.0f * 500.0f)
+                        {
+                            Audio.Set3DSoundPosition("lobster1_scissors", playerPos.x, NPCs[i].pos.y);
+                        }
+                        else
+                        {
+                            Audio.Set3DSoundPosition("lobster1_scissors", NPCs[i].pos.x, NPCs[i].pos.y);
+                        }
+                    }
+                    else
+                    {
+                        if (NPCs[i].audioPlaying)
+                        {
+                            Audio.StopSound("lobster1_scissors");
+                            NPCs[i].audioPlaying = false;
+                            Debug.Log("=== LOBSTER 1 SCISSORS SOUND STOPPED ===");
+                        }
+                    }
+                }
+
+                #endregion
+
             }
-
-            foreach (var a in NPCs)
-            {
-                Debug.Log(a.ToString());
-            }
-
-            #region LOBSTER 3D SCISSORS SOUND
-            // HARDCODDED LOBSTER SNIPPING SOUND FOR NOW
-            // update 3D audio listener position to follow player
-            vec2 playerPos = Transform.GetPosition(OwnerName);
-            Audio.Set3DListenerPosition(playerPos.x, playerPos.y);
-
-            // lobster positions
-            float lobster1X = 25684.0f;
-            float lobster1Y = 698.46f;
-            float lobster2X = 13370.0f;
-            float lobster2Y = 700.0f;
-
-            // calculate distances to lobsters
-            float dist1X = playerPos.x - lobster1X;
-            float dist1Y = playerPos.y - lobster1Y;
-            float distance1 = (float)Math.Sqrt(dist1X * dist1X + dist1Y * dist1Y);
-
-            float dist2X = playerPos.x - lobster2X;
-            float dist2Y = playerPos.y - lobster2Y;
-            float distance2 = (float)Math.Sqrt(dist2X * dist2X + dist2Y * dist2Y);
-
-            // lobster 1 sound within max distance of 3000
-            if (distance1 < 3000.0f)
-            {
-                if (!_lobster1SoundPlaying)
-                {
-                    Audio.PlaySound("scissors_snip", "lobster1_scissors");
-                    _lobster1SoundPlaying = true;
-                    Debug.Log("=== LOBSTER 1 SCISSORS SOUND STARTED ===");
-                }
-
-                // update position, no spatial if above or below
-                float horizontalDist1 = Math.Abs(dist1X);
-                if (horizontalDist1 < 500.0f)
-                {
-                    Audio.Set3DSoundPosition("lobster1_scissors", playerPos.x, lobster1Y);
-                }
-                else
-                {
-                    Audio.Set3DSoundPosition("lobster1_scissors", lobster1X, lobster1Y);
-                }
-            }
-            else
-            {
-                if (_lobster1SoundPlaying)
-                {
-                    Audio.StopSound("lobster1_scissors");
-                    _lobster1SoundPlaying = false;
-                    Debug.Log("=== LOBSTER 1 SCISSORS SOUND STOPPED ===");
-                }
-            }
-
-            // lobster 2 sound
-            if (distance2 < 3000.0f)
-            {
-                if (!_lobster2SoundPlaying)
-                {
-                    Audio.PlaySound("scissors_snip", "lobster2_scissors");
-                    _lobster2SoundPlaying = true;
-                    Debug.Log("=== LOBSTER 2 SCISSORS SOUND STARTED ===");
-                }
-
-                // update position - center if above/below
-                float horizontalDist2 = Math.Abs(dist2X);
-                if (horizontalDist2 < 500.0f)
-                {
-                    Audio.Set3DSoundPosition("lobster2_scissors", playerPos.x, lobster2Y);
-                }
-                else
-                {
-                    Audio.Set3DSoundPosition("lobster2_scissors", lobster2X, lobster2Y);
-                }
-            }
-            else
-            {
-                if (_lobster2SoundPlaying)
-                {
-                    Audio.StopSound("lobster2_scissors");
-                    _lobster2SoundPlaying = false;
-                    Debug.Log("=== LOBSTER 2 SCISSORS SOUND STOPPED ===");
-                }
-            }
-            #endregion
 
             // Handle all timers
             _jumpBufferTimer -= deltaTime;
