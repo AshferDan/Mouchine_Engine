@@ -188,6 +188,9 @@ namespace CSharpScript
         private float _calculatedSkidDecel;
         private float _hurtTimer = 0f;
 
+        // camera
+        vec2 cam_defaultOffset = new vec2();
+
         public static string vfx = "Hero_vfx";
         public static string pu_vfx = "Pickup_vfx";
         public static string vfx_nontracking = "Hero_vfx_nontracking";
@@ -369,6 +372,7 @@ namespace CSharpScript
             Physics.SetFriction(OwnerName, 0f);
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
+            cam_defaultOffset = Camera.GetFollowOffset();
             Camera.SetZoom(0.5f);
 
             // starting anims
@@ -385,6 +389,14 @@ namespace CSharpScript
             if (Input.GetKeyPressed(Input.KeyCode.L))
             {
                 triggerSpeedBoost = true;
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.Left))
+            {
+                Camera.SetFollowOffset(cam_defaultOffset.x + 200, 0);
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.Right))
+            {
+                Camera.SetFollowOffset(cam_defaultOffset.x - 200, 0);
             }
             if (Input.GetKeyPressed(Input.KeyCode.P))
             {
