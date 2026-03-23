@@ -919,7 +919,25 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
         return;
 
     auto &factory = GameObjectFactory::Instance();
-    GameObject *btn = factory.FindGameObject(buttonName);
+
+    // Multiple GOs may share the name "BackButton" (Settings + Leaderboard).
+    // Always operate on the active one so the correct instance gets updated.
+    GameObject *btn = nullptr;
+    if (buttonName == "BackButton")
+    {
+        for (auto &obj : factory.GetAllGameObjects())
+        {
+            if (obj->GetName() == "BackButton" && obj->IsActive())
+            {
+                btn = obj.get();
+                break;
+            }
+        }
+    }
+    else
+    {
+        btn = factory.FindGameObject(buttonName);
+    }
     if (!btn)
         return;
 
