@@ -27,10 +27,26 @@ using json = nlohmann::ordered_json;
 
 // ===== Helpers =====
 
-std::string GhostSystem::MakePath(const std::string& levelName)
+std::string GhostSystem::MakePath(const std::string& fileName)
 {
-    std::filesystem::create_directories("../Assets/Replay");
-    return "../Assets/Replay/" + levelName + ".json";
+    // Determine level subfolder (Level_1, Level_2, or Level_3) from the stored level name
+    std::string subFolder;
+    for (int i = 1; i <= 3; ++i)
+    {
+        std::string key = "Level_" + std::to_string(i);
+        if (m_levelName.find(key) != std::string::npos)
+        {
+            subFolder = key;
+            break;
+        }
+    }
+
+    std::string dir = subFolder.empty()
+        ? "../Assets/Replay"
+        : "../Assets/Replay/" + subFolder;
+
+    std::filesystem::create_directories(dir);
+    return dir + "/" + fileName + ".json";
 }
 
 // ===== ISystem =====

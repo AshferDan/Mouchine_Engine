@@ -2555,7 +2555,29 @@ void PauseMenuLogicSystem::ScanReplaysForGhost()
     m_ghostReplayLevels.clear();
     namespace fs = std::filesystem;
 
-    const std::string replayDir = "../Assets/Replay/";
+    // Determine the level subfolder (Level_1, Level_2, Level_3) from the current scene path
+    std::string subFolder;
+    {
+        std::string lvl = currentScenePath;
+        size_t slash = lvl.find_last_of("/\\");
+        if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+        size_t dot = lvl.rfind('.');
+        if (dot != std::string::npos) lvl = lvl.substr(0, dot);
+        for (int i = 1; i <= 3; ++i)
+        {
+            std::string key = "Level_" + std::to_string(i);
+            if (lvl.find(key) != std::string::npos)
+            {
+                subFolder = key;
+                break;
+            }
+        }
+    }
+
+    const std::string replayDir = subFolder.empty()
+        ? "../Assets/Replay/"
+        : "../Assets/Replay/" + subFolder + "/";
+
     if (!fs::exists(replayDir))
         return;
 
