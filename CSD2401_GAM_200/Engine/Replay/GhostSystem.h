@@ -247,6 +247,17 @@ public:
         m_pendingReplayLoad    = true;
     }
 
+    /**
+     * @brief Flags the system to auto-load a recording after scene load WITHOUT entering watch mode.
+     *        The ghost will be available for the key-0 toggle (Vs Ghost mode).
+     * @param recordingName The name of the recording file to load.
+     */
+    void RequestVsGhostOnLoad(const std::string& recordingName)
+    {
+        m_pendingRecordingName  = recordingName;
+        m_pendingVsGhostLoad    = true;
+    }
+
     // ===== Finish Trigger =====
 
 private:
@@ -278,5 +289,6 @@ private:
 
     // Deferred replay: set before scene load, fires once liveTarget exists in the new scene
     bool        m_pendingReplayLoad    = false;
+    bool        m_pendingVsGhostLoad   = false;
     std::string m_pendingRecordingName;
 };

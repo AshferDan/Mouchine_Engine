@@ -69,6 +69,17 @@ void GhostSystem::Update(float dt)
         }
     }
 
+    // Deferred Vs-Ghost-on-load: load recording without entering watch mode
+    if (m_pendingVsGhostLoad && !m_liveTarget.empty())
+    {
+        if (GameObjectFactory::Instance().FindGameObject(m_liveTarget))
+        {
+            m_pendingVsGhostLoad = false;
+            LoadRecording(m_pendingRecordingName);
+            std::cout << "[GhostSystem] Vs-Ghost recording loaded: " << m_pendingRecordingName << std::endl;
+        }
+    }
+
     // Key-0: toggle ghost on/off — disabled during full replay watch mode
     if (!m_isReplayMode)
     {
