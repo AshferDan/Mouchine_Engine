@@ -319,8 +319,9 @@ void GhostSystem::SaveToDisk(const std::string& levelName)
     }
 
     json root;
-    root["level"]    = m_levelName;
-    root["bestTime"] = m_bestTime;
+    root["level"]           = m_levelName;
+    root["bestTime"]        = m_bestTime;
+    root["shellsCollected"] = m_shellsCollected;
 
     json frames = json::array();
     for (const auto& kf : m_bestRecording)
@@ -385,8 +386,9 @@ bool GhostSystem::LoadFromDisk(const std::string& levelName)
         return false;
     }
 
-    m_levelName      = root.value("level",    std::string{});
-    float bestTime   = root.value("bestTime", FLT_MAX);
+    m_levelName      = root.value("level",          std::string{});
+    float bestTime   = root.value("bestTime",       FLT_MAX);
+    m_shellsCollected = root.value("shellsCollected", 0);
     const auto& frames = root["frames"];
 
     if (frames.empty())

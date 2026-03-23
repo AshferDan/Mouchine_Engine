@@ -170,6 +170,19 @@ public:
     float GetBestRunTime() const { return m_bestTime; }
 
     /**
+     * @brief Sets the number of shells collected during the current run.
+     *        Call this before SaveCurrentRun / SaveBestRun.
+     * @param count Shells collected this run.
+     */
+    void SetShellsCollected(int count) { m_shellsCollected = count; }
+
+    /**
+     * @brief Gets the shells collected count stored in the last loaded/saved recording.
+     * @return Shell count.
+     */
+    int GetShellsCollected() const { return m_shellsCollected; }
+
+    /**
      * @brief Checks if the ghost is actively playing back.
      * @return True while the ghost is playing.
      */
@@ -240,12 +253,13 @@ private:
     void SaveToDisk(const std::string& levelName);
     bool LoadFromDisk(const std::string& levelName);
 
-    static std::string MakePath(const std::string& levelName);
+    std::string MakePath(const std::string& fileName);
 
     ReplayRecorder m_recorder;
     ReplayPlayer   m_player;
     GhostRecording m_bestRecording;
-    float          m_bestTime = FLT_MAX;
+    float          m_bestTime        = FLT_MAX;
+    int            m_shellsCollected = 0;
 
     // Game-supplied object names (set via Configure())
     std::string m_liveTarget;   ///< e.g. "Hero"

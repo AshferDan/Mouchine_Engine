@@ -503,6 +503,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                             size_t dot = lvl.rfind('.');
                             if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
                             ghost->SetLevelName(lvl);
+                            if (CORE->GetGameCallbacks())
+                                ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
 
                             ghost->SaveCurrentRun(runName);
                             std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
@@ -534,6 +536,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                     size_t dot = lvl.rfind('.');
                     if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
                     ghost->SetLevelName(lvl);
+                    if (CORE->GetGameCallbacks())
+                        ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
                     ghost->SaveCurrentRun("Level1_testing");
                 }
                 CORE->SetGamePaused(false);
