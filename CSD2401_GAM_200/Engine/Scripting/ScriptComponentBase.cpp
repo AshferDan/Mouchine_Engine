@@ -5,10 +5,12 @@
 ScriptComponentBase::ScriptComponentBase(GameObject* owner)
     : IComponent(owner)
     , scriptInstance(nullptr)
+    , onAwake(nullptr)
     , onStart(nullptr)
     , onUpdate(nullptr)
     , onDestroy(nullptr)
     , gcHandle(0)
+    , isAwakened(false)
     , isStarted(false)
 {
 }
@@ -26,6 +28,7 @@ void ScriptComponentBase::Initialize()
 {
     if (CreateScriptInstance())
     {
+        CallOnAwake();
         CallOnStart();
     }
 }
@@ -34,7 +37,11 @@ void ScriptComponentBase::Update(float dt)
 {
     if (!enabled || !scriptInstance) return;
 
-    // Ensure OnStart is called before the first update
+    // Ensure OnAwake and OnStart are called before the first update
+    if (!isAwakened)
+    {
+        CallOnAwake();
+    }
     if (!isStarted)
     {
         CallOnStart();
@@ -80,10 +87,20 @@ void ScriptComponentBase::CacheMethods()
     if (!scriptInstance) return;
 
     MonoClass* instanceClass = mono_object_get_class(scriptInstance);
-    
+
+    onAwake = mono_class_get_method_from_name(instanceClass, "OnAwake", 0);
     onStart = mono_class_get_method_from_name(instanceClass, "OnStart", 0);
     onUpdate = mono_class_get_method_from_name(instanceClass, "OnUpdate", 1);
     onDestroy = mono_class_get_method_from_name(instanceClass, "OnDestroy", 0);
+}
+
+void ScriptComponentBase::CallOnAwake()
+{
+    if (scriptInstance && onAwake && !isAwakened)
+    {
+        mono_runtime_invoke(onAwake, scriptInstance, nullptr, nullptr);
+    }
+    isAwakened = true;
 }
 
 void ScriptComponentBase::CallOnStart()

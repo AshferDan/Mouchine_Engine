@@ -125,6 +125,9 @@ int main()
             int  GetTotalCoins()    const override { return pickupSystem.GetTotalCoins(); }
             int  GetTotalShells()   const override { return pickupSystem.GetTotalShells(); }
             void ReinitPickups()        override { pickupSystem = PickupSystem(); }
+
+            float GetLevelTimerLength() const override { return gameTimer ? gameTimer->GetLevelTimerLength() : 60.0f; }
+            void  SetLevelTimerLength(float length) override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
         };
 
         static GameApp gameApp;

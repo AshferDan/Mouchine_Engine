@@ -172,7 +172,12 @@ namespace CSharpScript
         public string vfx = "Hero_vfx";
         public string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
+        public override void OnAwake()
+        {
 
+            Debug.Log("testing ON AWAKE");
+
+        }
 
         public PlayerMovement()
         {
@@ -1817,12 +1822,10 @@ namespace CSharpScript
         private bool _blinkRestoredAlpha = true;    // tracks whether alpha has been restored after immunity ended
         private void HandleBlinkEffect()
         {
-            bool inBlinkWindow = _hurtTimer > 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration;
+            float defaultAlpha = 1f;// Graphics.GetColor(OwnerName).z;
 
-            if (inBlinkWindow)
+            if (_hurtTimer >= 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration)
             {
-                _blinkRestoredAlpha = false;
-                float defaultAlpha = Graphics.GetColor(OwnerName).w;
                 intervalTimer += fixeddt;
 
                 if (intervalTimer >= MoveStats.hurtBlinkInterval)
@@ -1832,14 +1835,12 @@ namespace CSharpScript
                     intervalTimer = 0f;
                 }
             }
-            else if (!_blinkRestoredAlpha)
+            else
             {
-                // Immunity ended — restore alpha only once
+                // Immunity ended, restore alpha
                 isVisible = false;
                 intervalTimer = 0f;
-                float defaultAlpha = Graphics.GetColor(OwnerName).w;
                 Graphics.SetAlpha(OwnerName, defaultAlpha);
-                _blinkRestoredAlpha = true;
             }
         }
 

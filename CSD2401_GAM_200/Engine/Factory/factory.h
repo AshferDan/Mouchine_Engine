@@ -306,6 +306,8 @@ public:
      */
     void DestroyAllGameObjects();
 
+
+    int CountAllGameObjects();
     /**
      * @brief Destroys all currently managed GameObjects.
      */

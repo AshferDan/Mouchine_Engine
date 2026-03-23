@@ -541,7 +541,7 @@ void GameObjectFactory::FlushPendingDestroys()
 
 void GameObjectFactory::DestroyAllRelatedGameObjects(EntityID parentID)
 {
-    std::vector<EntityID> goDestroyList; // vector to gather all items to destroy - cant use getfamilytree because we need the order
+    std::vector<EntityID> goDestroyList; // vector to gather all items to destroy 
     std::queue<EntityID> queue;          // queue to sort by which needs to go first (bottom to up)
     queue.push(parentID);
 
@@ -583,6 +583,14 @@ void GameObjectFactory::DestroyAllGameObjects()
     entityToIndex.clear();
 
     std::cout << "Factory: All game objects destroyed. Next ID will be: " << nextEntityID << std::endl;
+}
+
+
+// Returns the amount of gameobject in the Instance
+int GameObjectFactory::CountAllGameObjects()
+{
+    return gameObjects.size();
+
 }
 
 void GameObjectFactory::Clear()

@@ -94,7 +94,11 @@ public:
 
     float GetLevelTimerLength() const { return LevelTimerLength; }
 
-    void RestoreTimerBar(GameObject* timerGO);
+    /**
+     * @brief Sets the level timer length (in seconds).
+     * @param length Time in seconds for the level timer.
+     */
+    void SetLevelTimerLength(float length) { LevelTimerLength = length; }
 
 private:
     float       LevelTimerLength = 60.0f;

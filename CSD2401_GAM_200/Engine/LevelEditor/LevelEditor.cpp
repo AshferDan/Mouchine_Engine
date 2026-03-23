@@ -316,8 +316,19 @@ void LevelEditor::EnterPlayMode()
     }
 
     editorMode = EditorMode::Play;
-    // fire Start() once on all active game states
-    //GameManager::Instance().StartActiveState();
+
+    // Fire OnAwake then OnStart on all existing scripts
+    if (CORE && CORE->GetScriptSystem())
+    {
+        auto* scriptSys = CORE->GetScriptSystem();
+        const auto& gameObjects = factory.GetAllGameObjects();
+        for (const auto& go : gameObjects)
+        {
+            scriptSys->CallOnAwake(go.get());
+            scriptSys->CallOnStart(go.get());
+        }
+        std::cout << "[LevelEditor] Called OnAwake + OnStart on all scripts.\n";
+    }
 
     // start bgm when play is click
     if (audioManager)
@@ -763,12 +774,21 @@ bool LevelEditor::SaveLevel(const std::string &filepath)
             {
                 std::cerr << "[SaveLevel] WARNING: AudioManager is NULL" << std::endl;
             }
+
+            // save game settings (timer length, etc.)
+            IGameCallbacksSystem* gameCb = CORE->GetGameCallbacks();
+            if (gameCb)
+            {
+                root["GameSettings"] = json::object();
+                root["GameSettings"]["LevelTimerLength"] = gameCb->GetLevelTimerLength();
+                std::cout << "[SaveLevel] Game settings saved (Timer: " << gameCb->GetLevelTimerLength() << "s)" << std::endl;
+            }
         }
         else
         {
             std::cerr << "[SaveLevel] WARNING: CORE is NULL" << std::endl;
         }
-        
+
         // write to file
         std::ofstream outFile(filepath);
         if (!outFile.is_open())
@@ -910,6 +930,22 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
             if (!CORE)
             {
                 std::cerr << "[LoadLevel] ERROR: CORE is NULL!\n";
+            }
+        }
+
+        // load game settings (timer length, etc.) BEFORE GameObjects
+        if (CORE && root.contains("GameSettings"))
+        {
+            IGameCallbacksSystem* gameCb = CORE->GetGameCallbacks();
+            if (gameCb)
+            {
+                const auto& settings = root["GameSettings"];
+                if (settings.contains("LevelTimerLength"))
+                {
+                    float timerLength = settings["LevelTimerLength"].get<float>();
+                    gameCb->SetLevelTimerLength(timerLength);
+                    std::cout << "[LoadLevel] Game settings loaded (Timer: " << timerLength << "s)" << std::endl;
+                }
             }
         }
 

@@ -1873,10 +1873,10 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
                 texturePath = "../Assets/Sprites/Icons/playing_button.png";
                 break;
             case ButtonState::Hover:
-                texturePath = "../Assets/Sprites/Icons/Playing button_light.png";
+                texturePath = "../Assets/Sprites/Icons/Playing_button_light.png";
                 break;
             case ButtonState::Pressed:
-                texturePath = "../Assets/Sprites/Icons/Playing button_dark.png";
+                texturePath = "../Assets/Sprites/Icons/Playing_button_dark.png";
                 break;
         }
     }

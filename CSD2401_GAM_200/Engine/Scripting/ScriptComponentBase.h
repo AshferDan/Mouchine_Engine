@@ -30,12 +30,14 @@ class ScriptComponentBase : public IComponent
 protected:
     // Mono runtime objects
     MonoObject* scriptInstance;     // The C# script instance
+    MonoMethod* onAwake;            // Cached OnAwake method
     MonoMethod* onStart;            // Cached OnStart method
     MonoMethod* onUpdate;           // Cached OnUpdate method
     MonoMethod* onDestroy;          // Cached OnDestroy method
     uint32_t gcHandle;              // GC handle to prevent collection
 
     // State tracking
+    bool isAwakened;                // Has OnAwake been called?
     bool isStarted;                 // Has OnStart been called?
 
 public:
@@ -94,6 +96,11 @@ protected:
      * @brief Caches the script's lifecycle methods (OnStart, OnUpdate, OnDestroy)
      */
     void CacheMethods();
+
+    /**
+     * @brief Calls OnAwake if it hasn't been called yet
+     */
+    void CallOnAwake();
 
     /**
      * @brief Calls OnStart if it hasn't been called yet

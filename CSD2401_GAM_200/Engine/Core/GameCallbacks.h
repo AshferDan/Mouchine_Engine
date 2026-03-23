@@ -78,4 +78,8 @@ public:
     virtual int  GetTotalCoins()    const { return 0; }
     virtual int  GetTotalShells()   const { return 0; }
     virtual void ReinitPickups()         {}
+
+    // ── Timer system ──────────────────────────────────────────────────────────
+    virtual float GetLevelTimerLength() const { return 60.0f; }
+    virtual void  SetLevelTimerLength(float) {}
 };

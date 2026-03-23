@@ -30,7 +30,7 @@ Technology is prohibited.
 void GameTimerSystem::Initialize()
 {
     remainingTime = LevelTimerLength;
-    lastDisplayedSeconds = 60;
+    lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
 
@@ -46,7 +46,7 @@ void GameTimerSystem::Initialize()
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
 
-    UpdateBar(60);
+    UpdateBar(static_cast<int>(LevelTimerLength));
 }
 
 /**
@@ -105,7 +105,6 @@ void GameTimerSystem::Update(float dt)
         if (timerGO->IsActive())
         {
             timerGO->SetActive(false);
-            RestoreTimerBar(timerGO);
         }
         if (timerBackground && timerBackground->IsActive())
         {
@@ -125,7 +124,6 @@ void GameTimerSystem::Update(float dt)
         if (timerGO->IsActive())
         {
             timerGO->SetActive(false);
-            RestoreTimerBar(timerGO);
         }
         if (timerBackground && timerBackground->IsActive())
         {
@@ -155,11 +153,11 @@ void GameTimerSystem::Update(float dt)
     // reset timer and bar
     if (mode == EditorMode::Stop)
     {
-        if (remainingTime != 60.0f || lastDisplayedSeconds != 60) 
+        if (remainingTime != LevelTimerLength || lastDisplayedSeconds != static_cast<int>(LevelTimerLength))
         {
 
-            remainingTime = 60.0f;
-            lastDisplayedSeconds = 60;
+            remainingTime = LevelTimerLength;
+            lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
             hasTriggeredTimeUp = false;
             hasTriggeredPanicSound = false;
 
@@ -187,10 +185,9 @@ void GameTimerSystem::Update(float dt)
             originalCenterY = 0.0f;
             leftEdge = 0.0f;
 
-            
-            UpdateBar(60);
+            UpdateBar(static_cast<int>(LevelTimerLength));
         }
-        RestoreTimerBar(timerGO);
+
         return;
     }
 
@@ -241,8 +238,8 @@ void GameTimerSystem::Update(float dt)
  */
 void GameTimerSystem::ResetTimer()
 {
-    remainingTime = 30.0f;
-    lastDisplayedSeconds = 30;
+    remainingTime = LevelTimerLength;
+    lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
 
@@ -258,7 +255,7 @@ void GameTimerSystem::ResetTimer()
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
 
-    UpdateBar(30);
+    UpdateBar(static_cast<int>(LevelTimerLength));
 }
 
 /**
@@ -328,40 +325,6 @@ void GameTimerSystem::ComputeBarUVBounds(RenderComponent* renderComp) {
 }
 
 /**
- * @brief Resets the timer bar's transform and UV back to the original design-time values.
- *        The transform is only ever written here and in UpdateBar; restoring it here
- *        guarantees the serializer always sees a clean state.
- */
-void GameTimerSystem::RestoreTimerBar(GameObject* timerGO)
-{
-    if (!timerGO) return;
-
-    auto* transformComp = timerGO->GetComponent<TransformComponent>();
-    auto* renderComp = timerGO->GetComponent<RenderComponent>();
-
-    if (transformComp && originalScaleX > 0.0f)
-    {
-        transformComp->SetScale(originalScaleX, originalScaleY);
-        transformComp->SetPosition(originalCenterX, originalCenterY);
-    }
-
-    if (renderComp)
-    {
-        renderComp->SetUVScale(vec2(1.0f, 1.0f));
-        renderComp->SetUVOffset(vec2(0.0f, 0.0f));
-    }
-
-    // Let UpdateBar re-snapshot the transform next time play starts
-    originalScaleX = 0.0f;
-    originalScaleY = 0.0f;
-    originalCenterX = 0.0f;
-    originalCenterY = 0.0f;
-    leftEdge = 0.0f;
-    rightEdge = 0.0f;
-    uvBoundsReady = false;
-}
-
-/**
  * @brief Updates the timer bar fill amount based on remaining time.
  */
 void GameTimerSystem::UpdateBar(int )
@@ -420,7 +383,7 @@ void GameTimerSystem::UpdateBar(int )
         rightEdge = originalScaleX * uvBarWidth;
     }
 
-    float fillPercentage = std::clamp(remainingTime / 60.0f, 0.0f, 1.0f);
+    float fillPercentage = std::clamp(remainingTime / LevelTimerLength, 0.0f, 1.0f);
     float safeFill = std::max(fillPercentage, 0.001f);
 
     // world width of remaining visible blue
