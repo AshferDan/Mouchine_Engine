@@ -2,7 +2,7 @@
     "GameObjects": [
         {
             "name": "LeaderBoards_Menu",
-            "localID": 59,
+            "localID": 11,
             "parentID": 4294967295,
             "active": true,
             "TransformComponent": {
@@ -38,8 +38,8 @@
             "children": [
                 {
                     "name": "Leaderboards_tab_1st",
-                    "localID": 58,
-                    "parentID": 59,
+                    "localID": 12,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -63,7 +63,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 2,
+                        "layer": 3,
                         "screenSpace": false,
                         "tileable": false,
                         "tileCount": [
@@ -75,8 +75,8 @@
                 },
                 {
                     "name": "Leaderboards_BG",
-                    "localID": 57,
-                    "parentID": 59,
+                    "localID": 13,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -112,8 +112,8 @@
                 },
                 {
                     "name": "Leaderboards_tab_2nd",
-                    "localID": 60,
-                    "parentID": 59,
+                    "localID": 14,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -149,8 +149,8 @@
                 },
                 {
                     "name": "Leaderboards_tab_3rd",
-                    "localID": 61,
-                    "parentID": 59,
+                    "localID": 15,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -186,8 +186,8 @@
                 },
                 {
                     "name": "Leaderboards_Level_1",
-                    "localID": 62,
-                    "parentID": 59,
+                    "localID": 16,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -223,8 +223,8 @@
                 },
                 {
                     "name": "Leaderboards_Level_2",
-                    "localID": 63,
-                    "parentID": 59,
+                    "localID": 17,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -260,8 +260,8 @@
                 },
                 {
                     "name": "Leaderboards_Level_3",
-                    "localID": 64,
-                    "parentID": 59,
+                    "localID": 18,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -297,8 +297,8 @@
                 },
                 {
                     "name": "BackButton",
-                    "localID": 65,
-                    "parentID": 59,
+                    "localID": 19,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -334,8 +334,8 @@
                 },
                 {
                     "name": "ReplayButton",
-                    "localID": 66,
-                    "parentID": 59,
+                    "localID": 20,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -371,8 +371,8 @@
                 },
                 {
                     "name": "Vs_Ghost_Button",
-                    "localID": 67,
-                    "parentID": 59,
+                    "localID": 21,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -408,8 +408,8 @@
                 },
                 {
                     "name": "Name_1st_Text",
-                    "localID": 68,
-                    "parentID": 59,
+                    "localID": 22,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -445,7 +445,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "1stPlayer",
                         "color": [
                             0.0,
                             0.0,
@@ -459,8 +459,8 @@
                 },
                 {
                     "name": "Level_2_Text",
-                    "localID": 69,
-                    "parentID": 59,
+                    "localID": 23,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -496,7 +496,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "Level 2",
                         "color": [
                             0.0,
                             0.0,
@@ -510,8 +510,8 @@
                 },
                 {
                     "name": "Level_3_Text",
-                    "localID": 70,
-                    "parentID": 59,
+                    "localID": 24,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -547,7 +547,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "Level 3",
                         "color": [
                             0.0,
                             0.0,
@@ -561,8 +561,8 @@
                 },
                 {
                     "name": "Name_2nd_Text",
-                    "localID": 71,
-                    "parentID": 59,
+                    "localID": 25,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -598,7 +598,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "2ndPlayer",
                         "color": [
                             0.0,
                             0.0,
@@ -612,8 +612,8 @@
                 },
                 {
                     "name": "Name_3rd_Text",
-                    "localID": 72,
-                    "parentID": 59,
+                    "localID": 26,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -649,7 +649,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "3rdPlayer",
                         "color": [
                             0.0,
                             0.0,
@@ -663,8 +663,8 @@
                 },
                 {
                     "name": "Time_1st_Text",
-                    "localID": 74,
-                    "parentID": 59,
+                    "localID": 27,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -700,7 +700,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "1stTime",
                         "color": [
                             0.0,
                             0.0,
@@ -714,8 +714,8 @@
                 },
                 {
                     "name": "Time_2nd_Text",
-                    "localID": 75,
-                    "parentID": 59,
+                    "localID": 28,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -751,7 +751,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "2ndTime",
                         "color": [
                             0.0,
                             0.0,
@@ -765,8 +765,8 @@
                 },
                 {
                     "name": "Time_3rd_Text",
-                    "localID": 76,
-                    "parentID": 59,
+                    "localID": 29,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -802,7 +802,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "3rdTime",
                         "color": [
                             0.0,
                             0.0,
@@ -815,423 +815,9 @@
                     "children": []
                 },
                 {
-                    "name": "Shell_1st_dark_L",
-                    "localID": 77,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            274.5331115722656,
-                            4.3148040771484375
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_1st_dark_M",
-                    "localID": 78,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            330.59356689453125,
-                            4.3148040771484375
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_1st_dark_R",
-                    "localID": 79,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            384.8753662109375,
-                            4.3148040771484375
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_2nd_dark_L",
-                    "localID": 80,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            274.5331115722656,
-                            -59.453269958496094
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_2nd_dark_M",
-                    "localID": 81,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            330.59356689453125,
-                            -57.27931213378906
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_2nd_dark_R",
-                    "localID": 82,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            384.8753662109375,
-                            -56.554710388183594
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_3rd_dark_L",
-                    "localID": 83,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            274.5331115722656,
-                            -121.04740905761719
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_3rd_dark_M",
-                    "localID": 84,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            330.59356689453125,
-                            -118.87342071533203
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
-                    "name": "Shell_3rd_dark_R",
-                    "localID": 85,
-                    "parentID": 59,
-                    "active": true,
-                    "TransformComponent": {
-                        "enabled": true,
-                        "pos": [
-                            384.8753662109375,
-                            -117.42418670654297
-                        ],
-                        "scale": [
-                            50.0,
-                            50.0
-                        ],
-                        "rotation": 0.0
-                    },
-                    "RenderComponent": {
-                        "enabled": true,
-                        "shapeType": "Square",
-                        "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "layer": 3,
-                        "screenSpace": false,
-                        "tileable": false,
-                        "tileCount": [
-                            1.0,
-                            1.0
-                        ]
-                    },
-                    "ColliderComponent": {
-                        "enabled": true,
-                        "shape": "Square",
-                        "layer": "Default",
-                        "size": [
-                            50.0,
-                            50.0
-                        ]
-                    },
-                    "children": []
-                },
-                {
                     "name": "Level_1_Text",
-                    "localID": 86,
-                    "parentID": 59,
+                    "localID": 39,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -1267,7 +853,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "Level 1",
                         "color": [
                             0.0,
                             0.0,
@@ -1281,8 +867,8 @@
                 },
                 {
                     "name": "Replay_Text",
-                    "localID": 87,
-                    "parentID": 59,
+                    "localID": 40,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -1318,7 +904,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "Replay",
                         "color": [
                             0.0,
                             0.0,
@@ -1332,8 +918,8 @@
                 },
                 {
                     "name": "Vs_Ghost_Text",
-                    "localID": 88,
-                    "parentID": 59,
+                    "localID": 41,
+                    "parentID": 11,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
@@ -1369,7 +955,7 @@
                         "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 28,
-                        "text": "Yes",
+                        "text": "Vs Ghost",
                         "color": [
                             0.0,
                             0.0,
@@ -1378,6 +964,297 @@
                         ],
                         "scale": 1.0,
                         "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "1stRank",
+                    "localID": 42,
+                    "parentID": 11,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            324.2338562011719,
+                            7.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 28,
+                        "text": "1stPlayer",
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "2ndRank",
+                    "localID": 43,
+                    "parentID": 11,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            324.6305847167969,
+                            -60.8571662902832
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 28,
+                        "text": "1stPlayer",
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "3rdRank",
+                    "localID": 44,
+                    "parentID": 11,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            323.30792236328125,
+                            -126.3333511352539
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            0.5,
+                            0.5,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 28,
+                        "text": "1stPlayer",
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Letterscore_1st",
+                    "localID": 45,
+                    "parentID": 11,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            424.5792541503906,
+                            -58.36846923828125
+                        ],
+                        "scale": [
+                            80.0,
+                            80.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Letterscore_S.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 3,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Default",
+                        "size": [
+                            80.0,
+                            80.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Letterscore_2nd",
+                    "localID": 46,
+                    "parentID": 11,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            424.5792541503906,
+                            -119.47953796386719
+                        ],
+                        "scale": [
+                            80.0,
+                            80.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Letterscore_S.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 3,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Default",
+                        "size": [
+                            80.0,
+                            80.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Letterscore_3rd",
+                    "localID": 47,
+                    "parentID": 11,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            424.5792541503906,
+                            7.372280120849609
+                        ],
+                        "scale": [
+                            80.0,
+                            80.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Icons/Letterscore_S.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 3,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Default",
+                        "size": [
+                            80.0,
+                            80.0
+                        ]
                     },
                     "children": []
                 }
