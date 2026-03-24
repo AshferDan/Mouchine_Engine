@@ -73,6 +73,28 @@ public:
      */
     bool IsPaused()  const { return m_isPaused; }
 
+    /**
+     * @brief Returns the current playback clock time in seconds.
+     * @return Current time in seconds.
+     */
+    float GetClock() const { return m_clock; }
+
+    /**
+     * @brief Returns the total duration of the recording in seconds.
+     * @return Duration in seconds, or 0 if no recording.
+     */
+    float GetDuration() const
+    {
+        return (m_recording && !m_recording->empty()) ? m_recording->back().timestamp : 0.0f;
+    }
+
+    /**
+     * @brief Seeks to an absolute time position in the recording.
+     *        Clamps to [0, duration]. Safe to call while paused.
+     * @param t Target time in seconds.
+     */
+    void SeekAbsolute(float t);
+
 private:
     std::string           m_ghostName;
     const GhostRecording* m_recording  = nullptr;

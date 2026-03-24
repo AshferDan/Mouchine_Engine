@@ -15,15 +15,33 @@ Technology is prohibited.
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <algorithm>
 #include "Factory.h"
 #include "transform.h"
 #include "CameraManager.h"
 #include "CameraComponent.h"
 #include "Collidercomponent.h"
 #include "Physics.h"
+#include "Serialization.h"
+#include "InputManager.h"
 #include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::ordered_json;
+
+// ===== Media Player layout constants (tuned for zoom = 0.5 / 1920x1080) =====
+// All offsets are relative to the camera position.
+static constexpr float MP_Y_OFFSET   = -920.0f;  ///< Distance below camera centre (near bottom)
+static constexpr float MP_BAR_CX     =   50.0f;  ///< Timeline bar centre X offset
+static constexpr float MP_BAR_W      = 1000.0f;  ///< Timeline bar total width
+static constexpr float MP_BAR_H      =   50.0f;  ///< Timeline bar height
+static constexpr float MP_PLAY_X     = -550.0f;  ///< Play / Pause button centre X offset
+static constexpr float MP_PLAY_SIZE  =   80.0f;  ///< Play / Pause button half-size (square)
+static constexpr float MP_BWD_X      = -650.0f;  ///< Backward button centre X offset
+static constexpr float MP_BWD_SIZE   =   80.0f;  ///< Backward button half-size
+static constexpr float MP_FWD_X      =  650.0f;  ///< Forward button centre X offset
+static constexpr float MP_FWD_SIZE   =   80.0f;  ///< Forward button half-size
+static constexpr float MP_SLIDER_W   =   60.0f;  ///< Slider thumb width
+static constexpr float MP_SLIDER_H   =   80.0f;  ///< Slider thumb height
 
 // ===== Helpers =====
 
@@ -94,6 +112,10 @@ void GhostSystem::Update(float dt)
 
     // Player drives the ghost object this tick
     m_player.Update(dt);
+
+    // Update media player UI when watching a replay
+    if (m_isReplayMode && m_mediaPlayerSpawned)
+        UpdateMediaPlayer(dt);
 
 }
 
@@ -271,11 +293,13 @@ void GhostSystem::EnterReplayMode()
     m_player.StartPlayback(m_ghostTarget, m_bestRecording);
 
     m_isReplayMode = true;
+    SpawnMediaPlayer();
     std::cout << "[GhostSystem] Replay mode entered.\n";
 }
 
 void GhostSystem::ExitReplayMode()
 {
+    DestroyMediaPlayer();
     m_player.StopPlayback();
 
     auto& factory = GameObjectFactory::Instance();
@@ -433,4 +457,134 @@ bool GhostSystem::LoadFromDisk(const std::string& levelName)
         << m_bestTime << "s" << std::endl;
 
     return true;
+}
+
+// ===== Media Player =====
+
+void GhostSystem::SpawnMediaPlayer()
+{
+    if (m_mediaPlayerSpawned)
+        return;
+    Serialization::LoadPrefabWithReturn("Media_Player");
+    m_mediaPlayerSpawned = true;
+}
+
+void GhostSystem::DestroyMediaPlayer()
+{
+    if (!m_mediaPlayerSpawned)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+    static const char* names[] = {
+        "Media_Player", "Button_Play", "Button_Pause",
+        "Replay_forward", "Replay_backward",
+        "Replay_box", "Replay_slider", "Replay_bar_brown"
+    };
+    for (const char* name : names)
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj) factory.QueueDestroyGameObject(obj->GetID());
+    }
+    m_mediaPlayerSpawned = false;
+    m_sliderDragging     = false;
+}
+
+void GhostSystem::UpdateMediaPlayer(float dt)
+{
+    (void)dt;
+
+    auto& factory = GameObjectFactory::Instance();
+
+    // --- Camera anchor ---
+    vec2  camPos = CameraManager::Instance().GetCameraPosition();
+    float camX   = camPos.x;
+    float camY   = camPos.y;
+    float baseY  = camY + MP_Y_OFFSET;
+
+    // Helper: move object and optionally resize it
+    auto MoveObj = [&](const char* name, float wx, float wy, float sx = -1.f, float sy = -1.f)
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (!obj) return;
+        auto* tf = obj->GetComponent<TransformComponent>();
+        if (!tf) return;
+        tf->posX = wx;
+        tf->posY = wy;
+        if (sx > 0.f) { tf->scaleX = sx; tf->scaleY = sy; }
+    };
+
+    // Reposition static elements
+    MoveObj("Replay_bar_brown", camX + MP_BAR_CX, baseY, MP_BAR_W + 10.f, MP_BAR_H);
+    MoveObj("Replay_box",       camX + MP_BAR_CX, baseY, MP_BAR_W,        MP_BAR_H);
+    MoveObj("Replay_backward",  camX + MP_BWD_X,  baseY, MP_BWD_SIZE,     MP_BWD_SIZE);
+    MoveObj("Replay_forward",   camX + MP_FWD_X,  baseY, MP_FWD_SIZE,     MP_FWD_SIZE);
+
+    // Play / Pause button visibility toggle
+    bool paused = m_player.IsPaused();
+    {
+        GameObject* btnPlay  = factory.FindGameObject("Button_Play");
+        GameObject* btnPause = factory.FindGameObject("Button_Pause");
+        if (btnPlay)  { btnPlay->SetActive(!paused);  MoveObj("Button_Play",  camX + MP_PLAY_X, baseY, MP_PLAY_SIZE, MP_PLAY_SIZE); }
+        if (btnPause) { btnPause->SetActive(paused);   MoveObj("Button_Pause", camX + MP_PLAY_X, baseY, MP_PLAY_SIZE, MP_PLAY_SIZE); }
+    }
+
+    // Slider position reflects playback progress
+    float duration = m_player.GetDuration();
+    float clock    = m_player.GetClock();
+    float progress = (duration > 0.f) ? (clock / duration) : 0.f;
+    progress = (progress < 0.f) ? 0.f : (progress > 1.f) ? 1.f : progress;
+
+    float barLeft = camX + MP_BAR_CX - MP_BAR_W * 0.5f;
+    float sliderX = barLeft + progress * MP_BAR_W;
+    MoveObj("Replay_slider", sliderX, baseY, MP_SLIDER_W, MP_SLIDER_H);
+
+    // --- Input handling ---
+    float mouseX = static_cast<float>(InputManager::GetMouseWorldX());
+    float mouseY = static_cast<float>(InputManager::GetMouseWorldY());
+
+    bool mouseDown        = (glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+    bool mouseJustPressed = mouseDown && !m_mouseWasDown;
+    bool mouseJustReleased = !mouseDown && m_mouseWasDown;
+    m_mouseWasDown = mouseDown;
+
+    // Point-in-AABB test (centre + half-extents)
+    auto InRect = [](float mx, float my, float cx, float cy, float hw, float hh) -> bool
+    {
+        return (mx >= cx - hw) && (mx <= cx + hw) && (my >= cy - hh) && (my <= cy + hh);
+    };
+
+    // Begin slider drag when clicking inside the timeline bar
+    if (mouseJustPressed && !m_sliderDragging)
+    {
+        if (InRect(mouseX, mouseY, camX + MP_BAR_CX, baseY, MP_BAR_W * 0.5f, MP_BAR_H * 0.5f))
+            m_sliderDragging = true;
+    }
+
+    // While dragging, seek to the mouse position along the bar
+    if (m_sliderDragging && mouseDown)
+    {
+        float t = (mouseX - barLeft) / MP_BAR_W;
+        t = (t < 0.f) ? 0.f : (t > 1.f) ? 1.f : t;
+        m_player.SeekAbsolute(t * duration);
+    }
+
+    // Release drag
+    if (mouseJustReleased)
+        m_sliderDragging = false;
+
+    // Button clicks (only on fresh press, not while dragging the slider)
+    if (mouseJustPressed && !m_sliderDragging)
+    {
+        // Play / Pause toggle
+        if (InRect(mouseX, mouseY, camX + MP_PLAY_X, baseY, MP_PLAY_SIZE * 0.5f, MP_PLAY_SIZE * 0.5f))
+            m_player.TogglePause();
+
+        // Rewind 10 s
+        if (InRect(mouseX, mouseY, camX + MP_BWD_X, baseY, MP_BWD_SIZE * 0.5f, MP_BWD_SIZE * 0.5f))
+            m_player.Seek(-10.f);
+
+        // Skip forward 10 s
+        if (InRect(mouseX, mouseY, camX + MP_FWD_X, baseY, MP_FWD_SIZE * 0.5f, MP_FWD_SIZE * 0.5f))
+            m_player.Seek(10.f);
+    }
 }

@@ -188,6 +188,24 @@ public:
      */
     bool IsGhostPlaying() const { return m_player.IsPlaying(); }
 
+    // ===== Media Player / Replay UI =====
+
+    /**
+     * @brief Returns the current replay playback time in seconds.
+     */
+    float GetReplayClock() const { return m_player.GetClock(); }
+
+    /**
+     * @brief Returns the total duration of the loaded recording in seconds.
+     */
+    float GetReplayDuration() const { return m_player.GetDuration(); }
+
+    /**
+     * @brief Seeks the replay to an absolute time (clamped to [0, duration]).
+     * @param t Target time in seconds.
+     */
+    void SeekReplayAbsolute(float t) { m_player.SeekAbsolute(t); }
+
     // ===== Replay Watch Mode =====
 
     /**
@@ -265,6 +283,15 @@ private:
     bool LoadFromDisk(const std::string& levelName);
 
     std::string MakePath(const std::string& fileName);
+
+    // ===== Media Player helpers =====
+    void SpawnMediaPlayer();
+    void DestroyMediaPlayer();
+    void UpdateMediaPlayer(float dt);
+
+    bool  m_mediaPlayerSpawned = false; ///< True while the Media_Player prefab is live
+    bool  m_mouseWasDown       = false; ///< Previous-frame mouse-button state for edge detection
+    bool  m_sliderDragging     = false; ///< True while the user is dragging the timeline slider
 
     ReplayRecorder m_recorder;
     ReplayPlayer   m_player;
