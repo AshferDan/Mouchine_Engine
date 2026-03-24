@@ -28,7 +28,12 @@
           1.0
         ],
         "layer": 0,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "children": []
     },
@@ -60,7 +65,12 @@
           1.0
         ],
         "layer": 0,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "Spritesheet": {
         "enabled": true,
@@ -146,7 +156,12 @@
           1.0
         ],
         "layer": 0,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "children": []
     },
@@ -178,7 +193,12 @@
           1.0
         ],
         "layer": 0,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "TextComponent": {
         "enabled": false,
@@ -253,7 +273,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -285,7 +310,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -317,7 +347,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -349,43 +384,16 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         }
       ]
-    },
-    {
-      "name": "ReplayButton",
-      "localID": 11,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "enabled": true,
-        "pos": [
-          890.0,
-          340.0
-        ],
-        "scale": [
-          120.0,
-          110.0
-        ],
-        "rotation": 0.0
-      },
-      "RenderComponent": {
-        "enabled": true,
-        "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/Icons/Replay_Button.png",
-        "color": [
-          1.0,
-          1.0,
-          1.0,
-          1.0
-        ],
-        "layer": 0,
-        "screenSpace": false
-      },
-      "children": []
     },
     {
       "name": "Screen_LevelSelect",
@@ -415,7 +423,12 @@
           1.0
         ],
         "layer": 0,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "ColliderComponent": {
         "enabled": true,
@@ -455,7 +468,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "ColliderComponent": {
             "enabled": true,
@@ -495,7 +513,12 @@
                   0.0
                 ],
                 "layer": 503,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "TextComponent": {
                 "enabled": true,
@@ -543,7 +566,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "ColliderComponent": {
             "enabled": true,
@@ -583,7 +611,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -624,7 +657,12 @@
                   0.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "TextComponent": {
                 "enabled": true,
@@ -670,7 +708,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -711,7 +754,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -752,7 +800,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -795,7 +848,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "ColliderComponent": {
             "enabled": true,
@@ -835,7 +893,12 @@
                   0.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "TextComponent": {
                 "enabled": true,
@@ -881,7 +944,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -922,7 +990,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -963,7 +1036,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -1004,7 +1082,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -1045,7 +1128,12 @@
                   1.0
                 ],
                 "layer": 1,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             }
@@ -1079,7 +1167,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "ColliderComponent": {
             "enabled": true,
@@ -1119,7 +1212,12 @@
                   0.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "TextComponent": {
                 "enabled": true,
@@ -1165,7 +1263,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -1206,7 +1309,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -1247,7 +1355,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -1288,7 +1401,12 @@
                   1.0
                 ],
                 "layer": 0,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -1333,7 +1451,12 @@
           1.0
         ],
         "layer": 1,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "PhysicsComponent": {
         "enabled": true,
@@ -1375,7 +1498,12 @@
               1.0
             ],
             "layer": 1,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "TextComponent": {
             "enabled": true,
@@ -1421,7 +1549,12 @@
               1.0
             ],
             "layer": 2,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -1453,7 +1586,12 @@
               1.0
             ],
             "layer": 1,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -1485,7 +1623,12 @@
               1.0
             ],
             "layer": 2,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -1517,7 +1660,12 @@
               1.0
             ],
             "layer": 1,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "PhysicsComponent": {
             "enabled": true,
@@ -1534,7 +1682,7 @@
         },
         {
           "name": "BackButton",
-          "localID": 50,
+          "localID": 40,
           "parentID": 34,
           "active": true,
           "TransformComponent": {
@@ -1560,13 +1708,18 @@
               1.0
             ],
             "layer": 1,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "SFXText",
-          "localID": 45,
+          "localID": 41,
           "parentID": 34,
           "active": true,
           "TransformComponent": {
@@ -1592,7 +1745,12 @@
               1.0
             ],
             "layer": 1,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "TextComponent": {
             "enabled": true,
@@ -1611,8 +1769,8 @@
           "children": [
             {
               "name": "Slider_Bar_SFX",
-              "localID": 46,
-              "parentID": 45,
+              "localID": 42,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1637,14 +1795,19 @@
                   1.0
                 ],
                 "layer": 2,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             },
             {
               "name": "Slider_Bar_Back_SFX",
-              "localID": 47,
-              "parentID": 45,
+              "localID": 43,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1669,14 +1832,19 @@
                   1.0
                 ],
                 "layer": 1,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             },
             {
               "name": "Slider_Knob_SFX",
-              "localID": 48,
-              "parentID": 45,
+              "localID": 44,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1701,14 +1869,19 @@
                   1.0
                 ],
                 "layer": 2,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             },
             {
               "name": "SFXMuteButton",
-              "localID": 49,
-              "parentID": 45,
+              "localID": 45,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1733,7 +1906,12 @@
                   1.0
                 ],
                 "layer": 1,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "PhysicsComponent": {
                 "enabled": true,
@@ -1752,7 +1930,7 @@
         },
         {
           "name": "MusicText",
-          "localID": 40,
+          "localID": 46,
           "parentID": 34,
           "active": true,
           "TransformComponent": {
@@ -1778,7 +1956,12 @@
               1.0
             ],
             "layer": 1,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "TextComponent": {
             "enabled": true,
@@ -1797,8 +1980,8 @@
           "children": [
             {
               "name": "Slider_Bar_Music",
-              "localID": 41,
-              "parentID": 40,
+              "localID": 47,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1823,14 +2006,19 @@
                   1.0
                 ],
                 "layer": 2,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             },
             {
               "name": "Slider_Bar_Back_Music",
-              "localID": 42,
-              "parentID": 40,
+              "localID": 48,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1855,14 +2043,19 @@
                   1.0
                 ],
                 "layer": 1,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             },
             {
               "name": "Slider_Knob_Music",
-              "localID": 43,
-              "parentID": 40,
+              "localID": 49,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1887,14 +2080,19 @@
                   1.0
                 ],
                 "layer": 2,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "children": []
             },
             {
               "name": "MusicMuteButton",
-              "localID": 44,
-              "parentID": 40,
+              "localID": 50,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1919,7 +2117,12 @@
                   1.0
                 ],
                 "layer": 1,
-                "screenSpace": false
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
               },
               "PhysicsComponent": {
                 "enabled": true,
@@ -1966,7 +2169,12 @@
           1.0
         ],
         "layer": 0,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "children": [
         {
@@ -1997,7 +2205,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -2029,7 +2242,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
@@ -2061,7 +2279,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "TextComponent": {
             "enabled": true,
@@ -2107,7 +2330,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "TextComponent": {
             "enabled": true,
@@ -2153,7 +2381,12 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "TextComponent": {
             "enabled": true,
@@ -2168,6 +2401,1266 @@
             ],
             "scale": 1.0,
             "screenSpace": false
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "LeaderBoards_Menu",
+      "localID": 57,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": [
+        {
+          "name": "Leaderboards_tab_1st",
+          "localID": 58,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1.879791259765625,
+              3.96612548828125
+            ],
+            "scale": [
+              1050.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_tab_grey.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Leaderboards_BG",
+          "localID": 59,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -3.8955154418945313,
+              -6.65142822265625
+            ],
+            "scale": [
+              1920.0,
+              1080.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_menu.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 2,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Leaderboards_tab_2nd",
+          "localID": 60,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1.879791259765625,
+              -58.7529296875
+            ],
+            "scale": [
+              1050.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_tab_grey.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 2,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Leaderboards_tab_3rd",
+          "localID": 61,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1.879791259765625,
+              -119.93252563476563
+            ],
+            "scale": [
+              1050.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_tab_grey.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 2,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Leaderboards_Level_1",
+          "localID": 62,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -336.90301513671875,
+              115.0
+            ],
+            "scale": [
+              340.0,
+              60.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_tab_yellow.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Leaderboards_Level_2",
+          "localID": 63,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              4.297412872314453,
+              115.0
+            ],
+            "scale": [
+              340.0,
+              60.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_tab_grey.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Leaderboards_Level_3",
+          "localID": 64,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              344.1508483886719,
+              115.0
+            ],
+            "scale": [
+              340.0,
+              60.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Leaderboards_tab_grey.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "BackButton",
+          "localID": 65,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              650.0,
+              244.8270721435547
+            ],
+            "scale": [
+              200.0,
+              180.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Back_Button.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "ReplayButton",
+          "localID": 66,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -250.0,
+              -275.0
+            ],
+            "scale": [
+              300.0,
+              75.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/blankbtn.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Vs_Ghost_Button",
+          "localID": 67,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              205.0,
+              -275.0
+            ],
+            "scale": [
+              300.0,
+              75.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/blankbtn.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Name_1st_Text",
+          "localID": 68,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -330.0,
+              7.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Ashfer",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Level_2_Text",
+          "localID": 69,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              115.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Level 2",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Level_3_Text",
+          "localID": 70,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              330.0,
+              115.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Level 3",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Name_2nd_Text",
+          "localID": 71,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -330.0,
+              -57.972808837890625
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "---",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Name_3rd_Text",
+          "localID": 72,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -330.0,
+              -120.13484191894531
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "---",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Time_1st_Text",
+          "localID": 73,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              7.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "0:30.00",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Time_2nd_Text",
+          "localID": 74,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              -56.513427734375
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "--:--.--",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Time_3rd_Text",
+          "localID": 75,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              0.0,
+              -126.78363037109375
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "--:--.--",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Level_1_Text",
+          "localID": 76,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -330.0,
+              115.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Level 1",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Replay_Text",
+          "localID": 77,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              -249.99989318847656,
+              -275.05963134765625
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Replay",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Vs_Ghost_Text",
+          "localID": 78,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              205.17153930664063,
+              -275.05963134765625
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "Vs Ghost",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "1stRank",
+          "localID": 79,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              324.2338562011719,
+              7.0
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "1stPlayer",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "2ndRank",
+          "localID": 80,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              324.6305847167969,
+              -60.85716247558594
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "1stPlayer",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "3rdRank",
+          "localID": 81,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              323.30792236328125,
+              -126.33334350585938
+            ],
+            "scale": [
+              1.0,
+              1.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.5,
+              0.5,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "TextComponent": {
+            "enabled": true,
+            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+            "fontSize": 28,
+            "text": "1stPlayer",
+            "color": [
+              0.0,
+              0.0,
+              0.0,
+              1.0
+            ],
+            "scale": 1.0,
+            "screenSpace": false
+          },
+          "children": []
+        },
+        {
+          "name": "Letterscore_1st",
+          "localID": 82,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              424.5792541503906,
+              -58.36846923828125
+            ],
+            "scale": [
+              80.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Letterscore_S.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              80.0,
+              80.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Letterscore_2nd",
+          "localID": 83,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              424.5792541503906,
+              -119.47953796386719
+            ],
+            "scale": [
+              80.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Letterscore_S.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              80.0,
+              80.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Letterscore_3rd",
+          "localID": 84,
+          "parentID": 57,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              424.5792541503906,
+              7.372283935546875
+            ],
+            "scale": [
+              80.0,
+              80.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Letterscore_S.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 3,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              80.0,
+              80.0
+            ]
           },
           "children": []
         }
@@ -2263,5 +3756,8 @@
         "sound": "menu_restart"
       }
     ]
+  },
+  "GameSettings": {
+    "LevelTimerLength": 60.0
   }
 }

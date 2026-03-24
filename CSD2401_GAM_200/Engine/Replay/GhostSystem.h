@@ -170,10 +170,41 @@ public:
     float GetBestRunTime() const { return m_bestTime; }
 
     /**
+     * @brief Sets the number of shells collected during the current run.
+     *        Call this before SaveCurrentRun / SaveBestRun.
+     * @param count Shells collected this run.
+     */
+    void SetShellsCollected(int count) { m_shellsCollected = count; }
+
+    /**
+     * @brief Gets the shells collected count stored in the last loaded/saved recording.
+     * @return Shell count.
+     */
+    int GetShellsCollected() const { return m_shellsCollected; }
+
+    /**
      * @brief Checks if the ghost is actively playing back.
      * @return True while the ghost is playing.
      */
     bool IsGhostPlaying() const { return m_player.IsPlaying(); }
+
+    // ===== Media Player / Replay UI =====
+
+    /**
+     * @brief Returns the current replay playback time in seconds.
+     */
+    float GetReplayClock() const { return m_player.GetClock(); }
+
+    /**
+     * @brief Returns the total duration of the loaded recording in seconds.
+     */
+    float GetReplayDuration() const { return m_player.GetDuration(); }
+
+    /**
+     * @brief Seeks the replay to an absolute time (clamped to [0, duration]).
+     * @param t Target time in seconds.
+     */
+    void SeekReplayAbsolute(float t) { m_player.SeekAbsolute(t); }
 
     // ===== Replay Watch Mode =====
 
@@ -234,18 +265,39 @@ public:
         m_pendingReplayLoad    = true;
     }
 
+    /**
+     * @brief Flags the system to auto-load a recording after scene load WITHOUT entering watch mode.
+     *        The ghost will be available for the key-0 toggle (Vs Ghost mode).
+     * @param recordingName The name of the recording file to load.
+     */
+    void RequestVsGhostOnLoad(const std::string& recordingName)
+    {
+        m_pendingRecordingName  = recordingName;
+        m_pendingVsGhostLoad    = true;
+    }
+
     // ===== Finish Trigger =====
 
 private:
     void SaveToDisk(const std::string& levelName);
     bool LoadFromDisk(const std::string& levelName);
 
-    static std::string MakePath(const std::string& levelName);
+    std::string MakePath(const std::string& fileName);
+
+    // ===== Media Player helpers =====
+    void SpawnMediaPlayer();
+    void DestroyMediaPlayer();
+    void UpdateMediaPlayer(float dt);
+
+    bool  m_mediaPlayerSpawned = false; ///< True while the Media_Player prefab is live
+    bool  m_mouseWasDown       = false; ///< Previous-frame mouse-button state for edge detection
+    bool  m_sliderDragging     = false; ///< True while the user is dragging the timeline slider
 
     ReplayRecorder m_recorder;
     ReplayPlayer   m_player;
     GhostRecording m_bestRecording;
-    float          m_bestTime = FLT_MAX;
+    float          m_bestTime        = FLT_MAX;
+    int            m_shellsCollected = 0;
 
     // Game-supplied object names (set via Configure())
     std::string m_liveTarget;   ///< e.g. "Hero"
@@ -264,5 +316,6 @@ private:
 
     // Deferred replay: set before scene load, fires once liveTarget exists in the new scene
     bool        m_pendingReplayLoad    = false;
+    bool        m_pendingVsGhostLoad   = false;
     std::string m_pendingRecordingName;
 };

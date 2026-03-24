@@ -274,6 +274,73 @@ namespace API
         }
     }
 
+    // --- EntityID overloads ---
+
+    void GetColorByID(EntityID id, float* r, float* g, float* b, float* a)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* render = obj->GetComponent<RenderComponent>();
+            if (render)
+            {
+                vec4 c = render->GetColor();
+                *r = c.x; *g = c.y; *b = c.z; *a = c.w;
+                return;
+            }
+        }
+        *r = 0.0f; *g = 0.0f; *b = 0.0f; *a = 1.0f;
+    }
+
+    int GetRenderLayerByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj) return obj->GetGameLayer();
+        return 0;
+    }
+
+    void SetColorByID(EntityID id, vec4 color)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* render = obj->GetComponent<RenderComponent>();
+            if (render) render->SetColor(color);
+        }
+    }
+
+    void SetAlphaByID(EntityID id, float alpha)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* render = obj->GetComponent<RenderComponent>();
+            if (render) render->setAlpha(alpha);
+        }
+    }
+
+    void SetRenderLayerByID(EntityID id, int layer)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj) obj->SetGameLayer(layer);
+    }
+
+    void SetTextureByID(EntityID id, const char* filename)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* render = obj->GetComponent<RenderComponent>();
+            if (render) render->SetTextureID(GraphicsSystem::LoadTexture(filename));
+        }
+    }
+
 #pragma endregion
 
 #pragma region Physics
@@ -391,6 +458,30 @@ namespace API
         }
     }
 
+    // --- EntityID overloads ---
+
+    void GetVelocityByID(EntityID id, float* vx, float* vy)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* physics = obj->GetComponent<PhysicsComponent>();
+            if (physics) { *vx = physics->velocity.x; *vy = physics->velocity.y; return; }
+        }
+        *vx = 0.0f; *vy = 0.0f;
+    }
+
+    void SetVelocityByID(EntityID id, float x, float y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* physics = obj->GetComponent<PhysicsComponent>();
+            if (physics) { physics->velocity.x = x; physics->velocity.y = y; }
+        }
+    }
 
 #pragma endregion
 
@@ -517,6 +608,76 @@ namespace API
         *y = 0.0f;
     }
 
+    // --- EntityID overloads ---
+
+    void GetPositionByID(EntityID id, float* x, float* y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) { *x = tf->posX; *y = tf->posY; return; }
+        }
+        *x = 0.0f; *y = 0.0f;
+    }
+
+    void GetScaleByID(EntityID id, float* x, float* y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) { *x = tf->scaleX; *y = tf->scaleY; return; }
+        }
+        *x = 0.0f; *y = 0.0f;
+    }
+
+    float GetRotationByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) return tf->rotation;
+        }
+        return 0.0f;
+    }
+
+    void SetPosByID(EntityID id, float x, float y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) tf->SetPosition(x, y);
+        }
+    }
+
+    void SetScaleByID(EntityID id, float x, float y)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) tf->SetScale(x, y);
+        }
+    }
+
+    void SetRotByID(EntityID id, float rotation)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) tf->SetRotation(rotation);
+        }
+    }
 
 #pragma endregion
 
@@ -636,6 +797,32 @@ namespace API
         }
         return true;
     }
+
+    // --- EntityID overloads ---
+
+    std::string GetTextByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp) return textComp->GetText();
+        }
+        return "";
+    }
+
+    void SetTextByID(EntityID id, const std::string& text)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* textComp = obj->GetComponent<TextComponent>();
+            if (textComp) textComp->SetText(text);
+        }
+    }
+
 #pragma endregion
 
 #pragma region Components
@@ -1238,6 +1425,80 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         }
         return 0;
     }
+
+    // --- EntityID overloads ---
+
+    std::string GetCurrentAnimationNameByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet) return spritesheet->GetCurrentAnimationName();
+        }
+        return "";
+    }
+
+    int GetRowsByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet) return spritesheet->GetRows();
+        }
+        return 0;
+    }
+
+    int GetColsByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet) return spritesheet->GetCols();
+        }
+        return 0;
+    }
+
+    int GetCurrentRowByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet) return spritesheet->GetCurrentRow();
+        }
+        return 0;
+    }
+
+    int GetCurrentColByID(EntityID id)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet) return spritesheet->GetCurrentCol();
+        }
+        return 0;
+    }
+
+    void PlayAnimationByID(EntityID id, const std::string& animationName, bool isLooping)
+    {
+        auto& factory = GameObjectFactory::Instance();
+        GameObject* obj = factory.GetGameObject(id);
+        if (obj)
+        {
+            auto* spritesheet = obj->GetComponent<Spritesheet>();
+            if (spritesheet) spritesheet->PlayAnimation(animationName, isLooping);
+        }
+    }
+
 #pragma endregion
 
 #pragma region Misc

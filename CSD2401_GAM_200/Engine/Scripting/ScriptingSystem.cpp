@@ -951,6 +951,102 @@ static int Internal_GetCurrentCol(MonoString* objectName)
     return result;
 }
 
+// === EntityID-based getters/setters ===
+
+// Transform
+static void Internal_GetPositionByID(int id, float* x, float* y)
+{
+    API::GetPositionByID(static_cast<EntityID>(id), x, y);
+}
+static void Internal_GetScaleByID(int id, float* x, float* y)
+{
+    API::GetScaleByID(static_cast<EntityID>(id), x, y);
+}
+static float Internal_GetRotationByID(int id)
+{
+    return API::GetRotationByID(static_cast<EntityID>(id));
+}
+static void Internal_SetPosByID(int id, float x, float y)
+{
+    API::SetPosByID(static_cast<EntityID>(id), x, y);
+}
+static void Internal_SetScaleByID(int id, float x, float y)
+{
+    API::SetScaleByID(static_cast<EntityID>(id), x, y);
+}
+static void Internal_SetRotByID(int id, float rotation)
+{
+    API::SetRotByID(static_cast<EntityID>(id), rotation);
+}
+
+// Graphics
+static void Internal_GetColorByID(int id, float* r, float* g, float* b, float* a)
+{
+    API::GetColorByID(static_cast<EntityID>(id), r, g, b, a);
+}
+static int Internal_GetRenderLayerByID(int id)
+{
+    return API::GetRenderLayerByID(static_cast<EntityID>(id));
+}
+static void Internal_SetColorByID(int id, float r, float g, float b, float a)
+{
+    API::SetColorByID(static_cast<EntityID>(id), {r, g, b, a});
+}
+static void Internal_SetAlphaByID(int id, float alpha)
+{
+    API::SetAlphaByID(static_cast<EntityID>(id), alpha);
+}
+static void Internal_SetRenderLayerByID(int id, int layer)
+{
+    API::SetRenderLayerByID(static_cast<EntityID>(id), layer);
+}
+static void Internal_SetTextureByID(int id, MonoString* filename)
+{
+    char* file = mono_string_to_utf8(filename);
+    API::SetTextureByID(static_cast<EntityID>(id), file);
+    mono_free(file);
+}
+
+// Physics
+static void Internal_GetVelocityByID(int id, float* vx, float* vy)
+{
+    API::GetVelocityByID(static_cast<EntityID>(id), vx, vy);
+}
+static void Internal_SetVelocityByID(int id, float x, float y)
+{
+    API::SetVelocityByID(static_cast<EntityID>(id), x, y);
+}
+
+// Text
+static MonoString* Internal_GetTextByID(int id)
+{
+    std::string result = API::GetTextByID(static_cast<EntityID>(id));
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+static void Internal_SetTextByID(int id, MonoString* text)
+{
+    char* str = mono_string_to_utf8(text);
+    API::SetTextByID(static_cast<EntityID>(id), str);
+    mono_free(str);
+}
+
+// Animator
+static MonoString* Internal_GetCurrentAnimationNameByID(int id)
+{
+    std::string result = API::GetCurrentAnimationNameByID(static_cast<EntityID>(id));
+    return mono_string_new(mono_domain_get(), result.c_str());
+}
+static int Internal_GetRowsByID(int id)       { return API::GetRowsByID(static_cast<EntityID>(id)); }
+static int Internal_GetColsByID(int id)       { return API::GetColsByID(static_cast<EntityID>(id)); }
+static int Internal_GetCurrentRowByID(int id) { return API::GetCurrentRowByID(static_cast<EntityID>(id)); }
+static int Internal_GetCurrentColByID(int id) { return API::GetCurrentColByID(static_cast<EntityID>(id)); }
+static void Internal_PlayAnimationByID(int id, MonoString* animationName, bool isLooping)
+{
+    char* animName = mono_string_to_utf8(animationName);
+    API::PlayAnimationByID(static_cast<EntityID>(id), animName, isLooping);
+    mono_free(animName);
+}
+
 // === Misc ===
 static int Internal_RandomRange(int min, int max) {
     return API::RandomNumberGen(max, min); 
@@ -1574,6 +1670,12 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Transform::GetPosition_Internal", (void*)Internal_GetPosition);
     mono_add_internal_call("CSharpScript.Transform::GetRotation", (void*)Internal_GetRotation);
     mono_add_internal_call("CSharpScript.Transform::GetScale_Internal", (void*)Internal_GetScale);
+    mono_add_internal_call("CSharpScript.Transform::GetPositionByID_Internal", (void*)Internal_GetPositionByID);
+    mono_add_internal_call("CSharpScript.Transform::GetScaleByID_Internal",    (void*)Internal_GetScaleByID);
+    mono_add_internal_call("CSharpScript.Transform::GetRotationByID",          (void*)Internal_GetRotationByID);
+    mono_add_internal_call("CSharpScript.Transform::SetPositionByID",          (void*)Internal_SetPosByID);
+    mono_add_internal_call("CSharpScript.Transform::SetScaleByID",             (void*)Internal_SetScaleByID);
+    mono_add_internal_call("CSharpScript.Transform::SetRotationByID",          (void*)Internal_SetRotByID);
 
     // === Graphics ===
     mono_add_internal_call("CSharpScript.Graphics::SetShapeType", (void *)Internal_SetShapeType);
@@ -1585,6 +1687,12 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Graphics::GetRenderLayer", (void *)Internal_GetRenderLayer);
     mono_add_internal_call("CSharpScript.Graphics::SetLayerVisible", (void *)Internal_SetLayerVisible);
     mono_add_internal_call("CSharpScript.Graphics::IsLayerVisible", (void *)Internal_IsLayerVisible);
+    mono_add_internal_call("CSharpScript.Graphics::GetColorByID_Internal", (void*)Internal_GetColorByID);
+    mono_add_internal_call("CSharpScript.Graphics::GetRenderLayerByID",    (void*)Internal_GetRenderLayerByID);
+    mono_add_internal_call("CSharpScript.Graphics::SetColorByID",          (void*)Internal_SetColorByID);
+    mono_add_internal_call("CSharpScript.Graphics::SetAlphaByID",          (void*)Internal_SetAlphaByID);
+    mono_add_internal_call("CSharpScript.Graphics::SetRenderLayerByID",    (void*)Internal_SetRenderLayerByID);
+    mono_add_internal_call("CSharpScript.Graphics::SetTextureByID",        (void*)Internal_SetTextureByID);
 
     // === Physics ===
     mono_add_internal_call("CSharpScript.Physics::SetVelocity", (void *)Internal_SetVelocity);
@@ -1594,6 +1702,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Physics::GetVelocity_Internal", (void*)Internal_GetVelocity);
     mono_add_internal_call("CSharpScript.Physics::SetMass", (void*)Internal_SetMass);
     mono_add_internal_call("CSharpScript.Physics::SetFriction", (void*)Internal_SetFriction);
+    mono_add_internal_call("CSharpScript.Physics::GetVelocityByID_Internal", (void*)Internal_GetVelocityByID);
+    mono_add_internal_call("CSharpScript.Physics::SetVelocityByID",          (void*)Internal_SetVelocityByID);
 
     // === Collision ===
     mono_add_internal_call("CSharpScript.Collision::SetCollisionShape", (void *)Internal_SetCollisionShape);
@@ -1634,6 +1744,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Text::GetTextScale", (void*)Internal_GetTextScale);
     mono_add_internal_call("CSharpScript.Text::SetTextScreenSpace", (void*)Internal_SetTextScreenSpace);
     mono_add_internal_call("CSharpScript.Text::GetTextScreenSpace", (void*)Internal_GetTextScreenSpace);
+    mono_add_internal_call("CSharpScript.Text::GetTextByID",        (void*)Internal_GetTextByID);
+    mono_add_internal_call("CSharpScript.Text::SetTextByID",        (void*)Internal_SetTextByID);
 
     // === Audio ===
     mono_add_internal_call("CSharpScript.Audio::AddSound", (void*)Internal_AddSound);
@@ -1673,6 +1785,12 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Animation::GetCols", (void*)Internal_GetCols);
     mono_add_internal_call("CSharpScript.Animation::GetCurrentRow", (void*)Internal_GetCurrentRow);
     mono_add_internal_call("CSharpScript.Animation::GetCurrentCol", (void*)Internal_GetCurrentCol);
+    mono_add_internal_call("CSharpScript.Animation::GetCurrentAnimationNameByID", (void*)Internal_GetCurrentAnimationNameByID);
+    mono_add_internal_call("CSharpScript.Animation::GetRowsByID",       (void*)Internal_GetRowsByID);
+    mono_add_internal_call("CSharpScript.Animation::GetColsByID",       (void*)Internal_GetColsByID);
+    mono_add_internal_call("CSharpScript.Animation::GetCurrentRowByID", (void*)Internal_GetCurrentRowByID);
+    mono_add_internal_call("CSharpScript.Animation::GetCurrentColByID", (void*)Internal_GetCurrentColByID);
+    mono_add_internal_call("CSharpScript.Animation::PlayAnimationByID", (void*)Internal_PlayAnimationByID);
 
 
     // === Camera ===
@@ -2263,6 +2381,9 @@ void ScriptSystem::Update(float deltaTime)
         if (!LayerManager::IsLayerEnabled(gameObject->GetGameLayer()))
             continue;
 
+        // Ensure OnAwake and OnStart run before the first OnUpdate for this script
+        CallOnAwake(gameObject);
+        CallOnStart(gameObject);
         CallOnUpdate(gameObject, deltaTime);
     }
 }

@@ -154,6 +154,13 @@ namespace API {
 
 #pragma region Graphics
     vec4 GetColor(const std::string& objectName);
+    // --- EntityID overloads ---
+    void GetColorByID(EntityID id, float* r, float* g, float* b, float* a);
+    int  GetRenderLayerByID(EntityID id);
+    void SetColorByID(EntityID id, vec4 color);
+    void SetAlphaByID(EntityID id, float alpha);
+    void SetRenderLayerByID(EntityID id, int layer);
+    void SetTextureByID(EntityID id, const char* filename);
 
     /**
      * @brief Sets the shape type for a GameObject's render component.
@@ -262,6 +269,10 @@ namespace API {
 
     void SetFriction(const std::string&, float);
     void SetMass(const std::string&, float);
+    // --- EntityID overloads ---
+    void GetVelocityByID(EntityID id, float* vx, float* vy);
+    void SetVelocityByID(EntityID id, float x, float y);
+
 #pragma endregion
 
 #pragma region Transform
@@ -279,7 +290,7 @@ namespace API {
      * @param scale The scale value for both X and Y axes.
      */
     void SetScale(const std::string&, float);
-    
+
     /**
      * @brief Sets the scale of a GameObject with separate X and Y values.
      * @param objectName The name of the GameObject.
@@ -294,7 +305,7 @@ namespace API {
      * @param rotation The rotation angle in radians.
      */
     void SetRot(const std::string&, float);
-    
+
     /**
      * @brief Adds to the current rotation of a GameObject.
      * @param objectName The name of the GameObject.
@@ -307,13 +318,21 @@ namespace API {
      * @param objectName The name of the GameObject.
      */
         void GetPosition(const std::string&, float* x, float* y);
-        
+
         /**
          * @brief Gets the scale of a GameObject.
          * @param objectName The name of the GameObject.
          */
         void GetScale(const std::string&, float* x, float* y);
     float GetRotation(const std::string&);
+
+    // --- EntityID overloads ---
+    void GetPositionByID(EntityID id, float* x, float* y);
+    void GetScaleByID(EntityID id, float* x, float* y);
+    float GetRotationByID(EntityID id);
+    void SetPosByID(EntityID id, float x, float y);
+    void SetScaleByID(EntityID id, float x, float y);
+    void SetRotByID(EntityID id, float rotation);
 
 #pragma endregion
 
@@ -369,6 +388,10 @@ namespace API {
      * @param objectName The name of the GameObject.
      */
     bool GetTextScreenSpace(const std::string&);
+
+    // --- EntityID overloads ---
+    std::string GetTextByID(EntityID id);
+    void        SetTextByID(EntityID id, const std::string& text);
 
 #pragma endregion
 
@@ -516,6 +539,13 @@ namespace API {
     int GetCols(const std::string& objectName);
     int GetCurrentRow(const std::string& objectName);
     int GetCurrentCol(const std::string& objectName);
+    // --- EntityID overloads ---
+    std::string GetCurrentAnimationNameByID(EntityID id);
+    int GetRowsByID(EntityID id);
+    int GetColsByID(EntityID id);
+    int GetCurrentRowByID(EntityID id);
+    int GetCurrentColByID(EntityID id);
+    void PlayAnimationByID(EntityID id, const std::string& animationName, bool isLooping = true);
 #pragma endregion
 
 

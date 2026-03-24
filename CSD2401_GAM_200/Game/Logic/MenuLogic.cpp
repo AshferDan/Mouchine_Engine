@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "MenuLogic.h"
 #include "stb_image.h"
 #include <cmath>
+#include <cfloat>
+#include <cstdio>
 #include "GhostSystem.h"
 #include "CameraManager.h"
 #include "TextComponent.h"
@@ -37,7 +39,7 @@ enum MenuScreens
     Home = 0, // Normal landing page
     Settings,
     LevelSelect,
-    ReplayPicker,
+    Leaderboard,
     QUIT
 };
 MenuScreens currScreen = MenuScreens::Home;
@@ -120,11 +122,6 @@ void MenuLogicSystem::Update(float dt)
                         cutscene->PlayVideo(creditsPath, "CreditsAudio");
                     }
                 }
-                else if (hoveredButtonName == "ReplayButton")
-                {
-                    // ReplayButton now opens the picker immediately, not via pendingSceneChange.
-                    // This branch is kept for safety but should not be reached.
-                }
                 else if (hoveredButtonName == "YesButton")
                 {
                     std::cout << "YesButton Clicked! Quitting..." << std::endl;
@@ -137,18 +134,18 @@ void MenuLogicSystem::Update(float dt)
                 }
             }
 
-            else if (currScreen == MenuScreens::ReplayPicker)
+            else if (currScreen == MenuScreens::Home && !selectedLevelScenePath.empty() && !m_selectedReplay.empty())
             {
-                if (!m_selectedReplay.empty())
+                CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                m_selectedReplay.clear();
+                selectedLevelScenePath.clear();
+            }
+            else if (currScreen == MenuScreens::Leaderboard)
+            {
+                if (!selectedLevelScenePath.empty())
                 {
-                    HideReplayPicker();
-                    if (GhostSystem *ghost = CORE->GetGhostSystem())
-                    {
-                        ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
-                        ghost->RequestReplayOnLoad(m_selectedReplay);
-                    }
-                    CORE->RequestSceneLoad("../Assets/Scenes/Level_1.json", true);
-                    m_selectedReplay.clear();
+                    CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    selectedLevelScenePath.clear();
                     currScreen = MenuScreens::Home;
                 }
             }
@@ -219,6 +216,8 @@ void MenuLogicSystem::Update(float dt)
             rText2->SetActive(false);
         if (auto *rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
             rText3->SetActive(false);
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(false);
     }
     else if (currScreen == MenuScreens::Settings)
     {
@@ -253,6 +252,8 @@ void MenuLogicSystem::Update(float dt)
 
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
         }
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(false);
         // Show settings text labels when on settings screen
         if (auto *masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
             masterText->SetActive(true);
@@ -352,6 +353,8 @@ void MenuLogicSystem::Update(float dt)
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(false);
     }
     else if (currScreen == MenuScreens::QUIT)
     {
@@ -369,36 +372,23 @@ void MenuLogicSystem::Update(float dt)
         }
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
         {
-
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(true);
         }
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(false);
     }
-    else if (currScreen == MenuScreens::ReplayPicker)
+    else if (currScreen == MenuScreens::Leaderboard)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
+            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
-
-        UpdateReplayPickerPositions();
-
-        // Hide settings text labels when not on settings screen
-        if (auto *masterText = GameObjectFactory::Instance().FindGameObject("MasterText"))
-            masterText->SetActive(false);
-        if (auto *musicText = GameObjectFactory::Instance().FindGameObject("MusicText"))
-            musicText->SetActive(false);
-        if (auto *sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
-            sfxText->SetActive(false);
-
-        // Show level select text labels when on settings screen
-        if (auto *rText = GameObjectFactory::Instance().FindGameObject("Rating"))
-            rText->SetActive(false);
-        if (auto *rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
-            rText2->SetActive(false);
-        if (auto *rText3 = GameObjectFactory::Instance().FindGameObject("Rating(2)"))
-            rText3->SetActive(false);
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(true);
     }
 
     double mouseX = InputManager::GetMouseWorldX();
@@ -527,6 +517,8 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
             return "QuitButton";
         if (IsMouseOver(factory.FindGameObject("ReplayButton"), mouseX, mouseY))
             return "ReplayButton";
+        if (IsMouseOver(factory.FindGameObject("LeaderboardButton"), mouseX, mouseY))
+            return "LeaderboardButton";
         break;
 
     case MenuScreens::QUIT:
@@ -560,15 +552,28 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
             return "Level_BackButton";
         break;
 
-    case MenuScreens::ReplayPicker:
-        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot0"), mouseX, mouseY))
-            return "ReplayPicker_Slot0";
-        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot1"), mouseX, mouseY))
-            return "ReplayPicker_Slot1";
-        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Slot2"), mouseX, mouseY))
-            return "ReplayPicker_Slot2";
-        if (IsMouseOver(factory.FindGameObject("ReplayPicker_Back"), mouseX, mouseY))
-            return "ReplayPicker_Back";
+    case MenuScreens::Leaderboard:
+        // Level tabs
+        if (IsMouseOver(factory.FindGameObject("Leaderboards_Level_1"), mouseX, mouseY))
+            return "Leaderboards_Level_1";
+        if (IsMouseOver(factory.FindGameObject("Leaderboards_Level_2"), mouseX, mouseY))
+            return "Leaderboards_Level_2";
+        if (IsMouseOver(factory.FindGameObject("Leaderboards_Level_3"), mouseX, mouseY))
+            return "Leaderboards_Level_3";
+        // Rank rows (clickable to select a player)
+        if (IsMouseOver(factory.FindGameObject("Leaderboards_tab_1st"), mouseX, mouseY))
+            return "Leaderboards_tab_1st";
+        if (IsMouseOver(factory.FindGameObject("Leaderboards_tab_2nd"), mouseX, mouseY))
+            return "Leaderboards_tab_2nd";
+        if (IsMouseOver(factory.FindGameObject("Leaderboards_tab_3rd"), mouseX, mouseY))
+            return "Leaderboards_tab_3rd";
+        // Action buttons — iterate all GOs so we find the leaderboard's ReplayButton (not home screen's)
+        for (auto &obj : factory.GetAllGameObjects())
+        {
+            if ((obj->GetName() == "ReplayButton" || obj->GetName() == "Vs_Ghost_Button" ||
+                 obj->GetName() == "BackButton") && IsMouseOver(obj.get(), mouseX, mouseY))
+                return obj->GetName();
+        }
         break;
     }
 
@@ -736,8 +741,13 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
 
     if (buttonName == "CreditsButton")
     {
-        pendingSceneChange = true;
-        pendingTimer = 0.2f;
+        std::cout << "[MenuLogic] Leaderboard opened via CreditsButton." << std::endl;
+        m_leaderboardLevel = 1;
+        m_selectedRank = -1;
+        ScanLeaderboard(m_leaderboardLevel);
+        PopulateLeaderboard();
+        UpdateLeaderboardTextures();
+        currScreen = MenuScreens::Leaderboard;
         return true;
     }
 
@@ -764,36 +774,134 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
         return true;
     }
 
-    if (buttonName == "ReplayButton")
+    if (buttonName == "ReplayButton" && currScreen == MenuScreens::Home)
     {
-        std::cout << "ReplayButton Clicked! Opening replay picker..." << std::endl;
-        ShowReplayPicker();
-        return true;
-    }
-
-    if (buttonName == "ReplayPicker_Back")
-    {
-        HideReplayPicker();
-        currScreen = MenuScreens::Home;
-        return true;
-    }
-
-    if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" || buttonName == "ReplayPicker_Slot2")
-    {
-        int idx = buttonName.back() - '0';
-        if (idx >= 0 && idx < static_cast<int>(m_replayNames.size()))
+        // Scan all replay folders and load the most recent replay directly
+        ScanReplays();
+        if (!m_replayNames.empty())
         {
-            m_selectedReplay = m_replayNames[idx];
-            std::cout << "[MenuLogic] Replay selected: " << m_selectedReplay << std::endl;
+            m_selectedReplay = m_replayNames[0]; // most recent
+            std::cout << "[MenuLogic] ReplayButton: loading most recent replay: " << m_selectedReplay << std::endl;
+            if (GhostSystem *ghost = CORE->GetGhostSystem())
+            {
+                ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+                ghost->RequestReplayOnLoad(m_selectedReplay);
+            }
             if (audioManager)
                 audioManager->FadeOutCategory("music", 2.5f);
             pendingSceneChange = true;
             pendingTimer = 2.6f;
+            selectedLevelScenePath = "../Assets/Scenes/Level_1.json";
         }
         else
         {
-            std::cout << "[MenuLogic] Clicked empty replay slot." << std::endl;
+            std::cout << "[MenuLogic] ReplayButton: no replays found." << std::endl;
         }
+        return true;
+    }
+
+    // ===== Leaderboard =====
+    if (buttonName == "LeaderboardButton")
+    {
+        std::cout << "[MenuLogic] Leaderboard opened." << std::endl;
+        m_leaderboardLevel = 1;
+        m_selectedRank = -1;
+        ScanLeaderboard(m_leaderboardLevel);
+        PopulateLeaderboard();
+        UpdateLeaderboardTextures();
+        currScreen = MenuScreens::Leaderboard;
+        return true;
+    }
+
+    if (buttonName == "Leaderboards_Level_1")
+    {
+        m_leaderboardLevel = 1;
+        m_selectedRank = -1;
+        ScanLeaderboard(m_leaderboardLevel);
+        PopulateLeaderboard();
+        UpdateLeaderboardTextures();
+        return true;
+    }
+
+    if (buttonName == "Leaderboards_Level_2")
+    {
+        m_leaderboardLevel = 2;
+        m_selectedRank = -1;
+        ScanLeaderboard(m_leaderboardLevel);
+        PopulateLeaderboard();
+        UpdateLeaderboardTextures();
+        return true;
+    }
+
+    if (buttonName == "Leaderboards_Level_3")
+    {
+        m_leaderboardLevel = 3;
+        m_selectedRank = -1;
+        ScanLeaderboard(m_leaderboardLevel);
+        PopulateLeaderboard();
+        UpdateLeaderboardTextures();
+        return true;
+    }
+
+    // Rank row selection (toggle)
+    if (buttonName == "Leaderboards_tab_1st" || buttonName == "Leaderboards_tab_2nd" || buttonName == "Leaderboards_tab_3rd")
+    {
+        int clicked = (buttonName == "Leaderboards_tab_1st") ? 0 :
+                      (buttonName == "Leaderboards_tab_2nd") ? 1 : 2;
+        // Toggle off if already selected, otherwise select
+        m_selectedRank = (m_selectedRank == clicked) ? -1 : clicked;
+        UpdateLeaderboardTextures();
+        return true;
+    }
+
+    // Leaderboard Replay button — watch selected player's replay
+    if (buttonName == "ReplayButton" && currScreen == MenuScreens::Leaderboard)
+    {
+        if (m_selectedRank < 0 || m_selectedRank >= static_cast<int>(m_leaderboardData.size()))
+        {
+            std::cout << "[MenuLogic] Replay: no player selected." << std::endl;
+            return true;
+        }
+        const std::string replayName = m_leaderboardData[m_selectedRank].name;
+        const std::string levelScene = "../Assets/Scenes/Level_" + std::to_string(m_leaderboardLevel) + ".json";
+        std::cout << "[MenuLogic] Watching replay: " << replayName << " (Level " << m_leaderboardLevel << ")" << std::endl;
+        if (GhostSystem *ghost = CORE->GetGhostSystem())
+        {
+            ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+            ghost->SetLevelName("Level_" + std::to_string(m_leaderboardLevel));
+            ghost->RequestReplayOnLoad(replayName);
+        }
+        if (audioManager)
+            audioManager->FadeOutCategory("music", 2.5f);
+        pendingSceneChange = true;
+        pendingTimer = 2.6f;
+        // Store scene path so the pendingSceneChange block can load it
+        selectedLevelScenePath = levelScene;
+        return true;
+    }
+
+    // Leaderboard Vs Ghost button — play the level with selected player as ghost opponent
+    if (buttonName == "Vs_Ghost_Button")
+    {
+        if (m_selectedRank < 0 || m_selectedRank >= static_cast<int>(m_leaderboardData.size()))
+        {
+            std::cout << "[MenuLogic] Vs Ghost: no player selected." << std::endl;
+            return true;
+        }
+        const std::string replayName = m_leaderboardData[m_selectedRank].name;
+        const std::string levelScene = "../Assets/Scenes/Level_" + std::to_string(m_leaderboardLevel) + ".json";
+        std::cout << "[MenuLogic] Vs Ghost: " << replayName << " (Level " << m_leaderboardLevel << ")" << std::endl;
+        if (GhostSystem *ghost = CORE->GetGhostSystem())
+        {
+            ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+            ghost->SetLevelName("Level_" + std::to_string(m_leaderboardLevel));
+            ghost->RequestVsGhostOnLoad(replayName);
+        }
+        if (audioManager)
+            audioManager->FadeOutCategory("music", 2.5f);
+        pendingSceneChange = true;
+        pendingTimer = 2.6f;
+        selectedLevelScenePath = levelScene;
         return true;
     }
 
@@ -803,8 +911,33 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
 //  swap textures
 void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, bool isPressed)
 {
+    // Leaderboard tabs use selection-only textures managed by UpdateLeaderboardTextures().
+    // Do NOT apply hover/press effects to them.
+    if (buttonName == "Leaderboards_Level_1" || buttonName == "Leaderboards_Level_2" ||
+        buttonName == "Leaderboards_Level_3" || buttonName == "Leaderboards_tab_1st"  ||
+        buttonName == "Leaderboards_tab_2nd" || buttonName == "Leaderboards_tab_3rd")
+        return;
+
     auto &factory = GameObjectFactory::Instance();
-    GameObject *btn = factory.FindGameObject(buttonName);
+
+    // Multiple GOs may share the name "BackButton" (Settings + Leaderboard).
+    // Always operate on the active one so the correct instance gets updated.
+    GameObject *btn = nullptr;
+    if (buttonName == "BackButton")
+    {
+        for (auto &obj : factory.GetAllGameObjects())
+        {
+            if (obj->GetName() == "BackButton" && obj->IsActive())
+            {
+                btn = obj.get();
+                break;
+            }
+        }
+    }
+    else
+    {
+        btn = factory.FindGameObject(buttonName);
+    }
     if (!btn)
         return;
 
@@ -860,20 +993,14 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
         }
     }
 
-    else if (buttonName == "ReplayButton")
+    else if (buttonName == "ReplayButton" || buttonName == "Vs_Ghost_Button")
     {
         if (isPressed)
-        {
-            texturePath = "../Assets/Sprites/Icons/Replay_button_dark.png";
-        }
+            texturePath = "../Assets/Sprites/Icons/Hovering_button_light.png";
         else if (isHovered)
-        {
-            texturePath = "../Assets/Sprites/Icons/Replay_button_light.png";
-        }
+            texturePath = "../Assets/Sprites/Icons/Hovering_button_dark.png";
         else
-        {
-            texturePath = "../Assets/Sprites/Icons/Replay_button.png";
-        }
+            texturePath = "../Assets/Sprites/Icons/blankbtn.png";
     }
 
     else if (buttonName == "CreditsButton")
@@ -952,37 +1079,6 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
         }
     }
     else if (buttonName == "BackButton" || buttonName == "Level_BackButton")
-    {
-        if (isPressed)
-        {
-            texturePath = "../Assets/Sprites/Icons/Back_button_dark.png";
-        }
-        else if (isHovered)
-        {
-            texturePath = "../Assets/Sprites/Icons/Back_button_light.png";
-        }
-        else
-        {
-            texturePath = "../Assets/Sprites/Icons/Back_button.png";
-        }
-    }
-    else if (buttonName == "ReplayPicker_Slot0" || buttonName == "ReplayPicker_Slot1" ||
-             buttonName == "ReplayPicker_Slot2")
-    {
-        if (isPressed)
-        {
-            texturePath = "../Assets/Sprites/Icons/Button Large_dark.png";
-        }
-        else if (isHovered)
-        {
-            texturePath = "../Assets/Sprites/Icons/Button_Large_light.png";
-        }
-        else
-        {
-            texturePath = "../Assets/Sprites/Icons/blankbtnL.png";
-        }
-    }
-    else if (buttonName == "ReplayPicker_Back")
     {
         if (isPressed)
         {
@@ -1406,150 +1502,125 @@ void MenuLogicSystem::ScanReplays()
     std::cout << "[MenuLogic] Found " << m_replayNames.size() << " replay(s)." << std::endl;
 }
 
-void MenuLogicSystem::ShowReplayPicker()
+
+
+// ===== Leaderboard =====
+
+void MenuLogicSystem::ScanLeaderboard(int level)
 {
-    if (m_hasCreatedReplayPicker)
+    m_leaderboardData.clear();
+    m_selectedRank = -1;
+    namespace fs = std::filesystem;
+
+    const std::string dir = "../Assets/Replay/Level_" + std::to_string(level) + "/";
+    if (!fs::exists(dir))
+    {
+        std::cout << "[MenuLogic] Leaderboard dir not found: " << dir << std::endl;
         return;
+    }
 
-    ScanReplays();
+    for (const auto &entry : fs::directory_iterator(dir))
+    {
+        if (!entry.is_regular_file() || entry.path().extension() != ".json")
+            continue;
 
+        std::string stem = entry.path().stem().string();
+        float bestTime = FLT_MAX;
+
+        std::ifstream f(entry.path().string());
+        if (f)
+        {
+            try
+            {
+                nlohmann::json root;
+                f >> root;
+                bestTime = root.value("bestTime", FLT_MAX);
+            }
+            catch (...) {}
+        }
+
+        if (bestTime < FLT_MAX)
+            m_leaderboardData.push_back({ stem, bestTime });
+    }
+
+    // Sort fastest first, keep top 3
+    std::sort(m_leaderboardData.begin(), m_leaderboardData.end(),
+              [](const LeaderboardEntry &a, const LeaderboardEntry &b) { return a.time < b.time; });
+    if (m_leaderboardData.size() > 3)
+        m_leaderboardData.resize(3);
+
+    std::cout << "[MenuLogic] Leaderboard Level " << level
+              << ": " << m_leaderboardData.size() << " entries." << std::endl;
+}
+
+void MenuLogicSystem::UpdateLeaderboardTextures()
+{
     auto &factory = GameObjectFactory::Instance();
-    const vec2 camPos = CameraManager::Instance().GetCameraPosition();
-    const std::string font = "../Assets/FrederickatheGreat-Regular.ttf";
-    const int titleSize = 40;
-    const int slotSize = 32;
-    const int baseLayer = 150;
 
-    // Dark overlay
-    GameObject *overlay = factory.CreateGameObject("ReplayPicker_Overlay");
-    auto *ovT = overlay->AddComponent<TransformComponent>();
-    ovT->posX = camPos.x;
-    ovT->posY = camPos.y;
-    ovT->scaleX = 1920.0f;
-    ovT->scaleY = 1080.0f;
-    auto *ovR = overlay->AddComponent<RenderComponent>(
-        RenderComponent::ShapeType::Square, vec4(0.0f, 0.0f, 0.0f, 0.78f));
-    ovR->SetLayer(baseLayer);
+    const std::string yellow = "../Assets/Leaderboards_tab_yellow.png";
+    const std::string grey   = "../Assets/Leaderboards_tab_grey.png";
 
-    // Title panel
-    GameObject *titleObj = factory.CreateGameObject("ReplayPicker_Title");
-    auto *titleT = titleObj->AddComponent<TransformComponent>();
-    titleT->posX = camPos.x;
-    titleT->posY = camPos.y + 300.0f;
-    titleT->scaleX = 700.0f;
-    titleT->scaleY = 100.0f;
-    auto *titleR = titleObj->AddComponent<RenderComponent>();
-    titleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
-    titleR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    titleR->SetLayer(baseLayer + 1);
-    titleObj->AddComponent<TextComponent>(font.c_str(), titleSize, "CHOOSE A REPLAY",
-                                          vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    auto setTex = [](GameObject* obj, const std::string& path)
+    {
+        if (!obj) return;
+        if (auto *rc = obj->GetComponent<RenderComponent>())
+        {
+            rc->SetTexturePath(path);
+            rc->SetTextureID(GraphicsSystem::LoadTexture(path.c_str()));
+        }
+    };
 
-    // Slot buttons (3 slots, stacked vertically)
-    const float slotStartY = camPos.y + 130.0f;
-    const float slotSpacing = 150.0f;
+    // Level tabs
+    const char *levelTabs[] = { "Leaderboards_Level_1", "Leaderboards_Level_2", "Leaderboards_Level_3" };
+    for (int i = 0; i < 3; ++i)
+        setTex(factory.FindGameObject(levelTabs[i]), (i + 1 == m_leaderboardLevel) ? yellow : grey);
+
+    // Rank row tabs
+    const char *rankTabs[] = { "Leaderboards_tab_1st", "Leaderboards_tab_2nd", "Leaderboards_tab_3rd" };
+    for (int i = 0; i < 3; ++i)
+        setTex(factory.FindGameObject(rankTabs[i]), (i == m_selectedRank) ? yellow : grey);
+}
+
+void MenuLogicSystem::PopulateLeaderboard()
+{
+    auto &factory = GameObjectFactory::Instance();
+
+    const char *nameSlots[] = { "Name_1st_Text", "Name_2nd_Text", "Name_3rd_Text" };
+    const char *timeSlots[] = { "Time_1st_Text", "Time_2nd_Text", "Time_3rd_Text" };
+
     for (int i = 0; i < 3; ++i)
     {
-        std::string slotName = "ReplayPicker_Slot" + std::to_string(i);
-        bool hasReplay = (i < static_cast<int>(m_replayNames.size()));
-        std::string displayName;
-        if (hasReplay)
+        auto *nameObj = factory.FindGameObject(nameSlots[i]);
+        auto *timeObj = factory.FindGameObject(timeSlots[i]);
+
+        if (i < static_cast<int>(m_leaderboardData.size()))
         {
-            displayName = m_replayNames[i];
-            if (i < static_cast<int>(m_replayLevels.size()) && !m_replayLevels[i].empty())
-                displayName += "  [" + m_replayLevels[i] + "]";
+            const auto &entry = m_leaderboardData[i];
+
+            if (nameObj)
+                if (auto *tc = nameObj->GetComponent<TextComponent>())
+                    tc->SetText(entry.name);
+
+            if (timeObj)
+            {
+                if (auto *tc = timeObj->GetComponent<TextComponent>())
+                {
+                    int mins = static_cast<int>(entry.time) / 60;
+                    float secs = entry.time - mins * 60.0f;
+                    char buf[32];
+                    std::snprintf(buf, sizeof(buf), "%d:%05.2f", mins, secs);
+                    tc->SetText(buf);
+                }
+            }
         }
         else
         {
-            displayName = "(empty)";
-        }
-
-        GameObject *slot = factory.CreateGameObject(slotName);
-        auto *slotT = slot->AddComponent<TransformComponent>();
-        slotT->posX = camPos.x;
-        slotT->posY = slotStartY - i * slotSpacing;
-        slotT->scaleX = 620.0f;
-        slotT->scaleY = 110.0f;
-
-        auto *slotR = slot->AddComponent<RenderComponent>();
-        slotR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
-        slotR->SetColor(hasReplay ? vec4(1.0f, 1.0f, 1.0f, 1.0f) : vec4(0.55f, 0.55f, 0.55f, 1.0f));
-        slotR->SetLayer(baseLayer + 1);
-
-        vec4 textColor = hasReplay ? vec4(0.0f, 0.0f, 0.0f, 1.0f) : vec4(0.3f, 0.3f, 0.3f, 1.0f);
-        slot->AddComponent<TextComponent>(font.c_str(), slotSize, displayName, textColor, false);
-    }
-
-    // Back button
-    GameObject *backBtn = factory.CreateGameObject("ReplayPicker_Back");
-    auto *backT = backBtn->AddComponent<TransformComponent>();
-    backT->posX = camPos.x;
-    backT->posY = camPos.y - 300.0f;
-    backT->scaleX = 200.0f;
-    backT->scaleY = 175.0f;
-    auto *backR = backBtn->AddComponent<RenderComponent>();
-    backR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
-    backR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    backR->SetLayer(baseLayer + 1);
-
-    m_hasCreatedReplayPicker = true;
-    currScreen = MenuScreens::ReplayPicker;
-    std::cout << "[MenuLogic] Replay picker shown." << std::endl;
-}
-
-void MenuLogicSystem::HideReplayPicker()
-{
-    if (!m_hasCreatedReplayPicker)
-        return;
-
-    auto &factory = GameObjectFactory::Instance();
-    for (const std::string &name : {"ReplayPicker_Overlay", "ReplayPicker_Title",
-                                    "ReplayPicker_Slot0", "ReplayPicker_Slot1",
-                                    "ReplayPicker_Slot2", "ReplayPicker_Back"})
-    {
-        GameObject *obj = factory.FindGameObject(name);
-        if (obj)
-            factory.DestroyGameObject(obj->GetID());
-    }
-
-    m_hasCreatedReplayPicker = false;
-    m_replayNames.clear();
-    m_replayLevels.clear();
-    std::cout << "[MenuLogic] Replay picker hidden." << std::endl;
-}
-
-void MenuLogicSystem::UpdateReplayPickerPositions()
-{
-    if (!m_hasCreatedReplayPicker)
-        return;
-
-    const vec2 camPos = CameraManager::Instance().GetCameraPosition();
-    auto &factory = GameObjectFactory::Instance();
-
-    struct Elem
-    {
-        const char *name;
-        float dy;
-    };
-    const Elem elems[] = {
-        {"ReplayPicker_Overlay", 0.0f},
-        {"ReplayPicker_Title", 300.0f},
-        {"ReplayPicker_Slot0", 130.0f},
-        {"ReplayPicker_Slot1", -20.0f},
-        {"ReplayPicker_Slot2", -170.0f},
-        {"ReplayPicker_Back", -300.0f},
-    };
-
-    for (const auto &e : elems)
-    {
-        GameObject *obj = factory.FindGameObject(e.name);
-        if (!obj)
-            continue;
-        auto *t = obj->GetComponent<TransformComponent>();
-        if (t)
-        {
-            t->posX = camPos.x;
-            t->posY = camPos.y + e.dy;
+            if (nameObj)
+                if (auto *tc = nameObj->GetComponent<TextComponent>())
+                    tc->SetText("---");
+            if (timeObj)
+                if (auto *tc = timeObj->GetComponent<TextComponent>())
+                    tc->SetText("--:--.--");
         }
     }
 }

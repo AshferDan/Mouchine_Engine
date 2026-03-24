@@ -116,6 +116,25 @@ public:
 	 */
 	GLuint GetFontSize() { return fontSize; }
 
+	/**
+	 * @brief Reloads the font with a new path and/or size.
+	 *        Only accepts .ttf files. Silently ignores non-.ttf paths.
+	 * @param newFontPath File path to the new .ttf font.
+	 * @param newFontSize Desired font size in pixels.
+	 */
+	void SetFont(const char* newFontPath, GLuint newFontSize)
+	{
+		std::string path = newFontPath;
+		if (path.size() < 4 || path.substr(path.size() - 4) != ".ttf")
+		{
+			std::cerr << "ERROR::TextComponent::SetFont: Only .ttf files are accepted.\n";
+			return;
+		}
+		fontPath = path;
+		fontSize = newFontSize;
+		LoadFont(newFontPath, newFontSize);
+	}
+
 	/// --- Component Interface ---
 
 	/**

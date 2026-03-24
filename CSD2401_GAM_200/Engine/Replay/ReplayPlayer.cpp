@@ -40,6 +40,18 @@ void ReplayPlayer::TogglePause()
         m_isPaused = !m_isPaused;
 }
 
+void ReplayPlayer::SeekAbsolute(float t)
+{
+    if (!m_recording || m_recording->empty())
+        return;
+
+    m_clock = t;
+    if (m_clock < 0.0f)
+        m_clock = 0.0f;
+    else if (m_clock > m_recording->back().timestamp)
+        m_clock = m_recording->back().timestamp;
+}
+
 void ReplayPlayer::Seek(float deltaSeconds)
 {
     if (!m_recording || m_recording->empty())

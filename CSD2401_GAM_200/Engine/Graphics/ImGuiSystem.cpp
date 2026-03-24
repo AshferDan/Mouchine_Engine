@@ -36,6 +36,7 @@ Technology is prohibited.
 #include "AudioManager.h"
 #include "logic.h"
 #include "ScriptComponent.h"
+#include "TextComponent.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -2026,6 +2027,10 @@ void DirectoryNavigator::RenderImGui()
                 {
                     SendDragAndDrop(ScriptPayloadID, iter.path().generic_string(), fileName.c_str());
                 }
+                else if (extension == ".ttf")
+                {
+                    SendDragAndDrop(FontPayloadID, iter.path().generic_string(), fileName.c_str());
+                }
                 else
                 {
                     SendDragAndDrop(AssetPayloadID, iter.path().generic_string(), fileName.c_str());            // Anything else considered an general asset
@@ -2636,6 +2641,122 @@ void ImGuiSystem::RenderPropertyEditor()
                 UndoTracker layerTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Ascending order for topmost rendering position");
 
+            }
+        }
+    }
+
+    // Text component
+    if (auto* tc = obj->GetComponent<TextComponent>())
+    {
+        if (ImGui::CollapsingHeader("Text", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            // Remove button
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.3f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.1f, 0.1f, 1.0f));
+            float textBtnW = 100.0f;
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - textBtnW - 10);
+            bool textRemove = ImGui::Button("Remove##Text", ImVec2(textBtnW, 22));
+            ImGui::PopStyleColor(3);
+
+            if (textRemove)
+            {
+                propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                obj->RemoveComponent("TextComponent");
+                UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+            }
+            else
+            {
+                // --- Enabled ---
+                bool isTextEnabled = tc->IsEnabled();
+                if (ImGui::Checkbox("Component Enabled ##Text", &isTextEnabled))
+                {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                    tc->SetEnabled(isTextEnabled);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
+
+                // --- Text content ---
+                static char textContentBuf[512]{};
+                strncpy_s(textContentBuf, tc->GetText().c_str(), sizeof(textContentBuf) - 1);
+                if (ImGui::InputText("Text Content", textContentBuf, sizeof(textContentBuf)))
+                {
+                    tc->SetText(textContentBuf);
+                }
+                UndoTracker textContentTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
+                // --- Font path (drag .ttf from Project Navigator or type manually) ---
+                ImGui::Separator();
+                ImGui::Text("Font (.ttf only)");
+                static char fontPathBuf[512]{};
+                strncpy_s(fontPathBuf, tc->GetFontPath().c_str(), sizeof(fontPathBuf) - 1);
+                ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 10.0f);
+                if (ImGui::InputText("##FontPath", fontPathBuf, sizeof(fontPathBuf), ImGuiInputTextFlags_EnterReturnsTrue))
+                {
+                    std::string p = fontPathBuf;
+                    if (p.size() >= 4 && p.substr(p.size() - 4) == ".ttf")
+                    {
+                        propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                        tc->SetFont(fontPathBuf, tc->GetFontSize());
+                        UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                    }
+                    else
+                    {
+                        std::cout << "[TextComponent] Only .ttf files are accepted.\n";
+                    }
+                }
+                // Drag-and-drop target — only accepts FontPayloadID (.ttf)
+                {
+                    std::string droppedFont{};
+                    ReceiveDragAndDrop(FontPayloadID, droppedFont);
+                    if (!droppedFont.empty())
+                    {
+                        propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                        tc->SetFont(droppedFont.c_str(), tc->GetFontSize());
+                        UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                    }
+                }
+                CreateHintText("Type a path and press Enter, or drag a .ttf from the Project Navigator");
+
+                // --- Font size ---
+                int fontSizeVal = static_cast<int>(tc->GetFontSize());
+                ImGui::SetNextItemWidth(120.0f);
+                if (ImGui::InputInt("Font Size", &fontSizeVal))
+                {
+                    if (fontSizeVal < 1) fontSizeVal = 1;
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                    tc->SetFont(tc->GetFontPath().c_str(), static_cast<GLuint>(fontSizeVal));
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
+
+                ImGui::Separator();
+
+                // --- Color ---
+                vec4 tcCol = tc->GetColor();
+                float tcColorArr[4] = { tcCol.x, tcCol.y, tcCol.z, tcCol.w };
+                if (ImGui::ColorEdit4("Text Color", tcColorArr))
+                {
+                    tc->SetColor(vec4(tcColorArr[0], tcColorArr[1], tcColorArr[2], tcColorArr[3]));
+                }
+                UndoTracker tcColorTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
+                // --- Scale ---
+                float tcScale = tc->GetScale();
+                if (ImGui::DragFloat("Scale##Text", &tcScale, 0.01f, 0.0f, 100.0f))
+                {
+                    tc->SetScale(tcScale);
+                }
+                UndoTracker tcScaleTracker(obj, editor, isEditingProperty, propertyBeforeJson);
+
+                // --- Screen Space ---
+                bool tcSS = tc->isScreenSpace();
+                if (ImGui::Checkbox("Screen Space##Text", &tcSS))
+                {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                    tc->SetScreenSpace(tcSS);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
+                CreateHintText("Screen Space: text stays fixed on screen. World Space: text follows camera.");
             }
         }
     }
@@ -4609,7 +4730,11 @@ void PopulateComponentList()
             go->AddComponent<ScriptComponent>();    std::cout << "Added Script Component to " << go->GetName() << std::endl;
 } } });
 
-    //AllComponents.push_back({ "Text Component"      , ImTextureID(icon_active_ui), [](GameObject* go) { go->AddComponent<TextComponent>(); } });
+    AllComponents.push_back({ ComponentType::Render, "Text Component", ImTextureID(icon_active_ui), [](GameObject* go) {
+        if (!go->GetComponent<TextComponent>()) {
+            go->AddComponent<TextComponent>("../Assets/FrederickatheGreat-Regular.ttf", GLuint(36), std::string("New Text"));
+            std::cout << "Added Text Component to " << go->GetName() << std::endl;
+        } } });
     //AllComponents.push_back({ "Animator Component"  , ImTextureID(icon_active_ui), [](GameObject* go) { go->AddComponent<Spritesheet>(); } });
     // cant add these because theyre abit special, not just a simple slap on component
 }
