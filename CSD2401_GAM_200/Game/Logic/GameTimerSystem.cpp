@@ -355,7 +355,6 @@ void GameTimerSystem::UpdateBar(int )
     if (cb && (cb->IsWinScreenActive() || cb->IsLoseScreenActive()))
     {
         timerGO->SetActive(false);
-        RestoreTimerBar(timerGO);
         return;
     }
 

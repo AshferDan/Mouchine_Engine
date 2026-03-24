@@ -30,6 +30,10 @@ Technology is prohibited.
 
 std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
+std::string level1Path = "../Assets/Scenes/Level_1.json";
+std::string level2Path = "../Assets/Scenes/Level_2.json";
+std::string level3Path = "../Assets/Scenes/Level_2_V2.json";
+
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens
@@ -158,19 +162,20 @@ void MenuLogicSystem::Update(float dt)
                 {
                     std::cout << "Starting level: " << selectedLevelScenePath << std::endl;
                     CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
-                    if (!cutscene->HasPlayed(introPath))
+
+                    if (selectedLevelButtonName == "Level1Button" && !cutscene->HasPlayed(introPath)) 
                     {
                         if (!cutscene->IsPlaying())
                         {
                             cutscene->PlayVideo(introPath, "CutsceneAudio");
-                            currScreen = MenuScreens::Home;
+                            currScreen = MenuScreens::LevelSelect;
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
                         // Don't call RequestSceneLoad yet - StopCutscene will handle it
                     }
                     else
                     {
-                        // Cutscene already played, load normally with transition
+                        // No cutscene
                         CORE->RequestSceneLoad(selectedLevelScenePath, true);
                     }
                 }
@@ -346,12 +351,19 @@ void MenuLogicSystem::Update(float dt)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
-        if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
-            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(true);
+        if (auto* levelSelectScreen = GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
+        {
+            if (!levelSelectScreen->IsActive())  // only true on the first frame
+            {
+                justEnteredLevelSelect = true;
+            }
+            levelSelectScreen->SetActive(true);
+        }
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+
     }
     else if (currScreen == MenuScreens::QUIT)
     {
@@ -423,6 +435,19 @@ void MenuLogicSystem::Update(float dt)
             justEnteredSettings = false;
         }
     }
+
+    if (currScreen == MenuScreens::LevelSelect && justEnteredLevelSelect) 
+    {
+        if (auto* selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(false);
+        if (auto* selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(false);
+        if (auto* selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(false);
+        
+        justEnteredLevelSelect = false;
+    }
+
 
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
     std::string currentPressed = "";
@@ -641,21 +666,39 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     if (buttonName == "Level1Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level1Button", "../Assets/Scenes/Level_1.json");
+        SelectLevel("Level1Button", level1Path);
+        if (auto* selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(true);
+        if (auto* selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(false);
+        if (auto* selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(false);
         return true;
     }
 
     if (buttonName == "Level2Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level2Button", "../Assets/Scenes/Level_2.json"); 
+        SelectLevel("Level2Button", level2Path); 
+        if (auto* selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(false);
+        if (auto* selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(true);
+        if (auto* selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(false);
         return true;
     }
 
     if (buttonName == "Level3Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level3Button", "../Assets/Scenes/Level_2_V2.json");
+        SelectLevel("Level3Button", level3Path);
+        if (auto* selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(false);
+        if (auto* selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(false);
+        if (auto* selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(true);
         return true;
     }
 
