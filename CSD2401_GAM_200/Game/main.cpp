@@ -68,7 +68,7 @@ int main()
             PauseMenuLogicSystem*    pauseMenuLogic = nullptr;
             WinLoseLogicSystem*      winLoseLogic   = nullptr;
             GameTimerSystem*         gameTimer      = nullptr;
-            MediaPlayerLogicSystem*  mediaPlayer    = nullptr;
+            //MediaPlayerLogicSystem*  mediaPlayer    = nullptr;
             PickupSystem             pickupSystem;
 
             void FixedUpdatePlaying(float dt) override {
@@ -81,7 +81,7 @@ int main()
                 if (winLoseLogic)   winLoseLogic->Update(dt);
             }
             void VariableUpdate(float dt) override {
-                if (mediaPlayer) mediaPlayer->Update(dt);   // runs during replay mode too
+                //if (mediaPlayer) mediaPlayer->Update(dt);   // runs during replay mode too
                 if (CORE->GetGhostSystem()->IsReplayMode()) return;
                 if (gameTimer) gameTimer->Update(dt);
                 GameManager::Instance().GameStateLoop(dt);
@@ -98,7 +98,7 @@ int main()
                 if (pauseMenuLogic) pauseMenuLogic->Initialize();
                 if (gameTimer)      gameTimer->Initialize();
                 if (winLoseLogic)   winLoseLogic->Initialize();
-                if (mediaPlayer)    mediaPlayer->Initialize();
+                //if (mediaPlayer)    mediaPlayer->Initialize();
                 pickupSystem = PickupSystem();
             }
             bool IsPauseMenuActive()  const override { return pauseMenuLogic && pauseMenuLogic->IsPauseMenuActive(); }
@@ -138,13 +138,13 @@ int main()
         gameApp.pauseMenuLogic = CORE->AddSystem<PauseMenuLogicSystem>();
         gameApp.winLoseLogic   = CORE->AddSystem<WinLoseLogicSystem>();
         gameApp.gameTimer      = CORE->AddSystem<GameTimerSystem>();
-        gameApp.mediaPlayer    = CORE->AddSystem<MediaPlayerLogicSystem>();
+        //gameApp.mediaPlayer    = CORE->AddSystem<MediaPlayerLogicSystem>();
 
         gameApp.menuLogic->Initialize();
         gameApp.pauseMenuLogic->Initialize();
         gameApp.winLoseLogic->Initialize();
         gameApp.gameTimer->Initialize();
-        gameApp.mediaPlayer->Initialize();
+        //gameApp.mediaPlayer->Initialize();
 
         CORE->SetGameCallbacks(&gameApp);
         // ─────────────────────────────────────────────────────────────────────
