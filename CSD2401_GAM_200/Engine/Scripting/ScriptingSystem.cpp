@@ -1653,7 +1653,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::DestroyByName",       (void *)Internal_DestroyByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
-    mono_add_internal_call("CSharpScript.GameObject::CountAll",             (void *)Internal_CountAllGameObjects);
+    mono_add_internal_call("CSharpScript.GameObject::CountAllGameObjects",  (void *)Internal_CountAllGameObjects);
 
     // === GameTimer ===
     mono_add_internal_call("CSharpScript.GameTimer::GetRemainingTime",    (void *)Internal_GetRemainingTime);

@@ -226,7 +226,7 @@ namespace CSharpScript
         public static extern void DestroyByName(string name);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int CountAll();
+        public static extern int CountAllGameObjects();
     }
 
     /// <summary>

@@ -306,6 +306,28 @@ int main()
             }
         }
 
+        GameObject* Wall3 = GameObjectFactory::Instance().CreateShape(
+            "NPC_Lobster(1)",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            200.0f, 0.0f,                      // Center of screen
+            100.0f, 1000.0f,                  // Size
+            false,
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
+
+        if (Wall3)
+        {
+            ColliderComponent* colComp = Wall3->AddComponent<ColliderComponent>();
+            PhysicsComponent* phyComp = Wall3->AddComponent<PhysicsComponent>();
+
+            if (colComp && phyComp)
+            {
+                phyComp->SetStatic(true);
+                colComp->SetSize(100.0f, 1000.0f);
+                colComp->SetLayer(CollisionLayer::Ground);
+            }
+        }
+
 #endif
         // Initialise Game State Manager (Level1)
         GameManager::Instance().ChangeState(std::make_unique<Level1>());

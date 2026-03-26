@@ -53,12 +53,12 @@ namespace CSharpScript
                 return;
             }
 
-            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx2", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx3", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.7f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.9f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.9f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.4f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Coin_sfx2", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.4f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Coin_sfx3", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.4f, 1.0f, "pu_sfx");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -92,24 +92,24 @@ namespace CSharpScript
 
                     Random rnd = new Random();
                     int variation = rnd.Next(1, 4);
-                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "sfx");
+                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "pu_sfx");
                 }
                 else if (goName.Contains(Pickup_Shell_Name))
                 {
                     // shell effect
                     Pickups.CollectShell();
-                    Audio.PlaySound("PU_Shell_sfx", "sfx");
+                    Audio.PlaySound("PU_Shell_sfx", "pu_sfx");
                 }
                 else if (goName.Contains(Pickup_Speed_Name))
                 {
                     // powerup effect
-                    Audio.PlaySound("PU_Speed_sfx", "sfx");
+                    Audio.PlaySound("PU_Speed_sfx", "pu_sfx");
                     PlayerMovement.triggerSpeedBoost = true;
                 }
                 else if (goName.Contains(Pickup_Time_Name))
                 {
                     // powerup effect
-                    Audio.PlaySound("PU_Time_sfx", "sfx");
+                    Audio.PlaySound("PU_Time_sfx", "pu_sfx");
                     triggeredTimePU = true;
                 }
                 else
