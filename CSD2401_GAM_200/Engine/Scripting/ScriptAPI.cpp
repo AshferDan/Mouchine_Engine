@@ -270,7 +270,10 @@ namespace API
         {
             unsigned int newID = GraphicsSystem::LoadTexture(filename);
             auto *render = background->GetComponent<RenderComponent>();
-            render->SetTextureID(newID);
+            if (render)
+            {
+                render->SetTextureID(newID);
+            }
         }
     }
 
@@ -871,10 +874,9 @@ namespace API
     {
         auto &factory = GameObjectFactory::Instance();
         GameObject *obj = factory.FindGameObject(objectName);
-        auto transform = obj->GetComponent<TransformComponent>();
         if (obj)
         {
-
+            auto transform = obj->GetComponent<TransformComponent>();
             if (!obj->GetComponent<ColliderComponent>() && transform)
             {
                 obj->AddComponent<ColliderComponent>();
@@ -1066,6 +1068,7 @@ namespace API
         GameObject* obj1 = factory.FindGameObject(obj1_name);
         GameObject* obj2 = factory.FindGameObject(obj2_name);
         CollisionSystem* collisys = CORE->GetCollisionSystem();
+        if (!obj1 || !obj2 || !collisys) return false;
         if (collisys->CollisionSystem::JustCollided(obj1, obj2)) {
             return true;
         }
@@ -1078,6 +1081,7 @@ namespace API
         GameObject* obj1 = factory.FindGameObject(obj1_name);
         GameObject* obj2 = factory.FindGameObject(obj2_name);
         CollisionSystem* collisys = CORE->GetCollisionSystem();
+        if (!obj1 || !obj2 || !collisys) return false;
         if (collisys->CollisionSystem::JustStopped(obj1, obj2)) {
             return true;
         }
@@ -1090,6 +1094,7 @@ namespace API
         GameObject* obj1 = factory.FindGameObject(obj1_name);
         GameObject* obj2 = factory.FindGameObject(obj2_name);
         CollisionSystem* collisys = CORE->GetCollisionSystem();
+        if (!obj1 || !obj2 || !collisys) return false;
         if (collisys->CollisionSystem::StillColliding(obj1, obj2)) {
             return true;
         }

@@ -27,9 +27,9 @@ Technology is prohibited.
 struct SoundData {
     std::string name;
     std::string filepath;
-    bool loop;
-    float volume;
-    float pitch;
+    bool loop = false;
+    float volume = 1.0f;
+    float pitch = 1.0f;
     std::string category;
 };
 
@@ -59,6 +59,10 @@ private:
 
     // category volumes (music, sfx, voice, etc.)
     std::map<std::string, float> categoryVolumes;
+
+    // base volumes to save
+    std::map<std::string, float> baseCategoryVolumes;
+    float masterVolume = 1.0f;
 
     // Mute state
     bool m_isMuted;
@@ -124,6 +128,32 @@ public:
      * @return Current volume (0.0�1.0), or 1.0 if category not found.
      */
     float GetCategoryVolume(const std::string& category) const;
+
+    /**
+     * @brief Gets the base volume of a category before master multiplier.
+     * @param category Category name (music, sfx, etc.)
+     * @return Base volume (0.0�1.0), or 1.0 if category not found.
+     */
+    float GetBaseCategoryVolume(const std::string& category) const;
+
+    /**
+     * @brief Sets the base volume of a category before master multiplier.
+     * @param category Category name (music, sfx, etc.)
+     * @param volume Base volume (0.0�1.0).
+     */
+    void SetBaseCategoryVolume(const std::string& category, float volume);
+
+    /**
+     * @brief Gets the master volume multiplier.
+     * @return Master volume (0.0�1.0).
+     */
+    float GetMasterVolume() const;
+
+    /**
+     * @brief Sets the master volume multiplier and applies to all categories.
+     * @param volume Master volume (0.0�1.0).
+     */
+    void SetMasterVolume(float volume);
 
     /**
      * @brief Sets pitch for a specific sound.
@@ -362,6 +392,18 @@ public:
      * @return True if the operation was successful
      */
     bool UpdateMasterLowPassFilterFrequency(float cutoffFrequency);
+
+    /**
+     * @brief Saves current audio settings from AUDIO SETTINGS!
+     * @return True if settings were saved successfully.
+     */
+    bool SaveSettings();
+
+    /**
+     * @brief Loads audio settings from audio settings
+     * @return True if settings were loaded successfully.
+     */
+    bool LoadSettings();
 
 private:
     std::map<std::string, FadeState> categoryFadeStates;

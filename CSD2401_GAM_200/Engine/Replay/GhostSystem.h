@@ -284,15 +284,6 @@ private:
 
     std::string MakePath(const std::string& fileName);
 
-    // ===== Media Player helpers =====
-    void SpawnMediaPlayer();
-    void DestroyMediaPlayer();
-    void UpdateMediaPlayer(float dt);
-
-    bool  m_mediaPlayerSpawned = false; ///< True while the Media_Player prefab is live
-    bool  m_mouseWasDown       = false; ///< Previous-frame mouse-button state for edge detection
-    bool  m_sliderDragging     = false; ///< True while the user is dragging the timeline slider
-
     ReplayRecorder m_recorder;
     ReplayPlayer   m_player;
     GhostRecording m_bestRecording;

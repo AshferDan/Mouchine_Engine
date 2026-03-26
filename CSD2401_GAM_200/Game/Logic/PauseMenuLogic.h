@@ -129,6 +129,8 @@ public:
      */
     void CloseGhostMenu();
 
+    void HandleMessage(const WindowFocusMessage& msg) override;
+
 private:
     bool isPauseMenuActive = false;        // whether the pause menu is currently displayed
     std::string hoveredButtonName = "";    // name of the currently hovered button

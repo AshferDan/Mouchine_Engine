@@ -19,6 +19,8 @@ Technology is prohibited.
 #include <cctype>
 #include <filesystem>
 #include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 namespace
 {
@@ -40,11 +42,19 @@ namespace
  */
 AudioManager::AudioManager(AudioEngine* engine) : audioEngine(engine), m_isMuted(false)
 {
-    // default category volumes
-    categoryVolumes["music"] = 1.0f;
+    // default category volumes:, currently i set it to master=100%, music=50%, SFX=100%
+    categoryVolumes["music"] = 0.4f;
     categoryVolumes["sfx"] = 1.0f;
     categoryVolumes["voice"] = 1.0f;
     categoryVolumes["ambient"] = 1.0f;
+
+    // default base volumes, if change the categoryvolumes above, change this too to match
+    baseCategoryVolumes["music"] = 0.4f;
+    baseCategoryVolumes["sfx"] = 1.0f;
+    baseCategoryVolumes["voice"] = 1.0f;
+    baseCategoryVolumes["ambient"] = 1.0f;
+
+    masterVolume = 1.0f;  // Master at 100%
 }
 
 /**
@@ -716,7 +726,7 @@ void AudioManager::UpdateFade(float dt)
 }
 
 /**
- * @brief Resets all fade states and restores default category volumes.
+ * @brief Resets all fade states and restores user's base category volumes.
  *        Only resets if no fade is currently active (to preserve transitions).
  */
 void AudioManager::ResetFadeStates()
@@ -730,11 +740,15 @@ void AudioManager::ResetFadeStates()
 
     categoryFadeStates.clear();
 
-    // Restore default volumes
-    categoryVolumes["music"] = 1.0f;
-    categoryVolumes["sfx"] = 1.0f;
-    categoryVolumes["voice"] = 1.0f;
-    categoryVolumes["ambient"] = 1.0f;
+    // restore volumes from base volumes from settings changes
+    std::cout << "[ResetFadeStates] Restoring volumes - Master: " << masterVolume << std::endl;
+    for (const std::string& category : {"music", "sfx", "voice", "ambient"})
+    {
+        float baseVol = GetBaseCategoryVolume(category);
+        float finalVol = baseVol * masterVolume;
+        categoryVolumes[category] = finalVol;
+        std::cout << "  " << category << ": base=" << baseVol << ", final=" << finalVol << std::endl;
+    }
 
     // Apply to all currently playing sounds
     for (const auto& pair : soundDatabase)
@@ -895,4 +909,178 @@ bool AudioManager::UpdateMasterLowPassFilterFrequency(float cutoffFrequency)
     }
 
     return audioEngine->updateMasterLowPassFilterFrequency(cutoffFrequency);
+}
+
+/**
+ * @brief Gets the base volume of a category before master multiplier
+ */
+float AudioManager::GetBaseCategoryVolume(const std::string& category) const
+{
+    auto it = baseCategoryVolumes.find(category);
+    if (it != baseCategoryVolumes.end())
+    {
+        return it->second;
+    }
+    return 1.0f;
+}
+
+/**
+ * @brief Sets the base volume of a category before master multiplier
+ */
+void AudioManager::SetBaseCategoryVolume(const std::string& category, float volume)
+{
+    baseCategoryVolumes[category] = volume;
+}
+
+/**
+ * @brief Gets the master volume multiplier.
+ */
+float AudioManager::GetMasterVolume() const
+{
+    return masterVolume;
+}
+
+/**
+ * @brief Sets the master volume multiplier and applies to all categories.
+ */
+void AudioManager::SetMasterVolume(float volume)
+{
+    masterVolume = volume;
+}
+
+/**
+ * @brief Saves current audio settings from settings
+ */
+bool AudioManager::SaveSettings()
+{
+    try
+    {
+        nlohmann::json settings;
+        settings["masterVolume"] = masterVolume;
+
+        // save base category volumes
+        settings["baseVolumes"] = nlohmann::json::object();
+        for (const auto& pair : baseCategoryVolumes)
+        {
+            settings["baseVolumes"][pair.first] = pair.second;
+        }
+
+        // save final category volumes
+        settings["volumes"] = nlohmann::json::object();
+        for (const auto& pair : categoryVolumes)
+        {
+            settings["volumes"][pair.first] = pair.second;
+        }
+
+        // save mute states
+        settings["muteStates"] = nlohmann::json::object();
+        for (const auto& pair : m_categoryMuteStates)
+        {
+            settings["muteStates"][pair.first] = pair.second;
+        }
+
+        settings["masterMuted"] = m_isMuted;
+
+        // write to file
+        std::string settingsPath = "../Assets/Audio/audio_settings.json";
+        std::ofstream file(settingsPath);
+        if (!file.is_open())
+        {
+            //std::cerr << "[AudioManager] Failed to open settings file for writing: " << settingsPath << std::endl;
+            return false;
+        }
+
+        file << settings.dump(4);
+        file.close();
+
+        //std::cout << "[AudioManager] Settings saved to " << settingsPath << std::endl;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "[AudioManager] Error saving settings: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+/**
+ * @brief Loads audio settings from settings
+ */
+bool AudioManager::LoadSettings()
+{
+    try
+    {
+        std::string settingsPath = "../Assets/Audio/audio_settings.json";
+        std::ifstream file(settingsPath);
+        if (!file.is_open())
+        {
+            //std::cout << "[AudioManager] No settings file found, using defaults" << std::endl;
+            return false;
+        }
+
+        nlohmann::json settings;
+        file >> settings;
+        file.close();
+
+        // load master volume
+        if (settings.contains("masterVolume") && settings["masterVolume"].is_number())
+        {
+            masterVolume = settings["masterVolume"].get<float>();
+            //std::cout << "[AudioManager] Loaded master volume: " << masterVolume << std::endl;
+        }
+
+        // load BASE category volumes
+        if (settings.contains("baseVolumes"))
+        {
+            for (auto& [key, value] : settings["baseVolumes"].items())
+            {
+                if (value.is_number())
+                {
+                    baseCategoryVolumes[key] = value.get<float>();
+                    //std::cout << "[AudioManager] Loaded " << key << " base volume: " << value.get<float>() << std::endl;
+                }
+            }
+        }
+
+        // Load final category volumes
+        if (settings.contains("volumes"))
+        {
+            for (auto& [key, value] : settings["volumes"].items())
+            {
+                if (value.is_number())
+                {
+                    categoryVolumes[key] = value.get<float>();
+                    //std::cout << "[AudioManager] Loaded " << key << " volume: " << value.get<float>() << std::endl;
+                }
+            }
+        }
+
+        // Load mute states
+        if (settings.contains("muteStates"))
+        {
+            for (auto& [key, value] : settings["muteStates"].items())
+            {
+                if (value.is_boolean())
+                {
+                    m_categoryMuteStates[key] = value.get<bool>();
+                    //std::cout << "[AudioManager] Loaded " << key << " mute state: " << value.get<bool>() << std::endl;
+                }
+            }
+        }
+
+        // Load master mute
+        if (settings.contains("masterMuted") && settings["masterMuted"].is_boolean())
+        {
+            m_isMuted = settings["masterMuted"].get<bool>();
+            //std::cout << "[AudioManager] Loaded master mute state: " << m_isMuted << std::endl;
+        }
+
+        //std::cout << "[AudioManager] Settings loaded from " << settingsPath << std::endl;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "[AudioManager] Error loading settings: " << e.what() << std::endl;
+        return false;
+    }
 }
