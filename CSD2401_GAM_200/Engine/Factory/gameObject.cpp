@@ -22,6 +22,7 @@ Technology is prohibited.
 #include "ColliderComponent.h"
 #include "ScriptComponent.h"
 #include "CameraComponent.h"
+#include "TextComponent.h"
 #include "logic.h"
 
 
@@ -251,5 +252,7 @@ void GameObject::RemoveComponent(const std::string& ComponentName) {
         RemoveComponent<CameraComponent>();
     } else if (ComponentName == "EventComponent") {
         RemoveComponent<EventComponent>();
+    } else if (ComponentName == "TextComponent") {
+        RemoveComponent<TextComponent>();
     }
 }

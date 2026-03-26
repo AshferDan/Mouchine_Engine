@@ -747,11 +747,9 @@ bool LevelEditor::SaveLevel(const std::string &filepath)
 
         for (const auto& objPtr : allObjects)
         {
-            if (!objPtr || !objPtr->IsActive())
-                continue;
+            if (!objPtr) continue;
 
             GameObject* obj = objPtr.get();
-            if (!obj) continue;
             if (obj->GetParent() == nullptr)   // <-- ROOT OBJECT ONLY
                 roots.push_back(obj);
         }

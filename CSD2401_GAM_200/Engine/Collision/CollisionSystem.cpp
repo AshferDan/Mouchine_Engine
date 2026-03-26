@@ -519,5 +519,28 @@ bool CollisionSystem::Raycast(const vec2& origin, const vec2& direction, float d
         }
     }
 
+    // ===== Debug Visualization =====
+    if (CORE->GetGraphicsSystem()->isDebugModeOn())
+    {
+        auto* dbg = CORE->GetDebugSystem();
+
+        vec2 rayEnd = { origin.x + normDir.x * distance,
+                        origin.y + normDir.y * distance };
+
+        // Yellow = full ray beam
+        dbg->DrawLine(origin, rayEnd, { 1.f, 1.f, 0.f, 1.f });
+
+        if (foundHit)
+        {
+            // Red dot = hit point
+            dbg->DrawPoint(hit.point, { 1.f, 0.f, 0.f, 1.f });
+
+            // Green line = surface normal
+            vec2 normalEnd = { hit.point.x + hit.normal.x * 20.f,
+                               hit.point.y + hit.normal.y * 20.f };
+            dbg->DrawLine(hit.point, normalEnd, { 0.f, 1.f, 0.f, 1.f });
+        }
+    }
+
     return foundHit;
 }

@@ -42,6 +42,7 @@ const std::string ScenePayloadID{ "Scene_Name" };
 const std::string SpritePayloadID{ "Sprite_Name" };
 const std::string TilesetPayloadID{ "Tileset_Name" };
 const std::string ScriptPayloadID{ "Script_Filepath" };
+const std::string FontPayloadID{ "Font_Filepath" };
 
 // ASSET MANAGER/ DIRECTORY NAVIGATOR VARIABLES
 // Vars for ImGui::ImageButton

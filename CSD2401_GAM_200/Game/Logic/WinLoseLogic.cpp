@@ -116,6 +116,14 @@ void WinLoseLogicSystem::Update(float dt)
         GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
         if (ghost)
         {
+            // Derive level name from scene path and set it so load/save use the correct subfolder
+            std::string lvl = currentScenePath;
+            size_t slash = lvl.find_last_of("/\\");
+            if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+            size_t dot = lvl.rfind('.');
+            if (dot != std::string::npos) lvl = lvl.substr(0, dot);
+            ghost->SetLevelName(lvl);
+
             ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
             ghost->LoadRecording("Level1_testing");
             ghost->ResetGhostToggle();  // ghost is hidden by default each session
@@ -495,6 +503,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                             size_t dot = lvl.rfind('.');
                             if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
                             ghost->SetLevelName(lvl);
+                            if (CORE->GetGameCallbacks())
+                                ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
 
                             ghost->SaveCurrentRun(runName);
                             std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
@@ -526,6 +536,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                     size_t dot = lvl.rfind('.');
                     if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
                     ghost->SetLevelName(lvl);
+                    if (CORE->GetGameCallbacks())
+                        ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
                     ghost->SaveCurrentRun("Level1_testing");
                 }
                 CORE->SetGamePaused(false);

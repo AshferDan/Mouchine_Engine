@@ -75,26 +75,30 @@ private:
     float pendingTimer = 0.0f;
     bool creditsWerePlayed = false;       ///< Flag to restart BGM after credits finish
 
-    // ===== Replay Picker =====
-    std::vector<std::string> m_replayNames;   ///< Base names of replay files shown in the picker.
-    std::vector<std::string> m_replayLevels;  ///< Level name stored inside each replay (parallel to m_replayNames).
-    std::string              m_selectedReplay; ///< Replay chosen by the player; consumed on scene load.
-    bool                     m_hasCreatedReplayPicker = false;
+    // ===== Replay =====
+    std::vector<std::string> m_replayNames;   ///< Base names of replay files (newest-first).
+    std::vector<std::string> m_replayLevels;  ///< Level name stored inside each replay.
+    std::string              m_selectedReplay; ///< Replay queued for load; consumed on scene change.
 
     /**
-     * @brief Scans ../Assets/Replay/ and fills m_replayNames with up to 3
-     *        base names (no .json extension), sorted newest-first.
+     * @brief Scans ../Assets/Replay/ and fills m_replayNames sorted newest-first.
      */
     void ScanReplays();
 
-    /** @brief Creates the picker overlay GameObjects and sets the screen to ReplayPicker. */
-    void ShowReplayPicker();
+    // ===== Leaderboard =====
+    struct LeaderboardEntry { std::string name; float time; };
+    std::vector<LeaderboardEntry> m_leaderboardData;
+    int                           m_leaderboardLevel = 1;  ///< Which level tab (1/2/3) is shown.
+    int                           m_selectedRank     = -1; ///< Which rank row is selected (0/1/2), -1 = none.
 
-    /** @brief Destroys the picker overlay GameObjects. */
-    void HideReplayPicker();
+    /** @brief Scans ../Assets/Replay/Level_X/ and fills m_leaderboardData sorted by bestTime. */
+    void ScanLeaderboard(int level);
 
-    /** @brief Repositions picker elements to follow the camera each frame. */
-    void UpdateReplayPickerPositions();
+    /** @brief Writes m_leaderboardData into the Name/Time TextComponent placeholders. */
+    void PopulateLeaderboard();
+
+    /** @brief Updates level tab and rank row textures to reflect current selections. */
+    void UpdateLeaderboardTextures();
 
     // Slider state tracking
     struct SliderState {
