@@ -237,17 +237,32 @@ void GraphicsSystem::Initialize()
     //    }
     //    });
 
-    glfwSetWindowFocusCallback(window, [](GLFWwindow *win, int focused)
-                               {
-            (void)win;
+    glfwSetWindowFocusCallback(window, [](GLFWwindow* win, int focused)
+        {
+            if (!CORE)
+                return;
+
             if (focused == GLFW_FALSE)
             {
-                CORE->SetGamePaused(true);
+                CORE->HandleWindowFocusChanged(false);
+
+                // Minimize the game window when ALT-TABbing away
+                if (!glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+                {
+                    glfwIconifyWindow(win);
+                }
             }
             else
             {
-                CORE->SetGamePaused(false);
-            } });
+                // Restore when the user comes back
+                if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+                {
+                    glfwRestoreWindow(win);
+                }
+
+                CORE->HandleWindowFocusChanged(true);
+            }
+        });
 
     // Enable blending (allows transparency in textures and colors).
     glEnable(GL_BLEND);

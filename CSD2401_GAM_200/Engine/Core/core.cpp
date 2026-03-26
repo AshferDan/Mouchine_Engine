@@ -181,6 +181,12 @@ void CoreEngine::GameLoop()
 
     while (!glfwWindowShouldClose(graphicsSystem->getWindow()))
     {
+        GLFWwindow* window = graphicsSystem ? graphicsSystem->getWindow() : nullptr;
+        if (window && glfwGetWindowAttrib(window, GLFW_ICONIFIED))
+        {
+            glfwWaitEventsTimeout(0.05);
+            continue;
+        }
 
         if (m_hasPendingLoad)
         {
@@ -228,7 +234,12 @@ void CoreEngine::GameLoop()
                 }
 
                 // Unpause the game after scene load completes
-                if (m_gamePause)
+                //if (m_gamePause)
+                //{
+                //    std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
+                //    SetGamePaused(false);
+                //}
+                if (m_gamePause && !m_focusPauseActive)
                 {
                     std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
                     SetGamePaused(false);
@@ -336,49 +347,53 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
-                if (collisionSystem)
+                //stop updating gameplay systems while paused
+                if (!m_gamePause)
                 {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    collisionSystem->Update(static_cast<float>(fixed_dt));
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[collisionSystem->GetName()] += ms;
-                    g_totalLoopTime += ms;
+                    if (collisionSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        collisionSystem->Update(static_cast<float>(fixed_dt));
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[collisionSystem->GetName()] += ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    if (physicsSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        physicsSystem->Update(static_cast<float>(fixed_dt));
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[physicsSystem->GetName()] += ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    SpawnTest_Update(); // Stress Test Update
+
+                    if (scriptSystem)
+                    {
+                        std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
+                        scriptSystem->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
+                        std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
+                        double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
+                        g_systemTimings[scriptSystem->GetName()] = ms;
+                        g_totalLoopTime += ms;
+                    }
+
+                    // Flush any GameObjects destroyed from scripts this frame
+                    GameObjectFactory::Instance().FlushPendingDestroys();
+
+                    // Ghost system: record player state + drive ghost object (after scripts)
+                    if (ghostSystem)
+                        ghostSystem->Update(static_cast<float>(fixed_dt));
+
+                    // Game-specific variable-timestep update (game timer, state machine, etc.)
+                    if (gameCallbacks)
+                        gameCallbacks->FixedUpdatePlaying(static_cast<float>(fixed_dt));
                 }
-
-                if (physicsSystem)
-                {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    physicsSystem->Update(static_cast<float>(fixed_dt));
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[physicsSystem->GetName()] += ms;
-                    g_totalLoopTime += ms;
-                }
-
-                SpawnTest_Update(); // Stress Test Update
-
-                if (scriptSystem)
-                {
-                    std::chrono::high_resolution_clock::time_point sysStart = std::chrono::high_resolution_clock::now();
-                    scriptSystem->Update(static_cast<float>(fixed_dt)); // Use fixed timestep for consistency
-                    std::chrono::high_resolution_clock::time_point sysEnd = std::chrono::high_resolution_clock::now();
-                    double ms = std::chrono::duration<double, std::milli>(sysEnd - sysStart).count();
-                    g_systemTimings[scriptSystem->GetName()] = ms;
-                    g_totalLoopTime += ms;
-                }
-
-                // Flush any GameObjects destroyed from scripts this frame
-                GameObjectFactory::Instance().FlushPendingDestroys();
-
-                // Ghost system: record player state + drive ghost object (after scripts)
-                if (ghostSystem)
-                    ghostSystem->Update(static_cast<float>(fixed_dt));
-
-                // Game-specific fixed update (menu logic, etc.) – injected by the game project
-                if (gameCallbacks)
-                    gameCallbacks->FixedUpdatePlaying(static_cast<float>(fixed_dt));
-
+               
                 stepOnce = false; // Reset after processing one frame
             }
 
@@ -588,4 +603,91 @@ void CoreEngine::SetGamePaused(bool paused, bool pauseAudio)
     {
         audioManager->PauseAllSounds(paused);
     }
+}
+
+void CoreEngine::HandleWindowFocusChanged(bool focused)
+{
+    if (!focused)
+    {
+        // Ignore duplicate focus-lost events
+        if (m_focusPauseActive)
+            return;
+
+        m_focusPauseActive = true;
+        m_pauseStateBeforeFocusLoss = m_gamePause;
+
+        // Clear input so keys/buttons do not get "stuck"
+        if (inputManager)
+            inputManager->ResetState();
+
+        std::cout << "[ALT_TAB] Focus lost\n";
+
+        // Clear player movement so no stale motion resumes after ALT-TAB
+        GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+        if (!hero)
+        {
+            std::cout << "[ALT_TAB] Hero not found\n";
+        }
+        else
+        {
+
+            auto* physics = hero->GetComponent<PhysicsComponent>();
+            if (!physics)
+            {
+                std::cout << "[ALT_TAB] Hero has no PhysicsComponent\n";
+            }
+            else
+            {
+                // stop
+                physics->SetVelocity(0.0f, 0.0f);
+            }
+        }
+
+        
+
+        // Pause gameplay/physics only.
+        SetGamePaused(true, false);
+
+        // Hard-pause all sounds for ALT-TAB
+        if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+        {
+            audioManager->PauseAllSounds(true);
+        }
+
+        return;
+    }
+
+    // Ignore duplicate focus-gained events
+    if (!m_focusPauseActive)
+        return;
+
+    m_focusPauseActive = false;
+
+    // Clear input again on return
+    if (inputManager)
+        inputManager->ResetState();
+
+    // Stop movement again on focus return so the pause menu opens on a fully stopped player
+    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
+    if (hero)
+    {
+        if (auto* physics = hero->GetComponent<PhysicsComponent>())
+        {
+            physics->SetVelocity(0.0f, 0.0f);
+        }
+    }
+
+    // Resume hard-paused ALT-TAB audio
+    if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+    {
+        audioManager->PauseAllSounds(false);
+    }
+
+    // Restore whatever pause state existed before focus was lost
+    //SetGamePaused(m_pauseStateBeforeFocusLoss, false);
+    SetGamePaused(true, false); // Always stay paused when returning from Alt-Tab
+
+    // Notify the game side that we just returned from Alt-Tab
+    std::cout << "[CORE] Dispatching WindowFocusMessage" << std::endl;
+    messageBus.Publish(WindowFocusMessage(true));
 }

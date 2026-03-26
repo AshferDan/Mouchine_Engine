@@ -71,6 +71,8 @@ void PauseMenuLogicSystem::Initialize()
     ghostMenuCloseTimer = 0.0f;
     m_ghostReplayNames.clear();
     m_ghostReplayLevels.clear();
+
+    CORE->GetMessageBus().Subscribe<WindowFocusMessage>(static_cast<IMessageHandler*>(this));
 }
 
 /**
@@ -2739,5 +2741,20 @@ void PauseMenuLogicSystem::SetGhostMenuVisible(bool show)
     {
         GameObject* obj = factory.FindGameObject(name);
         if (obj) obj->SetActive(show);
+    }
+}
+
+void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
+    if (msg.hasFocus) {
+        // If we just gained focus, ensure the pause menu is shown
+
+        isPauseMenuActive = true;
+
+        // On the first Alt-Tab, hasCreatedPauseMenuUI is false.
+        if (!hasCreatedUI) {
+            CreatePauseMenuUI();
+        }
+
+        SetPauseMenuVisible(true);
     }
 }

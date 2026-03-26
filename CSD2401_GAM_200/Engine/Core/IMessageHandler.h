@@ -16,6 +16,8 @@ Technology is prohibited.
 #include "Message.h"
 #include <iostream>
 
+struct WindowFocusMessage;
+
 // Interface for anythat that handles messages
 class IMessageHandler
 {
@@ -61,4 +63,6 @@ public:
      * @param msg Reference to the CreateObjectMessage object.
      */
     virtual void HandleMessage(const CreateObjectMessage &msg) { (void)msg; }
+
+    virtual void HandleMessage(const WindowFocusMessage& msg) { (void)msg; }
 };
