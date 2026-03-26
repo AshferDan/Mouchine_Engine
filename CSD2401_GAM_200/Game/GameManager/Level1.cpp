@@ -68,7 +68,7 @@ void Level1::Update(float dt) {
         {
             //int currCoins = pickupSys1.GetCurrentCoins();
 
-            coinText->GetComponent<TextComponent>()->SetText(std::to_string(currCoins));
+            coinText->GetComponent<TextComponent>()->SetText(std::to_string(currCoins * 10));
         }
     }
 

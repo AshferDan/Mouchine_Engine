@@ -309,7 +309,8 @@ namespace CSharpScript
             for (int i = 0; i < NPCs.Count(); i++)
             {
                 //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
-                Audio.Load3DSound("scissors_snip" + i.ToString(), "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx" , 0.4f, 1.0f);
+                string audioPath = "../Assets/Audio/hairscissors_snip" + ((i%3)+1).ToString() + ".wav";
+                Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
             }
             Audio.Load3DSound("scissors_sniptest", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
 
@@ -435,7 +436,8 @@ namespace CSharpScript
                 for (int i = 0; i < NPCs.Count(); i++)
                 {
                     //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
-                    Audio.Load3DSound("scissors_snip" + i.ToString(), "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
+                    string audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
+                    Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
                 }
 
                 Debug.Log("NPC Count: " + NPCs.Count().ToString());
@@ -459,13 +461,13 @@ namespace CSharpScript
                     if (!NPCs[i].audioPlaying)
                     {
                         Audio.PlaySound("scissors_snip" + (i).ToString(), "lobster_scissors" + (i).ToString());
+                        Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
                         NPCs[i].audioPlaying = true;
-                        Debug.Log("=== LOBSTER 1 SCISSORS SOUND STARTED ===");
                     }
 
                     // update position, no spatial if above or below
                     float horizontalDist1 = Math.Abs(distX);
-                    if (horizontalDist1 < 250.0f)
+                    if (horizontalDist1 < 150.0f)
                     {
                         Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), playerPos.x, NPCs[i].pos.y);
                     }
@@ -476,13 +478,12 @@ namespace CSharpScript
                 }
                 else
                 {
-                    Debug.Log("npc " + (i).ToString() + "out of range");
+                    //Debug.Log("npc " + (i).ToString() + "out of range");
                     if (NPCs[i].audioPlaying)
                     {
-                        Debug.Log("lobster_scissors" + (i).ToString());
-                        Audio.StopSound("lobster_scissors" + (i).ToString());
+                        //Debug.Log("lobster_scissors" + (i).ToString());
+                        //Audio.StopSound("lobster_scissors" + (i).ToString());
                         NPCs[i].audioPlaying = false;
-                        Debug.Log("=== LOBSTER 1 SCISSORS SOUND STOPPED ===");
                     }
                 }
             }
