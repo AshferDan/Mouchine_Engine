@@ -659,18 +659,31 @@ void Serialization::DeserializeAudioManager(const json& j, AudioManager* audioMa
 	}
 
 	// deserialise events
-	if (audioJson.contains("events")) 
+	if (audioJson.contains("events"))
 	{
-		for (const auto& eventJson : audioJson["events"]) 
+		for (const auto& eventJson : audioJson["events"])
 		{
 			std::string eventName = eventJson.value("event", "");
 			std::string soundName = eventJson.value("sound", "");
 
-			if (!eventName.empty() && !soundName.empty()) 
+			if (!eventName.empty() && !soundName.empty())
 			{
 				audioManager->AddEventMapping(eventName, soundName);
 			}
 		}
 	}
 	audioManager->LoadAllSounds();
+
+	// Apply the current in-memory volumes to all categories (preserves settings from main menu)
+	float masterVol = audioManager->GetMasterVolume();
+	std::cout << "[DeserializeAudioManager] Applying in-memory volumes - Master: " << masterVol << std::endl;
+	for (const std::string& category : {"music", "sfx", "voice", "ambient"})
+	{
+		float baseVol = audioManager->GetBaseCategoryVolume(category);
+		float finalVol = baseVol * masterVol;
+		audioManager->SetCategoryVolume(category, finalVol);
+		std::cout << "  " << category << ": base=" << baseVol << ", master=" << masterVol << ", final=" << finalVol << std::endl;
+	}
+
+	std::cout << "[DeserializeAudioManager] In-memory audio settings applied to scene" << std::endl;
 }

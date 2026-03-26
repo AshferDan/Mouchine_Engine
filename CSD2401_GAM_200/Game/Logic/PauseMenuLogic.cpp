@@ -354,6 +354,17 @@ void PauseMenuLogicSystem::Update(float dt)
                     CreatePauseSettingsUI();
                 }
 
+                // load current volumes from Audio Manager
+                audioManager = CORE->GetAudioManager();
+                if (audioManager)
+                {
+                    savedMasterVolume = audioManager->GetMasterVolume();
+                    savedMusicVolume = audioManager->GetBaseCategoryVolume("music");
+                    savedSfxVolume = audioManager->GetBaseCategoryVolume("sfx");
+                    std::cout << "[PauseMenu] Opening Settings - Loaded from AudioManager: Master=" << savedMasterVolume
+                              << ", Music=" << savedMusicVolume << ", SFX=" << savedSfxVolume << std::endl;
+                }
+
                 isPauseSettingsOpen = true;
 
                 // Clear the pending state immediately for settings
@@ -554,38 +565,16 @@ void PauseMenuLogicSystem::Update(float dt)
             // load current volume values from audio manager
             if (audioManager)
             {
-                // get current actual volumes from the audio manager
-                float currentMusicVol = audioManager->GetCategoryVolume("music");
-                float currentSfxVol = audioManager->GetCategoryVolume("sfx");
+                std::cout << "[PauseMenu Init] Loaded volumes - Master: " << savedMasterVolume
+                          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume << std::endl;
 
-                //std::cout << "[PauseMenu Init] Current volumes from AudioManager - Music: " << currentMusicVol
-                //          << ", SFX: " << currentSfxVol << std::endl;
-                //std::cout << "[PauseMenu Init] Saved volumes - Master: " << savedMasterVolume
-                //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume << std::endl;
-
-                if (savedMasterVolume == 1.0f && currentMusicVol < 1.0f)
-                {
-                    savedMasterVolume = currentMusicVol;
-                    savedMusicVolume = 1.0f;
-                    savedSfxVolume = currentSfxVol / savedMasterVolume;
-                    std::cout << "[PauseMenu Init] Inferred master volume: " << savedMasterVolume << std::endl;
-                }
-                else
-                {
-                    // reverse the master multiplication to get base volumes
-                    if (savedMasterVolume > 0.001f)
-                    {
-                        savedMusicVolume = currentMusicVol / savedMasterVolume;
-                        savedSfxVolume = currentSfxVol / savedMasterVolume;
-                    }
-                }
-
+                // Set slider values directly from loaded volumes (no inference needed)
                 masterSlider.currentVolume = savedMasterVolume;
                 musicSlider.currentVolume = savedMusicVolume;
                 sfxSlider.currentVolume = savedSfxVolume;
 
-                //std::cout << "[PauseMenu Init] Final slider values - Master: " << masterSlider.currentVolume
-                //          << ", Music: " << musicSlider.currentVolume << ", SFX: " << sfxSlider.currentVolume << std::endl;
+                std::cout << "[PauseMenu Init] Slider values - Master: " << masterSlider.currentVolume
+                          << ", Music: " << musicSlider.currentVolume << ", SFX: " << sfxSlider.currentVolume << std::endl;
 
                 // only initialize if not already initialized
                 if (masterSlider.originalScaleX <= 0.0f)
@@ -2514,6 +2503,8 @@ void PauseMenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool 
                         if (currentSliderCategory == "master")
                         {
                             savedMasterVolume = volumePercent;
+                            audioManager->SetMasterVolume(savedMasterVolume);
+
                             float finalMusicVol = savedMusicVolume * savedMasterVolume;
                             float finalSfxVol = savedSfxVolume * savedMasterVolume;
 
@@ -2528,10 +2519,12 @@ void PauseMenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool 
                             if (currentSliderCategory == "music")
                             {
                                 savedMusicVolume = volumePercent;
+                                audioManager->SetBaseCategoryVolume("music", volumePercent);
                             }
                             else if (currentSliderCategory == "sfx")
                             {
                                 savedSfxVolume = volumePercent;
+                                audioManager->SetBaseCategoryVolume("sfx", volumePercent);
                             }
 
                             float finalVolume = volumePercent * savedMasterVolume;
