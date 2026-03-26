@@ -172,6 +172,10 @@ namespace CSharpScript
         public string vfx = "Hero_vfx";
         public string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
+
+        private int _pauseResumeFreezeFrames = 0;
+
+
         public override void OnAwake()
         {
 
@@ -548,6 +552,65 @@ namespace CSharpScript
             //Debug.Log(_isGrounded.ToString());
             //if (_isFacingRight) Debug.Log("right");
             //else Debug.Log("left");
+
+            if (_pauseResumeFreezeFrames > 0)
+            {
+                _pauseResumeFreezeFrames--;
+                Physics.SetVelocity(OwnerName, 0f, 0f);
+                return;
+            }
+
+            bool staleWallSlide = _isWallSliding &&
+            Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f &&
+            Math.Abs(InputManager.Movement.x) < 0.01f &&
+            !InputManager.JumpWasPressed &&
+            !InputManager.GroundPoundWasPressed &&
+            !InputManager.RollWasPressed &&
+            !InputManager.RunIsHeld;
+
+            // Ground pound falling actively holds Y = -GPFallSpeed.
+            // If gp_falling is true but Y velocity is near zero with no input = alt-tab froze it.
+            bool staleGroundPound = gp_falling &&
+                Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f &&
+                Math.Abs(InputManager.Movement.x) < 0.01f &&
+                !InputManager.JumpWasPressed &&
+                !InputManager.GroundPoundWasPressed &&
+                !InputManager.RollWasPressed &&
+                !InputManager.RunIsHeld;
+
+            bool velocityIsNearZero =
+                Math.Abs(Physics.GetVelocity(OwnerName).x) < 0.01f &&
+                Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f;
+
+            bool staleAltTabState = staleGroundPound || staleWallSlide || (
+                velocityIsNearZero &&
+                Math.Abs(InputManager.Movement.x) < 0.01f &&
+                !InputManager.JumpWasPressed &&
+                !InputManager.GroundPoundWasPressed &&
+                !InputManager.RollWasPressed &&
+                !InputManager.RunIsHeld &&
+                (
+                    movespeed > 0.01f ||
+                    _isRolling ||
+                    _isGroundPounding ||
+                    gp_falling ||
+                    _isWallSliding ||
+                    _isWallKicking ||
+                    _isWallJumping ||
+                    _isGliding ||
+                    _isSkidding ||
+                    _isJumping ||
+                    (_isFalling && !_isGrounded) ||
+                    (_isFastFalling && !_isGrounded)
+                )
+            );
+
+            if (staleAltTabState)
+            {
+                ResetVarsForPauseResume();
+                return;
+            }
+
 
             // check if player is taking damage
             bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
@@ -1307,7 +1370,6 @@ namespace CSharpScript
                     }
                 }
                 wallslideTime += fixeddt;
-
                 // apply friction/slide speed
                 Physics.SetVelocity(OwnerName, 0f, Math.Max(Physics.GetVelocity(OwnerName).y, -MoveStats.WallSlidingSpeed));
             }
@@ -1567,6 +1629,7 @@ namespace CSharpScript
             // kill all momentum for in air freeze
             _moveVelocity.x = 0;
             _moveVelocity.y = 0;
+            movespeed = 0;
 
             // set vel to vector.zero
             Physics.SetVelocity(OwnerName, 0, 0);
@@ -1620,6 +1683,7 @@ namespace CSharpScript
             // reset vertical velocity
             _moveVelocity.y = 0;
             Physics.SetVelocity(OwnerName, 0, 0);
+            movespeed = 0;
 
             // calculate height
             float fallHeight = lastPos.y - transform.position.y;
@@ -1666,6 +1730,7 @@ namespace CSharpScript
             }
 
             _isGroundPounding = false;
+            _rollCooldownTimer = 0f;
             Debug.Log("\n\ntargetRollSpeed: " + targetRollSpeed + "targetDuration: " + targetDuration + "\n\n");
 
             // trigger roll with calculated speed + duration
@@ -2087,6 +2152,49 @@ namespace CSharpScript
         }
 
         #endregion
+
+        public void ResetVarsForPauseResume()
+        {
+            // preserve the live state you do NOT want a full startup reset to destroy
+            bool wasGrounded = _isGrounded;
+            bool wasFacingRight = _isFacingRight;
+            int wasFacingDirection = _facingDirection;
+
+            ResetVars();
+
+            // restore runtime state that should not be blown away mid-game
+            _isGrounded = wasGrounded;
+            _isFacingRight = wasFacingRight;
+            _facingDirection = wasFacingDirection;
+            Turn(_isFacingRight);
+
+            // clear the extra runtime-only states that raw ResetVars() misses
+            gp_falling = false;
+            wallslideTrigger = false;
+            wallslideTime = 0f;
+
+            _groundPoundCooldownTimer = 0f;
+            _rollCooldownTimer = 0f;
+            _hurtTimer = 0f;
+
+            blockMovement = false;
+            _isRunning = false;
+            _isRunToggleActive = false;
+
+            // hard stop all movement
+            _moveVelocity = new vec2(0, 0);
+            VerticalVelocity = 0f;
+
+            if (!string.IsNullOrEmpty(OwnerName))
+            {
+                Physics.SetVelocity(OwnerName, 0f, 0f);
+            }
+
+            currState = PlayerState.Idle;
+
+            // keep player frozen briefly after resume
+            _pauseResumeFreezeFrames = 3;
+        }
 
         public void ResetVars()
         {

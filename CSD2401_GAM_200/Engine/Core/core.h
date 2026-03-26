@@ -343,6 +343,7 @@ public:
     void SetGamePaused(bool paused, bool pauseAudio);
 
     bool IsGamePaused() const { return m_gamePause; }
+    void HandleWindowFocusChanged(bool focused);
 
 private:
     /**
@@ -384,6 +385,9 @@ private:
     bool m_autoPlayAfterLoad = false;
     bool m_gamePause = false;
 	bool firstTimeLoad = true;
+
+    bool m_focusPauseActive = false;
+    bool m_pauseStateBeforeFocusLoss = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.

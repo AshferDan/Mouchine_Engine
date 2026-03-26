@@ -37,7 +37,8 @@ public:
         COLLISION,
         SCENE_CHANGE,
         CREATE_OBJECT,
-        PLAY_ANIMATION
+        PLAY_ANIMATION,
+        WINDOW_FOCUS
     };
 
     virtual ~Message() = default;
@@ -53,6 +54,11 @@ protected:
     /* @brief Protected constructor to enforce type-safe creation
     */
     explicit Message(Id type) : type(type) {}
+};
+
+struct WindowFocusMessage : public Message {
+    bool hasFocus;
+    WindowFocusMessage(bool focused) : Message(Id::WINDOW_FOCUS), hasFocus(focused) {}
 };
 
 /**

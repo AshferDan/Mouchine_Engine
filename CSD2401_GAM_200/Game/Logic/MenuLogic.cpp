@@ -32,6 +32,9 @@ Technology is prohibited.
 
 std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
+std::string level1Path = "../Assets/Scenes/Level_1.json";
+std::string level2Path = "../Assets/Scenes/Level_2.json";
+std::string level3Path = "../Assets/Scenes/Level_2_V2.json";
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens
@@ -50,7 +53,7 @@ void MenuLogicSystem::Update(float dt)
 {
     // Get commonly used singletons
     AudioManager *audioManager = CORE->GetAudioManager();
-    auto& factory = GameObjectFactory::Instance();
+    auto &factory = GameObjectFactory::Instance();
 
     // Update audio fade
     if (audioManager)
@@ -70,11 +73,11 @@ void MenuLogicSystem::Update(float dt)
                 const auto &sounds = audioManager->GetSoundDatabase();
                 if (sounds.find("MainMenuBGM") != sounds.end())
                 {
-                    //std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
+                    // std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
                     audioManager->StopSound("bgm_channel");
                     audioManager->PlaySound("MainMenuBGM", "bgm_channel");
                     audioManager->FadeInCategory("music", 3.0f, 0.5f); // fade to 50% volume instead of 100% cause too loud
-                    //std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
+                    // std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
                 }
                 else
                 {
@@ -155,19 +158,20 @@ void MenuLogicSystem::Update(float dt)
                 if (hoveredButtonName == "LevelSelectedButton" && !selectedLevelScenePath.empty())
                 {
                     std::cout << "Starting level: " << selectedLevelScenePath << std::endl;
-                    CutsceneSystem* cutscene = CORE->GetCutsceneSystem();
-                    if (!cutscene->HasPlayed(introPath))
+                    CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+
+                    if (selectedLevelButtonName == "Level1Button" && !cutscene->HasPlayed(introPath))
                     {
                         if (!cutscene->IsPlaying())
                         {
                             cutscene->PlayVideo(introPath, "CutsceneAudio");
-                            currScreen = MenuScreens::Home;
+                            currScreen = MenuScreens::LevelSelect;
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
                     }
                     else
                     {
-                        // Cutscene already played, load normally with transition
+                        // No cutscene
                         CORE->RequestSceneLoad(selectedLevelScenePath, true);
                     }
                 }
@@ -224,18 +228,18 @@ void MenuLogicSystem::Update(float dt)
     }
     else if (currScreen == MenuScreens::Settings)
     {
-        //hoveredButtonName.clear();
+        // hoveredButtonName.clear();
 
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
         {
-            auto* settingsScreen = GameObjectFactory::Instance().FindGameObject("Screen_Settings");
+            auto *settingsScreen = GameObjectFactory::Instance().FindGameObject("Screen_Settings");
             if (!settingsScreen->IsActive())
             {
                 settingsScreen->SetActive(true);
                 justEnteredSettings = true;
 
                 // load saved volumes into slider states
-                //std::cout << "[MenuLogic Enter Settings] Loading saved volumes - Master: " << savedMasterVolume
+                // std::cout << "[MenuLogic Enter Settings] Loading saved volumes - Master: " << savedMasterVolume
                 //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume << std::endl;
                 masterSlider.currentVolume = savedMasterVolume;
                 musicSlider.currentVolume = savedMusicVolume;
@@ -268,11 +272,11 @@ void MenuLogicSystem::Update(float dt)
         // update sliders based on saved base volumes
         if (audioManager)
         {
-            //std::cout << "[MenuLogic Settings] Saved base volumes - Master: " << savedMasterVolume
-            //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume
-            //          << " | Slider states - Master: " << masterSlider.currentVolume
-            //          << ", Music: " << musicSlider.currentVolume
-            //          << ", SFX: " << sfxSlider.currentVolume << std::endl; 
+            // std::cout << "[MenuLogic Settings] Saved base volumes - Master: " << savedMasterVolume
+            //           << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume
+            //           << " | Slider states - Master: " << masterSlider.currentVolume
+            //           << ", Music: " << musicSlider.currentVolume
+            //           << ", SFX: " << sfxSlider.currentVolume << std::endl;
 
             // update if slider states don't match saved values OR if just entered settings
             bool needsUpdate = justEnteredSettings ||
@@ -293,12 +297,12 @@ void MenuLogicSystem::Update(float dt)
                 // update knob(aka scissors) positions to matc
 
                 // master knob
-                GameObject* masterBar = factory.FindGameObject("Slider_Bar_Master");
-                GameObject* masterKnob = factory.FindGameObject("Slider_Knob_Master");
+                GameObject *masterBar = factory.FindGameObject("Slider_Bar_Master");
+                GameObject *masterKnob = factory.FindGameObject("Slider_Knob_Master");
                 if (masterBar && masterKnob)
                 {
-                    auto* barTransform = masterBar->GetComponent<TransformComponent>();
-                    auto* knobTransform = masterKnob->GetComponent<TransformComponent>();
+                    auto *barTransform = masterBar->GetComponent<TransformComponent>();
+                    auto *knobTransform = masterKnob->GetComponent<TransformComponent>();
                     if (barTransform && knobTransform)
                     {
                         float barCenterX, barCenterY, barScaleX, barScaleY;
@@ -310,12 +314,12 @@ void MenuLogicSystem::Update(float dt)
                 }
 
                 // music knob
-                GameObject* musicBar = factory.FindGameObject("Slider_Bar_Music");
-                GameObject* musicKnob = factory.FindGameObject("Slider_Knob_Music");
+                GameObject *musicBar = factory.FindGameObject("Slider_Bar_Music");
+                GameObject *musicKnob = factory.FindGameObject("Slider_Knob_Music");
                 if (musicBar && musicKnob)
                 {
-                    auto* barTransform = musicBar->GetComponent<TransformComponent>();
-                    auto* knobTransform = musicKnob->GetComponent<TransformComponent>();
+                    auto *barTransform = musicBar->GetComponent<TransformComponent>();
+                    auto *knobTransform = musicKnob->GetComponent<TransformComponent>();
                     if (barTransform && knobTransform)
                     {
                         float barCenterX, barCenterY, barScaleX, barScaleY;
@@ -327,12 +331,12 @@ void MenuLogicSystem::Update(float dt)
                 }
 
                 // SFX knob
-                GameObject* sfxBar = factory.FindGameObject("Slider_Bar_SFX");
-                GameObject* sfxKnob = factory.FindGameObject("Slider_Knob_SFX");
+                GameObject *sfxBar = factory.FindGameObject("Slider_Bar_SFX");
+                GameObject *sfxKnob = factory.FindGameObject("Slider_Knob_SFX");
                 if (sfxBar && sfxKnob)
                 {
-                    auto* barTransform = sfxBar->GetComponent<TransformComponent>();
-                    auto* knobTransform = sfxKnob->GetComponent<TransformComponent>();
+                    auto *barTransform = sfxBar->GetComponent<TransformComponent>();
+                    auto *knobTransform = sfxKnob->GetComponent<TransformComponent>();
                     if (barTransform && knobTransform)
                     {
                         float barCenterX, barCenterY, barScaleX, barScaleY;
@@ -350,14 +354,18 @@ void MenuLogicSystem::Update(float dt)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
-        if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
-            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(true);
+        if (auto *levelSelectScreen = GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
+        {
+            if (!levelSelectScreen->IsActive()) // only true on the first frame
+            {
+                justEnteredLevelSelect = true;
+            }
+            levelSelectScreen->SetActive(true);
+        }
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
-        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
-            lb->SetActive(false);
     }
     else if (currScreen == MenuScreens::QUIT)
     {
@@ -451,6 +459,18 @@ void MenuLogicSystem::Update(float dt)
             currentSliderCategory = "";
             justEnteredSettings = false;
         }
+    }
+
+    if (currScreen == MenuScreens::LevelSelect && justEnteredLevelSelect)
+    {
+        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(false);
+        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(false);
+        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(false);
+
+        justEnteredLevelSelect = false;
     }
 
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
@@ -612,7 +632,8 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
         for (auto &obj : factory.GetAllGameObjects())
         {
             if ((obj->GetName() == "ReplayButton" || obj->GetName() == "Vs_Ghost_Button" ||
-                 obj->GetName() == "BackButton") && IsMouseOver(obj.get(), mouseX, mouseY))
+                 obj->GetName() == "BackButton") &&
+                IsMouseOver(obj.get(), mouseX, mouseY))
                 return obj->GetName();
         }
         break;
@@ -703,21 +724,39 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     if (buttonName == "Level1Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level1Button", "../Assets/Scenes/Level_1.json");
+        SelectLevel("Level1Button", level1Path);
+        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(true);
+        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(false);
+        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(false);
         return true;
     }
 
     if (buttonName == "Level2Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level2Button", "../Assets/Scenes/Level_2.json"); 
+        SelectLevel("Level2Button", level2Path);
+        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(false);
+        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(true);
+        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(false);
         return true;
     }
 
     if (buttonName == "Level3Button")
     {
         TriggerUISound(buttonName);
-        SelectLevel("Level3Button", "../Assets/Scenes/Level_2_V2.json");
+        SelectLevel("Level3Button", level3Path);
+        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+            selectedLevel1->SetActive(false);
+        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+            selectedLevel2->SetActive(false);
+        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+            selectedLevel3->SetActive(true);
         return true;
     }
 
@@ -945,8 +984,8 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
     // Rank row selection (toggle)
     if (buttonName == "Leaderboards_tab_1st" || buttonName == "Leaderboards_tab_2nd" || buttonName == "Leaderboards_tab_3rd")
     {
-        int clicked = (buttonName == "Leaderboards_tab_1st") ? 0 :
-                      (buttonName == "Leaderboards_tab_2nd") ? 1 : 2;
+        int clicked = (buttonName == "Leaderboards_tab_1st") ? 0 : (buttonName == "Leaderboards_tab_2nd") ? 1
+                                                                                                          : 2;
         // Toggle off if already selected, otherwise select
         m_selectedRank = (m_selectedRank == clicked) ? -1 : clicked;
         UpdateLeaderboardTextures();
@@ -1013,7 +1052,7 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
     // Leaderboard tabs use selection-only textures managed by UpdateLeaderboardTextures().
     // Do NOT apply hover/press effects to them.
     if (buttonName == "Leaderboards_Level_1" || buttonName == "Leaderboards_Level_2" ||
-        buttonName == "Leaderboards_Level_3" || buttonName == "Leaderboards_tab_1st"  ||
+        buttonName == "Leaderboards_Level_3" || buttonName == "Leaderboards_tab_1st" ||
         buttonName == "Leaderboards_tab_2nd" || buttonName == "Leaderboards_tab_3rd")
         return;
 
@@ -1299,14 +1338,14 @@ void MenuLogicSystem::Reset()
     currentSliderCategory = "";
 }
 
-void MenuLogicSystem::ComputeSliderUVBounds(RenderComponent* renderComp, SliderState& sliderState)
+void MenuLogicSystem::ComputeSliderUVBounds(RenderComponent *renderComp, SliderState &sliderState)
 {
     std::string texturePath = renderComp->GetTexturePath();
 
     int width = 0;
     int height = 0;
     int channels = 0;
-    unsigned char* pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
+    unsigned char *pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, 4);
 
     if (pixels && width > 0 && height > 0)
     {
@@ -1353,18 +1392,18 @@ void MenuLogicSystem::ComputeSliderUVBounds(RenderComponent* renderComp, SliderS
     sliderState.uvBoundsReady = true;
 }
 
-void MenuLogicSystem::UpdateSlider(const std::string& barName, SliderState& sliderState, float volumePercent)
+void MenuLogicSystem::UpdateSlider(const std::string &barName, SliderState &sliderState, float volumePercent)
 {
-    auto& factory = GameObjectFactory::Instance();
-    GameObject* sliderBarGO = factory.FindGameObject(barName);
+    auto &factory = GameObjectFactory::Instance();
+    GameObject *sliderBarGO = factory.FindGameObject(barName);
 
     if (!sliderBarGO)
     {
         return;
     }
 
-    auto* renderComp = sliderBarGO->GetComponent<RenderComponent>();
-    auto* transformComp = sliderBarGO->GetComponent<TransformComponent>();
+    auto *renderComp = sliderBarGO->GetComponent<RenderComponent>();
+    auto *transformComp = sliderBarGO->GetComponent<TransformComponent>();
 
     if (!renderComp || !transformComp)
     {
@@ -1407,15 +1446,15 @@ void MenuLogicSystem::UpdateSlider(const std::string& barName, SliderState& slid
 
 void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMouseDown)
 {
-    auto& factory = GameObjectFactory::Instance();
-    AudioManager* audioManager = CORE->GetAudioManager();
+    auto &factory = GameObjectFactory::Instance();
+    AudioManager *audioManager = CORE->GetAudioManager();
     bool isMouseClicked = isMouseDown && !wasMouseDownOnSlider;
 
     if (isMouseClicked && !isDraggingSlider)
     {
-        GameObject* masterBarBack = factory.FindGameObject("Slider_Bar_Back_Master");
-        GameObject* musicBarBack = factory.FindGameObject("Slider_Bar_Back_Music");
-        GameObject* sfxBarBack = factory.FindGameObject("Slider_Bar_Back_SFX");
+        GameObject *masterBarBack = factory.FindGameObject("Slider_Bar_Back_Master");
+        GameObject *musicBarBack = factory.FindGameObject("Slider_Bar_Back_Music");
+        GameObject *sfxBarBack = factory.FindGameObject("Slider_Bar_Back_SFX");
 
         if (IsMouseOver(masterBarBack, mouseX, mouseY))
         {
@@ -1446,7 +1485,7 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
     if (isDraggingSlider && !currentSliderCategory.empty())
     {
         std::string barBackName;
-        SliderState* sliderState = nullptr;
+        SliderState *sliderState = nullptr;
         std::string category;
 
         if (currentSliderCategory == "master")
@@ -1471,10 +1510,10 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
         if (sliderState)
         {
             // get background bar to determine the slider range
-            GameObject* barBack = factory.FindGameObject(barBackName);
+            GameObject *barBack = factory.FindGameObject(barBackName);
             if (barBack)
             {
-                auto* barTransform = barBack->GetComponent<TransformComponent>();
+                auto *barTransform = barBack->GetComponent<TransformComponent>();
                 if (barTransform)
                 {
                     float barCenterX, barCenterY, barScaleX, barScaleY;
@@ -1514,12 +1553,12 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                     else if (currentSliderCategory == "sfx")
                         knobName = "Slider_Knob_SFX";
 
-                    GameObject* sliderBar = factory.FindGameObject(barName);
-                    GameObject* knob = factory.FindGameObject(knobName);
+                    GameObject *sliderBar = factory.FindGameObject(barName);
+                    GameObject *knob = factory.FindGameObject(knobName);
                     if (sliderBar && knob)
                     {
-                        auto* sliderTransform = sliderBar->GetComponent<TransformComponent>();
-                        auto* knobTransform = knob->GetComponent<TransformComponent>();
+                        auto *sliderTransform = sliderBar->GetComponent<TransformComponent>();
+                        auto *knobTransform = knob->GetComponent<TransformComponent>();
                         if (sliderTransform && knobTransform)
                         {
                             float sliderCenterX, sliderCenterY, sliderScaleX, sliderScaleY;
@@ -1544,10 +1583,10 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                             audioManager->SetCategoryVolume("music", finalMusicVol);
                             audioManager->SetCategoryVolume("sfx", finalSfxVol);
 
-                            //std::cout << "[MenuLogic] Final volumes - Music: " << finalMusicVol
-                            //          << " (base: " << savedMusicVolume << " * master: " << savedMasterVolume << ")"
-                            //          << ", SFX: " << finalSfxVol
-                            //          << " (base: " << savedSfxVolume << " * master: " << savedMasterVolume << ")" << std::endl;
+                            // std::cout << "[MenuLogic] Final volumes - Music: " << finalMusicVol
+                            //           << " (base: " << savedMusicVolume << " * master: " << savedMasterVolume << ")"
+                            //           << ", SFX: " << finalSfxVol
+                            //           << " (base: " << savedSfxVolume << " * master: " << savedMasterVolume << ")" << std::endl;
                         }
                         else
                         {
@@ -1565,8 +1604,8 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                             float finalVolume = volumePercent * savedMasterVolume;
                             audioManager->SetCategoryVolume(category, finalVolume);
 
-                            //std::cout << "[MenuLogic] Final " << category << " volume: " << finalVolume
-                            //          << " (base: " << volumePercent << " * master: " << savedMasterVolume << ")" << std::endl;
+                            // std::cout << "[MenuLogic] Final " << category << " volume: " << finalVolume
+                            //           << " (base: " << volumePercent << " * master: " << savedMasterVolume << ")" << std::endl;
                         }
                     }
                 }
@@ -1626,8 +1665,6 @@ void MenuLogicSystem::ScanReplays()
     std::cout << "[MenuLogic] Found " << m_replayNames.size() << " replay(s)." << std::endl;
 }
 
-
-
 // ===== Leaderboard =====
 
 void MenuLogicSystem::ScanLeaderboard(int level)
@@ -1660,16 +1697,19 @@ void MenuLogicSystem::ScanLeaderboard(int level)
                 f >> root;
                 bestTime = root.value("bestTime", FLT_MAX);
             }
-            catch (...) {}
+            catch (...)
+            {
+            }
         }
 
         if (bestTime < FLT_MAX)
-            m_leaderboardData.push_back({ stem, bestTime });
+            m_leaderboardData.push_back({stem, bestTime});
     }
 
     // Sort fastest first, keep top 3
     std::sort(m_leaderboardData.begin(), m_leaderboardData.end(),
-              [](const LeaderboardEntry &a, const LeaderboardEntry &b) { return a.time < b.time; });
+              [](const LeaderboardEntry &a, const LeaderboardEntry &b)
+              { return a.time < b.time; });
     if (m_leaderboardData.size() > 3)
         m_leaderboardData.resize(3);
 
@@ -1682,11 +1722,12 @@ void MenuLogicSystem::UpdateLeaderboardTextures()
     auto &factory = GameObjectFactory::Instance();
 
     const std::string yellow = "../Assets/Leaderboards_tab_yellow.png";
-    const std::string grey   = "../Assets/Leaderboards_tab_grey.png";
+    const std::string grey = "../Assets/Leaderboards_tab_grey.png";
 
-    auto setTex = [](GameObject* obj, const std::string& path)
+    auto setTex = [](GameObject *obj, const std::string &path)
     {
-        if (!obj) return;
+        if (!obj)
+            return;
         if (auto *rc = obj->GetComponent<RenderComponent>())
         {
             rc->SetTexturePath(path);
@@ -1695,12 +1736,12 @@ void MenuLogicSystem::UpdateLeaderboardTextures()
     };
 
     // Level tabs
-    const char *levelTabs[] = { "Leaderboards_Level_1", "Leaderboards_Level_2", "Leaderboards_Level_3" };
+    const char *levelTabs[] = {"Leaderboards_Level_1", "Leaderboards_Level_2", "Leaderboards_Level_3"};
     for (int i = 0; i < 3; ++i)
         setTex(factory.FindGameObject(levelTabs[i]), (i + 1 == m_leaderboardLevel) ? yellow : grey);
 
     // Rank row tabs
-    const char *rankTabs[] = { "Leaderboards_tab_1st", "Leaderboards_tab_2nd", "Leaderboards_tab_3rd" };
+    const char *rankTabs[] = {"Leaderboards_tab_1st", "Leaderboards_tab_2nd", "Leaderboards_tab_3rd"};
     for (int i = 0; i < 3; ++i)
         setTex(factory.FindGameObject(rankTabs[i]), (i == m_selectedRank) ? yellow : grey);
 }
@@ -1709,8 +1750,8 @@ void MenuLogicSystem::PopulateLeaderboard()
 {
     auto &factory = GameObjectFactory::Instance();
 
-    const char *nameSlots[] = { "Name_1st_Text", "Name_2nd_Text", "Name_3rd_Text" };
-    const char *timeSlots[] = { "Time_1st_Text", "Time_2nd_Text", "Time_3rd_Text" };
+    const char *nameSlots[] = {"Name_1st_Text", "Name_2nd_Text", "Name_3rd_Text"};
+    const char *timeSlots[] = {"Time_1st_Text", "Time_2nd_Text", "Time_3rd_Text"};
 
     for (int i = 0; i < 3; ++i)
     {
