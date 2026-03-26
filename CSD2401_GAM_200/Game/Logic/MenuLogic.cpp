@@ -40,6 +40,8 @@ enum MenuScreens
     Settings,
     LevelSelect,
     Leaderboard,
+    Extra,
+    HTP,
     QUIT
 };
 MenuScreens currScreen = MenuScreens::Home;
@@ -84,7 +86,7 @@ void MenuLogicSystem::Update(float dt)
                 std::cout << "[MenuLogic] ERROR: AudioManager is null!" << std::endl;
             }
 
-            creditsWerePlayed = false; // Reset flag
+            creditsWerePlayed = false; // Reset
         }
     }
 
@@ -129,7 +131,6 @@ void MenuLogicSystem::Update(float dt)
                     glfwSetWindowShouldClose(glfwGetCurrentContext(), GLFW_TRUE);
 #else
                     CORE->GetLevelEditor()->StopPlayMode();
-                    // CORE->RequestSceneLoad("../Assets/Scenes/Scene3.json", true);
 #endif
                 }
             }
@@ -163,7 +164,6 @@ void MenuLogicSystem::Update(float dt)
                             currScreen = MenuScreens::Home;
                             std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
                         }
-                        // Don't call RequestSceneLoad yet - StopCutscene will handle it
                     }
                     else
                     {
@@ -209,7 +209,6 @@ void MenuLogicSystem::Update(float dt)
             musicText->SetActive(false);
         if (auto *sfxText = GameObjectFactory::Instance().FindGameObject("SFXText"))
             sfxText->SetActive(false);
-        // Hide level select text labels when on settings screen
         if (auto *rText = GameObjectFactory::Instance().FindGameObject("Rating"))
             rText->SetActive(false);
         if (auto *rText2 = GameObjectFactory::Instance().FindGameObject("Rating(1)"))
@@ -218,6 +217,10 @@ void MenuLogicSystem::Update(float dt)
             rText3->SetActive(false);
         if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
             lb->SetActive(false);
+        if (auto *extra = GameObjectFactory::Instance().FindGameObject("Screen_Extra"))
+            extra->SetActive(false);
+        if (auto *htp = GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
+            htp->SetActive(false);
     }
     else if (currScreen == MenuScreens::Settings)
     {
@@ -269,7 +272,7 @@ void MenuLogicSystem::Update(float dt)
             //          << ", Music: " << savedMusicVolume << ", SFX: " << savedSfxVolume
             //          << " | Slider states - Master: " << masterSlider.currentVolume
             //          << ", Music: " << musicSlider.currentVolume
-            //          << ", SFX: " << sfxSlider.currentVolume << std::endl;
+            //          << ", SFX: " << sfxSlider.currentVolume << std::endl; 
 
             // update if slider states don't match saved values OR if just entered settings
             bool needsUpdate = justEnteredSettings ||
@@ -287,7 +290,7 @@ void MenuLogicSystem::Update(float dt)
                 UpdateSlider("Slider_Bar_Music", musicSlider, musicSlider.currentVolume);
                 UpdateSlider("Slider_Bar_SFX", sfxSlider, sfxSlider.currentVolume);
 
-                // update knob(aka scissors) positions to match
+                // update knob(aka scissors) positions to matc
 
                 // master knob
                 GameObject* masterBar = factory.FindGameObject("Slider_Bar_Master");
@@ -389,6 +392,42 @@ void MenuLogicSystem::Update(float dt)
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
         if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
             lb->SetActive(true);
+        if (auto *extra = GameObjectFactory::Instance().FindGameObject("Screen_Extra"))
+            extra->SetActive(false);
+    }
+    else if (currScreen == MenuScreens::Extra)
+    {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
+            GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
+            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
+            GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
+            GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(false);
+        if (auto *htp = GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
+            htp->SetActive(false);
+        if (auto *extra = GameObjectFactory::Instance().FindGameObject("Screen_Extra"))
+            extra->SetActive(true);
+    }
+    else if (currScreen == MenuScreens::HTP)
+    {
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
+            GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
+            GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
+            GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
+            GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+        if (auto *lb = GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            lb->SetActive(false);
+        if (auto *extra = GameObjectFactory::Instance().FindGameObject("Screen_Extra"))
+            extra->SetActive(false);
+        if (auto *htp = GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
+            htp->SetActive(true);
     }
 
     double mouseX = InputManager::GetMouseWorldX();
@@ -519,6 +558,8 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
             return "ReplayButton";
         if (IsMouseOver(factory.FindGameObject("LeaderboardButton"), mouseX, mouseY))
             return "LeaderboardButton";
+        if (IsMouseOver(factory.FindGameObject("ExtraButton"), mouseX, mouseY))
+            return "ExtraButton";
         break;
 
     case MenuScreens::QUIT:
@@ -574,6 +615,22 @@ std::string MenuLogicSystem::FindHoveredButton(double mouseX, double mouseY)
                  obj->GetName() == "BackButton") && IsMouseOver(obj.get(), mouseX, mouseY))
                 return obj->GetName();
         }
+        break;
+
+    case MenuScreens::Extra:
+        if (IsMouseOver(factory.FindGameObject("HowToPlay_Button"), mouseX, mouseY))
+            return "HowToPlay_Button";
+        if (IsMouseOver(factory.FindGameObject("Leaderboard_Button"), mouseX, mouseY))
+            return "Leaderboard_Button";
+        if (IsMouseOver(factory.FindGameObject("Credit_Button"), mouseX, mouseY))
+            return "Credit_Button";
+        if (IsMouseOver(factory.FindGameObject("BackButton_Extra"), mouseX, mouseY))
+            return "BackButton_Extra";
+        break;
+
+    case MenuScreens::HTP:
+        if (IsMouseOver(factory.FindGameObject("BackButton_HTP"), mouseX, mouseY))
+            return "BackButton_HTP";
         break;
     }
 
@@ -723,7 +780,51 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
 
     if (buttonName == "BackButton")
     {
+        if (currScreen == MenuScreens::Leaderboard)
+            currScreen = MenuScreens::Extra;
+        else
+            currScreen = MenuScreens::Home; // Settings -> Home
+        return true;
+    }
+
+    if (buttonName == "BackButton_HTP")
+    {
+        currScreen = MenuScreens::Extra;
+        return true;
+    }
+
+    if (buttonName == "BackButton_Extra")
+    {
         currScreen = MenuScreens::Home;
+        return true;
+    }
+
+    if (buttonName == "HowToPlay_Button")
+    {
+        currScreen = MenuScreens::HTP;
+        return true;
+    }
+
+    if (buttonName == "Leaderboard_Button")
+    {
+        m_leaderboardLevel = 1;
+        m_selectedRank = -1;
+        ScanLeaderboard(m_leaderboardLevel);
+        PopulateLeaderboard();
+        UpdateLeaderboardTextures();
+        currScreen = MenuScreens::Leaderboard;
+        return true;
+    }
+
+    if (buttonName == "Credit_Button")
+    {
+        CutsceneSystem *cutscene = CORE->GetCutsceneSystem();
+        if (cutscene && !cutscene->IsPlaying())
+        {
+            audioManager->FadeOutCategory("music", 2.5f);
+            cutscene->PlayVideo(creditsPath, "CreditsAudio");
+            creditsWerePlayed = true;
+        }
         return true;
     }
 
@@ -738,16 +839,14 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
         currScreen = MenuScreens::Settings;
         return true;
     }
+    if (buttonName == "ExtraButton") {
+        currScreen = MenuScreens::Extra;
+        return true;
+    }
 
     if (buttonName == "CreditsButton")
     {
         std::cout << "[MenuLogic] Leaderboard opened via CreditsButton." << std::endl;
-        m_leaderboardLevel = 1;
-        m_selectedRank = -1;
-        ScanLeaderboard(m_leaderboardLevel);
-        PopulateLeaderboard();
-        UpdateLeaderboardTextures();
-        currScreen = MenuScreens::Leaderboard;
         return true;
     }
 
@@ -1018,6 +1117,30 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
             texturePath = "../Assets/Sprites/Icons/Menu_credits_NEW.png";
         }
     }
+    else if (buttonName == "ExtraButton")
+    {
+        if (isPressed)
+        {
+            texturePath = "../Assets/Sprites/Icons/Menu_Extras_dark.png";
+        }
+        else if (isHovered)
+        {
+            texturePath = "../Assets/Sprites/Icons/Menu_Extras_light.png";
+        }
+        else
+        {
+            texturePath = "../Assets/Sprites/Icons/Menu_Extras.png";
+        }
+    }
+    else if (buttonName == "HowToPlay_Button" || buttonName == "Leaderboard_Button" || buttonName == "Credit_Button")
+    {
+        if (isPressed)
+            texturePath = "../Assets/Sprites/Icons/Hovering_button_dark.png";
+        else if (isHovered)
+            texturePath = "../Assets/Sprites/Icons/Hovering_button_light.png";
+        else
+            texturePath = "../Assets/Sprites/Icons/blankbtn.png";
+    }
     else if (buttonName == "MasterMuteButton")
     {
         bool isMuted = false;
@@ -1078,7 +1201,8 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
             texturePath = "../Assets/Sprites/Icons/blankbtn.png";
         }
     }
-    else if (buttonName == "BackButton" || buttonName == "Level_BackButton")
+    else if (buttonName == "BackButton" || buttonName == "Level_BackButton" ||
+             buttonName == "BackButton_HTP" || buttonName == "BackButton_Extra")
     {
         if (isPressed)
         {
