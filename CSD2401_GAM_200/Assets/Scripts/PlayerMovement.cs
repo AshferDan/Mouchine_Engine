@@ -189,7 +189,7 @@ namespace CSharpScript
         private float _hurtTimer = 0f;
 
         // camera
-        vec2 cam_defaultOffset = new vec2();
+        vec2 cam_offset = new vec2();
 
         public static string vfx = "Hero_vfx";
         public static string pu_vfx = "Pickup_vfx";
@@ -387,7 +387,7 @@ namespace CSharpScript
             Physics.SetFriction(OwnerName, 0f);
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
-            cam_defaultOffset = Camera.GetFollowOffset();
+            cam_offset = Camera.GetFollowOffset();
             Camera.SetZoom(0.5f);
 
             // starting anims
@@ -407,11 +407,11 @@ namespace CSharpScript
             }
             if (Input.GetKeyPressed(Input.KeyCode.Left))
             {
-                Camera.SetFollowOffset(cam_defaultOffset.x + 200, 0);
+                Camera.SetFollowOffset(cam_offset.x + 200, 0);
             }
             if (Input.GetKeyPressed(Input.KeyCode.Right))
             {
-                Camera.SetFollowOffset(cam_defaultOffset.x - 200, 0);
+                Camera.SetFollowOffset(cam_offset.x - 200, 0);
             }
             if (Input.GetKeyPressed(Input.KeyCode.P))
             {
@@ -522,6 +522,7 @@ namespace CSharpScript
             PlayFootsteps();
             // Handle Inputs
             HandleGeneralInput();
+            HandleCameraTracking();
             OnFixedUpdate(fixeddt);
 
             switch(currState)
@@ -1985,6 +1986,29 @@ namespace CSharpScript
             }
         }
 
+        #endregion
+
+        #region Camera Effects
+
+        // WIP ITS WEIRD ASF BUT IDKIDKIDKIDKIDK
+        vec2 currOffset = new vec2(0, 0); 
+        void HandleCameraTracking()
+        {
+            vec2 vel = Physics.GetVelocity(OwnerName);
+
+            float leadStrength = 200f;  
+            float smoothSpeed = 100.0f; 
+
+            float targetX = vel.x * leadStrength;
+            float targetY = vel.y * leadStrength;
+            
+            currOffset.x = Utils.MathfMoveTowards(currOffset.x, targetX, smoothSpeed * fixeddt);
+            currOffset.y = Utils.MathfMoveTowards(currOffset.y, targetY, smoothSpeed * fixeddt);
+
+            Debug.Log("offet x: " + currOffset.x.ToString() + " | offset y: " + currOffset.y.ToString());
+
+            Camera.SetFollowOffset(-currOffset.x, -currOffset.y);
+        }
         #endregion
 
         public override void OnDestroy()
