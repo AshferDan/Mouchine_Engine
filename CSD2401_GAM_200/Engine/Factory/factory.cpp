@@ -589,8 +589,24 @@ void GameObjectFactory::DestroyAllGameObjects()
 // Returns the amount of gameobject in the Instance
 int GameObjectFactory::CountAllGameObjects()
 {
-    return gameObjects.size();
+    return static_cast<int>(gameObjects.size()) - static_cast<int>(pendingDestroyIDs.size());
+}
 
+// Returns IDs of all active (non-pending-destroy) GameObjects
+std::vector<EntityID> GameObjectFactory::GetAllGameObjectIDs()
+{
+    std::vector<EntityID> ids;
+    ids.reserve(gameObjects.size());
+    for (auto const& go : gameObjects)
+    {
+        EntityID id = go->GetID();
+        bool pending = false;
+        for (EntityID pid : pendingDestroyIDs)
+            if (pid == id) { pending = true; break; }
+        if (!pending)
+            ids.push_back(id);
+    }
+    return ids;
 }
 
 void GameObjectFactory::Clear()

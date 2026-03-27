@@ -137,9 +137,20 @@ void ScriptComponent::AddScript(const std::string& scriptName) {
 			{
 				std::cout << "[ScriptComponent::AddScript] Successfully attached '" << scriptName << "' to " << owner->GetName() << std::endl;
 
-				// Call OnAwake then OnStart immediately after attachment
-				scriptSys->CallOnAwake(owner);
-				scriptSys->CallOnStart(owner);
+				// Only call OnAwake/OnStart immediately if we're currently in play mode.
+				// EnterPlayMode() handles the bulk call for all pre-existing scripts,
+				// and the update loop handles scripts added at runtime during play.
+				// During scene restore (StopPlayMode) we must NOT fire these — the
+				// next EnterPlayMode() will do it fresh.
+				LevelEditor* levelEditor = CORE ? CORE->GetLevelEditor() : nullptr;
+				bool isInPlayMode = levelEditor &&
+				    (levelEditor->GetEditorMode() == EditorMode::Play ||
+				     levelEditor->GetEditorMode() == EditorMode::Pause);
+				if (isInPlayMode)
+				{
+				    scriptSys->CallOnAwake(owner);
+				    scriptSys->CallOnStart(owner);
+				}
 			}
 			else
 			{

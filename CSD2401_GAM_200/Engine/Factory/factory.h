@@ -308,6 +308,12 @@ public:
 
 
     int CountAllGameObjects();
+
+    /**
+     * @brief Returns the EntityIDs of all active (non-pending-destroy) GameObjects.
+     * @return Vector of EntityIDs excluding any objects queued for destruction.
+     */
+    std::vector<EntityID> GetAllGameObjectIDs();
     /**
      * @brief Destroys all currently managed GameObjects.
      */

@@ -227,6 +227,13 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int CountAll();
+
+        /// <summary>
+        /// Returns the EntityIDs of all active GameObjects (excludes objects pending destruction).
+        /// </summary>
+        /// <returns>Array of integer EntityIDs.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int[] GetAllIDs();
     }
 
     /// <summary>
@@ -304,6 +311,29 @@ namespace CSharpScript
         {
             GetPosition_Internal(objectName, out float x, out float y);
             return new vec2(x, y);
+        }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void GetPositionByID_Internal(int id, out float x, out float y);
+
+        /// <summary>
+        /// Gets the position of a GameObject by its EntityID. Prefer over GetPosition when IDs are available (O(1) vs O(n) lookup).
+        /// Returns (0, 0) if the ID is invalid or the object no longer exists — does not throw.
+        /// </summary>
+        /// <param name="id">The EntityID of the GameObject.</param>
+        /// <returns>A vec2 containing the X and Y position, or (0, 0) on failure.</returns>
+        public static vec2 GetPositionByID(int id)
+        {
+            if (id <= 0) return new vec2(0f, 0f);
+            try
+            {
+                GetPositionByID_Internal(id, out float x, out float y);
+                return new vec2(x, y);
+            }
+            catch
+            {
+                return new vec2(0f, 0f);
+            }
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
