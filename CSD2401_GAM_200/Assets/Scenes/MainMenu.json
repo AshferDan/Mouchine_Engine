@@ -817,12 +817,58 @@
                 ]
               },
               "children": []
+            },
+            {
+              "name": "Level_select_selected",
+              "localID": 20,
+              "parentID": 14,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  -412.676513671875,
+                  -232.36851501464844
+                ],
+                "scale": [
+                  280.0,
+                  88.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Level_select_selected.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Default",
+                "size": [
+                  280.0,
+                  88.0
+                ]
+              },
+              "children": []
             }
           ]
         },
         {
           "name": "Level3Button",
-          "localID": 20,
+          "localID": 21,
           "parentID": 11,
           "active": true,
           "TransformComponent": {
@@ -867,8 +913,8 @@
           "children": [
             {
               "name": "Rating(2)",
-              "localID": 21,
-              "parentID": 20,
+              "localID": 22,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -918,8 +964,8 @@
             },
             {
               "name": "Letterscore_dash",
-              "localID": 22,
-              "parentID": 20,
+              "localID": 23,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -964,8 +1010,8 @@
             },
             {
               "name": "Shell_icon_dark(6)",
-              "localID": 23,
-              "parentID": 20,
+              "localID": 24,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1010,8 +1056,8 @@
             },
             {
               "name": "Shell_icon_dark(7)",
-              "localID": 24,
-              "parentID": 20,
+              "localID": 25,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1056,8 +1102,8 @@
             },
             {
               "name": "Shell_icon_dark(8)",
-              "localID": 25,
-              "parentID": 20,
+              "localID": 26,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1102,8 +1148,8 @@
             },
             {
               "name": "Level_BackButton",
-              "localID": 26,
-              "parentID": 20,
+              "localID": 27,
+              "parentID": 21,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1136,12 +1182,58 @@
                 ]
               },
               "children": []
+            },
+            {
+              "name": "Level_select_selected(2)",
+              "localID": 96,
+              "parentID": 21,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  410.85308837890625,
+                  -232.36851501464844
+                ],
+                "scale": [
+                  280.0,
+                  88.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Level_select_selected.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Default",
+                "size": [
+                  280.0,
+                  88.0
+                ]
+              },
+              "children": []
             }
           ]
         },
         {
           "name": "Level2Button",
-          "localID": 27,
+          "localID": 28,
           "parentID": 11,
           "active": true,
           "TransformComponent": {
@@ -1186,8 +1278,8 @@
           "children": [
             {
               "name": "Rating(1)",
-              "localID": 28,
-              "parentID": 27,
+              "localID": 29,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1237,8 +1329,8 @@
             },
             {
               "name": "Letterscore_A",
-              "localID": 29,
-              "parentID": 27,
+              "localID": 30,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1283,8 +1375,8 @@
             },
             {
               "name": "Shell_icon_dark(3)",
-              "localID": 30,
-              "parentID": 27,
+              "localID": 31,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1329,8 +1421,8 @@
             },
             {
               "name": "Shell_icon_dark(4)",
-              "localID": 31,
-              "parentID": 27,
+              "localID": 32,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1375,8 +1467,8 @@
             },
             {
               "name": "Shell_icon_dark(5)",
-              "localID": 32,
-              "parentID": 27,
+              "localID": 33,
+              "parentID": 28,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1418,6 +1510,52 @@
                 ]
               },
               "children": []
+            },
+            {
+              "name": "Level_select_selected(1)",
+              "localID": 95,
+              "parentID": 28,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  2.029104232788086,
+                  -232.36851501464844
+                ],
+                "scale": [
+                  280.0,
+                  88.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Icons/Level_select_selected.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Default",
+                "size": [
+                  280.0,
+                  88.0
+                ]
+              },
+              "children": []
             }
           ]
         }
@@ -1425,7 +1563,7 @@
     },
     {
       "name": "Screen_Settings",
-      "localID": 33,
+      "localID": 34,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1472,8 +1610,8 @@
       "children": [
         {
           "name": "MasterText",
-          "localID": 34,
-          "parentID": 33,
+          "localID": 35,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1523,8 +1661,8 @@
         },
         {
           "name": "Slider_Bar_Master",
-          "localID": 35,
-          "parentID": 33,
+          "localID": 36,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1560,8 +1698,8 @@
         },
         {
           "name": "Slider_Bar_Back_Master",
-          "localID": 36,
-          "parentID": 33,
+          "localID": 37,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1597,8 +1735,8 @@
         },
         {
           "name": "Slider_Knob_Master",
-          "localID": 37,
-          "parentID": 33,
+          "localID": 38,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1634,8 +1772,8 @@
         },
         {
           "name": "MasterMuteButton",
-          "localID": 38,
-          "parentID": 33,
+          "localID": 39,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1671,8 +1809,8 @@
         },
         {
           "name": "BackButton",
-          "localID": 39,
-          "parentID": 33,
+          "localID": 40,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1708,8 +1846,8 @@
         },
         {
           "name": "SFXText",
-          "localID": 40,
-          "parentID": 33,
+          "localID": 41,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1758,8 +1896,8 @@
           "children": [
             {
               "name": "Slider_Bar_SFX",
-              "localID": 41,
-              "parentID": 40,
+              "localID": 42,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1795,8 +1933,8 @@
             },
             {
               "name": "Slider_Bar_Back_SFX",
-              "localID": 42,
-              "parentID": 40,
+              "localID": 43,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1832,8 +1970,8 @@
             },
             {
               "name": "Slider_Knob_SFX",
-              "localID": 43,
-              "parentID": 40,
+              "localID": 44,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1869,8 +2007,8 @@
             },
             {
               "name": "SFXMuteButton",
-              "localID": 44,
-              "parentID": 40,
+              "localID": 45,
+              "parentID": 41,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1908,8 +2046,8 @@
         },
         {
           "name": "MusicText",
-          "localID": 45,
-          "parentID": 33,
+          "localID": 46,
+          "parentID": 34,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1958,8 +2096,8 @@
           "children": [
             {
               "name": "Slider_Bar_Music",
-              "localID": 46,
-              "parentID": 45,
+              "localID": 47,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -1995,8 +2133,8 @@
             },
             {
               "name": "Slider_Bar_Back_Music",
-              "localID": 47,
-              "parentID": 45,
+              "localID": 48,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2032,8 +2170,8 @@
             },
             {
               "name": "Slider_Knob_Music",
-              "localID": 48,
-              "parentID": 45,
+              "localID": 49,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2069,8 +2207,8 @@
             },
             {
               "name": "MusicMuteButton",
-              "localID": 49,
-              "parentID": 45,
+              "localID": 50,
+              "parentID": 46,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -2110,7 +2248,7 @@
     },
     {
       "name": "Screen_QuitButton",
-      "localID": 50,
+      "localID": 51,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2146,8 +2284,8 @@
       "children": [
         {
           "name": "YesButton",
-          "localID": 51,
-          "parentID": 50,
+          "localID": 52,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2183,8 +2321,8 @@
         },
         {
           "name": "NoButton",
-          "localID": 52,
-          "parentID": 50,
+          "localID": 53,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2220,8 +2358,8 @@
         },
         {
           "name": "AreYouSureText",
-          "localID": 53,
-          "parentID": 50,
+          "localID": 54,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2271,8 +2409,8 @@
         },
         {
           "name": "YesText",
-          "localID": 54,
-          "parentID": 50,
+          "localID": 55,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2322,8 +2460,8 @@
         },
         {
           "name": "NoText",
-          "localID": 55,
-          "parentID": 50,
+          "localID": 56,
+          "parentID": 51,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2375,7 +2513,7 @@
     },
     {
       "name": "LeaderBoards_Menu",
-      "localID": 56,
+      "localID": 57,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2411,8 +2549,8 @@
       "children": [
         {
           "name": "Leaderboards_tab_1st",
-          "localID": 57,
-          "parentID": 56,
+          "localID": 58,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2448,8 +2586,8 @@
         },
         {
           "name": "Leaderboards_BG",
-          "localID": 58,
-          "parentID": 56,
+          "localID": 59,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2485,8 +2623,8 @@
         },
         {
           "name": "Leaderboards_tab_2nd",
-          "localID": 59,
-          "parentID": 56,
+          "localID": 60,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2522,8 +2660,8 @@
         },
         {
           "name": "Leaderboards_tab_3rd",
-          "localID": 60,
-          "parentID": 56,
+          "localID": 61,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2559,8 +2697,8 @@
         },
         {
           "name": "Leaderboards_Level_1",
-          "localID": 61,
-          "parentID": 56,
+          "localID": 62,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2596,8 +2734,8 @@
         },
         {
           "name": "Leaderboards_Level_2",
-          "localID": 62,
-          "parentID": 56,
+          "localID": 63,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2633,8 +2771,8 @@
         },
         {
           "name": "Leaderboards_Level_3",
-          "localID": 63,
-          "parentID": 56,
+          "localID": 64,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2670,8 +2808,8 @@
         },
         {
           "name": "BackButton",
-          "localID": 64,
-          "parentID": 56,
+          "localID": 65,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2707,8 +2845,8 @@
         },
         {
           "name": "ReplayButton",
-          "localID": 65,
-          "parentID": 56,
+          "localID": 66,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2744,8 +2882,8 @@
         },
         {
           "name": "Vs_Ghost_Button",
-          "localID": 66,
-          "parentID": 56,
+          "localID": 67,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2781,8 +2919,8 @@
         },
         {
           "name": "Name_1st_Text",
-          "localID": 67,
-          "parentID": 56,
+          "localID": 68,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2832,8 +2970,8 @@
         },
         {
           "name": "Level_2_Text",
-          "localID": 68,
-          "parentID": 56,
+          "localID": 69,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2883,8 +3021,8 @@
         },
         {
           "name": "Level_3_Text",
-          "localID": 69,
-          "parentID": 56,
+          "localID": 70,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2934,8 +3072,8 @@
         },
         {
           "name": "Name_2nd_Text",
-          "localID": 70,
-          "parentID": 56,
+          "localID": 71,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2985,8 +3123,8 @@
         },
         {
           "name": "Name_3rd_Text",
-          "localID": 71,
-          "parentID": 56,
+          "localID": 72,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3036,8 +3174,8 @@
         },
         {
           "name": "Time_1st_Text",
-          "localID": 72,
-          "parentID": 56,
+          "localID": 73,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3087,8 +3225,8 @@
         },
         {
           "name": "Time_2nd_Text",
-          "localID": 73,
-          "parentID": 56,
+          "localID": 74,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3138,8 +3276,8 @@
         },
         {
           "name": "Time_3rd_Text",
-          "localID": 74,
-          "parentID": 56,
+          "localID": 75,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3189,8 +3327,8 @@
         },
         {
           "name": "Level_1_Text",
-          "localID": 75,
-          "parentID": 56,
+          "localID": 76,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3240,8 +3378,8 @@
         },
         {
           "name": "Replay_Text",
-          "localID": 76,
-          "parentID": 56,
+          "localID": 77,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3291,8 +3429,8 @@
         },
         {
           "name": "Vs_Ghost_Text",
-          "localID": 77,
-          "parentID": 56,
+          "localID": 78,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3342,8 +3480,8 @@
         },
         {
           "name": "1stRank",
-          "localID": 78,
-          "parentID": 56,
+          "localID": 79,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3393,8 +3531,8 @@
         },
         {
           "name": "2ndRank",
-          "localID": 79,
-          "parentID": 56,
+          "localID": 80,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3444,8 +3582,8 @@
         },
         {
           "name": "3rdRank",
-          "localID": 80,
-          "parentID": 56,
+          "localID": 81,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3495,8 +3633,8 @@
         },
         {
           "name": "Letterscore_1st",
-          "localID": 81,
-          "parentID": 56,
+          "localID": 82,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3541,8 +3679,8 @@
         },
         {
           "name": "Letterscore_2nd",
-          "localID": 82,
-          "parentID": 56,
+          "localID": 83,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3587,8 +3725,8 @@
         },
         {
           "name": "Letterscore_3rd",
-          "localID": 83,
-          "parentID": 56,
+          "localID": 84,
+          "parentID": 57,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3635,7 +3773,7 @@
     },
     {
       "name": "Screen_Extra",
-      "localID": 84,
+      "localID": 85,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3671,8 +3809,8 @@
       "children": [
         {
           "name": "Credit_Button",
-          "localID": 85,
-          "parentID": 84,
+          "localID": 86,
+          "parentID": 85,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3707,8 +3845,8 @@
           "children": [
             {
               "name": "Credit_text",
-              "localID": 86,
-              "parentID": 85,
+              "localID": 87,
+              "parentID": 86,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3760,8 +3898,8 @@
         },
         {
           "name": "Leaderboard_Button",
-          "localID": 87,
-          "parentID": 84,
+          "localID": 88,
+          "parentID": 85,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3796,8 +3934,8 @@
           "children": [
             {
               "name": "LeaderBoard_text",
-              "localID": 88,
-              "parentID": 87,
+              "localID": 89,
+              "parentID": 88,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3849,8 +3987,8 @@
         },
         {
           "name": "HowToPlay_Button",
-          "localID": 89,
-          "parentID": 84,
+          "localID": 90,
+          "parentID": 85,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3885,8 +4023,8 @@
           "children": [
             {
               "name": "HowToPlay_Text",
-              "localID": 90,
-              "parentID": 89,
+              "localID": 91,
+              "parentID": 90,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3938,8 +4076,8 @@
         },
         {
           "name": "BackButton_Extra",
-          "localID": 91,
-          "parentID": 84,
+          "localID": 92,
+          "parentID": 85,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3977,7 +4115,7 @@
     },
     {
       "name": "Screen_HTP",
-      "localID": 92,
+      "localID": 93,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4022,8 +4160,8 @@
       "children": [
         {
           "name": "BackButton_HTP",
-          "localID": 93,
-          "parentID": 92,
+          "localID": 94,
+          "parentID": 93,
           "active": true,
           "TransformComponent": {
             "enabled": true,

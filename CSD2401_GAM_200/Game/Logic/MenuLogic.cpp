@@ -162,18 +162,23 @@ void MenuLogicSystem::Update(float dt)
 
                     if (selectedLevelButtonName == "Level1Button" && !cutscene->HasPlayed(introPath))
                     {
-                        if (!cutscene->IsPlaying())
+                        if (selectedLevelButtonName == "Level1Button" && !cutscene->HasPlayed(introPath))
                         {
-                            cutscene->PlayVideo(introPath, "CutsceneAudio");
-                            currScreen = MenuScreens::LevelSelect;
-                            std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
-                        }
+                            if (!cutscene->IsPlaying())
+                            {
+                                cutscene->PlayVideo(introPath, "CutsceneAudio");
+                                currScreen = MenuScreens::LevelSelect;
+                                std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
+                            }
+                        }                       
                     }
                     else
                     {
                         // No cutscene
                         CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                       
                     }
+                    ClearLevelSelection();
                 }
             }
 
@@ -185,6 +190,7 @@ void MenuLogicSystem::Update(float dt)
         return;
     }
 
+    // -------------------- UI SETACTIVE HANDLING -------------------- //
     if (currScreen == MenuScreens::Home)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
@@ -356,16 +362,28 @@ void MenuLogicSystem::Update(float dt)
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
         if (auto *levelSelectScreen = GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
         {
-            if (!levelSelectScreen->IsActive()) // only true on the first frame
-            {
-                justEnteredLevelSelect = true;
-            }
             levelSelectScreen->SetActive(true);
+
+            // Set all Level Selected UI as false when first enter
+            if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+                s1->SetActive(selectedLevelButtonName == "Level1Button");
+
+            if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+                s2->SetActive(selectedLevelButtonName == "Level2Button");
+
+            if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+                s3->SetActive(selectedLevelButtonName == "Level3Button");
         }
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Extra"))
+            GameObjectFactory::Instance().FindGameObject("Screen_Extra")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
+            GameObjectFactory::Instance().FindGameObject("Screen_HTP")->SetActive(false);
     }
     else if (currScreen == MenuScreens::QUIT)
     {
@@ -459,18 +477,6 @@ void MenuLogicSystem::Update(float dt)
             currentSliderCategory = "";
             justEnteredSettings = false;
         }
-    }
-
-    if (currScreen == MenuScreens::LevelSelect && justEnteredLevelSelect)
-    {
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(false);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(false);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(false);
-
-        justEnteredLevelSelect = false;
     }
 
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
@@ -691,78 +697,45 @@ void MenuLogicSystem::TriggerUISound(const std::string &buttonName)
     std::cout << "menu button clicking sound is triggered" << std::endl;
 }
 
-void MenuLogicSystem::RefreshLevelSelectButtons()
-{
-    SetButtonTexture("Level1Button",
-                     hoveredButtonName == "Level1Button",
-                     pressedButtonName == "Level1Button");
-
-    SetButtonTexture("Level2Button",
-                     hoveredButtonName == "Level2Button",
-                     pressedButtonName == "Level2Button");
-
-    SetButtonTexture("Level3Button",
-                     hoveredButtonName == "Level3Button",
-                     pressedButtonName == "Level3Button");
-
-    SetButtonTexture("LevelSelectedButton",
-                     hoveredButtonName == "LevelSelectedButton",
-                     pressedButtonName == "LevelSelectedButton");
-}
-
-void MenuLogicSystem::SelectLevel(const std::string &buttonName, const std::string &scenePath)
-{
-    selectedLevelButtonName = buttonName;
-    selectedLevelScenePath = scenePath;
-    RefreshLevelSelectButtons();
-}
-bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
+bool MenuLogicSystem::HandleLevelSelectClick(const std::string& buttonName)
 {
     if (currScreen != MenuScreens::LevelSelect)
         return false;
 
-    if (buttonName == "Level1Button")
-    {
-        TriggerUISound(buttonName);
-        SelectLevel("Level1Button", level1Path);
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(true);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(false);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(false);
-        return true;
-    }
+    static const std::pair<std::string, std::string> levelMap[] = {
+        { "Level1Button", level1Path },
+        { "Level2Button", level2Path },
+        { "Level3Button", level3Path },
+    };
 
-    if (buttonName == "Level2Button")
+    for (const auto& [btnName, scenePath] : levelMap)
     {
-        TriggerUISound(buttonName);
-        SelectLevel("Level2Button", level2Path);
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(false);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(true);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(false);
-        return true;
-    }
+        if (buttonName == btnName)
+        {
+            TriggerUISound(buttonName);
+            selectedLevelButtonName = btnName;    // remember the pick
+            selectedLevelScenePath = scenePath;
+            
+            // update highlight visuals
+            SetButtonTexture("Level1Button", hoveredButtonName == "Level1Button", false);
+            SetButtonTexture("Level2Button", hoveredButtonName == "Level2Button", false);
+            SetButtonTexture("Level3Button", hoveredButtonName == "Level3Button", false);
+            SetButtonTexture("LevelSelectedButton", hoveredButtonName == "LevelSelectedButton", pressedButtonName == "LevelSelectedButton");
 
-    if (buttonName == "Level3Button")
-    {
-        TriggerUISound(buttonName);
-        SelectLevel("Level3Button", level3Path);
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(false);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(false);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(true);
-        return true;
+            // sync the button
+            if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+                s1->SetActive(selectedLevelButtonName == "Level1Button");
+            if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+                s2->SetActive(selectedLevelButtonName == "Level2Button");
+            if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+                s3->SetActive(selectedLevelButtonName == "Level3Button");
+
+            return true;
+        }
     }
 
     if (buttonName == "LevelSelectedButton")
     {
-        // Start only works after a level has been selected.
         if (selectedLevelButtonName.empty() || selectedLevelScenePath.empty())
         {
             SetButtonTexture("LevelSelectedButton", false, false);
@@ -1319,11 +1292,25 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
 
 void MenuLogicSystem::ClearLevelSelection()
 {
+    // Clean the saved pick
     selectedLevelButtonName.clear();
     selectedLevelScenePath.clear();
     hoveredButtonName.clear();
     pressedButtonName.clear();
-    RefreshLevelSelectButtons();
+
+    //Sync button textures
+    SetButtonTexture("Level1Button", hoveredButtonName == "Level1Button", pressedButtonName == "Level1Button");
+    SetButtonTexture("Level2Button", hoveredButtonName == "Level2Button", pressedButtonName == "Level2Button");
+    SetButtonTexture("Level3Button", hoveredButtonName == "Level3Button", pressedButtonName == "Level3Button");
+    SetButtonTexture("LevelSelectedButton", hoveredButtonName == "LevelSelectedButton", pressedButtonName == "LevelSelectedButton");
+
+    if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+        s1->SetActive(false);
+    if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+        s2->SetActive(false);
+    if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+        s3->SetActive(false);
+
 }
 
 void MenuLogicSystem::Reset()
