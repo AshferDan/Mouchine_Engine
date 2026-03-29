@@ -43,12 +43,11 @@ void TextInputSystem::CharCallback(GLFWwindow*, unsigned int codepoint)
 
 void TextInputSystem::Initialize()
 {
-    m_isActive                 = false;
-    m_hasUI                    = false;
-    m_backspaceWasHeld         = false;
-    m_enterWasHeld             = false;
-    m_escapeWasHeld            = false;
-    m_consumedEscapeThisFrame  = false;
+    m_isActive          = false;
+    m_hasUI             = false;
+    m_backspaceWasHeld  = false;
+    m_enterWasHeld      = false;
+    m_escapeWasHeld     = false;
     s_buffer.clear();
     s_active = false;
     std::cout << "Initializing system: TextInputSystem" << std::endl;
@@ -57,7 +56,6 @@ void TextInputSystem::Initialize()
 void TextInputSystem::Update(float dt)
 {
     (void)dt;
-    m_consumedEscapeThisFrame = false;   // reset at top of each frame
     if (!m_isActive) return;
 
     GLFWwindow* win = glfwGetCurrentContext();
@@ -86,7 +84,6 @@ void TextInputSystem::Update(float dt)
     bool escNow = (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS);
     if (escNow && !m_escapeWasHeld)
     {
-        m_consumedEscapeThisFrame = true;
         auto cb = m_onCancel;
         Hide();
         if (cb) cb();
