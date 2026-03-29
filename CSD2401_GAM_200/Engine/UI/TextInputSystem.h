@@ -136,6 +136,9 @@ public:
     /** @return True while the dialog is visible and capturing input. */
     bool IsActive() const { return m_isActive; }
 
+    /** @return True if the dialog consumed an ESC press this frame (even if it just closed). */
+    bool ConsumedEscapeThisFrame() const { return m_consumedEscapeThisFrame; }
+
     /** @return The text currently typed by the player (valid while IsActive()). */
     std::string GetCurrentText() const { return s_buffer; }
 
@@ -148,9 +151,10 @@ private:
     std::function<void(const std::string&)> m_onConfirm;
     std::function<void()>                   m_onCancel;
 
-    bool m_backspaceWasHeld = false;
-    bool m_enterWasHeld     = false;
-    bool m_escapeWasHeld    = false;
+    bool m_backspaceWasHeld        = false;
+    bool m_enterWasHeld            = false;
+    bool m_escapeWasHeld           = false;
+    bool m_consumedEscapeThisFrame = false;
 
     // ===== Appearance =====
     // NOTE: No engine-side defaults for font. Game code MUST call SetFont() before Show().

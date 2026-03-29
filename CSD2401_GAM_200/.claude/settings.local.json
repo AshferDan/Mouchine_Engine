@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200 -type f -name *Pause* -o -name *Save* -o -name *Menu*)",
+      "Bash(grep -r \"LoadScene\\\\|UnloadScene\\\\|callOnAwake\\\\|callOnStart\\\\|Scene\\\\.\" /c/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Assets/Scripts/ --include=*.cs)",
+      "Bash(grep -r \"Pause.*Menu\\\\|PauseMenu\\\\|pause.*menu\" /c/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200 --include=*.cs)",
+      "Bash(grep -r \"onAwake\\\\|OnAwake\\\\|onStart\\\\|OnStart\\\\|ESC\\\\|Escape\" /c/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Assets/Scripts/ --include=*.cs)",
+      "Bash(grep:*)",
+      "Bash(find /c/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Engine -type f \\\\\\(-name *.h -o -name *.cpp \\\\\\))",
+      "Bash(find /c/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200/Source -type f \\\\\\(-name *.h -o -name *.cpp \\\\\\))",
+      "Bash(ls:*)"
+    ]
+  }
+}

@@ -98,6 +98,7 @@ int main()
                 if (pauseMenuLogic) pauseMenuLogic->Initialize();
                 if (gameTimer)      gameTimer->Initialize();
                 if (winLoseLogic)   winLoseLogic->Initialize();
+                if (menuLogic)      menuLogic->Reset();
                 //if (mediaPlayer)    mediaPlayer->Initialize();
                 pickupSystem = PickupSystem();
             }
@@ -108,8 +109,9 @@ int main()
             bool IsPauseSettingsOpen() const override { return pauseMenuLogic && pauseMenuLogic->IsPauseSettingsOpen(); }
             bool IsGhostMenuOpen()    const override { return pauseMenuLogic && pauseMenuLogic->IsGhostMenuOpen(); }
             bool IsOnMainMenu()       const override {
-                return pauseMenuLogic &&
-                       pauseMenuLogic->GetCurrentScene().find("MainMenu") != std::string::npos;
+                if (!pauseMenuLogic) return false;
+                const std::string& scene = pauseMenuLogic->GetCurrentScene();
+                return scene.empty() || scene.find("MainMenu") != std::string::npos;
             }
             std::string GetCurrentScenePath() const override {
                 return pauseMenuLogic ? pauseMenuLogic->GetCurrentScene() : "";
