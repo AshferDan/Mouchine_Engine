@@ -513,6 +513,15 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
         goParent->RemoveChild(gameObject);
     }
 
+    // Clear parent pointers on this object's children before it is freed.
+    // Without this, children keep a dangling parent pointer and are silently
+    // skipped by SaveScene (GetParent() != nullptr but parent is destroyed),
+    // causing them to disappear from the saved scene file.
+    for (GameObject* child : gameObject->GetAllChildren())
+    {
+        if (child) child->RemoveParent();
+    }
+
     // swap and pop for factory side
     size_t index = it->second;
     if (index < gameObjects.size() - 1)
