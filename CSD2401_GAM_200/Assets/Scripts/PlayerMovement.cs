@@ -20,6 +20,8 @@ using System.Linq;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Resources;
+using System.Collections.Generic;
+using System.IO.Pipes;
 
 namespace CSharpScript
 {
@@ -52,6 +54,23 @@ namespace CSharpScript
         private PlayerState[] nonTrackingVFX = { PlayerState.Jumping, PlayerState.WallJumping, PlayerState.WallKicking, PlayerState.Land, PlayerState.Rolling};
         private float[] footstepFrequencies = { 0.47f, 0.3f, 0.25f, 0.2f };       // walking - tier1 - tier2- tier3
         private float minFootstepDistance = 5.0f;
+        public static bool triggerSpeedBoost = false;
+        private bool speedBoostActive = false;
+
+        // list contains (entityID, position, isAudioPlaying)
+        class NPCData
+        {
+            public uint ID;
+            public vec2 pos;
+            public bool audioPlaying;
+            public NPCData(uint id, vec2 position, bool soundPlaying)
+            {
+                ID = id;
+                pos = position;
+                audioPlaying = soundPlaying;
+            }
+        }
+        List<NPCData> NPCs = new List<NPCData>();     
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
@@ -169,8 +188,12 @@ namespace CSharpScript
         private float _calculatedSkidDecel;
         private float _hurtTimer = 0f;
 
-        public string vfx = "Hero_vfx";
-        public string vfx_nontracking = "Hero_vfx_nontracking";
+        // camera
+        vec2 cam_defaultOffset = new vec2();
+
+        public static string vfx = "Hero_vfx";
+        public static string pu_vfx = "Pickup_vfx";
+        public static string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
 
         private int _pauseResumeFreezeFrames = 0;
@@ -179,7 +202,7 @@ namespace CSharpScript
         public override void OnAwake()
         {
 
-            Debug.Log("testing ON AWAKE");
+            Debug.Log("\n\ntesting ON AWAKE\n\n");
 
         }
 
@@ -217,6 +240,42 @@ namespace CSharpScript
                     false
                 );
             }
+            if (GameObject.FindGameObjectByName(pu_vfx) == "")
+            {
+                CSharpScript.GameObject.CreateAnimatedImage(
+                    pu_vfx,
+                    0, 0,
+                    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
+                    "../Assets/spritesheet_player_vfx.png",
+                    15, 11,
+                    14, 10, 14, 10,
+                    12.0f,
+                    (int)CSharpScript.CollisionLayer.Player,
+                    false,
+                    false,
+                    false
+                );
+            }
+
+            // replace with onawake when it works
+            // putting in here to keep scope clean
+            {
+                NPCs.Clear();
+                int totalGOs = GameObject.CountAllGameObjects();
+                for (int i = 1; i <= totalGOs; i++)                         // starts with 1 bc ids start from 1
+                {
+                    string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
+                    if (string.IsNullOrEmpty(currGO)) continue;
+
+                    //Debug.Log("ID: " + i + " | Name: " + currGO);
+                    if (currGO.Contains("NPC_Lobster"))
+                    {
+                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                }
+                Debug.Log("NPC Count: " + NPCs.Count().ToString());
+            }
 
             // wip to fix the vfx issue
             //CSharpScript.GameObject.CreateAnimatedImage(
@@ -234,32 +293,37 @@ namespace CSharpScript
             //);
 
             // Add sounds
-            Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 0.5f, 1.5f, "sfx");
-            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", false, 0.5f, 2.0f, "sfx_loop");
-            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.1f, 1.25f, "sfx");
-            Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.1f, 0.9f, "sfx");
-            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 0.5f, 1.35f, "sfx");
-            Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.5f, 1.5f, "sfx_loop");
-            Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.05f, 1.1f, "sfx");
-            Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.05f, 1.1f, "sfx");
-            Audio.AddSound("hurt_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.3f, 1.0f, "sfx");
-            Audio.AddSound("pickup_sfx", "../Assets/audio/Player/Pickup.wav", false, 0.3f, 1.0f, "sfx");
+            Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 1.0f, 1.5f, "sfx");
+            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", false, 1.0f, 2.0f, "sfx_loop");
+            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.25f, 1.25f, "sfx");
+            Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.25f, 0.9f, "sfx");
+            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 1.0f, 1.35f, "sfx");
+            Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.8f, 1.5f, "sfx_loop");
+            Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.15f, 1.1f, "sfx");
+            Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
+            Audio.AddSound("hurt_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 1.0f, 1.0f, "sfx");
 
             // load 3D spatial sound for NPCs (scissors snip for lobster)
-            Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
+            for (int i = 0; i < NPCs.Count(); i++)
+            {
+                //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
+                string audioPath = "../Assets/Audio/hairscissors_snip" + ((i%3)+1).ToString() + ".wav";
+                Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
+            }
+            Audio.Load3DSound("scissors_sniptest", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
 
             //footsteps
-            Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx3", "../Assets/audio/Player/Footstep/Footstep3.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx4", "../Assets/audio/Player/Footstep/Footstep4.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx5", "../Assets/audio/Player/Footstep/Footstep5.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx6", "../Assets/audio/Player/Footstep/Footstep6.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx7", "../Assets/audio/Player/Footstep/Footstep7.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx8", "../Assets/audio/Player/Footstep/Footstep8.wav", false, 0.15f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx9", "../Assets/audio/Player/Footstep/Footstep9.wav", false, 0.15f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx3", "../Assets/audio/Player/Footstep/Footstep3.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx4", "../Assets/audio/Player/Footstep/Footstep4.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx5", "../Assets/audio/Player/Footstep/Footstep5.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx6", "../Assets/audio/Player/Footstep/Footstep6.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx7", "../Assets/audio/Player/Footstep/Footstep7.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx8", "../Assets/audio/Player/Footstep/Footstep8.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx9", "../Assets/audio/Player/Footstep/Footstep9.wav", false, 0.25f, 1.0f, "sfx");
             //landing
             Audio.AddSound("land_sfx1", "../Assets/audio/Player/Land/Land1.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx2", "../Assets/audio/Player/Land/Land2.wav", false, 0.3f, 1.0f, "sfx");
@@ -308,6 +372,11 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero_vfx", "Bonk", "../Assets/spritesheet_player_vfx.png",         15, 11, 5, 0, 5, 2, 4.0f);
             Animation.RegisterAnimation("Hero_vfx", "Zipline", "../Assets/spritesheet_player_vfx.png",      15, 11, 7, 0, 7, 1, 4.0f);
 
+            // Pickup VFX
+            Animation.RegisterAnimation(pu_vfx, "Speed", "../Assets/spritesheet_player_vfx.png",            15, 11, 2, 4, 2, 10, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Time", "../Assets/spritesheet_player_vfx.png",             15, 11, 1, 4, 1, 9, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Clear", "../Assets/spritesheet_player_vfx.png",            15, 11, 14, 10, 14, 10, 0f);
+
             _isFacingRight = true;
 
             Physics.SetGravity(OwnerName, true);
@@ -318,7 +387,11 @@ namespace CSharpScript
             Physics.SetFriction(OwnerName, 0f);
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
+            cam_defaultOffset = Camera.GetFollowOffset();
             Camera.SetZoom(0.5f);
+
+            // starting anims
+            //Animation.PlayAnimation(pu_vfx, "Clear");
         }
 
         bool vfxTracksPlayer;
@@ -328,88 +401,93 @@ namespace CSharpScript
         {
             if (OwnerName == null || OwnerName == "") return;
 
+            if (Input.GetKeyPressed(Input.KeyCode.L))
+            {
+                triggerSpeedBoost = true;
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.Left))
+            {
+                Camera.SetFollowOffset(cam_defaultOffset.x + 200, 0);
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.Right))
+            {
+                Camera.SetFollowOffset(cam_defaultOffset.x - 200, 0);
+            }
+            if (Input.GetKeyPressed(Input.KeyCode.P))
+            {
+                Animation.PlayAnimation(pu_vfx, "Clear");
+
+                //clearing here bc in update
+                NPCs.Clear();
+                int totalGOs = GameObject.CountAllGameObjects();
+                for (int i = 1; i <= totalGOs; i++)
+                {
+                    string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
+                    if (string.IsNullOrEmpty(currGO)) continue;
+
+                    //Debug.Log("ID: " + i + " | Name: " + currGO);
+                    if (currGO.Contains("NPC_Lobster"))
+                    {
+                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                }
+
+                for (int i = 0; i < NPCs.Count(); i++)
+                {
+                    //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
+                    string audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
+                    Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
+                }
+
+                Debug.Log("NPC Count: " + NPCs.Count().ToString());
+            }
+
             #region LOBSTER 3D SCISSORS SOUND
-            // HARDCODDED LOBSTER SNIPPING SOUND FOR NOW
-            // update 3D audio listener position to follow player
+
             vec2 playerPos = Transform.GetPosition(OwnerName);
             Audio.Set3DListenerPosition(playerPos.x, playerPos.y);
-
-            // lobster positions
-            float lobster1X = 25684.0f;
-            float lobster1Y = 698.46f;
-            float lobster2X = 13370.0f;
-            float lobster2Y = 700.0f;
-
-            // calculate distances to lobsters
-            float dist1X = playerPos.x - lobster1X;
-            float dist1Y = playerPos.y - lobster1Y;
-            float distance1 = (float)Math.Sqrt(dist1X * dist1X + dist1Y * dist1Y);
-
-            float dist2X = playerPos.x - lobster2X;
-            float dist2Y = playerPos.y - lobster2Y;
-            float distance2 = (float)Math.Sqrt(dist2X * dist2X + dist2Y * dist2Y);
-
-            // lobster 1 sound within max distance of 3000
-            if (distance1 < 3000.0f)
+            for (int i = 0; i < NPCs.Count(); i++)
             {
-                if (!_lobster1SoundPlaying)
-                {
-                    Audio.PlaySound("scissors_snip", "lobster1_scissors");
-                    _lobster1SoundPlaying = true;
-                    Debug.Log("=== LOBSTER 1 SCISSORS SOUND STARTED ===");
-                }
+                vec2 npcPos = NPCs[i].pos;
+                Debug.Log("Pos of " + i.ToString() + "'s NPC: (" + npcPos.x.ToString() + ", " + npcPos.y.ToString() + ")");
 
-                // update position, no spatial if above or below
-                float horizontalDist1 = Math.Abs(dist1X);
-                if (horizontalDist1 < 500.0f)
+                float distX = playerPos.x - npcPos.x;
+                float distY = playerPos.y - npcPos.y;
+                float distanceSq = (distX * distX + distY * distY);
+
+                if (distanceSq < MoveStats.Audio3D_ActiveDistance * MoveStats.Audio3D_ActiveDistance)
                 {
-                    Audio.Set3DSoundPosition("lobster1_scissors", playerPos.x, lobster1Y);
+                    if (!NPCs[i].audioPlaying)
+                    {
+                        Audio.PlaySound("scissors_snip" + (i).ToString(), "lobster_scissors" + (i).ToString());
+                        Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
+                        NPCs[i].audioPlaying = true;
+                    }
+
+                    // update position, no spatial if above or below
+                    float horizontalDist1 = Math.Abs(distX);
+                    if (horizontalDist1 < 150.0f)
+                    {
+                        Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), playerPos.x, NPCs[i].pos.y);
+                    }
+                    else
+                    {
+                        Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), NPCs[i].pos.x, NPCs[i].pos.y);
+                    }
                 }
                 else
                 {
-                    Audio.Set3DSoundPosition("lobster1_scissors", lobster1X, lobster1Y);
-                }
-            }
-            else
-            {
-                if (_lobster1SoundPlaying)
-                {
-                    Audio.StopSound("lobster1_scissors");
-                    _lobster1SoundPlaying = false;
-                    Debug.Log("=== LOBSTER 1 SCISSORS SOUND STOPPED ===");
+                    //Debug.Log("npc " + (i).ToString() + "out of range");
+                    if (NPCs[i].audioPlaying)
+                    {
+                        //Debug.Log("lobster_scissors" + (i).ToString());
+                        //Audio.StopSound("lobster_scissors" + (i).ToString());
+                        NPCs[i].audioPlaying = false;
+                    }
                 }
             }
 
-            // lobster 2 sound
-            if (distance2 < 3000.0f)
-            {
-                if (!_lobster2SoundPlaying)
-                {
-                    Audio.PlaySound("scissors_snip", "lobster2_scissors");
-                    _lobster2SoundPlaying = true;
-                    Debug.Log("=== LOBSTER 2 SCISSORS SOUND STARTED ===");
-                }
-
-                // update position - center if above/below
-                float horizontalDist2 = Math.Abs(dist2X);
-                if (horizontalDist2 < 500.0f)
-                {
-                    Audio.Set3DSoundPosition("lobster2_scissors", playerPos.x, lobster2Y);
-                }
-                else
-                {
-                    Audio.Set3DSoundPosition("lobster2_scissors", lobster2X, lobster2Y);
-                }
-            }
-            else
-            {
-                if (_lobster2SoundPlaying)
-                {
-                    Audio.StopSound("lobster2_scissors");
-                    _lobster2SoundPlaying = false;
-                    Debug.Log("=== LOBSTER 2 SCISSORS SOUND STOPPED ===");
-                }
-            }
             #endregion
 
             // Handle all timers
@@ -543,6 +621,7 @@ namespace CSharpScript
 
 
             Transform.SetPosition(vfx, finalPos.x, finalPos.y - 10f);
+            Transform.SetPosition(pu_vfx, pos.x, pos.y);
         }
 
         static bool resetSkid = false;
@@ -649,6 +728,18 @@ namespace CSharpScript
 
             if (!_isZiplining || !IsBeingKnockedBack) // && !_isBeingLaunched)
             {
+                //speed boost
+                if (triggerSpeedBoost)
+                {
+                    triggerSpeedBoost = false;
+                    speedBoostActive = true;
+                    speedTimer = MoveStats.Speed_Duration;
+                }
+                if (speedBoostActive)
+                {
+                    HandleSpeedBoost();
+                }
+
                 // gravity logic
                 Jump();
 
@@ -852,6 +943,8 @@ namespace CSharpScript
             }
             // determine max speed
             float currentMaxSpeed = isRunHeld ? MoveStats.T3_MaxSpeed : MoveStats.T0_MaxSpeed;
+            if (speedBoostActive) 
+                currentMaxSpeed *= MoveStats.Speed_Multiplier;
 
             // movement logic
             if (targetDirection != 0)
@@ -968,6 +1061,11 @@ namespace CSharpScript
             }
 
             _moveVelocity.x = movespeed * moveDir;
+            if (speedBoostActive)
+            {
+                _moveVelocity.x *= MoveStats.Speed_Multiplier;
+                _moveVelocity.y *= MoveStats.Speed_Multiplier;
+            }
             Physics.SetVelocity(OwnerName, _moveVelocity.x, Physics.GetVelocity(OwnerName).y);
         }
 
@@ -1870,6 +1968,25 @@ namespace CSharpScript
 
         #endregion
 
+        #region PickUp Effects
+
+        float speedTimer = 0.0f;
+        void HandleSpeedBoost()
+        {
+            if (speedTimer > 0f)
+            {
+                speedTimer -= fixeddt;
+                Animation.PlayAnimation(pu_vfx, "Speed", true);
+            }
+            else
+            {
+                speedBoostActive = false;
+                Animation.PlayAnimation(pu_vfx, "Clear");
+            }
+        }
+
+        #endregion
+
         public override void OnDestroy()
         {
             Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
@@ -1887,7 +2004,7 @@ namespace CSharpScript
         private bool _blinkRestoredAlpha = true;    // tracks whether alpha has been restored after immunity ended
         private void HandleBlinkEffect()
         {
-            float defaultAlpha = 1f;// Graphics.GetColor(OwnerName).z;
+            float defaultAlpha = Graphics.GetColor(OwnerName).z;    //1.0f
 
             if (_hurtTimer >= 0 && _hurtTimer < MoveStats.HurtImmunityLength - MoveStats.hurtStunDuration)
             {

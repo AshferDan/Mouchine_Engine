@@ -614,8 +614,8 @@ void WinLoseLogicSystem::TriggerWin()
     // stats for the right-side panel
     m_timerRunning = false; // stop timer on win
     std::string statTime = FormatElapsedTime(m_elapsedTime);
-    std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins());
-    std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells());
+    std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
+    std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
     std::string statLevelNum = "Level 1";
     std::string statLevelName = "Barbershop";
 
@@ -1106,8 +1106,8 @@ void WinLoseLogicSystem::TriggerLose()
     // ---- Gather stats for the right-side panel ----
     m_timerRunning = false; // stop timer on lose
     std::string statTime = FormatElapsedTime(m_elapsedTime);
-    std::string statCoins = "0";       // TODO: replace with real coin count
-    std::string statShells = "0/3";     // TODO: replace with real shell count
+    std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
+    std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
     std::string statLevelNum = "Level 1"; // TODO: replace with real level number
     std::string statLevelName = "Barbershop"; // TODO: replace with real level name
 

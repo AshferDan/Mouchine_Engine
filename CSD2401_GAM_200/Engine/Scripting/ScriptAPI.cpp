@@ -1540,24 +1540,24 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
 		return MathiClamp(value, min, max);
 	}
-    const char* FindGameObjectByName(const std::string& name)
+    std::string FindGameObjectByName(const std::string& name)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.FindGameObject(name);
-        if (obj)
+        if (obj && obj->GetID())
         {
-            return obj->GetName().c_str();
+            return std::to_string(obj->GetID());
         }
         return "";
     }
 
-    const char* FindGameObjectByID(int id)
+    std::string FindGameObjectByID(int id)
     {
         auto& factory = GameObjectFactory::Instance();
         GameObject* obj = factory.GetGameObject(id);
         if (obj)
         {
-            return obj->GetName().c_str();
+            return obj->GetName();
         }
         return "";
     }
@@ -1575,6 +1575,32 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     int CountAllGameObjects()
     {
         return GameObjectFactory::Instance().CountAllGameObjects();
+    }
+#pragma endregion
+
+#pragma region GameTimer
+    float GetRemainingTime()
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        return cb ? cb->GetRemainingTime() : 0.0f;
+    }
+
+    float GetLevelLength()
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        return cb ? cb->GetLevelTimerLength() : 60.0f;
+    }
+
+    void SetLevelTimerLength(float length)
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        if (cb) cb->SetLevelTimerLength(length);
+    }
+
+    void AddTime(float amount)
+    {
+        auto* cb = CORE->GetGameCallbacks();
+        if (cb) cb->AddTime(amount);
     }
 #pragma endregion
 

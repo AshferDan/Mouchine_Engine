@@ -28,14 +28,19 @@ namespace CSharpScript
     {
         public string Pickup_Coin_Name = "PU_Coin";
         public string Pickup_Shell_Name = "PU_Shell";
-        public string Pickup_PowerUp_Name = "PU_Powerup";
+        public string Pickup_Speed_Name = "PU_Speed";
+        public string Pickup_Time_Name = "PU_Time";
 
         private float dt => Utils.GetDelta_Time();
         private float fixeddt => Utils.GetFixed_Delta_Time();
 
+        public PlayerMovementStats MoveStats;
+        private bool triggeredTimePU = false;
+
         public PickupManager()
         {
             // When the script is created, instantiate its stats
+            MoveStats = new PlayerMovementStats();
             Debug.Log("PickupManager instantiated with new stats.");
         }
 
@@ -48,12 +53,12 @@ namespace CSharpScript
                 return;
             }
 
-            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx2", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.8f, 1.0f, "sfx");
-            Audio.AddSound("PU_Coin_sfx3", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.8f, 1.0f, "sfx");
+            Audio.AddSound("PU_Time_sfx", "../Assets/Audio/Pickups/PU_Time.wav", false, 0.7f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Speed_sfx", "../Assets/Audio/Pickups/PU_Speed.wav", false, 0.9f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Shell_sfx", "../Assets/Audio/Pickups/PU_Shell.wav", false, 0.9f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Coin_sfx1", "../Assets/Audio/Pickups/PU_Coin1.wav", false, 0.4f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Coin_sfx2", "../Assets/Audio/Pickups/PU_Coin2.wav", false, 0.4f, 1.0f, "pu_sfx");
+            Audio.AddSound("PU_Coin_sfx3", "../Assets/Audio/Pickups/PU_Coin3.wav", false, 0.4f, 1.0f, "pu_sfx");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -66,6 +71,7 @@ namespace CSharpScript
         public void OnFixedUpdate(float fixedDeltaTime)
         {
             HandlePickup();
+            HandleTimePU();
         }
 
         // Script will only handle collision and effect. Tracking and counting will be handled in c++ because its easier to access from other systems, save to file etc.
@@ -86,19 +92,25 @@ namespace CSharpScript
 
                     Random rnd = new Random();
                     int variation = rnd.Next(1, 4);
-                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "sfx");
+                    Audio.PlaySound("PU_Coin_sfx" + variation.ToString(), "pu_sfx");
                 }
                 else if (goName.Contains(Pickup_Shell_Name))
                 {
                     // shell effect
                     Pickups.CollectShell();
-                    Audio.PlaySound("PU_Shell_sfx", "sfx");
+                    Audio.PlaySound("PU_Shell_sfx", "pu_sfx");
                 }
-                else if (goName.Contains(Pickup_PowerUp_Name))
+                else if (goName.Contains(Pickup_Speed_Name))
                 {
                     // powerup effect
-                    //check if time or speed
-                    Audio.PlaySound("PU_Time_sfx", "sfx");
+                    Audio.PlaySound("PU_Speed_sfx", "pu_sfx");
+                    PlayerMovement.triggerSpeedBoost = true;
+                }
+                else if (goName.Contains(Pickup_Time_Name))
+                {
+                    // powerup effect
+                    Audio.PlaySound("PU_Time_sfx", "pu_sfx");
+                    triggeredTimePU = true;
                 }
                 else
                 {
@@ -108,6 +120,31 @@ namespace CSharpScript
                 // destroy regardless of pickup type
                 GameObject.DestroyByID(goID);
                 Debug.Log("destroyed go id: " + goID.ToString());            // works
+            }
+        }
+
+        float timePUTimer = 0.0f;
+        bool timePUActive = false;
+        private void HandleTimePU()
+        {
+            if (triggeredTimePU)
+            {
+                GameTimer.AddTime(MoveStats.Time_PickupAmount);
+                timePUTimer = MoveStats.Time_PickupAmount;
+                Animation.PlayAnimation(PlayerMovement.pu_vfx, "Time", true);
+                triggeredTimePU = false;
+                timePUActive = true;
+            }
+
+            if (timePUActive)
+            {
+                timePUTimer -= fixeddt;
+                if (timePUTimer <= 0.0f)
+                {
+                    Animation.PlayAnimation(PlayerMovement.pu_vfx, "Clear");
+                    timePUActive = false;
+                    timePUTimer = 0.0f;
+                }
             }
         }
 
