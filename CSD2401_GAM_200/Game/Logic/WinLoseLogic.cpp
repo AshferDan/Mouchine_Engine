@@ -207,6 +207,45 @@ void WinLoseLogicSystem::Update(float dt)
         return;
     }
 
+    // Cheat codes
+    if (!hasPlayerWon && !hasCreatedWinScreen && !hasCreatedLoseScreen)
+    {
+        InputManager* cheatInput = CORE->GetInputManager();
+        if (cheatInput)
+        {
+            bool ctrl = (cheatInput->IsKeyHeld(GLFW_KEY_LEFT_CONTROL) || cheatInput->IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) ||
+                        (cheatInput->IsKeyHeld(GLFW_KEY_RIGHT_CONTROL) || cheatInput->IsKeyPressed(GLFW_KEY_RIGHT_CONTROL));
+            if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_1))
+            {
+                // CTRL+1: Win current level instantly
+                TriggerWin();
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_2))
+            {
+                // CTRL+2: Trigger lose/respawn instantly
+                TriggerLose();
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_3))
+            {
+                // CTRL+3: Skip to next level
+                std::string nextScene;
+                if (currentScenePath.find("Level_1") != std::string::npos)
+                    nextScene = "../Assets/Scenes/Level_2.json";
+                else
+                    std::cout << "[Cheat] No next level to skip to.\n";
+
+                if (!nextScene.empty())
+                    CORE->RequestSceneLoad(nextScene, true);
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_4))
+            {
+                // CTRL+4: Reload current level instantly
+                if (!currentScenePath.empty())
+                    CORE->RequestSceneLoad(currentScenePath, true);
+            }
+        }
+    }
+
     if (isWaitingForWin)
     {
         winDelayTimer -= dt;
