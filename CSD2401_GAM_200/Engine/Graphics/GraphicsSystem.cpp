@@ -261,6 +261,10 @@ void GraphicsSystem::Initialize()
                 }
 
                 CORE->HandleWindowFocusChanged(true);
+
+                // call HandleWindowFocusChanged FIRST before restoring the window.
+                if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+                    glfwRestoreWindow(win);
             }
         });
 
