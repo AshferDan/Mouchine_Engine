@@ -14,32 +14,62 @@ Technology is prohibited.
 
 #include "MediaPlayerLogic.h"
 #include "GhostSystem.h"
-#include "Serialization.h"
 #include "InputManager.h"
-#include "CameraManager.h"
-#include "CameraComponent.h"
+#include "GraphicsSystem.h"
+#include "transform.h"
+#include "RenderComponent.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <algorithm>
 
 // ---------------------------------------------------------------------------
-// Layout constants — world-space units, relative to camera centre.
-// Tuned for zoom = 0.5 / 1920 x 1080.
+// Behaviour constants — layout is driven entirely by the scene JSON.
 // ---------------------------------------------------------------------------
-static constexpr float MP_Y_OFFSET  = -920.0f; ///< Distance below camera centre (near bottom)
-static constexpr float MP_BAR_CX    =   50.0f; ///< Timeline bar centre X offset from camera
-static constexpr float MP_BAR_W     = 1000.0f; ///< Timeline bar total width
-static constexpr float MP_BAR_H     =   50.0f; ///< Timeline bar height
-static constexpr float MP_PLAY_X    = -550.0f; ///< Play/Pause button centre X offset
-static constexpr float MP_PLAY_SIZE =   80.0f; ///< Play/Pause button size (square)
-static constexpr float MP_BWD_X     = -650.0f; ///< Backward (-10 s) button centre X offset
-static constexpr float MP_BWD_SIZE  =   80.0f; ///< Backward button size
-static constexpr float MP_FWD_X     =  650.0f; ///< Forward (+10 s) button centre X offset
-static constexpr float MP_FWD_SIZE  =   80.0f; ///< Forward button size
-static constexpr float MP_SLIDER_W  =   60.0f; ///< Slider thumb width
-static constexpr float MP_SLIDER_H  =   80.0f; ///< Slider thumb height
-static constexpr float MP_VIDEO_X   =  760.0f; ///< Exit-replay (ReplayVideo) button centre X
-static constexpr float MP_VIDEO_W   =   80.0f; ///< Exit-replay button width
-static constexpr float MP_VIDEO_H   =   80.0f; ///< Exit-replay button height
+static constexpr float MP_SEEK_SECS  = 5.0f;   // Seconds to skip forward / rewind
+
+// ---------------------------------------------------------------------------
+// GameObject name constants — must match the scene hierarchy exactly.
+// ---------------------------------------------------------------------------
+static constexpr const char* OBJ_ROOT   = "Media_Player";
+static constexpr const char* OBJ_BOX    = "Replay_box";
+static constexpr const char* OBJ_PLAY   = "Replay_playing";
+static constexpr const char* OBJ_BAR    = "Replay_bar_brown";
+static constexpr const char* OBJ_BWD    = "Replay_backward";
+static constexpr const char* OBJ_FWD    = "Replay_forward";
+static constexpr const char* OBJ_VIDEO  = "ReplayVideo";    // Restart button
+static constexpr const char* OBJ_SLIDER = "Replay_slider";
+
+// ---------------------------------------------------------------------------
+// Icon paths — add Replay_paused.png to Assets/Sprites/Icons/ for the swap.
+// ---------------------------------------------------------------------------
+static constexpr const char* ICON_PLAY  = "../Assets/Sprites/Icons/Replay_playing.png";
+static constexpr const char* ICON_PAUSE = "../Assets/Sprites/Icons/paused_button.png";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+void MediaPlayerLogicSystem::SetObjectActive(const char* name, bool active)
+{
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* obj = factory.FindGameObject(name);
+    if (!obj) return;
+
+    obj->SetActive(active);
+
+    // Components are serialised as disabled when the object is inactive,
+    // so we explicitly enable/disable the ones we care about.
+    if (auto* tf = obj->GetComponent<TransformComponent>())
+        tf->SetEnabled(active);
+    if (auto* rc = obj->GetComponent<RenderComponent>())
+    {
+        rc->SetEnabled(active);
+        // Force screen space on every child — some may have been saved with
+        // screenSpace=false if they were not individually updated in the editor.
+        if (active)
+            rc->SetScreenSpace(true);
+    }
+}
 
 // ---------------------------------------------------------------------------
 // ISystem interface
@@ -50,6 +80,7 @@ void MediaPlayerLogicSystem::Initialize()
     m_spawned        = false;
     m_mouseWasDown   = false;
     m_sliderDragging = false;
+    m_wasPaused      = false;
 }
 
 void MediaPlayerLogicSystem::Update(float dt)
@@ -62,7 +93,6 @@ void MediaPlayerLogicSystem::Update(float dt)
 
     bool inReplayMode = ghost->IsReplayMode();
 
-    // Spawn or destroy the UI to match replay mode state
     if (inReplayMode && !m_spawned)
         SpawnMediaPlayer();
     else if (!inReplayMode && m_spawned)
@@ -78,160 +108,169 @@ void MediaPlayerLogicSystem::Update(float dt)
 
 void MediaPlayerLogicSystem::SpawnMediaPlayer()
 {
-    Serialization::LoadPrefabWithReturn("Media_Player");
-    m_spawned = true;
-    std::cout << "[MediaPlayerLogic] Media_Player spawned.\n";
+    SetObjectActive(OBJ_ROOT,   true);
+    SetObjectActive(OBJ_BOX,    true);
+    SetObjectActive(OBJ_PLAY,   true);
+    SetObjectActive(OBJ_BAR,    true);
+    SetObjectActive(OBJ_BWD,    true);
+    SetObjectActive(OBJ_FWD,    true);
+    SetObjectActive(OBJ_VIDEO,  true);
+    SetObjectActive(OBJ_SLIDER, true);
+
+    m_spawned      = true;
+    m_wasPaused    = false;
+    std::cout << "[MediaPlayerLogic] Media_Player activated.\n";
 }
 
 void MediaPlayerLogicSystem::DestroyMediaPlayer()
 {
-    auto& factory = GameObjectFactory::Instance();
-
-    static const char* names[] = {
-        "Media_Player",
-        "Replay_box",
-        "Replay_playing",
-        "Replay_bar_brown",
-        "Replay_backward",
-        "Replay_forward",
-        "ReplayVideo",
-        "Replay_slider"
-    };
-
-    for (const char* name : names)
-    {
-        GameObject* obj = factory.FindGameObject(name);
-        if (obj)
-            factory.QueueDestroyGameObject(obj->GetID());
-    }
+    SetObjectActive(OBJ_ROOT,   false);
+    SetObjectActive(OBJ_BOX,    false);
+    SetObjectActive(OBJ_PLAY,   false);
+    SetObjectActive(OBJ_BAR,    false);
+    SetObjectActive(OBJ_BWD,    false);
+    SetObjectActive(OBJ_FWD,    false);
+    SetObjectActive(OBJ_VIDEO,  false);
+    SetObjectActive(OBJ_SLIDER, false);
 
     m_spawned        = false;
     m_sliderDragging = false;
-    std::cout << "[MediaPlayerLogic] Media_Player destroyed.\n";
+    std::cout << "[MediaPlayerLogic] Media_Player deactivated.\n";
+}
+
+void MediaPlayerLogicSystem::UpdatePlayPauseIcon(bool paused)
+{
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* btn = factory.FindGameObject(OBJ_PLAY);
+    if (!btn) return;
+
+    auto* rc = btn->GetComponent<RenderComponent>();
+    if (!rc)  return;
+
+    GraphicsSystem* gfx = CORE ? CORE->GetGraphicsSystem() : nullptr;
+    if (!gfx) return;
+
+    // paused == true  → replay is paused, so show the PLAY icon (click to resume)
+    // paused == false → replay is running, so show the PAUSE icon (click to pause)
+    const char* iconPath = paused ? ICON_PLAY : ICON_PAUSE;
+
+    GLuint newTex = gfx->LoadTexture(iconPath);
+    if (newTex)
+    {
+        GLuint old = rc->GetTextureID();
+        if (old) glDeleteTextures(1, &old);
+        rc->SetTextureID(newTex);
+        rc->SetTexturePath(iconPath);
+    }
 }
 
 void MediaPlayerLogicSystem::UpdateMediaPlayer()
 {
-    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-    if (!ghost)
-        return;
+    GhostSystem*    ghost = CORE ? CORE->GetGhostSystem()    : nullptr;
+    GraphicsSystem* gfx   = CORE ? CORE->GetGraphicsSystem() : nullptr;
+    InputManager*   input = CORE ? CORE->GetInputManager()   : nullptr;
+    if (!ghost || !gfx || !input) return;
 
     auto& factory = GameObjectFactory::Instance();
 
-    // --- Camera anchor: all positions are relative to the camera centre ---
-    vec2  camPos = CameraManager::Instance().GetCameraPosition();
-    float camX   = camPos.x;
-    float camY   = camPos.y;
-    float baseY  = camY + MP_Y_OFFSET;
+    // --- Slider thumb: position driven by playback progress along the bar ---
+    // Read the bar's actual transform so we respect whatever is set in the scene.
+    const float duration = ghost->GetReplayDuration();
+    const float clock    = ghost->GetReplayClock();
+    const float progress = (duration > 0.f)
+        ? std::max(0.f, std::min(1.f, clock / duration))
+        : 0.f;
 
-    // Helper: reposition an object and optionally resize it
-    auto MoveObj = [&](const char* name, float wx, float wy, float sx = -1.f, float sy = -1.f)
+    float barLeft = 0.f, barWidth = 0.f, barCY = 0.f;
+    if (GameObject* barObj = factory.FindGameObject(OBJ_BAR))
     {
-        GameObject* obj = factory.FindGameObject(name);
-        if (!obj) return;
-        auto* tf = obj->GetComponent<TransformComponent>();
-        if (!tf)  return;
-        tf->posX = wx;
-        tf->posY = wy;
-        if (sx > 0.f)
+        if (auto* tf = barObj->GetComponent<TransformComponent>())
         {
-            tf->scaleX = sx;
-            tf->scaleY = sy;
-        }
-    };
-
-    // Reposition all static media player elements
-    MoveObj("Replay_bar_brown", camX + MP_BAR_CX, baseY, MP_BAR_W + 10.f, MP_BAR_H);
-    MoveObj("Replay_box",       camX + MP_BAR_CX, baseY, MP_BAR_W,        MP_BAR_H);
-    MoveObj("Replay_backward",  camX + MP_BWD_X,  baseY, MP_BWD_SIZE,     MP_BWD_SIZE);
-    MoveObj("Replay_forward",   camX + MP_FWD_X,  baseY, MP_FWD_SIZE,     MP_FWD_SIZE);
-    MoveObj("Replay_playing",   camX + MP_PLAY_X, baseY, MP_PLAY_SIZE,    MP_PLAY_SIZE);
-    MoveObj("ReplayVideo",      camX + MP_VIDEO_X, baseY, MP_VIDEO_W,     MP_VIDEO_H);
-
-    // --- Slider thumb: position reflects playback progress ---
-    float duration = ghost->GetReplayDuration();
-    float clock    = ghost->GetReplayClock();
-    float progress = (duration > 0.f) ? (clock / duration) : 0.f;
-    if (progress < 0.f) progress = 0.f;
-    if (progress > 1.f) progress = 1.f;
-
-    float barLeft = camX + MP_BAR_CX - MP_BAR_W * 0.5f;
-    float sliderX = barLeft + progress * MP_BAR_W;
-    MoveObj("Replay_slider", sliderX, baseY, MP_SLIDER_W, MP_SLIDER_H);
-
-    // --- Mouse state ---
-    float mouseX = static_cast<float>(InputManager::GetMouseWorldX());
-    float mouseY = static_cast<float>(InputManager::GetMouseWorldY());
-
-    bool mouseDown         = (glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
-    bool mouseJustPressed  = mouseDown  && !m_mouseWasDown;
-    bool mouseJustReleased = !mouseDown &&  m_mouseWasDown;
-    m_mouseWasDown         = mouseDown;
-
-    // AABB point test (centre + half-extents)
-    auto InRect = [](float mx, float my, float cx, float cy, float hw, float hh) -> bool
-    {
-        return (mx >= cx - hw) && (mx <= cx + hw)
-            && (my >= cy - hh) && (my <= cy + hh);
-    };
-
-    // --- Slider drag: begin when clicking inside the timeline bar ---
-    if (mouseJustPressed && !m_sliderDragging)
-    {
-        if (InRect(mouseX, mouseY,
-                   camX + MP_BAR_CX, baseY,
-                   MP_BAR_W * 0.5f, MP_BAR_H * 0.5f))
-        {
-            m_sliderDragging = true;
+            barLeft  = tf->posX - tf->scaleX * 0.5f;
+            barWidth = tf->scaleX;
+            barCY    = tf->posY;
         }
     }
 
-    // While dragging, seek the replay to the mouse position along the bar
-    if (m_sliderDragging && mouseDown)
+    if (GameObject* sliderObj = factory.FindGameObject(OBJ_SLIDER))
     {
-        float t = (mouseX - barLeft) / MP_BAR_W;
-        if (t < 0.f) t = 0.f;
-        if (t > 1.f) t = 1.f;
+        if (auto* tf = sliderObj->GetComponent<TransformComponent>())
+            tf->posX = barLeft + progress * barWidth;
+    }
+
+    // --- Stop at end: pause when the replay reaches the last frame ---
+    if (!ghost->IsReplayPaused() && duration > 0.f && clock >= duration)
+        ghost->ToggleReplayPause();
+
+    // --- Play / Pause icon: swap texture whenever the pause state changes ---
+    const bool isPaused = ghost->IsReplayPaused();
+    if (isPaused != m_wasPaused)
+    {
+        UpdatePlayPauseIcon(isPaused);
+        m_wasPaused = isPaused;
+    }
+
+    // --- Mouse input (convert GLFW top-left Y to screen-space bottom-left Y) ---
+    const float windowH  = (float)gfx->GetWindowHeight();
+    const float mouseX   = (float)input->GetMouseX();
+    const float mouseY   = windowH - (float)input->GetMouseY();
+
+    const bool mouseDown         = (glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+    const bool mouseJustPressed  = mouseDown  && !m_mouseWasDown;
+    const bool mouseJustReleased = !mouseDown &&  m_mouseWasDown;
+    m_mouseWasDown               = mouseDown;
+
+    // AABB hit-test using each object's actual transform (respects scene layout)
+    auto HitTest = [&](const char* name) -> bool
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (!obj) return false;
+        auto* tf = obj->GetComponent<TransformComponent>();
+        if (!tf)  return false;
+        return mouseX >= tf->posX - tf->scaleX * 0.5f
+            && mouseX <= tf->posX + tf->scaleX * 0.5f
+            && mouseY >= tf->posY - tf->scaleY * 0.5f
+            && mouseY <= tf->posY + tf->scaleY * 0.5f;
+    };
+
+    // --- Begin slider drag when clicking inside the timeline bar ---
+    if (mouseJustPressed && !m_sliderDragging)
+    {
+        if (HitTest(OBJ_BAR))
+            m_sliderDragging = true;
+    }
+
+    // While dragging, seek to the mouse position along the bar
+    if (m_sliderDragging && mouseDown && barWidth > 0.f && duration > 0.f)
+    {
+        const float t = std::max(0.f, std::min(1.f, (mouseX - barLeft) / barWidth));
         ghost->SeekReplayAbsolute(t * duration);
     }
 
-    // Release drag
     if (mouseJustReleased)
         m_sliderDragging = false;
 
-    // --- Button clicks (only on fresh press, not while dragging) ---
+    // --- Button clicks (only on a fresh press, not while dragging) ---
     if (mouseJustPressed && !m_sliderDragging)
     {
         // Play / Pause toggle
-        if (InRect(mouseX, mouseY,
-                   camX + MP_PLAY_X, baseY,
-                   MP_PLAY_SIZE * 0.5f, MP_PLAY_SIZE * 0.5f))
-        {
+        if (HitTest(OBJ_PLAY))
             ghost->ToggleReplayPause();
-        }
 
-        // Rewind 10 s
-        if (InRect(mouseX, mouseY,
-                   camX + MP_BWD_X, baseY,
-                   MP_BWD_SIZE * 0.5f, MP_BWD_SIZE * 0.5f))
-        {
-            ghost->SeekReplay(-10.f);
-        }
+        // Rewind 5 seconds
+        if (HitTest(OBJ_BWD))
+            ghost->SeekReplay(-MP_SEEK_SECS);
 
-        // Skip forward 10 s
-        if (InRect(mouseX, mouseY,
-                   camX + MP_FWD_X, baseY,
-                   MP_FWD_SIZE * 0.5f, MP_FWD_SIZE * 0.5f))
-        {
-            ghost->SeekReplay(10.f);
-        }
+        // Skip forward 5 seconds
+        if (HitTest(OBJ_FWD))
+            ghost->SeekReplay(MP_SEEK_SECS);
 
-        // Exit replay mode (ReplayVideo button)
-        if (InRect(mouseX, mouseY,
-                   camX + MP_VIDEO_X, baseY,
-                   MP_VIDEO_W * 0.5f, MP_VIDEO_H * 0.5f))
+        // Restart: seek to beginning and resume if paused
+        if (HitTest(OBJ_VIDEO))
         {
-            ghost->ExitReplayMode();
+            ghost->SeekReplayAbsolute(0.f);
+            if (ghost->IsReplayPaused())
+                ghost->ToggleReplayPause();
         }
     }
 }

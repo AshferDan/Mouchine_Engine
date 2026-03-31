@@ -2643,6 +2643,16 @@ void ImGuiSystem::RenderPropertyEditor()
                 UndoTracker layerTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Ascending order for topmost rendering position");
 
+                // --- Screen Space ---
+                bool rcSS = render->isScreenSpace();
+                if (ImGui::Checkbox("Screen Space##Render", &rcSS))
+                {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                    render->SetScreenSpace(rcSS);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
+                CreateHintText("Screen Space: object stays fixed on screen. World Space: object follows camera.");
+
             }
         }
     }

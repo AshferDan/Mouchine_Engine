@@ -22,8 +22,8 @@
         "mode": "FOLLOW_TARGET",
         "zoom": 0.5,
         "position": [
-          37139.0546875,
-          1148.168701171875
+          0.0,
+          0.0
         ],
         "followOffset": [
           0.0,
@@ -353,6 +353,7 @@
         ],
         "fields": {
           "PlayerMovement": {
+            "triggerSpeedBoost": false,
             "fRun": false,
             "fJump": true,
             "fIdle": false,
@@ -365,6 +366,7 @@
             "constForce": 5.0,
             "inputForce": 7.5,
             "vfx": "Hero_vfx",
+            "pu_vfx": "Pickup_vfx",
             "vfx_nontracking": "Hero_vfx_nontracking"
           },
           "PlayerMovementStats": {
@@ -390,6 +392,9 @@
             "T2_SkidDuration": 0.550000011920929,
             "T3_SkidDuration": 0.800000011920929,
             "SkidExitSpeed": 100.0,
+            "Speed_Multiplier": 1.5,
+            "Speed_Duration": 5.0,
+            "Time_PickupAmount": 5.0,
             "T3_BonkDuration": 0.6499999761581421,
             "GroundDetectionRayLength": 10.0,
             "HeadDetectionRayLength": 0.019999999552965164,
@@ -444,6 +449,7 @@
             "ZiplineCoyoteTime": 0.20000000298023224,
             "HazardTimeDeduction": 1.0,
             "HurtImmunityLength": 2.0,
+            "Audio3D_ActiveDistance": 3000.0,
             "JumpTimeDeduction": 1.0,
             "RunTimeDeduction": 0.10000000149011612,
             "ZiplineTimeDeduction": 3.0,
@@ -483,7 +489,8 @@
           "PickupManager": {
             "Pickup_Coin_Name": "PU_Coin",
             "Pickup_Shell_Name": "PU_Shell",
-            "Pickup_PowerUp_Name": "PU_Powerup"
+            "Pickup_Speed_Name": "PU_Speed",
+            "Pickup_Time_Name": "PU_Time"
           }
         }
       },
@@ -2629,7 +2636,7 @@
     },
     {
       "name": "Shophouse_red_dark",
-      "localID": 154,
+      "localID": 51,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2675,7 +2682,7 @@
     },
     {
       "name": "UI",
-      "localID": 155,
+      "localID": 52,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2704,8 +2711,8 @@
       "children": [
         {
           "name": "Text FPS",
-          "localID": 156,
-          "parentID": 155,
+          "localID": 53,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2755,8 +2762,8 @@
         },
         {
           "name": "InGamePauseButton",
-          "localID": 157,
-          "parentID": 155,
+          "localID": 54,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2792,8 +2799,8 @@
         },
         {
           "name": "ShellIcon1",
-          "localID": 158,
-          "parentID": 155,
+          "localID": 55,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2815,7 +2822,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -2829,8 +2836,8 @@
         },
         {
           "name": "ShellIcon2",
-          "localID": 159,
-          "parentID": 155,
+          "localID": 56,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2852,7 +2859,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -2866,8 +2873,8 @@
         },
         {
           "name": "ShellIcon3",
-          "localID": 160,
-          "parentID": 155,
+          "localID": 57,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2889,7 +2896,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -2903,8 +2910,8 @@
         },
         {
           "name": "CoinIcon",
-          "localID": 161,
-          "parentID": 155,
+          "localID": 58,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2940,8 +2947,8 @@
         },
         {
           "name": "CoinCountText",
-          "localID": 162,
-          "parentID": 155,
+          "localID": 59,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2991,8 +2998,8 @@
         },
         {
           "name": "Timer Bar",
-          "localID": 163,
-          "parentID": 155,
+          "localID": 60,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3009,8 +3016,8 @@
           "children": [
             {
               "name": "LevelTimerBarFrame",
-              "localID": 164,
-              "parentID": 163,
+              "localID": 61,
+              "parentID": 60,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3046,8 +3053,8 @@
             },
             {
               "name": "LevelTimerBar",
-              "localID": 165,
-              "parentID": 163,
+              "localID": 62,
+              "parentID": 60,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3083,8 +3090,8 @@
             },
             {
               "name": "LevelTimerBarBackground",
-              "localID": 166,
-              "parentID": 163,
+              "localID": 63,
+              "parentID": 60,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3124,7 +3131,7 @@
     },
     {
       "name": "Outdoor_plant_dark(24)",
-      "localID": 65,
+      "localID": 64,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3170,7 +3177,7 @@
     },
     {
       "name": "StartEndZones",
-      "localID": 66,
+      "localID": 65,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3199,8 +3206,8 @@
       "children": [
         {
           "name": "SZ_Asset",
-          "localID": 67,
-          "parentID": 66,
+          "localID": 66,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3236,8 +3243,8 @@
         },
         {
           "name": "EZ_Asset",
-          "localID": 68,
-          "parentID": 66,
+          "localID": 67,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3273,8 +3280,8 @@
         },
         {
           "name": "WinZone",
-          "localID": 69,
-          "parentID": 66,
+          "localID": 68,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3319,8 +3326,8 @@
         },
         {
           "name": "SafeZone",
-          "localID": 70,
-          "parentID": 66,
+          "localID": 69,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3367,7 +3374,7 @@
     },
     {
       "name": "Hazards",
-      "localID": 71,
+      "localID": 70,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3385,8 +3392,8 @@
       "children": [
         {
           "name": "Spike_Hazard(11)",
-          "localID": 72,
-          "parentID": 71,
+          "localID": 71,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3453,8 +3460,8 @@
           "children": [
             {
               "name": "HazardColl(28)",
-              "localID": 73,
-              "parentID": 72,
+              "localID": 72,
+              "parentID": 71,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -3483,8 +3490,8 @@
         },
         {
           "name": "Spike_Hazard(2)",
-          "localID": 74,
-          "parentID": 71,
+          "localID": 73,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3561,8 +3568,8 @@
         },
         {
           "name": "Spike_Hazard(3)",
-          "localID": 75,
-          "parentID": 71,
+          "localID": 74,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3639,8 +3646,8 @@
         },
         {
           "name": "Spike_Hazard(4)",
-          "localID": 76,
-          "parentID": 71,
+          "localID": 75,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3717,8 +3724,8 @@
         },
         {
           "name": "Spike_Hazard(5)",
-          "localID": 77,
-          "parentID": 71,
+          "localID": 76,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3795,8 +3802,8 @@
         },
         {
           "name": "Spike_Hazard(6)",
-          "localID": 78,
-          "parentID": 71,
+          "localID": 77,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3873,8 +3880,8 @@
         },
         {
           "name": "Spike_Hazard(7)",
-          "localID": 79,
-          "parentID": 71,
+          "localID": 78,
+          "parentID": 70,
           "active": false,
           "TransformComponent": {
             "enabled": false,
@@ -3951,8 +3958,8 @@
         },
         {
           "name": "Spike_Hazard(8)",
-          "localID": 80,
-          "parentID": 71,
+          "localID": 79,
+          "parentID": 70,
           "active": false,
           "TransformComponent": {
             "enabled": false,
@@ -4029,8 +4036,8 @@
         },
         {
           "name": "Spike_Hazard(9)",
-          "localID": 81,
-          "parentID": 71,
+          "localID": 80,
+          "parentID": 70,
           "active": false,
           "TransformComponent": {
             "enabled": false,
@@ -4107,8 +4114,8 @@
         },
         {
           "name": "Starfish_Hazard(9)",
-          "localID": 82,
-          "parentID": 71,
+          "localID": 81,
+          "parentID": 70,
           "active": false,
           "TransformComponent": {
             "enabled": false,
@@ -4198,8 +4205,8 @@
         },
         {
           "name": "Spike_Hazard(24)",
-          "localID": 83,
-          "parentID": 71,
+          "localID": 82,
+          "parentID": 70,
           "active": false,
           "TransformComponent": {
             "enabled": false,
@@ -4276,8 +4283,8 @@
         },
         {
           "name": "Spike_Hazard(25)",
-          "localID": 84,
-          "parentID": 71,
+          "localID": 83,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4344,8 +4351,8 @@
           "children": [
             {
               "name": "HazardColl",
-              "localID": 85,
-              "parentID": 84,
+              "localID": 84,
+              "parentID": 83,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -4374,8 +4381,8 @@
         },
         {
           "name": "Spike_Hazard(26)",
-          "localID": 86,
-          "parentID": 71,
+          "localID": 85,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4442,8 +4449,8 @@
           "children": [
             {
               "name": "HazardColl(27)",
-              "localID": 87,
-              "parentID": 86,
+              "localID": 86,
+              "parentID": 85,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -4472,8 +4479,8 @@
         },
         {
           "name": "Spike_Hazard(1)",
-          "localID": 88,
-          "parentID": 71,
+          "localID": 87,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4550,8 +4557,8 @@
         },
         {
           "name": "Spike_Hazard(2)",
-          "localID": 89,
-          "parentID": 71,
+          "localID": 88,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4628,8 +4635,8 @@
         },
         {
           "name": "Spike_Hazard(1)",
-          "localID": 90,
-          "parentID": 71,
+          "localID": 89,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4706,8 +4713,8 @@
         },
         {
           "name": "Spike_Hazard(2)",
-          "localID": 91,
-          "parentID": 71,
+          "localID": 90,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4784,8 +4791,8 @@
         },
         {
           "name": "Spike_Hazard(3)",
-          "localID": 92,
-          "parentID": 71,
+          "localID": 91,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4862,8 +4869,8 @@
         },
         {
           "name": "Spike_Hazard(6)",
-          "localID": 93,
-          "parentID": 71,
+          "localID": 92,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4940,8 +4947,8 @@
         },
         {
           "name": "Spike_Hazard(1)",
-          "localID": 94,
-          "parentID": 71,
+          "localID": 93,
+          "parentID": 70,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5020,7 +5027,7 @@
     },
     {
       "name": "Outdoor_plant_dark",
-      "localID": 95,
+      "localID": 94,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5066,7 +5073,7 @@
     },
     {
       "name": "Pickups",
-      "localID": 96,
+      "localID": 95,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5084,8 +5091,8 @@
       "children": [
         {
           "name": "Coins",
-          "localID": 97,
-          "parentID": 96,
+          "localID": 96,
+          "parentID": 95,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5102,8 +5109,8 @@
           "children": [
             {
               "name": "PU_Coin",
-              "localID": 100,
-              "parentID": 97,
+              "localID": 97,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5167,8 +5174,8 @@
             },
             {
               "name": "PU_Coin(1)",
-              "localID": 101,
-              "parentID": 97,
+              "localID": 98,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5232,8 +5239,8 @@
             },
             {
               "name": "PU_Coin(2)",
-              "localID": 102,
-              "parentID": 97,
+              "localID": 99,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5297,8 +5304,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 103,
-              "parentID": 97,
+              "localID": 100,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5362,8 +5369,8 @@
             },
             {
               "name": "PU_Coin(1)",
-              "localID": 104,
-              "parentID": 97,
+              "localID": 101,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5427,8 +5434,8 @@
             },
             {
               "name": "PU_Coin(2)",
-              "localID": 105,
-              "parentID": 97,
+              "localID": 102,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5492,8 +5499,8 @@
             },
             {
               "name": "PU_Coin(4)",
-              "localID": 106,
-              "parentID": 97,
+              "localID": 103,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5557,8 +5564,8 @@
             },
             {
               "name": "PU_Coin(6)",
-              "localID": 107,
-              "parentID": 97,
+              "localID": 104,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5622,8 +5629,8 @@
             },
             {
               "name": "PU_Coin(8)",
-              "localID": 109,
-              "parentID": 97,
+              "localID": 105,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5687,8 +5694,8 @@
             },
             {
               "name": "PU_Coin(9)",
-              "localID": 110,
-              "parentID": 97,
+              "localID": 106,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5752,8 +5759,8 @@
             },
             {
               "name": "PU_Coin(10)",
-              "localID": 111,
-              "parentID": 97,
+              "localID": 107,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5817,8 +5824,8 @@
             },
             {
               "name": "PU_Coin(11)",
-              "localID": 112,
-              "parentID": 97,
+              "localID": 108,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5882,8 +5889,8 @@
             },
             {
               "name": "PU_Coin(12)",
-              "localID": 113,
-              "parentID": 97,
+              "localID": 109,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5947,8 +5954,8 @@
             },
             {
               "name": "PU_Coin(13)",
-              "localID": 114,
-              "parentID": 97,
+              "localID": 110,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6012,8 +6019,8 @@
             },
             {
               "name": "PU_Coin(14)",
-              "localID": 115,
-              "parentID": 97,
+              "localID": 111,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6077,8 +6084,8 @@
             },
             {
               "name": "PU_Coin(15)",
-              "localID": 116,
-              "parentID": 97,
+              "localID": 112,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6142,8 +6149,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 117,
-              "parentID": 97,
+              "localID": 113,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6207,8 +6214,8 @@
             },
             {
               "name": "PU_Coin(16)",
-              "localID": 118,
-              "parentID": 97,
+              "localID": 114,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6272,8 +6279,8 @@
             },
             {
               "name": "PU_Coin(17)",
-              "localID": 119,
-              "parentID": 97,
+              "localID": 115,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6337,8 +6344,8 @@
             },
             {
               "name": "PU_Coin(18)",
-              "localID": 120,
-              "parentID": 97,
+              "localID": 116,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6402,8 +6409,8 @@
             },
             {
               "name": "PU_Coin(19)",
-              "localID": 121,
-              "parentID": 97,
+              "localID": 117,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6467,8 +6474,8 @@
             },
             {
               "name": "PU_Coin(20)",
-              "localID": 122,
-              "parentID": 97,
+              "localID": 118,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6532,8 +6539,8 @@
             },
             {
               "name": "PU_Coin(21)",
-              "localID": 123,
-              "parentID": 97,
+              "localID": 119,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6597,8 +6604,8 @@
             },
             {
               "name": "PU_Coin(22)",
-              "localID": 124,
-              "parentID": 97,
+              "localID": 120,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6662,8 +6669,8 @@
             },
             {
               "name": "PU_Coin(23)",
-              "localID": 125,
-              "parentID": 97,
+              "localID": 121,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6727,8 +6734,8 @@
             },
             {
               "name": "PU_Coin(7)",
-              "localID": 126,
-              "parentID": 97,
+              "localID": 122,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6792,8 +6799,8 @@
             },
             {
               "name": "PU_Coin(8)",
-              "localID": 127,
-              "parentID": 97,
+              "localID": 123,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6857,8 +6864,8 @@
             },
             {
               "name": "PU_Coin(9)",
-              "localID": 128,
-              "parentID": 97,
+              "localID": 124,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6922,8 +6929,8 @@
             },
             {
               "name": "PU_Coin(10)",
-              "localID": 129,
-              "parentID": 97,
+              "localID": 125,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6987,8 +6994,8 @@
             },
             {
               "name": "PU_Coin(11)",
-              "localID": 130,
-              "parentID": 97,
+              "localID": 126,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7052,8 +7059,8 @@
             },
             {
               "name": "PU_Coin(12)",
-              "localID": 131,
-              "parentID": 97,
+              "localID": 127,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7117,8 +7124,8 @@
             },
             {
               "name": "PU_Coin(13)",
-              "localID": 132,
-              "parentID": 97,
+              "localID": 128,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7182,8 +7189,8 @@
             },
             {
               "name": "PU_Coin(14)",
-              "localID": 133,
-              "parentID": 97,
+              "localID": 129,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7247,8 +7254,8 @@
             },
             {
               "name": "PU_Coin(15)",
-              "localID": 134,
-              "parentID": 97,
+              "localID": 130,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7312,8 +7319,8 @@
             },
             {
               "name": "PU_Coin(16)",
-              "localID": 135,
-              "parentID": 97,
+              "localID": 131,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7377,8 +7384,8 @@
             },
             {
               "name": "PU_Coin(17)",
-              "localID": 136,
-              "parentID": 97,
+              "localID": 132,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7442,8 +7449,8 @@
             },
             {
               "name": "PU_Coin(18)",
-              "localID": 137,
-              "parentID": 97,
+              "localID": 133,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7507,8 +7514,8 @@
             },
             {
               "name": "PU_Coin(19)",
-              "localID": 138,
-              "parentID": 97,
+              "localID": 134,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7572,8 +7579,8 @@
             },
             {
               "name": "PU_Coin(20)",
-              "localID": 139,
-              "parentID": 97,
+              "localID": 135,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7637,8 +7644,8 @@
             },
             {
               "name": "PU_Coin(21)",
-              "localID": 140,
-              "parentID": 97,
+              "localID": 136,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7702,8 +7709,8 @@
             },
             {
               "name": "PU_Coin(22)",
-              "localID": 141,
-              "parentID": 97,
+              "localID": 137,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7767,8 +7774,8 @@
             },
             {
               "name": "PU_Coin(23)",
-              "localID": 142,
-              "parentID": 97,
+              "localID": 138,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7832,8 +7839,8 @@
             },
             {
               "name": "PU_Coin(4)",
-              "localID": 143,
-              "parentID": 97,
+              "localID": 139,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7897,8 +7904,8 @@
             },
             {
               "name": "PU_Coin(7)",
-              "localID": 144,
-              "parentID": 97,
+              "localID": 140,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7962,8 +7969,8 @@
             },
             {
               "name": "PU_Coin(8)",
-              "localID": 145,
-              "parentID": 97,
+              "localID": 141,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8027,8 +8034,8 @@
             },
             {
               "name": "PU_Coin(9)",
-              "localID": 146,
-              "parentID": 97,
+              "localID": 142,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8092,8 +8099,8 @@
             },
             {
               "name": "PU_Coin(10)",
-              "localID": 147,
-              "parentID": 97,
+              "localID": 143,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8157,8 +8164,8 @@
             },
             {
               "name": "PU_Coin(11)",
-              "localID": 148,
-              "parentID": 97,
+              "localID": 144,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8222,8 +8229,8 @@
             },
             {
               "name": "PU_Coin(12)",
-              "localID": 149,
-              "parentID": 97,
+              "localID": 145,
+              "parentID": 96,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8289,8 +8296,8 @@
         },
         {
           "name": "Shells",
-          "localID": 150,
-          "parentID": 96,
+          "localID": 146,
+          "parentID": 95,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8307,8 +8314,8 @@
           "children": [
             {
               "name": "PU_Shell",
-              "localID": 151,
-              "parentID": 150,
+              "localID": 147,
+              "parentID": 146,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8372,8 +8379,8 @@
             },
             {
               "name": "PU_Shell",
-              "localID": 152,
-              "parentID": 150,
+              "localID": 148,
+              "parentID": 146,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8437,8 +8444,8 @@
             },
             {
               "name": "PU_Shell",
-              "localID": 153,
-              "parentID": 150,
+              "localID": 149,
+              "parentID": 146,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8506,7 +8513,7 @@
     },
     {
       "name": "Parallax_2",
-      "localID": 51,
+      "localID": 150,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8524,8 +8531,8 @@
       "children": [
         {
           "name": "Parallax_BG_2_R",
-          "localID": 52,
-          "parentID": 51,
+          "localID": 151,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8561,8 +8568,8 @@
         },
         {
           "name": "Parallax_BG_2_L",
-          "localID": 53,
-          "parentID": 51,
+          "localID": 152,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8598,8 +8605,8 @@
         },
         {
           "name": "Parallax_BG_2",
-          "localID": 54,
-          "parentID": 51,
+          "localID": 153,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8634,8 +8641,8 @@
           "children": [
             {
               "name": "Below",
-              "localID": 55,
-              "parentID": 54,
+              "localID": 154,
+              "parentID": 153,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8671,8 +8678,8 @@
             },
             {
               "name": "Below(1)",
-              "localID": 56,
-              "parentID": 54,
+              "localID": 155,
+              "parentID": 153,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8708,8 +8715,8 @@
             },
             {
               "name": "Below(2)",
-              "localID": 57,
-              "parentID": 54,
+              "localID": 156,
+              "parentID": 153,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8745,8 +8752,8 @@
             },
             {
               "name": "Top",
-              "localID": 58,
-              "parentID": 54,
+              "localID": 157,
+              "parentID": 153,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8782,8 +8789,8 @@
             },
             {
               "name": "Top(1)",
-              "localID": 59,
-              "parentID": 54,
+              "localID": 158,
+              "parentID": 153,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8819,8 +8826,8 @@
             },
             {
               "name": "Top(2)",
-              "localID": 60,
-              "parentID": 54,
+              "localID": 159,
+              "parentID": 153,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8858,8 +8865,8 @@
         },
         {
           "name": "Frontlayer_BackGround2_R",
-          "localID": 61,
-          "parentID": 51,
+          "localID": 160,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8895,8 +8902,8 @@
         },
         {
           "name": "Frontlayer_BackGround2_L",
-          "localID": 62,
-          "parentID": 51,
+          "localID": 161,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8932,8 +8939,8 @@
         },
         {
           "name": "MIdlayer_BackGround2_L",
-          "localID": 63,
-          "parentID": 51,
+          "localID": 162,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8969,8 +8976,8 @@
         },
         {
           "name": "MIdlayer_BackGround2_R",
-          "localID": 64,
-          "parentID": 51,
+          "localID": 163,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -9006,8 +9013,8 @@
         },
         {
           "name": "Frontlayer_BackGround2",
-          "localID": 98,
-          "parentID": 51,
+          "localID": 164,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -9043,8 +9050,8 @@
         },
         {
           "name": "MIdlayer_BackGround2",
-          "localID": 99,
-          "parentID": 51,
+          "localID": 165,
+          "parentID": 150,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -9079,6 +9086,1788 @@
           "children": []
         }
       ]
+    },
+    {
+      "name": "Media_Player",
+      "localID": 166,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          960.0,
+          150.0
+        ],
+        "scale": [
+          9.560799598693848,
+          9.560799598693848
+        ],
+        "rotation": 0.0
+      },
+      "children": [
+        {
+          "name": "Replay_box",
+          "localID": 167,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              960.0,
+              150.0
+            ],
+            "scale": [
+              800.0,
+              233.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_box.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 49,
+            "screenSpace": true,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              800.0,
+              233.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Replay_forward",
+          "localID": 168,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              1016.0,
+              148.0
+            ],
+            "scale": [
+              32.0,
+              32.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_forward.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 50,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              32.0,
+              32.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Replay_playing",
+          "localID": 169,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              947.0,
+              148.0
+            ],
+            "scale": [
+              63.0,
+              63.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_playing.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 50,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              63.0,
+              63.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Replay_bar_brown",
+          "localID": 170,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              960.0,
+              219.0
+            ],
+            "scale": [
+              637.0,
+              17.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_bar_brown.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 50,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              637.0,
+              17.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Replay_backward",
+          "localID": 171,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              885.0,
+              148.0
+            ],
+            "scale": [
+              32.0,
+              32.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_backward.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 50,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              32.0,
+              32.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "ReplayVideo",
+          "localID": 172,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              1249.0,
+              148.0
+            ],
+            "scale": [
+              100.0,
+              90.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/ReplayVideo.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 50,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              100.0,
+              90.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Replay_slider",
+          "localID": 173,
+          "parentID": 166,
+          "active": false,
+          "TransformComponent": {
+            "enabled": false,
+            "pos": [
+              642.0,
+              219.0
+            ],
+            "scale": [
+              12.75,
+              19.12
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": false,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Icons/Replay_slider.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 51,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": false,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              4.0,
+              6.0
+            ]
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "PauseOverlay",
+      "localID": 174,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          10000.0,
+          10000.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          0.30000001192092896
+        ],
+        "layer": 100,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseBoard",
+      "localID": 175,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3840.0,
+          2160.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseResumeButton",
+      "localID": 176,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          1300.0,
+          -550.0
+        ],
+        "scale": [
+          400.0,
+          350.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseRestartButton",
+      "localID": 177,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          -160.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 76,
+        "text": "Restart",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSettingsButton",
+      "localID": 178,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          80.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 76,
+        "text": "Settings",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseMainMenuButton",
+      "localID": 179,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          -400.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 76,
+        "text": "Main Menu",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseHowToPlayButton",
+      "localID": 180,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          -640.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 76,
+        "text": "How To Play",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhostButton",
+      "localID": 181,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          1300.0,
+          -200.0
+        ],
+        "scale": [
+          520.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 76,
+        "text": "Ghost",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseScreen_Settings",
+      "localID": 182,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3840.0,
+          2160.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseMasterText",
+      "localID": 183,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          -700.0,
+          100.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "layer": 603,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 96,
+        "text": "Master",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseMusicText",
+      "localID": 184,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          -680.0,
+          -150.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "layer": 603,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 96,
+        "text": "Music",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSFXText",
+      "localID": 185,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          -640.0,
+          -400.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          0.5,
+          0.5,
+          1.0
+        ],
+        "layer": 603,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 96,
+        "text": "SFX",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Bar_Master",
+      "localID": 186,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          100.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Bar_Back_Master",
+      "localID": 187,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          100.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Knob_Master",
+      "localID": 188,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          100.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 603,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Bar_Music",
+      "localID": 189,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          -150.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Bar_Back_Music",
+      "localID": 190,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          -150.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Knob_Music",
+      "localID": 191,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          -150.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 603,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Bar_SFX",
+      "localID": 192,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          -400.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Bar_Back_SFX",
+      "localID": 193,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          -400.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSlider_Knob_SFX",
+      "localID": 194,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          400.0,
+          -400.0
+        ],
+        "scale": [
+          1340.0,
+          220.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 603,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseMasterMuteButton",
+      "localID": 195,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          -400.0,
+          101.0
+        ],
+        "scale": [
+          250.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseMusicMuteButton",
+      "localID": 196,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          -400.0,
+          -149.0
+        ],
+        "scale": [
+          250.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseSFXMuteButton",
+      "localID": 197,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          -400.0,
+          -399.0
+        ],
+        "scale": [
+          250.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseBackButton",
+      "localID": 198,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          1300.0,
+          -500.0
+        ],
+        "scale": [
+          400.0,
+          360.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseScreen_HowToPlay",
+      "localID": 199,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3840.0,
+          2160.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "HowToPlayBackButton",
+      "localID": 200,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          1250.0,
+          -470.0
+        ],
+        "scale": [
+          400.0,
+          360.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhostBoard",
+      "localID": 201,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3840.0,
+          2160.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 601,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhostTitle",
+      "localID": 202,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          500.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 84,
+        "text": "GHOST",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhost_Toggle",
+      "localID": 203,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          200.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 76,
+        "text": "Ghost: OFF",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhost_Slot0",
+      "localID": 204,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          -60.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 60,
+        "text": "jonfam  [Level_1]",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhost_Slot1",
+      "localID": 205,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          -300.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 60,
+        "text": "Ashfer  [M4_LEVEL_FIXED]",
+        "color": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhost_Slot2",
+      "localID": 206,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          0.0,
+          -540.0
+        ],
+        "scale": [
+          840.0,
+          200.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          0.550000011920929,
+          0.550000011920929,
+          0.550000011920929,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TextComponent": {
+        "enabled": false,
+        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+        "fontSize": 60,
+        "text": "(empty)",
+        "color": [
+          0.30000001192092896,
+          0.30000001192092896,
+          0.30000001192092896,
+          1.0
+        ],
+        "scale": 1.0,
+        "screenSpace": false
+      },
+      "children": []
+    },
+    {
+      "name": "PauseGhost_Back",
+      "localID": 207,
+      "parentID": 4294967295,
+      "active": false,
+      "TransformComponent": {
+        "enabled": false,
+        "pos": [
+          1300.0,
+          -500.0
+        ],
+        "scale": [
+          400.0,
+          360.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": false,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 602,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
     }
   ],
   "AudioManager": {
