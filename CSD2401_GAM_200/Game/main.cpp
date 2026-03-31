@@ -129,8 +129,10 @@ int main()
             int  GetTotalShells()   const override { return pickupSystem.GetTotalShells(); }
             void ReinitPickups()        override { pickupSystem = PickupSystem(); }
 
-            float GetLevelTimerLength() const override { return gameTimer ? gameTimer->GetLevelTimerLength() : 60.0f; }
-            void  SetLevelTimerLength(float length) override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
+            float GetRemainingTime()              const override { return gameTimer ? gameTimer->GetRemainingTime()       : 0.0f; }
+            float GetLevelTimerLength()           const override { return gameTimer ? gameTimer->GetLevelTimerLength()   : 60.0f; }
+            void  SetLevelTimerLength(float length)    override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
+            void  AddTime(float amount)                override { if (gameTimer) gameTimer->AddTime(amount); }
         };
 
         static GameApp gameApp;
@@ -238,7 +240,7 @@ int main()
         }
 
         GameObject* Platform = GameObjectFactory::Instance().CreateShape(
-            "Platform",                  // <--- NAME MUST MATCH C#
+            "Ground",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             0.0f, -200.0f,                      // Center of screen
             100000.0f, 200.0f,                  // Size
@@ -283,7 +285,7 @@ int main()
 
 
         GameObject* Wall2 = GameObjectFactory::Instance().CreateShape(
-            "Platform",                  // <--- NAME MUST MATCH C#
+            "NPC_Lobster",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             200.0f, 0.0f,                      // Center of screen
             100.0f, 1000.0f,                  // Size
@@ -303,6 +305,24 @@ int main()
                 colComp->SetLayer(CollisionLayer::Ground);
             }
         }
+
+        GameObject* Wall3 = GameObjectFactory::Instance().CreateShape(
+            "NPC_Lobster(1)",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            200.0f, 0.0f,                      // Center of screen
+            100.0f, 1000.0f,                  // Size
+            false,
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
+
+        GameObject* Wall4 = GameObjectFactory::Instance().CreateShape(
+            "NPC_Lobster(2)",                  // <--- NAME MUST MATCH C#
+            RenderComponent::ShapeType::Square,
+            200.0f, 0.0f,                      // Center of screen
+            100.0f, 1000.0f,                  // Size
+            false,
+            vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
+        );
 
 #endif
         // Initialise Game State Manager (Level1)

@@ -346,16 +346,22 @@ void LevelEditor::EnterPlayMode()
             // Game scene - play game BGM
             std::cout << "[LevelEditor] Playing game BGM\n";
             audioManager->PlaySound("bgm", "bgm_channel");
-            audioManager->FadeInCategory("music", 10.0f);
-            std::cout << "[LevelEditor] Started music fade in over 10 seconds\n";
+
+            // Fade in to user's saved volume setting (base * master)
+            float targetVol = audioManager->GetBaseCategoryVolume("music") * audioManager->GetMasterVolume();
+            audioManager->FadeInCategory("music", 10.0f, targetVol);
+            std::cout << "[LevelEditor] Started music fade in over 10 seconds to volume " << targetVol << "\n";
         }
         else if (sounds.find("MainMenuBGM") != sounds.end())
         {
             // Main menu scene - play menu BGM with fade in
             std::cout << "[LevelEditor] Playing main menu BGM\n";
             audioManager->PlaySound("MainMenuBGM", "bgm_channel");
-            audioManager->FadeInCategory("music", 3.0f, 0.8f);  // Fade in menu music to 80% over 3 seconds
-            std::cout << "[LevelEditor] Started menu music fade in over 3 seconds\n";
+
+            // Fade in to user's saved volume setting (base * master)
+            float targetVol = audioManager->GetBaseCategoryVolume("music") * audioManager->GetMasterVolume();
+            audioManager->FadeInCategory("music", 3.0f, targetVol);
+            std::cout << "[LevelEditor] Started menu music fade in over 3 seconds to volume " << targetVol << "\n";
         }
         else
         {

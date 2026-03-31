@@ -18,6 +18,9 @@ Technology is prohibited.
 //#include <Windows.h> // Just a helper for now
 #include "Utils.h"
 
+std::string shellTextureCollected{ "../Assets/Sprites/Icons/Shell_icon.png" }, shellTextureNotCollected{ "../Assets/Sprites/Icons/Shell_icon_dark.png" };
+int cachedCoins{ -1 }, cachedShells{ -1 };
+
 void Level1::Load() {
 	std::cout << "[LEVEL 1] Load Assets\n";
     
@@ -42,6 +45,18 @@ void Level1::Update(float dt) {
     int currCoins = CORE->GetGameCallbacks()->GetCurrentCoins();
     int currShells = CORE->GetGameCallbacks()->GetCurrentShells();
 
+    // optimisation so dont have to constantly keep updating textures and text
+    // skips all of update so anything important in this script put above here!
+    if (cachedCoins == currCoins && cachedShells == currShells)
+    {
+        return;
+    }
+    else
+    {
+        cachedShells = currShells;
+        cachedCoins = currCoins;
+    }
+
     GameObject* coinText = factory.FindGameObject("CoinCountText");
     GameObject* shellIcon1 = factory.FindGameObject("ShellIcon1");
     GameObject* shellIcon2 = factory.FindGameObject("ShellIcon2");
@@ -53,7 +68,7 @@ void Level1::Update(float dt) {
         {
             //int currCoins = pickupSys1.GetCurrentCoins();
 
-            coinText->GetComponent<TextComponent>()->SetText(std::to_string(currCoins));
+            coinText->GetComponent<TextComponent>()->SetText(std::to_string(currCoins * 10));
         }
     }
 
@@ -61,9 +76,12 @@ void Level1::Update(float dt) {
     {
         if (shellIcon1->IsActive() && shellIcon1->GetComponent<RenderComponent>())          // only checking for optimisation but please make sure yall do the same for the other 2
         {
-            shellIcon1->GetComponent<RenderComponent>()->setAlpha(currShells >= 1 ? 1.0f : 0.3f);
-            shellIcon2->GetComponent<RenderComponent>()->setAlpha(currShells >= 2 ? 1.0f : 0.3f);
-            shellIcon3->GetComponent<RenderComponent>()->setAlpha(currShells >= 3 ? 1.0f : 0.3f);
+            shellIcon1->GetComponent<RenderComponent>()->SetTextureID(GraphicsSystem::LoadTexture(
+                (currShells >= 1) ? shellTextureCollected.c_str() : shellTextureNotCollected.c_str()));
+            shellIcon2->GetComponent<RenderComponent>()->SetTextureID(GraphicsSystem::LoadTexture(
+                (currShells >= 2) ? shellTextureCollected.c_str() : shellTextureNotCollected.c_str()));
+            shellIcon3->GetComponent<RenderComponent>()->SetTextureID(GraphicsSystem::LoadTexture(
+                (currShells >= 3) ? shellTextureCollected.c_str() : shellTextureNotCollected.c_str()));
         }
     }
 

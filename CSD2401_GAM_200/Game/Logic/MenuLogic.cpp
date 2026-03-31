@@ -76,8 +76,11 @@ void MenuLogicSystem::Update(float dt)
                     // std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
                     audioManager->StopSound("bgm_channel");
                     audioManager->PlaySound("MainMenuBGM", "bgm_channel");
-                    audioManager->FadeInCategory("music", 3.0f, 0.5f); // fade to 50% volume instead of 100% cause too loud
-                    // std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in" << std::endl;
+
+                    // fade in to user's saved volume setting
+                    float targetVol = audioManager->GetBaseCategoryVolume("music") * audioManager->GetMasterVolume();
+                    audioManager->FadeInCategory("music", 3.0f, targetVol);
+                    //std::cout << "[MenuLogic] Main menu BGM restarted with 3 second fade in to volume " << targetVol << std::endl;
                 }
                 else
                 {
@@ -243,6 +246,17 @@ void MenuLogicSystem::Update(float dt)
             {
                 settingsScreen->SetActive(true);
                 justEnteredSettings = true;
+
+                // load current volumes from Audio Manager
+                audioManager = CORE->GetAudioManager();
+                if (audioManager)
+                {
+                    savedMasterVolume = audioManager->GetMasterVolume();
+                    savedMusicVolume = audioManager->GetBaseCategoryVolume("music");
+                    savedSfxVolume = audioManager->GetBaseCategoryVolume("sfx");
+                    std::cout << "[MenuLogic] Entering Settings - Loaded volumes: Master=" << savedMasterVolume
+                              << ", Music=" << savedMusicVolume << ", SFX=" << savedSfxVolume << std::endl;
+                }
 
                 // load saved volumes into slider states
                 // std::cout << "[MenuLogic Enter Settings] Loading saved volumes - Master: " << savedMasterVolume
@@ -766,7 +780,9 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
     if (buttonName == "MasterMuteButton")
     {
         if (audioManager)
+        {
             audioManager->ToggleMasterMute();
+        }
 
         SetButtonTexture("MasterMuteButton", true, false);
         return true;
@@ -775,7 +791,9 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
     if (buttonName == "MusicMuteButton")
     {
         if (audioManager)
+        {
             audioManager->ToggleCategoryMute("music");
+        }
 
         SetButtonTexture("MusicMuteButton", true, false);
         return true;
@@ -784,7 +802,9 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
     if (buttonName == "SFXMuteButton")
     {
         if (audioManager)
+        {
             audioManager->ToggleCategoryMute("sfx");
+        }
 
         SetButtonTexture("SFXMuteButton", true, false);
         return true;
@@ -1562,6 +1582,7 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                         if (currentSliderCategory == "master")
                         {
                             savedMasterVolume = volumePercent;
+                            audioManager->SetMasterVolume(savedMasterVolume);
 
                             // apply master as a multiplier to individual category volumes
                             float finalMusicVol = savedMusicVolume * savedMasterVolume;
@@ -1570,10 +1591,9 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                             audioManager->SetCategoryVolume("music", finalMusicVol);
                             audioManager->SetCategoryVolume("sfx", finalSfxVol);
 
-                            // std::cout << "[MenuLogic] Final volumes - Music: " << finalMusicVol
-                            //           << " (base: " << savedMusicVolume << " * master: " << savedMasterVolume << ")"
-                            //           << ", SFX: " << finalSfxVol
-                            //           << " (base: " << savedSfxVolume << " * master: " << savedMasterVolume << ")" << std::endl;
+                            std::cout << "[MenuLogic] Master changed to " << savedMasterVolume << " - Music: " << finalMusicVol
+                                      << " (base: " << savedMusicVolume << "), SFX: " << finalSfxVol
+                                      << " (base: " << savedSfxVolume << ")" << std::endl;
                         }
                         else
                         {
@@ -1581,18 +1601,20 @@ void MenuLogicSystem::HandleSliderInput(double mouseX, double mouseY, bool isMou
                             if (currentSliderCategory == "music")
                             {
                                 savedMusicVolume = volumePercent;
+                                audioManager->SetBaseCategoryVolume("music", volumePercent);
                             }
                             else if (currentSliderCategory == "sfx")
                             {
                                 savedSfxVolume = volumePercent;
+                                audioManager->SetBaseCategoryVolume("sfx", volumePercent);
                             }
 
                             // apply master multiplier to get final volume
                             float finalVolume = volumePercent * savedMasterVolume;
                             audioManager->SetCategoryVolume(category, finalVolume);
 
-                            // std::cout << "[MenuLogic] Final " << category << " volume: " << finalVolume
-                            //           << " (base: " << volumePercent << " * master: " << savedMasterVolume << ")" << std::endl;
+                            //std::cout << "[MenuLogic] " << category << " changed: base=" << volumePercent
+                            //         << ", master=" << savedMasterVolume << ", final=" << finalVolume << std::endl;
                         }
                     }
                 }

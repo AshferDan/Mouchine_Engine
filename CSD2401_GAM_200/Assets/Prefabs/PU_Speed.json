@@ -1,0 +1,69 @@
+{
+    "GameObjects": [
+        {
+            "name": "PU_Speed",
+            "localID": 8,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    197.0,
+                    -20.0
+                ],
+                "scale": [
+                    200.0,
+                    200.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/speed_spritesheet.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Pickup_Speed",
+                "animations": [
+                    {
+                        "name": "Pickup_Speed",
+                        "filepath": "../Assets/Sprites/Sheets/speed_spritesheet.png",
+                        "rows": 3,
+                        "cols": 8,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 2,
+                        "endCol": 7,
+                        "fps": 12.0,
+                        "pingPong": true,
+                        "flipRows": true
+                    }
+                ]
+            },
+            "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Pickup",
+                "size": [
+                    125.0,
+                    125.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}
