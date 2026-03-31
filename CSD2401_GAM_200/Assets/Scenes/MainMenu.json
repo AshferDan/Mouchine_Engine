@@ -3653,7 +3653,7 @@
       "RenderComponent": {
         "enabled": true,
         "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/AreYouSure_Menu.png",
+        "texturePath": "../Assets/Sprites/Extras_Menu.png",
         "color": [
           1.0,
           1.0,
@@ -3677,12 +3677,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1.6660308837890625,
-              -10.0
+              0,
+              -120.0
             ],
             "scale": [
-              180.0,
-              51.0
+              520.0,
+              100.0
             ],
             "rotation": 0.0
           },
@@ -3713,8 +3713,8 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  -1.6660385131835938,
-                  -10.000007629394531
+                  0,
+                  -110
                 ],
                 "scale": [
                   1.0,
@@ -3743,7 +3743,7 @@
               "TextComponent": {
                 "enabled": true,
                 "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-                "fontSize": 28,
+                "fontSize": 42,
                 "text": "Credits",
                 "color": [
                   0.0,
@@ -3766,12 +3766,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1.6660308837890625,
-              38.33330535888672
+              0,
+              7
             ],
             "scale": [
-              180.0,
-              51.0
+              520.0,
+              100.0
             ],
             "rotation": 0.0
           },
@@ -3802,8 +3802,8 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  -1.6660385131835938,
-                  34.99998474121094
+                  0,
+                  7
                 ],
                 "scale": [
                   1.0,
@@ -3832,7 +3832,7 @@
               "TextComponent": {
                 "enabled": true,
                 "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-                "fontSize": 28,
+                "fontSize": 32,
                 "text": "LeaderBoard",
                 "color": [
                   0.0,
@@ -3855,12 +3855,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1.6660308837890625,
-              84.99995422363281
+              0,
+              130
             ],
             "scale": [
-              180.0,
-              51.0
+              520.0,
+              100
             ],
             "rotation": 0.0
           },
@@ -3891,8 +3891,8 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  0.0581207275390625,
-                  83.16098022460938
+                  0,
+                  130
                 ],
                 "scale": [
                   1.0,
@@ -3921,7 +3921,7 @@
               "TextComponent": {
                 "enabled": true,
                 "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-                "fontSize": 28,
+                "fontSize": 32,
                 "text": "How To Play",
                 "color": [
                   0.0,
