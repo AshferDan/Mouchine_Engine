@@ -791,6 +791,15 @@ static int Internal_CountAllGameObjects()
     return GameObjectFactory::Instance().CountAllGameObjects();
 }
 
+static MonoArray* Internal_GetAllGameObjectIDs()
+{
+    std::vector<EntityID> ids = GameObjectFactory::Instance().GetAllGameObjectIDs();
+    MonoArray* arr = mono_array_new(mono_domain_get(), mono_get_int32_class(), ids.size());
+    for (size_t i = 0; i < ids.size(); ++i)
+        mono_array_set(arr, int, i, static_cast<int>(ids[i]));
+    return arr;
+}
+
 static float Internal_GetRemainingTime()
 {
     return API::GetRemainingTime();
@@ -1666,6 +1675,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameTimer::GetLevelLength",      (void *)Internal_GetLevelLength);
     mono_add_internal_call("CSharpScript.GameTimer::SetLevelTimerLength", (void *)Internal_SetLevelTimerLength);
     mono_add_internal_call("CSharpScript.GameTimer::AddTime",             (void *)Internal_AddTime);
+    mono_add_internal_call("CSharpScript.GameObject::CountAll",             (void *)Internal_CountAllGameObjects);
+    mono_add_internal_call("CSharpScript.GameObject::GetAllIDs",            (void *)Internal_GetAllGameObjectIDs);
 
     // === Transform ===
     mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);

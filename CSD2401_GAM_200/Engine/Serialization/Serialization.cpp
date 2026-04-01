@@ -17,6 +17,7 @@ Technology is prohibited.
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include <filesystem>
 
 using namespace Serialization;
@@ -335,16 +336,20 @@ void Serialization::SaveScene(const std::string &scenePath)
 	// Get all GameObjects currently managed by factory
 	const auto &objects = GameObjectFactory::Instance().GetAllGameObjects();
 
+	// Collect root objects then sort by ID so the saved JSON order is stable
+	// regardless of swap-and-pop reordering inside the factory vector.
+	std::vector<GameObject*> rootObjects;
 	for (const auto &obj : objects)
 	{
-		if (obj)
-		{
-			if (obj->GetParent() == nullptr)  // Only save top-level objects (children are saved recursively)
-			{
-				// Serialize and add to JSON array (saves both active and inactive objects)
-				j["GameObjects"].push_back(Serialization::SerializeGameObject(obj.get()));
-			}
-		}
+		if (obj && obj->GetParent() == nullptr)
+			rootObjects.push_back(obj.get());
+	}
+	std::sort(rootObjects.begin(), rootObjects.end(),
+		[](const GameObject* a, const GameObject* b) { return a->GetID() < b->GetID(); });
+
+	for (auto* obj : rootObjects)
+	{
+		j["GameObjects"].push_back(Serialization::SerializeGameObject(obj));
 	}
 
 	// serialise audio manager

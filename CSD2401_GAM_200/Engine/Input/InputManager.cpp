@@ -441,7 +441,8 @@ void InputManager::Update(float)
         bool loseScreenActive = gameCb && gameCb->IsLoseScreenActive();
 
         // In play mode: ESC exits replay mode if active, otherwise toggles pause menu
-        bool textInputActive = CORE && CORE->GetTextInputSystem() && CORE->GetTextInputSystem()->IsActive();
+        auto* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+        bool textInputActive = textInput && (textInput->IsActive() || textInput->ConsumedEscapeThisFrame());
 
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         {
