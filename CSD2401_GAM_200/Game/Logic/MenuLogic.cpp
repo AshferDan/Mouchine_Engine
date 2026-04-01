@@ -494,6 +494,194 @@ void MenuLogicSystem::Update(float dt)
     }
 
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
+
+    // Keyboard selection: UP/DOWN to navigate buttons, SPACE to confirm
+    bool spacePressed = false;
+    {
+        static MenuScreens kbPrevScreen = MenuScreens::Home;
+        static int  kbIdx    = 0;
+        static bool kbActive = false;
+
+        // Reset when the screen changes
+        if (currScreen != kbPrevScreen) { kbIdx = 0; kbActive = false; kbPrevScreen = currScreen; }
+
+        // Deactivate nav when not on the main menu (prevents stale selection from
+        // firing SPACE-confirm while the player is inside a level)
+        {
+            IGameCallbacksSystem* gameCb = CORE ? CORE->GetGameCallbacks() : nullptr;
+            if (!gameCb || !gameCb->IsOnMainMenu()) { kbActive = false; }
+        }
+
+        static const char* homeButtons[]        = { "PlayButton", "SettingsButton", "ExtraButton", "QuitButton" };
+        static const char* quitButtons[]        = { "YesButton", "NoButton" };
+        static const char* settingsButtons[]    = { "MasterMuteButton", "MusicMuteButton", "SFXMuteButton", "BackButton" };
+        static const char* levelSelectButtons[] = { "Level1Button", "Level2Button", "Level3Button", "LevelSelectedButton", "Level_BackButton" };
+        static const char* extraButtons[]       = { "HowToPlay_Button", "Leaderboard_Button", "Credit_Button", "BackButton_Extra" };
+        static const char* htpButtons[]         = { "BackButton_HTP" };
+        static const char* leaderboardButtons[] = { "Leaderboards_tab_1st", "Leaderboards_tab_2nd", "Leaderboards_tab_3rd", "ReplayButton", "Vs_Ghost_Button", "BackButton" };
+
+        const char** kbButtons = nullptr;
+        int kbCount = 0;
+        switch (currScreen)
+        {
+        case MenuScreens::Home:        kbButtons = homeButtons;        kbCount = 4; break;
+        case MenuScreens::QUIT:        kbButtons = quitButtons;        kbCount = 2; break;
+        case MenuScreens::Settings:    kbButtons = settingsButtons;    kbCount = 4; break;
+        case MenuScreens::LevelSelect: kbButtons = levelSelectButtons; kbCount = 5; break;
+        case MenuScreens::Extra:       kbButtons = extraButtons;       kbCount = 4; break;
+        case MenuScreens::HTP:         kbButtons = htpButtons;         kbCount = 1; break;
+        case MenuScreens::Leaderboard: kbButtons = leaderboardButtons; kbCount = 6; break;
+        default: break;
+        }
+
+        if (kbCount > 0)
+        {
+            InputManager* inp = CORE->GetInputManager();
+            if (inp)
+            {
+                if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kbIdx = (kbIdx + 1) % kbCount;              kbActive = true; }
+                if (inp->IsKeyPressed(GLFW_KEY_UP))   { kbIdx = ((kbIdx - 1) + kbCount) % kbCount;  kbActive = true; }
+                // D-pad maps to the same navigation as arrow keys
+                if (inp->IsGamepadConnected())
+                {
+                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kbIdx = (kbIdx + 1) % kbCount;              kbActive = true; }
+                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kbIdx = ((kbIdx - 1) + kbCount) % kbCount;  kbActive = true; }
+                }
+                if (isClicked && !currentHover.empty()) kbActive = false;
+                // Deselect keyboard nav when mouse interacts with a slider
+                if (isMouseDown && isDraggingSlider) kbActive = false;
+                if (kbActive) currentHover = kbButtons[kbIdx];
+                spacePressed = kbActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                    (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+
+                // adjust slider when on Settings screen and a row is selected
+                static float kMenuSliderRepeatTimer = 0.0f;
+                if (currScreen == MenuScreens::Settings && kbActive && kbIdx <= 2) // 0=Master,1=Music,2=SFX
+                {
+                    const float kRepeatDelay = 0.3f;
+                    const float kRepeatRate  = 0.08f;
+
+                    bool leftHeld  = inp->IsKeyHeld(GLFW_KEY_LEFT)  || inp->IsKeyPressed(GLFW_KEY_LEFT)
+                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonHeld(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+                    bool rightHeld = inp->IsKeyHeld(GLFW_KEY_RIGHT) || inp->IsKeyPressed(GLFW_KEY_RIGHT)
+                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonHeld(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+                    bool leftJust  = inp->IsKeyPressed(GLFW_KEY_LEFT)
+                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+                    bool rightJust = inp->IsKeyPressed(GLFW_KEY_RIGHT)
+                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+
+                    bool shouldStep = false;
+                    if (leftJust || rightJust)
+                    {
+                        shouldStep = true;
+                        kMenuSliderRepeatTimer = 0.0f;
+                    }
+                    else if (leftHeld || rightHeld)
+                    {
+                        kMenuSliderRepeatTimer += dt;
+                        if (kMenuSliderRepeatTimer >= kRepeatDelay)
+                        {
+                            float excess     = kMenuSliderRepeatTimer - kRepeatDelay;
+                            float prevExcess = excess - dt;
+                            if (prevExcess < 0.0f || static_cast<int>(excess / kRepeatRate) > static_cast<int>(prevExcess / kRepeatRate))
+                                shouldStep = true;
+                        }
+                    }
+                    else
+                    {
+                        kMenuSliderRepeatTimer = 0.0f;
+                    }
+
+                    if (shouldStep)
+                    {
+                        const float kStep = 0.05f;
+                        float delta = rightHeld ? kStep : -kStep;
+
+                        SliderState* sliderState = nullptr;
+                        std::string barName;
+                        std::string category;
+
+                        if (kbIdx == 0)      { sliderState = &masterSlider; barName = "Slider_Bar_Master"; category = "master"; }
+                        else if (kbIdx == 1) { sliderState = &musicSlider;  barName = "Slider_Bar_Music";  category = "music"; }
+                        else                 { sliderState = &sfxSlider;    barName = "Slider_Bar_SFX";    category = "sfx"; }
+
+                        float newVol = std::clamp(sliderState->currentVolume + delta, 0.0f, 1.0f);
+                        sliderState->currentVolume = newVol;
+                        UpdateSlider(barName, *sliderState, newVol);
+
+                        // Reposition scissors icon
+                        std::string knobName;
+                        if (kbIdx == 0)      knobName = "Slider_Knob_Master";
+                        else if (kbIdx == 1) knobName = "Slider_Knob_Music";
+                        else                 knobName = "Slider_Knob_SFX";
+
+                        GameObject* sliderBarGO = factory.FindGameObject(barName);
+                        GameObject* knob        = factory.FindGameObject(knobName);
+                        if (sliderBarGO && knob)
+                        {
+                            auto* st = sliderBarGO->GetComponent<TransformComponent>();
+                            auto* kt = knob->GetComponent<TransformComponent>();
+                            if (st && kt)
+                            {
+                                float cx, cy, sx, sy;
+                                st->GetPosition(cx, cy);
+                                st->GetScale(sx, sy);
+                                kt->SetPosition(cx + sx * 0.5f - 285.0f, cy);
+                            }
+                        }
+
+                        // Apply to audio
+                        if (audioManager)
+                        {
+                            if (category == "master")
+                            {
+                                savedMasterVolume = newVol;
+                                audioManager->SetMasterVolume(newVol);
+                                audioManager->SetCategoryVolume("music", savedMusicVolume * newVol);
+                                audioManager->SetCategoryVolume("sfx",   savedSfxVolume   * newVol);
+                            }
+                            else if (category == "music")
+                            {
+                                savedMusicVolume = newVol;
+                                audioManager->SetBaseCategoryVolume("music", newVol);
+                                audioManager->SetCategoryVolume("music", newVol * savedMasterVolume);
+                            }
+                            else
+                            {
+                                savedSfxVolume = newVol;
+                                audioManager->SetBaseCategoryVolume("sfx", newVol);
+                                audioManager->SetCategoryVolume("sfx", newVol * savedMasterVolume);
+                            }
+                        }
+                    }
+                }
+                else if (currScreen == MenuScreens::Leaderboard)
+                {
+                    // cycle through Level 1 / 2 / 3 tabs
+                    bool leftTab  = inp->IsKeyPressed(GLFW_KEY_LEFT)  || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+                    bool rightTab = inp->IsKeyPressed(GLFW_KEY_RIGHT) || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+                    if (leftTab)
+                    {
+                        int newLevel = ((m_leaderboardLevel - 2 + 3) % 3) + 1;
+                        const char* lvlBtns[] = { "Leaderboards_Level_1", "Leaderboards_Level_2", "Leaderboards_Level_3" };
+                        HandleImmediateButtonClick(lvlBtns[newLevel - 1]);
+                    }
+                    else if (rightTab)
+                    {
+                        int newLevel = (m_leaderboardLevel % 3) + 1;
+                        const char* lvlBtns[] = { "Leaderboards_Level_1", "Leaderboards_Level_2", "Leaderboards_Level_3" };
+                        HandleImmediateButtonClick(lvlBtns[newLevel - 1]);
+                    }
+                    kMenuSliderRepeatTimer = 0.0f;
+                }
+                else
+                {
+                    kMenuSliderRepeatTimer = 0.0f;
+                }
+            }
+        }
+    }
+
     std::string currentPressed = "";
 
     // Check if mouse is being pressed on the hovered button
@@ -554,7 +742,7 @@ void MenuLogicSystem::Update(float dt)
     }
 
     // Only process clicks if we are actually hovering over a button
-    if (isClicked && !hoveredButtonName.empty())
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty())
     {
         const std::string button = hoveredButtonName;
 

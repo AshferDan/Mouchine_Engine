@@ -585,8 +585,9 @@ void GraphicsSystem::Update(float)
 
     auto* cullCam = CameraManager::Instance().GetActiveCamera();
     if (cullCam) {
-        float camX = cullCam->GetPosition().x;
-        float camY = cullCam->GetPosition().y;
+        vec2 traumaOff = cullCam->GetTraumaOffset();
+        float camX = cullCam->GetPosition().x + traumaOff.x;
+        float camY = cullCam->GetPosition().y + traumaOff.y;
         float zoom = cullCam->getZoom();
 
         float halfW = (Wwidth / 2.f) / zoom;

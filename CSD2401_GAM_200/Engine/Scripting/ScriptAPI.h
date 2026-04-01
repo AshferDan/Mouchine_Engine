@@ -599,6 +599,11 @@ namespace API {
     float GetMouseY();
     float GetMouseWorldX();
     float GetMouseWorldY();
+    bool IsGamepadButtonPressed(int button);
+    bool IsGamepadButtonReleased(int button);
+    bool IsGamepadButtonHeld(int button);
+    float GetGamepadAxis(int axis);
+    bool IsGamepadConnected();
 #pragma endregion
 
 #pragma region Particles

@@ -187,7 +187,11 @@ namespace CSharpScript
                 vec2 s = Transform.GetScale(_names[i]);
                 if (s.x != 0f || s.y != 0f)    // non-zero scale = object exists in scene
                 {
-                    _startWorldPos[i] = Transform.GetPosition(_names[i]);
+                    // Use camera start X so backgrounds are centred on the camera
+                    // regardless of where the level places the objects in world space.
+                    // Keep the scene-editor Y for intentional vertical positioning.
+                    vec2 worldPos = Transform.GetPosition(_names[i]);
+                    _startWorldPos[i] = new vec2(_startCamPos.x, worldPos.y);
                     _inited[i] = true;
                 }
             }

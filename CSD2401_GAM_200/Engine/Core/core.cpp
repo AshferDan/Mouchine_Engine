@@ -224,9 +224,31 @@ void CoreEngine::GameLoop()
                 // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
                 if (m_autoPlayAfterLoad)
                 {
-                    std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
-                    level->EnterPlayMode();
-                    std::cout << "[CoreEngine] Play mode entered\n";
+                    bool alreadyPlaying = (level->GetEditorMode() == EditorMode::Play);
+                    if (alreadyPlaying)
+                    {
+                        // Already in play mode (scene transition during gameplay).
+                        // EnterPlayMode() would return early, so fire OnAwake/OnStart
+                        // directly for every script loaded by this scene.
+                        std::cout << "[CoreEngine] Already in play mode — firing OnAwake+OnStart for newly loaded scripts\n";
+                        if (scriptSystem)
+                        {
+                            const auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
+                            for (const auto& go : gameObjects)
+                            {
+                                scriptSystem->CallOnAwake(go.get());
+                                scriptSystem->CallOnStart(go.get());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Not yet playing (initial load in release mode).
+                        // EnterPlayMode sets editorMode=Play and fires OnAwake/OnStart.
+                        std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
+                        level->EnterPlayMode();
+                        std::cout << "[CoreEngine] Play mode entered\n";
+                    }
                 }
                 else
                 {
