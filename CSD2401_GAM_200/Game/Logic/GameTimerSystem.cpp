@@ -45,8 +45,6 @@ void GameTimerSystem::Initialize()
     uvBarMin = 0.0f;
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
-
-    UpdateBar(static_cast<int>(LevelTimerLength));
 }
 
 /**
@@ -184,8 +182,10 @@ void GameTimerSystem::Update(float dt)
             originalCenterX = 0.0f;
             originalCenterY = 0.0f;
             leftEdge = 0.0f;
-
-            UpdateBar(static_cast<int>(LevelTimerLength));
+            uvBoundsReady = false;
+            uvBarMin = 0.0f;
+            uvBarMax = 1.0f;
+            uvBarWidth = 1.0f;
         }
 
         return;
@@ -254,8 +254,6 @@ void GameTimerSystem::ResetTimer()
     uvBarMin = 0.0f;
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
-
-    UpdateBar(static_cast<int>(LevelTimerLength));
 }
 
 /**
