@@ -25,6 +25,7 @@ Technology is prohibited.
 #include "TextInputSystem.h"
 #include <iostream>
 #include <cmath>
+#include <random>
 
 /**
  * @brief Initializes all win/lose state variables.
@@ -518,6 +519,15 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
             TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
             if (textInput)
             {
+                // Play a random typing sound on each keystroke
+                TextInputSystem::SetOnCharTyped([]()
+                {
+                    static std::mt19937 rng{ std::random_device{}() };
+                    static std::uniform_int_distribution<int> dist(1, 6);
+                    if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
+                        audio->PlaySound("typing_sfx_" + std::to_string(dist(rng)));
+                });
+
                 textInput->Show(
                     "Name Your Run!", 20,
                     // --- onConfirm ---

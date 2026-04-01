@@ -10369,6 +10369,54 @@
         "category": "sfx"
       },
       {
+        "name": "typing_sfx_1",
+        "filepath": "../Assets/Replay/Typing_01.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_2",
+        "filepath": "../Assets/Replay/Typing_02.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_3",
+        "filepath": "../Assets/Replay/Typing_03.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_4",
+        "filepath": "../Assets/Replay/Typing_04.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_5",
+        "filepath": "../Assets/Replay/Typing_05.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_6",
+        "filepath": "../Assets/Replay/Typing_06.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "Replay_BGM",
         "filepath": "../Assets/Replay/Replay_BGM.wav",
         "loop": true,

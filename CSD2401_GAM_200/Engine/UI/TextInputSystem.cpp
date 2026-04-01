@@ -24,10 +24,11 @@ Technology is prohibited.
 #include <iostream>
 
 // ===== Static member definitions =====
-std::string  TextInputSystem::s_buffer;
-bool         TextInputSystem::s_active     = false;
-int          TextInputSystem::s_maxLength  = 20;
-GLFWcharfun  TextInputSystem::s_prevCallback = nullptr;
+std::string           TextInputSystem::s_buffer;
+bool                  TextInputSystem::s_active      = false;
+int                   TextInputSystem::s_maxLength   = 20;
+GLFWcharfun           TextInputSystem::s_prevCallback = nullptr;
+std::function<void()> TextInputSystem::s_onCharTyped;
 
 // ===== GLFW char callback =====
 
@@ -36,7 +37,10 @@ void TextInputSystem::CharCallback(GLFWwindow*, unsigned int codepoint)
     if (!s_active) return;
     if (static_cast<int>(s_buffer.size()) >= s_maxLength) return;
     if (codepoint >= 32 && codepoint < 127)   // printable ASCII
+    {
         s_buffer += static_cast<char>(codepoint);
+        if (s_onCharTyped) s_onCharTyped();
+    }
 }
 
 // ===== ISystem =====
@@ -66,7 +70,10 @@ void TextInputSystem::Update(float dt)
     // --- Backspace: edge-detected removal of last character ---
     bool backNow = (glfwGetKey(win, GLFW_KEY_BACKSPACE) == GLFW_PRESS);
     if (backNow && !m_backspaceWasHeld && !s_buffer.empty())
+    {
         s_buffer.pop_back();
+        if (s_onCharTyped) s_onCharTyped();
+    }
     m_backspaceWasHeld = backNow;
 
     // --- Enter: confirm ---
@@ -151,7 +158,8 @@ void TextInputSystem::Hide()
     if (!m_isActive) return;
 
     // Restore previous GLFW char callback
-    s_active = false;
+    s_active      = false;
+    s_onCharTyped = nullptr;
     GLFWwindow* win = glfwGetCurrentContext();
     if (win)
         glfwSetCharCallback(win, s_prevCallback);

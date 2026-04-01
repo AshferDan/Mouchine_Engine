@@ -101,6 +101,12 @@ public:
      */
     void SetStyle(const DialogStyle& style) { m_style = style; }
 
+    /**
+     * @brief Set a callback invoked on every accepted keystroke (character or backspace).
+     *        Use this to play typing sound effects. Cleared automatically on Hide().
+     */
+    static void SetOnCharTyped(std::function<void()> cb) { s_onCharTyped = std::move(cb); }
+
     // ===== Dialog control =====
 
     /**
@@ -164,10 +170,11 @@ private:
     DialogStyle m_style;          ///< Visual style (textures + colours). Defaults to plain quads.
 
     // ===== Static GLFW char-callback state =====
-    static std::string  s_buffer;      ///< Accumulates typed characters.
-    static bool         s_active;      ///< Guards the callback against stale events.
-    static int          s_maxLength;   ///< Forwarded from Show().
-    static GLFWcharfun  s_prevCallback; ///< Saved callback to restore on Hide().
+    static std::string           s_buffer;       ///< Accumulates typed characters.
+    static bool                  s_active;       ///< Guards the callback against stale events.
+    static int                   s_maxLength;    ///< Forwarded from Show().
+    static GLFWcharfun           s_prevCallback; ///< Saved callback to restore on Hide().
+    static std::function<void()> s_onCharTyped;  ///< Optional sound hook set by game code.
 
     /** GLFW char callback — appends printable ASCII while the dialog is open. */
     static void CharCallback(GLFWwindow* window, unsigned int codepoint);
