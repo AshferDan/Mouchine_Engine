@@ -513,6 +513,15 @@ void GameObjectFactory::DestroyGameObject(EntityID id)
         goParent->RemoveChild(gameObject);
     }
 
+    // Clear parent pointers on this object's children before it is freed.
+    // Without this, children keep a dangling parent pointer and are silently
+    // skipped by SaveScene (GetParent() != nullptr but parent is destroyed),
+    // causing them to disappear from the saved scene file.
+    for (GameObject* child : gameObject->GetAllChildren())
+    {
+        if (child) child->RemoveParent();
+    }
+
     // swap and pop for factory side
     size_t index = it->second;
     if (index < gameObjects.size() - 1)
@@ -589,8 +598,24 @@ void GameObjectFactory::DestroyAllGameObjects()
 // Returns the amount of gameobject in the Instance
 int GameObjectFactory::CountAllGameObjects()
 {
-    return gameObjects.size();
+    return static_cast<int>(gameObjects.size()) - static_cast<int>(pendingDestroyIDs.size());
+}
 
+// Returns IDs of all active (non-pending-destroy) GameObjects
+std::vector<EntityID> GameObjectFactory::GetAllGameObjectIDs()
+{
+    std::vector<EntityID> ids;
+    ids.reserve(gameObjects.size());
+    for (auto const& go : gameObjects)
+    {
+        EntityID id = go->GetID();
+        bool pending = false;
+        for (EntityID pid : pendingDestroyIDs)
+            if (pid == id) { pending = true; break; }
+        if (!pending)
+            ids.push_back(id);
+    }
+    return ids;
 }
 
 void GameObjectFactory::Clear()

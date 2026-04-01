@@ -226,6 +226,14 @@ namespace CSharpScript
         public static extern void DestroyByName(string name);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int CountAll();
+
+        /// <summary>
+        /// Returns the EntityIDs of all active GameObjects (excludes objects pending destruction).
+        /// </summary>
+        /// <returns>Array of integer EntityIDs.</returns>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int[] GetAllIDs();
         public static extern int CountAllGameObjects();
     }
 
@@ -326,6 +334,29 @@ namespace CSharpScript
         {
             GetPosition_Internal(objectName, out float x, out float y);
             return new vec2(x, y);
+        }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void GetPositionByID_Internal(int id, out float x, out float y);
+
+        /// <summary>
+        /// Gets the position of a GameObject by its EntityID. Prefer over GetPosition when IDs are available (O(1) vs O(n) lookup).
+        /// Returns (0, 0) if the ID is invalid or the object no longer exists — does not throw.
+        /// </summary>
+        /// <param name="id">The EntityID of the GameObject.</param>
+        /// <returns>A vec2 containing the X and Y position, or (0, 0) on failure.</returns>
+        public static vec2 GetPositionByID(int id)
+        {
+            if (id <= 0) return new vec2(0f, 0f);
+            try
+            {
+                GetPositionByID_Internal(id, out float x, out float y);
+                return new vec2(x, y);
+            }
+            catch
+            {
+                return new vec2(0f, 0f);
+            }
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -643,21 +674,21 @@ namespace CSharpScript
 
         // ---- Field getters ----
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern float  GetFloatField (string objectName, string scriptClass, string fieldName);
+        public static extern float GetFloatField(string objectName, string scriptClass, string fieldName);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern int    GetIntField   (string objectName, string scriptClass, string fieldName);
+        public static extern int GetIntField(string objectName, string scriptClass, string fieldName);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern bool   GetBoolField  (string objectName, string scriptClass, string fieldName);
+        public static extern bool GetBoolField(string objectName, string scriptClass, string fieldName);
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern string GetStringField(string objectName, string scriptClass, string fieldName);
 
         // ---- Field setters ----
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SetFloatField (string objectName, string scriptClass, string fieldName, float  value);
+        public static extern void SetFloatField(string objectName, string scriptClass, string fieldName, float value);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SetIntField   (string objectName, string scriptClass, string fieldName, int    value);
+        public static extern void SetIntField(string objectName, string scriptClass, string fieldName, int value);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern void SetBoolField  (string objectName, string scriptClass, string fieldName, bool   value);
+        public static extern void SetBoolField(string objectName, string scriptClass, string fieldName, bool value);
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetStringField(string objectName, string scriptClass, string fieldName, string value);
     }
@@ -1470,7 +1501,7 @@ namespace CSharpScript
             return new vec2(x, y);
         }
 
-            [MethodImpl(MethodImplOptions.InternalCall)]
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool IsKeyDown(int key);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -1570,6 +1601,44 @@ namespace CSharpScript
         {
             return IsMouseButtonHeld(button);
         }
+
+        // ---- Gamepad ----
+
+        public enum GamepadButton
+        {
+            A = 0, B = 1, X = 2, Y = 3,
+            LeftBumper = 4, RightBumper = 5,
+            Back = 6, Start = 7,
+            LeftThumb = 9, RightThumb = 10,
+            DpadUp = 11, DpadRight = 12, DpadDown = 13, DpadLeft = 14
+        }
+
+        public enum GamepadAxis
+        {
+            LeftX = 0, LeftY = 1,
+            RightX = 2, RightY = 3,
+            LeftTrigger = 4, RightTrigger = 5
+        }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGamepadButtonPressed(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGamepadButtonReleased(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGamepadButtonHeld(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetGamepadAxis(int axis);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsGamepadConnected();
+
+        public static bool GetGamepadButtonPressed(GamepadButton button)  => IsGamepadButtonPressed((int)button);
+        public static bool GetGamepadButtonReleased(GamepadButton button) => IsGamepadButtonReleased((int)button);
+        public static bool GetGamepadButtonHeld(GamepadButton button)     => IsGamepadButtonHeld((int)button);
+        public static float GetAxis(GamepadAxis axis)                     => GetGamepadAxis((int)axis);
     }
 
     /// <summary>

@@ -41,7 +41,7 @@ void ComponentSerialization::SerializeTransform(json &j, const TransformComponen
         {"enabled", t->IsEnabled()},
         {"pos", {t->posX, t->posY}},
         {"scale", {t->scaleX, t->scaleY}},
-        {"rotation", t->GetRotation()}};
+        {"rotation", t->GetRotation() * (180.0f / 3.14159265358979323846f)}};
 }
 
 /**
@@ -348,7 +348,7 @@ void ComponentSerialization::DeserializeTransform(const json &j, GameObject *go)
     }
 
     tc->SetScale(t["scale"][0], t["scale"][1]);
-    tc->SetRotation(t["rotation"]);
+    tc->SetRotation(static_cast<float>(t["rotation"]) * (3.14159265358979323846f / 180.0f));
 }
 
 /**

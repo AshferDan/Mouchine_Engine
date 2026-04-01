@@ -1464,6 +1464,13 @@ void GOCreationMenu_Spawn()
  */
 void ImGuiSystem::SetSelectedGameObject(EntityID id)
 {
+    if (selectedGameObjectID != id)
+    {
+        // Cancel any active ImGui widget (e.g. a DragFloat that is mid-drag).
+        // Without this, the accumulated drag delta carries over and gets applied
+        // to the newly selected object's transform on the next frame.
+        ImGui::ClearActiveID();
+    }
     selectedGameObjectID = id;
     hierarchyScrollToSelected = true;
     CORE->GetGraphicsSystem()->ClearEditorSelection();              // need to clear after resassigning so newly selected GO can have the correct outlines drawn
@@ -2509,15 +2516,10 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 UndoTracker scaleTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
-                float rotation = transform->GetRotation();
-                if (ImGui::DragFloat("Rotation", &rotation, 0.01f))
+                float rotationDeg = transform->GetRotation() * (180.0f / pi);
+                if (ImGui::DragFloat("Rotation (deg)", &rotationDeg, 0.5f, -360.0f, 360.0f))
                 {
-                    if (rotation > 2 * pi || rotation < -2 * pi)
-                    {
-                        rotation = 0;
-                    }
-                    transform->SetRotation(rotation);
-
+                    transform->SetRotation(rotationDeg * (pi / 180.0f));
                 }
                 UndoTracker rotTracker(obj, editor, isEditingProperty, propertyBeforeJson);
 
@@ -2640,6 +2642,16 @@ void ImGuiSystem::RenderPropertyEditor()
                 }
                 UndoTracker layerTracker(obj, editor, isEditingProperty, propertyBeforeJson);
                 CreateHintText("Ascending order for topmost rendering position");
+
+                // --- Screen Space ---
+                bool rcSS = render->isScreenSpace();
+                if (ImGui::Checkbox("Screen Space##Render", &rcSS))
+                {
+                    propertyBeforeJson = Serialization::SerializeGameObject(obj);
+                    render->SetScreenSpace(rcSS);
+                    UndoTracker::RecordInstantChange(obj, editor, propertyBeforeJson);
+                }
+                CreateHintText("Screen Space: object stays fixed on screen. World Space: object follows camera.");
 
             }
         }

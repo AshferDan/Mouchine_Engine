@@ -209,6 +209,45 @@ void WinLoseLogicSystem::Update(float dt)
         return;
     }
 
+    // Cheat codes
+    if (!hasPlayerWon && !hasCreatedWinScreen && !hasCreatedLoseScreen)
+    {
+        InputManager* cheatInput = CORE->GetInputManager();
+        if (cheatInput)
+        {
+            bool ctrl = (cheatInput->IsKeyHeld(GLFW_KEY_LEFT_CONTROL) || cheatInput->IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) ||
+                        (cheatInput->IsKeyHeld(GLFW_KEY_RIGHT_CONTROL) || cheatInput->IsKeyPressed(GLFW_KEY_RIGHT_CONTROL));
+            if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_1))
+            {
+                // CTRL+1: Win current level instantly
+                TriggerWin();
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_2))
+            {
+                // CTRL+2: Trigger lose/respawn instantly
+                TriggerLose();
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_3))
+            {
+                // CTRL+3: Skip to next level
+                std::string nextScene;
+                if (currentScenePath.find("Level_1") != std::string::npos)
+                    nextScene = "../Assets/Scenes/Level_2.json";
+                else
+                    std::cout << "[Cheat] No next level to skip to.\n";
+
+                if (!nextScene.empty())
+                    CORE->RequestSceneLoad(nextScene, true);
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_4))
+            {
+                // CTRL+4: Reload current level instantly
+                if (!currentScenePath.empty())
+                    CORE->RequestSceneLoad(currentScenePath, true);
+            }
+        }
+    }
+
     if (isWaitingForWin)
     {
         winDelayTimer -= dt;
@@ -860,6 +899,29 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         currentHover = "QuitButton";
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kWinButtons[] = { "NextButton", "ReplayButton", "QuitButton" };
+    static int  kWinIdx    = 0;
+    static bool kWinActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kWinIdx = (kWinIdx + 1) % 3;           kWinActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kWinIdx = ((kWinIdx - 1) + 3) % 3;     kWinActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kWinIdx = (kWinIdx + 1) % 3;       kWinActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kWinIdx = ((kWinIdx - 1) + 3) % 3; kWinActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kWinActive = false; // mouse click takes over
+            if (kWinActive) currentHover = kWinButtons[kWinIdx];
+            spacePressed = kWinActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -880,7 +942,7 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 
@@ -1311,6 +1373,29 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         currentHover = "LoseQuitButton";
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kLoseButtons[] = { "YesButton", "LoseQuitButton" };
+    static int  kLoseIdx    = 0;
+    static bool kLoseActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kLoseIdx = (kLoseIdx + 1) % 2;         kLoseActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kLoseIdx = ((kLoseIdx - 1) + 2) % 2;   kLoseActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kLoseIdx = (kLoseIdx + 1) % 2;       kLoseActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kLoseIdx = ((kLoseIdx - 1) + 2) % 2; kLoseActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kLoseActive = false;
+            if (kLoseActive) currentHover = kLoseButtons[kLoseIdx];
+            spacePressed = kLoseActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -1331,7 +1416,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 

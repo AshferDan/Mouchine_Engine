@@ -2104,6 +2104,41 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
         return (float)InputManager::GetMouseWorldY();
     }
+
+    bool IsGamepadButtonPressed(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return input->IsGamepadButtonPressed(button);
+        return false;
+    }
+
+    bool IsGamepadButtonReleased(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return input->IsGamepadButtonReleased(button);
+        return false;
+    }
+
+    bool IsGamepadButtonHeld(int button)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return input->IsGamepadButtonHeld(button);
+        return false;
+    }
+
+    float GetGamepadAxis(int axis)
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return input->GetGamepadAxis(axis);
+        return 0.0f;
+    }
+
+    bool IsGamepadConnected()
+    {
+        InputManager* input = CORE->GetInputManager();
+        if (input) return input->IsGamepadConnected();
+        return false;
+    }
 #pragma endregion
 
 #pragma region Particles

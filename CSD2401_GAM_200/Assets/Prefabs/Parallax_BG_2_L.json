@@ -1,0 +1,116 @@
+{
+    "GameObjects": [
+        {
+            "name": "Parallax_BG_2_L",
+            "localID": 57,
+            "parentID": 51,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    -12600.0,
+                    1023.0
+                ],
+                "scale": [
+                    4200.0,
+                    1920.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": -111,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": [
+                {
+                    "name": "Frontlayer_BackGround2_L",
+                    "localID": 54,
+                    "parentID": 57,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            2040.314453125,
+                            22491.2265625
+                        ],
+                        "scale": [
+                            4200.0,
+                            1320.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -110,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "MIdlayer_BackGround2_L",
+                    "localID": 53,
+                    "parentID": 57,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            2040.314453125,
+                            22801.2265625
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -111,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

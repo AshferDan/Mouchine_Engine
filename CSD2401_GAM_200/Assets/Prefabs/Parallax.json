@@ -1,0 +1,580 @@
+{
+    "GameObjects": [
+        {
+            "name": "Parallax",
+            "localID": 51,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    50.0,
+                    50.0
+                ],
+                "rotation": 0.0
+            },
+            "children": [
+                {
+                    "name": "Parallax_BG_2_R",
+                    "localID": 56,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -4208.82275390625,
+                            1023.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -110,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Parallax_BG_2_L",
+                    "localID": 57,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -12600.0,
+                            1023.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -111,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Parallax_BG_2",
+                    "localID": 58,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -8409.994140625,
+                            1023.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -110,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": [
+                        {
+                            "name": "Below",
+                            "localID": 59,
+                            "parentID": 58,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    -8409.994140625,
+                                    -890.0
+                                ],
+                                "scale": [
+                                    4200.0,
+                                    1920.0
+                                ],
+                                "rotation": 0.0
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": -109,
+                                "screenSpace": false,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "Below(1)",
+                            "localID": 60,
+                            "parentID": 58,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    -12609.994140625,
+                                    -890.00048828125
+                                ],
+                                "scale": [
+                                    4200.0,
+                                    1920.0
+                                ],
+                                "rotation": 0.0
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": -109,
+                                "screenSpace": false,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "Below(2)",
+                            "localID": 61,
+                            "parentID": 58,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    -4209.994140625,
+                                    -890.0
+                                ],
+                                "scale": [
+                                    4200.0,
+                                    1920.0
+                                ],
+                                "rotation": 0.0
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": -109,
+                                "screenSpace": false,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "Top",
+                            "localID": 62,
+                            "parentID": 58,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    -8409.994140625,
+                                    2910.0
+                                ],
+                                "scale": [
+                                    4200.0,
+                                    1920.0003662109375
+                                ],
+                                "rotation": 3.1410000324249268
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": -111,
+                                "screenSpace": false,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "Top(1)",
+                            "localID": 63,
+                            "parentID": 58,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    -4215.3798828125,
+                                    2900.0
+                                ],
+                                "scale": [
+                                    4200.0,
+                                    1919.9998779296875
+                                ],
+                                "rotation": 3.1410000324249268
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": -111,
+                                "screenSpace": false,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        },
+                        {
+                            "name": "Top(2)",
+                            "localID": 168,
+                            "parentID": 58,
+                            "active": true,
+                            "TransformComponent": {
+                                "enabled": true,
+                                "pos": [
+                                    -12609.994140625,
+                                    2920.000244140625
+                                ],
+                                "scale": [
+                                    4200.0,
+                                    1920.0018310546875
+                                ],
+                                "rotation": 3.1409852504730225
+                            },
+                            "RenderComponent": {
+                                "enabled": true,
+                                "shapeType": "Square",
+                                "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                                "color": [
+                                    1.0,
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ],
+                                "layer": -111,
+                                "screenSpace": false,
+                                "tileable": false,
+                                "tileCount": [
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Frontlayer_BackGround2_R",
+                    "localID": 167,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -4208.82275390625,
+                            730.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1320.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -109,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Frontlayer_BackGround2_L",
+                    "localID": 54,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -12609.9990234375,
+                            730.0001220703125
+                        ],
+                        "scale": [
+                            4200.0,
+                            1320.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -110,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "MIdlayer_BackGround2_L",
+                    "localID": 53,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -12609.9990234375,
+                            1020.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -111,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "MIdlayer_BackGround2_R",
+                    "localID": 64,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -4208.82275390625,
+                            1023.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -111,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Frontlayer_BackGround2",
+                    "localID": 55,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -8409.994140625,
+                            730.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1320.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -109,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "MIdlayer_BackGround2",
+                    "localID": 52,
+                    "parentID": 51,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -8409.994140625,
+                            1023.0
+                        ],
+                        "scale": [
+                            4200.0,
+                            1920.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": -111,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

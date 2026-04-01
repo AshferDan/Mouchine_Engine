@@ -107,9 +107,13 @@ void CutsceneSystem::Update(float dt) {
 		if (m_timeAccumulator > frameTime) m_timeAccumulator = frameTime * 0.5;
 	}
 
+	m_skipTimer += dt;
+
 	if (m_hasFrame) { // only render if decoded
 		RenderVideo();
-		m_canSkip = true;
+		// Require at least 0.5s of playback before allowing skip
+		if (m_skipTimer >= 0.5f)
+			m_canSkip = true;
 	}
 
 	// Check if Skip (Spacebar) or Left click - only after skip block timer expires
@@ -131,6 +135,8 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 	m_currentVideoPath = videoPath; // Store the name
 	m_isPlaying = true;
 	m_hasFrame = false;
+	m_canSkip = false;
+	m_skipTimer = 0.0f;
 	m_timeAccumulator = 0.0;
 
 	plm_set_audio_enabled(m_plm, 1); // Disable internal audio decoding (using AudioManager instead)
