@@ -2766,52 +2766,53 @@ void PauseMenuLogicSystem::SetGhostMenuVisible(bool show)
 }
 
 void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
-    if (!msg.hasFocus) return;
-
-    // In replay mode the MediaPlayerLogicSystem owns the UI.
-    // The game is already paused from focus-lost — leave it paused but
-    // don't open the pause menu on top of the media player.
-    //GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-    //if (ghost && ghost->IsReplayMode())
-    //    return;
-
     bool isMenuScene = currentScenePath.empty() ||
         currentScenePath.find("MainMenu") != std::string::npos;
 
+    // FOCUS LOST (Alt-Tab Out) --------------------------------------------------------
+    if (!msg.hasFocus) {
+        if (isMenuScene) {
+            // Main menu: game is paused by CoreEngine, but don't show pause menu UI
+            return;
+        }
+
+        // In-game: show pause menu when alt-tabbing out
+        isPauseMenuActive = true;
+
+        if (!hasCreatedUI)
+            CreatePauseMenuUI();
+
+        if (!isPauseSettingsOpen && !isGhostMenuOpen && !isHowToPlayOpen)
+        {
+            SetPauseMenuVisible(true);
+        }
+
+        return;
+    }
+
+    // FOCUS REGAINED (Alt-Tab Back In) --------------------------------------------------
     if (isMenuScene)
     {
-        // Menu scene: game was paused by focus-lost, silently unpause with no menu shown.
+        // Menu scene: game was paused by focus-lost, silently unpause with no menu shown
         CORE->SetGamePaused(false, false);
         return;
     }
 
-    // Close any open sub-screens so we always land on the pause menu root.
-    if (isPauseSettingsOpen)
-    {
-        isPauseSettingsOpen = false;
-        wasSettingsOpenLastFrame = false;
-        SetPauseSettingsVisible(false);
-    }
-
+    // In-game: Only close How to Play and return to pause menu root if it's open
+    // Otherwise keep whatever pause menu screen is currently showing
     if (isHowToPlayOpen)
     {
         isHowToPlayOpen = false;
         wasHowToPlayOpenLastFrame = false;
         howToPlayOpenedViaTab = false;
         SetHowToPlayVisible(false);
+
+        // Show the pause menu root
+        isPauseMenuActive = true;
+
+        if (!hasCreatedUI)
+            CreatePauseMenuUI();
+
+        SetPauseMenuVisible(true);
     }
-
-    if (isGhostMenuOpen)
-    {
-        isGhostMenuOpen = false;
-        wasGhostMenuOpenLastFrame = false;
-        SetGhostMenuVisible(false);
-    }
-
-    isPauseMenuActive = true;
-
-    if (!hasCreatedUI)
-        CreatePauseMenuUI();
-
-    SetPauseMenuVisible(true);
 }

@@ -607,7 +607,7 @@ void CoreEngine::SetGamePaused(bool paused, bool pauseAudio)
 
 void CoreEngine::HandleWindowFocusChanged(bool focused)
 {
-    // Focus lost ────────────────────────────────────────────────────────────────────────────
+    // Focus lost  ------------------------------------------------------------------
     if (!focused)
     {
         // Ignore duplicate focus-lost events
@@ -620,21 +620,21 @@ void CoreEngine::HandleWindowFocusChanged(bool focused)
         if (inputManager)
             inputManager->ResetState();
 
-        std::cout << "[ALT-TAB] Focus lost\n";
-
         SetGamePaused(true, true);
+
+        // Notify the game side that its Alt-Tab
+        std::cout << "[CORE] Dispatching WindowFocusMessage" << std::endl;
+        messageBus.Publish(WindowFocusMessage(false));
 
         return;
     }
 
-    // Focus regained ────────────────────────────────────────────────────────────────────────
+    // Focus regained ------------------------------------------------------------------
     // Ignore duplicate focus-gained events
     if (!m_isWindowUnfocused)
         return;
 
     m_isWindowUnfocused = false;
-
-    std::cout << "[ALT-TAB] Focus regained\n";
 
     // Flush input so no key held before alt-tab fires as a fresh press
     if (inputManager)
@@ -646,10 +646,7 @@ void CoreEngine::HandleWindowFocusChanged(bool focused)
         audioManager->PauseAllSounds(false);
     }
 
-    // Restore whatever pause state existed before focus was lost
-    SetGamePaused(true, false); // Always stay paused when returning from Alt-Tab
-
-    // Notify the game side that we just returned from Alt-Tab
-    std::cout << "[CORE] Dispatching WindowFocusMessage" << std::endl;
+    // Send message with hasFocus = true
     messageBus.Publish(WindowFocusMessage(true));
+
 }

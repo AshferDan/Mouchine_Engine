@@ -246,19 +246,9 @@ void GraphicsSystem::Initialize()
             {
                 CORE->HandleWindowFocusChanged(false);
 
-                // Minimize the game window when ALT-TABbing away
-                if (!glfwGetWindowAttrib(win, GLFW_ICONIFIED))
-                {
-                    glfwIconifyWindow(win);
-                }
             }
             else
             {
-                // Restore when the user comes back
-                if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
-                {
-                    glfwRestoreWindow(win);
-                }
 
                 CORE->HandleWindowFocusChanged(true);
 
