@@ -25,6 +25,8 @@ Technology is prohibited.
 #include "TextInputSystem.h"
 #include <iostream>
 #include <cmath>
+#include <map>
+#include <algorithm>
 
 /**
  * @brief Initializes all win/lose state variables.
@@ -608,7 +610,7 @@ void WinLoseLogicSystem::TriggerWin()
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f);
         audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", 2.0f);
+        audioManager->FadeInCategory("music", m_fadeWinIn);
     }
 
     // stats for the right-side panel
@@ -616,8 +618,10 @@ void WinLoseLogicSystem::TriggerWin()
     std::string statTime = FormatElapsedTime(m_elapsedTime);
     std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
     std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
-    std::string statLevelNum = "Level 1";
-    std::string statLevelName = "Barbershop";
+
+    // Get dynamic level information from current scene
+    std::string statLevelNum, statLevelName;
+    GetLevelInfo(statLevelNum, statLevelName);
 
     // Right panel X anchor (right third of screen)
     float panelX = 550.0f * uiScale;
@@ -887,8 +891,8 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Press");
                 // Fade out music before credits
-                audioManager->FadeOutCategory("music", 1.5f);
-                std::cout << "[WinZone] Started music fade out (1.5 seconds)" << std::endl;
+                audioManager->FadeOutCategory("music", m_fadeNextOut);
+                std::cout << "[WinZone] Started music fade out (" << m_fadeNextOut << " seconds)" << std::endl;
             }
 
             // Play credits cutscene with audio
@@ -911,14 +915,14 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Restart");
                 // Fade out music before restarting
-                audioManager->FadeOutCategory("music", 1.5f);
-                std::cout << "[WinZone] Started music fade out (1.5 seconds)" << std::endl;
+                audioManager->FadeOutCategory("music", m_fadeReplayOut);
+                std::cout << "[WinZone] Started music fade out (" << m_fadeReplayOut << " seconds)" << std::endl;
             }
 
             DestroyWinScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 1.7f;  // Wait for 1.5s fade + small buffer
+            pendingSceneTimer = m_fadeReplayOut + m_fadeTimerBuffer;
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -930,12 +934,12 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Quit");
                 // Fade out music before going to main menu
-                audioManager->FadeOutCategory("music", 2.0f);
-                std::cout << "[WinZone] Started music fade out (2.0 seconds)" << std::endl;
+                audioManager->FadeOutCategory("music", m_fadeQuitOut);
+                std::cout << "[WinZone] Started music fade out (" << m_fadeQuitOut << " seconds)" << std::endl;
             }
 
             DestroyWinScreen();
-            pendingSceneTimer = 2.2f;  // Wait for 2.0s fade + small buffer
+            pendingSceneTimer = m_fadeQuitOut + m_fadeTimerBuffer;
             pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
@@ -1100,7 +1104,7 @@ void WinLoseLogicSystem::TriggerLose()
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
         audioManager->PlaySound("gameover");
-        audioManager->FadeInCategory("music", 2.0f); // Fade in over 1 second
+        audioManager->FadeInCategory("music", m_fadeLoseIn);
     }
 
     // ---- Gather stats for the right-side panel ----
@@ -1108,8 +1112,10 @@ void WinLoseLogicSystem::TriggerLose()
     std::string statTime = FormatElapsedTime(m_elapsedTime);
     std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
     std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
-    std::string statLevelNum = "Level 1"; // TODO: replace with real level number
-    std::string statLevelName = "Barbershop"; // TODO: replace with real level name
+
+    // Get dynamic level information from current scene
+    std::string statLevelNum, statLevelName;
+    GetLevelInfo(statLevelNum, statLevelName);
 
     float panelX = 550.0f * uiScale;
 
@@ -1339,14 +1345,14 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             {
                 audioManager->TriggerEvent("UI_Click");
                 // Fade out music before restarting
-                audioManager->FadeOutCategory("music", 1.5f);
-                std::cout << "[WinLoseLogic] Started music fade out (1.5 seconds)" << std::endl;
+                audioManager->FadeOutCategory("music", m_fadeReplayOut);
+                std::cout << "[WinLoseLogic] Started music fade out (" << m_fadeReplayOut << " seconds)" << std::endl;
             }
 
             DestroyLoseScreen();
             CORE->SetGamePaused(false);
 
-            pendingSceneTimer = 1.7f;  // Wait for 1.5s fade + small buffer
+            pendingSceneTimer = m_fadeReplayOut + m_fadeTimerBuffer;
             pendingScenePath = currentScenePath;
             pendingSceneChange = true;
         }
@@ -1355,7 +1361,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Click");
-                audioManager->FadeOutCategory("music", 2.0f);
+                audioManager->FadeOutCategory("music", m_fadeQuitOut);
             }
             //DestroyLoseScreen();
             //CORE->SetGamePaused(false);
@@ -1430,6 +1436,74 @@ void WinLoseLogicSystem::DestroyLoseScreen()
     hoveredButtonName.clear();
 
     std::cout << "[WinLoseLogic] Lose screen destroyed and state reset" << std::endl;
+}
+
+/**
+ * @brief Extracts level number and friendly name from the current scene path.
+ */
+void WinLoseLogicSystem::GetLevelInfo(std::string& outLevelNum, std::string& outLevelName)
+{
+    // Extract filename from scene path (e.g., "../Assets/Scenes/Level_1.json" -> "Level_1")
+    std::string levelFileName = currentScenePath;
+    size_t slash = levelFileName.find_last_of("/\\");
+    if (slash != std::string::npos)
+        levelFileName = levelFileName.substr(slash + 1);
+    size_t dot = levelFileName.rfind('.');
+    if (dot != std::string::npos)
+        levelFileName = levelFileName.substr(0, dot);
+
+    // Map of level filenames to friendly display names
+    static const std::map<std::string, std::string> levelNames = {
+        {"Level_1", "Barbershop"},
+        {"Level_2", "Hair Salon"},
+        {"Level_M4", "Milestone 4"},
+        {"M4_LEVEL", "Milestone 4"},
+        {"Scene1", "Scene 1"}
+    };
+
+    // Try to extract level number from filename (e.g., "Level_1" -> "1")
+    std::string levelNum = "";
+    size_t underscorePos = levelFileName.find('_');
+    if (underscorePos != std::string::npos && underscorePos + 1 < levelFileName.length())
+    {
+        std::string numPart = levelFileName.substr(underscorePos + 1);
+        // Check if it's a valid number
+        if (!numPart.empty() && std::all_of(numPart.begin(), numPart.end(), ::isdigit))
+        {
+            levelNum = numPart;
+        }
+    }
+
+    // Format level number display
+    if (!levelNum.empty())
+    {
+        outLevelNum = "Level " + levelNum;
+    }
+    else
+    {
+        // Fallback: use the filename as-is with spaces instead of underscores
+        outLevelNum = levelFileName;
+        for (char& c : outLevelNum)
+        {
+            if (c == '_') c = ' ';
+        }
+    }
+
+    // Get friendly name from map, or use filename if not found
+    auto it = levelNames.find(levelFileName);
+    if (it != levelNames.end())
+    {
+        outLevelName = it->second;
+    }
+    else
+    {
+        // Fallback: use filename with spaces instead of underscores
+        outLevelName = levelFileName;
+        for (char& c : outLevelName)
+        {
+            if (c == '_') c = ' ';
+        }
+    }
 }
 
 // helper function

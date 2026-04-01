@@ -77,6 +77,25 @@ public:
 
     float CalculateRating() const;
 
+    /**
+     * @brief Sets audio fade durations from scene metadata.
+     * @param winIn Victory screen music fade in duration.
+     * @param loseIn Game over screen music fade in duration.
+     * @param replayOut Replay button fade out duration.
+     * @param quitOut Quit button fade out duration.
+     * @param nextOut Next/Continue button fade out duration.
+     * @param buffer Extra time buffer after fade completes.
+     */
+    void SetAudioFadeDurations(float winIn, float loseIn, float replayOut, float quitOut, float nextOut, float buffer)
+    {
+        m_fadeWinIn = winIn;
+        m_fadeLoseIn = loseIn;
+        m_fadeReplayOut = replayOut;
+        m_fadeQuitOut = quitOut;
+        m_fadeNextOut = nextOut;
+        m_fadeTimerBuffer = buffer;
+    }
+
 private:
     // ---------------- WIN STATE ----------------
     bool hasPlayerWon = false;
@@ -103,6 +122,15 @@ private:
     // ---------------- ELAPSED TIME ----------------
     float m_elapsedTime = 0.0f;  // seconds since player left SafeZone
     bool  m_timerRunning = false;
+
+    // ---------------- AUDIO FADE DURATIONS ----------------
+    // Loaded from scene's GameSettings.AudioFadeDurations
+    float m_fadeWinIn = 2.0f;       // Victory screen music fade in
+    float m_fadeLoseIn = 2.0f;      // Game over screen music fade in
+    float m_fadeReplayOut = 1.5f;   // Replay button fade out
+    float m_fadeQuitOut = 2.0f;     // Quit button fade out
+    float m_fadeNextOut = 1.5f;     // Next/Continue button fade out
+    float m_fadeTimerBuffer = 0.2f; // Extra time buffer after fade completes
 
     /**
      * @brief Checks if the player has left the safe zone and starts recording.
@@ -157,4 +185,11 @@ private:
      * @param isHovered Whether the button is currently hovered.
      */
     void SetButtonTexture(std::string buttonName, bool isHovered);
+
+    /**
+     * @brief Extracts level number and friendly name from current scene path.
+     * @param outLevelNum Output string for level number display (e.g., "Level 1").
+     * @param outLevelName Output string for level friendly name (e.g., "Barbershop").
+     */
+    void GetLevelInfo(std::string& outLevelNum, std::string& outLevelName);
 };
