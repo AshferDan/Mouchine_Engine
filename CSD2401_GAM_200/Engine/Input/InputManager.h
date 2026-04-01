@@ -81,6 +81,17 @@ public:
 	bool IsKeyHeld(int key);
     bool IsAnyKeyPress();
 
+    // Gamepad Input
+    bool IsGamepadButtonPressed(int button);
+    bool IsGamepadButtonHeld(int button);
+    bool IsGamepadButtonReleased(int button);
+    float GetGamepadAxis(int axis);
+    bool IsGamepadConnected() const { return m_gamepadConnected; }
+
+    // Virtual cursor position driven by controller (for menu navigation)
+    static double ControllerCursorX;
+    static double ControllerCursorY;
+
 	// Mouse Input
 	bool IsMouseButtonPressed(int button);
 	bool IsMouseButtonReleased(int button);
@@ -159,6 +170,10 @@ private:
 
 	std::map<int, KEY_STATE> m_keyStates;
 	std::map<int, KEY_STATE> m_mouseButtonStates;
+    std::map<int, KEY_STATE> m_gamepadButtonStates;
+    GLFWgamepadstate m_gamepadState{};
+    bool m_gamepadConnected = false;
+    bool m_usingController = false;
 
     EntityID cachedPlayerID = 0;
 

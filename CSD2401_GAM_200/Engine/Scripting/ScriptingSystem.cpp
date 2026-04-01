@@ -1110,6 +1110,12 @@ static float Internal_GetMouseWorldY()
     return API::GetMouseWorldY();
 }
 
+static bool Internal_IsGamepadButtonPressed(int button)  { return API::IsGamepadButtonPressed(button); }
+static bool Internal_IsGamepadButtonReleased(int button) { return API::IsGamepadButtonReleased(button); }
+static bool Internal_IsGamepadButtonHeld(int button)     { return API::IsGamepadButtonHeld(button); }
+static float Internal_GetGamepadAxis(int axis)           { return API::GetGamepadAxis(axis); }
+static bool Internal_IsGamepadConnected()                { return API::IsGamepadConnected(); }
+
 // === Pickup System ===
 static void Internal_CollectCoin()
 {
@@ -1832,6 +1838,11 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldY", (void*)Internal_GetMouseWorldY);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadButtonPressed",  (void*)Internal_IsGamepadButtonPressed);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadButtonReleased", (void*)Internal_IsGamepadButtonReleased);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadButtonHeld",     (void*)Internal_IsGamepadButtonHeld);
+    mono_add_internal_call("CSharpScript.Input::GetGamepadAxis",          (void*)Internal_GetGamepadAxis);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadConnected",      (void*)Internal_IsGamepadConnected);
 
     // === Pickup System ===
     mono_add_internal_call("CSharpScript.Pickups::CollectCoin",      (void*)Internal_CollectCoin);

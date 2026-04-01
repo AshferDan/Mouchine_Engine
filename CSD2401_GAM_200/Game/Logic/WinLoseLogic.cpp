@@ -895,6 +895,29 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         currentHover = "QuitButton";
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kWinButtons[] = { "NextButton", "ReplayButton", "QuitButton" };
+    static int  kWinIdx    = 0;
+    static bool kWinActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kWinIdx = (kWinIdx + 1) % 3;           kWinActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kWinIdx = ((kWinIdx - 1) + 3) % 3;     kWinActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kWinIdx = (kWinIdx + 1) % 3;       kWinActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kWinIdx = ((kWinIdx - 1) + 3) % 3; kWinActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kWinActive = false; // mouse click takes over
+            if (kWinActive) currentHover = kWinButtons[kWinIdx];
+            spacePressed = kWinActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -915,7 +938,7 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 
@@ -1344,6 +1367,29 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         currentHover = "LoseQuitButton";
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kLoseButtons[] = { "YesButton", "LoseQuitButton" };
+    static int  kLoseIdx    = 0;
+    static bool kLoseActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kLoseIdx = (kLoseIdx + 1) % 2;         kLoseActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kLoseIdx = ((kLoseIdx - 1) + 2) % 2;   kLoseActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kLoseIdx = (kLoseIdx + 1) % 2;       kLoseActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kLoseIdx = ((kLoseIdx - 1) + 2) % 2; kLoseActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kLoseActive = false;
+            if (kLoseActive) currentHover = kLoseButtons[kLoseIdx];
+            spacePressed = kLoseActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -1364,7 +1410,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 

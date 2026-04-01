@@ -118,6 +118,7 @@ private:
 	double m_timeAccumulator;	// To track decoding time
 	bool m_hasFrame = false;	// Check if frame has been decoded
 	bool m_canSkip = false;		// canSkip after frame is decoded
+	float m_skipTimer = 0.0f;	// Elapsed time since playback started (grace period before skip)
 
 
 	void RenderVideo();

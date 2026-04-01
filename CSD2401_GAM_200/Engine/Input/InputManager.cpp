@@ -26,6 +26,8 @@ double InputManager::MouseWorldX = 0.0;
 double InputManager::MouseWorldY = 0.0;
 bool InputManager::MouseLeftClicked = false;
 bool InputManager::ShowFPS = false;
+double InputManager::ControllerCursorX = 0.0;
+double InputManager::ControllerCursorY = 0.0;
 
 /**
  * @brief Constructs an InputManager with specified parameters.
@@ -50,6 +52,9 @@ InputManager::InputManager(GLFWwindow *window, AudioEngine *audio) : window(wind
 	for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST; ++i) {
 		m_mouseButtonStates[i] = KEY_STATE_RELEASE;
 	}
+    for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i) {
+        m_gamepadButtonStates[i] = KEY_STATE_RELEASE;
+    }
 }
 
 /**
@@ -113,6 +118,30 @@ bool InputManager::IsAnyKeyPress() {
     return false;
 }
 
+bool InputManager::IsGamepadButtonPressed(int button)
+{
+    auto it = m_gamepadButtonStates.find(button);
+    return (it != m_gamepadButtonStates.end()) && (it->second == KEY_STATE_PRESS);
+}
+
+bool InputManager::IsGamepadButtonHeld(int button)
+{
+    auto it = m_gamepadButtonStates.find(button);
+    return (it != m_gamepadButtonStates.end()) && (it->second == KEY_STATE_HOLD);
+}
+
+bool InputManager::IsGamepadButtonReleased(int button)
+{
+    auto it = m_gamepadButtonStates.find(button);
+    return (it != m_gamepadButtonStates.end()) && (it->second == KEY_STATE_RELEASE);
+}
+
+float InputManager::GetGamepadAxis(int axis)
+{
+    if (!m_gamepadConnected || axis < 0 || axis > GLFW_GAMEPAD_AXIS_LAST) return 0.0f;
+    return m_gamepadState.axes[axis];
+}
+
 /**
  * @brief Updates input handling, including key presses, mouse events,
  *        player movement, jumping, animations, and quitting logic.
@@ -153,6 +182,33 @@ void InputManager::Update(float)
 		}
 	}
 
+    // ---- Gamepad button state polling ----
+    {
+        GLFWgamepadstate gpState{};
+        m_gamepadConnected = (glfwGetGamepadState(GLFW_JOYSTICK_1, &gpState) == GLFW_TRUE);
+        if (m_gamepadConnected)
+        {
+            for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i)
+            {
+                if (gpState.buttons[i] == GLFW_PRESS)
+                {
+                    m_gamepadButtonStates[i] = (m_gamepadButtonStates[i] == KEY_STATE_RELEASE)
+                        ? KEY_STATE_PRESS : KEY_STATE_HOLD;
+                }
+                else
+                {
+                    m_gamepadButtonStates[i] = KEY_STATE_RELEASE;
+                }
+            }
+            m_gamepadState = gpState;
+        }
+        else
+        {
+            for (auto& kv : m_gamepadButtonStates)
+                kv.second = KEY_STATE_RELEASE;
+        }
+    }
+
     glfwGetWindowSize(window, &width, &height);
     static bool wasLeftMousePressed = false;
     bool isLeftMousePressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
@@ -178,6 +234,55 @@ void InputManager::Update(float)
 
     MouseWorldX = static_cast<double>((xpos - width / 2.0) / zoom) + camPos.x;
     MouseWorldY = static_cast<double>((height / 2.0 - ypos) / zoom) + camPos.y; // Flip Y axis
+
+    // ---- Virtual cursor shared by controller and arrow-key menu navigation ----
+    // Mouse movement always wins and resets to real mouse mode (runs regardless of controller).
+    {
+        static double prevMouseXVirt = 0.0, prevMouseYVirt = 0.0;
+        if (std::abs(xpos - prevMouseXVirt) > 2.0 || std::abs(ypos - prevMouseYVirt) > 2.0)
+            m_usingController = false;
+        prevMouseXVirt = xpos;
+        prevMouseYVirt = ypos;
+    }
+
+    // Controller stick / D-pad moves virtual cursor. Buttons alone do NOT activate it
+    // (avoids teleporting the cursor when the user presses A/Start on the real mouse).
+    if (m_gamepadConnected)
+    {
+        float lx = m_gamepadState.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+        float ly = m_gamepadState.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+        bool dpadActive = m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_LEFT]  != KEY_STATE_RELEASE
+                       || m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] != KEY_STATE_RELEASE
+                       || m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_UP]    != KEY_STATE_RELEASE
+                       || m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]  != KEY_STATE_RELEASE;
+        bool stickActive = std::abs(lx) > 0.2f || std::abs(ly) > 0.2f;
+
+        if ((stickActive || dpadActive) && !m_usingController)
+        {
+            // Inherit current mouse position so the cursor doesn't jump
+            ControllerCursorX = MouseWorldX;
+            ControllerCursorY = MouseWorldY;
+            m_usingController = true;
+        }
+
+        if (m_usingController)
+        {
+            const float cursorSpeed = 15.0f / zoom;
+            if (std::abs(lx) > 0.2f) ControllerCursorX += lx * cursorSpeed;
+            if (std::abs(ly) > 0.2f) ControllerCursorY -= ly * cursorSpeed;
+            if (m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT] != KEY_STATE_RELEASE) ControllerCursorX += cursorSpeed;
+            if (m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_LEFT]  != KEY_STATE_RELEASE) ControllerCursorX -= cursorSpeed;
+            if (m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_UP]    != KEY_STATE_RELEASE) ControllerCursorY += cursorSpeed;
+            if (m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_DPAD_DOWN]  != KEY_STATE_RELEASE) ControllerCursorY -= cursorSpeed;
+
+            MouseWorldX = ControllerCursorX;
+            MouseWorldY = ControllerCursorY;
+        }
+
+        // A button = confirm/click — works in any cursor mode
+        if (m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_A] == KEY_STATE_PRESS)
+            MouseLeftClicked = true;
+    }
 
     static bool keyPressed = false;
     LevelEditor* levelEditor = CORE ? CORE->GetLevelEditor() : nullptr;
@@ -381,6 +486,18 @@ void InputManager::Update(float)
         {
             singleTriggerKeys[GLFW_KEY_ESCAPE] = false;
         }
+
+        // Gamepad Start button: toggle pause (same as ESC in play mode)
+        if (m_gamepadConnected && m_gamepadButtonStates[GLFW_GAMEPAD_BUTTON_START] == KEY_STATE_PRESS
+            && !winScreenActive && !loseScreenActive && !isMainMenu)
+        {
+            GhostSystem* ghostSys = CORE ? CORE->GetGhostSystem() : nullptr;
+            if (ghostSys && ghostSys->IsReplayMode())
+                ghostSys->ExitReplayMode();
+            else if (gameCb)
+                gameCb->TogglePauseMenu();
+        }
+
     }
     else
     {
@@ -436,12 +553,15 @@ void InputManager::Update(float)
         }
 
         {
-            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+            static bool shiftRWasPressed = false;
+            bool shiftRPressed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS);
+            if (shiftRPressed && !shiftRWasPressed)
             {
                 std::string currentScenePath = gameCb ? gameCb->GetCurrentScenePath() : "";
                 if (!currentScenePath.empty())
                     CORE->RequestSceneLoad(currentScenePath, true);
             }
+            shiftRWasPressed = shiftRPressed;
         }
     }
     else

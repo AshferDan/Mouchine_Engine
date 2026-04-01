@@ -1570,6 +1570,44 @@ namespace CSharpScript
         {
             return IsMouseButtonHeld(button);
         }
+
+        // ---- Gamepad ----
+
+        public enum GamepadButton
+        {
+            A = 0, B = 1, X = 2, Y = 3,
+            LeftBumper = 4, RightBumper = 5,
+            Back = 6, Start = 7,
+            LeftThumb = 9, RightThumb = 10,
+            DpadUp = 11, DpadRight = 12, DpadDown = 13, DpadLeft = 14
+        }
+
+        public enum GamepadAxis
+        {
+            LeftX = 0, LeftY = 1,
+            RightX = 2, RightY = 3,
+            LeftTrigger = 4, RightTrigger = 5
+        }
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGamepadButtonPressed(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGamepadButtonReleased(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGamepadButtonHeld(int button);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern float GetGamepadAxis(int axis);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsGamepadConnected();
+
+        public static bool GetGamepadButtonPressed(GamepadButton button)  => IsGamepadButtonPressed((int)button);
+        public static bool GetGamepadButtonReleased(GamepadButton button) => IsGamepadButtonReleased((int)button);
+        public static bool GetGamepadButtonHeld(GamepadButton button)     => IsGamepadButtonHeld((int)button);
+        public static float GetAxis(GamepadAxis axis)                     => GetGamepadAxis((int)axis);
     }
 
     /// <summary>
