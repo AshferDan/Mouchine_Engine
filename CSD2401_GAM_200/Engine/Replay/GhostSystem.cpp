@@ -272,6 +272,7 @@ void GhostSystem::EnterReplayMode()
         cam->SetFollowTarget(ghost);
 
     m_player.StartPlayback(m_ghostTarget, m_bestRecording);
+    m_player.TogglePause(); // start paused — player must press play
 
     m_isReplayMode = true;
     std::cout << "[GhostSystem] Replay mode entered.\n";
