@@ -34,7 +34,7 @@ std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
 std::string level1Path = "../Assets/Scenes/Level_1.json";
 std::string level2Path = "../Assets/Scenes/Level_2.json";
-std::string level3Path = "../Assets/Scenes/Level_2_V2.json";
+std::string level3Path = "../Assets/Scenes/Level_2_V2_Extra.json";
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens

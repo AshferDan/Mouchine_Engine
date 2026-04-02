@@ -1,0 +1,60 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_Candle(E1)",
+            "localID": 216,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    35519.63671875,
+                    -1387.3221435546875
+                ],
+                "scale": [
+                    356.0,
+                    356.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/candle_spritesheet_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "PROP_Candle",
+                "animations": [
+                    {
+                        "name": "PROP_Candle",
+                        "filepath": "../Assets/Sprites/Props/Dark Version/candle_spritesheet_dark.png",
+                        "rows": 1,
+                        "cols": 3,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 2,
+                        "fps": 7.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    }
+                ]
+            },
+            "children": []
+        }
+    ]
+}

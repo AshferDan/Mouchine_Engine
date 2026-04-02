@@ -1,0 +1,41 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_Postbox(E2)",
+            "localID": 63,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    33769.36328125,
+                    -343.36334228515625
+                ],
+                "scale": [
+                    219.0,
+                    512.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/Environment 2/Post_Box_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}

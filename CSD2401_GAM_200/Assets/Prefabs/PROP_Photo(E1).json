@@ -1,0 +1,41 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_Photo(E1)",
+            "localID": 212,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    33783.60546875,
+                    -1305.168212890625
+                ],
+                "scale": [
+                    330.0,
+                    270.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/Environment 1/Family portrait_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}

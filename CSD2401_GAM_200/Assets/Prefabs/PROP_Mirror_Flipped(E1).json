@@ -1,0 +1,41 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_Mirror_Flipped(E1)",
+            "localID": 211,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    34196.2109375,
+                    -1314.991455078125
+                ],
+                "scale": [
+                    151.0,
+                    256.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/Environment 1/Mirror_dark_flipped.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}

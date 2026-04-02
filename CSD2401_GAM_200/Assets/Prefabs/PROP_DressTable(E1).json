@@ -1,0 +1,41 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_DressTable(E1)",
+            "localID": 107,
+            "parentID": 44,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    34101.890625,
+                    3876.74658203125
+                ],
+                "scale": [
+                    1024.0,
+                    512.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/Environment 1/Dressing_Table_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "children": []
+        }
+    ]
+}
