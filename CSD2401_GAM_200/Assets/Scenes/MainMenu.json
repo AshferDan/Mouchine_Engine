@@ -584,7 +584,7 @@
           },
           "children": [
             {
-              "name": "Letterscore_B",
+              "name": "Level_1_Score",
               "localID": 15,
               "parentID": 14,
               "active": false,
@@ -595,7 +595,7 @@
                   180.92929077148438
                 ],
                 "scale": [
-                  101.99398803710938,
+                  103.99398803710938,
                   108.79359436035156
                 ],
                 "rotation": 0.0
@@ -603,7 +603,7 @@
               "RenderComponent": {
                 "enabled": false,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Letterscore_B.png",
+                "texturePath": "../Assets/Sprites/Icons/Letterscore_dash.png",
                 "color": [
                   1.0,
                   1.0,
@@ -681,7 +681,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark",
+              "name": "Level_1_Shell1",
               "localID": 17,
               "parentID": 14,
               "active": false,
@@ -727,7 +727,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(1)",
+              "name": "Level_1_Shell2",
               "localID": 18,
               "parentID": 14,
               "active": false,
@@ -746,7 +746,7 @@
               "RenderComponent": {
                 "enabled": false,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Shell_icon.png",
+                "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
                 "color": [
                   1.0,
                   1.0,
@@ -773,7 +773,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(2)",
+              "name": "Level_1_Shell3",
               "localID": 19,
               "parentID": 14,
               "active": false,
@@ -792,7 +792,7 @@
               "RenderComponent": {
                 "enabled": false,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Shell_icon.png",
+                "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
                 "color": [
                   1.0,
                   1.0,
@@ -915,7 +915,7 @@
               "name": "Rating(2)",
               "localID": 22,
               "parentID": 21,
-              "active": true,
+              "active": false,
               "TransformComponent": {
                 "enabled": false,
                 "pos": [
@@ -963,15 +963,15 @@
               "children": []
             },
             {
-              "name": "Letterscore_dash",
+              "name": "Level_3_Score",
               "localID": 23,
               "parentID": 21,
               "active": false,
               "TransformComponent": {
                 "enabled": false,
                 "pos": [
-                  394.1899719238281,
-                  172.9144287109375
+                  403.1899719238281,
+                  180.92929077148438
                 ],
                 "scale": [
                   101.99400329589844,
@@ -1009,7 +1009,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(6)",
+              "name": "Level_3_Shell1",
               "localID": 24,
               "parentID": 21,
               "active": false,
@@ -1055,7 +1055,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(7)",
+              "name": "Level_3_Shell2",
               "localID": 25,
               "parentID": 21,
               "active": false,
@@ -1101,7 +1101,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(8)",
+              "name": "Level_3_Shell3",
               "localID": 26,
               "parentID": 21,
               "active": false,
@@ -1328,7 +1328,7 @@
               "children": []
             },
             {
-              "name": "Letterscore_A",
+              "name": "Level_2_Score",
               "localID": 30,
               "parentID": 28,
               "active": false,
@@ -1347,7 +1347,7 @@
               "RenderComponent": {
                 "enabled": false,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Letterscore_A.png",
+                "texturePath": "../Assets/Sprites/Icons/Letterscore_dash.png",
                 "color": [
                   1.0,
                   1.0,
@@ -1374,7 +1374,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(3)",
+              "name": "Level_2_Shell1",
               "localID": 31,
               "parentID": 28,
               "active": false,
@@ -1420,7 +1420,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(4)",
+              "name": "Level_2_Shell2",
               "localID": 32,
               "parentID": 28,
               "active": false,
@@ -1439,7 +1439,7 @@
               "RenderComponent": {
                 "enabled": false,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Shell_icon.png",
+                "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
                 "color": [
                   1.0,
                   1.0,
@@ -1466,7 +1466,7 @@
               "children": []
             },
             {
-              "name": "Shell_icon_dark(5)",
+              "name": "Level_2_Shell3",
               "localID": 33,
               "parentID": 28,
               "active": false,
@@ -1485,7 +1485,7 @@
               "RenderComponent": {
                 "enabled": false,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Shell_icon.png",
+                "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
                 "color": [
                   1.0,
                   1.0,
@@ -4208,7 +4208,7 @@
      {
         "name": "SkipCutScene",
         "filepath": "../Assets/Audio/skip_cutscene.wav",
-        "loop": true,
+        "loop": false,
         "volume": 1.0,
         "pitch": 1.0,
         "category": "sfx"

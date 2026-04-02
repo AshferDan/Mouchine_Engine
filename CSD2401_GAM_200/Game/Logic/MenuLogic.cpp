@@ -181,6 +181,7 @@ void MenuLogicSystem::Update(float dt)
                         CORE->RequestSceneLoad(selectedLevelScenePath, true);
                        
                     }
+                    m_levelSelectDataLoaded = false;
                     ClearLevelSelection();
                 }
             }
@@ -378,13 +379,68 @@ void MenuLogicSystem::Update(float dt)
         {
             levelSelectScreen->SetActive(true);
 
-            // Set all Level Selected UI as false when first enter
+            // Scan all 3 levels to populate best entries
+            if (!m_levelSelectDataLoaded) // Scan once
+            {
+                ScanLeaderboard(1);
+                ScanLeaderboard(2);
+                ScanLeaderboard(3);
+                m_levelSelectDataLoaded = true;  // Mark as loaded
+
+                std::cout << "[MenuLogic] Level stats loaded (one-time)" << std::endl;
+            }
+
+            // Array of best entries for each level
+            const LeaderboardEntry* levelEntries[] = {
+                &m_level1Best,
+                &m_level2Best,
+                &m_level3Best
+            };
+
+            const char* gameObjectPrefixes[] = { "Level_1", "Level_2", "Level_3" };
+
+            for (int i = 0; i < 3; ++i) {
+                const LeaderboardEntry& entry = *levelEntries[i];  
+
+                // Update shells
+                for (int idx = 1; idx <= 3; ++idx)
+                {
+                    std::string shellName = std::string(gameObjectPrefixes[i]) + "_Shell" + std::to_string(idx);
+
+                    if (auto* s = factory.FindGameObject(shellName))
+                    {
+                        if (auto* r = s->GetComponent<RenderComponent>())
+                        {
+                            bool isLight = entry.shells >= (4 - idx); 
+
+                            r->SetTextureID(GraphicsSystem::LoadTexture(
+                                isLight ? "../Assets/Sprites/Icons/shell_icon.png"
+                                : "../Assets/Sprites/Icons/shell_icon_dark.png"));
+                        }
+                    }
+                }
+
+                // Update rating score
+                std::string badgeName = std::string(gameObjectPrefixes[i]) + "_Score";
+                if (auto* badge = factory.FindGameObject(badgeName))
+                {
+                    if (auto* r = badge->GetComponent<RenderComponent>())
+                    {
+                        const char* texture = "../Assets/Sprites/Icons/Letterscore_dash.png";
+                        if (entry.rating >= 85.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
+                        else if (entry.rating >= 75.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
+                        else if (entry.rating >= 65.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
+                        else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
+                        r->SetTextureID(GraphicsSystem::LoadTexture(texture));
+                    }
+                }
+            }
+
+            // Level selection UI
             if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
                 s1->SetActive(selectedLevelButtonName == "Level1Button");
-
             if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
                 s2->SetActive(selectedLevelButtonName == "Level2Button");
-
             if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
                 s3->SetActive(selectedLevelButtonName == "Level3Button");
         }
@@ -954,6 +1010,7 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string& buttonName)
     {
         TriggerUISound(buttonName);
         currScreen = MenuScreens::Home;
+        m_levelSelectDataLoaded = false;
         ClearLevelSelection();
         return true;
     }
@@ -1531,6 +1588,7 @@ void MenuLogicSystem::Reset()
     sfxSlider = SliderState();
     isDraggingSlider = false;
     currentSliderCategory = "";
+    m_levelSelectDataLoaded = false;
 }
 
 void MenuLogicSystem::ComputeSliderUVBounds(RenderComponent *renderComp, SliderState &sliderState)
@@ -1877,6 +1935,10 @@ void MenuLogicSystem::ScanLeaderboard(int level)
         return;
     }
 
+    // Track the best entry while scanning
+    float highestRating = 0.0f;
+    LeaderboardEntry bestEntry;
+
     for (const auto &entry : fs::directory_iterator(dir))
     {
         if (!entry.is_regular_file() || entry.path().extension() != ".json")
@@ -1893,14 +1955,27 @@ void MenuLogicSystem::ScanLeaderboard(int level)
                 nlohmann::json root;
                 f >> root;
                 bestTime = root.value("bestTime", FLT_MAX);
+                float rating = root.value("rating", 0.0f);      
+                int shells = root.value("shellsCollected", 0); 
+
+                // Add to leaderboard data
+                if (bestTime < FLT_MAX)
+                    m_leaderboardData.push_back({ stem, bestTime, rating, shells });
+
+                // Track the best entry (highest rating)
+                if (rating > highestRating)
+                {
+                    highestRating = rating;
+                    bestEntry = { stem, bestTime, rating, shells };  // Store entire entry
+                }
             }
             catch (...)
             {
             }
         }
 
-        if (bestTime < FLT_MAX)
-            m_leaderboardData.push_back({stem, bestTime});
+        //if (bestTime < FLT_MAX)
+        //    m_leaderboardData.push_back({stem, bestTime });
     }
 
     // Sort fastest first, keep top 3
@@ -1909,6 +1984,11 @@ void MenuLogicSystem::ScanLeaderboard(int level)
               { return a.time < b.time; });
     if (m_leaderboardData.size() > 3)
         m_leaderboardData.resize(3);
+
+    // Store best entry for this level
+    if (level == 1)      m_level1Best = bestEntry;
+    else if (level == 2) m_level2Best = bestEntry;
+    else if (level == 3) m_level3Best = bestEntry;
 
     std::cout << "[MenuLogic] Leaderboard Level " << level
               << ": " << m_leaderboardData.size() << " entries." << std::endl;

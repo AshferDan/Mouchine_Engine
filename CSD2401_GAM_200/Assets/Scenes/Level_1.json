@@ -9451,7 +9451,7 @@
            {
         "name": "SkipCutScene",
         "filepath": "../Assets/Audio/skip_cutscene.wav",
-        "loop": true,
+        "loop": false,
         "volume": 1.0,
         "pitch": 1.0,
         "category": "sfx"
