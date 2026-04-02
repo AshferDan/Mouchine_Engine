@@ -191,6 +191,10 @@ void CutsceneSystem::StopCutscene() {
 			audioMgr->StopSound("cutscene_audio_channel");
 			m_currentAudio = "";
 		}
+
+		// Play skip cutscene audio
+		std::cout << "[CutsceneSystem] Playing skip cutscene audio" << std::endl;
+		audioMgr->PlaySound("SkipCutScene", "skip_audio_channel");
 	}
 
 	m_timeAccumulator = 0.0;
@@ -210,6 +214,13 @@ void CutsceneSystem::StopCutscene() {
 				CORE->SetGamePaused(false);
 				EventSystem::Clear();
 				if (CORE->GetInputManager()) CORE->GetInputManager()->ResetState();
+
+				// Stop skip audio after scene is fully loaded
+				AudioManager* audioMgr = CORE->GetAudioManager();
+				if (audioMgr) {
+					std::cout << "[CutsceneSystem] Stopping skip audio - scene loaded" << std::endl;
+					audioMgr->StopSound("skip_audio_channel");
+				}
 				});
 		}
 	}
@@ -217,6 +228,11 @@ void CutsceneSystem::StopCutscene() {
 		// For credits or other cutscenes, just resume
 		if (!CORE->HasPendingSceneLoad()) {
 			CORE->SetGamePaused(false);
+
+			if (audioMgr) {
+				std::cout << "[CutsceneSystem] Stopping skip audio - no loading screen" << std::endl;
+				audioMgr->StopSound("skip_audio_channel");
+			}
 		}
 	}
 }

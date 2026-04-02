@@ -123,7 +123,6 @@ private:
     std::string currentSliderCategory = "";  // "master", "music", or "sfx"
     bool justEnteredSettings = false;  // prevents slider input on first frame
     bool wasMouseDownOnSlider = false;  // tracks previous mouse state for click detection
-    bool justEnteredLevelSelect = false;
 
     // save last known volumes to restore visuals
     float savedMasterVolume = 1.0f;
@@ -174,9 +173,6 @@ private:
      * @brief Returns the button currently under the mouse for the active menu screen.
      */
     std::string FindHoveredButton(double mouseX, double mouseY);
-
-    void RefreshLevelSelectButtons();
-    void SelectLevel(const std::string& buttonName, const std::string& scenePath);
 
     /**
      * @brief Plays the correct UI sound for the clicked button.
