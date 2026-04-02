@@ -538,6 +538,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(false);
             if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(false);
+            if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(false);
         }
         else
         {
@@ -552,6 +553,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(true);
             if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(true);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(true);
+            if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(true);
         }
         wasGhostMenuOpenLastFrame = isGhostMenuOpen;
     }
@@ -652,6 +654,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
+                mainMenuBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(false);
         }
@@ -668,6 +672,8 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
                 settingsBtn->SetActive(true);
             if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(true);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
@@ -2990,15 +2996,52 @@ void PauseMenuLogicSystem::SetGhostMenuVisible(bool show)
 }
 
 void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
-    if (msg.hasFocus) {
-        // If we just gained focus, ensure the pause menu is shown
+    bool isMenuScene = currentScenePath.empty() ||
+        currentScenePath.find("MainMenu") != std::string::npos;
 
+    // FOCUS LOST (Alt-Tab Out) --------------------------------------------------------
+    if (!msg.hasFocus) {
+        if (isMenuScene) {
+            // Main menu: game is paused by CoreEngine, but don't show pause menu UI
+            return;
+        }
+
+        // In-game: show pause menu when alt-tabbing out
         isPauseMenuActive = true;
 
-        // On the first Alt-Tab, hasCreatedPauseMenuUI is false.
-        if (!hasCreatedUI) {
+        if (!hasCreatedUI)
             CreatePauseMenuUI();
+
+        if (!isPauseSettingsOpen && !isGhostMenuOpen && !isHowToPlayOpen)
+        {
+            SetPauseMenuVisible(true);
         }
+
+        return;
+    }
+
+    // FOCUS REGAINED (Alt-Tab Back In) --------------------------------------------------
+    if (isMenuScene)
+    {
+        // Menu scene: game was paused by focus-lost, silently unpause with no menu shown
+        CORE->SetGamePaused(false, false);
+        return;
+    }
+
+    // In-game: Only close How to Play and return to pause menu root if it's open
+    // Otherwise keep whatever pause menu screen is currently showing
+    if (isHowToPlayOpen)
+    {
+        isHowToPlayOpen = false;
+        wasHowToPlayOpenLastFrame = false;
+        howToPlayOpenedViaTab = false;
+        SetHowToPlayVisible(false);
+
+        // Show the pause menu root
+        isPauseMenuActive = true;
+
+        if (!hasCreatedUI)
+            CreatePauseMenuUI();
 
         SetPauseMenuVisible(true);
     }

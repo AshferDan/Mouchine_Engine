@@ -632,65 +632,6 @@ namespace CSharpScript
             //if (_isFacingRight) Debug.Log("right");
             //else Debug.Log("left");
 
-            if (_pauseResumeFreezeFrames > 0)
-            {
-                _pauseResumeFreezeFrames--;
-                Physics.SetVelocity(OwnerName, 0f, 0f);
-                return;
-            }
-
-            bool staleWallSlide = _isWallSliding &&
-            Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f &&
-            Math.Abs(InputManager.Movement.x) < 0.01f &&
-            !InputManager.JumpWasPressed &&
-            !InputManager.GroundPoundWasPressed &&
-            !InputManager.RollWasPressed &&
-            !InputManager.RunIsHeld;
-
-            // Ground pound falling actively holds Y = -GPFallSpeed.
-            // If gp_falling is true but Y velocity is near zero with no input = alt-tab froze it.
-            bool staleGroundPound = gp_falling &&
-                Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f &&
-                Math.Abs(InputManager.Movement.x) < 0.01f &&
-                !InputManager.JumpWasPressed &&
-                !InputManager.GroundPoundWasPressed &&
-                !InputManager.RollWasPressed &&
-                !InputManager.RunIsHeld;
-
-            bool velocityIsNearZero =
-                Math.Abs(Physics.GetVelocity(OwnerName).x) < 0.01f &&
-                Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f;
-
-            bool staleAltTabState = staleGroundPound || staleWallSlide || (
-                velocityIsNearZero &&
-                Math.Abs(InputManager.Movement.x) < 0.01f &&
-                !InputManager.JumpWasPressed &&
-                !InputManager.GroundPoundWasPressed &&
-                !InputManager.RollWasPressed &&
-                !InputManager.RunIsHeld &&
-                (
-                    movespeed > 0.01f ||
-                    _isRolling ||
-                    _isGroundPounding ||
-                    gp_falling ||
-                    _isWallSliding ||
-                    _isWallKicking ||
-                    _isWallJumping ||
-                    _isGliding ||
-                    _isSkidding ||
-                    _isJumping ||
-                    (_isFalling && !_isGrounded) ||
-                    (_isFastFalling && !_isGrounded)
-                )
-            );
-
-            if (staleAltTabState)
-            {
-                ResetVarsForPauseResume();
-                return;
-            }
-
-
             // check if player is taking damage
             bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
 

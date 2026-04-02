@@ -117,6 +117,13 @@ void MediaPlayerLogicSystem::SpawnMediaPlayer()
     SetObjectActive(OBJ_VIDEO,  true);
     SetObjectActive(OBJ_SLIDER, true);
 
+    // Switch to replay BGM
+    if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
+    {
+        audio->StopSound("bgm_channel");
+        audio->PlaySound("Replay_BGM", "bgm_channel");
+    }
+
     m_spawned      = true;
     m_wasPaused    = false;
     std::cout << "[MediaPlayerLogic] Media_Player activated.\n";
@@ -132,6 +139,13 @@ void MediaPlayerLogicSystem::DestroyMediaPlayer()
     SetObjectActive(OBJ_FWD,    false);
     SetObjectActive(OBJ_VIDEO,  false);
     SetObjectActive(OBJ_SLIDER, false);
+
+    // Restore level BGM
+    if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
+    {
+        audio->StopSound("bgm_channel");
+        audio->PlaySound("bgm", "bgm_channel");
+    }
 
     m_spawned        = false;
     m_sliderDragging = false;
@@ -255,7 +269,12 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
     {
         // Play / Pause toggle
         if (HitTest(OBJ_PLAY))
+        {
+            const bool wasPaused = ghost->IsReplayPaused();
             ghost->ToggleReplayPause();
+            if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
+                audio->PlaySound(wasPaused ? "Replay_Unpause" : "Replay_Pause");
+        }
 
         // Rewind 5 seconds
         if (HitTest(OBJ_BWD))
