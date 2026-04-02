@@ -337,8 +337,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -369,15 +369,15 @@
             ],
             "scale": [
               24905.998046875,
-              561.8770141601563
+              561.8770141601562
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -390,7 +390,7 @@
             "layer": "Ground",
             "size": [
               24905.998046875,
-              561.8770141601563
+              561.8770141601562
             ]
           },
           "children": []
@@ -415,8 +415,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -454,8 +454,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -493,8 +493,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -532,8 +532,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -571,8 +571,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -610,8 +610,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -642,15 +642,15 @@
             ],
             "scale": [
               1837.5670166015625,
-              550.3350219726563
+              550.3350219726562
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -663,7 +663,7 @@
             "layer": "Ground",
             "size": [
               1837.5670166015625,
-              550.3350219726563
+              550.3350219726562
             ]
           },
           "children": []
@@ -681,15 +681,15 @@
             ],
             "scale": [
               3177.7099609375,
-              550.3350219726563
+              550.3350219726562
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -702,7 +702,7 @@
             "layer": "Ground",
             "size": [
               3177.7099609375,
-              550.3350219726563
+              550.3350219726562
             ]
           },
           "children": []
@@ -720,15 +720,15 @@
             ],
             "scale": [
               3177.7099609375,
-              550.3350219726563
+              550.3350219726562
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -741,7 +741,7 @@
             "layer": "Ground",
             "size": [
               3177.7099609375,
-              550.3350219726563
+              550.3350219726562
             ]
           },
           "children": []
@@ -759,15 +759,15 @@
             ],
             "scale": [
               3311.7099609375,
-              813.3350219726563
+              813.3350219726562
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -780,7 +780,7 @@
             "layer": "Ground",
             "size": [
               3311.7099609375,
-              813.3350219726563
+              813.3350219726562
             ]
           },
           "children": []
@@ -805,8 +805,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -837,15 +837,15 @@
             ],
             "scale": [
               3512.990966796875,
-              238.66299438476563
+              238.66299438476562
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -858,7 +858,7 @@
             "layer": "Ground",
             "size": [
               3512.990966796875,
-              238.66299438476563
+              238.66299438476562
             ]
           },
           "children": []
@@ -883,8 +883,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -922,8 +922,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -961,8 +961,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1000,8 +1000,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1032,15 +1032,15 @@
             ],
             "scale": [
               2794.508056640625,
-              253.79800415039063
+              253.79800415039062
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1053,7 +1053,7 @@
             "layer": "Ground",
             "size": [
               2794.508056640625,
-              253.79800415039063
+              253.79800415039062
             ]
           },
           "children": []
@@ -1078,8 +1078,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1117,8 +1117,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1156,8 +1156,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1195,8 +1195,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1234,8 +1234,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1273,8 +1273,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1312,8 +1312,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1351,8 +1351,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1383,15 +1383,15 @@
             ],
             "scale": [
               3781.376953125,
-              231.97000122070313
+              231.97000122070312
             ],
             "rotation": 0.0
           },
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1404,7 +1404,7 @@
             "layer": "Ground",
             "size": [
               3781.376953125,
-              231.97000122070313
+              231.97000122070312
             ]
           },
           "children": []
@@ -1429,8 +1429,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1468,8 +1468,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1507,8 +1507,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1546,8 +1546,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1585,8 +1585,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1624,8 +1624,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1663,8 +1663,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1691,10 +1691,10 @@
             "enabled": true,
             "pos": [
               39945.1484375,
-              619.7100219726563
+              619.7100219726562
             ],
             "scale": [
-              620.2410278320313,
+              620.2410278320312,
               90.78349304199219
             ],
             "rotation": 0.0
@@ -1702,8 +1702,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1715,7 +1715,7 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              620.2410278320313,
+              620.2410278320312,
               90.78349304199219
             ]
           },
@@ -1730,7 +1730,7 @@
             "enabled": true,
             "pos": [
               33698.296875,
-              799.2222290039063
+              799.2222290039062
             ],
             "scale": [
               3834.7041015625,
@@ -1741,8 +1741,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1769,10 +1769,10 @@
             "enabled": true,
             "pos": [
               35835.62890625,
-              619.7100219726563
+              619.7100219726562
             ],
             "scale": [
-              620.2410278320313,
+              620.2410278320312,
               90.78349304199219
             ],
             "rotation": 0.0
@@ -1780,8 +1780,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1793,7 +1793,7 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              620.2410278320313,
+              620.2410278320312,
               90.78349304199219
             ]
           },
@@ -1808,10 +1808,10 @@
             "enabled": true,
             "pos": [
               37892.7734375,
-              619.7100219726563
+              619.7100219726562
             ],
             "scale": [
-              620.2410278320313,
+              620.2410278320312,
               90.78349304199219
             ],
             "rotation": 0.0
@@ -1819,8 +1819,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1832,7 +1832,7 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              620.2410278320313,
+              620.2410278320312,
               90.78349304199219
             ]
           },
@@ -1858,8 +1858,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1897,8 +1897,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1936,8 +1936,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -1975,8 +1975,8 @@
           "PhysicsComponent": {
             "enabled": true,
             "mass": 1.0,
-            "isStatic": false,
-            "useGravity": true,
+            "isStatic": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -2767,7 +2767,7 @@
             "enabled": true,
             "pos": [
               37892.7578125,
-              994.2710571289063
+              994.2710571289062
             ],
             "scale": [
               495.0,
@@ -3238,7 +3238,7 @@
               4390.96630859375
             ],
             "scale": [
-              728.2622680664063,
+              728.2622680664062,
               150.0
             ],
             "rotation": 0.0
@@ -4732,7 +4732,7 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              553.5735473632813,
+              553.5735473632812,
               8988.212890625
             ],
             "scale": [
@@ -8945,7 +8945,7 @@
           "ParallaxBackground": {
             "LayerFarBack": "",
             "LayerBack": "",
-            "LayerMid": "ƈ",
+            "LayerMid": "\u00c6\u02c6",
             "LayerFront": "",
             "FactorFarBack": 0.800000011920929,
             "FactorBack": 0.30000001192092896,
