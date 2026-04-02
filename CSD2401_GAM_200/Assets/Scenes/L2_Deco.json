@@ -22,8 +22,8 @@
         "mode": "FOLLOW_TARGET",
         "zoom": 0.5,
         "position": [
-          7348.64794921875,
-          2944.853515625
+          1943.583251953125,
+          2520.802490234375
         ],
         "followOffset": [
           -500.0,
@@ -72,7 +72,7 @@
       },
       "Spritesheet": {
         "enabled": true,
-        "defaultAnimation": "Falling",
+        "defaultAnimation": "Idle",
         "animations": [
           {
             "name": "Bonk",
@@ -463,7 +463,7 @@
           "ParallaxBackground": {
             "LayerFarBack": "",
             "LayerBack": "",
-            "LayerMid": "\u00c6\u02c6",
+            "LayerMid": "Æˆ",
             "LayerFront": "",
             "FactorFarBack": 0.800000011920929,
             "FactorBack": 0.30000001192092896,
@@ -761,8 +761,2710 @@
       "children": []
     },
     {
-      "name": "ZONE_Safe",
+      "name": "Parallax_BG",
       "localID": 4,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          3969.0
+        ],
+        "scale": [
+          4200.0,
+          12960.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALLPAPER.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco",
+      "localID": 5,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          4099.0
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window",
+      "localID": 6,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          1158.996337890625
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco(8)",
+      "localID": 7,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          1693.441650390625
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window(7)",
+      "localID": 8,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          3539.00048828125
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco(15)",
+      "localID": 9,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          8824.5556640625
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window(16)",
+      "localID": 10,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          8324.5556640625
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window(22)",
+      "localID": 11,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          5900.11083984375
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco(23)",
+      "localID": 12,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          6399.0
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_BackGround",
+      "localID": 13,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          3969.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(10)",
+      "localID": 14,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          8051.94287109375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_TOP.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(9)",
+      "localID": 15,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1199.9998779296875,
+          8051.94287109375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_TOP.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(6)",
+      "localID": 16,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1200.0001220703125,
+          6878.99853515625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(5)",
+      "localID": 17,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          6878.998046875
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(4)",
+      "localID": 18,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1204.1937255859375,
+          5699.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(3)",
+      "localID": 19,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          5699.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left",
+      "localID": 20,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          -236.55560302734375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right",
+      "localID": 21,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1204.1937255859375,
+          -236.55560302734375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(12)",
+      "localID": 22,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1204.1937255859375,
+          4522.33251953125
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(13)",
+      "localID": 23,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1204.1937255859375,
+          3329.000244140625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(14)",
+      "localID": 24,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          3329.000244140625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(17)",
+      "localID": 25,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1204.1937255859375,
+          2138.33349609375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(18)",
+      "localID": 26,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          2139.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(19)",
+      "localID": 27,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          950.1111450195313
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(20)",
+      "localID": 28,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1204.1937255859375,
+          949.4451293945313
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(21)",
+      "localID": 29,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -1199.9998779296875,
+          4511.2216796875
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Parallax_BG_L",
+      "localID": 30,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          3969.0
+        ],
+        "scale": [
+          4200.0,
+          12960.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALLPAPER.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_L",
+      "localID": 31,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          4099.0
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_L",
+      "localID": 32,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          1158.996337890625
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_L(8)",
+      "localID": 33,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          1693.441650390625
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_L(7)",
+      "localID": 34,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          3539.00048828125
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_L(15)",
+      "localID": 35,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          8824.5556640625
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_L(16)",
+      "localID": 36,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          8324.5556640625
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_L(22)",
+      "localID": 37,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          5900.11083984375
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_L(23)",
+      "localID": 38,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -4199.94140625,
+          6399.0
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Parallax_BG_R",
+      "localID": 39,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4170.05322265625,
+          3969.0
+        ],
+        "scale": [
+          4200.0,
+          12960.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALLPAPER.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_R",
+      "localID": 40,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4170.05322265625,
+          4099.0
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_R",
+      "localID": 41,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4170.05322265625,
+          1158.996337890625
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_R(8)",
+      "localID": 42,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4170.05322265625,
+          1693.441650390625
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_R(7)",
+      "localID": 43,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4170.05322265625,
+          3539.00048828125
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_R(15)",
+      "localID": 44,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4170.05322265625,
+          8824.5556640625
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_R(16)",
+      "localID": 45,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -50801.0546875,
+          8331.1298828125
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Window_R(22)",
+      "localID": 46,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -50801.0546875,
+          5906.685546875
+        ],
+        "scale": [
+          690.9677734375,
+          448.4399108886719
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WINDOWS.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Wall_Deco_R(23)",
+      "localID": 47,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -50801.0546875,
+          6405.57421875
+        ],
+        "scale": [
+          1219.3546142578125,
+          179.99996948242188
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/WALL_DECOR.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -110,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_BackGround_R",
+      "localID": 48,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          4150.0703125,
+          3969.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(10)",
+      "localID": 49,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          8051.94287109375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_TOP.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(9)",
+      "localID": 50,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5350.0703125,
+          8051.94287109375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_TOP.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(6)",
+      "localID": 51,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5350.0703125,
+          6878.99853515625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(5)",
+      "localID": 52,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          6878.998046875
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(4)",
+      "localID": 53,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5354.263671875,
+          5699.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(3)",
+      "localID": 54,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          5699.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left",
+      "localID": 55,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          -236.55560302734375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right",
+      "localID": 56,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5354.263671875,
+          -236.55560302734375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(12)",
+      "localID": 57,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5354.263671875,
+          4522.33251953125
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(13)",
+      "localID": 58,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5354.263671875,
+          3329.000244140625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(14)",
+      "localID": 59,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          3329.000244140625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(17)",
+      "localID": 60,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5354.263671875,
+          2138.33349609375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(18)",
+      "localID": 61,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          2139.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(19)",
+      "localID": 62,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          950.1111450195313
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(20)",
+      "localID": 63,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          5354.263671875,
+          949.4451293945313
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(21)",
+      "localID": 64,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          2950.0703125,
+          4511.2216796875
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(5)",
+      "localID": 356,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          6878.998046875
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(4)",
+      "localID": 357,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -2945.806640625,
+          5699.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(3)",
+      "localID": 358,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          5699.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left",
+      "localID": 359,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          -236.55560302734375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right",
+      "localID": 360,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -2945.806640625,
+          -236.55560302734375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(12)",
+      "localID": 361,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -2945.806640625,
+          4522.33251953125
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(13)",
+      "localID": 362,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -2945.806640625,
+          3329.000244140625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(14)",
+      "localID": 363,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          3329.000244140625
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(17)",
+      "localID": 364,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -2945.806640625,
+          2138.33349609375
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(18)",
+      "localID": 365,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          2139.0
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(19)",
+      "localID": 366,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          950.1111450195313
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_Right(20)",
+      "localID": 367,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -2945.806640625,
+          949.4451293945313
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Pillar_left(21)",
+      "localID": 368,
+      "parentID": 352,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          -5349.99951171875,
+          4511.2216796875
+        ],
+        "scale": [
+          569.0322265625,
+          1296.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": -109,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "ZONE_Safe",
+      "localID": 65,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -780,13 +3482,13 @@
       "children": [
         {
           "name": "SZ_Asset",
-          "localID": 5,
-          "parentID": 4,
+          "localID": 66,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              650.8887329101562,
+              650.8887329101563,
               2864.049560546875
             ],
             "scale": [
@@ -817,13 +3519,13 @@
         },
         {
           "name": "SafeZone",
-          "localID": 6,
-          "parentID": 4,
+          "localID": 67,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              650.3098754882812,
+              650.3098754882813,
               2815.493408203125
             ],
             "scale": [
@@ -865,7 +3567,7 @@
     },
     {
       "name": "ZONE_Exit",
-      "localID": 7,
+      "localID": 68,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -883,8 +3585,8 @@
       "children": [
         {
           "name": "EZ_Asset",
-          "localID": 8,
-          "parentID": 7,
+          "localID": 69,
+          "parentID": 68,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -920,8 +3622,8 @@
         },
         {
           "name": "WinZone",
-          "localID": 9,
-          "parentID": 7,
+          "localID": 70,
+          "parentID": 68,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -930,7 +3632,7 @@
               450.30169677734375
             ],
             "scale": [
-              178.85684204101562,
+              178.85684204101563,
               337.9048767089844
             ],
             "rotation": 0.0
@@ -968,11 +3670,11 @@
     },
     {
       "name": "Pickup_vfx",
-      "localID": 10,
+      "localID": 71,
       "parentID": 4294967295,
-      "active": true,
+      "active": false,
       "TransformComponent": {
-        "enabled": true,
+        "enabled": false,
         "pos": [
           629.2249755859375,
           2623.50146484375
@@ -984,7 +3686,7 @@
         "rotation": 0.0
       },
       "RenderComponent": {
-        "enabled": true,
+        "enabled": false,
         "shapeType": "Square",
         "texturePath": "",
         "color": [
@@ -1002,7 +3704,7 @@
         ]
       },
       "Spritesheet": {
-        "enabled": true,
+        "enabled": false,
         "defaultAnimation": "",
         "animations": []
       },
@@ -1010,7 +3712,7 @@
     },
     {
       "name": "Ground",
-      "localID": 11,
+      "localID": 72,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -1039,8 +3741,8 @@
       "children": [
         {
           "name": "C_Ground",
-          "localID": 12,
-          "parentID": 11,
+          "localID": 73,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1078,8 +3780,8 @@
         },
         {
           "name": "C_Ground(2)",
-          "localID": 13,
-          "parentID": 11,
+          "localID": 74,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1117,8 +3819,8 @@
         },
         {
           "name": "C_Ground(3)",
-          "localID": 14,
-          "parentID": 11,
+          "localID": 75,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1156,8 +3858,8 @@
         },
         {
           "name": "C_Ground(4)",
-          "localID": 15,
-          "parentID": 11,
+          "localID": 76,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1195,8 +3897,8 @@
         },
         {
           "name": "C_Ground(9)",
-          "localID": 16,
-          "parentID": 11,
+          "localID": 77,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1234,8 +3936,8 @@
         },
         {
           "name": "C_Ground(11)",
-          "localID": 17,
-          "parentID": 11,
+          "localID": 78,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1273,8 +3975,8 @@
         },
         {
           "name": "C_Ground(30)",
-          "localID": 18,
-          "parentID": 11,
+          "localID": 79,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1284,7 +3986,7 @@
             ],
             "scale": [
               93.49971008300781,
-              637.9819946289062
+              637.9819946289063
             ],
             "rotation": 0.0
           },
@@ -1305,15 +4007,15 @@
             "layer": "Ground",
             "size": [
               93.49971008300781,
-              637.9819946289062
+              637.9819946289063
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(33)",
-          "localID": 19,
-          "parentID": 11,
+          "localID": 80,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1351,8 +4053,8 @@
         },
         {
           "name": "C_Ground(34)",
-          "localID": 20,
-          "parentID": 11,
+          "localID": 81,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1390,8 +4092,8 @@
         },
         {
           "name": "C_Ground(35)",
-          "localID": 21,
-          "parentID": 11,
+          "localID": 82,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1429,8 +4131,8 @@
         },
         {
           "name": "C_Ground(36)",
-          "localID": 22,
-          "parentID": 11,
+          "localID": 83,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1468,8 +4170,8 @@
         },
         {
           "name": "C_Ground(37)",
-          "localID": 23,
-          "parentID": 11,
+          "localID": 84,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1507,8 +4209,8 @@
         },
         {
           "name": "C_Ground(38)",
-          "localID": 24,
-          "parentID": 11,
+          "localID": 85,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1539,15 +4241,15 @@
             "layer": "Ground",
             "size": [
               1762.666015625,
-              898.5440063476562
+              898.5440063476563
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(39)",
-          "localID": 25,
-          "parentID": 11,
+          "localID": 86,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1557,7 +4259,7 @@
             ],
             "scale": [
               999.7606811523438,
-              517.8469848632812
+              517.8469848632813
             ],
             "rotation": 0.0
           },
@@ -1578,15 +4280,15 @@
             "layer": "Ground",
             "size": [
               999.7606811523438,
-              517.8469848632812
+              517.8469848632813
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(40)",
-          "localID": 26,
-          "parentID": 11,
+          "localID": 87,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1595,7 +4297,7 @@
               1235.38134765625
             ],
             "scale": [
-              1007.7839965820312,
+              1007.7839965820313,
               401.52996826171875
             ],
             "rotation": 0.0
@@ -1616,7 +4318,7 @@
             "shape": "Square",
             "layer": "Ground",
             "size": [
-              1007.7839965820312,
+              1007.7839965820313,
               401.52996826171875
             ]
           },
@@ -1624,8 +4326,8 @@
         },
         {
           "name": "C_Ground(41)",
-          "localID": 27,
-          "parentID": 11,
+          "localID": 88,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1663,8 +4365,8 @@
         },
         {
           "name": "C_Ground(42)",
-          "localID": 28,
-          "parentID": 11,
+          "localID": 89,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1702,8 +4404,8 @@
         },
         {
           "name": "C_Ground(43)",
-          "localID": 29,
-          "parentID": 11,
+          "localID": 90,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1741,8 +4443,8 @@
         },
         {
           "name": "C_Ground(44)",
-          "localID": 30,
-          "parentID": 11,
+          "localID": 91,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1780,8 +4482,8 @@
         },
         {
           "name": "C_Ground(45)",
-          "localID": 31,
-          "parentID": 11,
+          "localID": 92,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1819,8 +4521,8 @@
         },
         {
           "name": "C_Ground(46)",
-          "localID": 32,
-          "parentID": 11,
+          "localID": 93,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1858,8 +4560,8 @@
         },
         {
           "name": "C_Ground(47)",
-          "localID": 33,
-          "parentID": 11,
+          "localID": 94,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1897,8 +4599,8 @@
         },
         {
           "name": "C_Ground(48)",
-          "localID": 34,
-          "parentID": 11,
+          "localID": 95,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1936,8 +4638,8 @@
         },
         {
           "name": "C_Ground(49)",
-          "localID": 35,
-          "parentID": 11,
+          "localID": 96,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -1975,8 +4677,8 @@
         },
         {
           "name": "C_Ground(50)",
-          "localID": 36,
-          "parentID": 11,
+          "localID": 97,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2014,8 +4716,8 @@
         },
         {
           "name": "C_Ground(51)",
-          "localID": 37,
-          "parentID": 11,
+          "localID": 98,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2025,7 +4727,7 @@
             ],
             "scale": [
               2490.843994140625,
-              650.9080200195312
+              650.9080200195313
             ],
             "rotation": 0.0
           },
@@ -2046,15 +4748,15 @@
             "layer": "Ground",
             "size": [
               2490.843994140625,
-              650.9080200195312
+              650.9080200195313
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(52)",
-          "localID": 38,
-          "parentID": 11,
+          "localID": 99,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2092,8 +4794,8 @@
         },
         {
           "name": "C_Ground(53)",
-          "localID": 39,
-          "parentID": 11,
+          "localID": 100,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2131,8 +4833,8 @@
         },
         {
           "name": "C_Ground(54)",
-          "localID": 40,
-          "parentID": 11,
+          "localID": 101,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2170,8 +4872,8 @@
         },
         {
           "name": "C_Ground(55)",
-          "localID": 41,
-          "parentID": 11,
+          "localID": 102,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2209,8 +4911,8 @@
         },
         {
           "name": "C_Ground(56)",
-          "localID": 42,
-          "parentID": 11,
+          "localID": 103,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2248,8 +4950,8 @@
         },
         {
           "name": "C_Ground(57)",
-          "localID": 43,
-          "parentID": 11,
+          "localID": 104,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2287,8 +4989,8 @@
         },
         {
           "name": "C_Ground(1)",
-          "localID": 326,
-          "parentID": 11,
+          "localID": 105,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2326,8 +5028,8 @@
         },
         {
           "name": "C_Ground(2)",
-          "localID": 327,
-          "parentID": 11,
+          "localID": 106,
+          "parentID": 72,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2367,7 +5069,7 @@
     },
     {
       "name": "DECORATIONS",
-      "localID": 44,
+      "localID": 107,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -2385,8 +5087,8 @@
       "children": [
         {
           "name": "PROP_Candle(E1)",
-          "localID": 45,
-          "parentID": 44,
+          "localID": 108,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2441,8 +5143,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 46,
-          "parentID": 44,
+          "localID": 109,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2478,8 +5180,8 @@
         },
         {
           "name": "NPC_Jellyfish(E1)",
-          "localID": 47,
-          "parentID": 44,
+          "localID": 110,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2534,8 +5236,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 48,
-          "parentID": 44,
+          "localID": 111,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2571,8 +5273,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 49,
-          "parentID": 44,
+          "localID": 112,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2627,8 +5329,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 50,
-          "parentID": 44,
+          "localID": 113,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2683,8 +5385,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 51,
-          "parentID": 44,
+          "localID": 114,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2720,8 +5422,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 52,
-          "parentID": 44,
+          "localID": 115,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2757,8 +5459,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 53,
-          "parentID": 44,
+          "localID": 116,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2794,8 +5496,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 54,
-          "parentID": 44,
+          "localID": 117,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2850,8 +5552,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 55,
-          "parentID": 44,
+          "localID": 118,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2887,8 +5589,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 56,
-          "parentID": 44,
+          "localID": 119,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2924,8 +5626,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 57,
-          "parentID": 44,
+          "localID": 120,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2961,8 +5663,8 @@
         },
         {
           "name": "PROP_Cabinet(E1)",
-          "localID": 58,
-          "parentID": 44,
+          "localID": 121,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -2998,8 +5700,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 59,
-          "parentID": 44,
+          "localID": 122,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3035,8 +5737,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 60,
-          "parentID": 44,
+          "localID": 123,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3072,8 +5774,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 61,
-          "parentID": 44,
+          "localID": 124,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3109,8 +5811,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 62,
-          "parentID": 44,
+          "localID": 125,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3146,8 +5848,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 63,
-          "parentID": 44,
+          "localID": 126,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3183,8 +5885,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 64,
-          "parentID": 44,
+          "localID": 127,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3220,8 +5922,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 65,
-          "parentID": 44,
+          "localID": 128,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3276,8 +5978,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 66,
-          "parentID": 44,
+          "localID": 129,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3313,8 +6015,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 67,
-          "parentID": 44,
+          "localID": 130,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3350,8 +6052,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 68,
-          "parentID": 44,
+          "localID": 131,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3387,8 +6089,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 69,
-          "parentID": 44,
+          "localID": 132,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3424,8 +6126,8 @@
         },
         {
           "name": "NPC_Lobster(E1)",
-          "localID": 70,
-          "parentID": 44,
+          "localID": 133,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3480,8 +6182,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 71,
-          "parentID": 44,
+          "localID": 134,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3517,8 +6219,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 72,
-          "parentID": 44,
+          "localID": 135,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3573,8 +6275,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 73,
-          "parentID": 44,
+          "localID": 136,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3629,8 +6331,8 @@
         },
         {
           "name": "NPC_Lobster(E1)",
-          "localID": 74,
-          "parentID": 44,
+          "localID": 137,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3685,8 +6387,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 75,
-          "parentID": 44,
+          "localID": 138,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3722,8 +6424,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 76,
-          "parentID": 44,
+          "localID": 139,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3778,8 +6480,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 77,
-          "parentID": 44,
+          "localID": 140,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3834,8 +6536,8 @@
         },
         {
           "name": "PROP_Chair_Flipped(E1)",
-          "localID": 78,
-          "parentID": 44,
+          "localID": 141,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3871,8 +6573,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 79,
-          "parentID": 44,
+          "localID": 142,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3927,8 +6629,8 @@
         },
         {
           "name": "PROP_Photo(E1)",
-          "localID": 80,
-          "parentID": 44,
+          "localID": 143,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3964,8 +6666,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 81,
-          "parentID": 44,
+          "localID": 144,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4020,8 +6722,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 82,
-          "parentID": 44,
+          "localID": 145,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4076,8 +6778,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 83,
-          "parentID": 44,
+          "localID": 146,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4113,8 +6815,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 84,
-          "parentID": 44,
+          "localID": 147,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4169,8 +6871,8 @@
         },
         {
           "name": "NPC_Lobster(E1)",
-          "localID": 85,
-          "parentID": 44,
+          "localID": 148,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4225,8 +6927,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 86,
-          "parentID": 44,
+          "localID": 149,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4262,8 +6964,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 87,
-          "parentID": 44,
+          "localID": 150,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4318,8 +7020,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 88,
-          "parentID": 44,
+          "localID": 151,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4374,8 +7076,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 89,
-          "parentID": 44,
+          "localID": 152,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4411,8 +7113,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 90,
-          "parentID": 44,
+          "localID": 153,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4448,8 +7150,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 91,
-          "parentID": 44,
+          "localID": 154,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4504,8 +7206,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 92,
-          "parentID": 44,
+          "localID": 155,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4541,8 +7243,8 @@
         },
         {
           "name": "PROP_Cabinet(E1)",
-          "localID": 93,
-          "parentID": 44,
+          "localID": 156,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4578,8 +7280,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 94,
-          "parentID": 44,
+          "localID": 157,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4615,8 +7317,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 95,
-          "parentID": 44,
+          "localID": 158,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4652,8 +7354,8 @@
         },
         {
           "name": "PROP_Photo(E1)",
-          "localID": 96,
-          "parentID": 44,
+          "localID": 159,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4689,8 +7391,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 97,
-          "parentID": 44,
+          "localID": 160,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4726,8 +7428,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 98,
-          "parentID": 44,
+          "localID": 161,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4763,8 +7465,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 99,
-          "parentID": 44,
+          "localID": 162,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4800,8 +7502,8 @@
         },
         {
           "name": "PROP_Sink(E1)",
-          "localID": 100,
-          "parentID": 44,
+          "localID": 163,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4837,8 +7539,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 101,
-          "parentID": 44,
+          "localID": 164,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4893,8 +7595,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 102,
-          "parentID": 44,
+          "localID": 165,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4930,8 +7632,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 103,
-          "parentID": 44,
+          "localID": 166,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4967,8 +7669,8 @@
         },
         {
           "name": "PROP_Photo(E1)",
-          "localID": 104,
-          "parentID": 44,
+          "localID": 167,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5004,8 +7706,8 @@
         },
         {
           "name": "PROP_Sink(E1)",
-          "localID": 105,
-          "parentID": 44,
+          "localID": 168,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5041,8 +7743,8 @@
         },
         {
           "name": "PROP_DressTable(E1)",
-          "localID": 106,
-          "parentID": 44,
+          "localID": 169,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5078,8 +7780,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 107,
-          "parentID": 44,
+          "localID": 170,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5115,8 +7817,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 108,
-          "parentID": 44,
+          "localID": 171,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5152,8 +7854,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 109,
-          "parentID": 44,
+          "localID": 172,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5189,8 +7891,8 @@
         },
         {
           "name": "PROP_Mirror(E1)",
-          "localID": 110,
-          "parentID": 44,
+          "localID": 173,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5226,8 +7928,8 @@
         },
         {
           "name": "PROP_Mirror(E1)",
-          "localID": 111,
-          "parentID": 44,
+          "localID": 174,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5263,8 +7965,8 @@
         },
         {
           "name": "PROP_Photo(E1)",
-          "localID": 112,
-          "parentID": 44,
+          "localID": 175,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5300,8 +8002,8 @@
         },
         {
           "name": "PROP_Sink(E1)",
-          "localID": 113,
-          "parentID": 44,
+          "localID": 176,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5337,8 +8039,8 @@
         },
         {
           "name": "PROP_Chair_Flipped(E1)",
-          "localID": 114,
-          "parentID": 44,
+          "localID": 177,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5374,8 +8076,8 @@
         },
         {
           "name": "NPC_Jellyfish(E1)",
-          "localID": 115,
-          "parentID": 44,
+          "localID": 178,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5430,8 +8132,8 @@
         },
         {
           "name": "PROP_Chair_Flipped(E1)",
-          "localID": 116,
-          "parentID": 44,
+          "localID": 179,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5467,8 +8169,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 117,
-          "parentID": 44,
+          "localID": 180,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5504,8 +8206,8 @@
         },
         {
           "name": "NPC_Jellyfish(E1)",
-          "localID": 118,
-          "parentID": 44,
+          "localID": 181,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5560,8 +8262,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 119,
-          "parentID": 44,
+          "localID": 182,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5597,8 +8299,8 @@
         },
         {
           "name": "PROP_Sink(E1)",
-          "localID": 120,
-          "parentID": 44,
+          "localID": 183,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5634,8 +8336,8 @@
         },
         {
           "name": "PROP_Photo(E1)",
-          "localID": 121,
-          "parentID": 44,
+          "localID": 184,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5671,8 +8373,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 122,
-          "parentID": 44,
+          "localID": 185,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5708,8 +8410,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 123,
-          "parentID": 44,
+          "localID": 186,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5745,8 +8447,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 124,
-          "parentID": 44,
+          "localID": 187,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5782,8 +8484,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 125,
-          "parentID": 44,
+          "localID": 188,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5838,8 +8540,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 126,
-          "parentID": 44,
+          "localID": 189,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5894,8 +8596,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 127,
-          "parentID": 44,
+          "localID": 190,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5950,8 +8652,8 @@
         },
         {
           "name": "PROP_Mirror(E1)",
-          "localID": 128,
-          "parentID": 44,
+          "localID": 191,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5987,8 +8689,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 129,
-          "parentID": 44,
+          "localID": 192,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6043,8 +8745,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 130,
-          "parentID": 44,
+          "localID": 193,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6099,8 +8801,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 131,
-          "parentID": 44,
+          "localID": 194,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6155,8 +8857,8 @@
         },
         {
           "name": "NPC_Jellyfish(E1)",
-          "localID": 132,
-          "parentID": 44,
+          "localID": 195,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6211,8 +8913,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 133,
-          "parentID": 44,
+          "localID": 196,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6248,8 +8950,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 134,
-          "parentID": 44,
+          "localID": 197,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6304,8 +9006,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 135,
-          "parentID": 44,
+          "localID": 198,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6360,8 +9062,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 136,
-          "parentID": 44,
+          "localID": 199,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6416,8 +9118,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 137,
-          "parentID": 44,
+          "localID": 200,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6472,8 +9174,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 138,
-          "parentID": 44,
+          "localID": 201,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6528,8 +9230,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 139,
-          "parentID": 44,
+          "localID": 202,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6584,8 +9286,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 140,
-          "parentID": 44,
+          "localID": 203,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6621,8 +9323,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 141,
-          "parentID": 44,
+          "localID": 204,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6658,8 +9360,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 142,
-          "parentID": 44,
+          "localID": 205,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6695,8 +9397,8 @@
         },
         {
           "name": "PROP_Cabinet(E1)",
-          "localID": 143,
-          "parentID": 44,
+          "localID": 206,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6732,8 +9434,8 @@
         },
         {
           "name": "PROP_Photo(E1)",
-          "localID": 144,
-          "parentID": 44,
+          "localID": 207,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6769,8 +9471,8 @@
         },
         {
           "name": "PROP_Sink(E1)",
-          "localID": 145,
-          "parentID": 44,
+          "localID": 208,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6806,8 +9508,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 146,
-          "parentID": 44,
+          "localID": 209,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6843,8 +9545,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 147,
-          "parentID": 44,
+          "localID": 210,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6880,8 +9582,8 @@
         },
         {
           "name": "PROP_Cabinet(E1)",
-          "localID": 148,
-          "parentID": 44,
+          "localID": 211,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6917,8 +9619,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 149,
-          "parentID": 44,
+          "localID": 212,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6954,8 +9656,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 150,
-          "parentID": 44,
+          "localID": 213,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6991,8 +9693,8 @@
         },
         {
           "name": "PROP_Mirror_Flipped(E1)",
-          "localID": 151,
-          "parentID": 44,
+          "localID": 214,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7028,8 +9730,8 @@
         },
         {
           "name": "PROP_Sink(E1)",
-          "localID": 152,
-          "parentID": 44,
+          "localID": 215,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7065,8 +9767,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 153,
-          "parentID": 44,
+          "localID": 216,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7102,8 +9804,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 154,
-          "parentID": 44,
+          "localID": 217,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7158,8 +9860,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 155,
-          "parentID": 44,
+          "localID": 218,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7195,8 +9897,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 156,
-          "parentID": 44,
+          "localID": 219,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7251,8 +9953,8 @@
         },
         {
           "name": "PROP_Chair(E1)",
-          "localID": 157,
-          "parentID": 44,
+          "localID": 220,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7288,8 +9990,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 158,
-          "parentID": 44,
+          "localID": 221,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7344,8 +10046,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 159,
-          "parentID": 44,
+          "localID": 222,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7400,8 +10102,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 160,
-          "parentID": 44,
+          "localID": 223,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7437,8 +10139,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 161,
-          "parentID": 44,
+          "localID": 224,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7474,8 +10176,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 162,
-          "parentID": 44,
+          "localID": 225,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7511,8 +10213,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 163,
-          "parentID": 44,
+          "localID": 226,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7567,8 +10269,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 164,
-          "parentID": 44,
+          "localID": 227,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7623,8 +10325,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 165,
-          "parentID": 44,
+          "localID": 228,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7660,8 +10362,8 @@
         },
         {
           "name": "PROP_Window(E1)",
-          "localID": 166,
-          "parentID": 44,
+          "localID": 229,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7697,8 +10399,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 167,
-          "parentID": 44,
+          "localID": 230,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7753,14 +10455,14 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 168,
-          "parentID": 44,
+          "localID": 231,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
               1457.0594482421875,
-              1938.615966796875
+              1860.5460205078125
             ],
             "scale": [
               148.0,
@@ -7809,8 +10511,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 169,
-          "parentID": 44,
+          "localID": 232,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -7865,14 +10567,14 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 170,
-          "parentID": 44,
+          "localID": 233,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
               960.6328125,
-              1938.615966796875
+              1860.5460205078125
             ],
             "scale": [
               148.0,
@@ -7921,14 +10623,14 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 171,
-          "parentID": 44,
+          "localID": 234,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
               2124.920654296875,
-              1938.615966796875
+              1860.5460205078125
             ],
             "scale": [
               148.0,
@@ -7977,8 +10679,8 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 172,
-          "parentID": 44,
+          "localID": 235,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8033,14 +10735,14 @@
         },
         {
           "name": "PROP_WallLamp(E1)",
-          "localID": 173,
-          "parentID": 44,
+          "localID": 236,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
               342.1082458496094,
-              1938.61572265625
+              1860.5460205078125
             ],
             "scale": [
               148.0,
@@ -8089,8 +10791,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 174,
-          "parentID": 44,
+          "localID": 237,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8145,8 +10847,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 175,
-          "parentID": 44,
+          "localID": 238,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8182,8 +10884,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 176,
-          "parentID": 44,
+          "localID": 239,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8219,8 +10921,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 177,
-          "parentID": 44,
+          "localID": 240,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8275,8 +10977,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 178,
-          "parentID": 44,
+          "localID": 241,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8331,8 +11033,8 @@
         },
         {
           "name": "PROP_Balcony(E1)",
-          "localID": 179,
-          "parentID": 44,
+          "localID": 242,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8368,8 +11070,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 180,
-          "parentID": 44,
+          "localID": 243,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8424,8 +11126,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 181,
-          "parentID": 44,
+          "localID": 244,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8480,8 +11182,8 @@
         },
         {
           "name": "PROP_Candle(E1)",
-          "localID": 182,
-          "parentID": 44,
+          "localID": 245,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8536,8 +11238,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 183,
-          "parentID": 44,
+          "localID": 246,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8573,8 +11275,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 184,
-          "parentID": 44,
+          "localID": 247,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8610,8 +11312,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 185,
-          "parentID": 44,
+          "localID": 248,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8647,8 +11349,8 @@
         },
         {
           "name": "PROP_CeilingLamp(E1)",
-          "localID": 186,
-          "parentID": 44,
+          "localID": 249,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8684,8 +11386,8 @@
         },
         {
           "name": "PROP_Mirror(E1)",
-          "localID": 187,
-          "parentID": 44,
+          "localID": 250,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8721,8 +11423,8 @@
         },
         {
           "name": "PROP_DressTable(E1)",
-          "localID": 188,
-          "parentID": 44,
+          "localID": 251,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8758,8 +11460,8 @@
         },
         {
           "name": "PROP_DressTable(E1)",
-          "localID": 189,
-          "parentID": 44,
+          "localID": 252,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8795,8 +11497,8 @@
         },
         {
           "name": "PROP_DressTable(E1)",
-          "localID": 190,
-          "parentID": 44,
+          "localID": 253,
+          "parentID": 107,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8834,7 +11536,7 @@
     },
     {
       "name": "Pickups",
-      "localID": 191,
+      "localID": 254,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8852,8 +11554,8 @@
       "children": [
         {
           "name": "Coins",
-          "localID": 192,
-          "parentID": 191,
+          "localID": 255,
+          "parentID": 254,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -8870,8 +11572,8 @@
           "children": [
             {
               "name": "PU_Coin",
-              "localID": 193,
-              "parentID": 192,
+              "localID": 256,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -8948,8 +11650,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 194,
-              "parentID": 192,
+              "localID": 257,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9026,8 +11728,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 195,
-              "parentID": 192,
+              "localID": 258,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9104,8 +11806,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 196,
-              "parentID": 192,
+              "localID": 259,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9182,8 +11884,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 197,
-              "parentID": 192,
+              "localID": 260,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9260,8 +11962,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 198,
-              "parentID": 192,
+              "localID": 261,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9338,8 +12040,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 199,
-              "parentID": 192,
+              "localID": 262,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9416,8 +12118,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 200,
-              "parentID": 192,
+              "localID": 263,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9494,8 +12196,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 201,
-              "parentID": 192,
+              "localID": 264,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9572,8 +12274,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 202,
-              "parentID": 192,
+              "localID": 265,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9650,8 +12352,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 203,
-              "parentID": 192,
+              "localID": 266,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9728,8 +12430,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 204,
-              "parentID": 192,
+              "localID": 267,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9806,8 +12508,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 205,
-              "parentID": 192,
+              "localID": 268,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9884,8 +12586,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 206,
-              "parentID": 192,
+              "localID": 269,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -9962,8 +12664,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 207,
-              "parentID": 192,
+              "localID": 270,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10040,8 +12742,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 208,
-              "parentID": 192,
+              "localID": 271,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10118,8 +12820,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 209,
-              "parentID": 192,
+              "localID": 272,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10196,8 +12898,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 210,
-              "parentID": 192,
+              "localID": 273,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10274,8 +12976,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 211,
-              "parentID": 192,
+              "localID": 274,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10352,8 +13054,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 212,
-              "parentID": 192,
+              "localID": 275,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10430,8 +13132,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 213,
-              "parentID": 192,
+              "localID": 276,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10508,8 +13210,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 214,
-              "parentID": 192,
+              "localID": 277,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10586,8 +13288,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 215,
-              "parentID": 192,
+              "localID": 278,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10664,8 +13366,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 216,
-              "parentID": 192,
+              "localID": 279,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10742,8 +13444,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 217,
-              "parentID": 192,
+              "localID": 280,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10820,14 +13522,14 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 218,
-              "parentID": 192,
+              "localID": 281,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
                   33727.01953125,
-                  672.6448364257812
+                  672.6448364257813
                 ],
                 "scale": [
                   125.0,
@@ -10898,8 +13600,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 219,
-              "parentID": 192,
+              "localID": 282,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -10976,8 +13678,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 220,
-              "parentID": 192,
+              "localID": 283,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11054,8 +13756,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 221,
-              "parentID": 192,
+              "localID": 284,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11132,8 +13834,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 222,
-              "parentID": 192,
+              "localID": 285,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11210,8 +13912,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 223,
-              "parentID": 192,
+              "localID": 286,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11288,8 +13990,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 224,
-              "parentID": 192,
+              "localID": 287,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11366,8 +14068,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 225,
-              "parentID": 192,
+              "localID": 288,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11444,8 +14146,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 226,
-              "parentID": 192,
+              "localID": 289,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11522,8 +14224,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 227,
-              "parentID": 192,
+              "localID": 290,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11600,8 +14302,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 228,
-              "parentID": 192,
+              "localID": 291,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11678,8 +14380,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 229,
-              "parentID": 192,
+              "localID": 292,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11756,8 +14458,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 230,
-              "parentID": 192,
+              "localID": 293,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11834,8 +14536,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 231,
-              "parentID": 192,
+              "localID": 294,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11912,8 +14614,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 232,
-              "parentID": 192,
+              "localID": 295,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -11990,8 +14692,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 233,
-              "parentID": 192,
+              "localID": 296,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12068,8 +14770,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 234,
-              "parentID": 192,
+              "localID": 297,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12146,8 +14848,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 235,
-              "parentID": 192,
+              "localID": 298,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12224,8 +14926,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 236,
-              "parentID": 192,
+              "localID": 299,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12302,8 +15004,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 237,
-              "parentID": 192,
+              "localID": 300,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12380,8 +15082,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 238,
-              "parentID": 192,
+              "localID": 301,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12458,8 +15160,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 239,
-              "parentID": 192,
+              "localID": 302,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12536,8 +15238,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 240,
-              "parentID": 192,
+              "localID": 303,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12614,8 +15316,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 241,
-              "parentID": 192,
+              "localID": 304,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12692,8 +15394,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 242,
-              "parentID": 192,
+              "localID": 305,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12770,8 +15472,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 243,
-              "parentID": 192,
+              "localID": 306,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12848,8 +15550,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 244,
-              "parentID": 192,
+              "localID": 307,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -12926,8 +15628,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 245,
-              "parentID": 192,
+              "localID": 308,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13004,8 +15706,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 246,
-              "parentID": 192,
+              "localID": 309,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13082,8 +15784,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 247,
-              "parentID": 192,
+              "localID": 310,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13160,8 +15862,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 248,
-              "parentID": 192,
+              "localID": 311,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13238,8 +15940,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 249,
-              "parentID": 192,
+              "localID": 312,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13316,8 +16018,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 250,
-              "parentID": 192,
+              "localID": 313,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13394,8 +16096,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 251,
-              "parentID": 192,
+              "localID": 314,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13472,8 +16174,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 252,
-              "parentID": 192,
+              "localID": 315,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13550,8 +16252,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 253,
-              "parentID": 192,
+              "localID": 316,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13628,8 +16330,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 254,
-              "parentID": 192,
+              "localID": 317,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13706,8 +16408,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 255,
-              "parentID": 192,
+              "localID": 318,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13784,8 +16486,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 256,
-              "parentID": 192,
+              "localID": 319,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13862,8 +16564,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 257,
-              "parentID": 192,
+              "localID": 320,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -13940,8 +16642,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 258,
-              "parentID": 192,
+              "localID": 321,
+              "parentID": 255,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14020,8 +16722,8 @@
         },
         {
           "name": "Shells",
-          "localID": 260,
-          "parentID": 191,
+          "localID": 322,
+          "parentID": 254,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -14038,8 +16740,8 @@
           "children": [
             {
               "name": "PU_Shell",
-              "localID": 261,
-              "parentID": 260,
+              "localID": 323,
+              "parentID": 322,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14103,8 +16805,8 @@
             },
             {
               "name": "PU_Shell(1)",
-              "localID": 262,
-              "parentID": 260,
+              "localID": 324,
+              "parentID": 322,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14168,8 +16870,8 @@
             },
             {
               "name": "PU_Shell(2)",
-              "localID": 263,
-              "parentID": 260,
+              "localID": 325,
+              "parentID": 322,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14237,7 +16939,7 @@
     },
     {
       "name": "UI",
-      "localID": 264,
+      "localID": 326,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -14265,296 +16967,9 @@
       },
       "children": [
         {
-          "name": "Text FPS",
-          "localID": 265,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              100.0,
-              100.0
-            ],
-            "scale": [
-              1.0,
-              1.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "",
-            "color": [
-              1.0,
-              0.5,
-              0.5,
-              1.0
-            ],
-            "layer": 0,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "TextComponent": {
-            "enabled": false,
-            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-            "fontSize": 50,
-            "text": "FPS",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "scale": 1.0,
-            "screenSpace": true
-          },
-          "children": []
-        },
-        {
-          "name": "InGamePauseButton",
-          "localID": 266,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1825.0,
-              70.0
-            ],
-            "scale": [
-              125.0,
-              110.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/playing_button.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 700,
-            "screenSpace": true,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "ShellIcon1",
-          "localID": 267,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1700.0,
-              920.0
-            ],
-            "scale": [
-              90.0,
-              90.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 700,
-            "screenSpace": true,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "ShellIcon2",
-          "localID": 268,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1770.0,
-              920.0
-            ],
-            "scale": [
-              90.0,
-              90.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 700,
-            "screenSpace": true,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "ShellIcon3",
-          "localID": 269,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1840.0,
-              920.0
-            ],
-            "scale": [
-              90.0,
-              90.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Shell_icon_dark.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 700,
-            "screenSpace": true,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "CoinIcon",
-          "localID": 270,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1700.0,
-              830.0
-            ],
-            "scale": [
-              100.0,
-              105.5
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Icons/Coin_icon.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 700,
-            "screenSpace": true,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "CoinCountText",
-          "localID": 271,
-          "parentID": 264,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1750.0,
-              810.0
-            ],
-            "scale": [
-              1.0,
-              1.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "",
-            "color": [
-              1.0,
-              0.5,
-              0.5,
-              1.0
-            ],
-            "layer": 0,
-            "screenSpace": true,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "TextComponent": {
-            "enabled": true,
-            "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
-            "fontSize": 60,
-            "text": "0",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "scale": 1.0,
-            "screenSpace": true
-          },
-          "children": []
-        },
-        {
           "name": "Timer Bar",
-          "localID": 272,
-          "parentID": 264,
+          "localID": 327,
+          "parentID": 326,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -14571,8 +16986,8 @@
           "children": [
             {
               "name": "LevelTimerBarFrame",
-              "localID": 273,
-              "parentID": 272,
+              "localID": 328,
+              "parentID": 327,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14608,8 +17023,8 @@
             },
             {
               "name": "LevelTimerBar",
-              "localID": 274,
-              "parentID": 272,
+              "localID": 329,
+              "parentID": 327,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14645,8 +17060,8 @@
             },
             {
               "name": "LevelTimerBarBackground",
-              "localID": 275,
-              "parentID": 272,
+              "localID": 330,
+              "parentID": 327,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14686,7 +17101,7 @@
     },
     {
       "name": "Hazards",
-      "localID": 276,
+      "localID": 331,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -14704,8 +17119,8 @@
       "children": [
         {
           "name": "Spike_Hazard(10)",
-          "localID": 277,
-          "parentID": 276,
+          "localID": 332,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -14717,7 +17132,7 @@
               742.5001220703125,
               150.0000457763672
             ],
-            "rotation": 179.556396484375
+            "rotation": 179.55638122558594
           },
           "RenderComponent": {
             "enabled": true,
@@ -14772,8 +17187,8 @@
           "children": [
             {
               "name": "Hazard Collider(2)",
-              "localID": 278,
-              "parentID": 277,
+              "localID": 333,
+              "parentID": 332,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -14785,7 +17200,7 @@
                   50.00007247924805,
                   101.94992065429688
                 ],
-                "rotation": 179.556396484375
+                "rotation": 179.55638122558594
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -14802,8 +17217,8 @@
         },
         {
           "name": "Spike_Hazard(11)",
-          "localID": 279,
-          "parentID": 276,
+          "localID": 334,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -14880,8 +17295,8 @@
         },
         {
           "name": "Spike_Hazard(12)",
-          "localID": 280,
-          "parentID": 276,
+          "localID": 335,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -14949,8 +17364,8 @@
         },
         {
           "name": "Spike_Hazard(13)",
-          "localID": 281,
-          "parentID": 276,
+          "localID": 336,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15027,8 +17442,8 @@
         },
         {
           "name": "Spike_Hazard(14)",
-          "localID": 282,
-          "parentID": 276,
+          "localID": 337,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15105,8 +17520,8 @@
         },
         {
           "name": "Spike_Hazard(15)",
-          "localID": 283,
-          "parentID": 276,
+          "localID": 338,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15173,8 +17588,8 @@
           "children": [
             {
               "name": "Hazard Collider(3)",
-              "localID": 284,
-              "parentID": 283,
+              "localID": 339,
+              "parentID": 338,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -15203,8 +17618,8 @@
         },
         {
           "name": "Spike_Hazard(32)",
-          "localID": 285,
-          "parentID": 276,
+          "localID": 340,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15281,8 +17696,8 @@
         },
         {
           "name": "Spike_Hazard(78)",
-          "localID": 286,
-          "parentID": 276,
+          "localID": 341,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15359,8 +17774,8 @@
         },
         {
           "name": "Spike_Hazard(8)",
-          "localID": 287,
-          "parentID": 276,
+          "localID": 342,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15428,8 +17843,8 @@
         },
         {
           "name": "Spike_Hazard(9)",
-          "localID": 288,
-          "parentID": 276,
+          "localID": 343,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15506,8 +17921,8 @@
         },
         {
           "name": "Spike_Hazard(10)",
-          "localID": 289,
-          "parentID": 276,
+          "localID": 344,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15584,8 +17999,8 @@
         },
         {
           "name": "Spike_Hazard(1)",
-          "localID": 290,
-          "parentID": 276,
+          "localID": 345,
+          "parentID": 331,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -15664,7 +18079,7 @@
     },
     {
       "name": "Tilemap",
-      "localID": 291,
+      "localID": 346,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -15704,7 +18119,7 @@
     },
     {
       "name": "PauseOverlay",
-      "localID": 292,
+      "localID": 347,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -15741,7 +18156,7 @@
     },
     {
       "name": "PauseBoard",
-      "localID": 293,
+      "localID": 348,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -15778,7 +18193,7 @@
     },
     {
       "name": "PauseResumeButton",
-      "localID": 294,
+      "localID": 349,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -15815,7 +18230,7 @@
     },
     {
       "name": "PauseRestartButton",
-      "localID": 295,
+      "localID": 350,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -15866,7 +18281,7 @@
     },
     {
       "name": "PauseSettingsButton",
-      "localID": 296,
+      "localID": 351,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -15917,7 +18332,7 @@
     },
     {
       "name": "PauseMainMenuButton",
-      "localID": 297,
+      "localID": 352,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -15968,7 +18383,7 @@
     },
     {
       "name": "PauseHowToPlayButton",
-      "localID": 298,
+      "localID": 353,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16019,7 +18434,7 @@
     },
     {
       "name": "PauseGhostButton",
-      "localID": 299,
+      "localID": 354,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16070,7 +18485,7 @@
     },
     {
       "name": "PauseScreen_Settings",
-      "localID": 300,
+      "localID": 355,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16107,7 +18522,7 @@
     },
     {
       "name": "PauseMasterText",
-      "localID": 301,
+      "localID": 356,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16158,7 +18573,7 @@
     },
     {
       "name": "PauseMusicText",
-      "localID": 302,
+      "localID": 357,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16209,7 +18624,7 @@
     },
     {
       "name": "PauseSFXText",
-      "localID": 303,
+      "localID": 358,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16260,7 +18675,7 @@
     },
     {
       "name": "PauseSlider_Bar_Master",
-      "localID": 304,
+      "localID": 359,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16297,7 +18712,7 @@
     },
     {
       "name": "PauseSlider_Bar_Back_Master",
-      "localID": 305,
+      "localID": 360,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16334,7 +18749,7 @@
     },
     {
       "name": "PauseSlider_Knob_Master",
-      "localID": 306,
+      "localID": 361,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16371,7 +18786,7 @@
     },
     {
       "name": "PauseSlider_Bar_Music",
-      "localID": 307,
+      "localID": 362,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16408,7 +18823,7 @@
     },
     {
       "name": "PauseSlider_Bar_Back_Music",
-      "localID": 308,
+      "localID": 363,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16445,7 +18860,7 @@
     },
     {
       "name": "PauseSlider_Knob_Music",
-      "localID": 309,
+      "localID": 364,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16482,7 +18897,7 @@
     },
     {
       "name": "PauseSlider_Bar_SFX",
-      "localID": 310,
+      "localID": 365,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16519,7 +18934,7 @@
     },
     {
       "name": "PauseSlider_Bar_Back_SFX",
-      "localID": 311,
+      "localID": 366,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16556,7 +18971,7 @@
     },
     {
       "name": "PauseSlider_Knob_SFX",
-      "localID": 312,
+      "localID": 367,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16593,7 +19008,7 @@
     },
     {
       "name": "PauseMasterMuteButton",
-      "localID": 313,
+      "localID": 368,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16630,7 +19045,7 @@
     },
     {
       "name": "PauseMusicMuteButton",
-      "localID": 314,
+      "localID": 369,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16667,7 +19082,7 @@
     },
     {
       "name": "PauseSFXMuteButton",
-      "localID": 315,
+      "localID": 370,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16704,7 +19119,7 @@
     },
     {
       "name": "PauseBackButton",
-      "localID": 316,
+      "localID": 371,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16741,7 +19156,7 @@
     },
     {
       "name": "PauseScreen_HowToPlay",
-      "localID": 317,
+      "localID": 372,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16778,7 +19193,7 @@
     },
     {
       "name": "HowToPlayBackButton",
-      "localID": 318,
+      "localID": 373,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16815,7 +19230,7 @@
     },
     {
       "name": "PauseGhostBoard",
-      "localID": 319,
+      "localID": 374,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16852,7 +19267,7 @@
     },
     {
       "name": "PauseGhostTitle",
-      "localID": 320,
+      "localID": 375,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16903,7 +19318,7 @@
     },
     {
       "name": "PauseGhost_Toggle",
-      "localID": 321,
+      "localID": 376,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -16954,7 +19369,7 @@
     },
     {
       "name": "PauseGhost_Slot0",
-      "localID": 322,
+      "localID": 377,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -17005,7 +19420,7 @@
     },
     {
       "name": "PauseGhost_Slot1",
-      "localID": 323,
+      "localID": 378,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -17056,7 +19471,7 @@
     },
     {
       "name": "PauseGhost_Slot2",
-      "localID": 324,
+      "localID": 379,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
@@ -17107,7 +19522,7 @@
     },
     {
       "name": "PauseGhost_Back",
-      "localID": 325,
+      "localID": 380,
       "parentID": 4294967295,
       "active": false,
       "TransformComponent": {
