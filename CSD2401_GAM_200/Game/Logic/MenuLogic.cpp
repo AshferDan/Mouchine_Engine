@@ -2029,11 +2029,14 @@ void MenuLogicSystem::PopulateLeaderboard()
 
     const char *nameSlots[] = {"Name_1st_Text", "Name_2nd_Text", "Name_3rd_Text"};
     const char *timeSlots[] = {"Time_1st_Text", "Time_2nd_Text", "Time_3rd_Text"};
+    const char* ratingSlots[] = {"Letterscore_1st", "Letterscore_2nd", "Letterscore_3rd"}; 
+
 
     for (int i = 0; i < 3; ++i)
     {
         auto *nameObj = factory.FindGameObject(nameSlots[i]);
         auto *timeObj = factory.FindGameObject(timeSlots[i]);
+        auto* ratingObj = factory.FindGameObject(ratingSlots[i]);
 
         if (i < static_cast<int>(m_leaderboardData.size()))
         {
@@ -2054,6 +2057,19 @@ void MenuLogicSystem::PopulateLeaderboard()
                     tc->SetText(buf);
                 }
             }
+
+            if (ratingObj)
+            {
+                if (auto* r = ratingObj->GetComponent<RenderComponent>())
+                {
+                    const char* texture = "../Assets/Sprites/Icons/Letterscore_dash.png";
+                    if (entry.rating >= 85.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
+                    else if (entry.rating >= 75.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
+                    else if (entry.rating >= 65.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
+                    else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
+                    r->SetTextureID(GraphicsSystem::LoadTexture(texture));
+                }
+            }
         }
         else
         {
@@ -2063,6 +2079,9 @@ void MenuLogicSystem::PopulateLeaderboard()
             if (timeObj)
                 if (auto *tc = timeObj->GetComponent<TextComponent>())
                     tc->SetText("--:--.--");
+            if (ratingObj)
+                if (auto* tc = ratingObj->GetComponent<TextComponent>())
+                    tc->SetText("--.--%");
         }
     }
 }
