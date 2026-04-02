@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "WinLoseLogic.h"
+#include "DoorAnimationLogic.h"
 #include "GhostSystem.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
@@ -559,10 +560,20 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                             std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
                         }
 
-                        // Hand off to the normal win sequence
+                        // Hand off to the door animation → win sequence
                         CORE->SetGamePaused(false);
                         isWaitingForWin = true;
-                        winDelayTimer = 0.5f;
+                        if (m_doorAnim)
+                        {
+                            winDelayTimer = 1000000.0f; // door anim calls TriggerWin; timer must not fire
+                            m_doorAnim->StartAnimation(
+                                [this]() { TriggerWin(); },
+                                [this]() { isWaitingForWin = false; });
+                        }
+                        else
+                        {
+                            winDelayTimer = 0.5f;       // fallback: no door animation available
+                        }
                     },
                     // --- onCancel (Escape) — proceed to win screen without saving ---
                     [this]()
@@ -570,7 +581,17 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
                         CORE->SetGamePaused(false);
                         isWaitingForWin = true;
-                        winDelayTimer = 0.5f;
+                        if (m_doorAnim)
+                        {
+                            winDelayTimer = 1000000.0f;
+                            m_doorAnim->StartAnimation(
+                                [this]() { TriggerWin(); },
+                                [this]() { isWaitingForWin = false; });
+                        }
+                        else
+                        {
+                            winDelayTimer = 0.5f;
+                        }
                     });
             }
             else
@@ -591,7 +612,17 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                 }
                 CORE->SetGamePaused(false);
                 isWaitingForWin = true;
-                winDelayTimer = 0.5f;
+                if (m_doorAnim)
+                {
+                    winDelayTimer = 1000000.0f;
+                    m_doorAnim->StartAnimation(
+                        [this]() { TriggerWin(); },
+                        [this]() { isWaitingForWin = false; });
+                }
+                else
+                {
+                    winDelayTimer = 0.5f;
+                }
             }
         }
     }

@@ -22,13 +22,11 @@ Technology is prohibited.
 #include <iostream>
 #include <algorithm>
 
-// ---------------------------------------------------------------------------
-// Behaviour constants — layout is driven entirely by the scene JSON.
-// ---------------------------------------------------------------------------
+
 static constexpr float MP_SEEK_SECS  = 5.0f;   // Seconds to skip forward / rewind
 
 // ---------------------------------------------------------------------------
-// GameObject name constants — must match the scene hierarchy exactly.
+// GameObject name constants 
 // ---------------------------------------------------------------------------
 static constexpr const char* OBJ_ROOT   = "Media_Player";
 static constexpr const char* OBJ_BOX    = "Replay_box";
@@ -40,10 +38,14 @@ static constexpr const char* OBJ_VIDEO  = "ReplayVideo";    // Restart button
 static constexpr const char* OBJ_SLIDER = "Replay_slider";
 
 // ---------------------------------------------------------------------------
-// Icon paths — add Replay_paused.png to Assets/Sprites/Icons/ for the swap.
+// Icon paths 
 // ---------------------------------------------------------------------------
 static constexpr const char* ICON_PLAY  = "../Assets/Sprites/Icons/Replay_playing.png";
-static constexpr const char* ICON_PAUSE = "../Assets/Sprites/Icons/paused_button.png";
+static constexpr const char* ICON_PAUSE = "../Assets/Sprites/Icons/Replay_pause.png";
+static constexpr const char* ICON_HOVER_PLAY = "../Assets/Sprites/Icons/Replay_playing_light.png";
+static constexpr const char* ICON_PRESS_PLAY = "../Assets/Sprites/Icons/Replay_playing_dark.png";
+static constexpr const char* ICON_HOVER_PAUSE = "../Assets/Sprites/Icons/Replay_paused_dark.png";
+static constexpr const char* ICON_PRESS_PAUSE = "../Assets/Sprites/Icons/Replay_paused_dark.png";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -57,15 +59,11 @@ void MediaPlayerLogicSystem::SetObjectActive(const char* name, bool active)
 
     obj->SetActive(active);
 
-    // Components are serialised as disabled when the object is inactive,
-    // so we explicitly enable/disable the ones we care about.
     if (auto* tf = obj->GetComponent<TransformComponent>())
         tf->SetEnabled(active);
     if (auto* rc = obj->GetComponent<RenderComponent>())
     {
         rc->SetEnabled(active);
-        // Force screen space on every child — some may have been saved with
-        // screenSpace=false if they were not individually updated in the editor.
         if (active)
             rc->SetScreenSpace(true);
     }
@@ -81,6 +79,8 @@ void MediaPlayerLogicSystem::Initialize()
     m_mouseWasDown   = false;
     m_sliderDragging = false;
     m_wasPaused      = false;
+    m_playHovered    = false;
+    m_playPressed    = false;
 }
 
 void MediaPlayerLogicSystem::Update(float dt)
@@ -152,21 +152,18 @@ void MediaPlayerLogicSystem::DestroyMediaPlayer()
     std::cout << "[MediaPlayerLogic] Media_Player deactivated.\n";
 }
 
-void MediaPlayerLogicSystem::UpdatePlayPauseIcon(bool paused)
+static void SetPlayIcon(const char* iconPath)
 {
-    auto& factory = GameObjectFactory::Instance();
-    GameObject* btn = factory.FindGameObject(OBJ_PLAY);
-    if (!btn) return;
-
-    auto* rc = btn->GetComponent<RenderComponent>();
-    if (!rc)  return;
-
     GraphicsSystem* gfx = CORE ? CORE->GetGraphicsSystem() : nullptr;
     if (!gfx) return;
 
-    // paused == true  → replay is paused, so show the PLAY icon (click to resume)
-    // paused == false → replay is running, so show the PAUSE icon (click to pause)
-    const char* iconPath = paused ? ICON_PLAY : ICON_PAUSE;
+    auto& factory = GameObjectFactory::Instance();
+    GameObject* btn = factory.FindGameObject(OBJ_PLAY);
+    if (!btn) return;
+    auto* rc = btn->GetComponent<RenderComponent>();
+    if (!rc)  return;
+
+    if (std::string(rc->GetTexturePath()) == iconPath) return; // already correct
 
     GLuint newTex = gfx->LoadTexture(iconPath);
     if (newTex)
@@ -176,6 +173,13 @@ void MediaPlayerLogicSystem::UpdatePlayPauseIcon(bool paused)
         rc->SetTextureID(newTex);
         rc->SetTexturePath(iconPath);
     }
+}
+
+void MediaPlayerLogicSystem::UpdatePlayPauseIcon(bool paused)
+{
+    // paused == true  → replay is paused, so show the PLAY icon (click to resume)
+    // paused == false → replay is running, so show the PAUSE icon (click to pause)
+    SetPlayIcon(paused ? ICON_PLAY : ICON_PAUSE);
 }
 
 void MediaPlayerLogicSystem::UpdateMediaPlayer()
@@ -216,14 +220,6 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
     if (!ghost->IsReplayPaused() && duration > 0.f && clock >= duration)
         ghost->ToggleReplayPause();
 
-    // --- Play / Pause icon: swap texture whenever the pause state changes ---
-    const bool isPaused = ghost->IsReplayPaused();
-    if (isPaused != m_wasPaused)
-    {
-        UpdatePlayPauseIcon(isPaused);
-        m_wasPaused = isPaused;
-    }
-
     // --- Mouse input (convert GLFW top-left Y to screen-space bottom-left Y) ---
     const float windowH  = (float)gfx->GetWindowHeight();
     const float mouseX   = (float)input->GetMouseX();
@@ -246,6 +242,32 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
             && mouseY >= tf->posY - tf->scaleY * 0.5f
             && mouseY <= tf->posY + tf->scaleY * 0.5f;
     };
+
+    // --- Play / Pause button: hover / press / normal icon ---
+    const bool isPaused    = ghost->IsReplayPaused();
+    const bool overPlay    = HitTest(OBJ_PLAY);
+    const bool pressedPlay = overPlay && mouseDown;
+
+    if (pressedPlay)
+    {
+        // Pressed: dark variant
+        SetPlayIcon(isPaused ? ICON_PRESS_PLAY : ICON_PRESS_PAUSE);
+    }
+    else if (overPlay)
+    {
+        // Hovered: light variant
+        SetPlayIcon(isPaused ? ICON_HOVER_PLAY : ICON_HOVER_PAUSE);
+    }
+    else
+    {
+        // Normal: swap only when state changes to avoid redundant GPU work
+        if (isPaused != m_wasPaused)
+            UpdatePlayPauseIcon(isPaused);
+    }
+
+    m_playHovered = overPlay;
+    m_playPressed = pressedPlay;
+    m_wasPaused   = isPaused;
 
     // --- Begin slider drag when clicking inside the timeline bar ---
     if (mouseJustPressed && !m_sliderDragging)

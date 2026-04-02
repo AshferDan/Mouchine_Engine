@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "transform.h"
 #include "core.h"
 
+class DoorAnimationLogicSystem;  // forward declaration
+
 /**
  * @class WinLoseLogicSystem
  * @brief Handles win and lose state transitions, UI screens, and scene loading logic.
@@ -59,6 +61,12 @@ public:
     void SetCurrentScene(const std::string& scenePath) { currentScenePath = scenePath; }
 
     /**
+     * @brief Connects the door animation system so it plays when the player wins.
+     * @param doorAnim Pointer to the registered DoorAnimationLogicSystem.
+     */
+    void SetDoorAnimSystem(DoorAnimationLogicSystem* doorAnim) { m_doorAnim = doorAnim; }
+
+    /**
      * @brief Checks if the win screen UI is currently active.
      * @return True if win screen is enabled.
      */
@@ -78,6 +86,9 @@ public:
     float CalculateRating() const;
 
 private:
+    // ---------------- DOOR ANIMATION ----------------
+    DoorAnimationLogicSystem* m_doorAnim = nullptr;
+
     // ---------------- WIN STATE ----------------
     bool hasPlayerWon = false;
     float winDelayTimer = 0.0f;
