@@ -302,7 +302,7 @@ void WinLoseLogicSystem::Update(float dt)
             {"WinSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
             {"WinSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
             {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
-            {"WinRatingBadge",  vec2((550.0f + 80.0f) * uiScale,  -50.0f * uiScale)},
+            {"WinRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
             {"WinSignHere",     vec2(550.0f * uiScale, -220.0f * uiScale)},
             {"WinSignLabel",    vec2(550.0f * uiScale, -270.0f * uiScale)},
             {"QuitButton",      vec2(550.0f * uiScale, -370.0f * uiScale)}
@@ -349,7 +349,7 @@ void WinLoseLogicSystem::Update(float dt)
             {"LoseSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
             {"LoseSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
             {"LoseRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
-            {"LoseRatingBadge",  vec2((550.0f + 170.0f) * uiScale,  -50.0f * uiScale)},
+            {"LoseRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
             {"LoseSignHereCross",vec2(550.0f * uiScale, -160.0f * uiScale)},
             {"LoseSignHere",     vec2(550.0f * uiScale, -220.0f * uiScale)},
             {"LoseSignLabel",    vec2(550.0f * uiScale, -270.0f * uiScale)},
@@ -933,7 +933,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
     GameObject* ratingBadge = factory.CreateGameObject("WinRatingBadge");
     auto* ratingBadgeT = ratingBadge->AddComponent<TransformComponent>();
-    ratingBadgeT->posX = camPos.x + (panelX + 80.0f * uiScale);
+    ratingBadgeT->posX = camPos.x + (panelX + 100.0f * uiScale);
     ratingBadgeT->posY = camPos.y + -20.0f * uiScale;
     ratingBadgeT->scaleX = 120.0f * uiScale;
     ratingBadgeT->scaleY = 100.0f * uiScale;
@@ -968,7 +968,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* winSignHere = factory.CreateGameObject("WinSignHere");
     auto* winSignT = winSignHere->AddComponent<TransformComponent>();
     winSignT->posX = camPos.x + panelX;
-    winSignT->posY = camPos.y + -160.0f * uiScale;
+    winSignT->posY = camPos.y + -220.0f * uiScale;
     winSignT->scaleX = 420.0f * uiScale;
     winSignT->scaleY = 120.0f * uiScale;
     auto* winSignR = winSignHere->AddComponent<RenderComponent>();
@@ -980,7 +980,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* winSignLabel = factory.CreateGameObject("WinSignLabel");
     auto* winSignLabelT = winSignLabel->AddComponent<TransformComponent>();
     winSignLabelT->posX = camPos.x + panelX;
-    winSignLabelT->posY = camPos.y + -210.0f * uiScale;
+    winSignLabelT->posY = camPos.y + -270.0f * uiScale;
     winSignLabelT->scaleX = 420.0f * uiScale;
     winSignLabelT->scaleY = 50.0f * uiScale;
     winSignLabel->AddComponent<TextComponent>(
@@ -992,7 +992,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* quitBtn = factory.CreateGameObject("QuitButton");
     auto* quitTransform = quitBtn->AddComponent<TransformComponent>();
     quitTransform->posX = camPos.x + panelX;
-    quitTransform->posY = camPos.y + -280.0f * uiScale;
+    quitTransform->posY = camPos.y + -370.0f * uiScale;
     quitTransform->scaleX = 430.0f * uiScale;
     quitTransform->scaleY = 130.0f * uiScale;
     auto* quitRender = quitBtn->AddComponent<RenderComponent>();
@@ -1422,7 +1422,7 @@ void WinLoseLogicSystem::TriggerLose()
     // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
     GameObject* ratingBadge = factory.CreateGameObject("LoseRatingBadge");
     auto* ratingBadgeT = ratingBadge->AddComponent<TransformComponent>();
-    ratingBadgeT->posX = camPos.x + (panelX +  50.0f * uiScale);
+    ratingBadgeT->posX = camPos.x + (panelX +  100.0f * uiScale);
     ratingBadgeT->posY = camPos.y + -20.0f * uiScale;
     ratingBadgeT->scaleX = 120.0f * uiScale;
     ratingBadgeT->scaleY = 100.0f * uiScale;
