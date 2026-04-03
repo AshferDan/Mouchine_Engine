@@ -9451,7 +9451,7 @@
            {
         "name": "SkipCutScene",
         "filepath": "../Assets/Audio/skip_cutscene.wav",
-        "loop": true,
+        "loop": false,
         "volume": 1.0,
         "pitch": 1.0,
         "category": "sfx"
@@ -9501,6 +9501,30 @@
         "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
         "loop": false,
         "volume": 0.800000011920929,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "Replay_BGM",
+        "filepath": "../Assets/Replay/Replay_BGM.wav",
+        "loop": true,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "Replay_Pause",
+        "filepath": "../Assets/Replay/Replay_Pause.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "Replay_Unpause",
+        "filepath": "../Assets/Replay/Replay_Unpause.wav",
+        "loop": false,
+        "volume": 0.5,
         "pitch": 1.0,
         "category": "sfx"
       },
@@ -9745,6 +9769,54 @@
         "category": "sfx"
       },
       {
+        "name": "typing_sfx_1",
+        "filepath": "../Assets/Replay/Typing_01.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_2",
+        "filepath": "../Assets/Replay/Typing_02.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_3",
+        "filepath": "../Assets/Replay/Typing_03.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_4",
+        "filepath": "../Assets/Replay/Typing_04.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_5",
+        "filepath": "../Assets/Replay/Typing_05.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_6",
+        "filepath": "../Assets/Replay/Typing_06.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "victory",
         "filepath": "../Assets/audio/victory.wav",
         "loop": true,
@@ -9782,78 +9854,6 @@
         "loop": false,
         "volume": 0.10000000149011612,
         "pitch": 0.8999999761581421,
-        "category": "sfx"
-      },
-      {
-        "name": "typing_sfx_1",
-        "filepath": "../Assets/Replay/Typing_01.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "typing_sfx_2",
-        "filepath": "../Assets/Replay/Typing_02.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "typing_sfx_3",
-        "filepath": "../Assets/Replay/Typing_03.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "typing_sfx_4",
-        "filepath": "../Assets/Replay/Typing_04.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "typing_sfx_5",
-        "filepath": "../Assets/Replay/Typing_05.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "typing_sfx_6",
-        "filepath": "../Assets/Replay/Typing_06.wav",
-        "loop": false,
-        "volume": 0.4,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "Replay_BGM",
-        "filepath": "../Assets/Replay/Replay_BGM.wav",
-        "loop": true,
-        "volume": 0.30000001192092896,
-        "pitch": 1.0,
-        "category": "bgm"
-      },
-      {
-        "name": "Replay_Pause",
-        "filepath": "../Assets/Replay/Replay_Pause.wav",
-        "loop": false,
-        "volume": 0.5,
-        "pitch": 1.0,
-        "category": "sfx"
-      },
-      {
-        "name": "Replay_Unpause",
-        "filepath": "../Assets/Replay/Replay_Unpause.wav",
-        "loop": false,
-        "volume": 0.5,
-        "pitch": 1.0,
         "category": "sfx"
       }
     ],

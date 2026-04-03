@@ -28,14 +28,14 @@
                             3788.49853515625
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_TOP.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -44,6 +44,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Top",
+                        "animations": [
+                            {
+                                "name": "Pillar_Top",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -58,14 +77,14 @@
                             3788.49853515625
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_TOP.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -74,6 +93,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Top",
+                        "animations": [
+                            {
+                                "name": "Pillar_Top",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -88,14 +126,14 @@
                             2615.55419921875
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -104,6 +142,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -118,14 +175,14 @@
                             2615.5537109375
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -134,6 +191,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -148,14 +224,14 @@
                             1435.5556640625
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -164,6 +240,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -178,14 +273,14 @@
                             1435.5556640625
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -194,6 +289,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -208,14 +322,14 @@
                             -4500.0
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -224,6 +338,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -238,14 +371,14 @@
                             -4500.0
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -254,6 +387,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -268,14 +420,14 @@
                             258.8883056640625
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -284,6 +436,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -298,14 +469,14 @@
                             -934.4442138671875
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -314,6 +485,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -328,14 +518,14 @@
                             -934.4442138671875
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -344,6 +534,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -358,14 +567,14 @@
                             -2125.11083984375
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -374,6 +583,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -388,14 +616,14 @@
                             -2124.4443359375
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -404,6 +632,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -418,14 +665,14 @@
                             -3313.333251953125
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -434,6 +681,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -448,14 +714,14 @@
                             -3313.999267578125
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -464,6 +730,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 },
@@ -478,14 +763,14 @@
                             247.7774658203125
                         ],
                         "scale": [
-                            569.0322265625,
+                            1580.0,
                             1296.0
                         ],
                         "rotation": 0.0
                     },
                     "RenderComponent": {
                         "shapeType": "Square",
-                        "texturePath": "../Assets/PILLAR_BOTTOM.png",
+                        "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
                         "color": [
                             1.0,
                             1.0,
@@ -494,6 +779,25 @@
                         ],
                         "layer": -109,
                         "screenSpace": false
+                    },
+                    "Spritesheet": {
+                        "enabled": true,
+                        "defaultAnimation": "Pillar_Bottom",
+                        "animations": [
+                            {
+                                "name": "Pillar_Bottom",
+                                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                                "rows": 2,
+                                "cols": 5,
+                                "startRow": 0,
+                                "startCol": 0,
+                                "endRow": 1,
+                                "endCol": 2,
+                                "fps": 8.0,
+                                "pingPong": false,
+                                "flipRows": true
+                            }
+                        ]
                     },
                     "children": []
                 }

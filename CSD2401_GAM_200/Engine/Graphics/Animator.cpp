@@ -80,6 +80,9 @@ Spritesheet::Spritesheet(Spritesheet const &rhs, GameObject *NewClone)
 	animation_mList = rhs.animation_mList;
 	currentAnimName = rhs.currentAnimName;
 	looping = rhs.looping;
+	pingPongMode = rhs.pingPongMode;
+	animationDirection = rhs.animationDirection;
+	flipRows = rhs.flipRows;
 }
 
 /**
