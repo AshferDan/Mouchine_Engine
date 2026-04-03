@@ -1267,7 +1267,7 @@
             ],
             "scale": [
               1587.1998291015625,
-              793.5999145507813
+              793.5999145507812
             ],
             "rotation": 0.0
           },
@@ -1489,7 +1489,7 @@
               3050.323486328125
             ],
             "scale": [
-              668.9519653320313,
+              668.9519653320312,
               413.6940002441406
             ],
             "rotation": 0.0
@@ -2425,7 +2425,7 @@
               3054.8623046875
             ],
             "scale": [
-              245.22000122070313,
+              245.22000122070312,
               416.02001953125
             ],
             "rotation": 0.0
@@ -3195,7 +3195,7 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              547.7000122070313,
+              547.7000122070312,
               3843.43408203125
             ],
             "scale": [
@@ -4039,7 +4039,7 @@
             ],
             "scale": [
               1957.565185546875,
-              246.27200317382813
+              246.27200317382812
             ],
             "rotation": 0.0
           },
@@ -4060,7 +4060,7 @@
             "layer": "Ground",
             "size": [
               1957.565185546875,
-              246.27200317382813
+              246.27200317382812
             ]
           },
           "children": []
@@ -4117,7 +4117,7 @@
             ],
             "scale": [
               6002.7958984375,
-              188.48599243164063
+              188.48599243164062
             ],
             "rotation": 0.0
           },
@@ -4138,7 +4138,7 @@
             "layer": "Ground",
             "size": [
               6002.7958984375,
-              188.48599243164063
+              188.48599243164062
             ]
           },
           "children": []
@@ -4234,7 +4234,7 @@
             ],
             "scale": [
               127.98899841308594,
-              960.0640258789063
+              960.0640258789062
             ],
             "rotation": 0.0
           },
@@ -4255,7 +4255,7 @@
             "layer": "Ground",
             "size": [
               127.98899841308594,
-              960.0640258789063
+              960.0640258789062
             ]
           },
           "children": []
@@ -7203,8 +7203,8 @@
           3969.0
         ],
         "scale": [
-          4200.0,
-          12960.0
+          2600.0,
+          6400.0
         ],
         "rotation": 0.0
       },
@@ -7239,8 +7239,8 @@
               4099.0
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7276,8 +7276,8 @@
               1158.996337890625
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7313,8 +7313,8 @@
               1693.441650390625
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7350,8 +7350,8 @@
               3539.00048828125
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7387,8 +7387,8 @@
               8824.5556640625
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7424,8 +7424,8 @@
               8324.5556640625
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7461,8 +7461,8 @@
               5900.11083984375
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7498,8 +7498,8 @@
               6399.0
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7533,12 +7533,12 @@
       "TransformComponent": {
         "enabled": true,
         "pos": [
-          -4199.94140625,
+          -2600.0,
           3969.0
         ],
         "scale": [
-          4200.0,
-          12960.0
+          2600.0,
+          6400.0
         ],
         "rotation": 0.0
       },
@@ -7573,8 +7573,8 @@
               4099.0
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7610,8 +7610,8 @@
               1158.996337890625
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7647,8 +7647,8 @@
               1693.441650390625
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7684,8 +7684,8 @@
               3539.00048828125
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7721,8 +7721,8 @@
               8824.5556640625
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7758,8 +7758,8 @@
               8324.5556640625
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7795,8 +7795,8 @@
               5900.11083984375
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7832,8 +7832,8 @@
               6399.0
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7867,12 +7867,12 @@
       "TransformComponent": {
         "enabled": true,
         "pos": [
-          4170.05322265625,
+          2600.0,
           3969.0
         ],
         "scale": [
-          4200.0,
-          12960.0
+          2600.0,
+          6400.0
         ],
         "rotation": 0.0
       },
@@ -7907,8 +7907,8 @@
               4099.0
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -7944,8 +7944,8 @@
               1158.996337890625
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -7981,8 +7981,8 @@
               1693.441650390625
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -8018,8 +8018,8 @@
               3539.00048828125
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -8055,8 +8055,8 @@
               8824.5556640625
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -8092,8 +8092,8 @@
               8331.1298828125
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -8129,8 +8129,8 @@
               5906.685546875
             ],
             "scale": [
-              690.9677734375,
-              448.4399108886719
+              520.0,
+              300.0
             ],
             "rotation": 0.0
           },
@@ -8166,8 +8166,8 @@
               6405.57421875
             ],
             "scale": [
-              1219.3546142578125,
-              179.99996948242188
+              830.0,
+              120.0
             ],
             "rotation": 0.0
           },
@@ -8219,12 +8219,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              8051.94287109375
+              -600.0,
+              6580.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8275,12 +8275,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1199.9998779296875,
-              8051.94287109375
+              -600.0,
+              6580.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8331,12 +8331,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1200.0001220703125,
-              6878.99853515625
+              600.0,
+              5550.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8387,12 +8387,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              6878.998046875
+              -600.0,
+              5550.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8443,12 +8443,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1204.1937255859375,
-              5699.0
+              600.0,
+              4510.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8499,124 +8499,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              5699.0
+              -600.0,
+              4510.0
             ],
             "scale": [
-              1580.0,
-              1296.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": -109,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Pillar_Bottom",
-            "animations": [
-              {
-                "name": "Pillar_Bottom",
-                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-                "rows": 2,
-                "cols": 5,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 1,
-                "endCol": 2,
-                "fps": 8.0,
-                "pingPong": false,
-                "flipRows": true
-              }
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "Pillar_left",
-          "localID": 179,
-          "parentID": 172,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -1199.9998779296875,
-              -236.55560302734375
-            ],
-            "scale": [
-              1580.0,
-              1296.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": -109,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Pillar_Bottom",
-            "animations": [
-              {
-                "name": "Pillar_Bottom",
-                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-                "rows": 2,
-                "cols": 5,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 1,
-                "endCol": 2,
-                "fps": 8.0,
-                "pingPong": false,
-                "flipRows": true
-              }
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "Pillar_Right",
-          "localID": 180,
-          "parentID": 172,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1204.1937255859375,
-              -236.55560302734375
-            ],
-            "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8667,12 +8555,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1204.1937255859375,
-              4522.33251953125
+              600.0,
+              3470.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8723,12 +8611,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1204.1937255859375,
-              3329.000244140625
+              600.0,
+              2430.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8779,12 +8667,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              3329.000244140625
+              -600.0,
+              2430.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8835,12 +8723,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1204.1937255859375,
-              2138.33349609375
+              600.0,
+              1390.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8891,12 +8779,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              2139.0
+              -600.0,
+              1390.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -8947,12 +8835,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              950.1111450195313
+              -600.0,
+              350.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9003,12 +8891,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1204.1937255859375,
-              949.4451293945313
+              600.0,
+              350.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9059,12 +8947,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -1199.9998779296875,
-              4511.2216796875
+              -600.0,
+              3470.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9135,12 +9023,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              8051.94287109375
+              -4750.0,
+              6580.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9191,12 +9079,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2950.00048828125,
-              8051.94287109375
+              -4750.0,
+              6580.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9247,12 +9135,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2950.00048828125,
-              6878.99853515625
+              -3550.0,
+              5550.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9303,12 +9191,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              6878.998046875
+              -4750.0,
+              5550.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9359,12 +9247,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2945.806640625,
-              5699.0
+              -3550.0,
+              4510.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9415,124 +9303,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              5699.0
+              -4750.0,
+              4510.0
             ],
             "scale": [
-              1580.0,
-              1296.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": -109,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Pillar_Bottom",
-            "animations": [
-              {
-                "name": "Pillar_Bottom",
-                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-                "rows": 2,
-                "cols": 5,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 1,
-                "endCol": 2,
-                "fps": 8.0,
-                "pingPong": false,
-                "flipRows": true
-              }
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "Pillar_left",
-          "localID": 196,
-          "parentID": 189,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -5349.99951171875,
-              -236.55560302734375
-            ],
-            "scale": [
-              1580.0,
-              1296.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": -109,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Pillar_Bottom",
-            "animations": [
-              {
-                "name": "Pillar_Bottom",
-                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-                "rows": 2,
-                "cols": 5,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 1,
-                "endCol": 2,
-                "fps": 8.0,
-                "pingPong": false,
-                "flipRows": true
-              }
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "Pillar_Right",
-          "localID": 197,
-          "parentID": 189,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -2945.806640625,
-              -236.55560302734375
-            ],
-            "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9583,12 +9359,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2945.806640625,
-              4522.33251953125
+              -3550.0,
+              3470.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9639,12 +9415,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2945.806640625,
-              3329.000244140625
+              -3550.0,
+              2430.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9695,12 +9471,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              3329.000244140625
+              -4750.0,
+              2430.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9751,12 +9527,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2945.806640625,
-              2138.33349609375
+              -3550.0,
+              1390.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9807,12 +9583,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              2139.0
+              -4750.0,
+              1390.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9863,12 +9639,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              950.1111450195313
+              -4750.0,
+              350.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9919,12 +9695,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -2945.806640625,
-              949.4451293945313
+              -3550.0,
+              350.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -9975,12 +9751,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -5349.99951171875,
-              4511.2216796875
+              -4750.0,
+              3470.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10051,12 +9827,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              8051.94287109375
+              3550.07,
+              6580.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10107,12 +9883,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5350.0703125,
-              8051.94287109375
+              3550.07,
+              6580.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10163,12 +9939,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5350.0703125,
-              6878.99853515625
+              4750.07,
+              5550.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10219,12 +9995,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              6878.998046875
+              3550.07,
+              5550.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10275,12 +10051,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5354.263671875,
-              5699.0
+              4750.07,
+              4510.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10331,124 +10107,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              5699.0
+              3550.07,
+              4510.0
             ],
             "scale": [
-              1580.0,
-              1296.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": -109,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Pillar_Bottom",
-            "animations": [
-              {
-                "name": "Pillar_Bottom",
-                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-                "rows": 2,
-                "cols": 5,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 1,
-                "endCol": 2,
-                "fps": 8.0,
-                "pingPong": false,
-                "flipRows": true
-              }
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "Pillar_left",
-          "localID": 213,
-          "parentID": 206,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              2950.0703125,
-              -236.55560302734375
-            ],
-            "scale": [
-              1580.0,
-              1296.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": -109,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Pillar_Bottom",
-            "animations": [
-              {
-                "name": "Pillar_Bottom",
-                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
-                "rows": 2,
-                "cols": 5,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 1,
-                "endCol": 2,
-                "fps": 8.0,
-                "pingPong": false,
-                "flipRows": true
-              }
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "Pillar_Right",
-          "localID": 214,
-          "parentID": 206,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              5354.263671875,
-              -236.55560302734375
-            ],
-            "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10499,12 +10163,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5354.263671875,
-              4522.33251953125
+              4750.07,
+              3470.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10555,12 +10219,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5354.263671875,
-              3329.000244140625
+              4750.07,
+              2430.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10611,12 +10275,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              3329.000244140625
+              3550.07,
+              2430.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10667,12 +10331,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5354.263671875,
-              2138.33349609375
+              4750.07,
+              1390.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10723,12 +10387,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              2139.0
+              3550.07,
+              1390.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10779,12 +10443,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              950.1111450195313
+              3550.07,
+              350.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10835,12 +10499,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              5354.263671875,
-              949.4451293945313
+              4750.07,
+              350.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
@@ -10891,12 +10555,12 @@
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              2950.0703125,
-              4511.2216796875
+              3550.07,
+              3470.0
             ],
             "scale": [
-              1580.0,
-              1296.0
+              1000.0,
+              1040.0
             ],
             "rotation": 0.0
           },
