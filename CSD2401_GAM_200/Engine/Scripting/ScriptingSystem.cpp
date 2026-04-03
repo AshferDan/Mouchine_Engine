@@ -2100,6 +2100,11 @@ bool ScriptSystem::AttachScript(GameObject* gameObject, const std::string& scrip
     std::cout << "[ScriptSystem] Successfully attached " << scriptClassName
         << " to " << gameObject->GetName() << std::endl;
 
+    // OnAwake fires immediately on creation (editor or runtime).
+    // OnStart is deferred: EnterPlayMode fires it in debug, or the Update
+    // safety-net fires it in release before the first OnUpdate.
+    CallOnAwake(gameObject);
+
     return true;
 }
 void ScriptSystem::RemoveScript(GameObject *gameObject, const std::string &scriptClassName)
@@ -2403,8 +2408,10 @@ void ScriptSystem::Update(float deltaTime)
         if (!LayerManager::IsLayerEnabled(gameObject->GetGameLayer()))
             continue;
 
-        // Ensure OnAwake and OnStart run before the first OnUpdate for this script
-        CallOnAwake(gameObject);
+        // OnAwake already fired in AttachScript (on creation).
+        // Fire OnStart here as a safety-net for release mode:
+        // EnterPlayMode calls it for debug, but the first Update tick
+        // catches any script that slipped through (e.g. runtime spawns).
         CallOnStart(gameObject);
         CallOnUpdate(gameObject, deltaTime);
     }
