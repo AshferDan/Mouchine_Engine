@@ -248,7 +248,7 @@ namespace CSharpScript
                 CSharpScript.GameObject.CreateAnimatedImage(
                     pu_vfx,
                     0, 0,
-                    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
+                    Transform.GetScale(OwnerName).x * 1.5f, Transform.GetScale(OwnerName).y * 1.5f,
                     "../Assets/spritesheet_player_vfx.png",
                     15, 11,
                     14, 10, 14, 10,
@@ -312,6 +312,7 @@ namespace CSharpScript
             Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.8f, 1.5f, "sfx_loop");
             Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.15f, 1.1f, "sfx");
             Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
+            Audio.AddSound("hurt_bass_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.4f, 1.0f, "sfx");
 
             // load 3D spatial sound for NPCs (scissors snip for lobster)
             for (int i = 0; i < NPCs.Count(); i++)
@@ -331,7 +332,7 @@ namespace CSharpScript
                 {
                     audioPath = "../Assets/Audio/DoorGlow.wav";
                     soundName = "door_glow";
-                    volume = 0.4f;
+                    volume = 0.6f;
                 }
 
                 if (string.IsNullOrEmpty(audioPath) || string.IsNullOrEmpty(soundName))
@@ -361,14 +362,14 @@ namespace CSharpScript
             Audio.AddSound("land_sfx3", "../Assets/audio/Player/Land/Land3.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx4", "../Assets/audio/Player/Land/Land4.wav", false, 0.3f, 1.0f, "sfx");
             //hurt
-            Audio.AddSound("hurt_sfx1", "../Assets/audio/Player/Hurt_01.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx2", "../Assets/audio/Player/Hurt_02.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx3", "../Assets/audio/Player/Hurt_03.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx4", "../Assets/audio/Player/Hurt_04.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx5", "../Assets/audio/Player/Hurt_05.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx1", "../Assets/audio/Player/Hurt/Hurt_01.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx2", "../Assets/audio/Player/Hurt/Hurt_02.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx3", "../Assets/audio/Player/Hurt/Hurt_03.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx4", "../Assets/audio/Player/Hurt/Hurt_04.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx5", "../Assets/audio/Player/Hurt/Hurt_05.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
 
 
             // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_R EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
@@ -416,6 +417,7 @@ namespace CSharpScript
             // Pickup VFX
             Animation.RegisterAnimation(pu_vfx, "Speed", "../Assets/spritesheet_player_vfx.png",            15, 11, 2, 4, 2, 10, 8.0f);
             Animation.RegisterAnimation(pu_vfx, "Time", "../Assets/spritesheet_player_vfx.png",             15, 11, 1, 4, 1, 9, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Shell", "../Assets/Sprites/Sheets/shell_vfx_spritehseet.png",  1, 10, 0, 0, 0, 9, 8.0f);
             Animation.RegisterAnimation(pu_vfx, "Clear", "../Assets/spritesheet_player_vfx.png",            15, 11, 14, 10, 14, 10, 0f);
 
             _isFacingRight = true;
@@ -2107,6 +2109,7 @@ namespace CSharpScript
                     if (enableDebug) Debug.Log("CurrState: " + "Hurting");
                     Random rndHurt = new Random();
                     int variationHurt = rndHurt.Next(1, 9);                     // 8 diff landing sounds
+                    Audio.PlaySound("hurt_bass_sfx", "sfx");
                     Audio.PlaySound("hurt_sfx" + variationHurt.ToString(), "sfx");
                     Camera.CameraFlash(0.75f, 1, 0, 0, 0.4f, true, 1.0f);
                     break;
