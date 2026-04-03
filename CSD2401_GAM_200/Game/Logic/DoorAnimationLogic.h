@@ -75,7 +75,7 @@ private:
 
     // ── Timings (seconds) ───────────────────────────────────────────────────
     static constexpr float k_closeDuration = 0.7f;
-    static constexpr float k_holdDuration  = 0.4f;
+    static constexpr float k_holdDuration  = 1.0f;
     static constexpr float k_openDuration  = 0.7f;
 
     // ── Screen-space positions for a 1920 x 1080 display ───────────────────

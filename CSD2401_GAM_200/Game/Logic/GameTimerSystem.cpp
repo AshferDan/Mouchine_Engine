@@ -200,7 +200,7 @@ void GameTimerSystem::Update(float dt)
             remainingTime -= dt;
         }
 
-        if (remainingTime <= 10.0f && !hasTriggeredPanicSound)
+        if (remainingTime <= 22.05f && !hasTriggeredPanicSound)
         {
             hasTriggeredPanicSound = true;
             CORE->GetAudioManager()->PlaySound("timer_ending");

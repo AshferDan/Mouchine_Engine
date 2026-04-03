@@ -2006,7 +2006,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
-    // Get audio manager for low pass filter
+    // Get audio manager for low pass filter and sound effects
     AudioManager* audioManager = CORE->GetAudioManager();
 
     // Reset pause settings and how to play state when closing pause menu
@@ -2028,6 +2028,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
         SetButtonTexture("PauseGhostButton", ButtonState::Normal);
 
+        // Play unpause sound effect before removing low pass filter
+        if (audioManager)
+        {
+            audioManager->PlaySound("game_unpause");
+        }
+
         // remove low pass filter when pause menu closes
         if (audioManager)
         {
@@ -2038,6 +2044,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     }
     else
     {
+        // Play pause sound effect before applying low pass filter
+        if (audioManager)
+        {
+            audioManager->PlaySound("game_pause");
+        }
+
         // apply low pass filter when pause menu opens
         if (audioManager)
         {
@@ -2352,16 +2364,16 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     howToPlayTransform->scaleX = 1920.0f * uiScale;
     howToPlayTransform->scaleY = 1080.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M5_Control_Panel.png"));
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 
     GameObject* backBtn = factory.CreateGameObject("HowToPlayBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
-    backBtnTransform->posX = 625.0f * uiScale;
-    backBtnTransform->posY = -235.0f * uiScale;
-    backBtnTransform->scaleX = 200.0f * uiScale;
-    backBtnTransform->scaleY = 180.0f * uiScale;
+    backBtnTransform->posX = 670.0f * uiScale;
+    backBtnTransform->posY = 280.0f * uiScale;
+    backBtnTransform->scaleX = 180.0f * uiScale;
+    backBtnTransform->scaleY = 160.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
     backBtnRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
     backBtnRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -2420,6 +2432,12 @@ void PauseMenuLogicSystem::SetHowToPlayVisible(bool show)
         {
             obj->SetActive(show);
         }
+    }
+
+    // Reset back button to normal state when showing How to Play
+    if (show)
+    {
+        SetButtonTexture("HowToPlayBackButton", ButtonState::Normal);
     }
 }
 

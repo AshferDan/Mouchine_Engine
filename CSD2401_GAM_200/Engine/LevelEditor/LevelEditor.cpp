@@ -318,17 +318,17 @@ void LevelEditor::EnterPlayMode()
 
     editorMode = EditorMode::Play;
 
-    // Fire OnAwake then OnStart on all existing scripts
+    // OnAwake already fired for every script when it was attached (on creation).
+    // EnterPlayMode only needs to fire OnStart — this is the "play clicked" moment.
     if (CORE && CORE->GetScriptSystem())
     {
         auto* scriptSys = CORE->GetScriptSystem();
         const auto& gameObjects = factory.GetAllGameObjects();
         for (const auto& go : gameObjects)
         {
-            scriptSys->CallOnAwake(go.get());
             scriptSys->CallOnStart(go.get());
         }
-        std::cout << "[LevelEditor] Called OnAwake + OnStart on all scripts.\n";
+        std::cout << "[LevelEditor] Called OnStart on all scripts (OnAwake fired on creation).\n";
     }
 
     // start bgm when play is click
@@ -996,6 +996,20 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                     float timerLength = settings["LevelTimerLength"].get<float>();
                     gameCb->SetLevelTimerLength(timerLength);
                     std::cout << "[LoadLevel] Game settings loaded (Timer: " << timerLength << "s)" << std::endl;
+                }
+
+                // load audio fade durations
+                if (settings.contains("AudioFadeDurations"))
+                {
+                    const auto& fadeDurations = settings["AudioFadeDurations"];
+                    float winIn = fadeDurations.value("winFadeIn", 2.0f);
+                    float loseIn = fadeDurations.value("loseFadeIn", 2.0f);
+                    float replayOut = fadeDurations.value("replayFadeOut", 1.5f);
+                    float quitOut = fadeDurations.value("quitFadeOut", 2.0f);
+                    float nextOut = fadeDurations.value("nextFadeOut", 1.5f);
+                    float buffer = fadeDurations.value("fadeTimerBuffer", 0.2f);
+                    gameCb->SetAudioFadeDurations(winIn, loseIn, replayOut, quitOut, nextOut, buffer);
+                    std::cout << "[LoadLevel] Audio fade durations loaded (Win: " << winIn << "s, Lose: " << loseIn << "s)" << std::endl;
                 }
             }
         }
