@@ -131,9 +131,15 @@ private:
     void CheckWinZoneCollision();
 
     /**
-     * @brief Creates win screen UI objects and pauses the game.
+     * @brief Pauses the game, hides HUD, stops BGM, and starts the door animation.
      */
     void TriggerWin();
+
+    /**
+     * @brief Spawns all win screen UI objects. Called via the door animation's
+     *        onOpening callback so the screen is revealed as the doors slide open.
+     */
+    void CreateWinScreen();
 
     /**
      * @brief Handles hover/click logic for win screen buttons.

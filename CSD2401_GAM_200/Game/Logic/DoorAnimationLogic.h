@@ -54,12 +54,14 @@ public:
 
     /**
      * @brief Spawns the door prefab and begins the animation.
-     * @param onClosed  Callback fired when doors are fully closed.
-     *                  Use this to create the win/lose UI behind the doors.
-     * @param onOpened  Callback fired when doors are fully open again.
-     *                  Use this to hand control back to the win/lose system.
+     * @param onClosed   Callback fired when doors are fully closed (use for prep work).
+     * @param onOpened   Callback fired when doors are fully open and destroyed.
+     * @param onOpening  Optional callback fired when the OPENING phase begins —
+     *                   spawn win/lose UI here so it is revealed as the doors slide out.
      */
-    void StartAnimation(std::function<void()> onClosed, std::function<void()> onOpened);
+    void StartAnimation(std::function<void()> onClosed,
+                        std::function<void()> onOpened,
+                        std::function<void()> onOpening = nullptr);
 
     /** @return True while a door animation is in progress. */
     bool IsAnimating() const
@@ -85,6 +87,7 @@ private:
 
     std::function<void()> m_onClosed;
     std::function<void()> m_onOpened;
+    std::function<void()> m_onOpening;
 
     TransformComponent* m_leftTransform  = nullptr;
     TransformComponent* m_rightTransform = nullptr;

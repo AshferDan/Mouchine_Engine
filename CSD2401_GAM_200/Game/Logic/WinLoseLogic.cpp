@@ -583,14 +583,15 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         isWaitingForWin = true;
                         if (m_doorAnim)
                         {
-                            winDelayTimer = 1000000.0f; // door anim calls TriggerWin; timer must not fire
+                            winDelayTimer = 1000000.0f;
                             m_doorAnim->StartAnimation(
                                 [this]() { TriggerWin(); },
-                                [this]() { isWaitingForWin = false; });
+                                [this]() { isWaitingForWin = false; },
+                                [this]() { CreateWinScreen(); });
                         }
                         else
                         {
-                            winDelayTimer = 0.5f;       // fallback: no door animation available
+                            winDelayTimer = 0.5f;
                         }
                     },
                     // --- onCancel (Escape) — proceed to win screen without saving ---
@@ -604,7 +605,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                             winDelayTimer = 1000000.0f;
                             m_doorAnim->StartAnimation(
                                 [this]() { TriggerWin(); },
-                                [this]() { isWaitingForWin = false; });
+                                [this]() { isWaitingForWin = false; },
+                                [this]() { CreateWinScreen(); });
                         }
                         else
                         {
@@ -636,7 +638,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                     winDelayTimer = 1000000.0f;
                     m_doorAnim->StartAnimation(
                         [this]() { TriggerWin(); },
-                        [this]() { isWaitingForWin = false; });
+                        [this]() { isWaitingForWin = false; },
+                        [this]() { CreateWinScreen(); });
                 }
                 else
                 {
@@ -664,25 +667,31 @@ static std::string FormatElapsedTime(float seconds)
 }
 
 /**
- * @brief Creates win UI elements and pauses the game.
+ * @brief Pauses the game, hides HUD, stops BGM, and kicks off the door animation.
+ *        Win screen UI is spawned later in CreateWinScreen() via the onOpening callback.
  */
 void WinLoseLogicSystem::TriggerWin()
 {
     auto& factory = GameObjectFactory::Instance();
-    vec2 camPos = CameraManager::Instance().GetCameraPosition();
-    float uiScale = 2.0f;
-    if (m_doorAnim)
+
+    // Start door animation if one isn't already running.
+    // When called as onClosed (animation already in CLOSED_HOLD), skip — CreateWinScreen
+    // will fire automatically via the onOpening callback that was set by the outer caller.
+    if (m_doorAnim && !m_doorAnim->IsAnimating())
     {
         winDelayTimer = 1000000.0f;
         m_doorAnim->StartAnimation(
             [this]() {},
-            [this]() { isWaitingForWin = false; });
+            [this]() { isWaitingForWin = false; },
+            [this]() { CreateWinScreen(); });
     }
-    else
+    else if (!m_doorAnim)
     {
-        winDelayTimer = 0.5f;
+        CreateWinScreen();  // no door animation — show immediately
     }
-    // pause game first
+    // else: called as onClosed while animation is running; CreateWinScreen fires via onOpening
+
+    // Pause game
     CORE->SetGamePaused(true);
 
     // Hide timer UI and pause button
@@ -709,19 +718,30 @@ void WinLoseLogicSystem::TriggerWin()
     if (coinIcon) coinIcon->SetActive(false);
     if (coinText) coinText->SetActive(false);
 
-    // stop all music and play victory sound with fade in
+    // Stop BGM; victory music starts after doors open
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f);
     }
-
-    // Delay the victory BGM so it starts after the doors finish opening.
     m_winBGMDelayTimer = 1.5f;
 
+    m_timerRunning = false; // stop elapsed-time counter
+}
+
+/**
+ * @brief Spawns all win screen UI objects (background, stats panel, buttons).
+ *        Called via the door animation's onOpening callback so it is revealed
+ *        as the doors slide back open.
+ */
+void WinLoseLogicSystem::CreateWinScreen()
+{
+    auto& factory = GameObjectFactory::Instance();
+    vec2 camPos = CameraManager::Instance().GetCameraPosition();
+    float uiScale = 2.0f;
+
     // stats for the right-side panel
-    m_timerRunning = false; // stop timer on win
     std::string statTime = FormatElapsedTime(m_elapsedTime);
     std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
     std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";

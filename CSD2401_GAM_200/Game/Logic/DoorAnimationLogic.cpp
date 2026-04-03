@@ -41,14 +41,14 @@ void DoorAnimationLogicSystem::Initialize()
     m_rightTransform = nullptr;
     m_onClosed       = nullptr;
     m_onOpened       = nullptr;
+    m_onOpening      = nullptr;
     m_leftID         = UINT32_MAX;
     m_rightID        = UINT32_MAX;
     m_rootID         = UINT32_MAX;
     m_audioClosing   = true;
     m_audioOpening   = true;
-   
 
-    
+    API::AddSound("doorClose", "../Assets/Audio/play_button.wav", false, 1.0f, 1, "sfx");
 }
 
 /**
@@ -62,8 +62,6 @@ void DoorAnimationLogicSystem::Initialize()
  */
 void DoorAnimationLogicSystem::Update(float dt)
 {
-    API::AddSound("doorClose", "../Assets/Audio/play_button.wav", false, 1.0f, 1, "sfx");
-    
     if (m_state == DoorAnimState::IDLE || m_state == DoorAnimState::DONE)
         return;
 
@@ -112,6 +110,9 @@ void DoorAnimationLogicSystem::Update(float dt)
         {
             m_timer = 0.0f;
             m_state = DoorAnimState::OPENING;
+
+            // Spawn win/lose UI now — it will be revealed as the doors slide open
+            if (m_onOpening) m_onOpening();
         }
         break;
     }
@@ -148,10 +149,12 @@ void DoorAnimationLogicSystem::Update(float dt)
 
 void DoorAnimationLogicSystem::StartAnimation(
     std::function<void()> onClosed,
-    std::function<void()> onOpened)
+    std::function<void()> onOpened,
+    std::function<void()> onOpening)
 {
     m_onClosed     = std::move(onClosed);
     m_onOpened     = std::move(onOpened);
+    m_onOpening    = std::move(onOpening);
     m_timer        = 0.0f;
     m_audioClosing = true;
     m_audioOpening = true;
