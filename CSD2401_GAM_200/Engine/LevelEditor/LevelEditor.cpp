@@ -997,6 +997,20 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                     gameCb->SetLevelTimerLength(timerLength);
                     std::cout << "[LoadLevel] Game settings loaded (Timer: " << timerLength << "s)" << std::endl;
                 }
+
+                // load audio fade durations
+                if (settings.contains("AudioFadeDurations"))
+                {
+                    const auto& fadeDurations = settings["AudioFadeDurations"];
+                    float winIn = fadeDurations.value("winFadeIn", 2.0f);
+                    float loseIn = fadeDurations.value("loseFadeIn", 2.0f);
+                    float replayOut = fadeDurations.value("replayFadeOut", 1.5f);
+                    float quitOut = fadeDurations.value("quitFadeOut", 2.0f);
+                    float nextOut = fadeDurations.value("nextFadeOut", 1.5f);
+                    float buffer = fadeDurations.value("fadeTimerBuffer", 0.2f);
+                    gameCb->SetAudioFadeDurations(winIn, loseIn, replayOut, quitOut, nextOut, buffer);
+                    std::cout << "[LoadLevel] Audio fade durations loaded (Win: " << winIn << "s, Lose: " << loseIn << "s)" << std::endl;
+                }
             }
         }
 

@@ -4122,7 +4122,7 @@
       "RenderComponent": {
         "enabled": false,
         "shapeType": "Square",
-        "texturePath": "../Assets/Sprites/M5_Control_Panel.png",
+        "texturePath": "../Assets/Sprites/M6_ControlPanel.png",
         "color": [
           1.0,
           1.0,

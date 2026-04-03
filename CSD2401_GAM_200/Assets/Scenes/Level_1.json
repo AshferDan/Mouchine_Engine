@@ -9729,6 +9729,22 @@
         "category": "sfx"
       },
       {
+        "name": "game_pause",
+        "filepath": "../Assets/audio/game_pause.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "game_unpause",
+        "filepath": "../Assets/audio/game_unpause.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
         "name": "pickup_sfx",
         "filepath": "../Assets/audio/Player/Pickup.wav",
         "loop": false,
@@ -9873,6 +9889,14 @@
     ]
   },
   "GameSettings": {
-    "LevelTimerLength": 60.0
+    "LevelTimerLength": 60.0,
+    "AudioFadeDurations": {
+      "winFadeIn": 2.0,
+      "loseFadeIn": 2.0,
+      "replayFadeOut": 1.5,
+      "quitFadeOut": 2.0,
+      "nextFadeOut": 1.5,
+      "fadeTimerBuffer": 0.2
+    }
   }
 }
