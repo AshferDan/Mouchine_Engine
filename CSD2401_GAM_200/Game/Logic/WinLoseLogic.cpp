@@ -147,6 +147,22 @@ void WinLoseLogicSystem::Update(float dt)
         audioManager->UpdateFade(dt);
     }
 
+    // Delayed victory BGM — starts counting down once TriggerWin fires,
+    // plays when the timer expires (after the doors have finished opening).
+    if (m_winBGMDelayTimer > 0.0f)
+    {
+        m_winBGMDelayTimer -= dt;
+        if (m_winBGMDelayTimer <= 0.0f)
+        {
+            m_winBGMDelayTimer = -1.0f;
+            if (audioManager)
+            {
+                audioManager->PlaySound("victory");
+                audioManager->FadeInCategory("music", 2.0f);
+            }
+        }
+    }
+
     // Check if credits are playing and have finished
     if (isPlayingCredits)
     {
@@ -651,9 +667,18 @@ void WinLoseLogicSystem::TriggerWin()
 {
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
-
     float uiScale = 2.0f;
-
+    if (m_doorAnim)
+    {
+        winDelayTimer = 1000000.0f;
+        m_doorAnim->StartAnimation(
+            [this]() {},
+            [this]() { isWaitingForWin = false; });
+    }
+    else
+    {
+        winDelayTimer = 0.5f;
+    }
     // pause game first
     CORE->SetGamePaused(true);
 
@@ -687,9 +712,10 @@ void WinLoseLogicSystem::TriggerWin()
     {
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f);
-        audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", 2.0f);
     }
+
+    // Delay the victory BGM so it starts after the doors finish opening.
+    m_winBGMDelayTimer = 1.5f;
 
     // stats for the right-side panel
     m_timerRunning = false; // stop timer on win
@@ -736,6 +762,7 @@ void WinLoseLogicSystem::TriggerWin()
     levelNumObj->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(60 * uiScale),
         statLevelNum, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    levelNumObj->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Level subtitle: "Barbershop" ----
     GameObject* levelNameObj = factory.CreateGameObject("WinLevelName");
@@ -747,6 +774,7 @@ void WinLoseLogicSystem::TriggerWin()
     levelNameObj->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(36 * uiScale),
         statLevelName, vec4(0.2f, 0.15f, 0.1f, 1.0f), false);
+    levelNameObj->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Clock icon ----
     GameObject* clockIcon = factory.CreateGameObject("WinClockIcon");
@@ -770,6 +798,7 @@ void WinLoseLogicSystem::TriggerWin()
     timeText->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         statTime, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    timeText->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Coin icon ----
     GameObject* coinIconWin = factory.CreateGameObject("WinCoinIcon");
@@ -793,6 +822,7 @@ void WinLoseLogicSystem::TriggerWin()
     coinCountWin->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         statCoins, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    coinCountWin->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Shell icon ----
     GameObject* shellIconWin = factory.CreateGameObject("WinShellIcon");
@@ -816,6 +846,7 @@ void WinLoseLogicSystem::TriggerWin()
     shellCountWin->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         statShells, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    shellCountWin->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Shop Rating: label ----
     // ---- Shop Rating: label ----
@@ -828,6 +859,7 @@ void WinLoseLogicSystem::TriggerWin()
     ratingLabel->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         "Shop Rating:", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    ratingLabel->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
     GameObject* ratingBadge = factory.CreateGameObject("WinRatingBadge");
@@ -877,6 +909,7 @@ void WinLoseLogicSystem::TriggerWin()
     nextBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Continue", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    nextBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Replay button ----
     GameObject* replayBtn = factory.CreateGameObject("ReplayButton");
@@ -892,6 +925,7 @@ void WinLoseLogicSystem::TriggerWin()
     replayBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    replayBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Quit button ----
     GameObject* quitBtn = factory.CreateGameObject("QuitButton");
@@ -907,6 +941,7 @@ void WinLoseLogicSystem::TriggerWin()
     quitBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    quitBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     hasCreatedWinScreen = true;
 }

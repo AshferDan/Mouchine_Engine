@@ -15,6 +15,7 @@ Technology is prohibited.
 #include "System.h"
 #include "factory.h"
 #include "transform.h"
+#include "ScriptAPI.h"
 #include "core.h"
 #include <functional>
 
@@ -93,6 +94,10 @@ private:
     EntityID m_leftID  = UINT32_MAX;
     EntityID m_rightID = UINT32_MAX;
     EntityID m_rootID  = UINT32_MAX;
+
+    // One-shot flags so each animation phase plays its sound exactly once
+    bool m_audioClosing = true;
+    bool m_audioOpening = true;
 
     void SpawnDoors();
     void DestroyDoors();

@@ -46,7 +46,7 @@
                     1.0,
                     1.0
                 ],
-                "layer": 0,
+                "layer": 110,
                 "screenSpace": true,
                 "tileable": false,
                 "tileCount": [
@@ -83,7 +83,7 @@
                     1.0,
                     1.0
                 ],
-                "layer": 0,
+                "layer": 110,
                 "screenSpace": true,
                 "tileable": false,
                 "tileCount": [

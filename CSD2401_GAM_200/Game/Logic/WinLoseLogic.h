@@ -94,6 +94,8 @@ private:
     float winDelayTimer = 0.0f;
     bool isWaitingForWin = false;
     bool hasCreatedWinScreen = false;
+    bool AudioCheck = false;
+    float m_winBGMDelayTimer = -1.0f;  // counts down after doors open; -1 = inactive
 
     // ---------------- LOSE STATE ----------------
     bool hasCreatedLoseScreen = false;

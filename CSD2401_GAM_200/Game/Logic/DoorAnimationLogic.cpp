@@ -44,6 +44,11 @@ void DoorAnimationLogicSystem::Initialize()
     m_leftID         = UINT32_MAX;
     m_rightID        = UINT32_MAX;
     m_rootID         = UINT32_MAX;
+    m_audioClosing   = true;
+    m_audioOpening   = true;
+   
+
+    
 }
 
 /**
@@ -57,6 +62,8 @@ void DoorAnimationLogicSystem::Initialize()
  */
 void DoorAnimationLogicSystem::Update(float dt)
 {
+    API::AddSound("doorClose", "../Assets/Audio/play_button.wav", false, 1.0f, 1, "sfx");
+    
     if (m_state == DoorAnimState::IDLE || m_state == DoorAnimState::DONE)
         return;
 
@@ -65,12 +72,19 @@ void DoorAnimationLogicSystem::Update(float dt)
     dt = std::min(dt, 0.05f);
 
     m_timer += dt;
-
+    
     switch (m_state)
     {
     // ── Phase 1: slide doors in from off-screen ───────────────────────────
     case DoorAnimState::CLOSING:
     {
+
+        if (m_audioClosing) {
+            API::PlaySound("doorClose", "sfx");
+            m_audioClosing = false;
+        }
+        
+        
         float t = SmoothStep(m_timer / k_closeDuration);
         if (m_leftTransform)  m_leftTransform->posX  = Lerp(k_leftOpenX,  k_leftClosedX,  t);
         if (m_rightTransform) m_rightTransform->posX = Lerp(k_rightOpenX, k_rightClosedX, t);
@@ -86,6 +100,7 @@ void DoorAnimationLogicSystem::Update(float dt)
 
             // Doors are fully shut — caller creates the win/lose screen here
             if (m_onClosed) m_onClosed();
+            
         }
         break;
     }
@@ -104,6 +119,10 @@ void DoorAnimationLogicSystem::Update(float dt)
     // ── Phase 3: slide doors back out to reveal win/lose screen ──────────
     case DoorAnimState::OPENING:
     {
+        if (m_audioOpening) {
+            API::PlaySound("doorClose", "sfx");
+            m_audioOpening = false;
+        }
         float t = SmoothStep(m_timer / k_openDuration);
         if (m_leftTransform)  m_leftTransform->posX  = Lerp(k_leftClosedX,  k_leftOpenX,  t);
         if (m_rightTransform) m_rightTransform->posX = Lerp(k_rightClosedX, k_rightOpenX, t);
@@ -131,10 +150,12 @@ void DoorAnimationLogicSystem::StartAnimation(
     std::function<void()> onClosed,
     std::function<void()> onOpened)
 {
-    m_onClosed = std::move(onClosed);
-    m_onOpened = std::move(onOpened);
-    m_timer    = 0.0f;
-    m_state    = DoorAnimState::CLOSING;
+    m_onClosed     = std::move(onClosed);
+    m_onOpened     = std::move(onOpened);
+    m_timer        = 0.0f;
+    m_audioClosing = true;
+    m_audioOpening = true;
+    m_state        = DoorAnimState::CLOSING;
     SpawnDoors();
 }
 
@@ -155,7 +176,7 @@ void DoorAnimationLogicSystem::SpawnDoors()
     // Load the prefab; creates DOOR_ANIMATION, Door_LEFT, Door_RIGHT
     Serialization::LoadPrefab("DOOR_ANIMATION");
 
-    // Find only the objects that did NOT exist before loading — these are ours
+    // Find only the objects that did NOT exist before loading
     GameObject* leftObj  = nullptr;
     GameObject* rightObj = nullptr;
     GameObject* rootObj  = nullptr;
