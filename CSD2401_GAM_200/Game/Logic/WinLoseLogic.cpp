@@ -523,6 +523,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
 
             hasPlayerWon = true;
 
+            float score = CalculateRating();
+
             // Hide timer UI while the dialog is open
             //auto& factory = GameObjectFactory::Instance();
             if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
@@ -548,7 +550,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                 textInput->Show(
                     "Name Your Run!", 20,
                     // --- onConfirm ---
-                    [this](const std::string& rawName)
+                    [this, score](const std::string& rawName)
                     {
                         // Sanitise: trim whitespace, replace spaces with underscores
                         std::string runName = rawName;
@@ -571,7 +573,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                             ghost->SetLevelName(lvl);
                             if (CORE->GetGameCallbacks())
                                 ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
-
+                            ghost->SetRating(score);
                             ghost->SaveCurrentRun(runName);
                             std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
                         }
@@ -592,7 +594,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         }
                     },
                     // --- onCancel (Escape) — proceed to win screen without saving ---
-                    [this]()
+                    [this, score]()
                     {
                         std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
                         CORE->SetGamePaused(false);
@@ -624,6 +626,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                     ghost->SetLevelName(lvl);
                     if (CORE->GetGameCallbacks())
                         ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
+                    ghost->SetRating(score);
                     ghost->SaveCurrentRun("Level1_testing");
                 }
                 CORE->SetGamePaused(false);

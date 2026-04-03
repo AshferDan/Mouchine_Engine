@@ -9448,6 +9448,14 @@
         "pitch": 1.0,
         "category": "sfx"
       },
+           {
+        "name": "SkipCutScene",
+        "filepath": "../Assets/Audio/skip_cutscene.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
       {
         "name": "PU_Coin_sfx1",
         "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
