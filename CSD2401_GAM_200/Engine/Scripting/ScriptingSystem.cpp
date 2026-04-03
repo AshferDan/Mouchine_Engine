@@ -791,6 +791,15 @@ static int Internal_CountAllGameObjects()
     return GameObjectFactory::Instance().CountAllGameObjects();
 }
 
+static MonoArray* Internal_GetAllGameObjectIDs()
+{
+    std::vector<EntityID> ids = GameObjectFactory::Instance().GetAllGameObjectIDs();
+    MonoArray* arr = mono_array_new(mono_domain_get(), mono_get_int32_class(), ids.size());
+    for (size_t i = 0; i < ids.size(); ++i)
+        mono_array_set(arr, int, i, static_cast<int>(ids[i]));
+    return arr;
+}
+
 static float Internal_GetRemainingTime()
 {
     return API::GetRemainingTime();
@@ -1109,6 +1118,12 @@ static float Internal_GetMouseWorldY()
 {
     return API::GetMouseWorldY();
 }
+
+static bool Internal_IsGamepadButtonPressed(int button)  { return API::IsGamepadButtonPressed(button); }
+static bool Internal_IsGamepadButtonReleased(int button) { return API::IsGamepadButtonReleased(button); }
+static bool Internal_IsGamepadButtonHeld(int button)     { return API::IsGamepadButtonHeld(button); }
+static float Internal_GetGamepadAxis(int axis)           { return API::GetGamepadAxis(axis); }
+static bool Internal_IsGamepadConnected()                { return API::IsGamepadConnected(); }
 
 // === Pickup System ===
 static void Internal_CollectCoin()
@@ -1660,6 +1675,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameTimer::GetLevelLength",      (void *)Internal_GetLevelLength);
     mono_add_internal_call("CSharpScript.GameTimer::SetLevelTimerLength", (void *)Internal_SetLevelTimerLength);
     mono_add_internal_call("CSharpScript.GameTimer::AddTime",             (void *)Internal_AddTime);
+    mono_add_internal_call("CSharpScript.GameObject::CountAll",             (void *)Internal_CountAllGameObjects);
+    mono_add_internal_call("CSharpScript.GameObject::GetAllIDs",            (void *)Internal_GetAllGameObjectIDs);
 
     // === Transform ===
     mono_add_internal_call("CSharpScript.Transform::SetPosition", (void *)Internal_SetPosition);
@@ -1832,6 +1849,11 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Input::GetMouseY", (void*)Internal_GetMouseY);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldX", (void*)Internal_GetMouseWorldX);
     mono_add_internal_call("CSharpScript.Input::GetMouseWorldY", (void*)Internal_GetMouseWorldY);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadButtonPressed",  (void*)Internal_IsGamepadButtonPressed);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadButtonReleased", (void*)Internal_IsGamepadButtonReleased);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadButtonHeld",     (void*)Internal_IsGamepadButtonHeld);
+    mono_add_internal_call("CSharpScript.Input::GetGamepadAxis",          (void*)Internal_GetGamepadAxis);
+    mono_add_internal_call("CSharpScript.Input::IsGamepadConnected",      (void*)Internal_IsGamepadConnected);
 
     // === Pickup System ===
     mono_add_internal_call("CSharpScript.Pickups::CollectCoin",      (void*)Internal_CollectCoin);

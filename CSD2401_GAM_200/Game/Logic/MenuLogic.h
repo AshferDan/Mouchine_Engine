@@ -56,7 +56,7 @@ public:
     /**
      * @brief Initializes the menu logic system.
      */
-    void Initialize() override {}
+    void Initialize() override { m_levelSelectDataLoaded = false; }
  
     /**
      * @brief Resets the menu state to the default (Home screen).
@@ -86,7 +86,12 @@ private:
     void ScanReplays();
 
     // ===== Leaderboard =====
-    struct LeaderboardEntry { std::string name; float time; };
+    struct LeaderboardEntry {
+        std::string name; 
+        float time; 
+        float rating = 0.0f;  
+        int shells = 0;       
+    };
     std::vector<LeaderboardEntry> m_leaderboardData;
     int                           m_leaderboardLevel = 1;  ///< Which level tab (1/2/3) is shown.
     int                           m_selectedRank     = -1; ///< Which rank row is selected (0/1/2), -1 = none.
@@ -99,6 +104,13 @@ private:
 
     /** @brief Updates level tab and rank row textures to reflect current selections. */
     void UpdateLeaderboardTextures();
+
+    //Best stats per level 
+    LeaderboardEntry  m_level1Best;
+    LeaderboardEntry  m_level2Best;
+    LeaderboardEntry  m_level3Best;
+
+    bool m_levelSelectDataLoaded = false;
 
     // Slider state tracking
     struct SliderState {
@@ -123,7 +135,6 @@ private:
     std::string currentSliderCategory = "";  // "master", "music", or "sfx"
     bool justEnteredSettings = false;  // prevents slider input on first frame
     bool wasMouseDownOnSlider = false;  // tracks previous mouse state for click detection
-    bool justEnteredLevelSelect = false;
 
     // save last known volumes to restore visuals
     float savedMasterVolume = 1.0f;
@@ -174,9 +185,6 @@ private:
      * @brief Returns the button currently under the mouse for the active menu screen.
      */
     std::string FindHoveredButton(double mouseX, double mouseY);
-
-    void RefreshLevelSelectButtons();
-    void SelectLevel(const std::string& buttonName, const std::string& scenePath);
 
     /**
      * @brief Plays the correct UI sound for the clicked button.

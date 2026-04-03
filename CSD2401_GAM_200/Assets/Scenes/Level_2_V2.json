@@ -353,6 +353,7 @@
         ],
         "fields": {
           "PlayerMovement": {
+            "triggerSpeedBoost": false,
             "fRun": false,
             "fJump": true,
             "fIdle": false,
@@ -365,6 +366,7 @@
             "constForce": 5.0,
             "inputForce": 7.5,
             "vfx": "Hero_vfx",
+            "pu_vfx": "Pickup_vfx",
             "vfx_nontracking": "Hero_vfx_nontracking"
           },
           "PlayerMovementStats": {
@@ -390,6 +392,9 @@
             "T2_SkidDuration": 0.550000011920929,
             "T3_SkidDuration": 0.800000011920929,
             "SkidExitSpeed": 100.0,
+            "Speed_Multiplier": 1.5,
+            "Speed_Duration": 5.0,
+            "Time_PickupAmount": 5.0,
             "T3_BonkDuration": 0.6499999761581421,
             "GroundDetectionRayLength": 10.0,
             "HeadDetectionRayLength": 0.019999999552965164,
@@ -444,6 +449,7 @@
             "ZiplineCoyoteTime": 0.20000000298023224,
             "HazardTimeDeduction": 1.0,
             "HurtImmunityLength": 2.0,
+            "Audio3D_ActiveDistance": 3000.0,
             "JumpTimeDeduction": 1.0,
             "RunTimeDeduction": 0.10000000149011612,
             "ZiplineTimeDeduction": 3.0,
@@ -459,9 +465,9 @@
             "LayerBack": "",
             "LayerMid": "Pillar_BackGround",
             "LayerFront": "",
-            "FactorFarBack": 0.1,
+            "FactorFarBack": 0.10000000149011612,
             "FactorBack": 0.0,
-            "FactorMid": 0.55,
+            "FactorMid": 0.550000011920929,
             "FactorFront": 0.0,
             "FactorYFarBack": 1.0,
             "FactorYBack": 1.0,
@@ -483,7 +489,8 @@
           "PickupManager": {
             "Pickup_Coin_Name": "PU_Coin",
             "Pickup_Shell_Name": "PU_Shell",
-            "Pickup_PowerUp_Name": ""
+            "Pickup_Speed_Name": "PU_Speed",
+            "Pickup_Time_Name": "PU_Time"
           }
         }
       },
@@ -832,7 +839,7 @@
                 "endCol": 8,
                 "fps": 12.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -925,7 +932,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -981,7 +988,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -1148,7 +1155,7 @@
                 "endCol": 8,
                 "fps": 12.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -1204,7 +1211,7 @@
                 "endCol": 8,
                 "fps": 12.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -1260,7 +1267,7 @@
             ],
             "scale": [
               1587.1998291015625,
-              793.5999145507812
+              793.5999145507813
             ],
             "rotation": 0.0
           },
@@ -1334,7 +1341,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -1390,7 +1397,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -1482,7 +1489,7 @@
               3050.323486328125
             ],
             "scale": [
-              668.9519653320312,
+              668.9519653320313,
               413.6940002441406
             ],
             "rotation": 0.0
@@ -2418,7 +2425,7 @@
               3054.8623046875
             ],
             "scale": [
-              245.22000122070312,
+              245.22000122070313,
               416.02001953125
             ],
             "rotation": 0.0
@@ -2678,7 +2685,7 @@
                 "endCol": 8,
                 "fps": 12.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -2734,7 +2741,7 @@
                 "endCol": 8,
                 "fps": 12.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -3033,7 +3040,7 @@
     },
     {
       "name": "StartEndZones",
-      "localID": 72,
+      "localID": 55,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3062,8 +3069,8 @@
       "children": [
         {
           "name": "SZ_Asset",
-          "localID": 73,
-          "parentID": 72,
+          "localID": 56,
+          "parentID": 55,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3099,8 +3106,8 @@
         },
         {
           "name": "EZ_Asset",
-          "localID": 74,
-          "parentID": 72,
+          "localID": 57,
+          "parentID": 55,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3136,8 +3143,8 @@
         },
         {
           "name": "WinZone",
-          "localID": 75,
-          "parentID": 72,
+          "localID": 58,
+          "parentID": 55,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3182,13 +3189,13 @@
         },
         {
           "name": "SafeZone",
-          "localID": 76,
-          "parentID": 72,
+          "localID": 59,
+          "parentID": 55,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              547.7000122070312,
+              547.7000122070313,
               3843.43408203125
             ],
             "scale": [
@@ -3230,7 +3237,7 @@
     },
     {
       "name": "NPCs",
-      "localID": 77,
+      "localID": 60,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3259,8 +3266,8 @@
       "children": [
         {
           "name": "NPC_Lobster",
-          "localID": 78,
-          "parentID": 77,
+          "localID": 61,
+          "parentID": 60,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3307,7 +3314,7 @@
                 "endCol": 5,
                 "fps": 10.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -3315,8 +3322,8 @@
         },
         {
           "name": "NPC_Jellyfish",
-          "localID": 79,
-          "parentID": 77,
+          "localID": 62,
+          "parentID": 60,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3363,7 +3370,7 @@
                 "endCol": 4,
                 "fps": 10.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -3371,8 +3378,8 @@
         },
         {
           "name": "NPC_Lobster(44)",
-          "localID": 80,
-          "parentID": 77,
+          "localID": 63,
+          "parentID": 60,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3419,7 +3426,7 @@
                 "endCol": 5,
                 "fps": 10.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -3427,8 +3434,8 @@
         },
         {
           "name": "NPC_Jellyfish(43)",
-          "localID": 81,
-          "parentID": 77,
+          "localID": 64,
+          "parentID": 60,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3475,7 +3482,7 @@
                 "endCol": 4,
                 "fps": 10.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -3485,7 +3492,7 @@
     },
     {
       "name": "Ground",
-      "localID": 82,
+      "localID": 65,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -3514,8 +3521,8 @@
       "children": [
         {
           "name": "C_Ground",
-          "localID": 83,
-          "parentID": 82,
+          "localID": 66,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3553,8 +3560,8 @@
         },
         {
           "name": "C_Ground(1)",
-          "localID": 84,
-          "parentID": 82,
+          "localID": 67,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3592,8 +3599,8 @@
         },
         {
           "name": "C_Ground(2)",
-          "localID": 85,
-          "parentID": 82,
+          "localID": 68,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3631,8 +3638,8 @@
         },
         {
           "name": "C_Ground(3)",
-          "localID": 86,
-          "parentID": 82,
+          "localID": 69,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3670,8 +3677,8 @@
         },
         {
           "name": "C_Ground(4)",
-          "localID": 87,
-          "parentID": 82,
+          "localID": 70,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3709,8 +3716,8 @@
         },
         {
           "name": "C_Ground(5)",
-          "localID": 88,
-          "parentID": 82,
+          "localID": 71,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3748,8 +3755,8 @@
         },
         {
           "name": "C_Ground(6)",
-          "localID": 89,
-          "parentID": 82,
+          "localID": 72,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3787,8 +3794,8 @@
         },
         {
           "name": "C_Ground(7)",
-          "localID": 90,
-          "parentID": 82,
+          "localID": 73,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3826,8 +3833,8 @@
         },
         {
           "name": "C_Ground(8)",
-          "localID": 91,
-          "parentID": 82,
+          "localID": 74,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3865,8 +3872,8 @@
         },
         {
           "name": "C_Ground(9)",
-          "localID": 92,
-          "parentID": 82,
+          "localID": 75,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3904,8 +3911,8 @@
         },
         {
           "name": "C_Ground(10)",
-          "localID": 93,
-          "parentID": 82,
+          "localID": 76,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3943,8 +3950,8 @@
         },
         {
           "name": "C_Ground(11)",
-          "localID": 94,
-          "parentID": 82,
+          "localID": 77,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -3982,8 +3989,8 @@
         },
         {
           "name": "C_Ground(12)",
-          "localID": 95,
-          "parentID": 82,
+          "localID": 78,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4021,8 +4028,8 @@
         },
         {
           "name": "C_Ground(13)",
-          "localID": 96,
-          "parentID": 82,
+          "localID": 79,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4032,7 +4039,7 @@
             ],
             "scale": [
               1957.565185546875,
-              246.27200317382812
+              246.27200317382813
             ],
             "rotation": 0.0
           },
@@ -4053,15 +4060,15 @@
             "layer": "Ground",
             "size": [
               1957.565185546875,
-              246.27200317382812
+              246.27200317382813
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(14)",
-          "localID": 97,
-          "parentID": 82,
+          "localID": 80,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4099,8 +4106,8 @@
         },
         {
           "name": "C_Ground(15)",
-          "localID": 98,
-          "parentID": 82,
+          "localID": 81,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4110,7 +4117,7 @@
             ],
             "scale": [
               6002.7958984375,
-              188.48599243164062
+              188.48599243164063
             ],
             "rotation": 0.0
           },
@@ -4131,15 +4138,15 @@
             "layer": "Ground",
             "size": [
               6002.7958984375,
-              188.48599243164062
+              188.48599243164063
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(16)",
-          "localID": 99,
-          "parentID": 82,
+          "localID": 82,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4177,8 +4184,8 @@
         },
         {
           "name": "C_Ground(17)",
-          "localID": 100,
-          "parentID": 82,
+          "localID": 83,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4216,8 +4223,8 @@
         },
         {
           "name": "C_Ground(18)",
-          "localID": 101,
-          "parentID": 82,
+          "localID": 84,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4227,7 +4234,7 @@
             ],
             "scale": [
               127.98899841308594,
-              960.0640258789062
+              960.0640258789063
             ],
             "rotation": 0.0
           },
@@ -4248,15 +4255,15 @@
             "layer": "Ground",
             "size": [
               127.98899841308594,
-              960.0640258789062
+              960.0640258789063
             ]
           },
           "children": []
         },
         {
           "name": "C_Ground(19)",
-          "localID": 102,
-          "parentID": 82,
+          "localID": 85,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4294,8 +4301,8 @@
         },
         {
           "name": "C_Ground(20)",
-          "localID": 103,
-          "parentID": 82,
+          "localID": 86,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4333,8 +4340,8 @@
         },
         {
           "name": "C_Ground(21)",
-          "localID": 104,
-          "parentID": 82,
+          "localID": 87,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4372,8 +4379,8 @@
         },
         {
           "name": "C_Ground(22)",
-          "localID": 105,
-          "parentID": 82,
+          "localID": 88,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4411,8 +4418,8 @@
         },
         {
           "name": "C_Ground(23)",
-          "localID": 106,
-          "parentID": 82,
+          "localID": 89,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4450,8 +4457,8 @@
         },
         {
           "name": "C_Ground(24)",
-          "localID": 107,
-          "parentID": 82,
+          "localID": 90,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4489,8 +4496,8 @@
         },
         {
           "name": "C_Ground(25)",
-          "localID": 108,
-          "parentID": 82,
+          "localID": 91,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4528,8 +4535,8 @@
         },
         {
           "name": "C_Ground(26)",
-          "localID": 109,
-          "parentID": 82,
+          "localID": 92,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4567,8 +4574,8 @@
         },
         {
           "name": "C_Ground(27)",
-          "localID": 110,
-          "parentID": 82,
+          "localID": 93,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4606,8 +4613,8 @@
         },
         {
           "name": "C_Ground(28)",
-          "localID": 111,
-          "parentID": 82,
+          "localID": 94,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4645,8 +4652,8 @@
         },
         {
           "name": "C_Ground(29)",
-          "localID": 112,
-          "parentID": 82,
+          "localID": 95,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4684,8 +4691,8 @@
         },
         {
           "name": "C_Ground(30)",
-          "localID": 113,
-          "parentID": 82,
+          "localID": 96,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4723,8 +4730,8 @@
         },
         {
           "name": "C_Ground(31)",
-          "localID": 114,
-          "parentID": 82,
+          "localID": 97,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4762,8 +4769,8 @@
         },
         {
           "name": "C_Ground(32)",
-          "localID": 115,
-          "parentID": 82,
+          "localID": 98,
+          "parentID": 65,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4803,7 +4810,7 @@
     },
     {
       "name": "UI",
-      "localID": 150,
+      "localID": 99,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4832,8 +4839,8 @@
       "children": [
         {
           "name": "Text FPS",
-          "localID": 151,
-          "parentID": 150,
+          "localID": 100,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4883,8 +4890,8 @@
         },
         {
           "name": "InGamePauseButton",
-          "localID": 152,
-          "parentID": 150,
+          "localID": 101,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4920,8 +4927,8 @@
         },
         {
           "name": "ShellIcon1",
-          "localID": 153,
-          "parentID": 150,
+          "localID": 102,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4943,7 +4950,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -4957,8 +4964,8 @@
         },
         {
           "name": "ShellIcon2",
-          "localID": 154,
-          "parentID": 150,
+          "localID": 103,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -4980,7 +4987,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -4994,8 +5001,8 @@
         },
         {
           "name": "ShellIcon3",
-          "localID": 155,
-          "parentID": 150,
+          "localID": 104,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5017,7 +5024,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -5031,8 +5038,8 @@
         },
         {
           "name": "CoinIcon",
-          "localID": 156,
-          "parentID": 150,
+          "localID": 105,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5068,8 +5075,8 @@
         },
         {
           "name": "CoinCountText",
-          "localID": 157,
-          "parentID": 150,
+          "localID": 106,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5119,8 +5126,8 @@
         },
         {
           "name": "Timer Bar",
-          "localID": 158,
-          "parentID": 150,
+          "localID": 107,
+          "parentID": 99,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5137,8 +5144,8 @@
           "children": [
             {
               "name": "LevelTimerBarFrame",
-              "localID": 159,
-              "parentID": 158,
+              "localID": 108,
+              "parentID": 107,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5174,8 +5181,8 @@
             },
             {
               "name": "LevelTimerBar",
-              "localID": 160,
-              "parentID": 158,
+              "localID": 109,
+              "parentID": 107,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5211,8 +5218,8 @@
             },
             {
               "name": "LevelTimerBarBackground",
-              "localID": 161,
-              "parentID": 158,
+              "localID": 110,
+              "parentID": 107,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5252,7 +5259,7 @@
     },
     {
       "name": "Hazards",
-      "localID": 162,
+      "localID": 111,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5270,8 +5277,8 @@
       "children": [
         {
           "name": "Spike_Hazard(1)",
-          "localID": 163,
-          "parentID": 162,
+          "localID": 112,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5318,7 +5325,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5331,7 +5338,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -5348,8 +5355,8 @@
         },
         {
           "name": "Spike_Hazard(4)",
-          "localID": 164,
-          "parentID": 162,
+          "localID": 113,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5396,7 +5403,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5409,7 +5416,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -5426,8 +5433,8 @@
         },
         {
           "name": "Spike_Hazard(3)",
-          "localID": 165,
-          "parentID": 162,
+          "localID": 114,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5439,7 +5446,7 @@
               495.000244140625,
               150.0
             ],
-            "rotation": -1.5709999799728394
+            "rotation": 270.0
           },
           "RenderComponent": {
             "enabled": true,
@@ -5474,7 +5481,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5487,15 +5494,15 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
           "children": [
             {
               "name": "Hazard Collider",
-              "localID": 166,
-              "parentID": 165,
+              "localID": 115,
+              "parentID": 114,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5507,7 +5514,7 @@
                   50.0,
                   50.0
                 ],
-                "rotation": 0.0
+                "rotation": 270.0
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -5524,8 +5531,8 @@
         },
         {
           "name": "Spike_Hazard(10)",
-          "localID": 167,
-          "parentID": 162,
+          "localID": 116,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5537,7 +5544,7 @@
               742.5,
               150.0
             ],
-            "rotation": 3.141590118408203
+            "rotation": 180.0
           },
           "RenderComponent": {
             "enabled": true,
@@ -5572,7 +5579,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5585,15 +5592,15 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
           "children": [
             {
               "name": "Hazard Collider(2)",
-              "localID": 168,
-              "parentID": 167,
+              "localID": 117,
+              "parentID": 116,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5605,7 +5612,7 @@
                   50.0,
                   101.94987487792969
                 ],
-                "rotation": 0.0
+                "rotation": 180.0
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -5622,8 +5629,8 @@
         },
         {
           "name": "Spike_Hazard(11)",
-          "localID": 169,
-          "parentID": 162,
+          "localID": 118,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5670,7 +5677,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5683,7 +5690,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -5700,8 +5707,8 @@
         },
         {
           "name": "Spike_Hazard(12)",
-          "localID": 170,
-          "parentID": 162,
+          "localID": 119,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5748,7 +5755,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5761,7 +5768,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -5769,8 +5776,8 @@
         },
         {
           "name": "Spike_Hazard(13)",
-          "localID": 172,
-          "parentID": 162,
+          "localID": 120,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5817,7 +5824,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5830,7 +5837,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -5847,8 +5854,8 @@
         },
         {
           "name": "Spike_Hazard(14)",
-          "localID": 173,
-          "parentID": 162,
+          "localID": 121,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5895,7 +5902,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5908,7 +5915,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
@@ -5925,8 +5932,8 @@
         },
         {
           "name": "Spike_Hazard(15)",
-          "localID": 174,
-          "parentID": 162,
+          "localID": 122,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5938,7 +5945,7 @@
               742.5,
               150.0
             ],
-            "rotation": 1.5707999467849731
+            "rotation": 90.0
           },
           "RenderComponent": {
             "enabled": true,
@@ -5973,7 +5980,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -5986,15 +5993,15 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
           "children": [
             {
               "name": "Hazard Collider(3)",
-              "localID": 175,
-              "parentID": 174,
+              "localID": 123,
+              "parentID": 122,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6006,7 +6013,7 @@
                   50.0,
                   101.94987487792969
                 ],
-                "rotation": 0.0
+                "rotation": 90.0
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -6023,8 +6030,8 @@
         },
         {
           "name": "Spike_Hazard(16)",
-          "localID": 176,
-          "parentID": 162,
+          "localID": 124,
+          "parentID": 111,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6036,7 +6043,7 @@
               495.0,
               150.0
             ],
-            "rotation": 1.5707999467849731
+            "rotation": 90.0
           },
           "RenderComponent": {
             "enabled": true,
@@ -6071,7 +6078,7 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               },
               {
                 "name": "Urchin",
@@ -6084,15 +6091,15 @@
                 "endCol": 2,
                 "fps": 5.0,
                 "pingPong": false,
-                "flipRows": false
+                "flipRows": true
               }
             ]
           },
           "children": [
             {
               "name": "Hazard Collider(1)",
-              "localID": 177,
-              "parentID": 176,
+              "localID": 125,
+              "parentID": 124,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6104,7 +6111,7 @@
                   50.0,
                   50.0
                 ],
-                "rotation": 1.5707999467849731
+                "rotation": 90.0
               },
               "ColliderComponent": {
                 "enabled": true,
@@ -6123,7 +6130,7 @@
     },
     {
       "name": "Hazard Collider nuh",
-      "localID": 171,
+      "localID": 126,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6151,7 +6158,7 @@
     },
     {
       "name": "Pickups",
-      "localID": 178,
+      "localID": 127,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -6169,8 +6176,8 @@
       "children": [
         {
           "name": "Coins",
-          "localID": 179,
-          "parentID": 178,
+          "localID": 128,
+          "parentID": 127,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6187,8 +6194,8 @@
           "children": [
             {
               "name": "PU_Coin",
-              "localID": 180,
-              "parentID": 179,
+              "localID": 129,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6252,8 +6259,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 181,
-              "parentID": 179,
+              "localID": 130,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6317,8 +6324,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 182,
-              "parentID": 179,
+              "localID": 131,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6382,8 +6389,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 183,
-              "parentID": 179,
+              "localID": 132,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6447,8 +6454,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 184,
-              "parentID": 179,
+              "localID": 133,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6512,8 +6519,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 185,
-              "parentID": 179,
+              "localID": 134,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6577,8 +6584,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 186,
-              "parentID": 179,
+              "localID": 135,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6642,8 +6649,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 187,
-              "parentID": 179,
+              "localID": 136,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6707,8 +6714,8 @@
             },
             {
               "name": "PU_Coin",
-              "localID": 188,
-              "parentID": 179,
+              "localID": 137,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6772,8 +6779,8 @@
             },
             {
               "name": "PU_Coin(2)",
-              "localID": 189,
-              "parentID": 179,
+              "localID": 138,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6837,8 +6844,8 @@
             },
             {
               "name": "PU_Coin(4)",
-              "localID": 190,
-              "parentID": 179,
+              "localID": 139,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6902,8 +6909,8 @@
             },
             {
               "name": "PU_Coin(5)",
-              "localID": 191,
-              "parentID": 179,
+              "localID": 140,
+              "parentID": 128,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6969,8 +6976,8 @@
         },
         {
           "name": "Shells",
-          "localID": 192,
-          "parentID": 178,
+          "localID": 141,
+          "parentID": 127,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6987,8 +6994,8 @@
           "children": [
             {
               "name": "PU_Shell",
-              "localID": 193,
-              "parentID": 192,
+              "localID": 142,
+              "parentID": 141,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7052,8 +7059,8 @@
             },
             {
               "name": "PU_Shell",
-              "localID": 194,
-              "parentID": 192,
+              "localID": 143,
+              "parentID": 141,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7117,8 +7124,8 @@
             },
             {
               "name": "PU_Shell",
-              "localID": 195,
-              "parentID": 192,
+              "localID": 144,
+              "parentID": 141,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -7186,10 +7193,11 @@
     },
     {
       "name": "Parallax_BG",
-      "localID": 205,
+      "localID": 145,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
+        "enabled": true,
         "pos": [
           0.0,
           3969.0
@@ -7201,6 +7209,7 @@
         "rotation": 0.0
       },
       "RenderComponent": {
+        "enabled": true,
         "shapeType": "Square",
         "texturePath": "../Assets/WALLPAPER.png",
         "color": [
@@ -7210,15 +7219,21 @@
           1.0
         ],
         "layer": -110,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "children": [
         {
           "name": "Wall_Deco",
-          "localID": 206,
-          "parentID": 205,
+          "localID": 146,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
               4099.0
@@ -7230,6 +7245,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7239,16 +7255,22 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Window",
-          "localID": 207,
-          "parentID": 205,
+          "localID": 147,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
               1158.996337890625
@@ -7260,6 +7282,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7269,16 +7292,22 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Deco(8)",
-          "localID": 208,
-          "parentID": 205,
+          "localID": 148,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
               1693.441650390625
@@ -7290,6 +7319,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7299,19 +7329,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Window(7)",
-          "localID": 209,
-          "parentID": 205,
+          "localID": 149,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
-              3539.0003662109375
+              3539.00048828125
             ],
             "scale": [
               690.9677734375,
@@ -7320,6 +7356,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7329,19 +7366,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Deco(15)",
-          "localID": 210,
-          "parentID": 205,
+          "localID": 150,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
-              8824.555419921875
+              8824.5556640625
             ],
             "scale": [
               1219.3546142578125,
@@ -7350,6 +7393,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7359,19 +7403,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Window(16)",
-          "localID": 211,
-          "parentID": 205,
+          "localID": 151,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
-              8324.555419921875
+              8324.5556640625
             ],
             "scale": [
               690.9677734375,
@@ -7380,6 +7430,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7389,19 +7440,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Window(22)",
-          "localID": 212,
-          "parentID": 205,
+          "localID": 152,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
-              5900.1109619140625
+              5900.11083984375
             ],
             "scale": [
               690.9677734375,
@@ -7410,6 +7467,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7419,19 +7477,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
           "name": "Wall_Deco(23)",
-          "localID": 213,
-          "parentID": 205,
+          "localID": 153,
+          "parentID": 145,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               0.0,
-              6398.9998779296875
+              6399.0
             ],
             "scale": [
               1219.3546142578125,
@@ -7440,6 +7504,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7449,7 +7514,12 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         }
@@ -7457,10 +7527,11 @@
     },
     {
       "name": "Parallax_BG_L",
-      "localID": 214,
+      "localID": 154,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
+        "enabled": true,
         "pos": [
           -4199.94140625,
           3969.0
@@ -7472,6 +7543,7 @@
         "rotation": 0.0
       },
       "RenderComponent": {
+        "enabled": true,
         "shapeType": "Square",
         "texturePath": "../Assets/WALLPAPER.png",
         "color": [
@@ -7481,15 +7553,21 @@
           1.0
         ],
         "layer": -110,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "children": [
         {
-          "name": "Wall_Deco",
-          "localID": 215,
-          "parentID": 214,
+          "name": "Wall_Deco_L",
+          "localID": 155,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
               4099.0
@@ -7501,6 +7579,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7510,16 +7589,22 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window",
-          "localID": 216,
-          "parentID": 214,
+          "name": "Wall_Window_L",
+          "localID": 156,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
               1158.996337890625
@@ -7531,6 +7616,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7540,16 +7626,22 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Deco(8)",
-          "localID": 217,
-          "parentID": 214,
+          "name": "Wall_Deco_L(8)",
+          "localID": 157,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
               1693.441650390625
@@ -7561,6 +7653,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7570,19 +7663,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window(7)",
-          "localID": 218,
-          "parentID": 214,
+          "name": "Wall_Window_L(7)",
+          "localID": 158,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
-              3539.0003662109375
+              3539.00048828125
             ],
             "scale": [
               690.9677734375,
@@ -7591,6 +7690,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7600,19 +7700,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Deco(15)",
-          "localID": 219,
-          "parentID": 214,
+          "name": "Wall_Deco_L(15)",
+          "localID": 159,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
-              8824.555419921875
+              8824.5556640625
             ],
             "scale": [
               1219.3546142578125,
@@ -7621,6 +7727,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7630,19 +7737,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window(16)",
-          "localID": 220,
-          "parentID": 214,
+          "name": "Wall_Window_L(16)",
+          "localID": 160,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
-              8324.555419921875
+              8324.5556640625
             ],
             "scale": [
               690.9677734375,
@@ -7651,6 +7764,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7660,19 +7774,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window(22)",
-          "localID": 221,
-          "parentID": 214,
+          "name": "Wall_Window_L(22)",
+          "localID": 161,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
-              5900.1109619140625
+              5900.11083984375
             ],
             "scale": [
               690.9677734375,
@@ -7681,6 +7801,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7690,19 +7811,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Deco(23)",
-          "localID": 222,
-          "parentID": 214,
+          "name": "Wall_Deco_L(23)",
+          "localID": 162,
+          "parentID": 154,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -4199.94140625,
-              6398.9998779296875
+              6399.0
             ],
             "scale": [
               1219.3546142578125,
@@ -7711,6 +7838,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7720,7 +7848,12 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         }
@@ -7728,10 +7861,11 @@
     },
     {
       "name": "Parallax_BG_R",
-      "localID": 223,
+      "localID": 163,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
+        "enabled": true,
         "pos": [
           4170.05322265625,
           3969.0
@@ -7743,6 +7877,7 @@
         "rotation": 0.0
       },
       "RenderComponent": {
+        "enabled": true,
         "shapeType": "Square",
         "texturePath": "../Assets/WALLPAPER.png",
         "color": [
@@ -7752,15 +7887,21 @@
           1.0
         ],
         "layer": -110,
-        "screenSpace": false
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
       },
       "children": [
         {
-          "name": "Wall_Deco",
-          "localID": 224,
-          "parentID": 223,
+          "name": "Wall_Deco_R",
+          "localID": 164,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               4170.05322265625,
               4099.0
@@ -7772,6 +7913,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7781,16 +7923,22 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window",
-          "localID": 225,
-          "parentID": 223,
+          "name": "Wall_Window_R",
+          "localID": 165,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               4170.05322265625,
               1158.996337890625
@@ -7802,6 +7950,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7811,16 +7960,22 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Deco(8)",
-          "localID": 226,
-          "parentID": 223,
+          "name": "Wall_Deco_R(8)",
+          "localID": 166,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               4170.05322265625,
               1693.441650390625
@@ -7832,6 +7987,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7841,19 +7997,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window(7)",
-          "localID": 227,
-          "parentID": 223,
+          "name": "Wall_Window_R(7)",
+          "localID": 167,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               4170.05322265625,
-              3539.0003662109375
+              3539.00048828125
             ],
             "scale": [
               690.9677734375,
@@ -7862,6 +8024,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7871,19 +8034,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Deco(15)",
-          "localID": 228,
-          "parentID": 223,
+          "name": "Wall_Deco_R(15)",
+          "localID": 168,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               4170.05322265625,
-              8824.555419921875
+              8824.5556640625
             ],
             "scale": [
               1219.3546142578125,
@@ -7892,6 +8061,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7901,19 +8071,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window(16)",
-          "localID": 229,
-          "parentID": 223,
+          "name": "Wall_Window_R(16)",
+          "localID": 169,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -50801.0546875,
-              8331.129638671875
+              8331.1298828125
             ],
             "scale": [
               690.9677734375,
@@ -7922,6 +8098,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7931,19 +8108,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Window(22)",
-          "localID": 230,
-          "parentID": 223,
+          "name": "Wall_Window_R(22)",
+          "localID": 170,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -50801.0546875,
-              5906.6854248046875
+              5906.685546875
             ],
             "scale": [
               690.9677734375,
@@ -7952,6 +8135,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WINDOWS.png",
             "color": [
@@ -7961,19 +8145,25 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         },
         {
-          "name": "Wall_Deco(23)",
-          "localID": 231,
-          "parentID": 223,
+          "name": "Wall_Deco_R(23)",
+          "localID": 171,
+          "parentID": 163,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -50801.0546875,
-              6405.5743408203125
+              6405.57421875
             ],
             "scale": [
               1219.3546142578125,
@@ -7982,6 +8172,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "../Assets/WALL_DECOR.png",
             "color": [
@@ -7991,7 +8182,12 @@
               1.0
             ],
             "layer": -110,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
           },
           "children": []
         }
@@ -7999,10 +8195,11 @@
     },
     {
       "name": "Pillar_BackGround",
-      "localID": 232,
+      "localID": 172,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
+        "enabled": true,
         "pos": [
           0.0,
           3969.0
@@ -8016,23 +8213,25 @@
       "children": [
         {
           "name": "Pillar_left(10)",
-          "localID": 233,
-          "parentID": 232,
+          "localID": 173,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              8051.942932128906
+              8051.94287109375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_TOP.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8040,29 +8239,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Top",
+            "animations": [
+              {
+                "name": "Pillar_Top",
+                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(9)",
-          "localID": 234,
-          "parentID": 232,
+          "localID": 174,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1199.9998779296875,
-              8051.942932128906
+              8051.94287109375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_TOP.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8070,29 +8295,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Top",
+            "animations": [
+              {
+                "name": "Pillar_Top",
+                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(6)",
-          "localID": 235,
-          "parentID": 232,
+          "localID": 175,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1200.0001220703125,
-              6878.998596191406
+              6878.99853515625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8100,29 +8351,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(5)",
-          "localID": 236,
-          "parentID": 232,
+          "localID": 176,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              6878.998107910156
+              6878.998046875
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8130,29 +8407,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(4)",
-          "localID": 237,
-          "parentID": 232,
+          "localID": 177,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1204.1937255859375,
-              5699.000061035156
+              5699.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8160,29 +8463,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(3)",
-          "localID": 238,
-          "parentID": 232,
+          "localID": 178,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              5699.000061035156
+              5699.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8190,29 +8519,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left",
-          "localID": 239,
-          "parentID": 232,
+          "localID": 179,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
               -236.55560302734375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8220,29 +8575,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right",
-          "localID": 240,
-          "parentID": 232,
+          "localID": 180,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1204.1937255859375,
               -236.55560302734375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8250,29 +8631,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(12)",
-          "localID": 241,
-          "parentID": 232,
+          "localID": 181,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1204.1937255859375,
-              4522.332702636719
+              4522.33251953125
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8280,29 +8687,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(13)",
-          "localID": 242,
-          "parentID": 232,
+          "localID": 182,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1204.1937255859375,
-              3329.0001831054688
+              3329.000244140625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8310,29 +8743,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(14)",
-          "localID": 243,
-          "parentID": 232,
+          "localID": 183,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              3329.0001831054688
+              3329.000244140625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8340,29 +8799,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(17)",
-          "localID": 244,
-          "parentID": 232,
+          "localID": 184,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1204.1937255859375,
-              2138.3335571289062
+              2138.33349609375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8370,29 +8855,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(18)",
-          "localID": 245,
-          "parentID": 232,
+          "localID": 185,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              2139.0000610351562
+              2139.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8400,29 +8911,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(19)",
-          "localID": 246,
-          "parentID": 232,
+          "localID": 186,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              950.1111450195312
+              950.1111450195313
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8430,29 +8967,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(20)",
-          "localID": 247,
-          "parentID": 232,
+          "localID": 187,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               1204.1937255859375,
-              949.4451293945312
+              949.4451293945313
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8460,29 +9023,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(21)",
-          "localID": 248,
-          "parentID": 232,
+          "localID": 188,
+          "parentID": 172,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -1199.9998779296875,
-              4511.221862792969
+              4511.2216796875
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8490,7 +9079,31 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         }
@@ -8498,10 +9111,11 @@
     },
     {
       "name": "Pillar_BackGround_L",
-      "localID": 249,
+      "localID": 189,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
+        "enabled": true,
         "pos": [
           -4150.00048828125,
           3969.0
@@ -8515,23 +9129,25 @@
       "children": [
         {
           "name": "Pillar_left(10)",
-          "localID": 250,
-          "parentID": 249,
+          "localID": 190,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              8051.942932128906
+              8051.94287109375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_TOP.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8539,29 +9155,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Top",
+            "animations": [
+              {
+                "name": "Pillar_Top",
+                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(9)",
-          "localID": 251,
-          "parentID": 249,
+          "localID": 191,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2950.00048828125,
-              8051.942932128906
+              8051.94287109375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_TOP.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8569,29 +9211,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Top",
+            "animations": [
+              {
+                "name": "Pillar_Top",
+                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(6)",
-          "localID": 252,
-          "parentID": 249,
+          "localID": 192,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2950.00048828125,
-              6878.998596191406
+              6878.99853515625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8599,29 +9267,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(5)",
-          "localID": 253,
-          "parentID": 249,
+          "localID": 193,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              6878.998107910156
+              6878.998046875
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8629,29 +9323,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(4)",
-          "localID": 254,
-          "parentID": 249,
+          "localID": 194,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2945.806640625,
-              5699.000061035156
+              5699.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8659,29 +9379,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(3)",
-          "localID": 255,
-          "parentID": 249,
+          "localID": 195,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              5699.000061035156
+              5699.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8689,29 +9435,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left",
-          "localID": 256,
-          "parentID": 249,
+          "localID": 196,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
               -236.55560302734375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8719,29 +9491,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right",
-          "localID": 257,
-          "parentID": 249,
+          "localID": 197,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2945.806640625,
               -236.55560302734375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8749,29 +9547,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(12)",
-          "localID": 258,
-          "parentID": 249,
+          "localID": 198,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2945.806640625,
-              4522.332702636719
+              4522.33251953125
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8779,29 +9603,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(13)",
-          "localID": 259,
-          "parentID": 249,
+          "localID": 199,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2945.806640625,
-              3329.0001831054688
+              3329.000244140625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8809,29 +9659,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(14)",
-          "localID": 260,
-          "parentID": 249,
+          "localID": 200,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              3329.0001831054688
+              3329.000244140625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8839,29 +9715,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(17)",
-          "localID": 261,
-          "parentID": 249,
+          "localID": 201,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2945.806640625,
-              2138.3335571289062
+              2138.33349609375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8869,29 +9771,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(18)",
-          "localID": 262,
-          "parentID": 249,
+          "localID": 202,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              2139.0000610351562
+              2139.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8899,29 +9827,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(19)",
-          "localID": 263,
-          "parentID": 249,
+          "localID": 203,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              950.1111450195312
+              950.1111450195313
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8929,29 +9883,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(20)",
-          "localID": 264,
-          "parentID": 249,
+          "localID": 204,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -2945.806640625,
-              949.4451293945312
+              949.4451293945313
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8959,29 +9939,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(21)",
-          "localID": 265,
-          "parentID": 249,
+          "localID": 205,
+          "parentID": 189,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               -5349.99951171875,
-              4511.221862792969
+              4511.2216796875
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -8989,7 +9995,31 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         }
@@ -8997,10 +10027,11 @@
     },
     {
       "name": "Pillar_BackGround_R",
-      "localID": 266,
+      "localID": 206,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
+        "enabled": true,
         "pos": [
           4150.0703125,
           3969.0
@@ -9014,23 +10045,25 @@
       "children": [
         {
           "name": "Pillar_left(10)",
-          "localID": 267,
-          "parentID": 266,
+          "localID": 207,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              8051.942932128906
+              8051.94287109375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_TOP.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9038,29 +10071,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Top",
+            "animations": [
+              {
+                "name": "Pillar_Top",
+                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(9)",
-          "localID": 268,
-          "parentID": 266,
+          "localID": 208,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5350.0703125,
-              8051.942932128906
+              8051.94287109375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_TOP.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9068,29 +10127,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Top",
+            "animations": [
+              {
+                "name": "Pillar_Top",
+                "filepath": "../Assets/Sprites/Sheets/pillar_top_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(6)",
-          "localID": 269,
-          "parentID": 266,
+          "localID": 209,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5350.0703125,
-              6878.998596191406
+              6878.99853515625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9098,29 +10183,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(5)",
-          "localID": 270,
-          "parentID": 266,
+          "localID": 210,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              6878.998107910156
+              6878.998046875
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9128,29 +10239,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(4)",
-          "localID": 271,
-          "parentID": 266,
+          "localID": 211,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5354.263671875,
-              5699.000061035156
+              5699.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9158,29 +10295,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(3)",
-          "localID": 272,
-          "parentID": 266,
+          "localID": 212,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              5699.000061035156
+              5699.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9188,29 +10351,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left",
-          "localID": 273,
-          "parentID": 266,
+          "localID": 213,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
               -236.55560302734375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9218,29 +10407,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right",
-          "localID": 274,
-          "parentID": 266,
+          "localID": 214,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5354.263671875,
               -236.55560302734375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9248,29 +10463,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(12)",
-          "localID": 275,
-          "parentID": 266,
+          "localID": 215,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5354.263671875,
-              4522.332702636719
+              4522.33251953125
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9278,29 +10519,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(13)",
-          "localID": 276,
-          "parentID": 266,
+          "localID": 216,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5354.263671875,
-              3329.0001831054688
+              3329.000244140625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9308,29 +10575,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(14)",
-          "localID": 277,
-          "parentID": 266,
+          "localID": 217,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              3329.0001831054688
+              3329.000244140625
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9338,29 +10631,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(17)",
-          "localID": 278,
-          "parentID": 266,
+          "localID": 218,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5354.263671875,
-              2138.3335571289062
+              2138.33349609375
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9368,29 +10687,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(18)",
-          "localID": 279,
-          "parentID": 266,
+          "localID": 219,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              2139.0000610351562
+              2139.0
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9398,29 +10743,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(19)",
-          "localID": 280,
-          "parentID": 266,
+          "localID": 220,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              950.1111450195312
+              950.1111450195313
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9428,29 +10799,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_Right(20)",
-          "localID": 281,
-          "parentID": 266,
+          "localID": 221,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               5354.263671875,
-              949.4451293945312
+              949.4451293945313
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9458,29 +10855,55 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         },
         {
           "name": "Pillar_left(21)",
-          "localID": 282,
-          "parentID": 266,
+          "localID": 222,
+          "parentID": 206,
           "active": true,
           "TransformComponent": {
+            "enabled": true,
             "pos": [
               2950.0703125,
-              4511.221862792969
+              4511.2216796875
             ],
             "scale": [
-              569.0322265625,
+              1580.0,
               1296.0
             ],
             "rotation": 0.0
           },
           "RenderComponent": {
+            "enabled": true,
             "shapeType": "Square",
-            "texturePath": "../Assets/PILLAR_BOTTOM.png",
+            "texturePath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
             "color": [
               1.0,
               1.0,
@@ -9488,7 +10911,31 @@
               1.0
             ],
             "layer": -109,
-            "screenSpace": false
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Pillar_Bottom",
+            "animations": [
+              {
+                "name": "Pillar_Bottom",
+                "filepath": "../Assets/Sprites/Sheets/pillar_bottom_spritesheet.png",
+                "rows": 2,
+                "cols": 5,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 1,
+                "endCol": 2,
+                "fps": 8.0,
+                "pingPong": false,
+                "flipRows": true
+              }
+            ]
           },
           "children": []
         }
@@ -9831,6 +11278,78 @@
         "loop": false,
         "volume": 0.10000000149011612,
         "pitch": 0.8999999761581421,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_1",
+        "filepath": "../Assets/Replay/Typing_01.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_2",
+        "filepath": "../Assets/Replay/Typing_02.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_3",
+        "filepath": "../Assets/Replay/Typing_03.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_4",
+        "filepath": "../Assets/Replay/Typing_04.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_5",
+        "filepath": "../Assets/Replay/Typing_05.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "typing_sfx_6",
+        "filepath": "../Assets/Replay/Typing_06.wav",
+        "loop": false,
+        "volume": 0.4,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "Replay_BGM",
+        "filepath": "../Assets/Replay/Replay_BGM.wav",
+        "loop": true,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "bgm"
+      },
+      {
+        "name": "Replay_Pause",
+        "filepath": "../Assets/Replay/Replay_Pause.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "Replay_Unpause",
+        "filepath": "../Assets/Replay/Replay_Unpause.wav",
+        "loop": false,
+        "volume": 0.5,
+        "pitch": 1.0,
         "category": "sfx"
       }
     ],

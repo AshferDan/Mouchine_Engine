@@ -107,9 +107,13 @@ void CutsceneSystem::Update(float dt) {
 		if (m_timeAccumulator > frameTime) m_timeAccumulator = frameTime * 0.5;
 	}
 
+	m_skipTimer += dt;
+
 	if (m_hasFrame) { // only render if decoded
 		RenderVideo();
-		m_canSkip = true;
+		// Require at least 0.5s of playback before allowing skip
+		if (m_skipTimer >= 0.5f)
+			m_canSkip = true;
 	}
 
 	// Check if Skip (Spacebar) or Left click - only after skip block timer expires
@@ -131,6 +135,8 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 	m_currentVideoPath = videoPath; // Store the name
 	m_isPlaying = true;
 	m_hasFrame = false;
+	m_canSkip = false;
+	m_skipTimer = 0.0f;
 	m_timeAccumulator = 0.0;
 
 	plm_set_audio_enabled(m_plm, 1); // Disable internal audio decoding (using AudioManager instead)
@@ -185,6 +191,10 @@ void CutsceneSystem::StopCutscene() {
 			audioMgr->StopSound("cutscene_audio_channel");
 			m_currentAudio = "";
 		}
+
+		// Play skip cutscene audio
+		std::cout << "[CutsceneSystem] Playing skip cutscene audio" << std::endl;
+		audioMgr->PlaySound("SkipCutScene", "skip_audio_channel");
 	}
 
 	m_timeAccumulator = 0.0;
@@ -204,6 +214,13 @@ void CutsceneSystem::StopCutscene() {
 				CORE->SetGamePaused(false);
 				EventSystem::Clear();
 				if (CORE->GetInputManager()) CORE->GetInputManager()->ResetState();
+
+				// Stop skip audio after scene is fully loaded
+				AudioManager* audioMgr = CORE->GetAudioManager();
+				if (audioMgr) {
+					std::cout << "[CutsceneSystem] Stopping skip audio - scene loaded" << std::endl;
+					audioMgr->StopSound("skip_audio_channel");
+				}
 				});
 		}
 	}
@@ -211,6 +228,11 @@ void CutsceneSystem::StopCutscene() {
 		// For credits or other cutscenes, just resume
 		if (!CORE->HasPendingSceneLoad()) {
 			CORE->SetGamePaused(false);
+
+			if (audioMgr) {
+				std::cout << "[CutsceneSystem] Stopping skip audio - no loading screen" << std::endl;
+				audioMgr->StopSound("skip_audio_channel");
+			}
 		}
 	}
 }

@@ -24,10 +24,11 @@ Technology is prohibited.
 #include <iostream>
 
 // ===== Static member definitions =====
-std::string  TextInputSystem::s_buffer;
-bool         TextInputSystem::s_active     = false;
-int          TextInputSystem::s_maxLength  = 20;
-GLFWcharfun  TextInputSystem::s_prevCallback = nullptr;
+std::string           TextInputSystem::s_buffer;
+bool                  TextInputSystem::s_active      = false;
+int                   TextInputSystem::s_maxLength   = 20;
+GLFWcharfun           TextInputSystem::s_prevCallback = nullptr;
+std::function<void()> TextInputSystem::s_onCharTyped;
 
 // ===== GLFW char callback =====
 
@@ -36,18 +37,22 @@ void TextInputSystem::CharCallback(GLFWwindow*, unsigned int codepoint)
     if (!s_active) return;
     if (static_cast<int>(s_buffer.size()) >= s_maxLength) return;
     if (codepoint >= 32 && codepoint < 127)   // printable ASCII
+    {
         s_buffer += static_cast<char>(codepoint);
+        if (s_onCharTyped) s_onCharTyped();
+    }
 }
 
 // ===== ISystem =====
 
 void TextInputSystem::Initialize()
 {
-    m_isActive          = false;
-    m_hasUI             = false;
-    m_backspaceWasHeld  = false;
-    m_enterWasHeld      = false;
-    m_escapeWasHeld     = false;
+    m_isActive                 = false;
+    m_hasUI                    = false;
+    m_backspaceWasHeld         = false;
+    m_enterWasHeld             = false;
+    m_escapeWasHeld            = false;
+    m_consumedEscapeThisFrame  = false;
     s_buffer.clear();
     s_active = false;
     std::cout << "Initializing system: TextInputSystem" << std::endl;
@@ -56,6 +61,7 @@ void TextInputSystem::Initialize()
 void TextInputSystem::Update(float dt)
 {
     (void)dt;
+    m_consumedEscapeThisFrame = false;   // reset at top of each frame
     if (!m_isActive) return;
 
     GLFWwindow* win = glfwGetCurrentContext();
@@ -64,7 +70,10 @@ void TextInputSystem::Update(float dt)
     // --- Backspace: edge-detected removal of last character ---
     bool backNow = (glfwGetKey(win, GLFW_KEY_BACKSPACE) == GLFW_PRESS);
     if (backNow && !m_backspaceWasHeld && !s_buffer.empty())
+    {
         s_buffer.pop_back();
+        if (s_onCharTyped) s_onCharTyped();
+    }
     m_backspaceWasHeld = backNow;
 
     // --- Enter: confirm ---
@@ -84,6 +93,7 @@ void TextInputSystem::Update(float dt)
     bool escNow = (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS);
     if (escNow && !m_escapeWasHeld)
     {
+        m_consumedEscapeThisFrame = true;
         auto cb = m_onCancel;
         Hide();
         if (cb) cb();
@@ -148,7 +158,8 @@ void TextInputSystem::Hide()
     if (!m_isActive) return;
 
     // Restore previous GLFW char callback
-    s_active = false;
+    s_active      = false;
+    s_onCharTyped = nullptr;
     GLFWwindow* win = glfwGetCurrentContext();
     if (win)
         glfwSetCharCallback(win, s_prevCallback);

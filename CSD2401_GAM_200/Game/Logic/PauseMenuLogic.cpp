@@ -378,19 +378,6 @@ void PauseMenuLogicSystem::Update(float dt)
                 //std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
 
                 CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
-                // Destroy UI before scene change
-                //DestroyHowToPlayUI();
-                //DestroyGhostMenuUI();
-                //DestroyPauseSettingsUI();
-                //DestroyPauseMenuUI();
-
-                //// close menu first
-                //if (isPauseMenuActive)
-                //{
-                //    isPauseMenuActive = false;
-                //    CORE->SetGamePaused(false, false);
-                //}
-                // back to main menu
             }
             else if (hoveredButtonName == "PauseHowToPlayButton")
             {
@@ -538,6 +525,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(false);
             if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(false);
+            if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(false);
         }
         else
         {
@@ -552,6 +540,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(true);
             if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(true);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(true);
+            if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(true);
         }
         wasGhostMenuOpenLastFrame = isGhostMenuOpen;
     }
@@ -652,6 +641,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
+                mainMenuBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(false);
         }
@@ -668,6 +659,8 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
                 settingsBtn->SetActive(true);
             if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(true);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
@@ -722,6 +715,160 @@ void PauseMenuLogicSystem::Update(float dt)
             currentHover = "PauseBackButton";
         }
 
+        // Keyboard navigation for settings sub-menu
+        // Rows: 0=Master, 1=Music, 2=SFX, 3=Back
+        static const char* kSettingsButtons[] = {
+            "PauseMasterMuteButton", "PauseMusicMuteButton", "PauseSFXMuteButton", "PauseBackButton"
+        };
+        static const int   kSettingsCount  = 4;
+        static int         kSettingsIdx    = 0;
+        static bool        kSettingsActive = false;
+        // Key-repeat state for LEFT/RIGHT slider adjustment
+        static float       kSliderRepeatTimer  = 0.0f;
+        static const float kSliderRepeatDelay  = 0.3f;  // seconds before repeat starts
+        static const float kSliderRepeatRate   = 0.08f; // seconds between repeat steps
+        bool settingsSpacePressed = false;
+        {
+            InputManager* inp = CORE->GetInputManager();
+            if (hoveredButtonName.empty()) { kSettingsActive = false; kSettingsIdx = 0; } // reset on fresh open
+            if (inp)
+            {
+                if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kSettingsIdx = (kSettingsIdx + 1) % kSettingsCount; kSettingsActive = true; }
+                if (inp->IsKeyPressed(GLFW_KEY_UP))   { kSettingsIdx = ((kSettingsIdx - 1) + kSettingsCount) % kSettingsCount; kSettingsActive = true; }
+                if (inp->IsGamepadConnected())
+                {
+                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kSettingsIdx = (kSettingsIdx + 1) % kSettingsCount;                         kSettingsActive = true; }
+                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kSettingsIdx = ((kSettingsIdx - 1) + kSettingsCount) % kSettingsCount;     kSettingsActive = true; }
+                }
+                if (isClicked && !currentHover.empty()) kSettingsActive = false;
+                if (kSettingsActive) currentHover = kSettingsButtons[kSettingsIdx];
+                settingsSpacePressed = kSettingsActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                    (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+
+                // LEFT/RIGHT: adjust slider on the current row (works without needing UP/DOWN first)
+                bool leftHeld  = inp->IsKeyHeld(GLFW_KEY_LEFT)  || inp->IsKeyPressed(GLFW_KEY_LEFT)
+                               || (inp->IsGamepadConnected() && inp->IsGamepadButtonHeld(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+                bool rightHeld = inp->IsKeyHeld(GLFW_KEY_RIGHT) || inp->IsKeyPressed(GLFW_KEY_RIGHT)
+                               || (inp->IsGamepadConnected() && inp->IsGamepadButtonHeld(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+                bool leftJust  = inp->IsKeyPressed(GLFW_KEY_LEFT)
+                               || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+                bool rightJust = inp->IsKeyPressed(GLFW_KEY_RIGHT)
+                               || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+
+                // Activate keyboard mode on any LEFT/RIGHT press so slider row defaults to 0 (Master)
+                if ((leftJust || rightJust) && !kSettingsActive) kSettingsActive = true;
+
+                int sliderRow = kSettingsIdx; // row the user has selected
+                if (kSettingsActive && sliderRow <= 2)
+                {
+                    // Determine if we should step this frame (initial press or repeat)
+                    bool shouldStep = false;
+                    if (leftJust || rightJust)
+                    {
+                        shouldStep = true;
+                        kSliderRepeatTimer = 0.0f;
+                    }
+                    else if (leftHeld || rightHeld)
+                    {
+                        kSliderRepeatTimer += dt;
+                        if (kSliderRepeatTimer >= kSliderRepeatDelay)
+                        {
+                            // Use modulo to fire at repeat rate
+                            float excess = kSliderRepeatTimer - kSliderRepeatDelay;
+                            float prevExcess = excess - dt;
+                            if (prevExcess < 0.0f || static_cast<int>(excess / kSliderRepeatRate) > static_cast<int>(prevExcess / kSliderRepeatRate))
+                                shouldStep = true;
+                        }
+                    }
+                    else
+                    {
+                        kSliderRepeatTimer = 0.0f;
+                    }
+
+                    if (shouldStep)
+                    {
+                        const float kStep = 0.05f;
+                        float delta = rightHeld ? kStep : -kStep;
+
+                        SliderState* sliderState = nullptr;
+                        std::string barName, knobName, category;
+
+                        if (sliderRow == 0)
+                        {
+                            sliderState = &masterSlider;
+                            barName  = "PauseSlider_Bar_Master";
+                            knobName = "PauseSlider_Knob_Master";
+                            category = "master";
+                        }
+                        else if (sliderRow == 1)
+                        {
+                            sliderState = &musicSlider;
+                            barName  = "PauseSlider_Bar_Music";
+                            knobName = "PauseSlider_Knob_Music";
+                            category = "music";
+                        }
+                        else
+                        {
+                            sliderState = &sfxSlider;
+                            barName  = "PauseSlider_Bar_SFX";
+                            knobName = "PauseSlider_Knob_SFX";
+                            category = "sfx";
+                        }
+
+                        float newVol = std::clamp(sliderState->currentVolume + delta, 0.0f, 1.0f);
+                        sliderState->currentVolume = newVol;
+                        UpdateSlider(barName, *sliderState, newVol);
+
+                        // Reposition knob
+                        auto& sliderFactory = GameObjectFactory::Instance();
+                        GameObject* sliderBar = sliderFactory.FindGameObject(barName);
+                        GameObject* knob      = sliderFactory.FindGameObject(knobName);
+                        if (sliderBar && knob)
+                        {
+                            auto* st = sliderBar->GetComponent<TransformComponent>();
+                            auto* kt = knob->GetComponent<TransformComponent>();
+                            if (st && kt)
+                            {
+                                float cx, cy, sx, sy;
+                                st->GetPosition(cx, cy);
+                                st->GetScale(sx, sy);
+                                kt->SetPosition(cx + sx * 0.5f - 570.0f, cy);
+                            }
+                        }
+
+                        // Apply to audio
+                        AudioManager* sliderAudio = CORE->GetAudioManager();
+                        if (sliderAudio)
+                        {
+                            if (category == "master")
+                            {
+                                savedMasterVolume = newVol;
+                                sliderAudio->SetMasterVolume(savedMasterVolume);
+                                sliderAudio->SetCategoryVolume("music", savedMusicVolume * savedMasterVolume);
+                                sliderAudio->SetCategoryVolume("sfx",   savedSfxVolume   * savedMasterVolume);
+                            }
+                            else if (category == "music")
+                            {
+                                savedMusicVolume = newVol;
+                                sliderAudio->SetBaseCategoryVolume("music", newVol);
+                                sliderAudio->SetCategoryVolume("music", newVol * savedMasterVolume);
+                            }
+                            else
+                            {
+                                savedSfxVolume = newVol;
+                                sliderAudio->SetBaseCategoryVolume("sfx", newVol);
+                                sliderAudio->SetCategoryVolume("sfx", newVol * savedMasterVolume);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    kSliderRepeatTimer = 0.0f;
+                }
+            }
+        }
+
         // Handle hover state changes
         if (currentHover != hoveredButtonName)
         {
@@ -744,7 +891,7 @@ void PauseMenuLogicSystem::Update(float dt)
         }
 
         // Handle clicks
-        if (isClicked && !hoveredButtonName.empty())
+        if ((isClicked || settingsSpacePressed) && !hoveredButtonName.empty())
         {
             // Set button to pressed state
             SetButtonTexture(hoveredButtonName, ButtonState::Pressed);
@@ -787,8 +934,12 @@ void PauseMenuLogicSystem::Update(float dt)
             }
         }
 
-        // handle slider input
+        // handle slider input — clear keyboard selection when mouse starts dragging
         bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        if (isMouseDown && isDraggingSlider)
+        {
+            hoveredButtonName.clear();
+        }
         HandleSliderInput(mouseX, mouseY, isMouseDown);
 
         return; // Don't process normal pause menu interactions
@@ -856,6 +1007,23 @@ void PauseMenuLogicSystem::Update(float dt)
             currentHover = "HowToPlayBackButton";
         }
 
+        // Keyboard: SPACE confirms the back button
+        bool htpSpacePressed = false;
+        {
+            InputManager* inp = CORE->GetInputManager();
+            if (inp)
+            {
+                bool gpAny = inp->IsGamepadConnected() && (
+                    inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN) ||
+                    inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP)   ||
+                    inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A));
+                if (inp->IsKeyPressed(GLFW_KEY_DOWN) || inp->IsKeyPressed(GLFW_KEY_UP) || inp->IsKeyPressed(GLFW_KEY_SPACE) || gpAny)
+                    currentHover = "HowToPlayBackButton";
+                htpSpacePressed = inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                    (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A));
+            }
+        }
+
         // Handle hover state changes
         if (currentHover != hoveredButtonName)
         {
@@ -878,7 +1046,7 @@ void PauseMenuLogicSystem::Update(float dt)
         }
 
         // Handle click
-        if (isClicked && hoveredButtonName == "HowToPlayBackButton")
+        if ((isClicked || htpSpacePressed) && hoveredButtonName == "HowToPlayBackButton")
         {
             SetButtonTexture("HowToPlayBackButton", ButtonState::Pressed);
             audioManager = CORE->GetAudioManager();
@@ -934,6 +1102,33 @@ void PauseMenuLogicSystem::Update(float dt)
         else if (IsMouseOver(factory.FindGameObject("PauseGhost_Back"), mouseX, mouseY))
             currentHover = "PauseGhost_Back";
 
+        // Keyboard navigation for ghost sub-menu
+        static const char* kGhostButtons[] = {
+            "PauseGhost_Toggle", "PauseGhost_Slot0", "PauseGhost_Slot1", "PauseGhost_Slot2", "PauseGhost_Back"
+        };
+        static const int kGhostCount = 5;
+        static int  kGhostIdx    = 0;
+        static bool kGhostActive = false;
+        bool ghostSpacePressed = false;
+        {
+            InputManager* inp = CORE->GetInputManager();
+            if (hoveredButtonName.empty()) kGhostActive = false; // reset on fresh open
+            if (inp)
+            {
+                if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kGhostIdx = (kGhostIdx + 1) % kGhostCount;                     kGhostActive = true; }
+                if (inp->IsKeyPressed(GLFW_KEY_UP))   { kGhostIdx = ((kGhostIdx - 1) + kGhostCount) % kGhostCount;     kGhostActive = true; }
+                if (inp->IsGamepadConnected())
+                {
+                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kGhostIdx = (kGhostIdx + 1) % kGhostCount;                     kGhostActive = true; }
+                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kGhostIdx = ((kGhostIdx - 1) + kGhostCount) % kGhostCount;     kGhostActive = true; }
+                }
+                if (isClicked && !currentHover.empty()) kGhostActive = false;
+                if (kGhostActive) currentHover = kGhostButtons[kGhostIdx];
+                ghostSpacePressed = kGhostActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                    (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+            }
+        }
+
         // Hover state changes
         if (currentHover != hoveredButtonName)
         {
@@ -949,7 +1144,7 @@ void PauseMenuLogicSystem::Update(float dt)
         }
 
         // Clicks
-        if (isClicked && !hoveredButtonName.empty())
+        if ((isClicked || ghostSpacePressed) && !hoveredButtonName.empty())
         {
             SetButtonTexture(hoveredButtonName, ButtonState::Pressed);
             audioManager = CORE->GetAudioManager();
@@ -1116,6 +1311,34 @@ void PauseMenuLogicSystem::Update(float dt)
         }
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kPauseButtons[] = {
+        "PauseResumeButton", "PauseSettingsButton", "PauseRestartButton",
+        "PauseMainMenuButton", "PauseHowToPlayButton", "PauseGhostButton"
+    };
+    static const int kPauseCount = 6;
+    static int  kPauseIdx    = 0;
+    static bool kPauseActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (hoveredButtonName.empty()) kPauseActive = false; // reset on fresh open
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kPauseIdx = (kPauseIdx + 1) % kPauseCount;                     kPauseActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kPauseIdx = ((kPauseIdx - 1) + kPauseCount) % kPauseCount;     kPauseActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kPauseIdx = (kPauseIdx + 1) % kPauseCount;                     kPauseActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kPauseIdx = ((kPauseIdx - 1) + kPauseCount) % kPauseCount;     kPauseActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kPauseActive = false;
+            if (kPauseActive) currentHover = kPauseButtons[kPauseIdx];
+            spacePressed = kPauseActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName && !pendingSceneChange)
     {
         if (!hoveredButtonName.empty())
@@ -1137,7 +1360,7 @@ void PauseMenuLogicSystem::Update(float dt)
     }
 
     // only process clicks if we are actually hovering over a button
-    if (isClicked && !hoveredButtonName.empty())
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty())
     {
         // Set button to pressed state
         SetButtonTexture(hoveredButtonName, ButtonState::Pressed);
@@ -2760,15 +2983,52 @@ void PauseMenuLogicSystem::SetGhostMenuVisible(bool show)
 }
 
 void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
-    if (msg.hasFocus) {
-        // If we just gained focus, ensure the pause menu is shown
+    bool isMenuScene = currentScenePath.empty() ||
+        currentScenePath.find("MainMenu") != std::string::npos;
 
+    // FOCUS LOST (Alt-Tab Out) --------------------------------------------------------
+    if (!msg.hasFocus) {
+        if (isMenuScene) {
+            // Main menu: game is paused by CoreEngine, but don't show pause menu UI
+            return;
+        }
+
+        // In-game: show pause menu when alt-tabbing out
         isPauseMenuActive = true;
 
-        // On the first Alt-Tab, hasCreatedPauseMenuUI is false.
-        if (!hasCreatedUI) {
+        if (!hasCreatedUI)
             CreatePauseMenuUI();
+
+        if (!isPauseSettingsOpen && !isGhostMenuOpen && !isHowToPlayOpen)
+        {
+            SetPauseMenuVisible(true);
         }
+
+        return;
+    }
+
+    // FOCUS REGAINED (Alt-Tab Back In) --------------------------------------------------
+    if (isMenuScene)
+    {
+        // Menu scene: game was paused by focus-lost, silently unpause with no menu shown
+        CORE->SetGamePaused(false, false);
+        return;
+    }
+
+    // In-game: Only close How to Play and return to pause menu root if it's open
+    // Otherwise keep whatever pause menu screen is currently showing
+    if (isHowToPlayOpen)
+    {
+        isHowToPlayOpen = false;
+        wasHowToPlayOpenLastFrame = false;
+        howToPlayOpenedViaTab = false;
+        SetHowToPlayVisible(false);
+
+        // Show the pause menu root
+        isPauseMenuActive = true;
+
+        if (!hasCreatedUI)
+            CreatePauseMenuUI();
 
         SetPauseMenuVisible(true);
     }

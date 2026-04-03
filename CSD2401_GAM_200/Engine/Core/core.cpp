@@ -224,9 +224,31 @@ void CoreEngine::GameLoop()
                 // ===== AUTO-ENTER PLAY MODE IF REQUESTED =====
                 if (m_autoPlayAfterLoad)
                 {
-                    std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
-                    level->EnterPlayMode();
-                    std::cout << "[CoreEngine] Play mode entered\n";
+                    bool alreadyPlaying = (level->GetEditorMode() == EditorMode::Play);
+                    if (alreadyPlaying)
+                    {
+                        // Already in play mode (scene transition during gameplay).
+                        // EnterPlayMode() would return early, so fire OnAwake/OnStart
+                        // directly for every script loaded by this scene.
+                        std::cout << "[CoreEngine] Already in play mode — firing OnAwake+OnStart for newly loaded scripts\n";
+                        if (scriptSystem)
+                        {
+                            const auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
+                            for (const auto& go : gameObjects)
+                            {
+                                scriptSystem->CallOnAwake(go.get());
+                                scriptSystem->CallOnStart(go.get());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Not yet playing (initial load in release mode).
+                        // EnterPlayMode sets editorMode=Play and fires OnAwake/OnStart.
+                        std::cout << "[CoreEngine] Auto-play flag is TRUE - entering play mode\n";
+                        level->EnterPlayMode();
+                        std::cout << "[CoreEngine] Play mode entered\n";
+                    }
                 }
                 else
                 {
@@ -239,7 +261,7 @@ void CoreEngine::GameLoop()
                 //    std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
                 //    SetGamePaused(false);
                 //}
-                if (m_gamePause && !m_focusPauseActive)
+                if (m_gamePause && !m_isWindowUnfocused)
                 {
                     std::cout << "[CoreEngine] Unpausing game after scene load" << std::endl;
                     SetGamePaused(false);
@@ -347,7 +369,7 @@ void CoreEngine::GameLoop()
                     g_totalLoopTime += ms;
                 }
 
-                //stop updating gameplay systems while paused
+                // Update Engine if gameplay is not paused
                 if (!m_gamePause)
                 {
                     if (collisionSystem)
@@ -607,87 +629,46 @@ void CoreEngine::SetGamePaused(bool paused, bool pauseAudio)
 
 void CoreEngine::HandleWindowFocusChanged(bool focused)
 {
+    // Focus lost  ------------------------------------------------------------------
     if (!focused)
     {
         // Ignore duplicate focus-lost events
-        if (m_focusPauseActive)
+        if (m_isWindowUnfocused)
             return;
 
-        m_focusPauseActive = true;
-        m_pauseStateBeforeFocusLoss = m_gamePause;
+        m_isWindowUnfocused = true;
 
         // Clear input so keys/buttons do not get "stuck"
         if (inputManager)
             inputManager->ResetState();
 
-        std::cout << "[ALT_TAB] Focus lost\n";
+        SetGamePaused(true, true);
 
-        // Clear player movement so no stale motion resumes after ALT-TAB
-        GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
-        if (!hero)
-        {
-            std::cout << "[ALT_TAB] Hero not found\n";
-        }
-        else
-        {
-
-            auto* physics = hero->GetComponent<PhysicsComponent>();
-            if (!physics)
-            {
-                std::cout << "[ALT_TAB] Hero has no PhysicsComponent\n";
-            }
-            else
-            {
-                // stop
-                physics->SetVelocity(0.0f, 0.0f);
-            }
-        }
-
-        
-
-        // Pause gameplay/physics only.
-        SetGamePaused(true, false);
-
-        // Hard-pause all sounds for ALT-TAB
-        if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
-        {
-            audioManager->PauseAllSounds(true);
-        }
+        // Notify the game side that its Alt-Tab
+        std::cout << "[CORE] Dispatching WindowFocusMessage" << std::endl;
+        messageBus.Publish(WindowFocusMessage(false));
 
         return;
     }
 
+    // Focus regained ------------------------------------------------------------------
     // Ignore duplicate focus-gained events
-    if (!m_focusPauseActive)
+    if (!m_isWindowUnfocused)
         return;
 
-    m_focusPauseActive = false;
+    m_isWindowUnfocused = false;
 
-    // Clear input again on return
+    // Flush input so no key held before alt-tab fires as a fresh press
     if (inputManager)
         inputManager->ResetState();
 
-    // Stop movement again on focus return so the pause menu opens on a fully stopped player
-    GameObject* hero = GameObjectFactory::Instance().FindGameObject("Hero");
-    if (hero)
-    {
-        if (auto* physics = hero->GetComponent<PhysicsComponent>())
-        {
-            physics->SetVelocity(0.0f, 0.0f);
-        }
-    }
-
-    // Resume hard-paused ALT-TAB audio
+    // Resume hard-paused audio
     if (audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(false);
     }
 
-    // Restore whatever pause state existed before focus was lost
-    //SetGamePaused(m_pauseStateBeforeFocusLoss, false);
-    SetGamePaused(true, false); // Always stay paused when returning from Alt-Tab
-
-    // Notify the game side that we just returned from Alt-Tab
-    std::cout << "[CORE] Dispatching WindowFocusMessage" << std::endl;
+    // Send message with hasFocus = true
     messageBus.Publish(WindowFocusMessage(true));
+
 }

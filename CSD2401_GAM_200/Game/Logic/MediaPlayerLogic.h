@@ -58,23 +58,39 @@ public:
     std::string GetName() override { return "MediaPlayerLogicSystem"; }
 
 private:
-    bool m_spawned        = false;  ///< True while Media_Player prefab is live
-    bool m_mouseWasDown   = false;  ///< Previous-frame LMB state for press/release edge detection
+    bool m_spawned        = false;  ///< True while the Media_Player UI is visible
+    bool m_mouseWasDown   = false;  ///< Previous-frame LMB state for edge detection
     bool m_sliderDragging = false;  ///< True while the user is dragging the timeline scrubber
+    bool m_wasPaused      = false;  ///< Tracks last-known pause state to detect icon changes
+    bool m_playHovered    = false;  ///< True when the cursor is over the play/pause button
+    bool m_playPressed    = false;  ///< True while LMB is held down on the play/pause button
 
     /**
-     * @brief Loads the Media_Player prefab into the scene.
+     * @brief Activates all Media_Player child objects in the scene.
      */
     void SpawnMediaPlayer();
 
     /**
-     * @brief Destroys all Media_Player prefab objects from the scene.
+     * @brief Deactivates all Media_Player child objects in the scene.
      */
     void DestroyMediaPlayer();
 
     /**
-     * @brief Repositions UI objects to follow the camera, updates the slider thumb,
-     *        and handles all mouse input for the media player controls.
+     * @brief Updates screen-space layout, slider thumb, and all button interactions.
      */
     void UpdateMediaPlayer();
+
+    /**
+     * @brief Swaps the Replay_playing button texture between the play and pause icons.
+     * @param paused True when currently paused (show play icon), false when playing (show pause icon).
+     */
+    void UpdatePlayPauseIcon(bool paused);
+
+    /**
+     * @brief Activates or deactivates a named GameObject and enables/disables its
+     *        TransformComponent and RenderComponent to match the desired state.
+     * @param name   Name of the GameObject.
+     * @param active True to activate, false to deactivate.
+     */
+    static void SetObjectActive(const char* name, bool active);
 };

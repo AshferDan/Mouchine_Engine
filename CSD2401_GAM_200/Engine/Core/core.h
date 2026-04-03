@@ -386,8 +386,7 @@ private:
     bool m_gamePause = false;
 	bool firstTimeLoad = true;
 
-    bool m_focusPauseActive = false;
-    bool m_pauseStateBeforeFocusLoss = false;
+    bool m_isWindowUnfocused = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.

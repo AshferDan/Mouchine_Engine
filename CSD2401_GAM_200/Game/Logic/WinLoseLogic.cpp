@@ -13,6 +13,7 @@ Technology is prohibited.
 /* End Header **************************************************************************/
 
 #include "WinLoseLogic.h"
+#include "DoorAnimationLogic.h"
 #include "GhostSystem.h"
 #include "LevelEditor.h"
 #include "CameraManager.h"
@@ -25,6 +26,7 @@ Technology is prohibited.
 #include "TextInputSystem.h"
 #include <iostream>
 #include <cmath>
+#include <random>
 
 /**
  * @brief Initializes all win/lose state variables.
@@ -145,6 +147,22 @@ void WinLoseLogicSystem::Update(float dt)
         audioManager->UpdateFade(dt);
     }
 
+    // Delayed victory BGM — starts counting down once TriggerWin fires,
+    // plays when the timer expires (after the doors have finished opening).
+    if (m_winBGMDelayTimer > 0.0f)
+    {
+        m_winBGMDelayTimer -= dt;
+        if (m_winBGMDelayTimer <= 0.0f)
+        {
+            m_winBGMDelayTimer = -1.0f;
+            if (audioManager)
+            {
+                audioManager->PlaySound("victory");
+                audioManager->FadeInCategory("music", 2.0f);
+            }
+        }
+    }
+
     // Check if credits are playing and have finished
     if (isPlayingCredits)
     {
@@ -205,6 +223,45 @@ void WinLoseLogicSystem::Update(float dt)
     if (mode != EditorMode::Play)
     {
         return;
+    }
+
+    // Cheat codes
+    if (!hasPlayerWon && !hasCreatedWinScreen && !hasCreatedLoseScreen)
+    {
+        InputManager* cheatInput = CORE->GetInputManager();
+        if (cheatInput)
+        {
+            bool ctrl = (cheatInput->IsKeyHeld(GLFW_KEY_LEFT_CONTROL) || cheatInput->IsKeyPressed(GLFW_KEY_LEFT_CONTROL)) ||
+                        (cheatInput->IsKeyHeld(GLFW_KEY_RIGHT_CONTROL) || cheatInput->IsKeyPressed(GLFW_KEY_RIGHT_CONTROL));
+            if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_1))
+            {
+                // CTRL+1: Win current level instantly
+                TriggerWin();
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_2))
+            {
+                // CTRL+2: Trigger lose/respawn instantly
+                TriggerLose();
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_3))
+            {
+                // CTRL+3: Skip to next level
+                std::string nextScene;
+                if (currentScenePath.find("Level_1") != std::string::npos)
+                    nextScene = "../Assets/Scenes/Level_2.json";
+                else
+                    std::cout << "[Cheat] No next level to skip to.\n";
+
+                if (!nextScene.empty())
+                    CORE->RequestSceneLoad(nextScene, true);
+            }
+            else if (ctrl && cheatInput->IsKeyPressed(GLFW_KEY_4))
+            {
+                // CTRL+4: Reload current level instantly
+                if (!currentScenePath.empty())
+                    CORE->RequestSceneLoad(currentScenePath, true);
+            }
+        }
     }
 
     if (isWaitingForWin)
@@ -466,6 +523,8 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
 
             hasPlayerWon = true;
 
+            float score = CalculateRating();
+
             // Hide timer UI while the dialog is open
             //auto& factory = GameObjectFactory::Instance();
             if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
@@ -479,10 +538,19 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
             TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
             if (textInput)
             {
+                // Play a random typing sound on each keystroke
+                TextInputSystem::SetOnCharTyped([]()
+                {
+                    static std::mt19937 rng{ std::random_device{}() };
+                    static std::uniform_int_distribution<int> dist(1, 6);
+                    if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
+                        audio->PlaySound("typing_sfx_" + std::to_string(dist(rng)));
+                });
+
                 textInput->Show(
                     "Name Your Run!", 20,
                     // --- onConfirm ---
-                    [this](const std::string& rawName)
+                    [this, score](const std::string& rawName)
                     {
                         // Sanitise: trim whitespace, replace spaces with underscores
                         std::string runName = rawName;
@@ -505,23 +573,45 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                             ghost->SetLevelName(lvl);
                             if (CORE->GetGameCallbacks())
                                 ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
-
+                            ghost->SetRating(score);
                             ghost->SaveCurrentRun(runName);
                             std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
                         }
 
-                        // Hand off to the normal win sequence
+                        // Hand off to the door animation → win sequence
                         CORE->SetGamePaused(false);
                         isWaitingForWin = true;
-                        winDelayTimer = 0.5f;
+                        if (m_doorAnim)
+                        {
+                            winDelayTimer = 1000000.0f;
+                            m_doorAnim->StartAnimation(
+                                [this]() { TriggerWin(); },
+                                [this]() { isWaitingForWin = false; },
+                                [this]() { CreateWinScreen(); });
+                        }
+                        else
+                        {
+                            winDelayTimer = 0.5f;
+                        }
                     },
                     // --- onCancel (Escape) — proceed to win screen without saving ---
-                    [this]()
+                    [this, score]()
                     {
                         std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
                         CORE->SetGamePaused(false);
                         isWaitingForWin = true;
-                        winDelayTimer = 0.5f;
+                        if (m_doorAnim)
+                        {
+                            winDelayTimer = 1000000.0f;
+                            m_doorAnim->StartAnimation(
+                                [this]() { TriggerWin(); },
+                                [this]() { isWaitingForWin = false; },
+                                [this]() { CreateWinScreen(); });
+                        }
+                        else
+                        {
+                            winDelayTimer = 0.5f;
+                        }
                     });
             }
             else
@@ -538,11 +628,23 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                     ghost->SetLevelName(lvl);
                     if (CORE->GetGameCallbacks())
                         ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
+                    ghost->SetRating(score);
                     ghost->SaveCurrentRun("Level1_testing");
                 }
                 CORE->SetGamePaused(false);
                 isWaitingForWin = true;
-                winDelayTimer = 0.5f;
+                if (m_doorAnim)
+                {
+                    winDelayTimer = 1000000.0f;
+                    m_doorAnim->StartAnimation(
+                        [this]() { TriggerWin(); },
+                        [this]() { isWaitingForWin = false; },
+                        [this]() { CreateWinScreen(); });
+                }
+                else
+                {
+                    winDelayTimer = 0.5f;
+                }
             }
         }
     }
@@ -565,16 +667,31 @@ static std::string FormatElapsedTime(float seconds)
 }
 
 /**
- * @brief Creates win UI elements and pauses the game.
+ * @brief Pauses the game, hides HUD, stops BGM, and kicks off the door animation.
+ *        Win screen UI is spawned later in CreateWinScreen() via the onOpening callback.
  */
 void WinLoseLogicSystem::TriggerWin()
 {
     auto& factory = GameObjectFactory::Instance();
-    vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
-    float uiScale = 2.0f;
+    // Start door animation if one isn't already running.
+    // When called as onClosed (animation already in CLOSED_HOLD), skip — CreateWinScreen
+    // will fire automatically via the onOpening callback that was set by the outer caller.
+    if (m_doorAnim && !m_doorAnim->IsAnimating())
+    {
+        winDelayTimer = 1000000.0f;
+        m_doorAnim->StartAnimation(
+            [this]() {},
+            [this]() { isWaitingForWin = false; },
+            [this]() { CreateWinScreen(); });
+    }
+    else if (!m_doorAnim)
+    {
+        CreateWinScreen();  // no door animation — show immediately
+    }
+    // else: called as onClosed while animation is running; CreateWinScreen fires via onOpening
 
-    // pause game first
+    // Pause game
     CORE->SetGamePaused(true);
 
     // Hide timer UI and pause button
@@ -601,18 +718,30 @@ void WinLoseLogicSystem::TriggerWin()
     if (coinIcon) coinIcon->SetActive(false);
     if (coinText) coinText->SetActive(false);
 
-    // stop all music and play victory sound with fade in
+    // Stop BGM; victory music starts after doors open
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f);
-        audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", 2.0f);
     }
+    m_winBGMDelayTimer = 1.5f;
+
+    m_timerRunning = false; // stop elapsed-time counter
+}
+
+/**
+ * @brief Spawns all win screen UI objects (background, stats panel, buttons).
+ *        Called via the door animation's onOpening callback so it is revealed
+ *        as the doors slide back open.
+ */
+void WinLoseLogicSystem::CreateWinScreen()
+{
+    auto& factory = GameObjectFactory::Instance();
+    vec2 camPos = CameraManager::Instance().GetCameraPosition();
+    float uiScale = 2.0f;
 
     // stats for the right-side panel
-    m_timerRunning = false; // stop timer on win
     std::string statTime = FormatElapsedTime(m_elapsedTime);
     std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
     std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
@@ -656,6 +785,7 @@ void WinLoseLogicSystem::TriggerWin()
     levelNumObj->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(60 * uiScale),
         statLevelNum, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    levelNumObj->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Level subtitle: "Barbershop" ----
     GameObject* levelNameObj = factory.CreateGameObject("WinLevelName");
@@ -667,6 +797,7 @@ void WinLoseLogicSystem::TriggerWin()
     levelNameObj->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(36 * uiScale),
         statLevelName, vec4(0.2f, 0.15f, 0.1f, 1.0f), false);
+    levelNameObj->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Clock icon ----
     GameObject* clockIcon = factory.CreateGameObject("WinClockIcon");
@@ -690,6 +821,7 @@ void WinLoseLogicSystem::TriggerWin()
     timeText->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         statTime, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    timeText->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Coin icon ----
     GameObject* coinIconWin = factory.CreateGameObject("WinCoinIcon");
@@ -713,6 +845,7 @@ void WinLoseLogicSystem::TriggerWin()
     coinCountWin->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         statCoins, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    coinCountWin->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Shell icon ----
     GameObject* shellIconWin = factory.CreateGameObject("WinShellIcon");
@@ -736,6 +869,7 @@ void WinLoseLogicSystem::TriggerWin()
     shellCountWin->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         statShells, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    shellCountWin->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Shop Rating: label ----
     // ---- Shop Rating: label ----
@@ -748,6 +882,7 @@ void WinLoseLogicSystem::TriggerWin()
     ratingLabel->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
         "Shop Rating:", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    ratingLabel->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
     GameObject* ratingBadge = factory.CreateGameObject("WinRatingBadge");
@@ -797,6 +932,7 @@ void WinLoseLogicSystem::TriggerWin()
     nextBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Continue", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    nextBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Replay button ----
     GameObject* replayBtn = factory.CreateGameObject("ReplayButton");
@@ -812,6 +948,7 @@ void WinLoseLogicSystem::TriggerWin()
     replayBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    replayBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Quit button ----
     GameObject* quitBtn = factory.CreateGameObject("QuitButton");
@@ -827,6 +964,7 @@ void WinLoseLogicSystem::TriggerWin()
     quitBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    quitBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     hasCreatedWinScreen = true;
 }
@@ -856,6 +994,29 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         currentHover = "QuitButton";
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kWinButtons[] = { "NextButton", "ReplayButton", "QuitButton" };
+    static int  kWinIdx    = 0;
+    static bool kWinActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kWinIdx = (kWinIdx + 1) % 3;           kWinActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kWinIdx = ((kWinIdx - 1) + 3) % 3;     kWinActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kWinIdx = (kWinIdx + 1) % 3;       kWinActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kWinIdx = ((kWinIdx - 1) + 3) % 3; kWinActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kWinActive = false; // mouse click takes over
+            if (kWinActive) currentHover = kWinButtons[kWinIdx];
+            spacePressed = kWinActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -876,7 +1037,7 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 
@@ -1305,6 +1466,29 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         currentHover = "LoseQuitButton";
     }
 
+    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
+    static const char* kLoseButtons[] = { "YesButton", "LoseQuitButton" };
+    static int  kLoseIdx    = 0;
+    static bool kLoseActive = false;
+    bool spacePressed = false;
+    {
+        InputManager* inp = CORE->GetInputManager();
+        if (inp && !pendingSceneChange)
+        {
+            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kLoseIdx = (kLoseIdx + 1) % 2;         kLoseActive = true; }
+            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kLoseIdx = ((kLoseIdx - 1) + 2) % 2;   kLoseActive = true; }
+            if (inp->IsGamepadConnected())
+            {
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kLoseIdx = (kLoseIdx + 1) % 2;       kLoseActive = true; }
+                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kLoseIdx = ((kLoseIdx - 1) + 2) % 2; kLoseActive = true; }
+            }
+            if (isClicked && !currentHover.empty()) kLoseActive = false;
+            if (kLoseActive) currentHover = kLoseButtons[kLoseIdx];
+            spacePressed = kLoseActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -1325,7 +1509,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 

@@ -90,6 +90,9 @@ struct GameObjectData
     int currentCol;
     float currentFrameTime;
 
+    // script data
+    std::vector<std::string> scripts;
+
     GameObjectData() :
         originalID(0), isActive(true),
         hasTransform(false), posX(0), posY(0), scaleX(1), scaleY(1), rotation(0),
