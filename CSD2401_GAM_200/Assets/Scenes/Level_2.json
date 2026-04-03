@@ -8009,7 +8009,7 @@
     },
     {
       "name": "UI",
-      "localID": 141,
+      "localID": 52,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -8038,14 +8038,14 @@
       "children": [
         {
           "name": "Text FPS",
-          "localID": 142,
-          "parentID": 141,
+          "localID": 53,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              100.0,
-              100.0
+              5.21,
+              9.26
             ],
             "scale": [
               1.0,
@@ -8089,14 +8089,14 @@
         },
         {
           "name": "InGamePauseButton",
-          "localID": 143,
-          "parentID": 141,
+          "localID": 54,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1825.0,
-              70.0
+              95.05,
+              6.48
             ],
             "scale": [
               125.0,
@@ -8126,14 +8126,14 @@
         },
         {
           "name": "ShellIcon1",
-          "localID": 144,
-          "parentID": 141,
+          "localID": 55,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1700.0,
-              920.0
+              88.54,
+              85.19
             ],
             "scale": [
               90.0,
@@ -8149,7 +8149,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -8163,14 +8163,14 @@
         },
         {
           "name": "ShellIcon2",
-          "localID": 145,
-          "parentID": 141,
+          "localID": 56,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1770.0,
-              920.0
+              92.19,
+              85.19
             ],
             "scale": [
               90.0,
@@ -8186,7 +8186,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -8200,14 +8200,14 @@
         },
         {
           "name": "ShellIcon3",
-          "localID": 146,
-          "parentID": 141,
+          "localID": 57,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1840.0,
-              920.0
+              95.83,
+              85.19
             ],
             "scale": [
               90.0,
@@ -8223,7 +8223,7 @@
               1.0,
               1.0,
               1.0,
-              0.30000001192092896
+              1.0
             ],
             "layer": 700,
             "screenSpace": true,
@@ -8237,14 +8237,14 @@
         },
         {
           "name": "CoinIcon",
-          "localID": 147,
-          "parentID": 141,
+          "localID": 58,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1700.0,
-              830.0
+              88.54,
+              76.85
             ],
             "scale": [
               100.0,
@@ -8274,14 +8274,14 @@
         },
         {
           "name": "CoinCountText",
-          "localID": 148,
-          "parentID": 141,
+          "localID": 59,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              1750.0,
-              810.0
+              91.15,
+              75.00
             ],
             "scale": [
               1.0,
@@ -8325,13 +8325,13 @@
         },
         {
           "name": "Timer Bar",
-          "localID": 149,
-          "parentID": 141,
+          "localID": 60,
+          "parentID": 52,
           "active": true,
           "TransformComponent": {
             "enabled": true,
             "pos": [
-              -38.0,
+              -1.98,
               0.0
             ],
             "scale": [
@@ -8343,14 +8343,14 @@
           "children": [
             {
               "name": "LevelTimerBarFrame",
-              "localID": 150,
-              "parentID": 149,
+              "localID": 61,
+              "parentID": 60,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  512.0,
-                  920.0
+                  26.67,
+                  85.19
                 ],
                 "scale": [
                   1000.0,
@@ -8380,14 +8380,14 @@
             },
             {
               "name": "LevelTimerBar",
-              "localID": 151,
-              "parentID": 149,
+              "localID": 62,
+              "parentID": 60,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  520.6439819335938,
-                  920.0
+                  27.12,
+                  85.19
                 ],
                 "scale": [
                   977.6099853515625,
@@ -8417,14 +8417,14 @@
             },
             {
               "name": "LevelTimerBarBackground",
-              "localID": 152,
-              "parentID": 149,
+              "localID": 63,
+              "parentID": 60,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  512.0,
-                  920.0
+                  26.67,
+                  85.19
                 ],
                 "scale": [
                   1000.0,

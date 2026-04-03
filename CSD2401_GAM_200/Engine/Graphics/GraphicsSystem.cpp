@@ -500,18 +500,29 @@ void GraphicsSystem::Update(float)
     shader->Use();
 
     // === View-Projection Matrix Calculation ===
-    float renderWidth = editorMode ? (float)(frameBufferWidth) : float(Wwidth);
-    float renderHeight = editorMode ? (float)(frameBufferHeight) : float(Wheight);
+    float renderWidth = editorMode ? (float)(frameBufferWidth) : (float)(Wwidth);
+    float renderHeight = editorMode ? (float)(frameBufferHeight) : (float)(Wheight);
+
+    // 1. Calculate resolution scale based on 1080p native resolution
+    const float BASE_WIDTH = 1920.0f;
+    const float BASE_HEIGHT = 1080.0f;
+    float scaleX = renderWidth / BASE_WIDTH;
+    float scaleY = renderHeight / BASE_HEIGHT;
+    float resolutionScale = std::min(scaleX, scaleY);
+
+    // 2. Shrink the requested virtual bounds to force the camera to zoom in
+    float virtualWidth = renderWidth / resolutionScale;
+    float virtualHeight = renderHeight / resolutionScale;
+
     if (levelEditor && (levelEditor->GetEditorMode() == EditorMode::Stop || levelEditor->GetEditorMode() == EditorMode::Pause))
     {
-        // EDITOR MODE: Use free editor camera for level editing
-        // This allows designers to navigate and edit the level
-        vp = levelEditor->GetEditorViewProjection((float)renderWidth, (float)renderHeight);
+        // EDITOR MODE
+        vp = levelEditor->GetEditorViewProjection(virtualWidth, virtualHeight);
     }
     else
     {
-        // GAME MODE: Use the primary game camera
-        vp = CameraManager::Instance().GetViewProjectMatrix(renderWidth, renderHeight);
+        // GAME MODE
+        vp = CameraManager::Instance().GetViewProjectMatrix(virtualWidth, virtualHeight);
         vec2 camPos = CameraManager::Instance().GetCameraPosition();
     }
 
@@ -661,6 +672,21 @@ void GraphicsSystem::Update(float)
         bool isCircle = (rend->GetShapeType() == RenderComponent::ShapeType::Circle);
         int layer = rend->GetLayer(); // For draw order sorting
         bool screenSpace = rend->isScreenSpace();
+
+        if (screenSpace)
+        {
+            float targetScreenWidth = editorMode ? (float)(frameBufferWidth) : (float)(Wwidth);
+            float targetScreenHeight = editorMode ? (float)(frameBufferHeight) : (float)(Wheight);
+
+            // Convert x and y from 0-100 percentage to actual screen pixels
+            x = (x / 100.0f) * targetScreenWidth;
+            y = (y / 100.0f) * targetScreenHeight;
+
+            // Scale the size of the UI based on window height vs native 1080p
+            float uiScale = targetScreenHeight / 1080.0f;
+            sx *= uiScale;
+            sy *= uiScale;
+        }
 
 #ifdef _DEBUG
         if (hasCamBounds && !screenSpace &&
@@ -900,15 +926,33 @@ void GraphicsSystem::Update(float)
                 {
                     float x, y;
                     transform->GetPosition(x, y);
+                    float scale = textComp->GetScale();
+
+                    // --- NEW PERCENTAGE UI SCALING FOR TEXT ---
+                    if (textComp->isScreenSpace())
+                    {
+                        float targetScreenWidth = editorMode ? (float)(frameBufferWidth) : (float)(Wwidth);
+                        float targetScreenHeight = editorMode ? (float)(frameBufferHeight) : (float)(Wheight);
+
+                        // Convert x and y from 0-100 percentage to actual screen pixels
+                        x = (x / 100.0f) * targetScreenWidth;
+                        y = (y / 100.0f) * targetScreenHeight;
+
+                        // Scale the font size so it shrinks proportionately on smaller screens
+                        float uiScale = targetScreenHeight / 1080.0f;
+                        scale *= uiScale;
+                    }
+                    // ------------------------------------------
+
                     m_textItems.push_back({
                         &textComp->GetCharacters(),
                         textComp->GetText(),
                         x, y,
-                        textComp->GetScale(),
+                        scale, 
                         textComp->GetColor(),
                         textComp->isScreenSpace(),
                         textComp->GetLayer()
-                    });
+                        });
                 }
             }
         }
