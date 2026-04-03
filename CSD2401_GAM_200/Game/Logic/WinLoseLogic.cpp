@@ -674,10 +674,6 @@ void WinLoseLogicSystem::TriggerWin()
 {
     auto& factory = GameObjectFactory::Instance();
 
-    // Start door animation if one isn't already running.
-    // When called as onClosed (animation is in CLOSED_HOLD), IsAnimating() returns
-    // true so we skip here — the outer caller's onClosed lambda already called
-    // CreateWinScreen() before reaching this point.
     if (m_doorAnim && !m_doorAnim->IsAnimating())
     {
         winDelayTimer = 1000000.0f;
@@ -690,10 +686,7 @@ void WinLoseLogicSystem::TriggerWin()
     {
         CreateWinScreen();  // no door animation — show immediately
     }
-    // else: called as onClosed while animation is running; CreateWinScreen was already
-    // invoked by the outer StartAnimation's onClosed lambda.
 
-    // Pause game
     CORE->SetGamePaused(true);
 
     // Hide timer UI and pause button
