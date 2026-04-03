@@ -93,6 +93,20 @@ public:
 	const std::map<char, Character>& GetCharacters() const;
 
 	/**
+	 * @brief Sets the render layer for depth sorting against sprite batches.
+	 *        Lower values draw first (behind); higher values draw last (in front).
+	 *        Default 9999 preserves the original always-on-top behavior.
+	 * @param layer The desired render layer.
+	 */
+	void SetLayer(int layer) { m_layer = layer; }
+
+	/**
+	 * @brief Gets the render layer used for depth sorting.
+	 * @return The current render layer.
+	 */
+	int GetLayer() const { return m_layer; }
+
+	/**
 	 * @brief Sets whether the text is rendered in screen space (fixed GUI) or world space (follows camera).
 	 * @param isScreenSpace True for screen space, false for world space.
 	 */
@@ -161,6 +175,7 @@ private:
 	vec4 color;
 	float scale;
 	bool screenSpace;
+	int m_layer = 9999;  // render layer for depth sorting; 9999 = always on top (legacy default)
 
 	// --- Resource Identification ---
 	std::string fontPath;

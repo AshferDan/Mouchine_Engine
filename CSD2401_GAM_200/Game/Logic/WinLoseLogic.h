@@ -19,6 +19,8 @@ Technology is prohibited.
 #include "transform.h"
 #include "core.h"
 
+class DoorAnimationLogicSystem;  // forward declaration
+
 /**
  * @class WinLoseLogicSystem
  * @brief Handles win and lose state transitions, UI screens, and scene loading logic.
@@ -59,6 +61,12 @@ public:
     void SetCurrentScene(const std::string& scenePath) { currentScenePath = scenePath; }
 
     /**
+     * @brief Connects the door animation system so it plays when the player wins.
+     * @param doorAnim Pointer to the registered DoorAnimationLogicSystem.
+     */
+    void SetDoorAnimSystem(DoorAnimationLogicSystem* doorAnim) { m_doorAnim = doorAnim; }
+
+    /**
      * @brief Checks if the win screen UI is currently active.
      * @return True if win screen is enabled.
      */
@@ -97,11 +105,16 @@ public:
     }
 
 private:
+    // ---------------- DOOR ANIMATION ----------------
+    DoorAnimationLogicSystem* m_doorAnim = nullptr;
+
     // ---------------- WIN STATE ----------------
     bool hasPlayerWon = false;
     float winDelayTimer = 0.0f;
     bool isWaitingForWin = false;
     bool hasCreatedWinScreen = false;
+    bool AudioCheck = false;
+    float m_winBGMDelayTimer = -1.0f;  // counts down after doors open; -1 = inactive
 
     // ---------------- LOSE STATE ----------------
     bool hasCreatedLoseScreen = false;
@@ -146,9 +159,15 @@ private:
     void CheckWinZoneCollision();
 
     /**
-     * @brief Creates win screen UI objects and pauses the game.
+     * @brief Pauses the game, hides HUD, stops BGM, and starts the door animation.
      */
     void TriggerWin();
+
+    /**
+     * @brief Spawns all win screen UI objects. Called via the door animation's
+     *        onOpening callback so the screen is revealed as the doors slide open.
+     */
+    void CreateWinScreen();
 
     /**
      * @brief Handles hover/click logic for win screen buttons.

@@ -62,6 +62,8 @@ private:
     bool m_mouseWasDown   = false;  ///< Previous-frame LMB state for edge detection
     bool m_sliderDragging = false;  ///< True while the user is dragging the timeline scrubber
     bool m_wasPaused      = false;  ///< Tracks last-known pause state to detect icon changes
+    bool m_playHovered    = false;  ///< True when the cursor is over the play/pause button
+    bool m_playPressed    = false;  ///< True while LMB is held down on the play/pause button
 
     /**
      * @brief Activates all Media_Player child objects in the scene.

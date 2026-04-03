@@ -29,6 +29,7 @@ Technology is prohibited.
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unordered_set>
 namespace fs = std::filesystem;
 
 /**
@@ -568,8 +569,54 @@ void LevelEditor::RestoreSceneState()
             }
         }
 
+        // restore animation to its starting frame
+        if (savedData->hasAnimation)
+        {
+            if (auto* spritesheet = obj->GetComponent<Spritesheet>())
+            {
+                float fps = (savedData->fps > 0.0f) ? savedData->fps : 1.0f;
+                spritesheet->SetAnimation(savedData->startFrame, savedData->endFrame, fps);
+            }
+        }
+
         // restore active state
         obj->SetActive(savedData->isActive);
+    }
+
+    // Recreate objects that were destroyed during play (e.g. collected coins)
+    {
+        std::unordered_set<EntityID> existingIDs;
+        for (const auto& objPtr : this->factory.GetAllGameObjects())
+            existingIDs.insert(objPtr->GetID());
+
+        for (const auto& savedData : savedSceneState.gameObjects)
+        {
+            if (existingIDs.count(savedData.originalID))
+                continue; // still alive, already restored above
+
+            std::cout << "[LevelEditor] Recreating destroyed object: " << savedData.name
+                << " (ID: " << savedData.originalID << ")\n";
+
+            GameObject* recreated = DeserialiseGameObject(savedData);
+            if (!recreated)
+                continue;
+
+            // Re-attach scripts that were on this object
+            if (!savedData.scripts.empty())
+            {
+                auto* scriptComp = recreated->AddComponent<ScriptComponent>();
+                for (const auto& scriptName : savedData.scripts)
+                    scriptComp->AddScriptName(scriptName);
+                scriptComp->Initialize();
+            }
+
+            // Fire lifecycle hooks so the scripts initialise properly
+            if (CORE && CORE->GetScriptSystem())
+            {
+                CORE->GetScriptSystem()->CallOnAwake(recreated);
+                CORE->GetScriptSystem()->CallOnStart(recreated);
+            }
+        }
     }
 
     GameObject* hero = factory.FindGameObject("Hero");
@@ -1357,6 +1404,15 @@ GameObjectData LevelEditor::SerialiseGameObject(GameObject *obj)
     else
     {
         data.hasAnimation = false;
+    }
+
+    // serialise scripts
+    if (auto* scriptComp = obj->GetComponent<ScriptComponent>())
+    {
+        for (const auto& [id, name] : scriptComp->GetScripts())
+        {
+            data.scripts.push_back(name);
+        }
     }
 
     return data;
