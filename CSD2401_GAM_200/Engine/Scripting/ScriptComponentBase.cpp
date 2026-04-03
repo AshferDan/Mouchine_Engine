@@ -28,8 +28,8 @@ void ScriptComponentBase::Initialize()
 {
     if (CreateScriptInstance())
     {
+        // OnAwake fires on creation. OnStart is deferred to play mode start.
         CallOnAwake();
-        CallOnStart();
     }
 }
 
@@ -37,11 +37,8 @@ void ScriptComponentBase::Update(float dt)
 {
     if (!enabled || !scriptInstance) return;
 
-    // Ensure OnAwake and OnStart are called before the first update
-    if (!isAwakened)
-    {
-        CallOnAwake();
-    }
+    // OnAwake fired on creation (Initialize). Fire OnStart here as a
+    // safety-net before the first OnUpdate (covers release-mode sequence).
     if (!isStarted)
     {
         CallOnStart();

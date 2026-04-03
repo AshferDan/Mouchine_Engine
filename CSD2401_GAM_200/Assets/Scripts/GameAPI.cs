@@ -234,6 +234,7 @@ namespace CSharpScript
         /// <returns>Array of integer EntityIDs.</returns>
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int[] GetAllIDs();
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int CountAllGameObjects();
     }
 

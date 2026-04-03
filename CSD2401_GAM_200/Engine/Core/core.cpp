@@ -230,13 +230,12 @@ void CoreEngine::GameLoop()
                         // Already in play mode (scene transition during gameplay).
                         // EnterPlayMode() would return early, so fire OnAwake/OnStart
                         // directly for every script loaded by this scene.
-                        std::cout << "[CoreEngine] Already in play mode — firing OnAwake+OnStart for newly loaded scripts\n";
+                        std::cout << "[CoreEngine] Already in play mode — firing OnStart for newly loaded scripts (OnAwake fired on creation)\n";
                         if (scriptSystem)
                         {
                             const auto& gameObjects = GameObjectFactory::Instance().GetAllGameObjects();
                             for (const auto& go : gameObjects)
                             {
-                                scriptSystem->CallOnAwake(go.get());
                                 scriptSystem->CallOnStart(go.get());
                             }
                         }
