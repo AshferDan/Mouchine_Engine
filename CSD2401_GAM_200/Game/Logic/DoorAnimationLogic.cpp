@@ -96,7 +96,7 @@ void DoorAnimationLogicSystem::Update(float dt)
             m_timer = 0.0f;
             m_state = DoorAnimState::CLOSED_HOLD;
 
-            // Doors are fully shut — caller creates the win/lose screen here
+            // Doors fully shut — create the win/lose screen now while view is blocked
             if (m_onClosed) m_onClosed();
             
         }
@@ -111,7 +111,7 @@ void DoorAnimationLogicSystem::Update(float dt)
             m_timer = 0.0f;
             m_state = DoorAnimState::OPENING;
 
-            // Spawn win/lose UI now — it will be revealed as the doors slide open
+            // Begin opening phase — win/lose screen already exists behind the doors
             if (m_onOpening) m_onOpening();
         }
         break;

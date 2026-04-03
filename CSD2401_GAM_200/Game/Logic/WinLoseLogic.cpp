@@ -585,9 +585,9 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         {
                             winDelayTimer = 1000000.0f;
                             m_doorAnim->StartAnimation(
-                                [this]() { TriggerWin(); },
+                                [this]() { TriggerWin(); CreateWinScreen(); },
                                 [this]() { isWaitingForWin = false; },
-                                [this]() { CreateWinScreen(); });
+                                nullptr);
                         }
                         else
                         {
@@ -604,9 +604,9 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         {
                             winDelayTimer = 1000000.0f;
                             m_doorAnim->StartAnimation(
-                                [this]() { TriggerWin(); },
+                                [this]() { TriggerWin(); CreateWinScreen(); },
                                 [this]() { isWaitingForWin = false; },
-                                [this]() { CreateWinScreen(); });
+                                nullptr);
                         }
                         else
                         {
@@ -637,9 +637,9 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                 {
                     winDelayTimer = 1000000.0f;
                     m_doorAnim->StartAnimation(
-                        [this]() { TriggerWin(); },
+                        [this]() { TriggerWin(); CreateWinScreen(); },
                         [this]() { isWaitingForWin = false; },
-                        [this]() { CreateWinScreen(); });
+                        nullptr);
                 }
                 else
                 {
@@ -675,21 +675,23 @@ void WinLoseLogicSystem::TriggerWin()
     auto& factory = GameObjectFactory::Instance();
 
     // Start door animation if one isn't already running.
-    // When called as onClosed (animation already in CLOSED_HOLD), skip — CreateWinScreen
-    // will fire automatically via the onOpening callback that was set by the outer caller.
+    // When called as onClosed (animation is in CLOSED_HOLD), IsAnimating() returns
+    // true so we skip here — the outer caller's onClosed lambda already called
+    // CreateWinScreen() before reaching this point.
     if (m_doorAnim && !m_doorAnim->IsAnimating())
     {
         winDelayTimer = 1000000.0f;
         m_doorAnim->StartAnimation(
-            [this]() {},
+            [this]() { CreateWinScreen(); },  // doors closed — create screen behind them
             [this]() { isWaitingForWin = false; },
-            [this]() { CreateWinScreen(); });
+            nullptr);
     }
     else if (!m_doorAnim)
     {
         CreateWinScreen();  // no door animation — show immediately
     }
-    // else: called as onClosed while animation is running; CreateWinScreen fires via onOpening
+    // else: called as onClosed while animation is running; CreateWinScreen was already
+    // invoked by the outer StartAnimation's onClosed lambda.
 
     // Pause game
     CORE->SetGamePaused(true);
@@ -732,8 +734,8 @@ void WinLoseLogicSystem::TriggerWin()
 
 /**
  * @brief Spawns all win screen UI objects (background, stats panel, buttons).
- *        Called via the door animation's onOpening callback so it is revealed
- *        as the doors slide back open.
+ *        Called via the door animation's onClosed callback so the screen is
+ *        created while the doors are fully shut, then revealed as they open.
  */
 void WinLoseLogicSystem::CreateWinScreen()
 {
