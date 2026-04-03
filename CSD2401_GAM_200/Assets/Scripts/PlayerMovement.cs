@@ -60,11 +60,15 @@ namespace CSharpScript
         // list contains (entityID, position, isAudioPlaying)
         class NPCData
         {
+            public string name;
             public uint ID;
             public vec2 pos;
+            public string soundName = "";
+            public float volume = 0.5f;
             public bool audioPlaying;
-            public NPCData(uint id, vec2 position, bool soundPlaying)
+            public NPCData(string goName, uint id, vec2 position, bool soundPlaying)
             {
+                name = goName;
                 ID = id;
                 pos = position;
                 audioPlaying = soundPlaying;
@@ -201,9 +205,8 @@ namespace CSharpScript
 
         public override void OnAwake()
         {
-
             Debug.Log("\n\ntesting ON AWAKE\n\n");
-
+            Audio.AddSound("cb", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
         }
 
         public PlayerMovement()
@@ -257,11 +260,12 @@ namespace CSharpScript
                 );
             }
 
-            // replace with onawake when it works
-            // putting in here to keep scope clean
+            // 3D audio stuff
             {
                 NPCs.Clear();
                 int totalGOs = GameObject.CountAllGameObjects();
+
+                // lobter
                 for (int i = 1; i <= totalGOs; i++)                         // starts with 1 bc ids start from 1
                 {
                     string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
@@ -270,7 +274,12 @@ namespace CSharpScript
                     //Debug.Log("ID: " + i + " | Name: " + currGO);
                     if (currGO.Contains("NPC_Lobster"))
                     {
-                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("NPC_Lobster", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                    else if (currGO.Contains("EZ_Asset"))
+                    {
+                        NPCData temp = new NPCData("EZ_Asset", (uint)i, Transform.GetPosition(currGO), false);
                         NPCs.Add(temp);
                     }
                 }
@@ -303,14 +312,36 @@ namespace CSharpScript
             Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.8f, 1.5f, "sfx_loop");
             Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.15f, 1.1f, "sfx");
             Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
-            Audio.AddSound("hurt_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 1.0f, 1.0f, "sfx");
 
             // load 3D spatial sound for NPCs (scissors snip for lobster)
             for (int i = 0; i < NPCs.Count(); i++)
             {
                 //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
-                string audioPath = "../Assets/Audio/hairscissors_snip" + ((i%3)+1).ToString() + ".wav";
-                Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
+                string audioPath = "";
+                string soundName = "";
+                float volume = 0.5f;
+
+                if (NPCs[i].name.Contains("NPC_Lobster"))
+                {
+                    audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
+                    soundName = "scissors_snip" + i.ToString();
+                    volume = 0.4f;
+                }
+                else if (NPCs[i].name.Contains("EZ_Asset"))
+                {
+                    audioPath = "../Assets/Audio/DoorGlow.wav";
+                    soundName = "door_glow";
+                    volume = 0.4f;
+                }
+
+                if (string.IsNullOrEmpty(audioPath) || string.IsNullOrEmpty(soundName))
+                {
+                    Debug.Log("3D AUDIO WARNING: No matching 3D audio for: " + NPCs[i].name);
+                    continue;
+                }
+
+                NPCs[i].soundName = soundName;
+                Audio.Load3DSound(soundName, audioPath, true, 500.0f, 3000.0f, soundName, volume, 1.0f);
             }
             Audio.Load3DSound("scissors_sniptest", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
 
@@ -329,6 +360,16 @@ namespace CSharpScript
             Audio.AddSound("land_sfx2", "../Assets/audio/Player/Land/Land2.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx3", "../Assets/audio/Player/Land/Land3.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx4", "../Assets/audio/Player/Land/Land4.wav", false, 0.3f, 1.0f, "sfx");
+            //hurt
+            Audio.AddSound("hurt_sfx1", "../Assets/audio/Player/Hurt_01.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx2", "../Assets/audio/Player/Hurt_02.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx3", "../Assets/audio/Player/Hurt_03.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx4", "../Assets/audio/Player/Hurt_04.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx5", "../Assets/audio/Player/Hurt_05.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
+
 
             // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_R EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
@@ -416,31 +457,6 @@ namespace CSharpScript
             if (Input.GetKeyPressed(Input.KeyCode.P))
             {
                 Animation.PlayAnimation(pu_vfx, "Clear");
-
-                //clearing here bc in update
-                NPCs.Clear();
-                int totalGOs = GameObject.CountAllGameObjects();
-                for (int i = 1; i <= totalGOs; i++)
-                {
-                    string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
-                    if (string.IsNullOrEmpty(currGO)) continue;
-
-                    //Debug.Log("ID: " + i + " | Name: " + currGO);
-                    if (currGO.Contains("NPC_Lobster"))
-                    {
-                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
-                        NPCs.Add(temp);
-                    }
-                }
-
-                for (int i = 0; i < NPCs.Count(); i++)
-                {
-                    //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
-                    string audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
-                    Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
-                }
-
-                Debug.Log("NPC Count: " + NPCs.Count().ToString());
             }
 
             #region LOBSTER 3D SCISSORS SOUND
@@ -460,20 +476,20 @@ namespace CSharpScript
                 {
                     if (!NPCs[i].audioPlaying)
                     {
-                        Audio.PlaySound("scissors_snip" + (i).ToString(), "lobster_scissors" + (i).ToString());
-                        Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
+                        Audio.PlaySound(NPCs[i].soundName, NPCs[i].soundName);
+                        //Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
                         NPCs[i].audioPlaying = true;
                     }
 
                     // update position, no spatial if above or below
                     float horizontalDist1 = Math.Abs(distX);
-                    if (horizontalDist1 < 150.0f)
+                    if (horizontalDist1 < 200.0f)
                     {
-                        Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), playerPos.x, NPCs[i].pos.y);
+                        Audio.Set3DSoundPosition(NPCs[i].soundName, playerPos.x, NPCs[i].pos.y);
                     }
                     else
                     {
-                        Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), NPCs[i].pos.x, NPCs[i].pos.y);
+                        Audio.Set3DSoundPosition(NPCs[i].soundName, NPCs[i].pos.x, NPCs[i].pos.y);
                     }
                 }
                 else
@@ -2089,7 +2105,9 @@ namespace CSharpScript
                     break;
                 case PlayerState.Hurting:
                     if (enableDebug) Debug.Log("CurrState: " + "Hurting");
-                    Audio.PlaySound("hurt_sfx", "sfx");
+                    Random rndHurt = new Random();
+                    int variationHurt = rndHurt.Next(1, 9);                     // 8 diff landing sounds
+                    Audio.PlaySound("hurt_sfx" + variationHurt.ToString(), "sfx");
                     Camera.CameraFlash(0.75f, 1, 0, 0, 0.4f, true, 1.0f);
                     break;
             }
