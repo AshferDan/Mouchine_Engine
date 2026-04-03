@@ -318,17 +318,17 @@ void LevelEditor::EnterPlayMode()
 
     editorMode = EditorMode::Play;
 
-    // Fire OnAwake then OnStart on all existing scripts
+    // OnAwake already fired for every script when it was attached (on creation).
+    // EnterPlayMode only needs to fire OnStart — this is the "play clicked" moment.
     if (CORE && CORE->GetScriptSystem())
     {
         auto* scriptSys = CORE->GetScriptSystem();
         const auto& gameObjects = factory.GetAllGameObjects();
         for (const auto& go : gameObjects)
         {
-            scriptSys->CallOnAwake(go.get());
             scriptSys->CallOnStart(go.get());
         }
-        std::cout << "[LevelEditor] Called OnAwake + OnStart on all scripts.\n";
+        std::cout << "[LevelEditor] Called OnStart on all scripts (OnAwake fired on creation).\n";
     }
 
     // start bgm when play is click
