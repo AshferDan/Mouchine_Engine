@@ -2019,7 +2019,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
-    // Get audio manager for low pass filter
+    // Get audio manager for low pass filter and sound effects
     AudioManager* audioManager = CORE->GetAudioManager();
 
     // Reset pause settings and how to play state when closing pause menu
@@ -2041,6 +2041,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
         SetButtonTexture("PauseGhostButton", ButtonState::Normal);
 
+        // Play unpause sound effect before removing low pass filter
+        if (audioManager)
+        {
+            audioManager->PlaySound("game_unpause");
+        }
+
         // remove low pass filter when pause menu closes
         if (audioManager)
         {
@@ -2051,6 +2057,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     }
     else
     {
+        // Play pause sound effect before applying low pass filter
+        if (audioManager)
+        {
+            audioManager->PlaySound("game_pause");
+        }
+
         // apply low pass filter when pause menu opens
         if (audioManager)
         {
