@@ -1997,6 +1997,203 @@
       ]
     },
     {
+      "name": "StartEndZones",
+      "localID": 59,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          33363.1640625,
+          1301.2940673828125
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 0.0,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "children": [
+        {
+          "name": "SZ_Asset",
+          "localID": 60,
+          "parentID": 59,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              32648.37109375,
+              1527.208984375
+            ],
+            "scale": [
+              1000.0,
+              746.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Props/Safe_zone.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "EZ_Asset",
+          "localID": 61,
+          "parentID": 59,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1868.0689697265625,
+              542.498779296875
+            ],
+            "scale": [
+              400.0,
+              512.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Props/Exit zone.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 6,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "WinZone",
+          "localID": 62,
+          "parentID": 59,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1867.9129638671875,
+              479.4715576171875
+            ],
+            "scale": [
+              234.82369995117188,
+              384.5270080566406
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "layer": 10,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              234.82369995117188,
+              384.5270080566406
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "SafeZone",
+          "localID": 63,
+          "parentID": 59,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              32653.12109375,
+              1472.4727783203125
+            ],
+            "scale": [
+              800.5,
+              515.6822509765625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              0.0,
+              0.0,
+              1.0,
+              0.0
+            ],
+            "layer": 10,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Platform",
+            "size": [
+              800.5,
+              515.6822509765625
+            ]
+          },
+          "children": []
+        }
+      ]
+    },
+    {
       "name": "UI",
       "localID": 47,
       "parentID": 4294967295,
@@ -2442,203 +2639,6 @@
               "children": []
             }
           ]
-        }
-      ]
-    },
-    {
-      "name": "StartEndZones",
-      "localID": 59,
-      "parentID": 4294967295,
-      "active": true,
-      "TransformComponent": {
-        "enabled": true,
-        "pos": [
-          33363.1640625,
-          1301.2940673828125
-        ],
-        "scale": [
-          50.0,
-          50.0
-        ],
-        "rotation": 0.0
-      },
-      "PhysicsComponent": {
-        "enabled": true,
-        "mass": 0.0,
-        "isStatic": false,
-        "useGravity": true,
-        "isGrounded": false,
-        "velocity": [
-          0.0,
-          0.0
-        ]
-      },
-      "children": [
-        {
-          "name": "SZ_Asset",
-          "localID": 60,
-          "parentID": 59,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              32648.37109375,
-              1527.208984375
-            ],
-            "scale": [
-              1000.0,
-              746.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Props/Safe_zone.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 0,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "EZ_Asset",
-          "localID": 61,
-          "parentID": 59,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1868.0689697265625,
-              542.498779296875
-            ],
-            "scale": [
-              400.0,
-              512.0
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Props/Exit zone.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 6,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "WinZone",
-          "localID": 62,
-          "parentID": 59,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              1867.9129638671875,
-              479.4715576171875
-            ],
-            "scale": [
-              234.82369995117188,
-              384.5270080566406
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "",
-            "color": [
-              0.0,
-              1.0,
-              0.0,
-              0.0
-            ],
-            "layer": 10,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "ColliderComponent": {
-            "enabled": true,
-            "shape": "Square",
-            "layer": "Default",
-            "size": [
-              234.82369995117188,
-              384.5270080566406
-            ]
-          },
-          "children": []
-        },
-        {
-          "name": "SafeZone",
-          "localID": 63,
-          "parentID": 59,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              32653.12109375,
-              1472.4727783203125
-            ],
-            "scale": [
-              800.5,
-              515.6822509765625
-            ],
-            "rotation": 0.0
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "",
-            "color": [
-              0.0,
-              0.0,
-              1.0,
-              0.0
-            ],
-            "layer": 10,
-            "screenSpace": false,
-            "tileable": false,
-            "tileCount": [
-              1.0,
-              1.0
-            ]
-          },
-          "ColliderComponent": {
-            "enabled": true,
-            "shape": "Square",
-            "layer": "Platform",
-            "size": [
-              800.5,
-              515.6822509765625
-            ]
-          },
-          "children": []
         }
       ]
     },
