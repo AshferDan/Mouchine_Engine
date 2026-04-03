@@ -173,8 +173,8 @@
       "TransformComponent": {
         "enabled": true,
         "pos": [
-          100.0,
-          100.0
+          10.0,
+          10.0
         ],
         "scale": [
           1.0,
