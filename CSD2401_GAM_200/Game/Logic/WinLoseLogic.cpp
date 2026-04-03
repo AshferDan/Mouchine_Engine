@@ -292,20 +292,20 @@ void WinLoseLogicSystem::Update(float dt)
             {"WinTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
             {"WinLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
             {"WinLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"WinClockIcon",    vec2((550.0f - 180.0f) * uiScale,  210.0f * uiScale)},
-            {"WinTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   210.0f * uiScale)},
-            {"WinTimeText",     vec2((550.0f + 130.0f) * uiScale,  210.0f * uiScale)},
-            {"WinCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  100.0f * uiScale)},
-            {"WinCoinText",     vec2((550.0f - 100.0f) * uiScale,  100.0f * uiScale)},
-            {"WinShellIcon",    vec2((550.0f + 60.0f) * uiScale,  100.0f * uiScale)},
-            {"WinShellText",    vec2((550.0f + 155.0f) * uiScale,  100.0f * uiScale)},
-            {"WinSeparator1",   vec2(550.0f * uiScale,  150.0f * uiScale)},
-            {"WinSeparator2",   vec2(550.0f * uiScale,   40.0f * uiScale)},
-            {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -20.0f * uiScale)},
-            {"WinRatingBadge",  vec2((550.0f + 170.0f) * uiScale,  -20.0f * uiScale)},
-            {"WinSignHere",     vec2(550.0f * uiScale, -160.0f * uiScale)},
-            {"WinSignLabel",    vec2(550.0f * uiScale, -210.0f * uiScale)},
-            {"QuitButton",      vec2(550.0f * uiScale, -280.0f * uiScale)}
+            {"WinClockIcon",    vec2((550.0f - 180.0f) * uiScale,  180.0f * uiScale)},
+            {"WinTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   180.0f * uiScale)},
+            {"WinTimeText",     vec2((550.0f + 130.0f) * uiScale,  180.0f * uiScale)},
+            {"WinCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  70.0f * uiScale)},
+            {"WinCoinText",     vec2((550.0f - 100.0f) * uiScale,  70.0f * uiScale)},
+            {"WinShellIcon",    vec2((550.0f + 60.0f) * uiScale,  70.0f * uiScale)},
+            {"WinShellText",    vec2((550.0f + 155.0f) * uiScale,  70.0f * uiScale)},
+            {"WinSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
+            {"WinSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
+            {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
+            {"WinRatingBadge",  vec2((550.0f + 80.0f) * uiScale,  -50.0f * uiScale)},
+            {"WinSignHere",     vec2(550.0f * uiScale, -220.0f * uiScale)},
+            {"WinSignLabel",    vec2(550.0f * uiScale, -270.0f * uiScale)},
+            {"QuitButton",      vec2(550.0f * uiScale, -370.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -339,17 +339,17 @@ void WinLoseLogicSystem::Update(float dt)
             {"LoseTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
             {"LoseLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
             {"LoseLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"LoseClockIcon",    vec2((550.0f - 180.0f) * uiScale,  210.0f * uiScale)},
-            {"LoseTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   210.0f * uiScale)},
-            {"LoseTimeText",     vec2((550.0f + 130.0f) * uiScale,  210.0f * uiScale)},
-            {"LoseCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  100.0f * uiScale)},
-            {"LoseCoinText",     vec2((550.0f - 100.0f) * uiScale,  100.0f * uiScale)},
-            {"LoseShellIcon",    vec2((550.0f + 60.0f) * uiScale,  100.0f * uiScale)},
-            {"LoseShellText",    vec2((550.0f + 155.0f) * uiScale,  100.0f * uiScale)},
-            {"LoseSeparator1",   vec2(550.0f * uiScale,  150.0f * uiScale)},
-            {"LoseSeparator2",   vec2(550.0f * uiScale,   40.0f * uiScale)},
-            {"LoseRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -20.0f * uiScale)},
-            {"LoseRatingBadge",  vec2((550.0f + 170.0f) * uiScale,  -20.0f * uiScale)},
+            {"LoseClockIcon",    vec2((550.0f - 180.0f) * uiScale,  180.0f * uiScale)},
+            {"LoseTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   180.0f * uiScale)},
+            {"LoseTimeText",     vec2((550.0f + 130.0f) * uiScale,  180.0f * uiScale)},
+            {"LoseCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseCoinText",     vec2((550.0f - 100.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseShellIcon",    vec2((550.0f + 60.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseShellText",    vec2((550.0f + 155.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
+            {"LoseSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
+            {"LoseRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
+            {"LoseRatingBadge",  vec2((550.0f + 170.0f) * uiScale,  -50.0f * uiScale)},
             {"LoseSignHereCross",vec2(550.0f * uiScale, -160.0f * uiScale)},
             {"LoseSignHere",     vec2(550.0f * uiScale, -220.0f * uiScale)},
             {"LoseSignLabel",    vec2(550.0f * uiScale, -270.0f * uiScale)},
@@ -814,7 +814,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* clockIcon = factory.CreateGameObject("WinClockIcon");
     auto* clockT = clockIcon->AddComponent<TransformComponent>();
     clockT->posX = camPos.x + (panelX - 180.0f * uiScale);
-    clockT->posY = camPos.y + 210.0f * uiScale;
+    clockT->posY = camPos.y + 180.0f * uiScale;
     clockT->scaleX = 110.0f * uiScale;
     clockT->scaleY = 110.0f * uiScale;
     auto* clockR = clockIcon->AddComponent<RenderComponent>();
@@ -826,11 +826,11 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* timeLabel = factory.CreateGameObject("WinTimeLabel");
     auto* timeLabelT = timeLabel->AddComponent<TransformComponent>();
     timeLabelT->posX = camPos.x + (panelX - 70.0f * uiScale);
-    timeLabelT->posY = camPos.y + 210.0f * uiScale;
+    timeLabelT->posY = camPos.y + 180.0f * uiScale;
     timeLabelT->scaleX = 150.0f * uiScale;
     timeLabelT->scaleY = 70.0f * uiScale;
     timeLabel->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Time", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
     timeLabel->GetComponent<TextComponent>()->SetLayer(102);
 
@@ -838,11 +838,11 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* timeText = factory.CreateGameObject("WinTimeText");
     auto* timeT = timeText->AddComponent<TransformComponent>();
     timeT->posX = camPos.x + (panelX + 130.0f * uiScale);
-    timeT->posY = camPos.y + 210.0f * uiScale;
+    timeT->posY = camPos.y + 180.0f * uiScale;
     timeT->scaleX = 300.0f * uiScale;
     timeT->scaleY = 70.0f * uiScale;
     timeText->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         statTime, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
     timeText->GetComponent<TextComponent>()->SetLayer(102);
 
@@ -850,7 +850,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* winSep1 = factory.CreateGameObject("WinSeparator1");
     auto* winSep1T = winSep1->AddComponent<TransformComponent>();
     winSep1T->posX = camPos.x + panelX;
-    winSep1T->posY = camPos.y + 150.0f * uiScale;
+    winSep1T->posY = camPos.y + 120.0f * uiScale;
     winSep1T->scaleX = 500.0f * uiScale;
     winSep1T->scaleY = 50.0f * uiScale;
     winSep1->AddComponent<TextComponent>(
@@ -862,7 +862,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* coinIconWin = factory.CreateGameObject("WinCoinIcon");
     auto* coinIconT = coinIconWin->AddComponent<TransformComponent>();
     coinIconT->posX = camPos.x + (panelX - 180.0f * uiScale);
-    coinIconT->posY = camPos.y + 100.0f * uiScale;
+    coinIconT->posY = camPos.y + 70.0f * uiScale;
     coinIconT->scaleX = 110.0f * uiScale;
     coinIconT->scaleY = 110.0f * uiScale;
     auto* coinIconR = coinIconWin->AddComponent<RenderComponent>();
@@ -874,11 +874,11 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* coinCountWin = factory.CreateGameObject("WinCoinText");
     auto* coinCountT = coinCountWin->AddComponent<TransformComponent>();
     coinCountT->posX = camPos.x + (panelX - 90.0f * uiScale);
-    coinCountT->posY = camPos.y + 100.0f * uiScale;
+    coinCountT->posY = camPos.y + 70.0f * uiScale;
     coinCountT->scaleX = 150.0f * uiScale;
     coinCountT->scaleY = 70.0f * uiScale;
     coinCountWin->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         statCoins, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
     coinCountWin->GetComponent<TextComponent>()->SetLayer(102);
 
@@ -886,7 +886,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* shellIconWin = factory.CreateGameObject("WinShellIcon");
     auto* shellIconT = shellIconWin->AddComponent<TransformComponent>();
     shellIconT->posX = camPos.x + (panelX + 60.0f * uiScale);
-    shellIconT->posY = camPos.y + 100.0f * uiScale;
+    shellIconT->posY = camPos.y + 70.0f * uiScale;
     shellIconT->scaleX = 110.0f * uiScale;
     shellIconT->scaleY = 110.0f * uiScale;
     auto* shellIconR = shellIconWin->AddComponent<RenderComponent>();
@@ -898,11 +898,11 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* shellCountWin = factory.CreateGameObject("WinShellText");
     auto* shellCountT = shellCountWin->AddComponent<TransformComponent>();
     shellCountT->posX = camPos.x + (panelX + 155.0f * uiScale);
-    shellCountT->posY = camPos.y + 100.0f * uiScale;
+    shellCountT->posY = camPos.y + 70.0f * uiScale;
     shellCountT->scaleX = 150.0f * uiScale;
     shellCountT->scaleY = 70.0f * uiScale;
     shellCountWin->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         statShells, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
     shellCountWin->GetComponent<TextComponent>()->SetLayer(102);
 
@@ -922,21 +922,21 @@ void WinLoseLogicSystem::CreateWinScreen()
     GameObject* ratingLabel = factory.CreateGameObject("WinRatingLabel");
     auto* ratingLabelT = ratingLabel->AddComponent<TransformComponent>();
     ratingLabelT->posX = camPos.x + (panelX - 80.0f * uiScale);
-    ratingLabelT->posY = camPos.y + -20.0f * uiScale;
+    ratingLabelT->posY = camPos.y + -50.0f * uiScale;
     ratingLabelT->scaleX = 320.0f * uiScale;
     ratingLabelT->scaleY = 70.0f * uiScale;
     ratingLabel->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Shop Rating:", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
     ratingLabel->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
     GameObject* ratingBadge = factory.CreateGameObject("WinRatingBadge");
     auto* ratingBadgeT = ratingBadge->AddComponent<TransformComponent>();
-    ratingBadgeT->posX = camPos.x + (panelX + 170.0f * uiScale);
+    ratingBadgeT->posX = camPos.x + (panelX + 80.0f * uiScale);
     ratingBadgeT->posY = camPos.y + -20.0f * uiScale;
-    ratingBadgeT->scaleX = 160.0f * uiScale;
-    ratingBadgeT->scaleY = 140.0f * uiScale;
+    ratingBadgeT->scaleX = 120.0f * uiScale;
+    ratingBadgeT->scaleY = 100.0f * uiScale;
     auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
 
     float score = CalculateRating();
@@ -1326,7 +1326,7 @@ void WinLoseLogicSystem::TriggerLose()
     timeLabelT->scaleX = 150.0f * uiScale;
     timeLabelT->scaleY = 70.0f * uiScale;
     timeLabel->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Time", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
 
     // ---- Time value ----
@@ -1337,7 +1337,7 @@ void WinLoseLogicSystem::TriggerLose()
     timeT->scaleX = 300.0f * uiScale;
     timeT->scaleY = 70.0f * uiScale;
     timeText->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         statTime, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
 
     // ---- Separator under time ----
@@ -1371,7 +1371,7 @@ void WinLoseLogicSystem::TriggerLose()
     coinCountT->scaleX = 150.0f * uiScale;
     coinCountT->scaleY = 70.0f * uiScale;
     coinCountLose->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         statCoins, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
 
     // ---- Shell icon ----
@@ -1394,7 +1394,7 @@ void WinLoseLogicSystem::TriggerLose()
     shellCountT->scaleX = 150.0f * uiScale;
     shellCountT->scaleY = 70.0f * uiScale;
     shellCountLose->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         statShells, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
 
     // ---- Separator under collectibles ----
@@ -1416,16 +1416,16 @@ void WinLoseLogicSystem::TriggerLose()
     ratingLabelT->scaleX = 320.0f * uiScale;
     ratingLabelT->scaleY = 70.0f * uiScale;
     ratingLabel->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(44 * uiScale),
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
         "Shop Rating:", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
 
     // ---- Rating badge (Letterscore_dash sprite — score icon, no text overlay) ----
     GameObject* ratingBadge = factory.CreateGameObject("LoseRatingBadge");
     auto* ratingBadgeT = ratingBadge->AddComponent<TransformComponent>();
-    ratingBadgeT->posX = camPos.x + (panelX + 170.0f * uiScale);
+    ratingBadgeT->posX = camPos.x + (panelX +  50.0f * uiScale);
     ratingBadgeT->posY = camPos.y + -20.0f * uiScale;
-    ratingBadgeT->scaleX = 160.0f * uiScale;
-    ratingBadgeT->scaleY = 140.0f * uiScale;
+    ratingBadgeT->scaleX = 120.0f * uiScale;
+    ratingBadgeT->scaleY = 100.0f * uiScale;
     auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
     ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
     ratingBadgeR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
