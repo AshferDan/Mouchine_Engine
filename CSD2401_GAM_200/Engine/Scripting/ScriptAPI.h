@@ -564,6 +564,7 @@ namespace API {
     std::string FindGameObjectByID(int id);
     void DestroyGameObject(const std::string& name);
     int CountAllGameObjects();
+    int GetHighestLocalID();
 
 #pragma endregion
 

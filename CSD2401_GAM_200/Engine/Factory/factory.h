@@ -336,6 +336,12 @@ public:
     EntityID GetSmallestAvailableID() const;
 
     /**
+     * @brief Returns the highest localID (EntityID) currently in use in the scene.
+     *        Returns 0 if the scene contains no GameObjects.
+     */
+    EntityID GetHighestLocalID() const;
+
+    /**
      * @brief Check if gameObject is alive
      */
     bool IsAlive(GameObject* ptr) const;
