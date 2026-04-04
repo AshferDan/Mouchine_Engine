@@ -831,7 +831,7 @@ namespace CSharpScript
         static bool jumpFullyReleased = false;
         private void HandleGeneralInput()
         {
-            bool isControlLocked = _bonkTimer > 0 || _isSkidding || currState == PlayerState.Hurting;
+            bool isControlLocked = _bonkTimer > 0 || _isSkidding || currState == PlayerState.Hurting || isPlayerDead;
             if (isControlLocked)
             {
                 return;
@@ -884,7 +884,7 @@ namespace CSharpScript
             //{
             //    return;
             //}
-            if (_isWallJumping || _wallJumpTimer > 0f && InputManager.JumpWasPressed || currState == PlayerState.WallSliding) return;
+            if (_isWallJumping || _wallJumpTimer > 0f && InputManager.JumpWasPressed || currState == PlayerState.WallSliding || isPlayerDead) return;
 
             float inputX = moveInput.x;
             bool isRunHeld = _isRunToggleActive; // for run toggle option
@@ -1243,6 +1243,9 @@ namespace CSharpScript
 
         private void JumpChecks()
         {
+            // if dead block jump
+            if (isPlayerDead) return;
+
             // button press buffer
             if (InputManager.JumpWasPressed)
             {
