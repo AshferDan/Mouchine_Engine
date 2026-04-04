@@ -382,32 +382,47 @@ void GameTimerSystem::UpdateBar(int )
         ComputeBarUVBounds(renderComp);
     }
 
+    // --- INSIDE UpdateBar() ---
+
+        // We assume the native UI resolution that the original scales were built for
+    const float NATIVE_WIDTH = 1920.0f;
+
     if (originalScaleX <= 0.0f)
     {
         transformComp->GetScale(originalScaleX, originalScaleY);
         transformComp->GetPosition(originalCenterX, originalCenterY);
 
-        // world-space start of the ACTUAL visible blue bar
-        leftEdge = (originalCenterX - originalScaleX * 0.5f) + (originalScaleX * uvBarMin);
+        // Calculate the absolute pixel bounds assuming a 1920 wide screen
+        // NOTE: originalCenterX is a PERCENTAGE (0-100), we must convert it to pixels first
+        float absoluteStartX = (originalCenterX / 100.0f) * NATIVE_WIDTH;
 
-        // usable visible blue width only
+        // world-space pixel start of the ACTUAL visible blue bar
+        leftEdge = (absoluteStartX - originalScaleX * 0.5f) + (originalScaleX * uvBarMin);
+
+        // usable visible blue width only in pixels
         rightEdge = originalScaleX * uvBarWidth;
     }
 
     float fillPercentage = std::clamp(remainingTime / LevelTimerLength, 0.0f, 1.0f);
     float safeFill = std::max(fillPercentage, 0.001f);
 
-    // world width of remaining visible blue
+    // Calculate new width in absolute pixels
     float newScaleX = rightEdge * safeFill;
-    float newCenterX = leftEdge + (newScaleX * 0.5f);
 
+    // Calculate new center X in absolute pixels
+    float newAbsoluteCenterX = leftEdge + (newScaleX * 0.5f);
+
+    // Convert the new absolute center X back into a percentage for the TransformComponent
+    float newCenterPercentageX = (newAbsoluteCenterX / NATIVE_WIDTH) * 100.0f;
+
+    // Apply the updates: Scale remains absolute, Position remains percentage
     transformComp->SetScale(newScaleX, originalScaleY);
-    transformComp->SetPosition(newCenterX, originalCenterY);
+    transformComp->SetPosition(newCenterPercentageX, originalCenterY);
 
     // crop inside the painted blue bar and preserve the right-end detail
     float croppedUWidth = uvBarWidth * safeFill;
     renderComp->SetUVScale(vec2(croppedUWidth, 1.0f));
-    renderComp->SetUVOffset(vec2(uvBarMax - croppedUWidth, 0.0f));;
+    renderComp->SetUVOffset(vec2(uvBarMax - croppedUWidth, 0.0f));
 }
 
 /**
