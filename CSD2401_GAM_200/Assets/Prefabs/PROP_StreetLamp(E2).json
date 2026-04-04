@@ -1,0 +1,60 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_StreetLamp(E2)",
+            "localID": 128,
+            "parentID": 123,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    23386.267578125,
+                    4642.07763671875
+                ],
+                "scale": [
+                    666.0,
+                    666.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/Environment 2/streetlamp_spritesheet_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "PROP_StreetLamp",
+                "animations": [
+                    {
+                        "name": "PROP_StreetLamp",
+                        "filepath": "../Assets/Sprites/Props/Dark Version/Environment 2/streetlamp_spritesheet_dark.png",
+                        "rows": 2,
+                        "cols": 5,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 1,
+                        "endCol": 4,
+                        "fps": 8.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    }
+                ]
+            },
+            "children": []
+        }
+    ]
+}

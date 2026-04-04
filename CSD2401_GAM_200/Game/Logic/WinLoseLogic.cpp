@@ -104,7 +104,7 @@ void WinLoseLogicSystem::Update(float dt)
             // Match the win/lose screen visual style
             DialogStyle style;
             style.titleTexPath    = "../Assets/Sprites/Icons/win_lose_bracket.png";
-            style.fieldTexPath    = "../Assets/Sprites/Icons/win_lose_button_dark.png";
+            style.fieldTexPath    = "../Assets/Sprites/Icons/Sign_here.png";
             style.hintTexPath     = "../Assets/Sprites/Icons/win_lose_button_dark.png";
             style.overlayColor    = { 0.0f,  0.0f,  0.0f,  0.7f  };
             style.titlePanelColor = { 1.0f,  1.0f,  1.0f,  1.0f  };
@@ -307,8 +307,7 @@ void WinLoseLogicSystem::Update(float dt)
             {"WinSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
             {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
             {"WinRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
-            {"WinSignHere",     vec2(550.0f * uiScale, -220.0f * uiScale)},
-            {"WinSignLabel",    vec2(550.0f * uiScale, -270.0f * uiScale)},
+            {"TextInput_Field",  vec2(550.0f * uiScale, -220.0f * uiScale)},
             {"QuitButton",      vec2(550.0f * uiScale, -370.0f * uiScale)}
         };
 
@@ -587,128 +586,25 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
 
             hasPlayerWon = true;
 
-            float score = CalculateRating();
-
-            // Hide timer UI while the dialog is open
-            //auto& factory = GameObjectFactory::Instance();
+            // Hide timer UI while the win sequence plays
             if (auto* o = factory.FindGameObject("LevelTimerBarBackground")) o->SetActive(false);
             if (auto* o = factory.FindGameObject("LevelTimerBar"))           o->SetActive(false);
             if (auto* o = factory.FindGameObject("LevelTimerBarFrame"))      o->SetActive(false);
             if (auto* o = factory.FindGameObject("InGamePauseButton"))       o->SetActive(false);
 
-            CORE->SetGamePaused(true);
-
-            // Show the engine-level name-input dialog
-            TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
-            if (textInput)
+            // Start the door animation immediately — name input is on the win screen itself
+            isWaitingForWin = true;
+            if (m_doorAnim)
             {
-                // Play a random typing sound on each keystroke
-                TextInputSystem::SetOnCharTyped([]()
-                {
-                    static std::mt19937 rng{ std::random_device{}() };
-                    static std::uniform_int_distribution<int> dist(1, 6);
-                    if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
-                        audio->PlaySound("typing_sfx_" + std::to_string(dist(rng)));
-                });
-
-                textInput->Show(
-                    "Name Your Run!", 20,
-                    // --- onConfirm ---
-                    [this, score](const std::string& rawName)
-                    {
-                        // Sanitise: trim whitespace, replace spaces with underscores
-                        std::string runName = rawName;
-                        while (!runName.empty() && runName.front() == ' ')
-                            runName.erase(runName.begin());
-                        while (!runName.empty() && runName.back() == ' ')
-                            runName.pop_back();
-                        for (char& c : runName) if (c == ' ') c = '_';
-                        if (runName.empty()) runName = "Level1_testing";
-
-                        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-                        if (ghost)
-                        {
-                            // Derive a friendly level name from the scene path (strip dir + ext)
-                            std::string lvl = currentScenePath;
-                            size_t slash = lvl.find_last_of("/\\");
-                            if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
-                            size_t dot = lvl.rfind('.');
-                            if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
-                            ghost->SetLevelName(lvl);
-                            if (CORE->GetGameCallbacks())
-                                ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
-                            ghost->SetRating(score);
-                            ghost->SaveCurrentRun(runName);
-                            std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json (level: " << lvl << ")\n";
-                        }
-
-                        // Hand off to the door animation → win sequence
-                        CORE->SetGamePaused(false);
-                        isWaitingForWin = true;
-                        if (m_doorAnim)
-                        {
-                            winDelayTimer = 1000000.0f;
-                            m_doorAnim->StartAnimation(
-                                [this]() { TriggerWin(); CreateWinScreen(); },
-                                [this]() { isWaitingForWin = false; },
-                                nullptr);
-                        }
-                        else
-                        {
-                            winDelayTimer = 0.5f;
-                        }
-                    },
-                    // --- onCancel (Escape) — proceed to win screen without saving ---
-                    [this, score]()
-                    {
-                        std::cout << "[WinLoseLogic] Name input cancelled — skipping save.\n";
-                        CORE->SetGamePaused(false);
-                        isWaitingForWin = true;
-                        if (m_doorAnim)
-                        {
-                            winDelayTimer = 1000000.0f;
-                            m_doorAnim->StartAnimation(
-                                [this]() { TriggerWin(); CreateWinScreen(); },
-                                [this]() { isWaitingForWin = false; },
-                                nullptr);
-                        }
-                        else
-                        {
-                            winDelayTimer = 0.5f;
-                        }
-                    });
+                winDelayTimer = -1.0f;
+                m_doorAnim->StartAnimation(
+                    [this]() { TriggerWin(); CreateWinScreen(); },
+                    [this]() { isWaitingForWin = false; },
+                    nullptr);
             }
             else
             {
-                // TextInputSystem unavailable — fall back to default name
-                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-                if (ghost)
-                {
-                    std::string lvl = currentScenePath;
-                    size_t slash = lvl.find_last_of("/\\");
-                    if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
-                    size_t dot = lvl.rfind('.');
-                    if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
-                    ghost->SetLevelName(lvl);
-                    if (CORE->GetGameCallbacks())
-                        ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
-                    ghost->SetRating(score);
-                    ghost->SaveCurrentRun("Level1_testing");
-                }
-                CORE->SetGamePaused(false);
-                isWaitingForWin = true;
-                if (m_doorAnim)
-                {
-                    winDelayTimer = 1000000.0f;
-                    m_doorAnim->StartAnimation(
-                        [this]() { TriggerWin(); CreateWinScreen(); },
-                        [this]() { isWaitingForWin = false; },
-                        nullptr);
-                }
-                else
-                {
-                    winDelayTimer = 0.5f;
-                }
+                winDelayTimer = 0.5f;
             }
         }
     }
@@ -740,7 +636,7 @@ void WinLoseLogicSystem::TriggerWin()
 
     if (m_doorAnim && !m_doorAnim->IsAnimating())
     {
-        winDelayTimer = 1000000.0f;
+        winDelayTimer = -1.0f; // door anim controls timing; no countdown needed
         m_doorAnim->StartAnimation(
             [this]() { CreateWinScreen(); },  // doors closed — create screen behind them
             [this]() { isWaitingForWin = false; },
@@ -783,8 +679,8 @@ void WinLoseLogicSystem::TriggerWin()
     {
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f);
-        audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", m_fadeWinIn);
+        //audioManager->PlaySound("victory");
+        //audioManager->FadeInCategory("music", m_fadeWinIn);
     }
     m_winBGMDelayTimer = 1.5f;
 
@@ -1018,29 +914,53 @@ void WinLoseLogicSystem::CreateWinScreen()
     ratingBadgeR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     ratingBadgeR->SetLayer(102);
 
-    // ---- Sign here image ----
-    GameObject* winSignHere = factory.CreateGameObject("WinSignHere");
-    auto* winSignT = winSignHere->AddComponent<TransformComponent>();
-    winSignT->posX = camPos.x + panelX;
-    winSignT->posY = camPos.y + -220.0f * uiScale;
-    winSignT->scaleX = 420.0f * uiScale;
-    winSignT->scaleY = 120.0f * uiScale;
-    auto* winSignR = winSignHere->AddComponent<RenderComponent>();
-    winSignR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Sign_here.png"));
-    winSignR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    winSignR->SetLayer(102);
+    // ---- Text input using the WinSignHere visual (Sign_here.png) ----
+    TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+    if (textInput)
+    {
+        TextInputSystem::SetOnCharTyped([]()
+        {
+            static std::mt19937 rng{ std::random_device{}() };
+            static std::uniform_int_distribution<int> dist(1, 6);
+            if (auto* audio = CORE ? CORE->GetAudioManager() : nullptr)
+                audio->PlaySound("typing_sfx_" + std::to_string(dist(rng)));
+        });
 
-    // ---- Sign here label ----
-    GameObject* winSignLabel = factory.CreateGameObject("WinSignLabel");
-    auto* winSignLabelT = winSignLabel->AddComponent<TransformComponent>();
-    winSignLabelT->posX = camPos.x + panelX;
-    winSignLabelT->posY = camPos.y + -270.0f * uiScale;
-    winSignLabelT->scaleX = 420.0f * uiScale;
-    winSignLabelT->scaleY = 50.0f * uiScale;
-    winSignLabel->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(18 * uiScale),
-        "(sign here)", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
-    winSignLabel->GetComponent<TextComponent>()->SetLayer(102);
+        textInput->SetFieldOffset(panelX, -220.0f * uiScale);
+        textInput->SetFieldSize(420.0f * uiScale, 120.0f * uiScale);
+        textInput->SetShowAuxPanels(false);
+
+        textInput->Show(
+            "", 20,
+            [this, score](const std::string& rawName)
+            {
+                std::string runName = rawName;
+                while (!runName.empty() && runName.front() == ' ')
+                    runName.erase(runName.begin());
+                while (!runName.empty() && runName.back() == ' ')
+                    runName.pop_back();
+                for (char& c : runName) if (c == ' ') c = '_';
+                if (runName.empty()) runName = "Level1_testing";
+
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost)
+                {
+                    std::string lvl = currentScenePath;
+                    size_t slash = lvl.find_last_of("/\\");
+                    if (slash != std::string::npos) lvl = lvl.substr(slash + 1);
+                    size_t dot = lvl.rfind('.');
+                    if (dot != std::string::npos)   lvl = lvl.substr(0, dot);
+                    ghost->SetLevelName(lvl);
+                    if (CORE->GetGameCallbacks())
+                        ghost->SetShellsCollected(CORE->GetGameCallbacks()->GetCurrentShells());
+                    ghost->SetRating(score);
+                    ghost->SaveCurrentRun(runName);
+                    std::cout << "[WinLoseLogic] Run saved as: " << runName << ".json\n";
+                }
+            },
+            nullptr  // Escape = cancel silently
+        );
+    }
 
     // ---- Save Run button ----
     GameObject* quitBtn = factory.CreateGameObject("QuitButton");
@@ -1066,8 +986,19 @@ void WinLoseLogicSystem::CreateWinScreen()
  */
 void WinLoseLogicSystem::HandleWinScreenButtons()
 {
-    double mouseX = InputManager::GetMouseWorldX();
-    double mouseY = InputManager::GetMouseWorldY();
+    InputManager* inp = CORE->GetInputManager();
+    float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+    float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+    float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+    float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+    float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+    float virtualW = renderW / resScale;
+    float virtualH = renderH / resScale;
+    auto* _cam = CameraManager::Instance().GetActiveCamera();
+    float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+    vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+    double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+    double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
     bool isClicked = InputManager::IsMouseLeftClicked();
 
     auto& factory = GameObjectFactory::Instance();
@@ -1122,6 +1053,11 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         {
             std::cout << "[WinZone] Save Run clicked - Opening options screen" << std::endl;
 
+            // Confirm any in-progress name input before leaving
+            TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+            if (textInput && textInput->IsActive())
+                textInput->Confirm();
+
             if (audioManager)
             {
                 audioManager->TriggerEvent("UI_Click");
@@ -1141,6 +1077,11 @@ void WinLoseLogicSystem::DestroyWinScreen()
     if (!hasCreatedWinScreen)
         return;
 
+    // Dismiss the inline name input if still open
+    TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+    if (textInput && textInput->IsActive())
+        textInput->Hide();
+
     auto& factory = GameObjectFactory::Instance();
 
     std::vector<std::string> uiElements = {
@@ -1159,8 +1100,6 @@ void WinLoseLogicSystem::DestroyWinScreen()
         "WinSeparator2",
         "WinRatingLabel",
         "WinRatingBadge",
-        "WinSignHere",
-        "WinSignLabel",
         "QuitButton"
     };
 
@@ -1843,8 +1782,19 @@ void WinLoseLogicSystem::TriggerLose()
  */
 void WinLoseLogicSystem::HandleLoseScreenButtons()
 {
-    double mouseX = InputManager::GetMouseWorldX();
-    double mouseY = InputManager::GetMouseWorldY();
+    InputManager* inp = CORE->GetInputManager();
+    float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+    float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+    float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+    float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+    float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+    float virtualW = renderW / resScale;
+    float virtualH = renderH / resScale;
+    auto* _cam = CameraManager::Instance().GetActiveCamera();
+    float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+    vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+    double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+    double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
     bool isClicked = InputManager::IsMouseLeftClicked();
 
     auto& factory = GameObjectFactory::Instance();
@@ -2095,7 +2045,7 @@ float WinLoseLogicSystem::CalculateRating() const
 {
     //(10000 / elapsedTime) * 1000 + (pickups * 500)
     // HARD CODED FOR NOW
-    int scorepercentage = 60 - static_cast<int>(m_elapsedTime / 60);
+    int scorepercentage = std::max(0, 60 - static_cast<int>(m_elapsedTime / 60));
     float currScore = (scorepercentage * 100.f) + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
     float totalScore = 100.f + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
     std::cout << "CalculateRating(): " << (currScore / totalScore) * 100 << '\n';

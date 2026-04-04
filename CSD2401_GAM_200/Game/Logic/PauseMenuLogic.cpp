@@ -138,15 +138,18 @@ void PauseMenuLogicSystem::Update(float dt)
                 return;
             }
 
-            float screenHeight = static_cast<float>(graphics->GetWindowHeight());
+            float screenWidth = (float)graphics->GetWindowWidth();
+            float screenHeight = (float)graphics->GetWindowHeight();
+            float uiScale = screenHeight / 1080.0f;
 
-            float btnX = transform->posX -10.0f;
-            float btnY = screenHeight - transform->posY;
-            float halfWidth = transform->scaleX / 2.0f;
-            float halfHeight = transform->scaleY / 2.0f;
+            // Convert percentage pos to actual pixels (Y is bottom-left origin, flip for GLFW top-left)
+            float btnX = (transform->posX / 100.0f) * screenWidth;
+            float btnY = screenHeight - ((transform->posY / 100.0f) * screenHeight);
+            float halfWidth = (transform->scaleX * uiScale) / 2.0f;
+            float halfHeight = (transform->scaleY * uiScale) / 2.0f;
 
             bool isHoveringPauseBtn = (mouseX >= btnX - halfWidth && mouseX <= btnX + halfWidth &&
-                                       mouseY >= btnY - halfHeight && mouseY <= btnY + halfHeight);
+                mouseY >= btnY - halfHeight && mouseY <= btnY + halfHeight);
 
             static bool wasHoveringLastFrame = false;
 
@@ -691,8 +694,19 @@ void PauseMenuLogicSystem::Update(float dt)
         }
 
         // Check if back button is clicked to close settings
-        double mouseX = InputManager::GetMouseWorldX();
-        double mouseY = InputManager::GetMouseWorldY();
+        InputManager* inp = CORE->GetInputManager();
+        float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+        float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+        float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+        float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+        float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+        float virtualW = renderW / resScale;
+        float virtualH = renderH / resScale;
+        auto* _cam = CameraManager::Instance().GetActiveCamera();
+        float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+        vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+        double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+        double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
         bool isClicked = InputManager::IsMouseLeftClicked();
 
         std::string currentHover = "";
@@ -967,8 +981,19 @@ void PauseMenuLogicSystem::Update(float dt)
         }
 
         // Check for ESC key or back button click to close
-        double mouseX = InputManager::GetMouseWorldX();
-        double mouseY = InputManager::GetMouseWorldY();
+        InputManager* inp = CORE->GetInputManager();
+        float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+        float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+        float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+        float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+        float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+        float virtualW = renderW / resScale;
+        float virtualH = renderH / resScale;
+        auto* _cam = CameraManager::Instance().GetActiveCamera();
+        float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+        vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+        double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+        double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
         bool isClicked = InputManager::IsMouseLeftClicked();
 
         // Check if user pressed ESC to close
@@ -1085,8 +1110,20 @@ void PauseMenuLogicSystem::Update(float dt)
             return;
         }
 
-        double mouseX = InputManager::GetMouseWorldX();
-        double mouseY = InputManager::GetMouseWorldY();
+        InputManager* inp = CORE->GetInputManager();
+        float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+        float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+        float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+        float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+        float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+        float virtualW = renderW / resScale;
+        float virtualH = renderH / resScale;
+        auto* _cam = CameraManager::Instance().GetActiveCamera();
+        float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+        vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+        double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+        double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
+
         bool isClicked = InputManager::IsMouseLeftClicked();
 
         std::string currentHover = "";
@@ -1276,8 +1313,19 @@ void PauseMenuLogicSystem::Update(float dt)
     }
 
     // Normal pause menu button handling
-    double mouseX = InputManager::GetMouseWorldX();
-    double mouseY = InputManager::GetMouseWorldY();
+    InputManager* inp = CORE->GetInputManager();
+    float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+    float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+    float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+    float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+    float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+    float virtualW = renderW / resScale;
+    float virtualH = renderH / resScale;
+    auto* _cam = CameraManager::Instance().GetActiveCamera();
+    float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+    vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+    double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+    double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
     bool isClicked = InputManager::IsMouseLeftClicked();
 
     std::string currentHover = "";

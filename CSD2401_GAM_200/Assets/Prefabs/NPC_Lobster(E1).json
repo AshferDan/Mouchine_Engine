@@ -1,0 +1,60 @@
+{
+    "GameObjects": [
+        {
+            "name": "NPC_Lobster(E1)",
+            "localID": 204,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    34709.20703125,
+                    -831.491455078125
+                ],
+                "scale": [
+                    413.0,
+                    413.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/NPCs/lobster_eel_spritesheet_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "NPC_Lobster",
+                "animations": [
+                    {
+                        "name": "NPC_Lobster",
+                        "filepath": "../Assets/Sprites/Props/Dark Version/NPCs/lobster_eel_spritesheet_dark.png",
+                        "rows": 1,
+                        "cols": 6,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 5,
+                        "fps": 8.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    }
+                ]
+            },
+            "children": []
+        }
+    ]
+}

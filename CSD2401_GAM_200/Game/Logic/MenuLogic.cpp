@@ -34,7 +34,7 @@ std::string introPath = "../Assets/cutscene_M5.mpeg";
 std::string creditsPath = "../Assets/Credits.mpeg";
 std::string level1Path = "../Assets/Scenes/Level_1.json";
 std::string level2Path = "../Assets/Scenes/Level_2.json";
-std::string level3Path = "../Assets/Scenes/Level_2_V2.json";
+std::string level3Path = "../Assets/Scenes/Level_2_V2_Extra.json";
 
 // abit overkill but if we want more screens in the menu this is better
 enum MenuScreens
@@ -526,8 +526,19 @@ void MenuLogicSystem::Update(float dt)
             htp->SetActive(true);
     }
 
-    double mouseX = InputManager::GetMouseWorldX();
-    double mouseY = InputManager::GetMouseWorldY();
+    InputManager* inp = CORE->GetInputManager();
+    float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+    float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+    float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+    float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+    float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+    float virtualW = renderW / resScale;
+    float virtualH = renderH / resScale;
+    auto* _cam = CameraManager::Instance().GetActiveCamera();
+    float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+    vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+    double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+    double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
     bool isClicked = InputManager::IsMouseLeftClicked();
     bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 

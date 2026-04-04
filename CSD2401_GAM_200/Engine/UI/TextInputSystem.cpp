@@ -196,39 +196,67 @@ void TextInputSystem::CreateUI(const std::string& title)
         r->SetLayer(layer);
     };
 
-    // --- Full-screen semi-transparent dark overlay ---
-    GameObject* overlay = factory.CreateGameObject("TextInput_Overlay");
-    auto* ovT = overlay->AddComponent<TransformComponent>();
-    ovT->posX   = camPos.x;
-    ovT->posY   = camPos.y;
-    ovT->scaleX = 1920.0f * s;
-    ovT->scaleY = 1080.0f * s;
-    auto* ovR = overlay->AddComponent<RenderComponent>();
-    applyPanel(ovR, {}, m_style.overlayColor, baseLayer);
+    if (m_showAuxPanels)
+    {
+        // --- Full-screen semi-transparent dark overlay ---
+        GameObject* overlay = factory.CreateGameObject("TextInput_Overlay");
+        auto* ovT = overlay->AddComponent<TransformComponent>();
+        ovT->posX   = camPos.x;
+        ovT->posY   = camPos.y;
+        ovT->scaleX = 1920.0f * s;
+        ovT->scaleY = 1080.0f * s;
+        auto* ovR = overlay->AddComponent<RenderComponent>();
+        applyPanel(ovR, {}, m_style.overlayColor, baseLayer);
 
-    // --- Title bar ---
-    GameObject* titleObj = factory.CreateGameObject("TextInput_Title");
-    auto* titleT = titleObj->AddComponent<TransformComponent>();
-    titleT->posX   = camPos.x;
-    titleT->posY   = camPos.y + 200.0f * s;
-    titleT->scaleX = 800.0f * s;
-    titleT->scaleY = 180.0f * s;
-    auto* titleR = titleObj->AddComponent<RenderComponent>();
-    applyPanel(titleR, m_style.titleTexPath, m_style.titlePanelColor, baseLayer + 1);
-    titleObj->AddComponent<TextComponent>(
-        m_fontPath.c_str(),
-        static_cast<int>(m_fontSize * s),
-        title,
-        m_style.titleTextColor,
-        false);
+        // --- Title bar ---
+        GameObject* titleObj = factory.CreateGameObject("TextInput_Title");
+        auto* titleT = titleObj->AddComponent<TransformComponent>();
+        titleT->posX   = camPos.x;
+        titleT->posY   = camPos.y + 200.0f * s;
+        titleT->scaleX = 800.0f * s;
+        titleT->scaleY = 180.0f * s;
+        auto* titleR = titleObj->AddComponent<RenderComponent>();
+        applyPanel(titleR, m_style.titleTexPath, m_style.titlePanelColor, baseLayer + 1);
+        titleObj->AddComponent<TextComponent>(
+            m_fontPath.c_str(),
+            static_cast<int>(m_fontSize * s),
+            title,
+            m_style.titleTextColor,
+            false);
+
+        // --- Hint bar ---
+        std::string hintText = "ENTER = confirm";
+        if (m_onCancel)
+            hintText += "     ESC = cancel";
+
+        GameObject* hintObj = factory.CreateGameObject("TextInput_Hint");
+        auto* hintT = hintObj->AddComponent<TransformComponent>();
+        hintT->posX   = camPos.x;
+        hintT->posY   = camPos.y - 200.0f * s;
+        hintT->scaleX = 800.0f * s;
+        hintT->scaleY = 100.0f * s;
+        auto* hintR = hintObj->AddComponent<RenderComponent>();
+        applyPanel(hintR, m_style.hintTexPath, m_style.hintPanelColor, baseLayer + 1);
+        hintObj->AddComponent<TextComponent>(
+            m_fontPath.c_str(),
+            static_cast<int>(m_fontSize * 0.55f * s),
+            hintText,
+            m_style.hintTextColor,
+            false);
+    }
 
     // --- Input field ---
+    float fieldX  = camPos.x + m_fieldDX;
+    float fieldY  = camPos.y + m_fieldDY;
+    float fieldSX = m_fieldSX > 0.f ? m_fieldSX : 800.0f * s;
+    float fieldSY = m_fieldSY > 0.f ? m_fieldSY : 130.0f * s;
+
     GameObject* fieldObj = factory.CreateGameObject("TextInput_Field");
     auto* fieldT = fieldObj->AddComponent<TransformComponent>();
-    fieldT->posX   = camPos.x;
-    fieldT->posY   = camPos.y;
-    fieldT->scaleX = 800.0f * s;
-    fieldT->scaleY = 130.0f * s;
+    fieldT->posX   = fieldX;
+    fieldT->posY   = fieldY;
+    fieldT->scaleX = fieldSX;
+    fieldT->scaleY = fieldSY;
     auto* fieldR = fieldObj->AddComponent<RenderComponent>();
     applyPanel(fieldR, m_style.fieldTexPath, m_style.fieldPanelColor, baseLayer + 1);
     fieldObj->AddComponent<TextComponent>(
@@ -236,26 +264,6 @@ void TextInputSystem::CreateUI(const std::string& title)
         static_cast<int>(m_fontSize * s),
         s_buffer + "_",
         m_style.fieldTextColor,
-        false);
-
-    // --- Hint bar ---
-    std::string hintText = "ENTER = confirm";
-    if (m_onCancel)
-        hintText += "     ESC = cancel";
-
-    GameObject* hintObj = factory.CreateGameObject("TextInput_Hint");
-    auto* hintT = hintObj->AddComponent<TransformComponent>();
-    hintT->posX   = camPos.x;
-    hintT->posY   = camPos.y - 200.0f * s;
-    hintT->scaleX = 800.0f * s;
-    hintT->scaleY = 100.0f * s;
-    auto* hintR = hintObj->AddComponent<RenderComponent>();
-    applyPanel(hintR, m_style.hintTexPath, m_style.hintPanelColor, baseLayer + 1);
-    hintObj->AddComponent<TextComponent>(
-        m_fontPath.c_str(),
-        static_cast<int>(m_fontSize * 0.55f * s),
-        hintText,
-        m_style.hintTextColor,
         false);
 
     m_hasUI = true;
@@ -275,6 +283,13 @@ void TextInputSystem::DestroyUI()
         if (obj) factory.DestroyGameObject(obj->GetID());
     }
 
+    // Reset inline-field overrides so the next Show() uses defaults
+    m_fieldDX      = 0.f;
+    m_fieldDY      = 0.f;
+    m_fieldSX      = 0.f;
+    m_fieldSY      = 0.f;
+    m_showAuxPanels = true;
+
     m_hasUI = false;
 }
 
@@ -284,29 +299,45 @@ void TextInputSystem::UpdateUI()
 
     const float s      = m_uiScale;
     const vec2  camPos = CameraManager::Instance().GetCameraPosition();
+    auto& factory      = GameObjectFactory::Instance();
 
-    struct Elem { const char* name; float dy; };
-    constexpr Elem elems[] = {
-        {"TextInput_Overlay",  0.0f},
-        {"TextInput_Title",    200.0f},
-        {"TextInput_Field",      0.0f},
-        {"TextInput_Hint",    -200.0f},
-    };
-
-    auto& factory = GameObjectFactory::Instance();
-    for (const auto& e : elems)
+    if (m_showAuxPanels)
     {
-        GameObject* obj = factory.FindGameObject(e.name);
-        if (!obj) continue;
-        auto* t = obj->GetComponent<TransformComponent>();
-        if (t) { t->posX = camPos.x; t->posY = camPos.y + e.dy * s; }
+        struct Elem { const char* name; float dy; };
+        constexpr Elem auxElems[] = {
+            {"TextInput_Overlay",  0.0f},
+            {"TextInput_Title",    200.0f},
+            {"TextInput_Hint",    -200.0f},
+        };
+        for (const auto& e : auxElems)
+        {
+            GameObject* obj = factory.FindGameObject(e.name);
+            if (!obj) continue;
+            auto* t = obj->GetComponent<TransformComponent>();
+            if (t) { t->posX = camPos.x; t->posY = camPos.y + e.dy * s; }
+        }
     }
 
-    // Refresh the typed text in the input field
+    // Reposition the input field — honour custom offset if set
     GameObject* field = factory.FindGameObject("TextInput_Field");
     if (field)
     {
+        auto* t = field->GetComponent<TransformComponent>();
+        if (t)
+        {
+            t->posX = camPos.x + m_fieldDX;
+            t->posY = camPos.y + m_fieldDY;
+        }
         auto* tc = field->GetComponent<TextComponent>();
         if (tc) tc->SetText(s_buffer + "_");
     }
+}
+
+void TextInputSystem::Confirm()
+{
+    if (!m_isActive) return;
+    auto  cb     = m_onConfirm;
+    const std::string result = s_buffer;
+    Hide();
+    if (cb) cb(result);
 }

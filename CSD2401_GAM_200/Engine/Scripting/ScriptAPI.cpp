@@ -1576,6 +1576,10 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
         return GameObjectFactory::Instance().CountAllGameObjects();
     }
+    int GetHighestLocalID()
+    {
+        return static_cast<int>(GameObjectFactory::Instance().GetHighestLocalID());
+    }
 #pragma endregion
 
 #pragma region GameTimer

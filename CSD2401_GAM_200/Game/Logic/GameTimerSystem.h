@@ -118,6 +118,7 @@ private:
     bool        hasTriggeredPanicSound = false;
     bool        hasTriggeredLowPass = false;
     float       lowPassThreshold = 20.0f;          // seconds before time-up to engage low-pass filter
+    float       loseDelayTimer = -1.0f;             // counts down before lose screen shows; -1 = inactive
 
     // Bar scaling variables
     float       originalScaleX = 0.0f;              // original bar width

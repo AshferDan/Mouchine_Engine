@@ -25,7 +25,12 @@ Technology is prohibited.
 */
 GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 {
-    EntityID id = nextEntityID++;
+    EntityID id = GetSmallestAvailableID();
+
+    if (id >= nextEntityID) {
+        id = nextEntityID++;
+    }
+
     auto gameObject = std::make_unique<GameObject>(id, name);
     GameObject *ptr = gameObject.get();
 
@@ -650,6 +655,17 @@ void GameObjectFactory::SetNextEntityID(EntityID id)
 EntityID GameObjectFactory::GetNextEntityID() const
 {
     return nextEntityID;
+}
+
+EntityID GameObjectFactory::GetHighestLocalID() const
+{
+    EntityID highest = 0;
+    for (const auto& pair : entityToIndex)
+    {
+        if (pair.first > highest)
+            highest = pair.first;
+    }
+    return highest;
 }
 
 EntityID GameObjectFactory::GetSmallestAvailableID() const
