@@ -791,6 +791,11 @@ static int Internal_CountAllGameObjects()
     return GameObjectFactory::Instance().CountAllGameObjects();
 }
 
+static int Internal_GetHighestLocalID()
+{
+    return static_cast<int>(GameObjectFactory::Instance().GetHighestLocalID());
+}
+
 static MonoArray* Internal_GetAllGameObjectIDs()
 {
     std::vector<EntityID> ids = GameObjectFactory::Instance().GetAllGameObjectIDs();
@@ -1669,6 +1674,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
     mono_add_internal_call("CSharpScript.GameObject::CountAllGameObjects",  (void *)Internal_CountAllGameObjects);
+    mono_add_internal_call("CSharpScript.GameObject::GetHighestLocalID",   (void *)Internal_GetHighestLocalID);
 
     // === GameTimer ===
     mono_add_internal_call("CSharpScript.GameTimer::GetRemainingTime",    (void *)Internal_GetRemainingTime);

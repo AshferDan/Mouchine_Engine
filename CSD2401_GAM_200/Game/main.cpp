@@ -89,7 +89,8 @@ int main()
                 GameManager::Instance().GameStateLoop(dt);
             }
             void OnEditorStop() override {
-                if (menuLogic) menuLogic->Reset();
+                if (menuLogic)    menuLogic->Reset();
+                if (winLoseLogic) winLoseLogic->Initialize(); // reset statics between play sessions
             }
             void OnLevelLoaded(const std::string& path) override {
                 if (pauseMenuLogic) pauseMenuLogic->SetCurrentScene(path);
@@ -157,8 +158,6 @@ int main()
         gameApp.gameTimer->Initialize();
         gameApp.mediaPlayer->Initialize();
         gameApp.doorAnimLogic->Initialize();
-
-        // Connect the door animation system so WinLoseLogic can trigger it
         gameApp.winLoseLogic->SetDoorAnimSystem(gameApp.doorAnimLogic);
 
         CORE->SetGameCallbacks(&gameApp);
@@ -185,13 +184,16 @@ int main()
         }
 
         CameraManager::Instance().SetActiveCamera(mainCamera);
+        GameObject* Hero = Hero = GameObjectFactory::Instance().FindGameObject("Hero");
 
+        if (API::FindGameObjectByName("Hero") == "") {
+            API::CreateAnimatedImage("Hero",
+                0, 0,
+                192, 192,
+                "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f, CollisionLayer::Player, false, false, false);
+        }
 
-        GameObject* Hero = GameObjectFactory::Instance().CreateAnimatedImage(
-            "Hero",
-            0, 0,
-            192, 192,
-            "../Assets/Mouch_idle.png", 1, 2, 0, 7, 2.0f, CollisionLayer::Player);
+        Hero = GameObjectFactory::Instance().FindGameObject("Hero");
 
         if (Hero)
         {

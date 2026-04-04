@@ -2,14 +2,14 @@
     "GameObjects": [
         {
             "name": "PU_Coin",
-            "localID": 179,
-            "parentID": 178,
+            "localID": 97,
+            "parentID": 96,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    3850.0,
-                    3880.0
+                    25900.0,
+                    4663.43505859375
                 ],
                 "scale": [
                     125.0,
@@ -20,7 +20,7 @@
             "RenderComponent": {
                 "enabled": true,
                 "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Sheets/coin_spritesheet.png",
+                "texturePath": "../Assets/Sprites/Sheets/coin_3d_spritesheet.png",
                 "color": [
                     1.0,
                     1.0,
@@ -37,7 +37,7 @@
             },
             "Spritesheet": {
                 "enabled": true,
-                "defaultAnimation": "Pickup_Coin",
+                "defaultAnimation": "Pickup_Coin_3D",
                 "animations": [
                     {
                         "name": "Pickup_Coin",
@@ -50,6 +50,19 @@
                         "endCol": 7,
                         "fps": 12.0,
                         "pingPong": true,
+                        "flipRows": true
+                    },
+                    {
+                        "name": "Pickup_Coin_3D",
+                        "filepath": "../Assets/Sprites/Sheets/coin_3d_spritesheet.png",
+                        "rows": 6,
+                        "cols": 8,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 5,
+                        "endCol": 7,
+                        "fps": 12.0,
+                        "pingPong": false,
                         "flipRows": true
                     }
                 ]
