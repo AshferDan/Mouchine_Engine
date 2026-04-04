@@ -305,6 +305,11 @@ namespace CSharpScript
                         NPCData temp = new NPCData("EZ_Asset", (uint)i, Transform.GetPosition(currGO), false);
                         NPCs.Add(temp);
                     }
+                    else if (currGO.Contains("PU_Shell"))
+                    {
+                        NPCData temp = new NPCData("PU_Shell", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
                 }
                 Debug.Log("NPC Count: " + NPCs.Count().ToString());
             }
@@ -373,6 +378,12 @@ namespace CSharpScript
                 {
                     audioPath = "../Assets/Audio/DoorGlow.wav";
                     soundName = "door_glow";
+                    volume = 0.6f;
+                }
+                else if (NPCs[i].name.Contains("PU_Shell"))
+                {
+                    audioPath = "../Assets/Audio/DoorGlow.wav";
+                    soundName = "shell_glow";
                     volume = 0.6f;
                 }
 
