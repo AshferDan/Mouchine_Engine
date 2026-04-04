@@ -290,6 +290,15 @@ void AudioManager::PlaySound(const std::string& soundName, const std::string& ch
     std::cout << "[AudioManager] Final volume for " << soundName << ": " << finalVolume << std::endl;
     audioEngine->setVolume(channel, finalVolume);
     audioEngine->setPitch(channel, sound.pitch <= 0.0f ? 1.0f : sound.pitch);
+
+    // Reapply global low-pass filter if active and this sound is not excluded
+    if (m_globalLowPassActive)
+    {
+        bool excluded = std::find(m_lowPassExclusions.begin(), m_lowPassExclusions.end(), soundName)
+                        != m_lowPassExclusions.end();
+        if (!excluded)
+            audioEngine->setLowPassFilter(channel, true, m_globalLowPassCutoff, m_globalLowPassResonance);
+    }
 }
 
 /**
@@ -909,6 +918,31 @@ bool AudioManager::UpdateMasterLowPassFilterFrequency(float cutoffFrequency)
     }
 
     return audioEngine->updateMasterLowPassFilterFrequency(cutoffFrequency);
+}
+
+/**
+ * @brief Applies a low pass filter to all currently playing sounds, excluding specified ones.
+ *        Stores the state so future PlaySound calls also apply the filter automatically.
+ */
+void AudioManager::SetLowPassFilterExcluding(bool enable, float cutoffFrequency,
+                                              float resonance,
+                                              const std::vector<std::string>& excluded)
+{
+    m_globalLowPassActive    = enable;
+    m_globalLowPassCutoff    = cutoffFrequency;
+    m_globalLowPassResonance = resonance;
+    m_lowPassExclusions      = excluded;
+
+    if (!audioEngine) return;
+
+    for (const auto& [name, data] : soundDatabase)
+    {
+        bool isExcluded = std::find(excluded.begin(), excluded.end(), name) != excluded.end();
+        if (isExcluded) continue;
+
+        std::string channelName = name + "_channel";
+        audioEngine->setLowPassFilter(channelName, enable, cutoffFrequency, resonance);
+    }
 }
 
 /**

@@ -33,6 +33,8 @@ void GameTimerSystem::Initialize()
     lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
+    hasTriggeredLowPass = false;
+    lowPassRampTimer = 0.0f;
     loseDelayTimer = -1.0f;
 
     // Reset bar scaling variables
@@ -160,6 +162,13 @@ void GameTimerSystem::Update(float dt)
             hasTriggeredTimeUp = false;
             hasTriggeredPanicSound = false;
 
+            if (hasTriggeredLowPass)
+            {
+                hasTriggeredLowPass = false;
+    lowPassRampTimer = 0.0f;
+                CORE->GetAudioManager()->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});
+            }
+
             auto* renderComp = timerGO->GetComponent<RenderComponent>();
             auto* transformComp = timerGO->GetComponent<TransformComponent>();
 
@@ -208,6 +217,23 @@ void GameTimerSystem::Update(float dt)
             std::cout << "Triggered panic timer (10 seconds left)\n";
         }
 
+        // Gradually ramp in the low-pass filter over lowPassRampDuration seconds
+        if (remainingTime <= lowPassThreshold)
+        {
+            if (!hasTriggeredLowPass)
+            {
+                hasTriggeredLowPass = true;
+                lowPassRampTimer = 0.0f;
+                std::cout << "[GameTimerSystem] Low-pass filter ramping in (" << lowPassThreshold << "s left)\n";
+            }
+
+            lowPassRampTimer += dt;
+            float t = std::min(lowPassRampTimer / lowPassRampDuration, 1.0f);
+            // Interpolate cutoff from 22000 Hz (open) down to 800 Hz (fully filtered)
+            float cutoff = 22000.0f + t * (800.0f - 22000.0f);
+            CORE->GetAudioManager()->SetLowPassFilterExcluding(true, cutoff, 1.0f, { "timer_ending" });
+        }
+
         // check for lose condition aka time ran out
         if (remainingTime <= 0.0f && !hasTriggeredTimeUp)
         {
@@ -215,7 +241,7 @@ void GameTimerSystem::Update(float dt)
             hasTriggeredTimeUp = true;
 
             // Start delay so the player death animation can finish first
-            loseDelayTimer = 0.7f;
+            loseDelayTimer = 1.5f;
             std::cout << "TIME'S UP! Waiting 0.5s for death animation..." << std::endl;
         }
 

@@ -100,7 +100,7 @@ void CutsceneSystem::Update(float dt) {
 			m_timeAccumulator -= frameTime; // one frame's time
 		}
 		else {
-			StopCutscene(); // End of video file
+			StopCutscene(false); // End of video file
 			return;
 		}
 		// throttle (avoid sprinting through frames)
@@ -119,7 +119,7 @@ void CutsceneSystem::Update(float dt) {
 	// Check if Skip (Spacebar) or Left click - only after skip block timer expires
 	if (m_canSkip) {
 		if (CORE->GetInputManager()->IsAnyKeyPress()) {
-			StopCutscene();
+			StopCutscene(true);
 		}
 	}
 }
@@ -171,7 +171,7 @@ void CutsceneSystem::PlayVideo(const std::string& videoPath, const std::string& 
 /**
  * @brief Stops video playback and releases resources.
  */
-void CutsceneSystem::StopCutscene() {
+void CutsceneSystem::StopCutscene(bool wasSkipped) {
 	if (!m_isPlaying) return;
 
 	if (!m_currentVideoPath.empty()) {
@@ -192,9 +192,11 @@ void CutsceneSystem::StopCutscene() {
 			m_currentAudio = "";
 		}
 
-		// Play skip cutscene audio
-		std::cout << "[CutsceneSystem] Playing skip cutscene audio" << std::endl;
-		audioMgr->PlaySound("SkipCutScene", "skip_audio_channel");
+		// Only play skip audio if the player actually skipped the cutscene
+		if (wasSkipped) {
+			std::cout << "[CutsceneSystem] Playing skip cutscene audio (player skipped)" << std::endl;
+			audioMgr->PlaySound("SkipCutScene", "skip_audio_channel");
+		}
 	}
 
 	m_timeAccumulator = 0.0;
@@ -214,25 +216,13 @@ void CutsceneSystem::StopCutscene() {
 				CORE->SetGamePaused(false);
 				EventSystem::Clear();
 				if (CORE->GetInputManager()) CORE->GetInputManager()->ResetState();
-
-				// Stop skip audio after scene is fully loaded
-				AudioManager* audioMgr = CORE->GetAudioManager();
-				if (audioMgr) {
-					std::cout << "[CutsceneSystem] Stopping skip audio - scene loaded" << std::endl;
-					audioMgr->StopSound("skip_audio_channel");
-				}
-				});
+			});
 		}
 	}
 	else {
 		// For credits or other cutscenes, just resume
 		if (!CORE->HasPendingSceneLoad()) {
 			CORE->SetGamePaused(false);
-
-			if (audioMgr) {
-				std::cout << "[CutsceneSystem] Stopping skip audio - no loading screen" << std::endl;
-				audioMgr->StopSound("skip_audio_channel");
-			}
 		}
 	}
 }

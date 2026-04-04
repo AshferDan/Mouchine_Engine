@@ -70,7 +70,7 @@ public:
      * @brief Checks if the win screen UI is currently active.
      * @return True if win screen is enabled.
      */
-    bool IsWinScreenActive() const { return hasCreatedWinScreen; }
+    bool IsWinScreenActive() const { return hasCreatedWinScreen || hasCreatedWinScreen2; }
 
     /**
      * @brief Checks if the lose screen UI is currently active.
@@ -113,6 +113,7 @@ private:
     float winDelayTimer = 0.0f;
     bool isWaitingForWin = false;
     bool hasCreatedWinScreen = false;
+    bool hasCreatedWinScreen2 = false;
     bool AudioCheck = false;
     float m_winBGMDelayTimer = -1.0f;  // counts down after doors open; -1 = inactive
 
@@ -178,6 +179,21 @@ private:
      * @brief Destroys win screen UI objects and resets state.
      */
     void DestroyWinScreen();
+
+    /**
+     * @brief Spawns the second victory screen with Continue/Replay/Quit buttons.
+     */
+    void CreateWinScreen2();
+
+    /**
+     * @brief Handles hover/click logic for the second win screen buttons.
+     */
+    void HandleWinScreen2Buttons();
+
+    /**
+     * @brief Destroys the second win screen UI objects and resets state.
+     */
+    void DestroyWinScreen2();
 
     /**
      * @brief Handles hover/click logic for lose screen buttons.

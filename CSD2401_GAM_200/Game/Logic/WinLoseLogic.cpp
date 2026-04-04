@@ -39,6 +39,7 @@ void WinLoseLogicSystem::Initialize()
     winDelayTimer = 0.0f;
     isWaitingForWin = false;
     hasCreatedWinScreen = false;
+    hasCreatedWinScreen2 = false;
     hasCreatedLoseScreen = false;
     pendingSceneChange = false;
     pendingSceneTimer = 0.0f;
@@ -84,6 +85,7 @@ void WinLoseLogicSystem::Update(float dt)
         hasPlayerWon = false;
         isWaitingForWin = false;
         hasCreatedWinScreen = false;
+        hasCreatedWinScreen2 = false;
         hasCreatedLoseScreen = false;
         winDelayTimer = 0.0f;
         pendingSceneChange = false;
@@ -178,6 +180,7 @@ void WinLoseLogicSystem::Update(float dt)
             hasPlayerWon = false;
             isWaitingForWin = false;
             hasCreatedWinScreen = false;
+            hasCreatedWinScreen2 = false;
             hasCreatedLoseScreen = false;
             winDelayTimer = 0.0f;
         }
@@ -208,6 +211,7 @@ void WinLoseLogicSystem::Update(float dt)
             hasPlayerWon = false;
             isWaitingForWin = false;
             hasCreatedWinScreen = false;
+            hasCreatedWinScreen2 = false;
             hasCreatedLoseScreen = false;
             winDelayTimer = 0.0f;
         }
@@ -289,22 +293,22 @@ void WinLoseLogicSystem::Update(float dt)
         // update all win screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"WinScreen",       vec2(0.0f, 0.0f)},
-            {"WinTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
-            {"WinLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
-            {"WinLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"WinClockIcon",    vec2((550.0f - 180.0f) * uiScale,  180.0f * uiScale)},
-            {"WinTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   180.0f * uiScale)},
-            {"WinTimeText",     vec2((550.0f + 130.0f) * uiScale,  180.0f * uiScale)},
-            {"WinCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  70.0f * uiScale)},
-            {"WinCoinText",     vec2((550.0f - 100.0f) * uiScale,  70.0f * uiScale)},
-            {"WinShellIcon",    vec2((550.0f + 60.0f) * uiScale,  70.0f * uiScale)},
-            {"WinShellText",    vec2((550.0f + 155.0f) * uiScale,  70.0f * uiScale)},
-            {"WinSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
-            {"WinSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
-            {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
-            {"WinRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
-            {"TextInput_Field",  vec2(550.0f * uiScale, -220.0f * uiScale)},
-            {"QuitButton",      vec2(550.0f * uiScale, -370.0f * uiScale)}
+            {"WinTitleBracket", vec2(600.0f * uiScale,  350.0f * uiScale)},
+            {"WinLevelNumber",  vec2(600.0f * uiScale,  380.0f * uiScale)},
+            {"WinLevelName",    vec2(600.0f * uiScale,  310.0f * uiScale)},
+            {"WinClockIcon",    vec2((600.0f - 180.0f) * uiScale,  180.0f * uiScale)},
+            {"WinTimeLabel",    vec2((600.0f - 70.0f) * uiScale,   180.0f * uiScale)},
+            {"WinTimeText",     vec2((600.0f + 130.0f) * uiScale,  180.0f * uiScale)},
+            {"WinCoinIcon",     vec2((600.0f - 180.0f) * uiScale,  70.0f * uiScale)},
+            {"WinCoinText",     vec2((600.0f - 100.0f) * uiScale,  70.0f * uiScale)},
+            {"WinShellIcon",    vec2((600.0f + 60.0f) * uiScale,  70.0f * uiScale)},
+            {"WinShellText",    vec2((600.0f + 155.0f) * uiScale,  70.0f * uiScale)},
+            {"WinSeparator1",   vec2(600.0f * uiScale,  120.0f * uiScale)},
+            {"WinSeparator2",   vec2(600.0f * uiScale,   10.0f * uiScale)},
+            {"WinRatingLabel",  vec2((600.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
+            {"WinRatingBadge",  vec2((600.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
+            {"TextInput_Field",  vec2(600.0f * uiScale, -220.0f * uiScale)},
+            {"QuitButton",      vec2(600.0f * uiScale, -370.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -325,6 +329,55 @@ void WinLoseLogicSystem::Update(float dt)
         return;
     }
 
+    if (hasCreatedWinScreen2)
+    {
+        vec2 camPos = CameraManager::Instance().GetCameraPosition();
+        auto& factory = GameObjectFactory::Instance();
+        float uiScale = 2.0f;
+
+        std::vector<std::pair<std::string, vec2>> uiElements2 = {
+            {"WinScreen2",         vec2(0.0f, 0.0f)},
+            {"Win2TitleBracket",   vec2(600.0f * uiScale,  350.0f * uiScale)},
+            {"Win2LevelNumber",    vec2(600.0f * uiScale,  380.0f * uiScale)},
+            {"Win2LevelName",      vec2(600.0f * uiScale,  310.0f * uiScale)},
+            {"WinContinueButton",  vec2(600.0f * uiScale,  120.0f * uiScale)},
+            {"WinReplayButton",    vec2(600.0f * uiScale,  -50.0f * uiScale)},
+            {"WinQuitButton",      vec2(600.0f * uiScale, -230.0f * uiScale)}
+        };
+
+        for (const auto& element : uiElements2)
+        {
+            GameObject* obj = factory.FindGameObject(element.first);
+            if (obj)
+            {
+                auto* transform = obj->GetComponent<TransformComponent>();
+                if (transform)
+                {
+                    transform->posX = camPos.x + element.second.x;
+                    transform->posY = camPos.y + element.second.y;
+                }
+            }
+        }
+
+        // Keep HUD hidden every frame in case another system re-activates it
+        auto hideIfActive = [&](const char* name) {
+            GameObject* obj = factory.FindGameObject(name);
+            if (obj && obj->IsActive()) obj->SetActive(false);
+        };
+        hideIfActive("LevelTimerBarBackground");
+        hideIfActive("LevelTimerBar");
+        hideIfActive("LevelTimerBarFrame");
+        hideIfActive("InGamePauseButton");
+        hideIfActive("ShellIcon1");
+        hideIfActive("ShellIcon2");
+        hideIfActive("ShellIcon3");
+        hideIfActive("CoinIcon");
+        hideIfActive("CoinCountText");
+
+        HandleWinScreen2Buttons();
+        return;
+    }
+
     // update lose screen position to follow camera
     if (hasCreatedLoseScreen)
     {
@@ -335,24 +388,25 @@ void WinLoseLogicSystem::Update(float dt)
 
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"LoseScreen",       vec2(0.0f, 0.0f)},
-            {"LoseTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
-            {"LoseLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
-            {"LoseLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"LoseClockIcon",    vec2((550.0f - 180.0f) * uiScale,  180.0f * uiScale)},
-            {"LoseTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   180.0f * uiScale)},
-            {"LoseTimeText",     vec2((550.0f + 130.0f) * uiScale,  180.0f * uiScale)},
-            {"LoseCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseCoinText",     vec2((550.0f - 100.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseShellIcon",    vec2((550.0f + 60.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseShellText",    vec2((550.0f + 155.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
-            {"LoseSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
-            {"LoseRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
-            {"LoseRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
-            {"LoseSignHereCross",vec2(550.0f * uiScale, -160.0f * uiScale)},
-            {"LoseSignHere",     vec2(550.0f * uiScale, -220.0f * uiScale)},
-            {"LoseSignLabel",    vec2(550.0f * uiScale, -270.0f * uiScale)},
-            {"LoseQuitButton",   vec2(550.0f * uiScale, -370.0f * uiScale)}
+            {"LoseTitleBracket", vec2(600.0f * uiScale,  350.0f * uiScale)},
+            {"LoseLevelNumber",  vec2(600.0f * uiScale,  380.0f * uiScale)},
+            {"LoseLevelName",    vec2(600.0f * uiScale,  310.0f * uiScale)},
+            {"LoseClockIcon",    vec2((600.0f - 180.0f) * uiScale,  180.0f * uiScale)},
+            {"LoseTimeLabel",    vec2((600.0f - 70.0f) * uiScale,   180.0f * uiScale)},
+            {"LoseTimeText",     vec2((600.0f + 130.0f) * uiScale,  180.0f * uiScale)},
+            {"LoseCoinIcon",     vec2((600.0f - 180.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseCoinText",     vec2((600.0f - 100.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseShellIcon",    vec2((600.0f + 60.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseShellText",    vec2((600.0f + 155.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseSeparator1",   vec2(600.0f * uiScale,  120.0f * uiScale)},
+            {"LoseSeparator2",   vec2(600.0f * uiScale,   10.0f * uiScale)},
+            {"LoseRatingLabel",  vec2((600.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
+            {"LoseRatingBadge",  vec2((600.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
+            {"LoseSignHereCross",vec2(600.0f * uiScale, -140.0f * uiScale)},
+            {"LoseSignHere",     vec2(600.0f * uiScale, -160.0f * uiScale)},
+            {"LoseSignLabel",    vec2(600.0f * uiScale, -220.0f * uiScale)},
+            {"LoseRetryButton",   vec2(600.0f * uiScale, -300.0f * uiScale)},
+            {"LoseQuitButton",    vec2(600.0f * uiScale, -410.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -673,15 +727,15 @@ void WinLoseLogicSystem::CreateWinScreen()
     GetLevelInfo(statLevelNum, statLevelName);
 
     // Right panel X anchor (right third of screen)
-    float panelX = 550.0f * uiScale;
+    float panelX = 600.0f * uiScale;
 
     // win screen background
     GameObject* board = factory.CreateGameObject("WinScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 1920.0f * uiScale;
-    boardTransform->scaleY = 1080.0f * uiScale;
+    boardTransform->scaleX = 2080.0f * uiScale;
+    boardTransform->scaleY = 1170.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1014,7 +1068,7 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
         if (hoveredButtonName == "QuitButton")
         {
-            std::cout << "[WinZone] Quit clicked - Going to main menu" << std::endl;
+            std::cout << "[WinZone] Save Run clicked - Opening options screen" << std::endl;
 
             // Confirm any in-progress name input before leaving
             TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
@@ -1023,16 +1077,11 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
             if (audioManager)
             {
-                audioManager->TriggerEvent("UI_Quit");
-                // Fade out music before going to main menu
-                audioManager->FadeOutCategory("music", m_fadeQuitOut);
-                std::cout << "[WinZone] Started music fade out (" << m_fadeQuitOut << " seconds)" << std::endl;
+                audioManager->TriggerEvent("UI_Click");
             }
 
             DestroyWinScreen();
-            pendingSceneTimer = m_fadeQuitOut + m_fadeTimerBuffer;
-            pendingScenePath = "../Assets/Scenes/MainMenu.json";
-            pendingSceneChange = true;
+            CreateWinScreen2();
         }
     }
 }
@@ -1111,6 +1160,293 @@ void WinLoseLogicSystem::DestroyWinScreen()
 }
 
 /**
+ * @brief Spawns the second victory screen with Continue, Replay, and Quit buttons.
+ */
+void WinLoseLogicSystem::CreateWinScreen2()
+{
+    if (hasCreatedWinScreen2) return;
+
+    auto& factory = GameObjectFactory::Instance();
+    vec2 camPos = CameraManager::Instance().GetCameraPosition();
+    float uiScale = 2.0f;
+    float panelX = 600.0f * uiScale;
+
+    std::string statLevelNum, statLevelName;
+    GetLevelInfo(statLevelNum, statLevelName);
+
+    // Background — same asset as the first win screen
+    GameObject* board2 = factory.CreateGameObject("WinScreen2");
+    auto* board2Transform = board2->AddComponent<TransformComponent>();
+    board2Transform->posX = camPos.x;
+    board2Transform->posY = camPos.y;
+    board2Transform->scaleX = 2080.0f * uiScale;
+    board2Transform->scaleY = 1170.0f * uiScale;
+    auto* board2Render = board2->AddComponent<RenderComponent>();
+    board2Render->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
+    board2Render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    board2Render->SetLayer(101);
+
+    // Hide timer UI and pause button
+    GameObject* timerBg2  = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerBar2 = factory.FindGameObject("LevelTimerBar");
+    GameObject* timerFrm2 = factory.FindGameObject("LevelTimerBarFrame");
+    GameObject* pauseBtn2 = factory.FindGameObject("InGamePauseButton");
+    if (timerBg2)  timerBg2->SetActive(false);
+    if (timerBar2) timerBar2->SetActive(false);
+    if (timerFrm2) timerFrm2->SetActive(false);
+    if (pauseBtn2) pauseBtn2->SetActive(false);
+
+    // Hide shell/coin UI
+    GameObject* shellIcon1_2 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2_2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3_2 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon2    = factory.FindGameObject("CoinIcon");
+    GameObject* coinText2    = factory.FindGameObject("CoinCountText");
+    if (shellIcon1_2) shellIcon1_2->SetActive(false);
+    if (shellIcon2_2) shellIcon2_2->SetActive(false);
+    if (shellIcon3_2) shellIcon3_2->SetActive(false);
+    if (coinIcon2)    coinIcon2->SetActive(false);
+    if (coinText2)    coinText2->SetActive(false);
+
+    // ---- Bracket background behind level title ----
+    GameObject* win2TitleBracket = factory.CreateGameObject("Win2TitleBracket");
+    auto* win2BracketT = win2TitleBracket->AddComponent<TransformComponent>();
+    win2BracketT->posX = camPos.x + panelX;
+    win2BracketT->posY = camPos.y + 350.0f * uiScale;
+    win2BracketT->scaleX = 550.0f * uiScale;
+    win2BracketT->scaleY = 200.0f * uiScale;
+    auto* win2BracketR = win2TitleBracket->AddComponent<RenderComponent>();
+    win2BracketR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_bracket.png"));
+    win2BracketR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    win2BracketR->SetLayer(102);
+
+    // ---- Level number ----
+    GameObject* win2LevelNum = factory.CreateGameObject("Win2LevelNumber");
+    auto* win2LevelNumT = win2LevelNum->AddComponent<TransformComponent>();
+    win2LevelNumT->posX = camPos.x + panelX;
+    win2LevelNumT->posY = camPos.y + 380.0f * uiScale;
+    win2LevelNumT->scaleX = 500.0f * uiScale;
+    win2LevelNumT->scaleY = 100.0f * uiScale;
+    win2LevelNum->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(60 * uiScale),
+        statLevelNum, vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    win2LevelNum->GetComponent<TextComponent>()->SetLayer(102);
+
+    // ---- Level name ----
+    GameObject* win2LevelName = factory.CreateGameObject("Win2LevelName");
+    auto* win2LevelNameT = win2LevelName->AddComponent<TransformComponent>();
+    win2LevelNameT->posX = camPos.x + panelX;
+    win2LevelNameT->posY = camPos.y + 310.0f * uiScale;
+    win2LevelNameT->scaleX = 500.0f * uiScale;
+    win2LevelNameT->scaleY = 70.0f * uiScale;
+    win2LevelName->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(36 * uiScale),
+        statLevelName, vec4(0.2f, 0.15f, 0.1f, 1.0f), false);
+    win2LevelName->GetComponent<TextComponent>()->SetLayer(102);
+
+    // ---- Continue button (top) ----
+    GameObject* continueBtn = factory.CreateGameObject("WinContinueButton");
+    auto* continueT = continueBtn->AddComponent<TransformComponent>();
+    continueT->posX = camPos.x + panelX;
+    continueT->posY = camPos.y + 150.0f * uiScale;
+    continueT->scaleX = 430.0f * uiScale;
+    continueT->scaleY = 130.0f * uiScale;
+    auto* continueR = continueBtn->AddComponent<RenderComponent>();
+    continueR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    continueR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    continueR->SetLayer(102);
+    continueBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Continue", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    continueBtn->GetComponent<TextComponent>()->SetLayer(102);
+
+    // ---- Replay button (middle) ----
+    GameObject* replayBtn = factory.CreateGameObject("WinReplayButton");
+    auto* replayT = replayBtn->AddComponent<TransformComponent>();
+    replayT->posX = camPos.x + panelX;
+    replayT->posY = camPos.y + -30.0f * uiScale;
+    replayT->scaleX = 430.0f * uiScale;
+    replayT->scaleY = 130.0f * uiScale;
+    auto* replayR = replayBtn->AddComponent<RenderComponent>();
+    replayR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    replayR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    replayR->SetLayer(102);
+    replayBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Replay", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    replayBtn->GetComponent<TextComponent>()->SetLayer(102);
+
+    // ---- Quit button (bottom) ----
+    GameObject* quitBtn2 = factory.CreateGameObject("WinQuitButton");
+    auto* quitT2 = quitBtn2->AddComponent<TransformComponent>();
+    quitT2->posX = camPos.x + panelX;
+    quitT2->posY = camPos.y + -210.0f * uiScale;
+    quitT2->scaleX = 430.0f * uiScale;
+    quitT2->scaleY = 130.0f * uiScale;
+    auto* quitR2 = quitBtn2->AddComponent<RenderComponent>();
+    quitR2->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    quitR2->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    quitR2->SetLayer(102);
+    quitBtn2->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    quitBtn2->GetComponent<TextComponent>()->SetLayer(102);
+
+    hasCreatedWinScreen2 = true;
+}
+
+/**
+ * @brief Handles hover and click states for the second win screen buttons.
+ */
+void WinLoseLogicSystem::HandleWinScreen2Buttons()
+{
+    double mouseX = InputManager::GetMouseWorldX();
+    double mouseY = InputManager::GetMouseWorldY();
+    bool isClicked = InputManager::IsMouseLeftClicked();
+
+    auto& factory = GameObjectFactory::Instance();
+    std::string currentHover = "";
+
+    if (IsMouseOver(factory.FindGameObject("WinContinueButton"), mouseX, mouseY))
+        currentHover = "WinContinueButton";
+    if (IsMouseOver(factory.FindGameObject("WinReplayButton"), mouseX, mouseY))
+        currentHover = "WinReplayButton";
+    if (IsMouseOver(factory.FindGameObject("WinQuitButton"), mouseX, mouseY))
+        currentHover = "WinQuitButton";
+
+    if (currentHover != hoveredButtonName)
+    {
+        if (!hoveredButtonName.empty())
+            SetButtonTexture(hoveredButtonName, false);
+
+        if (!currentHover.empty())
+        {
+            SetButtonTexture(currentHover, true);
+            AudioManager* audioManager = CORE->GetAudioManager();
+            if (audioManager)
+                audioManager->TriggerEvent("UI_Hover");
+        }
+
+        hoveredButtonName = currentHover;
+    }
+
+    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+
+        if (hoveredButtonName == "WinContinueButton")
+        {
+            std::cout << "[WinLoseLogic] Continue clicked - Loading next level" << std::endl;
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Click");
+                audioManager->FadeOutCategory("music", m_fadeNextOut);
+            }
+
+            std::string nextScene;
+            if (currentScenePath.find("Level_1") != std::string::npos)
+                nextScene = "../Assets/Scenes/Level_2.json";
+            //else if (currentScenePath.find("Level_2_V2") != std::string::npos)
+            //    nextScene = "../Assets/Scenes/Level_3.json";
+            else
+                nextScene = "../Assets/Scenes/MainMenu.json";
+
+            DestroyWinScreen2();
+            pendingSceneTimer = m_fadeNextOut + m_fadeTimerBuffer;
+            pendingScenePath = nextScene;
+            pendingSceneChange = true;
+        }
+        else if (hoveredButtonName == "WinReplayButton")
+        {
+            std::cout << "[WinLoseLogic] Replay clicked - Restarting level" << std::endl;
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Click");
+                audioManager->FadeOutCategory("music", m_fadeReplayOut);
+            }
+
+            DestroyWinScreen2();
+            CORE->SetGamePaused(false);
+            pendingSceneTimer = m_fadeReplayOut + m_fadeTimerBuffer;
+            pendingScenePath = currentScenePath;
+            pendingSceneChange = true;
+        }
+        else if (hoveredButtonName == "WinQuitButton")
+        {
+            std::cout << "[WinLoseLogic] Quit clicked - Returning to main menu" << std::endl;
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Click");
+                audioManager->FadeOutCategory("music", m_fadeQuitOut);
+            }
+
+            DestroyWinScreen2();
+            pendingSceneTimer = m_fadeQuitOut + m_fadeTimerBuffer;
+            pendingScenePath = "../Assets/Scenes/MainMenu.json";
+            pendingSceneChange = true;
+        }
+    }
+}
+
+/**
+ * @brief Deletes the second win screen UI elements and resets state.
+ */
+void WinLoseLogicSystem::DestroyWinScreen2()
+{
+    if (!hasCreatedWinScreen2)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+
+    std::vector<std::string> uiElements = {
+        "WinScreen2",
+        "Win2TitleBracket",
+        "Win2LevelNumber",
+        "Win2LevelName",
+        "WinContinueButton",
+        "WinReplayButton",
+        "WinQuitButton"
+    };
+
+    for (const auto& name : uiElements)
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj)
+            factory.DestroyGameObject(obj->GetID());
+    }
+
+    // Re-show timer UI and pause button
+    GameObject* timerBg2  = factory.FindGameObject("LevelTimerBarBackground");
+    GameObject* timerBar2 = factory.FindGameObject("LevelTimerBar");
+    GameObject* timerFrm2 = factory.FindGameObject("LevelTimerBarFrame");
+    GameObject* pauseBtn2 = factory.FindGameObject("InGamePauseButton");
+    if (timerBg2)  timerBg2->SetActive(true);
+    if (timerBar2) timerBar2->SetActive(true);
+    if (timerFrm2) timerFrm2->SetActive(true);
+    if (pauseBtn2) pauseBtn2->SetActive(true);
+
+    // Re-show shell/coin UI
+    GameObject* shellIcon1_2 = factory.FindGameObject("ShellIcon1");
+    GameObject* shellIcon2_2 = factory.FindGameObject("ShellIcon2");
+    GameObject* shellIcon3_2 = factory.FindGameObject("ShellIcon3");
+    GameObject* coinIcon2    = factory.FindGameObject("CoinIcon");
+    GameObject* coinText2    = factory.FindGameObject("CoinCountText");
+    if (shellIcon1_2) shellIcon1_2->SetActive(true);
+    if (shellIcon2_2) shellIcon2_2->SetActive(true);
+    if (shellIcon3_2) shellIcon3_2->SetActive(true);
+    if (coinIcon2)    coinIcon2->SetActive(true);
+    if (coinText2)    coinText2->SetActive(true);
+
+    hasCreatedWinScreen2 = false;
+    hasPlayerWon = false;
+    isWaitingForWin = false;
+    hoveredButtonName.clear();
+}
+
+/**
  * @brief Checks if mouse cursor is overlapping a UI button.
  */
 bool WinLoseLogicSystem::IsMouseOver(GameObject* button, double mouseX, double mouseY)
@@ -1138,7 +1474,9 @@ void WinLoseLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered
 
     std::string texturePath;
     if (buttonName == "NextButton" || buttonName == "ReplayButton" || buttonName == "QuitButton" ||
-        buttonName == "YesButton" || buttonName == "LoseQuitButton")
+        buttonName == "YesButton" || buttonName == "LoseRetryButton" ||
+        buttonName == "LoseQuitButton" || buttonName == "WinContinueButton" ||
+        buttonName == "WinReplayButton" || buttonName == "WinQuitButton")
     {
         texturePath = isHovered ? "../Assets/Sprites/Icons/win_lose_button.png" : "../Assets/Sprites/Icons/win_lose_button_dark.png";
     }
@@ -1214,15 +1552,15 @@ void WinLoseLogicSystem::TriggerLose()
     std::string statLevelNum, statLevelName;
     GetLevelInfo(statLevelNum, statLevelName);
 
-    float panelX = 550.0f * uiScale;
+    float panelX = 600.0f * uiScale;
 
     // lose screen background
     GameObject* board = factory.CreateGameObject("LoseScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 1920.0f * uiScale;
-    boardTransform->scaleY = 1080.0f * uiScale;
+    boardTransform->scaleX = 2080.0f * uiScale;
+    boardTransform->scaleY = 1170.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_over_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1392,8 +1730,8 @@ void WinLoseLogicSystem::TriggerLose()
     auto* loseSignT = loseSignHere->AddComponent<TransformComponent>();
     loseSignT->posX = camPos.x + panelX;
     loseSignT->posY = camPos.y + -160.0f * uiScale;
-    loseSignT->scaleX = 420.0f * uiScale;
-    loseSignT->scaleY = 120.0f * uiScale;
+    loseSignT->scaleX = 230.0f * uiScale;
+    loseSignT->scaleY = 100 * uiScale;
     auto* loseSignR = loseSignHere->AddComponent<RenderComponent>();
     loseSignR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Sign_here_cross.png"));
     loseSignR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1403,7 +1741,7 @@ void WinLoseLogicSystem::TriggerLose()
     GameObject* loseSignHere2 = factory.CreateGameObject("LoseSignHere");
     auto* loseSignT2 = loseSignHere2->AddComponent<TransformComponent>();
     loseSignT2->posX = camPos.x + panelX;
-    loseSignT2->posY = camPos.y + -220.0f * uiScale;
+    loseSignT2->posY = camPos.y + -180.0f * uiScale;
     loseSignT2->scaleX = 420.0f * uiScale;
     loseSignT2->scaleY = 120.0f * uiScale;
     auto* loseSignR2 = loseSignHere2->AddComponent<RenderComponent>();
@@ -1424,19 +1762,34 @@ void WinLoseLogicSystem::TriggerLose()
     loseSignLabel->GetComponent<TextComponent>()->SetLayer(102);
 
     // ---- Retry button ----
-    GameObject* loseQuitBtn = factory.CreateGameObject("LoseQuitButton");
-    auto* loseQuitTransform = loseQuitBtn->AddComponent<TransformComponent>();
+    GameObject* LoseRetryBtn = factory.CreateGameObject("LoseRetryButton");
+    auto* loseRetryTransform = LoseRetryBtn->AddComponent<TransformComponent>();
+    loseRetryTransform->posX = camPos.x + panelX;
+    loseRetryTransform->posY = camPos.y + -300.0f * uiScale;
+    loseRetryTransform->scaleX = 410.0f * uiScale;
+    loseRetryTransform->scaleY = 110.0f * uiScale;
+    auto* loseRetryRender = LoseRetryBtn->AddComponent<RenderComponent>();
+    loseRetryRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
+    loseRetryRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    loseRetryRender->SetLayer(102);
+    LoseRetryBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
+        "Retry", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // ---- Quit button ----
+    GameObject* LoseQuitBtn = factory.CreateGameObject("LoseQuitButton");
+    auto* loseQuitTransform = LoseQuitBtn->AddComponent<TransformComponent>();
     loseQuitTransform->posX = camPos.x + panelX;
-    loseQuitTransform->posY = camPos.y + -350.0f * uiScale;
-    loseQuitTransform->scaleX = 430.0f * uiScale;
-    loseQuitTransform->scaleY = 130.0f * uiScale;
-    auto* loseQuitRender = loseQuitBtn->AddComponent<RenderComponent>();
+    loseQuitTransform->posY = camPos.y + -410.0f * uiScale;
+    loseQuitTransform->scaleX = 410.0f * uiScale;
+    loseQuitTransform->scaleY = 110.0f * uiScale;
+    auto* loseQuitRender = LoseQuitBtn->AddComponent<RenderComponent>();
     loseQuitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     loseQuitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     loseQuitRender->SetLayer(102);
-    loseQuitBtn->AddComponent<TextComponent>(
+    LoseQuitBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
-        "Retry", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "Quit", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedLoseScreen = true;
 }
@@ -1464,13 +1817,17 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
 
+    if (IsMouseOver(factory.FindGameObject("LoseRetryButton"), mouseX, mouseY))
+    {
+        currentHover = "LoseRetryButton";
+    }
     if (IsMouseOver(factory.FindGameObject("LoseQuitButton"), mouseX, mouseY))
     {
         currentHover = "LoseQuitButton";
     }
 
     // Keyboard selection: SPACE to confirm
-    static const char* kLoseButtons[] = { "LoseQuitButton" };
+    static const char* kLoseButtons[] = { "LoseRetryButton", "LoseQuitButton" };
     static int  kLoseIdx    = 0;
     static bool kLoseActive = false;
     bool spacePressed = false;
@@ -1509,7 +1866,7 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 
-        if (hoveredButtonName == "LoseQuitButton")
+        if (hoveredButtonName == "LoseRetryButton")
         {
             std::cout << "[WinLoseLogic] Retry clicked - Restarting level" << std::endl;
 
@@ -1520,7 +1877,6 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
                 audioManager->TriggerEvent("UI_Click");
                 // Fade out music before restarting
                 audioManager->FadeOutCategory("music", m_fadeReplayOut);
-                //std::cout << "[WinLoseLogic] Started music fade out (" << m_fadeReplayOut << " seconds)" << std::endl;
             }
 
             DestroyLoseScreen();
@@ -1528,6 +1884,25 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
 
             pendingSceneTimer = m_fadeReplayOut + m_fadeTimerBuffer;
             pendingScenePath = currentScenePath;
+            pendingSceneChange = true;
+        }
+        else if (hoveredButtonName == "LoseQuitButton")
+        {
+            std::cout << "[WinLoseLogic] Quit clicked - Returning to main menu" << std::endl;
+
+            AbandonRecording();
+
+            if (audioManager)
+            {
+                audioManager->TriggerEvent("UI_Click");
+                audioManager->FadeOutCategory("music", m_fadeQuitOut);
+            }
+
+            DestroyLoseScreen();
+            CORE->SetGamePaused(false);
+
+            pendingSceneTimer = m_fadeQuitOut + m_fadeTimerBuffer;
+            pendingScenePath = "../Assets/Scenes/MainMenu.json";
             pendingSceneChange = true;
         }
     }
@@ -1562,6 +1937,7 @@ void WinLoseLogicSystem::DestroyLoseScreen()
         "LoseSignHereCross",
         "LoseSignHere",
         "LoseSignLabel",
+        "LoseRetryButton",
         "LoseQuitButton"
     };
 

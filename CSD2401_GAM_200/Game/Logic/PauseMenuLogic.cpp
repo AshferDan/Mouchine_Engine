@@ -1494,8 +1494,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = 0.0f;
     boardTransform->posY = 0.0f;
-    boardTransform->scaleX = 1920.0f * uiScale;
-    boardTransform->scaleY = 1080.0f * uiScale;
+    boardTransform->scaleX = 2080.0f * uiScale;
+    boardTransform->scaleY = 1170.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Pause_Menu_New.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1607,8 +1607,8 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 1920.0f * uiScale;
-    settingsTransform->scaleY = 1080.0f * uiScale;
+    settingsTransform->scaleX = 2080.0f * uiScale;
+    settingsTransform->scaleY = 1170.0f * uiScale;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings_New.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -2409,8 +2409,8 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     auto* howToPlayTransform = howToPlayScreen->AddComponent<TransformComponent>();
     howToPlayTransform->posX = 0.0f;
     howToPlayTransform->posY = 0.0f;
-    howToPlayTransform->scaleX = 1920.0f * uiScale;
-    howToPlayTransform->scaleY = 1080.0f * uiScale;
+    howToPlayTransform->scaleX = 2080.0f * uiScale;
+    howToPlayTransform->scaleY = 1170.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
     howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -2916,8 +2916,8 @@ void PauseMenuLogicSystem::CreateGhostMenuUI()
     auto* boardT = board->AddComponent<TransformComponent>();
     boardT->posX = 0.0f;
     boardT->posY = 0.0f;
-    boardT->scaleX = 1920.0f * uiScale;
-    boardT->scaleY = 1080.0f * uiScale;
+    boardT->scaleX = 2080.0f * uiScale;
+    boardT->scaleY = 1170.0f * uiScale;
     auto* boardR = board->AddComponent<RenderComponent>();
     boardR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Pause_Menu_New.png"));
     boardR->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));

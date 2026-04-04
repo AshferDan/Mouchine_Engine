@@ -170,15 +170,18 @@ namespace CSharpScript
         public float Audio3D_ActiveDistance = 3000.0f;
 
         // Time Deduction Penalties
-        public float JumpTimeDeduction = 1.0f;
-        public float RunTimeDeduction = 0.1f;
-        public float ZiplineTimeDeduction = 3.0f;
-        public float ZiplineDeductionInterval = 0.2f;
-        public float GroundPoundTimeDeduction = 3.0f;
-        public float RollTimeDeduction = 2.0f;
-        public float GlideTimeDeduction = 1.0f;
-        public float GlideDeductionInterval = 0.5f;
-        public float WallKickTimeDeduction = 2.5f;
+        public float Pen_Jump = 1.0f;
+        public float Pen_Run = 0.1f;
+        public float Pen_Run_Interval = 1.0f;
+        public float Pen_Zipline = 1.0f;
+        public float Pen_Zipline_Interval = 0.2f;
+        public float Pen_GroundPound = 1.0f;
+        public float Pen_Roll = 1.0f;
+        public float Pen_Glide = 0.5f;
+        public float Pen_Glide_Interval = 0.5f;
+        public float Pen_WallJump = 0.5f;
+        public float Pen_Hurt = 1.5f;
+        public float Pen_Bonk = 0.5f;
 
         // Calculated values
         public float Gravity { get; private set; }

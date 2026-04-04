@@ -165,6 +165,18 @@ int main()
 
         // CORE->RequestSceneLoad("Prefab_TestScene");
 #ifndef _DEBUG
+        // Splash screen — runs before any scene is loaded
+        SplashScreenSystem splash(
+            CORE->GetGraphicsSystem(),
+            "../Assets/Logos/DigiPen_Logo.png",
+            "../Assets/Logos/Group_Logo.png",
+            /*logoHoldSecs=*/ 2.0f,
+            /*fadeSecs=*/     0.8f
+        );
+        splash.Initialize();
+        splash.Run();   // blocks until both logos finish, then returns
+
+
         CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
 		CORE->GetGraphicsSystem()->SetEditorMode(false);
 #else

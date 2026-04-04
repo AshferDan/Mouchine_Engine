@@ -591,12 +591,12 @@
               "TransformComponent": {
                 "enabled": false,
                 "pos": [
-                  -416.5834655761719,
-                  180.92929077148438
+                  -414.6603698730469,
+                  180.0
                 ],
                 "scale": [
-                  103.99398803710938,
-                  108.79359436035156
+                  50.0,
+                  50.0
                 ],
                 "rotation": 0.0
               },
@@ -623,8 +623,8 @@
                 "shape": "Square",
                 "layer": "Default",
                 "size": [
-                  15.0,
-                  16.0
+                  50.0,
+                  50.0
                 ]
               },
               "children": []
@@ -970,12 +970,12 @@
               "TransformComponent": {
                 "enabled": false,
                 "pos": [
-                  403.1899719238281,
-                  180.92929077148438
+                  407.0361633300781,
+                  180.0
                 ],
                 "scale": [
-                  101.99400329589844,
-                  108.79399871826172
+                  50.0,
+                  50.0
                 ],
                 "rotation": 0.0
               },
@@ -1002,8 +1002,8 @@
                 "shape": "Square",
                 "layer": "Default",
                 "size": [
-                  101.99400329589844,
-                  108.79399871826172
+                  50.0,
+                  50.0
                 ]
               },
               "children": []
@@ -1336,11 +1336,11 @@
                 "enabled": false,
                 "pos": [
                   -7.857486724853516,
-                  179.5935516357422
+                  180.0
                 ],
                 "scale": [
-                  101.99400329589844,
-                  108.79399871826172
+                  50.0,
+                  50.0
                 ],
                 "rotation": 0.0
               },
@@ -1367,8 +1367,8 @@
                 "shape": "Square",
                 "layer": "Default",
                 "size": [
-                  101.99400329589844,
-                  108.79399871826172
+                  50.0,
+                  50.0
                 ]
               },
               "children": []
@@ -2704,7 +2704,7 @@
           "RenderComponent": {
             "enabled": false,
             "shapeType": "Square",
-            "texturePath": "../Assets/Leaderboards_tab_grey.png",
+            "texturePath": "../Assets/Leaderboards_tab_yellow.png",
             "color": [
               1.0,
               1.0,
@@ -2778,7 +2778,7 @@
           "RenderComponent": {
             "enabled": false,
             "shapeType": "Square",
-            "texturePath": "../Assets/Leaderboards_tab_yellow.png",
+            "texturePath": "../Assets/Leaderboards_tab_grey.png",
             "color": [
               1.0,
               1.0,
@@ -2945,7 +2945,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "---",
+            "text": "Ashfer",
             "color": [
               0.0,
               0.0,
@@ -3098,7 +3098,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "---",
+            "text": "Jonathan",
             "color": [
               0.0,
               0.0,
@@ -3149,7 +3149,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "---",
+            "text": "TestTest",
             "color": [
               0.0,
               0.0,
@@ -3200,7 +3200,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "--:--.--",
+            "text": "0:30.00",
             "color": [
               0.0,
               0.0,
@@ -3251,7 +3251,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "--:--.--",
+            "text": "0:41.58",
             "color": [
               0.0,
               0.0,
@@ -3302,7 +3302,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "--:--.--",
+            "text": "0:47.80",
             "color": [
               0.0,
               0.0,
@@ -3632,8 +3632,8 @@
               -58.36846923828125
             ],
             "scale": [
-              80.0,
-              80.0
+              40.0,
+              40.0
             ],
             "rotation": 0.0
           },
@@ -3660,8 +3660,8 @@
             "shape": "Square",
             "layer": "Default",
             "size": [
-              80.0,
-              80.0
+              40.0,
+              40.0
             ]
           },
           "children": []
@@ -3678,8 +3678,8 @@
               -119.47953796386719
             ],
             "scale": [
-              80.0,
-              80.0
+              40.0,
+              40.0
             ],
             "rotation": 0.0
           },
@@ -3706,8 +3706,8 @@
             "shape": "Square",
             "layer": "Default",
             "size": [
-              80.0,
-              80.0
+              40.0,
+              40.0
             ]
           },
           "children": []
@@ -3724,8 +3724,8 @@
               7.372283935546875
             ],
             "scale": [
-              80.0,
-              80.0
+              40.0,
+              40.0
             ],
             "rotation": 0.0
           },
@@ -3752,8 +3752,8 @@
             "shape": "Square",
             "layer": "Default",
             "size": [
-              80.0,
-              80.0
+              40.0,
+              40.0
             ]
           },
           "children": []
@@ -4155,12 +4155,12 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              650.0,
-              -250.0
+              672.727294921875,
+              278.7874755859375
             ],
             "scale": [
-              200.0,
-              180.0
+              176.0,
+              158.39999389648438
             ],
             "rotation": 0.0
           },
