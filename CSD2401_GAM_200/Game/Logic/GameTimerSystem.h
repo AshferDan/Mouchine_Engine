@@ -116,6 +116,7 @@ private:
     std::string timerObjectName = "LevelTimerBar";
     bool        hasTriggeredTimeUp = false;         // prevent multiple scene loads
     bool        hasTriggeredPanicSound = false;
+    float       loseDelayTimer = -1.0f;             // counts down before lose screen shows; -1 = inactive
 
     // Bar scaling variables
     float       originalScaleX = 0.0f;              // original bar width

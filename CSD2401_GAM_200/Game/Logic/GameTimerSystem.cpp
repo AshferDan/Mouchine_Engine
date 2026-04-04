@@ -33,6 +33,7 @@ void GameTimerSystem::Initialize()
     lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
+    loseDelayTimer = -1.0f;
 
     // Reset bar scaling variables
     originalScaleX = 0.0f;
@@ -213,13 +214,25 @@ void GameTimerSystem::Update(float dt)
             remainingTime = 0.0f;
             hasTriggeredTimeUp = true;
 
-            // LOSE CONDITION - trigger lose screen
-            std::cout << "TIME'S UP! Triggering lose screen..." << std::endl;
-            if (gameCb)
+            // Start delay so the player death animation can finish first
+            loseDelayTimer = 0.7f;
+            std::cout << "TIME'S UP! Waiting 0.5s for death animation..." << std::endl;
+        }
+
+        // Countdown the lose delay; fire TriggerLose when it expires
+        if (loseDelayTimer > 0.0f)
+        {
+            loseDelayTimer -= dt;
+            if (loseDelayTimer <= 0.0f)
             {
-                gameCb->TriggerLose();
+                loseDelayTimer = -1.0f;
+                std::cout << "TIME'S UP! Triggering lose screen..." << std::endl;
+                if (gameCb)
+                {
+                    gameCb->TriggerLose();
+                }
+                return;
             }
-            return;
         }
 
         int totalSeconds = static_cast<int>(remainingTime);
@@ -242,6 +255,7 @@ void GameTimerSystem::ResetTimer()
     lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
+    loseDelayTimer = -1.0f;
 
     // Reset bar scaling variables
     originalScaleX = 0.0f;
