@@ -729,8 +729,8 @@ void WinLoseLogicSystem::TriggerWin()
     {
         audioManager->StopSound("bgm_channel");
         audioManager->SetCategoryVolume("music", 0.0f);
-        audioManager->PlaySound("victory");
-        audioManager->FadeInCategory("music", m_fadeWinIn);
+        //audioManager->PlaySound("victory");
+        //audioManager->FadeInCategory("music", m_fadeWinIn);
     }
     m_winBGMDelayTimer = 1.5f;
 
