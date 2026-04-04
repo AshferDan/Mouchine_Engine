@@ -215,7 +215,7 @@ void GameTimerSystem::Update(float dt)
             hasTriggeredTimeUp = true;
 
             // Start delay so the player death animation can finish first
-            loseDelayTimer = 0.7f;
+            loseDelayTimer = 1.5f;
             std::cout << "TIME'S UP! Waiting 0.5s for death animation..." << std::endl;
         }
 

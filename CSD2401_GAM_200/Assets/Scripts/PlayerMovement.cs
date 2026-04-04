@@ -85,6 +85,8 @@ namespace CSharpScript
         public PickupManager pickupManager;
 
         #region Variables
+        public bool isTimeAsResourceEnabled = true;
+
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
 
         // scissors sound flags
@@ -231,6 +233,7 @@ namespace CSharpScript
             ResetVars();
             currState = PlayerState.Idle;
             isPlayerDead = false;
+            //isTimeAsResourceEnabled = MoveStats.TimeAsResourcePenalty;
 
             if (GameObject.FindGameObjectByName(vfx) == "")
             {
@@ -280,6 +283,21 @@ namespace CSharpScript
                     if (currGO.Contains("NPC_Lobster"))
                     {
                         NPCData temp = new NPCData("NPC_Lobster", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                    else if (currGO.Contains("NPC_Jellyfish"))
+                    {
+                        NPCData temp = new NPCData("NPC_Jellyfish", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                    else if (currGO.Contains("NPC_Lionfish"))
+                    {
+                        NPCData temp = new NPCData("NPC_Lionfish", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                    else if (currGO.Contains("NPC_Pufferfish"))
+                    {
+                        NPCData temp = new NPCData("NPC_Pufferfish", (uint)i, Transform.GetPosition(currGO), false);
                         NPCs.Add(temp);
                     }
                     else if (currGO.Contains("EZ_Asset"))
@@ -333,6 +351,24 @@ namespace CSharpScript
                     soundName = "scissors_snip" + i.ToString();
                     volume = 0.4f;
                 }
+                else if (NPCs[i].name.Contains("NPC_Jellyfish"))
+                {
+                    audioPath = "../Assets/Audio/DoorGlow.wav";
+                    soundName = "pedi_clip";
+                    volume = 0.6f;
+                }
+                else if (NPCs[i].name.Contains("NPC_Lionfish"))
+                {
+                    audioPath = "../Assets/Audio/slurp.wav";
+                    soundName = "slurp";
+                    volume = 1.0f;
+                }
+                else if (NPCs[i].name.Contains("NPC_Pufferfish"))
+                {
+                    audioPath = "../Assets/Audio/newspaper.wav";
+                    soundName = "newspaper";
+                    volume = 1.0f;
+                }
                 else if (NPCs[i].name.Contains("EZ_Asset"))
                 {
                     audioPath = "../Assets/Audio/DoorGlow.wav";
@@ -349,7 +385,6 @@ namespace CSharpScript
                 NPCs[i].soundName = soundName;
                 Audio.Load3DSound(soundName, audioPath, true, 500.0f, 3000.0f, soundName, volume, 1.0f);
             }
-            Audio.Load3DSound("scissors_sniptest", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
 
             //footsteps
             Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.25f, 1.0f, "sfx");
@@ -375,6 +410,7 @@ namespace CSharpScript
             Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
             Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
             Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("death_sfx", "../Assets/audio/Player/Death.wav"       , false, 1.0f, 1.0f, "sfx");
 
 
             // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_R EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
@@ -478,7 +514,6 @@ namespace CSharpScript
             for (int i = 0; i < NPCs.Count(); i++)
             {
                 vec2 npcPos = NPCs[i].pos;
-                Debug.Log("Pos of " + i.ToString() + "'s NPC: (" + npcPos.x.ToString() + ", " + npcPos.y.ToString() + ")");
 
                 float distX = playerPos.x - npcPos.x;
                 float distY = playerPos.y - npcPos.y;
@@ -555,9 +590,8 @@ namespace CSharpScript
 
             // check if player is dead here
             HandlePlayerHealth();
-            Debug.Log(currState.ToString());
-            Debug.Log(Animation.GetCurrentAnimationName(OwnerName));
-            Debug.Log("row: " + Animation.GetCurrentRow(OwnerName).ToString() + " | col: " + Animation.GetCurrentCol(OwnerName).ToString());
+            //Debug.Log(currState.ToString());
+            Debug.Log(GameTimer.GetRemainingTime().ToString());
 
             switch (currState)
             {
@@ -671,7 +705,7 @@ namespace CSharpScript
             //else Debug.Log("left");
 
             // check if player is taking damage
-            bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
+            bool isHurting = IsBeingKnockedBack || isPlayerDead; // = (_playerHealth != null && _playerHealth.IsHurting);
 
             // wall bonk stun
             if (_bonkTimer > 0)
@@ -880,11 +914,17 @@ namespace CSharpScript
         #region Movement
         public void Move(vec2 moveInput)
         {
-            //if (IsBeingKnockedBack || currState == PlayerState.Bonking)       // removed bc causing bug
-            //{
-            //    return;
-            //}
-            if (_isWallJumping || _wallJumpTimer > 0f && InputManager.JumpWasPressed || currState == PlayerState.WallSliding || isPlayerDead) return;
+            if (_isWallJumping || _wallJumpTimer > 0f && InputManager.JumpWasPressed || currState == PlayerState.WallSliding) return;
+
+            if (isPlayerDead)
+            {
+                if (_isGrounded)
+                {
+                    float newX = Utils.MathfMoveTowards(Physics.GetVelocity(OwnerName).x, 0, MoveStats.KnockbackFriction.x * fixeddt);
+                    Physics.SetVelocity(OwnerName, newX, Physics.GetVelocity(OwnerName).y);
+                }
+                return;
+            }
 
             float inputX = moveInput.x;
             bool isRunHeld = _isRunToggleActive; // for run toggle option
@@ -1852,7 +1892,7 @@ namespace CSharpScript
                 {
                     // Timer for periodic time deduction
                     _timeSinceLastGlideDeduction += fixeddt;
-                    if (_timeSinceLastGlideDeduction >= MoveStats.GlideDeductionInterval)
+                    if (_timeSinceLastGlideDeduction >= MoveStats.Pen_Glide_Interval)
                     {
                         fGlide = true; // Set the flag for the TimerManager
                         _timeSinceLastGlideDeduction = 0f; // Reset the timer
@@ -1986,7 +2026,7 @@ namespace CSharpScript
             currOffset.x = Utils.MathfMoveTowards(currOffset.x, targetX, smoothSpeed * fixeddt);
             currOffset.y = Utils.MathfMoveTowards(currOffset.y, targetY, smoothSpeed * fixeddt);
 
-            Debug.Log("offet x: " + currOffset.x.ToString() + " | offset y: " + currOffset.y.ToString());
+            //Debug.Log("offet x: " + currOffset.x.ToString() + " | offset y: " + currOffset.y.ToString());
 
             Camera.SetFollowOffset(-currOffset.x, -currOffset.y);
         }
@@ -2062,6 +2102,7 @@ namespace CSharpScript
                 // player dead
                 isPlayerDead = true;
                 deathFallTimer = 0.5f;
+                Audio.PlaySound("death_sfx", "sfx");
             }
 
             if (isPlayerDead) 
@@ -2082,6 +2123,39 @@ namespace CSharpScript
             }
         }
 
+        private void InflictTimePenalty(PlayerState state)
+        {
+            switch (state)
+            {
+                case PlayerState.Jumping:
+                    GameTimer.AddTime(-MoveStats.Pen_Jump);
+                    break;
+                case PlayerState.Running:
+                    GameTimer.AddTime(-MoveStats.Pen_Run);          // got interval also
+                    break;
+                case PlayerState.GroundPounding:
+                    GameTimer.AddTime(-MoveStats.Pen_GroundPound);
+                    break;
+                case PlayerState.WallJumping:
+                    GameTimer.AddTime(-MoveStats.Pen_WallJump);
+                    break;
+                case PlayerState.Ziplining:
+                    GameTimer.AddTime(-MoveStats.Pen_Zipline);          // interval
+                    break;
+                case PlayerState.Bonking:
+                    // raymond say slowing down is alr a type of penalty so think ab it
+                    //GameTimer.AddTime(-MoveStats.Pen_Bonk);
+                    break;
+                case PlayerState.Hurting:
+                    // same as above
+                    //GameTimer.AddTime(-MoveStats.Pen_Hurt);
+                    break;
+                default:
+                    //nothin
+                    break;
+            }
+        }
+
         private void EnterState(PlayerState state)
         {
             Debug.Log(state.ToString());
@@ -2091,6 +2165,9 @@ namespace CSharpScript
                 staticVfxPos = Transform.GetPosition(OwnerName);
 
             bool enableDebug = false;           // change this to true if u wanna test states
+
+            if (isTimeAsResourceEnabled)
+                InflictTimePenalty(state);
 
             // handles playing of sound effects
             switch (state)
