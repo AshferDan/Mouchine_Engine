@@ -3506,7 +3506,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "1stPlayer",
+            "text": "Rank:",
             "color": [
               0.0,
               0.0,
@@ -3557,7 +3557,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "1stPlayer",
+            "text": "Rank:",
             "color": [
               0.0,
               0.0,
@@ -3608,7 +3608,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "1stPlayer",
+            "text": "Rank:",
             "color": [
               0.0,
               0.0,

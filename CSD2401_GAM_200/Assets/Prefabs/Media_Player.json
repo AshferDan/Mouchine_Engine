@@ -2,36 +2,36 @@
     "GameObjects": [
         {
             "name": "Media_Player",
-            "localID": 7,
+            "localID": 194,
             "parentID": 4294967295,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
                     50.0,
-                    6.5
+                    13.890000343322754
                 ],
                 "scale": [
-                    0.0,
-                    0.0
+                    9.560799598693848,
+                    9.560799598693848
                 ],
                 "rotation": 0.0
             },
             "children": [
                 {
                     "name": "Replay_box",
-                    "localID": 8,
-                    "parentID": 7,
+                    "localID": 195,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
                             50.0,
-                            6.5
+                            13.890000343322754
                         ],
                         "scale": [
-                            250.0,
-                            70.0
+                            800.0,
+                            233.0
                         ],
                         "rotation": 0.0
                     },
@@ -45,7 +45,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": -2,
+                        "layer": 49,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
@@ -58,26 +58,26 @@
                         "shape": "Square",
                         "layer": "Default",
                         "size": [
-                            250.0,
-                            70.0
+                            800.0,
+                            233.0
                         ]
                     },
                     "children": []
                 },
                 {
                     "name": "Replay_forward",
-                    "localID": 9,
-                    "parentID": 7,
+                    "localID": 196,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            50.78,
-                            6.04
+                            54.0,
+                            14.0
                         ],
                         "scale": [
-                            10.0,
-                            10.0
+                            50.0,
+                            50.0
                         ],
                         "rotation": 0.0
                     },
@@ -91,7 +91,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 0,
+                        "layer": 50,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
@@ -104,26 +104,26 @@
                         "shape": "Square",
                         "layer": "Default",
                         "size": [
-                            10.0,
-                            10.0
+                            50.0,
+                            50.0
                         ]
                     },
                     "children": []
                 },
                 {
                     "name": "Replay_playing",
-                    "localID": 10,
-                    "parentID": 7,
+                    "localID": 197,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            50.0,
-                            6.04
+                            49.31999969482422,
+                            13.699999809265137
                         ],
                         "scale": [
-                            20.0,
-                            20.0
+                            100.0,
+                            100.0
                         ],
                         "rotation": 0.0
                     },
@@ -137,7 +137,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 0,
+                        "layer": 50,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
@@ -150,26 +150,26 @@
                         "shape": "Square",
                         "layer": "Default",
                         "size": [
-                            20.0,
-                            20.0
+                            63.0,
+                            63.0
                         ]
                     },
                     "children": []
                 },
                 {
                     "name": "Replay_bar_brown",
-                    "localID": 11,
-                    "parentID": 7,
+                    "localID": 198,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
                             50.0,
-                            8.07
+                            20.280000686645508
                         ],
                         "scale": [
-                            200.0,
-                            5.0
+                            637.0,
+                            17.0
                         ],
                         "rotation": 0.0
                     },
@@ -183,7 +183,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 2,
+                        "layer": 50,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
@@ -196,26 +196,26 @@
                         "shape": "Square",
                         "layer": "Default",
                         "size": [
-                            200.0,
-                            5.0
+                            637.0,
+                            17.0
                         ]
                     },
                     "children": []
                 },
                 {
                     "name": "Replay_backward",
-                    "localID": 12,
-                    "parentID": 7,
+                    "localID": 199,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            49.22,
-                            6.04
+                            45.0,
+                            14.0
                         ],
                         "scale": [
-                            10.0,
-                            10.0
+                            50.0,
+                            50.0
                         ],
                         "rotation": 0.0
                     },
@@ -229,7 +229,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 0,
+                        "layer": 50,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
@@ -242,26 +242,26 @@
                         "shape": "Square",
                         "layer": "Default",
                         "size": [
-                            10.0,
-                            10.0
+                            50.0,
+                            50.0
                         ]
                     },
                     "children": []
                 },
                 {
                     "name": "ReplayVideo",
-                    "localID": 13,
-                    "parentID": 7,
+                    "localID": 200,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            54.69,
-                            6.04
+                            65.05000305175781,
+                            13.699999809265137
                         ],
                         "scale": [
-                            31.0,
-                            28.0
+                            100.0,
+                            90.0
                         ],
                         "rotation": 0.0
                     },
@@ -275,7 +275,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 0,
+                        "layer": 50,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
@@ -288,26 +288,26 @@
                         "shape": "Square",
                         "layer": "Default",
                         "size": [
-                            31.0,
-                            28.0
+                            100.0,
+                            90.0
                         ]
                     },
                     "children": []
                 },
                 {
                     "name": "Replay_slider",
-                    "localID": 14,
-                    "parentID": 7,
+                    "localID": 201,
+                    "parentID": 194,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            44.79,
-                            8.07
+                            33.439998626708984,
+                            20.280000686645508
                         ],
                         "scale": [
-                            4.0,
-                            6.0
+                            12.75,
+                            19.1200008392334
                         ],
                         "rotation": 0.0
                     },
@@ -321,7 +321,7 @@
                             1.0,
                             1.0
                         ],
-                        "layer": 3,
+                        "layer": 51,
                         "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
