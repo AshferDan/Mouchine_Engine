@@ -229,7 +229,6 @@ namespace CSharpScript
                 return;
             }
             ResetVars();
-            Debug.Log("\n\n\n\n\n\nstart called\n\n\n\n\n\n");
             currState = PlayerState.Idle;
             isPlayerDead = false;
 
