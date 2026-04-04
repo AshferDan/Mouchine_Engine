@@ -1,0 +1,60 @@
+{
+    "GameObjects": [
+        {
+            "name": "PROP_Fountain(E2)",
+            "localID": 200,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    35473.17578125,
+                    -333.2088928222656
+                ],
+                "scale": [
+                    512.0,
+                    512.0
+                ],
+                "rotation": 0.0
+            },
+            "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Props/Dark Version/Environment 2/Fountain_spritesheet_dark.png",
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                    1.0,
+                    1.0
+                ]
+            },
+            "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "PROP_Fountain",
+                "animations": [
+                    {
+                        "name": "PROP_Fountain",
+                        "filepath": "../Assets/Sprites/Props/Dark Version/Environment 2/Fountain_spritesheet_dark.png",
+                        "rows": 1,
+                        "cols": 6,
+                        "startRow": 0,
+                        "startCol": 0,
+                        "endRow": 0,
+                        "endCol": 5,
+                        "fps": 8.0,
+                        "pingPong": false,
+                        "flipRows": false
+                    }
+                ]
+            },
+            "children": []
+        }
+    ]
+}

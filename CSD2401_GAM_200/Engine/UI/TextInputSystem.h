@@ -96,6 +96,31 @@ public:
     void SetUIScale(float scale) { m_uiScale = scale; }
 
     /**
+     * @brief Set a world-space offset for the input field from the camera centre.
+     *        Pass (0, 0) to restore the default centred position.
+     */
+    void SetFieldOffset(float dx, float dy) { m_fieldDX = dx; m_fieldDY = dy; }
+
+    /**
+     * @brief Override the input field size in world-space units.
+     *        Pass (0, 0) to use the default size.
+     */
+    void SetFieldSize(float sx, float sy) { m_fieldSX = sx; m_fieldSY = sy; }
+
+    /**
+     * @brief When false the overlay, title bar and hint bar are not created,
+     *        leaving only the input field.  Use this to embed the field inline
+     *        inside an existing screen.
+     */
+    void SetShowAuxPanels(bool show) { m_showAuxPanels = show; }
+
+    /**
+     * @brief Programmatically confirm the dialog with the current typed text,
+     *        invoking onConfirm and closing the dialog.  No-op if not active.
+     */
+    void Confirm();
+
+    /**
      * @brief Override the visual style of the dialog (textures and colours).
      *        Call before Show(). Safe to call multiple times.
      */
@@ -153,6 +178,13 @@ private:
     bool m_isActive  = false;
     int  m_maxLength = 20;
     bool m_hasUI     = false;
+
+    // ===== Inline-field overrides =====
+    float m_fieldDX      = 0.f;   ///< World-space X offset from camera centre.
+    float m_fieldDY      = 0.f;   ///< World-space Y offset from camera centre.
+    float m_fieldSX      = 0.f;   ///< World-space field width  (0 = use default).
+    float m_fieldSY      = 0.f;   ///< World-space field height (0 = use default).
+    bool  m_showAuxPanels = true;  ///< Whether to create overlay/title/hint panels.
 
     std::function<void(const std::string&)> m_onConfirm;
     std::function<void()>                   m_onCancel;

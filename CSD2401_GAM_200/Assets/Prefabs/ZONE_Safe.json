@@ -1,0 +1,107 @@
+{
+    "GameObjects": [
+        {
+            "name": "ZONE_Safe",
+            "localID": 378,
+            "parentID": 4294967295,
+            "active": true,
+            "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.0,
+                    0.0
+                ],
+                "rotation": 0.0
+            },
+            "children": [
+                {
+                    "name": "SZ_Asset",
+                    "localID": 63,
+                    "parentID": 378,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            650.8887329101563,
+                            2864.049560546875
+                        ],
+                        "scale": [
+                            1000.0,
+                            746.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Sprites/Props/Safe_zone.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "SafeZone",
+                    "localID": 66,
+                    "parentID": 378,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            650.3098754882813,
+                            2815.493408203125
+                        ],
+                        "scale": [
+                            861.5379638671875,
+                            574.703857421875
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0
+                        ],
+                        "layer": 10,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "ColliderComponent": {
+                        "enabled": true,
+                        "shape": "Square",
+                        "layer": "Platform",
+                        "size": [
+                            800.5,
+                            515.6822509765625
+                        ]
+                    },
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

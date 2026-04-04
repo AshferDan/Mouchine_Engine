@@ -26,6 +26,7 @@ Technology is prohibited.
 GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 {
     EntityID id = GetSmallestAvailableID();
+
     if (id >= nextEntityID) {
         id = nextEntityID++;
     }
@@ -654,6 +655,17 @@ void GameObjectFactory::SetNextEntityID(EntityID id)
 EntityID GameObjectFactory::GetNextEntityID() const
 {
     return nextEntityID;
+}
+
+EntityID GameObjectFactory::GetHighestLocalID() const
+{
+    EntityID highest = 0;
+    for (const auto& pair : entityToIndex)
+    {
+        if (pair.first > highest)
+            highest = pair.first;
+    }
+    return highest;
 }
 
 EntityID GameObjectFactory::GetSmallestAvailableID() const

@@ -236,6 +236,8 @@ namespace CSharpScript
         public static extern int[] GetAllIDs();
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int CountAllGameObjects();
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern int GetHighestLocalID();
     }
 
     /// <summary>
