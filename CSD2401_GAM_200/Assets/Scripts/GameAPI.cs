@@ -1662,6 +1662,9 @@ namespace CSharpScript
                                              string liveVfx, string ghostVfx);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void ConfigureBackground(string b0, string b1, string b2, string b3);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void StartRecording(string targetName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -1732,6 +1735,18 @@ namespace CSharpScript
         public static void Setup(string liveTarget, string ghostTarget,
                                  string liveVfx = "", string ghostVfx = "")
             => Configure(liveTarget, ghostTarget, liveVfx, ghostVfx);
+
+        /// <summary>
+        /// Set the background layer object names whose X positions will be recorded
+        /// and replayed with the ghost. Call before BeginRecording() / entering replay mode.
+        /// <br/>
+        /// Level 1 example:
+        ///   Ghost.SetupBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
+        /// Level 2 example:
+        ///   Ghost.SetupBackground("Parallax_BG", "Pillar_BackGround");
+        /// </summary>
+        public static void SetupBackground(string b0, string b1 = "", string b2 = "", string b3 = "")
+            => ConfigureBackground(b0, b1, b2, b3);
     }
 
     /// <summary>

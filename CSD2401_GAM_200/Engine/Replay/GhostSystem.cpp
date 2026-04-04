@@ -105,6 +105,7 @@ void GhostSystem::Update(float dt)
 void GhostSystem::StartRecording(const std::string& targetName)
 {
     const std::string& target = targetName.empty() ? m_liveTarget : targetName;
+    m_recorder.SetBgLayers(m_bgLayers[0], m_bgLayers[1], m_bgLayers[2], m_bgLayers[3]);
     m_recorder.StartRecording(target);
     std::cout << "[GhostSystem] Recording started for: " << targetName << std::endl;
 }
@@ -139,6 +140,7 @@ void GhostSystem::StartPlayback(const std::string& ghostObjectName)
         return;
     }
     const std::string& target = ghostObjectName.empty() ? m_ghostTarget : ghostObjectName;
+    m_player.SetBgLayers(m_bgLayers[0], m_bgLayers[1], m_bgLayers[2], m_bgLayers[3]);
     m_player.StartPlayback(target, m_bestRecording);
     std::cout << "[GhostSystem] Ghost playback started on: " << ghostObjectName << std::endl;
 }
@@ -271,6 +273,7 @@ void GhostSystem::EnterReplayMode()
     if (cam && ghost)
         cam->SetFollowTarget(ghost);
 
+    m_player.SetBgLayers(m_bgLayers[0], m_bgLayers[1], m_bgLayers[2], m_bgLayers[3]);
     m_player.StartPlayback(m_ghostTarget, m_bestRecording);
     m_player.TogglePause(); // start paused — player must press play
 
@@ -354,6 +357,14 @@ void GhostSystem::SaveToDisk(const std::string& levelName)
         frame["vfxAnim"]    = kf.vfxAnimName;
         frame["vfxAnimRow"] = kf.vfxAnimRow;
         frame["vfxAnimCol"] = kf.vfxAnimCol;
+        frame["bgX0"]       = kf.bgLayerX[0];
+        frame["bgX1"]       = kf.bgLayerX[1];
+        frame["bgX2"]       = kf.bgLayerX[2];
+        frame["bgX3"]       = kf.bgLayerX[3];
+        frame["bgY0"]       = kf.bgLayerY[0];
+        frame["bgY1"]       = kf.bgLayerY[1];
+        frame["bgY2"]       = kf.bgLayerY[2];
+        frame["bgY3"]       = kf.bgLayerY[3];
         frames.push_back(std::move(frame));
     }
     root["frames"] = std::move(frames);
@@ -425,9 +436,17 @@ bool GhostSystem::LoadFromDisk(const std::string& levelName)
         kf.animName    = frame.value("anim",       std::string{});
         kf.animRow     = frame.value("animRow",    0);
         kf.animCol     = frame.value("animCol",    0);
-        kf.vfxAnimName = frame.value("vfxAnim",   std::string{});
-        kf.vfxAnimRow  = frame.value("vfxAnimRow", 0);
-        kf.vfxAnimCol  = frame.value("vfxAnimCol", 0);
+        kf.vfxAnimName  = frame.value("vfxAnim",   std::string{});
+        kf.vfxAnimRow   = frame.value("vfxAnimRow", 0);
+        kf.vfxAnimCol   = frame.value("vfxAnimCol", 0);
+        kf.bgLayerX[0]  = frame.value("bgX0", 0.f);
+        kf.bgLayerX[1]  = frame.value("bgX1", 0.f);
+        kf.bgLayerX[2]  = frame.value("bgX2", 0.f);
+        kf.bgLayerX[3]  = frame.value("bgX3", 0.f);
+        kf.bgLayerY[0]  = frame.value("bgY0", 0.f);
+        kf.bgLayerY[1]  = frame.value("bgY1", 0.f);
+        kf.bgLayerY[2]  = frame.value("bgY2", 0.f);
+        kf.bgLayerY[3]  = frame.value("bgY3", 0.f);
         loaded.push_back(std::move(kf));
     }
 

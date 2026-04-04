@@ -25,6 +25,27 @@ void ReplayPlayer::StartPlayback(const std::string& ghostObjectName, const Ghost
     m_recording = &recording;
     m_clock     = 0.0;
     m_isPlaying = !recording.empty();
+
+    // Auto-detect tile widths for each bg layer by reading the current offset of its _L copy.
+    // The relationship posX_center - posX_L == tileWidth is always maintained by ParallaxBackground.
+    for (int i = 0; i < 4; ++i)
+    {
+        m_bgTileWidths[i] = 0.f;
+        if (m_bgLayers[i].empty()) continue;
+        GameObject* center = GameObjectFactory::Instance().FindGameObject(m_bgLayers[i]);
+        GameObject* left   = GameObjectFactory::Instance().FindGameObject(m_bgLayers[i] + "_L");
+        if (center && left)
+        {
+            auto* tfC = center->GetComponent<TransformComponent>();
+            auto* tfL = left->GetComponent<TransformComponent>();
+            if (tfC && tfL)
+            {
+                m_bgTileWidths[i] = tfC->posX - tfL->posX;
+                std::cout << "[ReplayPlayer] bg layer '" << m_bgLayers[i]
+                          << "' tileWidth=" << m_bgTileWidths[i] << "\n";
+            }
+        }
+    }
 }
 
 void ReplayPlayer::StopPlayback()
@@ -163,5 +184,27 @@ void ReplayPlayer::Update(float dt)
                 vfxSprite->SetCurrentFrame(A.vfxAnimRow, A.vfxAnimCol);
             }
         }
+    }
+
+    // Background layers — override parallax position with the recorded value.
+    // Drives center, _L and _R tiling copies. Runs after scripts so it takes priority
+    // over ParallaxBackground's camera-based calculation.
+    for (int i = 0; i < 4; ++i)
+    {
+        if (m_bgLayers[i].empty()) continue;
+        float bx = A.bgLayerX[i];
+        float by = A.bgLayerY[i];
+        float tw = m_bgTileWidths[i];
+
+        auto setPos = [](GameObject* obj, float x, float y)
+        {
+            if (!obj) return;
+            auto* tf = obj->GetComponent<TransformComponent>();
+            if (tf) tf->SetPosition(x, y);
+        };
+
+        setPos(GameObjectFactory::Instance().FindGameObject(m_bgLayers[i]),        bx,      by);
+        setPos(GameObjectFactory::Instance().FindGameObject(m_bgLayers[i] + "_L"), bx - tw, by);
+        setPos(GameObjectFactory::Instance().FindGameObject(m_bgLayers[i] + "_R"), bx + tw, by);
     }
 }
