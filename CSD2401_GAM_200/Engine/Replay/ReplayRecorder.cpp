@@ -88,6 +88,35 @@ void ReplayRecorder::Update(float dt)
         }
     }
 
+    // --- Background layers ---
+    for (int i = 0; i < 4; ++i)
+    {
+        frame.bgLayerX[i] = 0.f;
+        frame.bgLayerY[i] = 0.f;
+        if (m_bgLayers[i].empty()) continue;
+        GameObject* bgObj = GameObjectFactory::Instance().FindGameObject(m_bgLayers[i]);
+        if (bgObj)
+        {
+            auto* tf = bgObj->GetComponent<TransformComponent>();
+            if (tf)
+            {
+                frame.bgLayerX[i] = tf->posX;
+                frame.bgLayerY[i] = tf->posY;
+            }
+        }
+        else if (m_recording.size() < 3)
+        {
+            std::cout << "[ReplayRecorder] WARNING: bg layer '" << m_bgLayers[i] << "' not found in scene!\n";
+        }
+    }
+    if (m_recording.size() < 3)
+    {
+        std::cout << "[ReplayRecorder] frame bg XY: "
+                  << frame.bgLayerX[0] << "," << frame.bgLayerY[0] << "  "
+                  << frame.bgLayerX[1] << "," << frame.bgLayerY[1] << "  "
+                  << frame.bgLayerX[2] << "," << frame.bgLayerY[2] << "\n";
+    }
+
     // Cap to ~15 minutes at 60 fps to prevent unbounded memory growth
     static constexpr std::size_t k_maxFrames = 54000;
     if (m_recording.size() < k_maxFrames)

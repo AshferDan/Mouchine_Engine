@@ -191,29 +191,51 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
 
     auto& factory = GameObjectFactory::Instance();
 
+    // --- Screen dimensions and uiScale (mirrors the graphics system's conversion) ---
+    const float windowW  = (float)gfx->GetWindowWidth();
+    const float windowH  = (float)gfx->GetWindowHeight();
+    const float uiScale  = windowH / 1080.0f;
+
+    // Helper: convert a screen-space percentage position + raw-pixel scale to pixel AABB
+    // posX/posY are 0-100 %, scaleX/scaleY are raw pixels (scaled by uiScale for rendering)
+    auto ToPixelAABB = [&](float posXpct, float posYpct, float scaleX, float scaleY,
+                           float& outLeft, float& outRight, float& outBottom, float& outTop)
+    {
+        float cx   = (posXpct / 100.f) * windowW;
+        float cy   = (posYpct / 100.f) * windowH;
+        float halfW = scaleX * uiScale * 0.5f;
+        float halfH = scaleY * uiScale * 0.5f;
+        outLeft   = cx - halfW;
+        outRight  = cx + halfW;
+        outBottom = cy - halfH;
+        outTop    = cy + halfH;
+    };
+
     // --- Slider thumb: position driven by playback progress along the bar ---
-    // Read the bar's actual transform so we respect whatever is set in the scene.
     const float duration = ghost->GetReplayDuration();
     const float clock    = ghost->GetReplayClock();
     const float progress = (duration > 0.f)
         ? std::max(0.f, std::min(1.f, clock / duration))
         : 0.f;
 
-    float barLeft = 0.f, barWidth = 0.f, barCY = 0.f;
+    // Bar bounds in actual pixels (needed for slider positioning and drag maths)
+    float barLeft = 0.f, barRight = 0.f, barBottom = 0.f, barTop = 0.f;
     if (GameObject* barObj = factory.FindGameObject(OBJ_BAR))
     {
         if (auto* tf = barObj->GetComponent<TransformComponent>())
-        {
-            barLeft  = tf->posX - tf->scaleX * 0.5f;
-            barWidth = tf->scaleX;
-            barCY    = tf->posY;
-        }
+            ToPixelAABB(tf->posX, tf->posY, tf->scaleX, tf->scaleY,
+                        barLeft, barRight, barBottom, barTop);
     }
+    const float barWidth = barRight - barLeft;
 
     if (GameObject* sliderObj = factory.FindGameObject(OBJ_SLIDER))
     {
         if (auto* tf = sliderObj->GetComponent<TransformComponent>())
-            tf->posX = barLeft + progress * barWidth;
+        {
+            // Store slider posX back as a percentage so the renderer places it correctly
+            float sliderPixX = barLeft + progress * barWidth;
+            tf->posX = sliderPixX / windowW * 100.0f;
+        }
     }
 
     // --- Stop at end: pause when the replay reaches the last frame ---
@@ -221,7 +243,6 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
         ghost->ToggleReplayPause();
 
     // --- Mouse input (convert GLFW top-left Y to screen-space bottom-left Y) ---
-    const float windowH  = (float)gfx->GetWindowHeight();
     const float mouseX   = (float)input->GetMouseX();
     const float mouseY   = windowH - (float)input->GetMouseY();
 
@@ -230,17 +251,16 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
     const bool mouseJustReleased = !mouseDown &&  m_mouseWasDown;
     m_mouseWasDown               = mouseDown;
 
-    // AABB hit-test using each object's actual transform (respects scene layout)
+    // AABB hit-test: converts percentage positions to actual pixels before comparing
     auto HitTest = [&](const char* name) -> bool
     {
         GameObject* obj = factory.FindGameObject(name);
         if (!obj) return false;
         auto* tf = obj->GetComponent<TransformComponent>();
         if (!tf)  return false;
-        return mouseX >= tf->posX - tf->scaleX * 0.5f
-            && mouseX <= tf->posX + tf->scaleX * 0.5f
-            && mouseY >= tf->posY - tf->scaleY * 0.5f
-            && mouseY <= tf->posY + tf->scaleY * 0.5f;
+        float l, r, b, t;
+        ToPixelAABB(tf->posX, tf->posY, tf->scaleX, tf->scaleY, l, r, b, t);
+        return mouseX >= l && mouseX <= r && mouseY >= b && mouseY <= t;
     };
 
     // --- Play / Pause button: hover / press / normal icon ---
@@ -276,7 +296,7 @@ void MediaPlayerLogicSystem::UpdateMediaPlayer()
             m_sliderDragging = true;
     }
 
-    // While dragging, seek to the mouse position along the bar
+    // While dragging, seek to the mouse position along the bar (barLeft/barWidth already in pixels)
     if (m_sliderDragging && mouseDown && barWidth > 0.f && duration > 0.f)
     {
         const float t = std::max(0.f, std::min(1.f, (mouseX - barLeft) / barWidth));

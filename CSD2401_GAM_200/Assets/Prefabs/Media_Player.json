@@ -8,8 +8,8 @@
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    124.30773162841797,
-                    -123.7732162475586
+                    50.0,
+                    6.5
                 ],
                 "scale": [
                     0.0,
@@ -26,8 +26,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            124.30773162841797,
-                            -123.7732162475586
+                            50.0,
+                            6.5
                         ],
                         "scale": [
                             250.0,
@@ -46,7 +46,7 @@
                             1.0
                         ],
                         "layer": -2,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -72,8 +72,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            139.3077392578125,
-                            -128.77322387695313
+                            50.78,
+                            6.04
                         ],
                         "scale": [
                             10.0,
@@ -92,7 +92,7 @@
                             1.0
                         ],
                         "layer": 0,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -118,8 +118,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            124.30773162841797,
-                            -128.77322387695313
+                            50.0,
+                            6.04
                         ],
                         "scale": [
                             20.0,
@@ -138,7 +138,7 @@
                             1.0
                         ],
                         "layer": 0,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -164,8 +164,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            124.30773162841797,
-                            -106.7732162475586
+                            50.0,
+                            8.07
                         ],
                         "scale": [
                             200.0,
@@ -184,7 +184,7 @@
                             1.0
                         ],
                         "layer": 2,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -210,8 +210,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            109.30773162841797,
-                            -128.77322387695313
+                            49.22,
+                            6.04
                         ],
                         "scale": [
                             10.0,
@@ -230,7 +230,7 @@
                             1.0
                         ],
                         "layer": 0,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -256,8 +256,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            214.3077392578125,
-                            -128.77322387695313
+                            54.69,
+                            6.04
                         ],
                         "scale": [
                             31.0,
@@ -276,7 +276,7 @@
                             1.0
                         ],
                         "layer": 0,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -302,8 +302,8 @@
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            92.10499572753906,
-                            -106.66732025146484
+                            44.79,
+                            8.07
                         ],
                         "scale": [
                             4.0,
@@ -322,7 +322,7 @@
                             1.0
                         ],
                         "layer": 3,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,

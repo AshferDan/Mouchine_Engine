@@ -565,6 +565,8 @@ namespace API {
     void DestroyGameObject(const std::string& name);
     int CountAllGameObjects();
     int GetHighestLocalID();
+    bool IsGameObjectActive(const std::string& name);
+    bool IsGameObjectActiveByID(int id);
 
 #pragma endregion
 
@@ -675,6 +677,14 @@ namespace API {
          */
         void Configure(const std::string& liveTarget, const std::string& ghostTarget,
                        const std::string& liveVfx = "", const std::string& ghostVfx = "");
+
+        /**
+         * @brief Supply background layer object names to record and replay.
+         *        Call before StartRecording / entering replay mode.
+         *        Pass "" for unused slots (up to 4 layers supported).
+         */
+        void ConfigureBackground(const std::string& b0, const std::string& b1 = "",
+                                 const std::string& b2 = "", const std::string& b3 = "");
 
         /** @brief Begin recording the named target's position and animation each fixed tick. */
         void StartRecording(const std::string& targetName);

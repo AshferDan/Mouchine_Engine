@@ -483,6 +483,23 @@ void WinLoseLogicSystem::CheckSafeZoneExit()
         if (ghost)
         {
             ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+
+            // Configure level-specific background layers so they are recorded and replayed
+            if (currentScenePath.find("Level_1") != std::string::npos)
+            {
+                ghost->ConfigureBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
+                std::cout << "[WinLoseLogic] Background configured for Level_1.\n";
+            }
+            else if (currentScenePath.find("Level_2") != std::string::npos)
+            {
+                ghost->ConfigureBackground("Parallax_BG", "Pillar_BackGround");
+                std::cout << "[WinLoseLogic] Background configured for Level_2.\n";
+            }
+            else
+            {
+                std::cout << "[WinLoseLogic] WARNING: no background configured — currentScenePath='" << currentScenePath << "'\n";
+            }
+
             ghost->StartRecording("Hero");
 
             // If the ghost is already toggled on, start playback now that the run has begun

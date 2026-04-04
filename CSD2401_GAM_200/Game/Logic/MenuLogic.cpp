@@ -1172,6 +1172,7 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
             if (GhostSystem *ghost = CORE->GetGhostSystem())
             {
                 ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+                ghost->ConfigureBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
                 ghost->RequestReplayOnLoad(m_selectedReplay);
             }
             if (audioManager)
@@ -1256,6 +1257,10 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
         {
             ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
             ghost->SetLevelName("Level_" + std::to_string(m_leaderboardLevel));
+            if (m_leaderboardLevel == 1)
+                ghost->ConfigureBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
+            else if (m_leaderboardLevel == 2)
+                ghost->ConfigureBackground("Parallax_BG", "Pillar_BackGround");
             ghost->RequestReplayOnLoad(replayName);
         }
         if (audioManager)
@@ -1282,6 +1287,10 @@ bool MenuLogicSystem::HandleImmediateButtonClick(const std::string &buttonName)
         {
             ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
             ghost->SetLevelName("Level_" + std::to_string(m_leaderboardLevel));
+            if (m_leaderboardLevel == 1)
+                ghost->ConfigureBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
+            else if (m_leaderboardLevel == 2)
+                ghost->ConfigureBackground("Parallax_BG", "Pillar_BackGround");
             ghost->RequestVsGhostOnLoad(replayName);
         }
         if (audioManager)

@@ -1580,6 +1580,16 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
         return static_cast<int>(GameObjectFactory::Instance().GetHighestLocalID());
     }
+    bool IsGameObjectActive(const std::string& name)
+    {
+        GameObject* obj = GameObjectFactory::Instance().FindGameObject(name);
+        return obj ? obj->IsActive() : false;
+    }
+    bool IsGameObjectActiveByID(int id)
+    {
+        GameObject* obj = GameObjectFactory::Instance().GetGameObject(id);
+        return obj ? obj->IsActive() : false;
+    }
 #pragma endregion
 
 #pragma region GameTimer
@@ -2652,6 +2662,13 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         {
             if (CORE && CORE->GetGhostSystem())
                 CORE->GetGhostSystem()->Configure(liveTarget, ghostTarget, liveVfx, ghostVfx);
+        }
+
+        void ConfigureBackground(const std::string& b0, const std::string& b1,
+                                 const std::string& b2, const std::string& b3)
+        {
+            if (CORE && CORE->GetGhostSystem())
+                CORE->GetGhostSystem()->ConfigureBackground(b0, b1, b2, b3);
         }
 
         void StartRecording(const std::string& targetName)

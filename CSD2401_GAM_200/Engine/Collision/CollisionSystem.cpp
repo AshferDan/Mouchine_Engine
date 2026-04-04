@@ -113,6 +113,9 @@ void CollisionSystem::Update(float deltaTime)
     // Insert all objects with colliders into the grid
     for (const auto& obj : gameObjects)
     {
+        if (!obj->IsActive())
+            continue;
+
         if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
             continue;
 
@@ -126,6 +129,9 @@ void CollisionSystem::Update(float deltaTime)
     // Use spatial grid for broad-phase collision detection
     for (const auto& obj1 : gameObjects)
     {
+        if (!obj1->IsActive())
+            continue;
+
         if (!LayerManager::IsLayerEnabled(obj1->GetGameLayer()))
             continue;
 
@@ -449,11 +455,14 @@ bool CollisionSystem::Raycast(const vec2& origin, const vec2& direction, float d
             continue; // Skip the object that is casting the ray
         }
 
+        if (!obj->IsActive())
+            continue; // Skip inactive GameObjects
+
         if (!LayerManager::IsLayerEnabled(obj->GetGameLayer()))
             continue; // Skip objects on disabled layers
 
         auto* collider = obj->GetComponent<ColliderComponent>();
-        if (!collider) continue;
+        if (!collider || !collider->IsEnabled()) continue;
 
         // Filter by layer if not Default (Default means check all layers)
         if (layerMask != CollisionLayer::Default &&

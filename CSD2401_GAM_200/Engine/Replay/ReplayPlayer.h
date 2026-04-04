@@ -89,6 +89,18 @@ public:
     }
 
     /**
+     * @brief Sets the background layer object names to drive from the recording.
+     *        Pass empty strings for unused slots.
+     *        Call before StartPlayback so the player knows which objects to update.
+     */
+    void SetBgLayers(const std::string& b0, const std::string& b1,
+                     const std::string& b2, const std::string& b3)
+    {
+        m_bgLayers[0] = b0; m_bgLayers[1] = b1;
+        m_bgLayers[2] = b2; m_bgLayers[3] = b3;
+    }
+
+    /**
      * @brief Seeks to an absolute time position in the recording.
      *        Clamps to [0, duration]. Safe to call while paused.
      * @param t Target time in seconds.
@@ -101,4 +113,6 @@ private:
     double                m_clock      = 0.0;  // double avoids float precision loss over long sessions
     bool                  m_isPlaying  = false;
     bool                  m_isPaused   = false;
+    std::string           m_bgLayers[4];        // background layer object names (up to 4)
+    float                 m_bgTileWidths[4] = {0.f, 0.f, 0.f, 0.f}; // auto-detected from _L copy offset
 };
