@@ -7263,8 +7263,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              100.0,
-              100.0
+              5.21,
+              9.26
             ],
             "scale": [
               1.0,
@@ -7314,8 +7314,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              1825.0,
-              70.0
+              95.05,
+              6.48
             ],
             "scale": [
               125.0,
@@ -7351,8 +7351,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              1700.0,
-              920.0
+              88.54,
+              85.19
             ],
             "scale": [
               90.0,
@@ -7388,8 +7388,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              1770.0,
-              920.0
+              92.19,
+              85.19
             ],
             "scale": [
               90.0,
@@ -7425,8 +7425,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              1840.0,
-              920.0
+              95.83,
+              85.19
             ],
             "scale": [
               90.0,
@@ -7462,8 +7462,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              1700.0,
-              830.0
+              88.54,
+              76.85
             ],
             "scale": [
               100.0,
@@ -7499,8 +7499,8 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              1750.0,
-              810.0
+              91.15,
+              75.00
             ],
             "scale": [
               1.0,
@@ -7550,7 +7550,7 @@
           "TransformComponent": {
             "enabled": false,
             "pos": [
-              -38.0,
+              -1.98,
               0.0
             ],
             "scale": [
@@ -7568,8 +7568,8 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  512.0,
-                  920.0
+                  26.67,
+                  85.19
                 ],
                 "scale": [
                   1000.0,
@@ -7605,8 +7605,8 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  520.6439819335938,
-                  920.0
+                  27.12,
+                  85.19
                 ],
                 "scale": [
                   977.6099853515625,
@@ -7642,8 +7642,8 @@
               "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                  512.0,
-                  920.0
+                  26.67,
+                  85.19
                 ],
                 "scale": [
                   1000.0,

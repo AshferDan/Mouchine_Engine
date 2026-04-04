@@ -138,15 +138,18 @@ void PauseMenuLogicSystem::Update(float dt)
                 return;
             }
 
-            float screenHeight = static_cast<float>(graphics->GetWindowHeight());
+            float screenWidth = (float)graphics->GetWindowWidth();
+            float screenHeight = (float)graphics->GetWindowHeight();
+            float uiScale = screenHeight / 1080.0f;
 
-            float btnX = transform->posX -10.0f;
-            float btnY = screenHeight - transform->posY;
-            float halfWidth = transform->scaleX / 2.0f;
-            float halfHeight = transform->scaleY / 2.0f;
+            // Convert percentage pos to actual pixels (Y is bottom-left origin, flip for GLFW top-left)
+            float btnX = (transform->posX / 100.0f) * screenWidth;
+            float btnY = screenHeight - ((transform->posY / 100.0f) * screenHeight);
+            float halfWidth = (transform->scaleX * uiScale) / 2.0f;
+            float halfHeight = (transform->scaleY * uiScale) / 2.0f;
 
             bool isHoveringPauseBtn = (mouseX >= btnX - halfWidth && mouseX <= btnX + halfWidth &&
-                                       mouseY >= btnY - halfHeight && mouseY <= btnY + halfHeight);
+                mouseY >= btnY - halfHeight && mouseY <= btnY + halfHeight);
 
             static bool wasHoveringLastFrame = false;
 
