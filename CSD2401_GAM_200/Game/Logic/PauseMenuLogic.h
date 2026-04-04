@@ -185,6 +185,17 @@ private:
     std::vector<std::string> m_ghostReplayNames; // scanned replay file stems
     std::vector<std::string> m_ghostReplayLevels;// level names from replay headers
 
+    // Leaderboard overlay state
+    struct PauseLBEntry { std::string name; float time = 0.0f; float rating = 0.0f; int shells = 0; };
+    bool isLeaderboardOpen = false;
+    bool wasLeaderboardOpenLastFrame = false;
+    bool hasCreatedLeaderboardUI = false;
+    bool pendingLeaderboardClose = false;
+    float leaderboardCloseTimer = 0.0f;
+    int  m_lbLevel = 1;
+    int  m_lbSelectedRank = 0;
+    std::vector<PauseLBEntry> m_lbData;
+
     /**
      * @brief Creates all pause menu UI elements (overlay, buttons, title).
      */
@@ -237,6 +248,32 @@ private:
      * @brief Creates the Ghost menu screen UI (toggle + replay slots + back button).
      */
     void CreateGhostMenuUI();
+
+    /**
+     * @brief Creates the leaderboard overlay UI.
+     */
+    void CreateLeaderboardUI();
+
+    /**
+     * @brief Destroys the leaderboard overlay UI objects.
+     */
+    void DestroyLeaderboardUI();
+
+    /**
+     * @brief Shows or hides leaderboard UI objects.
+     */
+    void SetLeaderboardVisible(bool show);
+
+    /**
+     * @brief Scans replay directory for the given level and fills m_lbData.
+     * @param level Level number (1, 2, or 3).
+     */
+    void ScanLBData(int level);
+
+    /**
+     * @brief Updates leaderboard row text objects from m_lbData.
+     */
+    void PopulateLB();
 
     /**
      * @brief Destroys the Ghost menu screen UI objects.

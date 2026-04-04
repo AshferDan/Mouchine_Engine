@@ -402,11 +402,11 @@ void WinLoseLogicSystem::Update(float dt)
             {"LoseSeparator2",   vec2(600.0f * uiScale,   10.0f * uiScale)},
             {"LoseRatingLabel",  vec2((600.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
             {"LoseRatingBadge",  vec2((600.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
-            {"LoseSignHereCross",vec2(600.0f * uiScale, -140.0f * uiScale)},
-            {"LoseSignHere",     vec2(600.0f * uiScale, -160.0f * uiScale)},
-            {"LoseSignLabel",    vec2(600.0f * uiScale, -220.0f * uiScale)},
-            {"LoseRetryButton",   vec2(600.0f * uiScale, -300.0f * uiScale)},
-            {"LoseQuitButton",    vec2(600.0f * uiScale, -410.0f * uiScale)}
+            {"LoseSignHereCross",vec2(600.0f * uiScale, -160.0f * uiScale)},
+            {"LoseSignHere",     vec2(600.0f * uiScale, -180.0f * uiScale)},
+            {"LoseSignLabel",    vec2(600.0f * uiScale, -230.0f * uiScale)},
+            {"LoseRetryButton",   vec2(600.0f * uiScale, -320.0f * uiScale)},
+            {"LoseQuitButton",    vec2(600.0f * uiScale, -440.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -1765,9 +1765,9 @@ void WinLoseLogicSystem::TriggerLose()
     GameObject* LoseRetryBtn = factory.CreateGameObject("LoseRetryButton");
     auto* loseRetryTransform = LoseRetryBtn->AddComponent<TransformComponent>();
     loseRetryTransform->posX = camPos.x + panelX;
-    loseRetryTransform->posY = camPos.y + -300.0f * uiScale;
-    loseRetryTransform->scaleX = 410.0f * uiScale;
-    loseRetryTransform->scaleY = 110.0f * uiScale;
+    loseRetryTransform->posY = camPos.y + -320.0f * uiScale;
+    loseRetryTransform->scaleX = 390.0f * uiScale;
+    loseRetryTransform->scaleY = 100.0f * uiScale;
     auto* loseRetryRender = LoseRetryBtn->AddComponent<RenderComponent>();
     loseRetryRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     loseRetryRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1780,9 +1780,9 @@ void WinLoseLogicSystem::TriggerLose()
     GameObject* LoseQuitBtn = factory.CreateGameObject("LoseQuitButton");
     auto* loseQuitTransform = LoseQuitBtn->AddComponent<TransformComponent>();
     loseQuitTransform->posX = camPos.x + panelX;
-    loseQuitTransform->posY = camPos.y + -410.0f * uiScale;
-    loseQuitTransform->scaleX = 410.0f * uiScale;
-    loseQuitTransform->scaleY = 110.0f * uiScale;
+    loseQuitTransform->posY = camPos.y + -440.0f * uiScale;
+    loseQuitTransform->scaleX = 390.0f * uiScale;
+    loseQuitTransform->scaleY = 100.0f * uiScale;
     auto* loseQuitRender = LoseQuitBtn->AddComponent<RenderComponent>();
     loseQuitRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/win_lose_button_dark.png"));
     loseQuitRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));

@@ -25,6 +25,7 @@ Technology is prohibited.
 #include <algorithm>
 #include <fstream>
 #include <cmath>
+#include <cfloat>
 #include <nlohmann/json.hpp>
 #include "ColliderComponent.h"
 #include "Collision.h"
@@ -35,6 +36,7 @@ Technology is prohibited.
 void PauseMenuLogicSystem::Initialize()
 {
     // Clean up any existing UI before resetting
+    DestroyLeaderboardUI();
     DestroyHowToPlayUI();
     DestroyGhostMenuUI();
     DestroyPauseSettingsUI();
@@ -71,6 +73,14 @@ void PauseMenuLogicSystem::Initialize()
     ghostMenuCloseTimer = 0.0f;
     m_ghostReplayNames.clear();
     m_ghostReplayLevels.clear();
+
+    isLeaderboardOpen = false;
+    wasLeaderboardOpenLastFrame = false;
+    hasCreatedLeaderboardUI = false;
+    pendingLeaderboardClose = false;
+    leaderboardCloseTimer = 0.0f;
+    m_lbLevel = 1;
+    m_lbData.clear();
 
     CORE->GetMessageBus().Subscribe<WindowFocusMessage>(static_cast<IMessageHandler*>(this));
 }
@@ -240,7 +250,7 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseSettingsButton",
             "PauseMainMenuButton",
             "PauseHowToPlayButton",
-            "PauseGhostButton",
+            "PauseLeaderboardButton",
             "PauseScreen_Settings",
             "PauseMasterText",
             "PauseMusicText",
@@ -266,7 +276,17 @@ void PauseMenuLogicSystem::Update(float dt)
             "PauseGhost_Slot0",
             "PauseGhost_Slot1",
             "PauseGhost_Slot2",
-            "PauseGhost_Back"
+            "PauseGhost_Back",
+            "PauseLB_Board",
+            "PauseLB_LevelLabel",
+            "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3",
+            "PauseLB_Name_1", "PauseLB_Name_2", "PauseLB_Name_3",
+            "PauseLB_Time_1", "PauseLB_Time_2", "PauseLB_Time_3",
+            "PauseLB_Rating_1", "PauseLB_Rating_2", "PauseLB_Rating_3",
+            "PauseLB_Circle_1", "PauseLB_Circle_2", "PauseLB_Circle_3",
+            "PauseLB_CircleNum_1", "PauseLB_CircleNum_2", "PauseLB_CircleNum_3",
+            "PauseLB_Back",
+            "PauseLB_Replay", "PauseLB_VsGhost"
         };
 
         for (const auto& name : uiElements)
@@ -399,19 +419,44 @@ void PauseMenuLogicSystem::Update(float dt)
                 pendingSceneChange = false;
                 hoveredButtonName.clear();
             }
-            else if (hoveredButtonName == "PauseGhostButton")
+            else if (hoveredButtonName == "PauseLeaderboardButton")
             {
-                std::cout << "[PauseMenu] Ghost button clicked - opening ghost menu" << std::endl;
+                if (!hasCreatedLeaderboardUI)
+                    CreateLeaderboardUI();
 
-                // Create ghost menu UI if not created yet
-                if (!hasCreatedGhostMenuUI)
+                // Default to the current level's tab
+                m_lbLevel = 1;
+                if (currentScenePath.find("Level_2") != std::string::npos) m_lbLevel = 2;
+                else if (currentScenePath.find("Level_3") != std::string::npos) m_lbLevel = 3;
+
+                ScanLBData(m_lbLevel);
+                PopulateLB();
+
+                // Update level label text to match current level
                 {
-                    CreateGhostMenuUI();
+                    auto& lbFactory = GameObjectFactory::Instance();
+                    GameObject* lbl = lbFactory.FindGameObject("PauseLB_LevelLabel");
+                    if (lbl) { auto* tc = lbl->GetComponent<TextComponent>(); if (tc) tc->SetText("Level " + std::to_string(m_lbLevel)); }
                 }
 
-                isGhostMenuOpen = true;
+                // Reset selection to first rank; reset tab textures to grey
+                m_lbSelectedRank = 0;
+                {
+                    auto& lbFactory = GameObjectFactory::Instance();
+                    const char* rowTabNames[3] = { "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3" };
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        GameObject* tab = lbFactory.FindGameObject(rowTabNames[i]);
+                        if (tab)
+                        {
+                            auto* rc = tab->GetComponent<RenderComponent>();
+                            if (rc) rc->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_tab_grey.png"));
+                        }
+                    }
+                }
 
-                // Clear the pending state immediately
+                isLeaderboardOpen = true;
+
                 pendingSceneChange = false;
                 hoveredButtonName.clear();
             }
@@ -464,7 +509,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
-            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton"))
+            if (auto* ghostBtn = factory.FindGameObject("PauseLeaderboardButton"))
                 ghostBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(false);
@@ -495,7 +540,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
-            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton"))
+            if (auto* ghostBtn = factory.FindGameObject("PauseLeaderboardButton"))
                 ghostBtn->SetActive(true);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(true);
@@ -519,14 +564,14 @@ void PauseMenuLogicSystem::Update(float dt)
             SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
             SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
             SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
-            SetButtonTexture("PauseGhostButton", ButtonState::Normal);
+            SetButtonTexture("PauseLeaderboardButton", ButtonState::Normal);
 
             if (auto* resumeBtn = factory.FindGameObject("PauseResumeButton"))   resumeBtn->SetActive(false);
             if (auto* restartBtn = factory.FindGameObject("PauseRestartButton")) restartBtn->SetActive(false);
             if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton")) settingsBtn->SetActive(false);
             if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton")) mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(false);
-            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(false);
+            if (auto* ghostBtn = factory.FindGameObject("PauseLeaderboardButton")) ghostBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(false);
             if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(false);
         }
@@ -541,11 +586,52 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton")) settingsBtn->SetActive(true);
             if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton")) mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(true);
-            if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(true);
+            if (auto* ghostBtn = factory.FindGameObject("PauseLeaderboardButton")) ghostBtn->SetActive(true);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(true);
             if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(true);
         }
         wasGhostMenuOpenLastFrame = isGhostMenuOpen;
+    }
+
+    // Handle leaderboard overlay visibility - ONLY update when state changes
+    if (isLeaderboardOpen != wasLeaderboardOpenLastFrame)
+    {
+        if (isLeaderboardOpen)
+        {
+            hoveredButtonName.clear();
+
+            SetLeaderboardVisible(true);
+
+            SetButtonTexture("PauseResumeButton", ButtonState::Normal);
+            SetButtonTexture("PauseRestartButton", ButtonState::Normal);
+            SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
+            SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
+            SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
+            SetButtonTexture("PauseLeaderboardButton", ButtonState::Normal);
+
+            if (auto* r = factory.FindGameObject("PauseResumeButton"))    r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseRestartButton"))   r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseSettingsButton"))  r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseMainMenuButton"))  r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseHowToPlayButton")) r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseLeaderboardButton")) r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseBoard"))           r->SetActive(false);
+            if (auto* r = factory.FindGameObject("PauseOverlay"))         r->SetActive(false);
+        }
+        else
+        {
+            SetLeaderboardVisible(false);
+
+            if (auto* r = factory.FindGameObject("PauseResumeButton"))    r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseRestartButton"))   r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseSettingsButton"))  r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseMainMenuButton"))  r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseHowToPlayButton")) r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseLeaderboardButton")) r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseBoard"))           r->SetActive(true);
+            if (auto* r = factory.FindGameObject("PauseOverlay"))         r->SetActive(true);
+        }
+        wasLeaderboardOpenLastFrame = isLeaderboardOpen;
     }
 
     // Handle pause settings screen visibility - ONLY update when state changes
@@ -644,7 +730,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
-            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseLeaderboardButton"))
                 mainMenuBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(false);
@@ -663,7 +749,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 settingsBtn->SetActive(true);
             if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
                 mainMenuBtn->SetActive(true);
-            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseLeaderboardButton"))
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
@@ -1312,6 +1398,156 @@ void PauseMenuLogicSystem::Update(float dt)
         return; // Don't process normal pause menu interactions
     }
 
+    // Handle leaderboard overlay interactions
+    if (isLeaderboardOpen)
+    {
+        if (pendingLeaderboardClose)
+        {
+            leaderboardCloseTimer -= dt;
+            if (leaderboardCloseTimer <= 0.0f)
+            {
+                isLeaderboardOpen = false;
+                pendingLeaderboardClose = false;
+                hoveredButtonName.clear();
+            }
+            return;
+        }
+
+        InputManager* inp = CORE->GetInputManager();
+        float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
+        float renderH = (float)CORE->GetGraphicsSystem()->GetWindowHeight();
+        float ndcX = static_cast<float>(inp->GetMouseX() / renderW) * 2.0f - 1.0f;
+        float ndcY = 1.0f - static_cast<float>(inp->GetMouseY() / renderH) * 2.0f;
+        float resScale = std::min(renderW / 1920.0f, renderH / 1080.0f);
+        float virtualW = renderW / resScale;
+        float virtualH = renderH / resScale;
+        auto* _cam = CameraManager::Instance().GetActiveCamera();
+        float _zoom = (_cam && _cam->getZoom() != 0.0f) ? _cam->getZoom() : 1.0f;
+        vec2 _camPos = CameraManager::Instance().GetCameraPosition();
+        double mouseX = _camPos.x + ndcX * (virtualW / (2.0f * _zoom));
+        double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
+        bool isClicked = InputManager::IsMouseLeftClicked();
+
+        std::string currentHover = "";
+        if (IsMouseOver(factory.FindGameObject("PauseLB_Back"), mouseX, mouseY))
+            currentHover = "PauseLB_Back";
+        else if (IsMouseOver(factory.FindGameObject("PauseLB_Replay"), mouseX, mouseY))
+            currentHover = "PauseLB_Replay";
+        else if (IsMouseOver(factory.FindGameObject("PauseLB_VsGhost"), mouseX, mouseY))
+            currentHover = "PauseLB_VsGhost";
+
+        if (currentHover != hoveredButtonName)
+        {
+            if (!hoveredButtonName.empty())
+                SetButtonTexture(hoveredButtonName, ButtonState::Normal);
+            if (!currentHover.empty())
+            {
+                SetButtonTexture(currentHover, ButtonState::Hover);
+                AudioManager* localAudio = CORE->GetAudioManager();
+                if (localAudio) localAudio->TriggerEvent("UI_Hover");
+            }
+            hoveredButtonName = currentHover;
+        }
+
+        // Row tab click — selects rank (highlight yellow)
+        const char* rowTabNames[3] = { "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3" };
+        if (isClicked)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                GameObject* rt = factory.FindGameObject(rowTabNames[i]);
+                if (rt && IsMouseOver(rt, mouseX, mouseY) && i < static_cast<int>(m_lbData.size()))
+                {
+                    m_lbSelectedRank = i;
+                    AudioManager* localAudio = CORE->GetAudioManager();
+                    if (localAudio) localAudio->TriggerEvent("UI_Click");
+                    // Update tab textures: yellow for selected, grey for others
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        GameObject* tab = factory.FindGameObject(rowTabNames[j]);
+                        if (tab)
+                        {
+                            auto* rc = tab->GetComponent<RenderComponent>();
+                            if (rc)
+                            {
+                                const char* tex = (j == m_lbSelectedRank)
+                                    ? "../Assets/Leaderboards_tab_yellow.png"
+                                    : "../Assets/Leaderboards_tab_grey.png";
+                                rc->SetTextureID(GraphicsSystem::LoadTexture(tex));
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (isClicked && hoveredButtonName == "PauseLB_Back")
+        {
+            SetButtonTexture("PauseLB_Back", ButtonState::Pressed);
+            AudioManager* localAudio = CORE->GetAudioManager();
+            if (localAudio) localAudio->TriggerEvent("UI_Click");
+            pendingLeaderboardClose = true;
+            leaderboardCloseTimer = 0.15f;
+        }
+        else if (isClicked && hoveredButtonName == "PauseLB_Replay")
+        {
+            SetButtonTexture("PauseLB_Replay", ButtonState::Pressed);
+            AudioManager* localAudio = CORE->GetAudioManager();
+            if (localAudio) localAudio->TriggerEvent("UI_Click");
+
+            // Load selected recording and restart scene in Watch Replay mode
+            if (m_lbSelectedRank < static_cast<int>(m_lbData.size()))
+            {
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost) ghost->RequestReplayOnLoad(m_lbData[m_lbSelectedRank].name);
+            }
+            isLeaderboardOpen = false;
+            hoveredButtonName.clear();
+            DestroyLeaderboardUI();
+            DestroyGhostMenuUI();
+            DestroyPauseSettingsUI();
+            DestroyHowToPlayUI();
+            DestroyPauseMenuUI();
+            if (isPauseMenuActive)
+            {
+                isPauseMenuActive = false;
+                CORE->SetGamePaused(false, false);
+            }
+            if (!currentScenePath.empty())
+                CORE->RequestSceneLoad(currentScenePath, true);
+        }
+        else if (isClicked && hoveredButtonName == "PauseLB_VsGhost")
+        {
+            SetButtonTexture("PauseLB_VsGhost", ButtonState::Pressed);
+            AudioManager* localAudio = CORE->GetAudioManager();
+            if (localAudio) localAudio->TriggerEvent("UI_Click");
+
+            // Load selected recording and restart scene in VS Ghost mode
+            if (m_lbSelectedRank < static_cast<int>(m_lbData.size()))
+            {
+                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+                if (ghost) ghost->RequestVsGhostOnLoad(m_lbData[m_lbSelectedRank].name);
+            }
+            isLeaderboardOpen = false;
+            hoveredButtonName.clear();
+            DestroyLeaderboardUI();
+            DestroyGhostMenuUI();
+            DestroyPauseSettingsUI();
+            DestroyHowToPlayUI();
+            DestroyPauseMenuUI();
+            if (isPauseMenuActive)
+            {
+                isPauseMenuActive = false;
+                CORE->SetGamePaused(false, false);
+            }
+            if (!currentScenePath.empty())
+                CORE->RequestSceneLoad(currentScenePath, true);
+        }
+
+        return; // Don't process normal pause menu interactions
+    }
+
     // Normal pause menu button handling
     InputManager* inp = CORE->GetInputManager();
     float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
@@ -1353,16 +1589,16 @@ void PauseMenuLogicSystem::Update(float dt)
         {
             currentHover = "PauseHowToPlayButton";
         }
-        else if (IsMouseOver(factory.FindGameObject("PauseGhostButton"), mouseX, mouseY))
+        else if (IsMouseOver(factory.FindGameObject("PauseLeaderboardButton"), mouseX, mouseY))
         {
-            currentHover = "PauseGhostButton";
+            currentHover = "PauseLeaderboardButton";
         }
     }
 
     // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
     static const char* kPauseButtons[] = {
         "PauseResumeButton", "PauseSettingsButton", "PauseRestartButton",
-        "PauseMainMenuButton", "PauseHowToPlayButton", "PauseGhostButton"
+        "PauseMainMenuButton", "PauseHowToPlayButton", "PauseLeaderboardButton"
     };
     static const int kPauseCount = 6;
     static int  kPauseIdx    = 0;
@@ -1501,11 +1737,11 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     boardRender->SetLayer(601); // above overlay
 
-    // back button (resume)
+    // back button (resume) — top right
     GameObject* pausedBtn = factory.CreateGameObject("PauseResumeButton");
     auto* pausedTransform = pausedBtn->AddComponent<TransformComponent>();
     pausedTransform->posX = 650.0f * uiScale;
-    pausedTransform->posY = -275.0f * uiScale;
+    pausedTransform->posY = 270.0f * uiScale;
     pausedTransform->scaleX = 200.0f * uiScale;
     pausedTransform->scaleY = 175.0f * uiScale;
     auto* pausedRender = pausedBtn->AddComponent<RenderComponent>();
@@ -1513,75 +1749,75 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     pausedRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     pausedRender->SetLayer(602);
 
-    // restart button
+    // restart button — left column, row 1
     GameObject* restartBtn = factory.CreateGameObject("PauseRestartButton");
     auto* restartTransform = restartBtn->AddComponent<TransformComponent>();
-    restartTransform->posX = 0.0f;
-    restartTransform->posY = -80.0f * uiScale;
-    restartTransform->scaleX = 420.0f * uiScale;
+    restartTransform->posX = -200.0f * uiScale;
+    restartTransform->posY = 45.0f * uiScale;
+    restartTransform->scaleX = 380.0f * uiScale;
     restartTransform->scaleY = 100.0f * uiScale;
     auto* restartRender = restartBtn->AddComponent<RenderComponent>();
     restartRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets//Sprites/Icons/blankbtnL.png"));
     restartRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     restartRender->SetLayer(602);
     restartBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Restart", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(31 * uiScale), "Restart Level", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // settings button
-    GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
-    auto* settingsTransform = settingsBtn->AddComponent<TransformComponent>();
-    settingsTransform->posX = 0.0f;
-    settingsTransform->posY = 40.0f * uiScale;
-    settingsTransform->scaleX = 420.0f * uiScale;
-    settingsTransform->scaleY = 100.0f * uiScale;
-    auto* settingsRender = settingsBtn->AddComponent<RenderComponent>();
-    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
-    settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    settingsRender->SetLayer(602);
-    settingsBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-    // quit button
-    GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
-    auto* mainMenuTransform = mainMenuBtn->AddComponent<TransformComponent>();
-    mainMenuTransform->posX = 0.0f;
-    mainMenuTransform->posY = -200.0f * uiScale;
-    mainMenuTransform->scaleX = 420.0f * uiScale;
-    mainMenuTransform->scaleY = 100.0f * uiScale;
-    auto* mainMenuRender = mainMenuBtn->AddComponent<RenderComponent>();
-    mainMenuRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
-    mainMenuRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    mainMenuRender->SetLayer(602);
-    mainMenuBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
-
-    // how to play button
+    // how to play button — right column, row 1
     GameObject* howToPlayBtn = factory.CreateGameObject("PauseHowToPlayButton");
     auto* howToPlayTransform = howToPlayBtn->AddComponent<TransformComponent>();
-    howToPlayTransform->posX = 0.0f;
-    howToPlayTransform->posY = -320.0f * uiScale;
-    howToPlayTransform->scaleX = 420.0f * uiScale;
+    howToPlayTransform->posX = 200.0f * uiScale;
+    howToPlayTransform->posY = 45.0f * uiScale;
+    howToPlayTransform->scaleX = 380.0f * uiScale;
     howToPlayTransform->scaleY = 100.0f * uiScale;
     auto* howToPlayRender = howToPlayBtn->AddComponent<RenderComponent>();
     howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(602);
     howToPlayBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "How To Play", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(31 * uiScale), "How To Play", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
-    // ghost button — right side, above the resume/back button
-    GameObject* ghostBtn = factory.CreateGameObject("PauseGhostButton");
-    auto* ghostTransform = ghostBtn->AddComponent<TransformComponent>();
-    ghostTransform->posX = 650.0f * uiScale;
-    ghostTransform->posY = -100.0f * uiScale;
-    ghostTransform->scaleX = 260.0f * uiScale;
-    ghostTransform->scaleY = 100.0f * uiScale;
-    auto* ghostRender = ghostBtn->AddComponent<RenderComponent>();
-    ghostRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
-    ghostRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    ghostRender->SetLayer(602);
-    ghostBtn->AddComponent<TextComponent>(
-        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale), "Ghost", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+    // settings button — left column, row 2
+    GameObject* settingsBtn = factory.CreateGameObject("PauseSettingsButton");
+    auto* settingsTransform = settingsBtn->AddComponent<TransformComponent>();
+    settingsTransform->posX = -200.0f * uiScale;
+    settingsTransform->posY = -100.0f * uiScale;
+    settingsTransform->scaleX = 380.0f * uiScale;
+    settingsTransform->scaleY = 100.0f * uiScale;
+    auto* settingsRender = settingsBtn->AddComponent<RenderComponent>();
+    settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    settingsRender->SetLayer(602);
+    settingsBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(31 * uiScale), "Settings", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // leaderboard button — right column, row 2
+    GameObject* leaderboardBtn = factory.CreateGameObject("PauseLeaderboardButton");
+    auto* leaderboardTransform = leaderboardBtn->AddComponent<TransformComponent>();
+    leaderboardTransform->posX = 200.0f * uiScale;
+    leaderboardTransform->posY = -100.0f * uiScale;
+    leaderboardTransform->scaleX = 380.0f * uiScale;
+    leaderboardTransform->scaleY = 100.0f * uiScale;
+    auto* leaderboardRender = leaderboardBtn->AddComponent<RenderComponent>();
+    leaderboardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    leaderboardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    leaderboardRender->SetLayer(602);
+    leaderboardBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(31 * uiScale), "Leaderboards", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+
+    // main menu button — row 3, centered
+    GameObject* mainMenuBtn = factory.CreateGameObject("PauseMainMenuButton");
+    auto* mainMenuTransform = mainMenuBtn->AddComponent<TransformComponent>();
+    mainMenuTransform->posX = 0.0f;
+    mainMenuTransform->posY = -250.0f * uiScale;
+    mainMenuTransform->scaleX = 380.0f * uiScale;
+    mainMenuTransform->scaleY = 100.0f * uiScale;
+    auto* mainMenuRender = mainMenuBtn->AddComponent<RenderComponent>();
+    mainMenuRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
+    mainMenuRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    mainMenuRender->SetLayer(602);
+    mainMenuBtn->AddComponent<TextComponent>(
+        "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(31 * uiScale), "Main Menu", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
 
     hasCreatedUI = true;
 
@@ -1810,7 +2046,7 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     GameObject* backBtn = factory.CreateGameObject("PauseBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
     backBtnTransform->posX = 650.0f * uiScale;
-    backBtnTransform->posY = -250.0f * uiScale;
+    backBtnTransform->posY = 270.0f * uiScale;
     backBtnTransform->scaleX = 200.0f * uiScale;
     backBtnTransform->scaleY = 180.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
@@ -1880,7 +2116,7 @@ void PauseMenuLogicSystem::DestroyPauseMenuUI()
         "PauseSettingsButton",
         "PauseMainMenuButton",
         "PauseHowToPlayButton",
-        "PauseGhostButton"
+        "PauseLeaderboardButton"
     };
 
     for (const auto& name : uiElements)
@@ -1953,7 +2189,7 @@ void PauseMenuLogicSystem::SetPauseMenuVisible(bool show)
         "PauseSettingsButton",
         "PauseMainMenuButton",
         "PauseHowToPlayButton",
-        "PauseGhostButton"
+        "PauseLeaderboardButton"
     };
 
     for (const auto& name : uiElements)
@@ -2051,6 +2287,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         CreateGhostMenuUI();
     }
 
+    // create leaderboard UI on first toggle to avoid delays later
+    if (!hasCreatedLeaderboardUI)
+    {
+        CreateLeaderboardUI();
+    }
+
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
@@ -2067,6 +2309,8 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         howToPlayOpenedViaTab = false;
         isGhostMenuOpen = false;
         wasGhostMenuOpenLastFrame = false;
+        isLeaderboardOpen = false;
+        wasLeaderboardOpenLastFrame = false;
 
         // Reset all button textures when closing pause menu
         SetButtonTexture("PauseResumeButton", ButtonState::Normal);
@@ -2074,7 +2318,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         SetButtonTexture("PauseSettingsButton", ButtonState::Normal);
         SetButtonTexture("PauseMainMenuButton", ButtonState::Normal);
         SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
-        SetButtonTexture("PauseGhostButton", ButtonState::Normal);
+        SetButtonTexture("PauseLeaderboardButton", ButtonState::Normal);
 
         // Play unpause sound effect before removing low pass filter
         if (audioManager)
@@ -2147,7 +2391,7 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
                 texturePath = "../Assets/Sprites/Icons/playing_button.png";
                 break;
             case ButtonState::Hover:
-                texturePath = "../Assets/Sprites/Icons/Playing_button_light.png";
+                texturePath = "../Assets/Sprites/Icons/Playing button_light.png";
                 break;
             case ButtonState::Pressed:
                 texturePath = "../Assets/Sprites/Icons/Playing_button_dark.png";
@@ -2218,11 +2462,11 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
                 break;
         }
     }
-    else if (buttonName == "PauseGhostButton" || buttonName == "PauseGhost_Toggle" ||
+    else if (buttonName == "PauseLeaderboardButton" || buttonName == "PauseGhost_Toggle" ||
              buttonName == "PauseGhost_Slot0" || buttonName == "PauseGhost_Slot1" ||
              buttonName == "PauseGhost_Slot2")
     {
-        // Ghost buttons: blank/light/dark
+        // Ghost / leaderboard buttons: blank/light/dark
         switch (state)
         {
             case ButtonState::Normal:
@@ -2236,7 +2480,7 @@ void PauseMenuLogicSystem::SetButtonTexture(std::string buttonName, ButtonState 
                 break;
         }
     }
-    else if (buttonName == "PauseGhost_Back")
+    else if (buttonName == "PauseLB_Back" || buttonName == "PauseGhost_Back")
     {
         switch (state)
         {
@@ -2412,14 +2656,14 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     howToPlayTransform->scaleX = 2080.0f * uiScale;
     howToPlayTransform->scaleY = 1170.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel.png"));
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel_Keyboard.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 
     GameObject* backBtn = factory.CreateGameObject("HowToPlayBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
-    backBtnTransform->posX = 670.0f * uiScale;
-    backBtnTransform->posY = 280.0f * uiScale;
+    backBtnTransform->posX = 690.0f * uiScale;
+    backBtnTransform->posY = 300.0f * uiScale;
     backBtnTransform->scaleX = 180.0f * uiScale;
     backBtnTransform->scaleY = 160.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
@@ -2928,7 +3172,7 @@ void PauseMenuLogicSystem::CreateGhostMenuUI()
     auto* titleT = titleObj->AddComponent<TransformComponent>();
     titleT->posX = 0.0f;
     titleT->posY = 250.0f * uiScale;
-    titleT->scaleX = 420.0f * uiScale;
+    titleT->scaleX = 380.0f * uiScale;
     titleT->scaleY = 100.0f * uiScale;
     auto* titleR = titleObj->AddComponent<RenderComponent>();
     titleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
@@ -2946,7 +3190,7 @@ void PauseMenuLogicSystem::CreateGhostMenuUI()
     auto* toggleT = toggleBtn->AddComponent<TransformComponent>();
     toggleT->posX = 0.0f;
     toggleT->posY = 100.0f * uiScale;
-    toggleT->scaleX = 420.0f * uiScale;
+    toggleT->scaleX = 380.0f * uiScale;
     toggleT->scaleY = 100.0f * uiScale;
     auto* toggleR = toggleBtn->AddComponent<RenderComponent>();
     toggleR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
@@ -2978,7 +3222,7 @@ void PauseMenuLogicSystem::CreateGhostMenuUI()
         auto* slotT = slot->AddComponent<TransformComponent>();
         slotT->posX = 0.0f;
         slotT->posY = slotStartY - i * slotSpacing;
-        slotT->scaleX = 420.0f * uiScale;
+        slotT->scaleX = 380.0f * uiScale;
         slotT->scaleY = 100.0f * uiScale;
         auto* slotR = slot->AddComponent<RenderComponent>();
         slotR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtnL.png"));
@@ -3065,7 +3309,7 @@ void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
         if (!hasCreatedUI)
             CreatePauseMenuUI();
 
-        if (!isPauseSettingsOpen && !isGhostMenuOpen && !isHowToPlayOpen)
+        if (!isPauseSettingsOpen && !isGhostMenuOpen && !isHowToPlayOpen && !isLeaderboardOpen)
         {
             SetPauseMenuVisible(true);
         }
@@ -3097,5 +3341,353 @@ void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
             CreatePauseMenuUI();
 
         SetPauseMenuVisible(true);
+    }
+}
+
+/**
+ * @brief Scans the replay directory for the given level and fills m_lbData (top 3, fastest first).
+ */
+void PauseMenuLogicSystem::ScanLBData(int level)
+{
+    m_lbData.clear();
+    namespace fs = std::filesystem;
+
+    const std::string dir = "../Assets/Replay/Level_" + std::to_string(level) + "/";
+    if (!fs::exists(dir))
+        return;
+
+    for (const auto& entry : fs::directory_iterator(dir))
+    {
+        if (!entry.is_regular_file() || entry.path().extension() != ".json")
+            continue;
+
+        std::ifstream f(entry.path().string());
+        if (!f) continue;
+
+        try
+        {
+            nlohmann::json root;
+            f >> root;
+            float bestTime = root.value("bestTime", FLT_MAX);
+            if (bestTime >= FLT_MAX) continue;
+            float rating = root.value("rating", 0.0f);
+            int shells = root.value("shellsCollected", 0);
+            m_lbData.push_back({ entry.path().stem().string(), bestTime, rating, shells });
+        }
+        catch (...) {}
+    }
+
+    std::sort(m_lbData.begin(), m_lbData.end(),
+        [](const PauseLBEntry& a, const PauseLBEntry& b) { return a.time < b.time; });
+    if (m_lbData.size() > 3)
+        m_lbData.resize(3);
+}
+
+/**
+ * @brief Updates the leaderboard row text/icon objects from m_lbData.
+ */
+void PauseMenuLogicSystem::PopulateLB()
+{
+    auto& factory = GameObjectFactory::Instance();
+    const char* nameObjs[]   = { "PauseLB_Name_1",   "PauseLB_Name_2",   "PauseLB_Name_3" };
+    const char* timeObjs[]   = { "PauseLB_Time_1",   "PauseLB_Time_2",   "PauseLB_Time_3" };
+    const char* ratingObjs[] = { "PauseLB_Rating_1", "PauseLB_Rating_2", "PauseLB_Rating_3" };
+
+    for (int i = 0; i < 3; ++i)
+    {
+        GameObject* nameObj   = factory.FindGameObject(nameObjs[i]);
+        GameObject* timeObj   = factory.FindGameObject(timeObjs[i]);
+        GameObject* ratingObj = factory.FindGameObject(ratingObjs[i]);
+
+        if (i < static_cast<int>(m_lbData.size()))
+        {
+            const PauseLBEntry& entry = m_lbData[i];
+
+            // Format time as M:SS.ss (matching main menu format)
+            int totalSec = static_cast<int>(entry.time);
+            int frac     = static_cast<int>((entry.time - totalSec) * 100.0f);
+            int minutes  = totalSec / 60;
+            int seconds  = totalSec % 60;
+            char timeStr[16];
+            snprintf(timeStr, sizeof(timeStr), "%d:%02d.%02d", minutes, seconds, frac);
+
+            if (nameObj) { auto* tc = nameObj->GetComponent<TextComponent>(); if (tc) tc->SetText(entry.name); nameObj->SetActive(true); }
+            if (timeObj) { auto* tc = timeObj->GetComponent<TextComponent>(); if (tc) tc->SetText(timeStr); timeObj->SetActive(true); }
+
+            if (ratingObj)
+            {
+                auto* rc = ratingObj->GetComponent<RenderComponent>();
+                if (rc)
+                {
+                    std::string tex;
+                    if (entry.rating >= 85.0f)      tex = "../Assets/Sprites/Icons/Letterscore_S.png";
+                    else if (entry.rating >= 75.0f) tex = "../Assets/Sprites/Icons/Letterscore_A.png";
+                    else if (entry.rating >= 65.0f) tex = "../Assets/Sprites/Icons/Letterscore_B.png";
+                    else if (entry.rating >= 50.0f) tex = "../Assets/Sprites/Icons/Letterscore_C.png";
+                    else                            tex = "../Assets/Sprites/Icons/Letterscore_dash.png";
+                    rc->SetTextureID(GraphicsSystem::LoadTexture(tex.c_str()));
+                }
+                ratingObj->SetActive(true);
+            }
+        }
+        else
+        {
+            if (nameObj)   { auto* tc = nameObj->GetComponent<TextComponent>();   if (tc) tc->SetText("---"); nameObj->SetActive(true); }
+            if (timeObj)   { auto* tc = timeObj->GetComponent<TextComponent>();   if (tc) tc->SetText(""); timeObj->SetActive(false); }
+            if (ratingObj) ratingObj->SetActive(false);
+        }
+    }
+}
+
+/**
+ * @brief Creates the leaderboard overlay UI mirroring the main menu leaderboard layout.
+ * Positions are the main menu values × uiScale (2).
+ */
+void PauseMenuLogicSystem::CreateLeaderboardUI()
+{
+    if (hasCreatedLeaderboardUI)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+    const float s = 2.0f;
+    const std::string font = "../Assets/FrederickatheGreat-Regular.ttf";
+    const int baseLayer = 601;
+
+    // Background
+    GameObject* board = factory.CreateGameObject("PauseLB_Board");
+    {
+        auto* t = board->AddComponent<TransformComponent>();
+        t->posX = 0.0f; t->posY = 0.0f;
+        t->scaleX = 2080.0f * s; t->scaleY = 1170.0f * s;
+        auto* r = board->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_menu.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer);
+    }
+
+    // Row background bands
+    const float rowBandYs[3] = { 4.0f*s, -58.75f*s, -119.93f*s };
+    const char* rowTabNames[3] = { "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3" };
+    for (int i = 0; i < 3; ++i)
+    {
+        GameObject* rt = factory.CreateGameObject(rowTabNames[i]);
+        auto* t = rt->AddComponent<TransformComponent>();
+        t->posX = 1.88f*s; t->posY = rowBandYs[i];
+        t->scaleX = 1050.0f*s; t->scaleY = 80.0f*s;
+        auto* r = rt->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_tab_grey.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 1);
+    }
+
+    // Level label
+    {
+        GameObject* lbl = factory.CreateGameObject("PauseLB_LevelLabel");
+        auto* t = lbl->AddComponent<TransformComponent>();
+        t->posX = 1.88f*s; t->posY = 115.0f*s;
+        t->scaleX = 1050.0f*s; t->scaleY = 90.0*s;
+        auto* r = lbl->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_tab_grey.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 2);
+        lbl->AddComponent<TextComponent>(
+            font.c_str(), static_cast<int>(28*s), "Level 1", vec4(0,0,0,1), false);
+    }
+
+    // Name text objects
+    const float nameYs[3] = { 4.0f*s, -59.97f*s, -120.13f*s };
+    const char* nameNames[3] = { "PauseLB_Name_1", "PauseLB_Name_2", "PauseLB_Name_3" };
+    for (int i = 0; i < 3; ++i)
+    {
+        GameObject* nm = factory.CreateGameObject(nameNames[i]);
+        auto* t = nm->AddComponent<TransformComponent>();
+        t->posX = -330.0f*s; t->posY = nameYs[i]; t->scaleX = 1; t->scaleY = 1;
+        auto* r = nm->AddComponent<RenderComponent>();
+        r->SetColor(vec4(1,0.5f,0.5f,1)); r->SetLayer(baseLayer + 3);
+        nm->AddComponent<TextComponent>(
+            font.c_str(), static_cast<int>(28*s), "---", vec4(0,0,0,1), false);
+    }
+
+    // Time text objects
+    const float timeYs[3] = { 5.0f*s, -56.51f*s, -120.0f*s };
+    const char* timeNames[3] = { "PauseLB_Time_1", "PauseLB_Time_2", "PauseLB_Time_3" };
+    for (int i = 0; i < 3; ++i)
+    {
+        GameObject* tm = factory.CreateGameObject(timeNames[i]);
+        auto* t = tm->AddComponent<TransformComponent>();
+        t->posX = 0.0f; t->posY = timeYs[i]; t->scaleX = 1; t->scaleY = 1;
+        auto* r = tm->AddComponent<RenderComponent>();
+        r->SetColor(vec4(1,0.5f,0.5f,1)); r->SetLayer(baseLayer + 3);
+        tm->AddComponent<TextComponent>(
+            font.c_str(), static_cast<int>(28*s), "", vec4(0,0,0,1), false);
+    }
+
+    // Rating icons
+    const float ratingYs[3] = { 7.37f*s, -60.86f*s, -126.0f*s };
+    const char* ratingNames[3] = { "PauseLB_Rating_1", "PauseLB_Rating_2", "PauseLB_Rating_3" };
+    for (int i = 0; i < 3; ++i)
+    {
+        GameObject* rt = factory.CreateGameObject(ratingNames[i]);
+        auto* t = rt->AddComponent<TransformComponent>();
+        t->posX = 424.58f*s; t->posY = ratingYs[i];
+        t->scaleX = 40.0f*s; t->scaleY = 40.0f*s;
+        auto* r = rt->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 3);
+        rt->SetActive(false); // hidden until populated
+    }
+
+    // Number circles
+    const float circle1Y = 4.0f*s;
+    const float circle2Y = -59.97f*s;
+    const float circle3Y = -120.13f*s;
+
+    // 1st Circle
+    { 
+        GameObject* ci = factory.CreateGameObject("PauseLB_Circle_1");
+        auto* t = ci->AddComponent<TransformComponent>();
+        t->posX = -460.0f*s; t->posY = circle1Y;
+        t->scaleX = 60.0f*s; t->scaleY = 55.0f*s;
+        auto* r = ci->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_number_circle.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 4);
+
+        GameObject* cn = factory.CreateGameObject("PauseLB_CircleNum_1");
+        auto* tn = cn->AddComponent<TransformComponent>();
+        tn->posX = -460.0f*s; tn->posY = circle1Y; tn->scaleX = 1; tn->scaleY = 1;
+        auto* rn = cn->AddComponent<RenderComponent>();
+        rn->SetColor(vec4(0,0,0,1)); rn->SetLayer(baseLayer + 5);
+        cn->AddComponent<TextComponent>(font.c_str(), static_cast<int>(28*s), "1", vec4(0,0,0,1), false);
+    }
+
+    // 2nd Circle
+    { 
+        GameObject* ci = factory.CreateGameObject("PauseLB_Circle_2");
+        auto* t = ci->AddComponent<TransformComponent>();
+        t->posX = -460.0f*s; t->posY = circle2Y;
+        t->scaleX = 60.0f*s; t->scaleY = 55.0f*s;
+        auto* r = ci->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_number_circle.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 4);
+
+        GameObject* cn = factory.CreateGameObject("PauseLB_CircleNum_2");
+        auto* tn = cn->AddComponent<TransformComponent>();
+        tn->posX = -460.0f*s; tn->posY = circle2Y; tn->scaleX = 1; tn->scaleY = 1;
+        auto* rn = cn->AddComponent<RenderComponent>();
+        rn->SetColor(vec4(0,0,0,1)); rn->SetLayer(baseLayer + 5);
+        cn->AddComponent<TextComponent>(font.c_str(), static_cast<int>(28*s), "2", vec4(0,0,0,1), false);
+    }
+
+    // 3rd Circle 
+    { 
+        GameObject* ci = factory.CreateGameObject("PauseLB_Circle_3");
+        auto* t = ci->AddComponent<TransformComponent>();
+        t->posX = -460.0f*s; t->posY = circle3Y;
+        t->scaleX = 60.0f*s; t->scaleY = 55.0f*s;
+        auto* r = ci->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_number_circle.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 4);
+
+        GameObject* cn = factory.CreateGameObject("PauseLB_CircleNum_3");
+        auto* tn = cn->AddComponent<TransformComponent>();
+        tn->posX = -460.0f*s; tn->posY = circle3Y; tn->scaleX = 1; tn->scaleY = 1;
+        auto* rn = cn->AddComponent<RenderComponent>();
+        rn->SetColor(vec4(0,0,0,1)); rn->SetLayer(baseLayer + 5);
+        cn->AddComponent<TextComponent>(font.c_str(), static_cast<int>(28*s), "3", vec4(0,0,0,1), false);
+    }
+
+    // Back button
+    GameObject* backBtn = factory.CreateGameObject("PauseLB_Back");
+    {
+        auto* t = backBtn->AddComponent<TransformComponent>();
+        t->posX = 650.0f*s; t->posY = 244.8f*s;
+        t->scaleX = 200.0f*s; t->scaleY = 180.0f*s;
+        auto* r = backBtn->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 2);
+    }
+
+    // Watch Replay button
+    GameObject* replayBtn = factory.CreateGameObject("PauseLB_Replay");
+    {
+        auto* t = replayBtn->AddComponent<TransformComponent>();
+        t->posX = -220.0f*s; t->posY = -255.0f*s;
+        t->scaleX = 450.0f*s; t->scaleY = 90.0f*s;
+        auto* r = replayBtn->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtn.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 2);
+        replayBtn->AddComponent<TextComponent>(
+            font.c_str(), static_cast<int>(28*s), "Watch Replay", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    }
+
+    // VS Ghost button
+    GameObject* vsGhostBtn = factory.CreateGameObject("PauseLB_VsGhost");
+    {
+        auto* t = vsGhostBtn->AddComponent<TransformComponent>();
+        t->posX = 235.0f*s; t->posY = -255.0f*s;
+        t->scaleX = 450.0f*s; t->scaleY = 90.0f*s;
+        auto* r = vsGhostBtn->AddComponent<RenderComponent>();
+        r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/blankbtn.png"));
+        r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer + 2);
+        vsGhostBtn->AddComponent<TextComponent>(
+            font.c_str(), static_cast<int>(28*s), "Vs Ghost", vec4(0.1f, 0.05f, 0.0f, 1.0f), false);
+    }
+
+    hasCreatedLeaderboardUI = true;
+    SetLeaderboardVisible(false);
+}
+
+/**
+ * @brief Destroys all leaderboard overlay UI elements.
+ */
+void PauseMenuLogicSystem::DestroyLeaderboardUI()
+{
+    if (!hasCreatedLeaderboardUI)
+        return;
+
+    auto& factory = GameObjectFactory::Instance();
+    for (const std::string& name : {
+        "PauseLB_Board",
+        "PauseLB_LevelLabel",
+        "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3",
+        "PauseLB_Name_1", "PauseLB_Name_2", "PauseLB_Name_3",
+        "PauseLB_Time_1", "PauseLB_Time_2", "PauseLB_Time_3",
+        "PauseLB_Rating_1", "PauseLB_Rating_2", "PauseLB_Rating_3",
+        "PauseLB_Circle_1", "PauseLB_Circle_2", "PauseLB_Circle_3",
+        "PauseLB_CircleNum_1", "PauseLB_CircleNum_2", "PauseLB_CircleNum_3",
+        "PauseLB_Back", "PauseLB_Replay", "PauseLB_VsGhost"})
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj) factory.DestroyGameObject(obj->GetID());
+    }
+
+    hasCreatedLeaderboardUI = false;
+    m_lbData.clear();
+}
+
+/**
+ * @brief Shows or hides leaderboard overlay UI elements.
+ */
+void PauseMenuLogicSystem::SetLeaderboardVisible(bool show)
+{
+    auto& factory = GameObjectFactory::Instance();
+    for (const std::string& name : {
+        "PauseLB_Board",
+        "PauseLB_LevelLabel",
+        "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3",
+        "PauseLB_Name_1", "PauseLB_Name_2", "PauseLB_Name_3",
+        "PauseLB_Time_1", "PauseLB_Time_2", "PauseLB_Time_3",
+        "PauseLB_Circle_1", "PauseLB_Circle_2", "PauseLB_Circle_3",
+        "PauseLB_CircleNum_1", "PauseLB_CircleNum_2", "PauseLB_CircleNum_3",
+        "PauseLB_Back", "PauseLB_Replay", "PauseLB_VsGhost"})
+    {
+        GameObject* obj = factory.FindGameObject(name);
+        if (obj) obj->SetActive(show);
+    }
+    // Rating icons
+    if (!show)
+    {
+        for (const std::string& name : { "PauseLB_Rating_1", "PauseLB_Rating_2", "PauseLB_Rating_3" })
+        {
+            GameObject* obj = factory.FindGameObject(name);
+            if (obj) obj->SetActive(false);
+        }
     }
 }

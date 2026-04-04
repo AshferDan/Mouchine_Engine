@@ -98,6 +98,7 @@ int main()
                 pickupSystem = PickupSystem();
             }
             void OnSceneLoadReinit() override {
+                if (menuLogic)      menuLogic->Reset();
                 if (pauseMenuLogic) pauseMenuLogic->Initialize();
                 if (gameTimer)      gameTimer->Initialize();
                 if (winLoseLogic)   winLoseLogic->Initialize();

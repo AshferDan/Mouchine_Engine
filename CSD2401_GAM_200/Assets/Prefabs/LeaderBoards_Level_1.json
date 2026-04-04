@@ -1081,6 +1081,270 @@
                         ]
                     },
                     "children": []
+                },
+                {
+                    "name": "Circle_1st",
+                    "localID": 36,
+                    "parentID": 8,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -460.0,
+                            7.0
+                        ],
+                        "scale": [
+                            60.0,
+                            60.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Leaderboards_number_circle.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 4,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Circle_2nd",
+                    "localID": 37,
+                    "parentID": 8,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -460.0,
+                            -57.972808837890625
+                        ],
+                        "scale": [
+                            60.0,
+                            60.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Leaderboards_number_circle.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 4,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "Circle_3rd",
+                    "localID": 38,
+                    "parentID": 8,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -460.0,
+                            -120.13484191894531
+                        ],
+                        "scale": [
+                            60.0,
+                            60.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "../Assets/Leaderboards_number_circle.png",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 4,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "children": []
+                },
+                {
+                    "name": "CircleNum_1st",
+                    "localID": 39,
+                    "parentID": 8,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -460.0,
+                            7.0
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 28,
+                        "text": "1",
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "CircleNum_2nd",
+                    "localID": 40,
+                    "parentID": 8,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -460.0,
+                            -57.972808837890625
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 28,
+                        "text": "2",
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": false
+                    },
+                    "children": []
+                },
+                {
+                    "name": "CircleNum_3rd",
+                    "localID": 41,
+                    "parentID": 8,
+                    "active": true,
+                    "TransformComponent": {
+                        "enabled": true,
+                        "pos": [
+                            -460.0,
+                            -120.13484191894531
+                        ],
+                        "scale": [
+                            1.0,
+                            1.0
+                        ],
+                        "rotation": 0.0
+                    },
+                    "RenderComponent": {
+                        "enabled": true,
+                        "shapeType": "Square",
+                        "texturePath": "",
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "layer": 0,
+                        "screenSpace": false,
+                        "tileable": false,
+                        "tileCount": [
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "TextComponent": {
+                        "enabled": true,
+                        "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
+                        "fontSize": 28,
+                        "text": "3",
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "scale": 1.0,
+                        "screenSpace": false
+                    },
+                    "children": []
                 }
             ]
         }
