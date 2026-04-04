@@ -49,6 +49,7 @@ Technology is prohibited.
 #include "MediaPlayerLogic.h"
 #include "DoorAnimationLogic.h"
 #include "GameCallbacks.h"
+#include "SplashScreen.h"
 #include "Utils.h"
 
 /**
