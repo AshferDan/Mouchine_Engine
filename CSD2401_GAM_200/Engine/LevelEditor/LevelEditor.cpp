@@ -319,10 +319,12 @@ void LevelEditor::EnterPlayMode()
     editorMode = EditorMode::Play;
 
     // OnAwake already fired for every script when it was attached (on creation).
-    // EnterPlayMode only needs to fire OnStart — this is the "play clicked" moment.
+    // EnterPlayMode fires OnStart — reset the flag first so it re-fires on every
+    // play session, not just the first one (RestoreSceneState keeps GOs alive).
     if (CORE && CORE->GetScriptSystem())
     {
         auto* scriptSys = CORE->GetScriptSystem();
+        scriptSys->ResetAllStartedFlags();
         const auto& gameObjects = factory.GetAllGameObjects();
         for (const auto& go : gameObjects)
         {

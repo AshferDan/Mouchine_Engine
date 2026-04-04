@@ -405,7 +405,7 @@ void ImGuiSystem::Initialize()
     IMGUI_CHECKVERSION();   // Verify ImGui version
     ImGui::CreateContext(); // Create ImGui context
     // IO object (moved to EditorLayout_Load)
-    ImGui::GetIO().FontGlobalScale = 1.5f;                        // Jo's setting
+    //ImGui::GetIO().FontGlobalScale = 1.5f;                        // Jo's setting
     ImGui::StyleColorsDark();                                     // Set dark theme
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);                 // Initialize GLFW backend
     ImGui_ImplOpenGL3_Init("#version 450");                       // Initialize OpenGL backend
