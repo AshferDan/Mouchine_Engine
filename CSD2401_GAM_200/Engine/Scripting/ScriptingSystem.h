@@ -172,6 +172,13 @@ public:
      */
     void CallOnAwake(GameObject* gameObject);
     void CallOnStart(GameObject* gameObject);
+
+    /**
+     * @brief Resets the isStarted flag on every script instance so OnStart
+     *        fires again the next time EnterPlayMode calls CallOnStart.
+     *        Call this at the top of EnterPlayMode, before CallOnStart.
+     */
+    void ResetAllStartedFlags();
     
     /**
      * @brief Calls the OnUpdate method for all scripts attached to a GameObject.

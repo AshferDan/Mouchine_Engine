@@ -2184,6 +2184,15 @@ void ScriptSystem::CallOnAwake(GameObject *gameObject)
     }
 }
 
+void ScriptSystem::ResetAllStartedFlags()
+{
+    for (auto& [go, scripts] : gameObjectScripts)
+    {
+        for (auto& scriptInstance : scripts)
+            scriptInstance.isStarted = false;
+    }
+}
+
 void ScriptSystem::CallOnStart(GameObject *gameObject)
 {
     auto it = gameObjectScripts.find(gameObject);

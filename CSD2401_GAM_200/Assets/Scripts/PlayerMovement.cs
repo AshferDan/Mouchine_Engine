@@ -219,6 +219,7 @@ namespace CSharpScript
 
         public override void OnStart()
         {
+            
             // It's crucial that OwnerName is set by the C++ engine before OnStart is called.
             if (OwnerName == null)
             {
