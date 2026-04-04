@@ -9448,7 +9448,7 @@
         "pitch": 1.0,
         "category": "sfx"
       },
-           {
+      {
         "name": "SkipCutScene",
         "filepath": "../Assets/Audio/skip_cutscene.wav",
         "loop": false,
@@ -9774,7 +9774,7 @@
         "loop": false,
         "volume": 0.4000000059604645,
         "pitch": 1.0,
-        "category": "sfx"
+        "category": "timer"
       },
       {
         "name": "turnskid_sfx",
