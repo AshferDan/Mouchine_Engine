@@ -1501,6 +1501,12 @@ static float Internal_Ghost_GetBestRunTime()
     return API::Ghost::GetBestRunTime();
 }
 
+static bool Internal_Ghost_IsReplayMode()
+{
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    return ghost ? ghost->IsReplayMode() : false;
+}
+
 MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassName, GameObject* owner)
 {
     if (!coreAssembly || !coreImage)
@@ -1921,6 +1927,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Ghost::LoadRecording",     (void*)Internal_Ghost_LoadRecording);
     mono_add_internal_call("CSharpScript.Ghost::IsGhostAvailable",  (void*)Internal_Ghost_IsGhostAvailable);
     mono_add_internal_call("CSharpScript.Ghost::GetBestRunTime",    (void*)Internal_Ghost_GetBestRunTime);
+    mono_add_internal_call("CSharpScript.Ghost::IsReplayMode",      (void*)Internal_Ghost_IsReplayMode);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)

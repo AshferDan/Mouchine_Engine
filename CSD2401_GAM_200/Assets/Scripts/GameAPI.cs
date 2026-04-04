@@ -1685,6 +1685,9 @@ namespace CSharpScript
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern float GetBestRunTime();
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsReplayMode();
+
         /// <summary>Begin recording the named target's position and animation each tick.</summary>
         public static void BeginRecording(string targetName) => StartRecording(targetName);
 
@@ -1714,6 +1717,9 @@ namespace CSharpScript
 
         /// <summary>Best run time in seconds. Returns float.MaxValue if no run recorded yet.</summary>
         public static float BestTime() => GetBestRunTime();
+
+        /// <summary>True when the ghost replay is actively playing back.</summary>
+        public static bool InReplayMode() => IsReplayMode();
 
         /// <summary>
         /// Set the live player and ghost object names the system will use.

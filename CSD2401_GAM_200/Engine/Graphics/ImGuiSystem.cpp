@@ -2461,6 +2461,7 @@ void ImGuiSystem::RenderPropertyEditor()
     if (ImGui::Checkbox("Active", &isActive))
     {
         obj->SetActive(isActive);
+        
     }
 
     UndoTracker activeTracker(obj, editor, isEditingProperty, propertyBeforeJson);
