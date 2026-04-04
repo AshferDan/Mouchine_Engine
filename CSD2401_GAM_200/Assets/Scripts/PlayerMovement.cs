@@ -46,7 +46,8 @@ namespace CSharpScript
             Ziplining,
             Gliding,
             WallSliding,
-            WallJumping
+            WallJumping,
+            Dead
         };
 
         private PlayerState currState = PlayerState.Idle;
@@ -191,6 +192,7 @@ namespace CSharpScript
         private float _skidTimer = 0f;
         private float _calculatedSkidDecel;
         private float _hurtTimer = 0f;
+        private bool isPlayerDead = false;
 
         // camera
         vec2 cam_offset = new vec2();
@@ -226,6 +228,9 @@ namespace CSharpScript
                 return;
             }
             ResetVars();
+            Debug.Log("\n\n\n\n\n\nstart called\n\n\n\n\n\n");
+            currState = PlayerState.Idle;
+            isPlayerDead = false;
 
             if (GameObject.FindGameObjectByName(vfx) == "")
             {
@@ -392,6 +397,8 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero", "Hurt", "../Assets/spritesheet_R.png", 13, 10, 0, 0, 0, 2, 3.0f);
             Animation.RegisterAnimation("Hero", "Bonk", "../Assets/spritesheet_R.png", 13, 10, 2, 0, 2, 2, 4.0f);
             Animation.RegisterAnimation("Hero", "Zipline", "../Assets/spritesheet_R.png", 13, 10, 6, 0, 6, 1, 4.0f);
+            Animation.RegisterAnimation("Hero", "Death_Fall", "../Assets/spritesheet_R.png", 13, 10, 2, 4, 2, 6, 4.0f);
+            Animation.RegisterAnimation("Hero", "Death_Loop", "../Assets/spritesheet_R.png", 13, 10, 2, 8, 2, 9, 4.0f);
             landAnimationLength = 0.15f;         // can calculate roughly how long it shud be with fps * amnt of frames / 60fps. 4.0f * 2 / 60;
 
             //VFX
@@ -413,6 +420,8 @@ namespace CSharpScript
             Animation.RegisterAnimation("Hero_vfx", "Hurt", "../Assets/spritesheet_player_vfx.png",         15, 11, 3, 0, 3, 2, 3.0f);
             Animation.RegisterAnimation("Hero_vfx", "Bonk", "../Assets/spritesheet_player_vfx.png",         15, 11, 5, 0, 5, 2, 4.0f);
             Animation.RegisterAnimation("Hero_vfx", "Zipline", "../Assets/spritesheet_player_vfx.png",      15, 11, 7, 0, 7, 1, 4.0f);
+            Animation.RegisterAnimation("Hero_vfx", "Death_Fall", "../Assets/spritesheet_player_vfx.png",   15, 11, 5, 4, 5, 7, 4.0f);
+            Animation.RegisterAnimation("Hero_vfx", "Death_Loop", "../Assets/spritesheet_player_vfx.png",   15, 11, 5, 9, 5, 10, 4.0f);
 
             // Pickup VFX
             Animation.RegisterAnimation(pu_vfx, "Speed", "../Assets/spritesheet_player_vfx.png",            15, 11, 2, 4, 2, 10, 8.0f);
@@ -459,6 +468,7 @@ namespace CSharpScript
             if (Input.GetKeyPressed(Input.KeyCode.P))
             {
                 Animation.PlayAnimation(pu_vfx, "Clear");
+                isPlayerDead = true;
             }
 
             #region LOBSTER 3D SCISSORS SOUND
@@ -543,7 +553,13 @@ namespace CSharpScript
             HandleCameraTracking();
             OnFixedUpdate(fixeddt);
 
-            switch(currState)
+            // check if player is dead here
+            HandlePlayerHealth();
+            Debug.Log(currState.ToString());
+            Debug.Log(Animation.GetCurrentAnimationName(OwnerName));
+            Debug.Log("row: " + Animation.GetCurrentRow(OwnerName).ToString() + " | col: " + Animation.GetCurrentCol(OwnerName).ToString());
+
+            switch (currState)
             {
                 case PlayerState.Idle:
                     Animation.PlayAnimation(OwnerName, "Idle");
@@ -615,6 +631,9 @@ namespace CSharpScript
                 case PlayerState.Bonking:
                     Animation.PlayAnimation(OwnerName, "Bonk");
                     Animation.PlayAnimation(vfx, "Bonk");
+                    break;
+                case PlayerState.Dead:
+                    // Handled in HandlePlayerHealth() because of the 2 animation types
                     break;
             }
 
@@ -2032,6 +2051,34 @@ namespace CSharpScript
             }
         }
 
+        float deathFallTimer = 0.5f;
+        private void HandlePlayerHealth()
+        {
+            if (GameTimer.GetRemainingTime() < 0 && !isPlayerDead)
+            {
+                // player dead
+                isPlayerDead = true;
+                deathFallTimer = 0.5f;
+            }
+
+            if (isPlayerDead) 
+            {
+                currState = PlayerState.Dead;
+                deathFallTimer -= fixeddt;
+
+                if (deathFallTimer > 0)
+                {
+                    Animation.PlayAnimation(OwnerName, "Death_Fall", true);
+                    Animation.PlayAnimation(vfx, "Death_Fall", true);
+                }
+                else
+                {
+                    Animation.PlayAnimation(OwnerName, "Death_Loop", true);
+                    Animation.PlayAnimation(vfx, "Death_Loop", true);
+                }
+            }
+        }
+
         private void EnterState(PlayerState state)
         {
             Debug.Log(state.ToString());
@@ -2385,6 +2432,8 @@ namespace CSharpScript
             // Not use yet: _skidTargetDirection = 0;
             _skidTimer = 0;
             _calculatedSkidDecel = 0;
+
+            isPlayerDead = false;
         }
 
     }
