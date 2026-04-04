@@ -100,6 +100,19 @@ static MonoString* Internal_FindGameObjectByID(int id)
     return mono_string_new(mono_domain_get(), result.c_str());
 }
 
+static bool Internal_IsGameObjectActive(MonoString* name)
+{
+    char* objName = mono_string_to_utf8(name);
+    bool result = API::IsGameObjectActive(objName);
+    mono_free(objName);
+    return result;
+}
+
+static bool Internal_IsGameObjectActiveByID(int id)
+{
+    return API::IsGameObjectActiveByID(id);
+}
+
 // === Transform ===
 static void Internal_SetPosition(MonoString *objectName, float x, float y)
 {
@@ -1691,6 +1704,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
     mono_add_internal_call("CSharpScript.GameObject::CountAllGameObjects",  (void *)Internal_CountAllGameObjects);
+    mono_add_internal_call("CSharpScript.GameObject::IsActive",             (void *)Internal_IsGameObjectActive);
+    mono_add_internal_call("CSharpScript.GameObject::IsActiveByID",         (void *)Internal_IsGameObjectActiveByID);
     mono_add_internal_call("CSharpScript.GameObject::GetHighestLocalID",   (void *)Internal_GetHighestLocalID);
 
     // === GameTimer ===

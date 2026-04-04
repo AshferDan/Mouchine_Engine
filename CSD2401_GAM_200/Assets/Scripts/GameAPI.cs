@@ -238,6 +238,20 @@ namespace CSharpScript
         public static extern int CountAllGameObjects();
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int GetHighestLocalID();
+
+        /// <summary>
+        /// Returns true if the named GameObject exists and is currently active.
+        /// Returns false if the object is inactive or does not exist in the scene.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsActive(string name);
+
+        /// <summary>
+        /// Returns true if the GameObject with the given EntityID exists and is currently active.
+        /// Returns false if the object is inactive or does not exist in the scene.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsActiveByID(int id);
     }
 
     /// <summary>

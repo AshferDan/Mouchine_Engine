@@ -1580,6 +1580,16 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
     {
         return static_cast<int>(GameObjectFactory::Instance().GetHighestLocalID());
     }
+    bool IsGameObjectActive(const std::string& name)
+    {
+        GameObject* obj = GameObjectFactory::Instance().FindGameObject(name);
+        return obj ? obj->IsActive() : false;
+    }
+    bool IsGameObjectActiveByID(int id)
+    {
+        GameObject* obj = GameObjectFactory::Instance().GetGameObject(id);
+        return obj ? obj->IsActive() : false;
+    }
 #pragma endregion
 
 #pragma region GameTimer
