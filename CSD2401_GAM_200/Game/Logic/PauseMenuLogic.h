@@ -193,6 +193,7 @@ private:
     bool pendingLeaderboardClose = false;
     float leaderboardCloseTimer = 0.0f;
     int  m_lbLevel = 1;
+    int  m_lbSelectedRank = 0;
     std::vector<PauseLBEntry> m_lbData;
 
     /**
