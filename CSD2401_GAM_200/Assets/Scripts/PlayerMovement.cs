@@ -60,11 +60,15 @@ namespace CSharpScript
         // list contains (entityID, position, isAudioPlaying)
         class NPCData
         {
+            public string name;
             public uint ID;
             public vec2 pos;
+            public string soundName = "";
+            public float volume = 0.5f;
             public bool audioPlaying;
-            public NPCData(uint id, vec2 position, bool soundPlaying)
+            public NPCData(string goName, uint id, vec2 position, bool soundPlaying)
             {
+                name = goName;
                 ID = id;
                 pos = position;
                 audioPlaying = soundPlaying;
@@ -189,7 +193,7 @@ namespace CSharpScript
         private float _hurtTimer = 0f;
 
         // camera
-        vec2 cam_defaultOffset = new vec2();
+        vec2 cam_offset = new vec2();
 
         public static string vfx = "Hero_vfx";
         public static string pu_vfx = "Pickup_vfx";
@@ -201,9 +205,8 @@ namespace CSharpScript
 
         public override void OnAwake()
         {
-
             Debug.Log("\n\ntesting ON AWAKE\n\n");
-
+            Audio.AddSound("cb", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
         }
 
         public PlayerMovement()
@@ -245,7 +248,7 @@ namespace CSharpScript
                 CSharpScript.GameObject.CreateAnimatedImage(
                     pu_vfx,
                     0, 0,
-                    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
+                    Transform.GetScale(OwnerName).x * 1.5f, Transform.GetScale(OwnerName).y * 1.5f,
                     "../Assets/spritesheet_player_vfx.png",
                     15, 11,
                     14, 10, 14, 10,
@@ -257,11 +260,12 @@ namespace CSharpScript
                 );
             }
 
-            // replace with onawake when it works
-            // putting in here to keep scope clean
+            // 3D audio stuff
             {
                 NPCs.Clear();
                 int totalGOs = GameObject.CountAllGameObjects();
+
+                // lobter
                 for (int i = 1; i <= totalGOs; i++)                         // starts with 1 bc ids start from 1
                 {
                     string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
@@ -270,7 +274,12 @@ namespace CSharpScript
                     //Debug.Log("ID: " + i + " | Name: " + currGO);
                     if (currGO.Contains("NPC_Lobster"))
                     {
-                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("NPC_Lobster", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCs.Add(temp);
+                    }
+                    else if (currGO.Contains("EZ_Asset"))
+                    {
+                        NPCData temp = new NPCData("EZ_Asset", (uint)i, Transform.GetPosition(currGO), false);
                         NPCs.Add(temp);
                     }
                 }
@@ -303,14 +312,37 @@ namespace CSharpScript
             Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.8f, 1.5f, "sfx_loop");
             Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.15f, 1.1f, "sfx");
             Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
-            Audio.AddSound("hurt_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_bass_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.4f, 1.0f, "sfx");
 
             // load 3D spatial sound for NPCs (scissors snip for lobster)
             for (int i = 0; i < NPCs.Count(); i++)
             {
                 //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
-                string audioPath = "../Assets/Audio/hairscissors_snip" + ((i%3)+1).ToString() + ".wav";
-                Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
+                string audioPath = "";
+                string soundName = "";
+                float volume = 0.5f;
+
+                if (NPCs[i].name.Contains("NPC_Lobster"))
+                {
+                    audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
+                    soundName = "scissors_snip" + i.ToString();
+                    volume = 0.4f;
+                }
+                else if (NPCs[i].name.Contains("EZ_Asset"))
+                {
+                    audioPath = "../Assets/Audio/DoorGlow.wav";
+                    soundName = "door_glow";
+                    volume = 0.6f;
+                }
+
+                if (string.IsNullOrEmpty(audioPath) || string.IsNullOrEmpty(soundName))
+                {
+                    Debug.Log("3D AUDIO WARNING: No matching 3D audio for: " + NPCs[i].name);
+                    continue;
+                }
+
+                NPCs[i].soundName = soundName;
+                Audio.Load3DSound(soundName, audioPath, true, 500.0f, 3000.0f, soundName, volume, 1.0f);
             }
             Audio.Load3DSound("scissors_sniptest", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
 
@@ -329,6 +361,16 @@ namespace CSharpScript
             Audio.AddSound("land_sfx2", "../Assets/audio/Player/Land/Land2.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx3", "../Assets/audio/Player/Land/Land3.wav", false, 0.3f, 1.0f, "sfx");
             Audio.AddSound("land_sfx4", "../Assets/audio/Player/Land/Land4.wav", false, 0.3f, 1.0f, "sfx");
+            //hurt
+            Audio.AddSound("hurt_sfx1", "../Assets/audio/Player/Hurt/Hurt_01.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx2", "../Assets/audio/Player/Hurt/Hurt_02.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx3", "../Assets/audio/Player/Hurt/Hurt_03.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx4", "../Assets/audio/Player/Hurt/Hurt_04.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx5", "../Assets/audio/Player/Hurt/Hurt_05.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
+
 
             // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_R EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
             Animation.RegisterAnimation("Hero", "Idle", "../Assets/spritesheet_R.png", 13, 10, 7, 0, 7, 2, 4.0f);
@@ -375,6 +417,7 @@ namespace CSharpScript
             // Pickup VFX
             Animation.RegisterAnimation(pu_vfx, "Speed", "../Assets/spritesheet_player_vfx.png",            15, 11, 2, 4, 2, 10, 8.0f);
             Animation.RegisterAnimation(pu_vfx, "Time", "../Assets/spritesheet_player_vfx.png",             15, 11, 1, 4, 1, 9, 8.0f);
+            Animation.RegisterAnimation(pu_vfx, "Shell", "../Assets/Sprites/Sheets/shell_vfx_spritehseet.png",  1, 10, 0, 0, 0, 9, 8.0f);
             Animation.RegisterAnimation(pu_vfx, "Clear", "../Assets/spritesheet_player_vfx.png",            15, 11, 14, 10, 14, 10, 0f);
 
             _isFacingRight = true;
@@ -387,7 +430,7 @@ namespace CSharpScript
             Physics.SetFriction(OwnerName, 0f);
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
-            cam_defaultOffset = Camera.GetFollowOffset();
+            cam_offset = Camera.GetFollowOffset();
             Camera.SetZoom(0.5f);
 
             // starting anims
@@ -407,40 +450,15 @@ namespace CSharpScript
             }
             if (Input.GetKeyPressed(Input.KeyCode.Left))
             {
-                Camera.SetFollowOffset(cam_defaultOffset.x + 200, 0);
+                Camera.SetFollowOffset(cam_offset.x + 200, 0);
             }
             if (Input.GetKeyPressed(Input.KeyCode.Right))
             {
-                Camera.SetFollowOffset(cam_defaultOffset.x - 200, 0);
+                Camera.SetFollowOffset(cam_offset.x - 200, 0);
             }
             if (Input.GetKeyPressed(Input.KeyCode.P))
             {
                 Animation.PlayAnimation(pu_vfx, "Clear");
-
-                //clearing here bc in update
-                NPCs.Clear();
-                int totalGOs = GameObject.CountAllGameObjects();
-                for (int i = 1; i <= totalGOs; i++)
-                {
-                    string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
-                    if (string.IsNullOrEmpty(currGO)) continue;
-
-                    //Debug.Log("ID: " + i + " | Name: " + currGO);
-                    if (currGO.Contains("NPC_Lobster"))
-                    {
-                        NPCData temp = new NPCData((uint)i, Transform.GetPosition(currGO), false);
-                        NPCs.Add(temp);
-                    }
-                }
-
-                for (int i = 0; i < NPCs.Count(); i++)
-                {
-                    //Audio.Load3DSound("scissors_snip", "../Assets/Audio/hairscissors_snip1.wav", true, 500.0f, 3000.0f, "sfx", 0.4f, 1.0f);
-                    string audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
-                    Audio.Load3DSound("scissors_snip" + i.ToString(), audioPath, true, 500.0f, 3000.0f, "lobster_scissors" + i.ToString(), 0.4f, 1.0f);
-                }
-
-                Debug.Log("NPC Count: " + NPCs.Count().ToString());
             }
 
             #region LOBSTER 3D SCISSORS SOUND
@@ -460,20 +478,20 @@ namespace CSharpScript
                 {
                     if (!NPCs[i].audioPlaying)
                     {
-                        Audio.PlaySound("scissors_snip" + (i).ToString(), "lobster_scissors" + (i).ToString());
-                        Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
+                        Audio.PlaySound(NPCs[i].soundName, NPCs[i].soundName);
+                        //Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
                         NPCs[i].audioPlaying = true;
                     }
 
                     // update position, no spatial if above or below
                     float horizontalDist1 = Math.Abs(distX);
-                    if (horizontalDist1 < 150.0f)
+                    if (horizontalDist1 < 200.0f)
                     {
-                        Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), playerPos.x, NPCs[i].pos.y);
+                        Audio.Set3DSoundPosition(NPCs[i].soundName, playerPos.x, NPCs[i].pos.y);
                     }
                     else
                     {
-                        Audio.Set3DSoundPosition("lobster_scissors" + (i).ToString(), NPCs[i].pos.x, NPCs[i].pos.y);
+                        Audio.Set3DSoundPosition(NPCs[i].soundName, NPCs[i].pos.x, NPCs[i].pos.y);
                     }
                 }
                 else
@@ -522,6 +540,7 @@ namespace CSharpScript
             PlayFootsteps();
             // Handle Inputs
             HandleGeneralInput();
+            HandleCameraTracking();
             OnFixedUpdate(fixeddt);
 
             switch(currState)
@@ -631,65 +650,6 @@ namespace CSharpScript
             //Debug.Log(_isGrounded.ToString());
             //if (_isFacingRight) Debug.Log("right");
             //else Debug.Log("left");
-
-            if (_pauseResumeFreezeFrames > 0)
-            {
-                _pauseResumeFreezeFrames--;
-                Physics.SetVelocity(OwnerName, 0f, 0f);
-                return;
-            }
-
-            bool staleWallSlide = _isWallSliding &&
-            Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f &&
-            Math.Abs(InputManager.Movement.x) < 0.01f &&
-            !InputManager.JumpWasPressed &&
-            !InputManager.GroundPoundWasPressed &&
-            !InputManager.RollWasPressed &&
-            !InputManager.RunIsHeld;
-
-            // Ground pound falling actively holds Y = -GPFallSpeed.
-            // If gp_falling is true but Y velocity is near zero with no input = alt-tab froze it.
-            bool staleGroundPound = gp_falling &&
-                Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f &&
-                Math.Abs(InputManager.Movement.x) < 0.01f &&
-                !InputManager.JumpWasPressed &&
-                !InputManager.GroundPoundWasPressed &&
-                !InputManager.RollWasPressed &&
-                !InputManager.RunIsHeld;
-
-            bool velocityIsNearZero =
-                Math.Abs(Physics.GetVelocity(OwnerName).x) < 0.01f &&
-                Math.Abs(Physics.GetVelocity(OwnerName).y) < 0.01f;
-
-            bool staleAltTabState = staleGroundPound || staleWallSlide || (
-                velocityIsNearZero &&
-                Math.Abs(InputManager.Movement.x) < 0.01f &&
-                !InputManager.JumpWasPressed &&
-                !InputManager.GroundPoundWasPressed &&
-                !InputManager.RollWasPressed &&
-                !InputManager.RunIsHeld &&
-                (
-                    movespeed > 0.01f ||
-                    _isRolling ||
-                    _isGroundPounding ||
-                    gp_falling ||
-                    _isWallSliding ||
-                    _isWallKicking ||
-                    _isWallJumping ||
-                    _isGliding ||
-                    _isSkidding ||
-                    _isJumping ||
-                    (_isFalling && !_isGrounded) ||
-                    (_isFastFalling && !_isGrounded)
-                )
-            );
-
-            if (staleAltTabState)
-            {
-                ResetVarsForPauseResume();
-                return;
-            }
-
 
             // check if player is taking damage
             bool isHurting = IsBeingKnockedBack; // = (_playerHealth != null && _playerHealth.IsHurting);
@@ -1987,6 +1947,29 @@ namespace CSharpScript
 
         #endregion
 
+        #region Camera Effects
+
+        // WIP ITS WEIRD ASF BUT IDKIDKIDKIDKIDK
+        vec2 currOffset = new vec2(0, 0); 
+        void HandleCameraTracking()
+        {
+            vec2 vel = Physics.GetVelocity(OwnerName);
+
+            float leadStrength = 200f;  
+            float smoothSpeed = 100.0f; 
+
+            float targetX = vel.x * leadStrength;
+            float targetY = vel.y * leadStrength;
+            
+            currOffset.x = Utils.MathfMoveTowards(currOffset.x, targetX, smoothSpeed * fixeddt);
+            currOffset.y = Utils.MathfMoveTowards(currOffset.y, targetY, smoothSpeed * fixeddt);
+
+            Debug.Log("offet x: " + currOffset.x.ToString() + " | offset y: " + currOffset.y.ToString());
+
+            Camera.SetFollowOffset(-currOffset.x, -currOffset.y);
+        }
+        #endregion
+
         public override void OnDestroy()
         {
             Debug.Log("PlayerMovement Script Destroyed for object: " + OwnerName);
@@ -2124,7 +2107,10 @@ namespace CSharpScript
                     break;
                 case PlayerState.Hurting:
                     if (enableDebug) Debug.Log("CurrState: " + "Hurting");
-                    Audio.PlaySound("hurt_sfx", "sfx");
+                    Random rndHurt = new Random();
+                    int variationHurt = rndHurt.Next(1, 9);                     // 8 diff landing sounds
+                    Audio.PlaySound("hurt_bass_sfx", "sfx");
+                    Audio.PlaySound("hurt_sfx" + variationHurt.ToString(), "sfx");
                     Camera.CameraFlash(0.75f, 1, 0, 0, 0.4f, true, 1.0f);
                     break;
             }

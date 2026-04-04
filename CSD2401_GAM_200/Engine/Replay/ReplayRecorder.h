@@ -63,6 +63,6 @@ public:
 private:
     std::string    m_targetName;
     GhostRecording m_recording;
-    float          m_clock      = 0.0f;
+    double         m_clock      = 0.0;  // double avoids float precision loss after ~9h of recording
     bool           m_isRecording = false;
 };

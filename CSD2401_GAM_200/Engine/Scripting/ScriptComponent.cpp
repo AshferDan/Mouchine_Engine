@@ -148,7 +148,8 @@ void ScriptComponent::AddScript(const std::string& scriptName) {
 				     levelEditor->GetEditorMode() == EditorMode::Pause);
 				if (isInPlayMode)
 				{
-				    scriptSys->CallOnAwake(owner);
+				    // OnAwake already fired inside AttachScript (on creation).
+				    // Only OnStart remains - gated by isStarted so no double-fire.
 				    scriptSys->CallOnStart(owner);
 				}
 			}

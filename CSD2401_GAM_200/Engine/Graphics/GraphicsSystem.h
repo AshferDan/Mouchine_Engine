@@ -63,6 +63,20 @@ struct BatchVertex
  * @brief Represents a single group of GameObjects that can be drawn in one GL draw call.
  * Grouped by Texture ID, Shape Type (Square/Circle), and Layer.
  */
+/**
+ * @brief Represents a pending text draw call, collected during the object loop
+ *        so it can be layer-sorted and interleaved with sprite batches.
+ */
+struct TextRenderItem
+{
+	const std::map<char, Character>* characters;
+	std::string text;
+	float x, y, scale;
+	vec4 color;
+	bool screenSpace;
+	int layer;
+};
+
 struct RenderBatch
 {
 	GLuint textureID;				// The OpenGL texture ID bound for the entire batch.
@@ -211,6 +225,11 @@ public:
 	 */
 	void DrawBatches();
 
+	/**
+	 * @brief Draws a single RenderBatch (sets up shader state, uploads data, issues draw call).
+	 */
+	void DrawSingleBatch(RenderBatch& batch);
+
 	void SetEditorSelection(float x, float y, float sx, float sy) {
 		currentSelection = { x,y,sx,sy,true };
 	}
@@ -347,6 +366,7 @@ private:
 	EditorSelection currentSelection_ColliderOnly;
 
 	std::vector<RenderBatch> batches;		// Collection of all accumulated batches for the current frame.
+	std::vector<TextRenderItem> m_textItems; // Pending text draws, layer-sorted and merged with sprite batches.
 	GLuint batchVAO, batchVBO, batchEBO;	// OpenGL buffers for the batch rendering system.
 
 	// --- Text Rendering Buffers ---

@@ -183,6 +183,19 @@ public:
     int GetShellsCollected() const { return m_shellsCollected; }
 
     /**
+     * @brief Sets the rating achieved during the current run.
+     *        Call this before SaveCurrentRun / SaveBestRun.
+     * @param rating Rating percentage (0-100).
+     */
+    void SetRating(float rating) { m_rating = rating; }
+
+    /**
+     * @brief Gets the rating stored in the last loaded/saved recording.
+     * @return Rating percentage (0-100).
+     */
+    float GetRating() const { return m_rating; }
+
+    /**
      * @brief Checks if the ghost is actively playing back.
      * @return True while the ghost is playing.
      */
@@ -289,6 +302,7 @@ private:
     GhostRecording m_bestRecording;
     float          m_bestTime        = FLT_MAX;
     int            m_shellsCollected = 0;
+    float          m_rating          = 0.0f;
 
     // Game-supplied object names (set via Configure())
     std::string m_liveTarget;   ///< e.g. "Hero"

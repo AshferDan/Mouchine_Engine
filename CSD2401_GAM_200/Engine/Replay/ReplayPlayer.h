@@ -77,7 +77,7 @@ public:
      * @brief Returns the current playback clock time in seconds.
      * @return Current time in seconds.
      */
-    float GetClock() const { return m_clock; }
+    float GetClock() const { return static_cast<float>(m_clock); }
 
     /**
      * @brief Returns the total duration of the recording in seconds.
@@ -98,7 +98,7 @@ public:
 private:
     std::string           m_ghostName;
     const GhostRecording* m_recording  = nullptr;
-    float                 m_clock      = 0.0f;
+    double                m_clock      = 0.0;  // double avoids float precision loss over long sessions
     bool                  m_isPlaying  = false;
     bool                  m_isPaused   = false;
 };

@@ -246,21 +246,15 @@ void GraphicsSystem::Initialize()
             {
                 CORE->HandleWindowFocusChanged(false);
 
-                // Minimize the game window when ALT-TABbing away
-                if (!glfwGetWindowAttrib(win, GLFW_ICONIFIED))
-                {
-                    glfwIconifyWindow(win);
-                }
             }
             else
             {
-                // Restore when the user comes back
-                if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
-                {
-                    glfwRestoreWindow(win);
-                }
 
                 CORE->HandleWindowFocusChanged(true);
+
+                // call HandleWindowFocusChanged FIRST before restoring the window.
+                if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+                    glfwRestoreWindow(win);
             }
         });
 
@@ -565,6 +559,7 @@ void GraphicsSystem::Update(float)
 
     // Accumulate all geometry into batches
     batches.clear();
+    m_textItems.clear();
 
     auto *textObj = GameObjectFactory::Instance().FindGameObject("Text FPS");
     if (textObj)
@@ -817,11 +812,9 @@ void GraphicsSystem::Update(float)
             return !a.screenSpace; // World space (false) before screen space (true)
         }
         return a.layer < b.layer; });
-    // auto afterSort = std::chrono::high_resolution_clock::now();
 
-    // Draw all accumulated batches
-    DrawBatches();
-    // auto afterDraw = std::chrono::high_resolution_clock::now();
+    // Sprite batches and text items are drawn together in the merged loop below,
+    // after text items have been collected from the second object pass.
 
     // Draw Non-batched shapes (Lines, Points)
     for (auto &obj : gameObjects)
@@ -898,7 +891,7 @@ void GraphicsSystem::Update(float)
             }
         }
 
-        // Text rendering
+        // Text rendering — collect for layer-sorted merged draw with sprite batches
         if (auto* textComp = obj->GetComponent<TextComponent>())
         {
             if (textComp->IsEnabled())
@@ -907,10 +900,52 @@ void GraphicsSystem::Update(float)
                 {
                     float x, y;
                     transform->GetPosition(x, y);
-
-                    RenderText(textComp->GetCharacters(), textComp->GetText(), x, y,
-                        textComp->GetScale(), textComp->GetColor(), textComp->isScreenSpace());
+                    m_textItems.push_back({
+                        &textComp->GetCharacters(),
+                        textComp->GetText(),
+                        x, y,
+                        textComp->GetScale(),
+                        textComp->GetColor(),
+                        textComp->isScreenSpace(),
+                        textComp->GetLayer()
+                    });
                 }
+            }
+        }
+    }
+
+    // Merged draw: interleave sprite batches and text items in layer order.
+    // Text items were collected above; now both lists are fully populated.
+    {
+        std::sort(m_textItems.begin(), m_textItems.end(), [](const TextRenderItem& a, const TextRenderItem& b) {
+            if (a.screenSpace != b.screenSpace) return !a.screenSpace;
+            return a.layer < b.layer; });
+
+        size_t batchIdx = 0;
+        size_t textIdx  = 0;
+        while (batchIdx < batches.size() || textIdx < m_textItems.size())
+        {
+            bool drawBatch = false;
+            if (batchIdx < batches.size() && textIdx < m_textItems.size())
+            {
+                const auto& b = batches[batchIdx];
+                const auto& t = m_textItems[textIdx];
+                if (b.screenSpace != t.screenSpace)
+                    drawBatch = !b.screenSpace; // world space first
+                else
+                    drawBatch = (b.layer <= t.layer);
+            }
+            else
+            {
+                drawBatch = (batchIdx < batches.size());
+            }
+
+            if (drawBatch)
+                DrawSingleBatch(batches[batchIdx++]);
+            else
+            {
+                const auto& t = m_textItems[textIdx++];
+                RenderText(*t.characters, t.text, t.x, t.y, t.scale, t.color, t.screenSpace);
             }
         }
     }
@@ -1166,94 +1201,77 @@ void GraphicsSystem::DrawCircleOutline(float cx, float cy, float r, int segments
 }
 
 /**
- * \brief Draws all accumulated batches.
- * Iterates through the sorted list of RenderBatches, uploads their data to the
- * GPU buffers (VBO/EBO), sets uniforms, binds the texture, and issues a single draw call.
+ * \brief Draws all accumulated batches (legacy wrapper; prefer the merged draw loop in Update).
  */
 void GraphicsSystem::DrawBatches()
 {
-    if (batches.empty())
+    for (auto& batch : batches)
+        DrawSingleBatch(batch);
+}
+
+/**
+ * \brief Draws a single RenderBatch: sets up the batch shader, uploads data, issues one draw call.
+ *        Self-contained so it can be called from the merged sprite/text draw loop.
+ */
+void GraphicsSystem::DrawSingleBatch(RenderBatch& batch)
+{
+    if (batch.vertices.empty())
+        return;
+
+    if (batch.vertices.size() > MAX_BATCH_VERTICES)
     {
+        std::cerr << "ERROR: Batch exceeds vertex buffer size! "
+                  << batch.vertices.size() << " > " << MAX_BATCH_VERTICES << std::endl;
+        return;
+    }
+    if (batch.indices.size() > MAX_BATCH_INDICES)
+    {
+        std::cerr << "ERROR: Batch exceeds index buffer size! "
+                  << batch.indices.size() << " > " << MAX_BATCH_INDICES << std::endl;
         return;
     }
 
     shader->Use();
-    // Signal the shader to use the batch rendering pipeline (instance data)
     shader->SetUniform("uUseBatching", 1);
-
     glBindVertexArray(batchVAO);
 
-    for (auto &batch : batches)
+    glNamedBufferSubData(batchVBO, 0, batch.vertices.size() * sizeof(BatchVertex), batch.vertices.data());
+    glNamedBufferSubData(batchEBO, 0, batch.indices.size() * sizeof(GLuint), batch.indices.data());
+
+    mat4 projection = batch.screenSpace ? screenProjectionMatrix : vp;
+    shader->SetUniform("uMVP", projection);
+    shader->SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
+
+    if (batch.textureID > 0)
     {
-        if (batch.vertices.empty())
+        shader->SetUniform("uHasTexture", 1);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, batch.textureID);
+
+        GLint wrapMode = batch.tileable ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+
+        if (batch.tileable)
         {
-            continue;
-        }
-
-        // std::cout << "Batch size: " << batch.vertices.size() << ".\n\n";
-
-        // === ADD THIS SAFETY CHECK ===
-        // Ensure batch size doesn't exceed pre-allocated buffer size
-        if (batch.vertices.size() > MAX_BATCH_VERTICES)
-        {
-            std::cerr << "ERROR: Batch exceeds vertex buffer size! "
-                      << batch.vertices.size() << " > " << MAX_BATCH_VERTICES << std::endl;
-            continue;
-        }
-        if (batch.indices.size() > MAX_BATCH_INDICES)
-        {
-            std::cerr << "ERROR: Batch exceeds index buffer size! "
-                      << batch.indices.size() << " > " << MAX_BATCH_INDICES << std::endl;
-            continue;
-        }
-        // === END SAFETY CHECK ===
-
-        // Upload vertex data (sub-data for dynamic updates)
-        glNamedBufferSubData(batchVBO, 0, batch.vertices.size() * sizeof(BatchVertex), batch.vertices.data());
-
-        // Upload index data (sub-data for dynamic updates)
-        glNamedBufferSubData(batchEBO, 0, batch.indices.size() * sizeof(GLuint), batch.indices.data());
-
-        // Set Uniforms that apply to the whole batch
-        mat4 projection = batch.screenSpace ? screenProjectionMatrix : vp;
-        shader->SetUniform("uMVP", projection);
-        shader->SetUniform("uIsCircle", batch.isCircle ? 1 : 0);
-
-        // Bind Texture
-        if (batch.textureID > 0)
-        {
-            shader->SetUniform("uHasTexture", 1);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, batch.textureID);
-
-            GLint wrapMode = batch.tileable ? GL_REPEAT : GL_CLAMP_TO_EDGE;
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-
-            if (batch.tileable)
-            {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); // use nearest mip instead of linear blend between mips
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.0f); // clamp to mip 0 only
-            }
-            else
-            {
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.0f); // restore default
-            }
-
-            shader->SetUniform("uTexture", 0); // Set sampler to texture unit 0
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 0.0f);
         }
         else
         {
-            // Disable texturing if no texture is provided
-            shader->SetUniform("uHasTexture", 0);
-            glBindTexture(GL_TEXTURE_2D, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.0f);
         }
 
-        // Issue a single draw call for all elements in the batch
-        glDrawElements(GL_TRIANGLES, (GLsizei)batch.indices.size(), GL_UNSIGNED_INT, 0);
+        shader->SetUniform("uTexture", 0);
     }
-    // Restore shader state to non-batching mode
+    else
+    {
+        shader->SetUniform("uHasTexture", 0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    glDrawElements(GL_TRIANGLES, (GLsizei)batch.indices.size(), GL_UNSIGNED_INT, 0);
     shader->SetUniform("uUseBatching", 0);
 }
 

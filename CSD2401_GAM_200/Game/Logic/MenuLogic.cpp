@@ -165,18 +165,24 @@ void MenuLogicSystem::Update(float dt)
 
                     if (selectedLevelButtonName == "Level1Button" && !cutscene->HasPlayed(introPath))
                     {
-                        if (!cutscene->IsPlaying())
+                        if (selectedLevelButtonName == "Level1Button" && !cutscene->HasPlayed(introPath))
                         {
-                            cutscene->PlayVideo(introPath, "CutsceneAudio");
-                            currScreen = MenuScreens::LevelSelect;
-                            std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
-                        }
+                            if (!cutscene->IsPlaying())
+                            {
+                                cutscene->PlayVideo(introPath, "CutsceneAudio");
+                                currScreen = MenuScreens::LevelSelect;
+                                std::cout << "[MenuLogic] Playing cutscene, music remains faded out" << std::endl;
+                            }
+                        }                       
                     }
                     else
                     {
                         // No cutscene
                         CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                       
                     }
+                    m_levelSelectDataLoaded = false;
+                    ClearLevelSelection();
                 }
             }
 
@@ -188,6 +194,7 @@ void MenuLogicSystem::Update(float dt)
         return;
     }
 
+    // -------------------- UI SETACTIVE HANDLING -------------------- //
     if (currScreen == MenuScreens::Home)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
@@ -370,16 +377,83 @@ void MenuLogicSystem::Update(float dt)
             GameObjectFactory::Instance().FindGameObject("Screen_Settings")->SetActive(false);
         if (auto *levelSelectScreen = GameObjectFactory::Instance().FindGameObject("Screen_LevelSelect"))
         {
-            if (!levelSelectScreen->IsActive()) // only true on the first frame
-            {
-                justEnteredLevelSelect = true;
-            }
             levelSelectScreen->SetActive(true);
+
+            // Scan all 3 levels to populate best entries
+            if (!m_levelSelectDataLoaded) // Scan once
+            {
+                ScanLeaderboard(1);
+                ScanLeaderboard(2);
+                ScanLeaderboard(3);
+                m_levelSelectDataLoaded = true;  // Mark as loaded
+
+                std::cout << "[MenuLogic] Level stats loaded (one-time)" << std::endl;
+            }
+
+            // Array of best entries for each level
+            const LeaderboardEntry* levelEntries[] = {
+                &m_level1Best,
+                &m_level2Best,
+                &m_level3Best
+            };
+
+            const char* gameObjectPrefixes[] = { "Level_1", "Level_2", "Level_3" };
+
+            for (int i = 0; i < 3; ++i) {
+                const LeaderboardEntry& entry = *levelEntries[i];  
+
+                // Update shells
+                for (int idx = 1; idx <= 3; ++idx)
+                {
+                    std::string shellName = std::string(gameObjectPrefixes[i]) + "_Shell" + std::to_string(idx);
+
+                    if (auto* s = factory.FindGameObject(shellName))
+                    {
+                        if (auto* r = s->GetComponent<RenderComponent>())
+                        {
+                            bool isLight = entry.shells >= (4 - idx); 
+
+                            r->SetTextureID(GraphicsSystem::LoadTexture(
+                                isLight ? "../Assets/Sprites/Icons/shell_icon.png"
+                                : "../Assets/Sprites/Icons/shell_icon_dark.png"));
+                        }
+                    }
+                }
+
+                // Update rating score
+                std::string badgeName = std::string(gameObjectPrefixes[i]) + "_Score";
+                if (auto* badge = factory.FindGameObject(badgeName))
+                {
+                    if (auto* r = badge->GetComponent<RenderComponent>())
+                    {
+                        const char* texture = "../Assets/Sprites/Icons/Letterscore_dash.png";
+                        if (entry.rating >= 85.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
+                        else if (entry.rating >= 75.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
+                        else if (entry.rating >= 65.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
+                        else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
+                        r->SetTextureID(GraphicsSystem::LoadTexture(texture));
+                    }
+                }
+            }
+
+            // Level selection UI
+            if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+                s1->SetActive(selectedLevelButtonName == "Level1Button");
+            if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+                s2->SetActive(selectedLevelButtonName == "Level2Button");
+            if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+                s3->SetActive(selectedLevelButtonName == "Level3Button");
         }
         if (GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons"))
             GameObjectFactory::Instance().FindGameObject("Screen_TitleButtons")->SetActive(false);
         if (GameObjectFactory::Instance().FindGameObject("Screen_QuitButton"))
             GameObjectFactory::Instance().FindGameObject("Screen_QuitButton")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu"))
+            GameObjectFactory::Instance().FindGameObject("LeaderBoards_Menu")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_Extra"))
+            GameObjectFactory::Instance().FindGameObject("Screen_Extra")->SetActive(false);
+        if (GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
+            GameObjectFactory::Instance().FindGameObject("Screen_HTP")->SetActive(false);
     }
     else if (currScreen == MenuScreens::QUIT)
     {
@@ -473,18 +547,6 @@ void MenuLogicSystem::Update(float dt)
             currentSliderCategory = "";
             justEnteredSettings = false;
         }
-    }
-
-    if (currScreen == MenuScreens::LevelSelect && justEnteredLevelSelect)
-    {
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(false);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(false);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(false);
-
-        justEnteredLevelSelect = false;
     }
 
     std::string currentHover = FindHoveredButton(mouseX, mouseY);
@@ -893,78 +955,45 @@ void MenuLogicSystem::TriggerUISound(const std::string &buttonName)
     std::cout << "menu button clicking sound is triggered" << std::endl;
 }
 
-void MenuLogicSystem::RefreshLevelSelectButtons()
-{
-    SetButtonTexture("Level1Button",
-                     hoveredButtonName == "Level1Button",
-                     pressedButtonName == "Level1Button");
-
-    SetButtonTexture("Level2Button",
-                     hoveredButtonName == "Level2Button",
-                     pressedButtonName == "Level2Button");
-
-    SetButtonTexture("Level3Button",
-                     hoveredButtonName == "Level3Button",
-                     pressedButtonName == "Level3Button");
-
-    SetButtonTexture("LevelSelectedButton",
-                     hoveredButtonName == "LevelSelectedButton",
-                     pressedButtonName == "LevelSelectedButton");
-}
-
-void MenuLogicSystem::SelectLevel(const std::string &buttonName, const std::string &scenePath)
-{
-    selectedLevelButtonName = buttonName;
-    selectedLevelScenePath = scenePath;
-    RefreshLevelSelectButtons();
-}
-bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
+bool MenuLogicSystem::HandleLevelSelectClick(const std::string& buttonName)
 {
     if (currScreen != MenuScreens::LevelSelect)
         return false;
 
-    if (buttonName == "Level1Button")
-    {
-        TriggerUISound(buttonName);
-        SelectLevel("Level1Button", level1Path);
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(true);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(false);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(false);
-        return true;
-    }
+    static const std::pair<std::string, std::string> levelMap[] = {
+        { "Level1Button", level1Path },
+        { "Level2Button", level2Path },
+        { "Level3Button", level3Path },
+    };
 
-    if (buttonName == "Level2Button")
+    for (const auto& [btnName, scenePath] : levelMap)
     {
-        TriggerUISound(buttonName);
-        SelectLevel("Level2Button", level2Path);
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(false);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(true);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(false);
-        return true;
-    }
+        if (buttonName == btnName)
+        {
+            TriggerUISound(buttonName);
+            selectedLevelButtonName = btnName;    // remember the pick
+            selectedLevelScenePath = scenePath;
+            
+            // update highlight visuals
+            SetButtonTexture("Level1Button", hoveredButtonName == "Level1Button", false);
+            SetButtonTexture("Level2Button", hoveredButtonName == "Level2Button", false);
+            SetButtonTexture("Level3Button", hoveredButtonName == "Level3Button", false);
+            SetButtonTexture("LevelSelectedButton", hoveredButtonName == "LevelSelectedButton", pressedButtonName == "LevelSelectedButton");
 
-    if (buttonName == "Level3Button")
-    {
-        TriggerUISound(buttonName);
-        SelectLevel("Level3Button", level3Path);
-        if (auto *selectedLevel1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
-            selectedLevel1->SetActive(false);
-        if (auto *selectedLevel2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
-            selectedLevel2->SetActive(false);
-        if (auto *selectedLevel3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
-            selectedLevel3->SetActive(true);
-        return true;
+            // sync the button
+            if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+                s1->SetActive(selectedLevelButtonName == "Level1Button");
+            if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+                s2->SetActive(selectedLevelButtonName == "Level2Button");
+            if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+                s3->SetActive(selectedLevelButtonName == "Level3Button");
+
+            return true;
+        }
     }
 
     if (buttonName == "LevelSelectedButton")
     {
-        // Start only works after a level has been selected.
         if (selectedLevelButtonName.empty() || selectedLevelScenePath.empty())
         {
             SetButtonTexture("LevelSelectedButton", false, false);
@@ -981,6 +1010,7 @@ bool MenuLogicSystem::HandleLevelSelectClick(const std::string &buttonName)
     {
         TriggerUISound(buttonName);
         currScreen = MenuScreens::Home;
+        m_levelSelectDataLoaded = false;
         ClearLevelSelection();
         return true;
     }
@@ -1527,11 +1557,25 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
 
 void MenuLogicSystem::ClearLevelSelection()
 {
+    // Clean the saved pick
     selectedLevelButtonName.clear();
     selectedLevelScenePath.clear();
     hoveredButtonName.clear();
     pressedButtonName.clear();
-    RefreshLevelSelectButtons();
+
+    //Sync button textures
+    SetButtonTexture("Level1Button", hoveredButtonName == "Level1Button", pressedButtonName == "Level1Button");
+    SetButtonTexture("Level2Button", hoveredButtonName == "Level2Button", pressedButtonName == "Level2Button");
+    SetButtonTexture("Level3Button", hoveredButtonName == "Level3Button", pressedButtonName == "Level3Button");
+    SetButtonTexture("LevelSelectedButton", hoveredButtonName == "LevelSelectedButton", pressedButtonName == "LevelSelectedButton");
+
+    if (auto* s1 = GameObjectFactory::Instance().FindGameObject("Level_select_selected"))
+        s1->SetActive(false);
+    if (auto* s2 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(1)"))
+        s2->SetActive(false);
+    if (auto* s3 = GameObjectFactory::Instance().FindGameObject("Level_select_selected(2)"))
+        s3->SetActive(false);
+
 }
 
 void MenuLogicSystem::Reset()
@@ -1544,6 +1588,7 @@ void MenuLogicSystem::Reset()
     sfxSlider = SliderState();
     isDraggingSlider = false;
     currentSliderCategory = "";
+    m_levelSelectDataLoaded = false;
 }
 
 void MenuLogicSystem::ComputeSliderUVBounds(RenderComponent *renderComp, SliderState &sliderState)
@@ -1890,6 +1935,10 @@ void MenuLogicSystem::ScanLeaderboard(int level)
         return;
     }
 
+    // Track the best entry while scanning
+    float highestRating = 0.0f;
+    LeaderboardEntry bestEntry;
+
     for (const auto &entry : fs::directory_iterator(dir))
     {
         if (!entry.is_regular_file() || entry.path().extension() != ".json")
@@ -1906,14 +1955,27 @@ void MenuLogicSystem::ScanLeaderboard(int level)
                 nlohmann::json root;
                 f >> root;
                 bestTime = root.value("bestTime", FLT_MAX);
+                float rating = root.value("rating", 0.0f);      
+                int shells = root.value("shellsCollected", 0); 
+
+                // Add to leaderboard data
+                if (bestTime < FLT_MAX)
+                    m_leaderboardData.push_back({ stem, bestTime, rating, shells });
+
+                // Track the best entry (highest rating)
+                if (rating > highestRating)
+                {
+                    highestRating = rating;
+                    bestEntry = { stem, bestTime, rating, shells };  // Store entire entry
+                }
             }
             catch (...)
             {
             }
         }
 
-        if (bestTime < FLT_MAX)
-            m_leaderboardData.push_back({stem, bestTime});
+        //if (bestTime < FLT_MAX)
+        //    m_leaderboardData.push_back({stem, bestTime });
     }
 
     // Sort fastest first, keep top 3
@@ -1922,6 +1984,11 @@ void MenuLogicSystem::ScanLeaderboard(int level)
               { return a.time < b.time; });
     if (m_leaderboardData.size() > 3)
         m_leaderboardData.resize(3);
+
+    // Store best entry for this level
+    if (level == 1)      m_level1Best = bestEntry;
+    else if (level == 2) m_level2Best = bestEntry;
+    else if (level == 3) m_level3Best = bestEntry;
 
     std::cout << "[MenuLogic] Leaderboard Level " << level
               << ": " << m_leaderboardData.size() << " entries." << std::endl;
@@ -1962,11 +2029,14 @@ void MenuLogicSystem::PopulateLeaderboard()
 
     const char *nameSlots[] = {"Name_1st_Text", "Name_2nd_Text", "Name_3rd_Text"};
     const char *timeSlots[] = {"Time_1st_Text", "Time_2nd_Text", "Time_3rd_Text"};
+    const char* ratingSlots[] = {"Letterscore_1st", "Letterscore_2nd", "Letterscore_3rd"}; 
+
 
     for (int i = 0; i < 3; ++i)
     {
         auto *nameObj = factory.FindGameObject(nameSlots[i]);
         auto *timeObj = factory.FindGameObject(timeSlots[i]);
+        auto* ratingObj = factory.FindGameObject(ratingSlots[i]);
 
         if (i < static_cast<int>(m_leaderboardData.size()))
         {
@@ -1987,6 +2057,19 @@ void MenuLogicSystem::PopulateLeaderboard()
                     tc->SetText(buf);
                 }
             }
+
+            if (ratingObj)
+            {
+                if (auto* r = ratingObj->GetComponent<RenderComponent>())
+                {
+                    const char* texture = "../Assets/Sprites/Icons/Letterscore_dash.png";
+                    if (entry.rating >= 85.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
+                    else if (entry.rating >= 75.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
+                    else if (entry.rating >= 65.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
+                    else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
+                    r->SetTextureID(GraphicsSystem::LoadTexture(texture));
+                }
+            }
         }
         else
         {
@@ -1996,6 +2079,9 @@ void MenuLogicSystem::PopulateLeaderboard()
             if (timeObj)
                 if (auto *tc = timeObj->GetComponent<TextComponent>())
                     tc->SetText("--:--.--");
+            if (ratingObj)
+                if (auto* tc = ratingObj->GetComponent<TextComponent>())
+                    tc->SetText("--.--%");
         }
     }
 }

@@ -23,7 +23,7 @@ void ReplayPlayer::StartPlayback(const std::string& ghostObjectName, const Ghost
 {
     m_ghostName = ghostObjectName;
     m_recording = &recording;
-    m_clock     = 0.0f;
+    m_clock     = 0.0;
     m_isPlaying = !recording.empty();
 }
 
@@ -83,7 +83,8 @@ void ReplayPlayer::Update(float dt)
 
     // Binary search for the last keyframe with timestamp <= clock (keyframe A)
     // Lower bound gives first element > clock, so we step back one.
-    auto it = std::upper_bound(rec.begin(), rec.end(), m_clock,
+    float clockF = static_cast<float>(m_clock);
+    auto it = std::upper_bound(rec.begin(), rec.end(), clockF,
         [](float t, const GhostKeyframe& kf) { return t < kf.timestamp; });
 
     // Clamp A to valid range
@@ -106,7 +107,7 @@ void ReplayPlayer::Update(float dt)
     {
         const GhostKeyframe& B = *nextIt;
         float span = B.timestamp - A.timestamp;
-        float t    = (span > 0.0f) ? (m_clock - A.timestamp) / span : 0.0f;
+        float t    = (span > 0.0f) ? (clockF - A.timestamp) / span : 0.0f;
         t = (t < 0.0f) ? 0.0f : (t > 1.0f) ? 1.0f : t;
 
         posX = A.posX + (B.posX - A.posX) * t;

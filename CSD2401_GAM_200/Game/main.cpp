@@ -69,6 +69,7 @@ int main()
             WinLoseLogicSystem*      winLoseLogic   = nullptr;
             GameTimerSystem*         gameTimer      = nullptr;
             MediaPlayerLogicSystem*  mediaPlayer    = nullptr;
+            DoorAnimationLogicSystem* doorAnimLogic = nullptr;
             PickupSystem             pickupSystem;
 
             void FixedUpdatePlaying(float dt) override {
@@ -78,6 +79,7 @@ int main()
             void FixedUpdateAlways(float dt) override {
                 if (CORE->GetGhostSystem()->IsReplayMode()) return;
                 if (pauseMenuLogic) pauseMenuLogic->Update(dt);
+                if (doorAnimLogic)  doorAnimLogic->Update(dt);  // must run even when paused
                 if (winLoseLogic)   winLoseLogic->Update(dt);
             }
             void VariableUpdate(float dt) override {
@@ -87,7 +89,8 @@ int main()
                 GameManager::Instance().GameStateLoop(dt);
             }
             void OnEditorStop() override {
-                if (menuLogic) menuLogic->Reset();
+                if (menuLogic)    menuLogic->Reset();
+                if (winLoseLogic) winLoseLogic->Initialize(); // reset statics between play sessions
             }
             void OnLevelLoaded(const std::string& path) override {
                 if (pauseMenuLogic) pauseMenuLogic->SetCurrentScene(path);
@@ -99,6 +102,7 @@ int main()
                 if (gameTimer)      gameTimer->Initialize();
                 if (winLoseLogic)   winLoseLogic->Initialize();
                 if (mediaPlayer)    mediaPlayer->Initialize();
+                if (doorAnimLogic)  doorAnimLogic->Initialize();
                 pickupSystem = PickupSystem();
             }
             bool IsPauseMenuActive()  const override { return pauseMenuLogic && pauseMenuLogic->IsPauseMenuActive(); }
@@ -133,6 +137,11 @@ int main()
             float GetLevelTimerLength()           const override { return gameTimer ? gameTimer->GetLevelTimerLength()   : 60.0f; }
             void  SetLevelTimerLength(float length)    override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
             void  AddTime(float amount)                override { if (gameTimer) gameTimer->AddTime(amount); }
+
+            void SetAudioFadeDurations(float winIn, float loseIn, float replayOut, float quitOut, float nextOut, float buffer) override
+            {
+                if (winLoseLogic) winLoseLogic->SetAudioFadeDurations(winIn, loseIn, replayOut, quitOut, nextOut, buffer);
+            }
         };
 
         static GameApp gameApp;
@@ -141,12 +150,17 @@ int main()
         gameApp.winLoseLogic   = CORE->AddSystem<WinLoseLogicSystem>();
         gameApp.gameTimer      = CORE->AddSystem<GameTimerSystem>();
         gameApp.mediaPlayer    = CORE->AddSystem<MediaPlayerLogicSystem>();
+        gameApp.doorAnimLogic  = CORE->AddSystem<DoorAnimationLogicSystem>();
 
         gameApp.menuLogic->Initialize();
         gameApp.pauseMenuLogic->Initialize();
         gameApp.winLoseLogic->Initialize();
         gameApp.gameTimer->Initialize();
         gameApp.mediaPlayer->Initialize();
+        gameApp.doorAnimLogic->Initialize();
+
+        // Connect the door animation system so WinLoseLogic can trigger it
+        gameApp.winLoseLogic->SetDoorAnimSystem(gameApp.doorAnimLogic);
 
         CORE->SetGameCallbacks(&gameApp);
         // ─────────────────────────────────────────────────────────────────────

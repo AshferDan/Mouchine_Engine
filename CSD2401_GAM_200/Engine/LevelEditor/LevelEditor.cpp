@@ -29,6 +29,7 @@ Technology is prohibited.
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <unordered_set>
 namespace fs = std::filesystem;
 
 /**
@@ -317,17 +318,17 @@ void LevelEditor::EnterPlayMode()
 
     editorMode = EditorMode::Play;
 
-    // Fire OnAwake then OnStart on all existing scripts
+    // OnAwake already fired for every script when it was attached (on creation).
+    // EnterPlayMode only needs to fire OnStart — this is the "play clicked" moment.
     if (CORE && CORE->GetScriptSystem())
     {
         auto* scriptSys = CORE->GetScriptSystem();
         const auto& gameObjects = factory.GetAllGameObjects();
         for (const auto& go : gameObjects)
         {
-            scriptSys->CallOnAwake(go.get());
             scriptSys->CallOnStart(go.get());
         }
-        std::cout << "[LevelEditor] Called OnAwake + OnStart on all scripts.\n";
+        std::cout << "[LevelEditor] Called OnStart on all scripts (OnAwake fired on creation).\n";
     }
 
     // start bgm when play is click
@@ -568,8 +569,54 @@ void LevelEditor::RestoreSceneState()
             }
         }
 
+        // restore animation to its starting frame
+        if (savedData->hasAnimation)
+        {
+            if (auto* spritesheet = obj->GetComponent<Spritesheet>())
+            {
+                float fps = (savedData->fps > 0.0f) ? savedData->fps : 1.0f;
+                spritesheet->SetAnimation(savedData->startFrame, savedData->endFrame, fps);
+            }
+        }
+
         // restore active state
         obj->SetActive(savedData->isActive);
+    }
+
+    // Recreate objects that were destroyed during play (e.g. collected coins)
+    {
+        std::unordered_set<EntityID> existingIDs;
+        for (const auto& objPtr : this->factory.GetAllGameObjects())
+            existingIDs.insert(objPtr->GetID());
+
+        for (const auto& savedData : savedSceneState.gameObjects)
+        {
+            if (existingIDs.count(savedData.originalID))
+                continue; // still alive, already restored above
+
+            std::cout << "[LevelEditor] Recreating destroyed object: " << savedData.name
+                << " (ID: " << savedData.originalID << ")\n";
+
+            GameObject* recreated = DeserialiseGameObject(savedData);
+            if (!recreated)
+                continue;
+
+            // Re-attach scripts that were on this object
+            if (!savedData.scripts.empty())
+            {
+                auto* scriptComp = recreated->AddComponent<ScriptComponent>();
+                for (const auto& scriptName : savedData.scripts)
+                    scriptComp->AddScriptName(scriptName);
+                scriptComp->Initialize();
+            }
+
+            // Fire lifecycle hooks so the scripts initialise properly
+            if (CORE && CORE->GetScriptSystem())
+            {
+                CORE->GetScriptSystem()->CallOnAwake(recreated);
+                CORE->GetScriptSystem()->CallOnStart(recreated);
+            }
+        }
     }
 
     GameObject* hero = factory.FindGameObject("Hero");
@@ -949,6 +996,20 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
                     float timerLength = settings["LevelTimerLength"].get<float>();
                     gameCb->SetLevelTimerLength(timerLength);
                     std::cout << "[LoadLevel] Game settings loaded (Timer: " << timerLength << "s)" << std::endl;
+                }
+
+                // load audio fade durations
+                if (settings.contains("AudioFadeDurations"))
+                {
+                    const auto& fadeDurations = settings["AudioFadeDurations"];
+                    float winIn = fadeDurations.value("winFadeIn", 2.0f);
+                    float loseIn = fadeDurations.value("loseFadeIn", 2.0f);
+                    float replayOut = fadeDurations.value("replayFadeOut", 1.5f);
+                    float quitOut = fadeDurations.value("quitFadeOut", 2.0f);
+                    float nextOut = fadeDurations.value("nextFadeOut", 1.5f);
+                    float buffer = fadeDurations.value("fadeTimerBuffer", 0.2f);
+                    gameCb->SetAudioFadeDurations(winIn, loseIn, replayOut, quitOut, nextOut, buffer);
+                    std::cout << "[LoadLevel] Audio fade durations loaded (Win: " << winIn << "s, Lose: " << loseIn << "s)" << std::endl;
                 }
             }
         }
@@ -1343,6 +1404,15 @@ GameObjectData LevelEditor::SerialiseGameObject(GameObject *obj)
     else
     {
         data.hasAnimation = false;
+    }
+
+    // serialise scripts
+    if (auto* scriptComp = obj->GetComponent<ScriptComponent>())
+    {
+        for (const auto& [id, name] : scriptComp->GetScripts())
+        {
+            data.scripts.push_back(name);
+        }
     }
 
     return data;

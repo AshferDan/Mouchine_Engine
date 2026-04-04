@@ -65,7 +65,7 @@ namespace CSharpScript
         public float Speed_Duration = 5f;
 
         // Time pickup
-        public float Time_PickupAmount = 5f;
+        public float Time_PickupAmount = 10f;
 
         // Wall Bonk
         public float T3_BonkDuration = 0.65f;

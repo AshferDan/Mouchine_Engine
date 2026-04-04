@@ -47,6 +47,7 @@ Technology is prohibited.
 #include "WinLoseLogic.h"
 #include "GameTimerSystem.h"
 #include "MediaPlayerLogic.h"
+#include "DoorAnimationLogic.h"
 #include "GameCallbacks.h"
 #include "Utils.h"
 

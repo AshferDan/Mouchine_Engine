@@ -378,19 +378,6 @@ void PauseMenuLogicSystem::Update(float dt)
                 //std::cout << "[PauseMenu] Main Menu - fade complete, loading scene" << std::endl;
 
                 CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
-                // Destroy UI before scene change
-                //DestroyHowToPlayUI();
-                //DestroyGhostMenuUI();
-                //DestroyPauseSettingsUI();
-                //DestroyPauseMenuUI();
-
-                //// close menu first
-                //if (isPauseMenuActive)
-                //{
-                //    isPauseMenuActive = false;
-                //    CORE->SetGamePaused(false, false);
-                //}
-                // back to main menu
             }
             else if (hoveredButtonName == "PauseHowToPlayButton")
             {
@@ -538,6 +525,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(false);
             if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(false);
+            if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(false);
         }
         else
         {
@@ -552,6 +540,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton")) howToPlayBtn->SetActive(true);
             if (auto* ghostBtn = factory.FindGameObject("PauseGhostButton")) ghostBtn->SetActive(true);
             if (auto* board = factory.FindGameObject("PauseBoard")) board->SetActive(true);
+            if (auto* overlay = factory.FindGameObject("PauseOverlay")) overlay->SetActive(true);
         }
         wasGhostMenuOpenLastFrame = isGhostMenuOpen;
     }
@@ -652,6 +641,8 @@ void PauseMenuLogicSystem::Update(float dt)
                 mainMenuBtn->SetActive(false);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(false);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
+                mainMenuBtn->SetActive(false);
             if (auto* board = factory.FindGameObject("PauseBoard"))
                 board->SetActive(false);
         }
@@ -668,6 +659,8 @@ void PauseMenuLogicSystem::Update(float dt)
             if (auto* settingsBtn = factory.FindGameObject("PauseSettingsButton"))
                 settingsBtn->SetActive(true);
             if (auto* mainMenuBtn = factory.FindGameObject("PauseMainMenuButton"))
+                mainMenuBtn->SetActive(true);
+            if (auto* mainMenuBtn = factory.FindGameObject("PauseGhostButton"))
                 mainMenuBtn->SetActive(true);
             if (auto* howToPlayBtn = factory.FindGameObject("PauseHowToPlayButton"))
                 howToPlayBtn->SetActive(true);
@@ -2013,7 +2006,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
 
-    // Get audio manager for low pass filter
+    // Get audio manager for low pass filter and sound effects
     AudioManager* audioManager = CORE->GetAudioManager();
 
     // Reset pause settings and how to play state when closing pause menu
@@ -2035,6 +2028,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
         SetButtonTexture("PauseHowToPlayButton", ButtonState::Normal);
         SetButtonTexture("PauseGhostButton", ButtonState::Normal);
 
+        // Play unpause sound effect before removing low pass filter
+        if (audioManager)
+        {
+            audioManager->PlaySound("game_unpause");
+        }
+
         // remove low pass filter when pause menu closes
         if (audioManager)
         {
@@ -2045,6 +2044,12 @@ void PauseMenuLogicSystem::TogglePauseMenu()
     }
     else
     {
+        // Play pause sound effect before applying low pass filter
+        if (audioManager)
+        {
+            audioManager->PlaySound("game_pause");
+        }
+
         // apply low pass filter when pause menu opens
         if (audioManager)
         {
@@ -2359,16 +2364,16 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     howToPlayTransform->scaleX = 1920.0f * uiScale;
     howToPlayTransform->scaleY = 1080.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M5_Control_Panel.png"));
+    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 
     GameObject* backBtn = factory.CreateGameObject("HowToPlayBackButton");
     auto* backBtnTransform = backBtn->AddComponent<TransformComponent>();
-    backBtnTransform->posX = 625.0f * uiScale;
-    backBtnTransform->posY = -235.0f * uiScale;
-    backBtnTransform->scaleX = 200.0f * uiScale;
-    backBtnTransform->scaleY = 180.0f * uiScale;
+    backBtnTransform->posX = 670.0f * uiScale;
+    backBtnTransform->posY = 280.0f * uiScale;
+    backBtnTransform->scaleX = 180.0f * uiScale;
+    backBtnTransform->scaleY = 160.0f * uiScale;
     auto* backBtnRender = backBtn->AddComponent<RenderComponent>();
     backBtnRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Back_button.png"));
     backBtnRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -2427,6 +2432,12 @@ void PauseMenuLogicSystem::SetHowToPlayVisible(bool show)
         {
             obj->SetActive(show);
         }
+    }
+
+    // Reset back button to normal state when showing How to Play
+    if (show)
+    {
+        SetButtonTexture("HowToPlayBackButton", ButtonState::Normal);
     }
 }
 
@@ -2990,15 +3001,52 @@ void PauseMenuLogicSystem::SetGhostMenuVisible(bool show)
 }
 
 void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
-    if (msg.hasFocus) {
-        // If we just gained focus, ensure the pause menu is shown
+    bool isMenuScene = currentScenePath.empty() ||
+        currentScenePath.find("MainMenu") != std::string::npos;
 
+    // FOCUS LOST (Alt-Tab Out) --------------------------------------------------------
+    if (!msg.hasFocus) {
+        if (isMenuScene) {
+            // Main menu: game is paused by CoreEngine, but don't show pause menu UI
+            return;
+        }
+
+        // In-game: show pause menu when alt-tabbing out
         isPauseMenuActive = true;
 
-        // On the first Alt-Tab, hasCreatedPauseMenuUI is false.
-        if (!hasCreatedUI) {
+        if (!hasCreatedUI)
             CreatePauseMenuUI();
+
+        if (!isPauseSettingsOpen && !isGhostMenuOpen && !isHowToPlayOpen)
+        {
+            SetPauseMenuVisible(true);
         }
+
+        return;
+    }
+
+    // FOCUS REGAINED (Alt-Tab Back In) --------------------------------------------------
+    if (isMenuScene)
+    {
+        // Menu scene: game was paused by focus-lost, silently unpause with no menu shown
+        CORE->SetGamePaused(false, false);
+        return;
+    }
+
+    // In-game: Only close How to Play and return to pause menu root if it's open
+    // Otherwise keep whatever pause menu screen is currently showing
+    if (isHowToPlayOpen)
+    {
+        isHowToPlayOpen = false;
+        wasHowToPlayOpenLastFrame = false;
+        howToPlayOpenedViaTab = false;
+        SetHowToPlayVisible(false);
+
+        // Show the pause menu root
+        isPauseMenuActive = true;
+
+        if (!hasCreatedUI)
+            CreatePauseMenuUI();
 
         SetPauseMenuVisible(true);
     }
