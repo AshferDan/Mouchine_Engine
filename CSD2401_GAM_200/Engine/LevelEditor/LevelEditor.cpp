@@ -907,6 +907,17 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
 
         if (audio)
         {
+            if (audio->isPlaying("skip_audio_channel")) {
+                std::cout << "[LoadLevel] Skip Cutscene audio is playing, waiting for it to finish..." << std::endl;
+                int timeout = 100; 
+                while (audio->isPlaying("skip_audio_channel") && timeout > 0) 
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    timeout--;
+                }
+                std::cout << "[LoadLevel] Skip audio finished" << std::endl;
+            }
+
             std::cout << "[LoadLevel] Stopping all sounds...\n";
             audio->stopAllSound();
             audio->updateAudio(); // ensure FMOD flushes

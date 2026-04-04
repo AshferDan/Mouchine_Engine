@@ -76,7 +76,7 @@ public:
 	/**
 	 * @brief Stops current playback and closes video file handles.
 	 */
-	void StopCutscene();
+	void StopCutscene(bool wasSkipped = false);
 
 	/** @return True if a video is currently being decoded and displayed. */
 	bool IsPlaying() const { return m_isPlaying; }
