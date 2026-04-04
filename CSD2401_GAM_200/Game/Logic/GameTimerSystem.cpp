@@ -33,6 +33,7 @@ void GameTimerSystem::Initialize()
     lastDisplayedSeconds = static_cast<int>(LevelTimerLength);
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
+    hasTriggeredLowPass = false;
 
     // Reset bar scaling variables
     originalScaleX = 0.0f;
@@ -159,6 +160,12 @@ void GameTimerSystem::Update(float dt)
             hasTriggeredTimeUp = false;
             hasTriggeredPanicSound = false;
 
+            if (hasTriggeredLowPass)
+            {
+                hasTriggeredLowPass = false;
+                CORE->GetAudioManager()->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});
+            }
+
             auto* renderComp = timerGO->GetComponent<RenderComponent>();
             auto* transformComp = timerGO->GetComponent<TransformComponent>();
 
@@ -205,6 +212,15 @@ void GameTimerSystem::Update(float dt)
             hasTriggeredPanicSound = true;
             CORE->GetAudioManager()->PlaySound("timer_ending");
             std::cout << "Triggered panic timer (10 seconds left)\n";
+        }
+
+        // Engage low-pass filter on all sounds except clock/urgency sounds
+        if (remainingTime <= lowPassThreshold && !hasTriggeredLowPass)
+        {
+            hasTriggeredLowPass = true;
+            CORE->GetAudioManager()->SetLowPassFilterExcluding(
+                true, 800.0f, 1.0f, { "timer_ending" });
+            std::cout << "[GameTimerSystem] Low-pass filter engaged (" << lowPassThreshold << "s left)\n";
         }
 
         // check for lose condition aka time ran out

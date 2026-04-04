@@ -116,6 +116,8 @@ private:
     std::string timerObjectName = "LevelTimerBar";
     bool        hasTriggeredTimeUp = false;         // prevent multiple scene loads
     bool        hasTriggeredPanicSound = false;
+    bool        hasTriggeredLowPass = false;
+    float       lowPassThreshold = 20.0f;          // seconds before time-up to engage low-pass filter
 
     // Bar scaling variables
     float       originalScaleX = 0.0f;              // original bar width
