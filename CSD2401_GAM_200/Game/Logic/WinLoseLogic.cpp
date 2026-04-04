@@ -254,7 +254,7 @@ void WinLoseLogicSystem::Update(float dt)
                 // CTRL+3: Skip to next level
                 std::string nextScene;
                 if (currentScenePath.find("Level_1") != std::string::npos)
-                    nextScene = "../Assets/Scenes/Level_2_V2.json";
+                    nextScene = "../Assets/Scenes/Level_2.json";
                 else
                     std::cout << "[Cheat] No next level to skip to.\n";
 
@@ -293,22 +293,22 @@ void WinLoseLogicSystem::Update(float dt)
         // update all win screen elements to follow camera
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"WinScreen",       vec2(0.0f, 0.0f)},
-            {"WinTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
-            {"WinLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
-            {"WinLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"WinClockIcon",    vec2((550.0f - 180.0f) * uiScale,  180.0f * uiScale)},
-            {"WinTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   180.0f * uiScale)},
-            {"WinTimeText",     vec2((550.0f + 130.0f) * uiScale,  180.0f * uiScale)},
-            {"WinCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  70.0f * uiScale)},
-            {"WinCoinText",     vec2((550.0f - 100.0f) * uiScale,  70.0f * uiScale)},
-            {"WinShellIcon",    vec2((550.0f + 60.0f) * uiScale,  70.0f * uiScale)},
-            {"WinShellText",    vec2((550.0f + 155.0f) * uiScale,  70.0f * uiScale)},
-            {"WinSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
-            {"WinSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
-            {"WinRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
-            {"WinRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
-            {"TextInput_Field",  vec2(550.0f * uiScale, -220.0f * uiScale)},
-            {"QuitButton",      vec2(550.0f * uiScale, -370.0f * uiScale)}
+            {"WinTitleBracket", vec2(600.0f * uiScale,  350.0f * uiScale)},
+            {"WinLevelNumber",  vec2(600.0f * uiScale,  380.0f * uiScale)},
+            {"WinLevelName",    vec2(600.0f * uiScale,  310.0f * uiScale)},
+            {"WinClockIcon",    vec2((600.0f - 180.0f) * uiScale,  180.0f * uiScale)},
+            {"WinTimeLabel",    vec2((600.0f - 70.0f) * uiScale,   180.0f * uiScale)},
+            {"WinTimeText",     vec2((600.0f + 130.0f) * uiScale,  180.0f * uiScale)},
+            {"WinCoinIcon",     vec2((600.0f - 180.0f) * uiScale,  70.0f * uiScale)},
+            {"WinCoinText",     vec2((600.0f - 100.0f) * uiScale,  70.0f * uiScale)},
+            {"WinShellIcon",    vec2((600.0f + 60.0f) * uiScale,  70.0f * uiScale)},
+            {"WinShellText",    vec2((600.0f + 155.0f) * uiScale,  70.0f * uiScale)},
+            {"WinSeparator1",   vec2(600.0f * uiScale,  120.0f * uiScale)},
+            {"WinSeparator2",   vec2(600.0f * uiScale,   10.0f * uiScale)},
+            {"WinRatingLabel",  vec2((600.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
+            {"WinRatingBadge",  vec2((600.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
+            {"TextInput_Field",  vec2(600.0f * uiScale, -220.0f * uiScale)},
+            {"QuitButton",      vec2(600.0f * uiScale, -370.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -337,12 +337,12 @@ void WinLoseLogicSystem::Update(float dt)
 
         std::vector<std::pair<std::string, vec2>> uiElements2 = {
             {"WinScreen2",         vec2(0.0f, 0.0f)},
-            {"Win2TitleBracket",   vec2(550.0f * uiScale,  350.0f * uiScale)},
-            {"Win2LevelNumber",    vec2(550.0f * uiScale,  380.0f * uiScale)},
-            {"Win2LevelName",      vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"WinContinueButton",  vec2(550.0f * uiScale,  120.0f * uiScale)},
-            {"WinReplayButton",    vec2(550.0f * uiScale,  -50.0f * uiScale)},
-            {"WinQuitButton",      vec2(550.0f * uiScale, -230.0f * uiScale)}
+            {"Win2TitleBracket",   vec2(600.0f * uiScale,  350.0f * uiScale)},
+            {"Win2LevelNumber",    vec2(600.0f * uiScale,  380.0f * uiScale)},
+            {"Win2LevelName",      vec2(600.0f * uiScale,  310.0f * uiScale)},
+            {"WinContinueButton",  vec2(600.0f * uiScale,  120.0f * uiScale)},
+            {"WinReplayButton",    vec2(600.0f * uiScale,  -50.0f * uiScale)},
+            {"WinQuitButton",      vec2(600.0f * uiScale, -230.0f * uiScale)}
         };
 
         for (const auto& element : uiElements2)
@@ -388,25 +388,25 @@ void WinLoseLogicSystem::Update(float dt)
 
         std::vector<std::pair<std::string, vec2>> uiElements = {
             {"LoseScreen",       vec2(0.0f, 0.0f)},
-            {"LoseTitleBracket", vec2(550.0f * uiScale,  350.0f * uiScale)},
-            {"LoseLevelNumber",  vec2(550.0f * uiScale,  380.0f * uiScale)},
-            {"LoseLevelName",    vec2(550.0f * uiScale,  310.0f * uiScale)},
-            {"LoseClockIcon",    vec2((550.0f - 180.0f) * uiScale,  180.0f * uiScale)},
-            {"LoseTimeLabel",    vec2((550.0f - 70.0f) * uiScale,   180.0f * uiScale)},
-            {"LoseTimeText",     vec2((550.0f + 130.0f) * uiScale,  180.0f * uiScale)},
-            {"LoseCoinIcon",     vec2((550.0f - 180.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseCoinText",     vec2((550.0f - 100.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseShellIcon",    vec2((550.0f + 60.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseShellText",    vec2((550.0f + 155.0f) * uiScale,  70.0f * uiScale)},
-            {"LoseSeparator1",   vec2(550.0f * uiScale,  120.0f * uiScale)},
-            {"LoseSeparator2",   vec2(550.0f * uiScale,   10.0f * uiScale)},
-            {"LoseRatingLabel",  vec2((550.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
-            {"LoseRatingBadge",  vec2((550.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
-            {"LoseSignHereCross",vec2(550.0f * uiScale, -140.0f * uiScale)},
-            {"LoseSignHere",     vec2(550.0f * uiScale, -160.0f * uiScale)},
-            {"LoseSignLabel",    vec2(550.0f * uiScale, -220.0f * uiScale)},
-            {"LoseRetryButton",   vec2(550.0f * uiScale, -300.0f * uiScale)},
-            {"LoseQuitButton",    vec2(550.0f * uiScale, -410.0f * uiScale)}
+            {"LoseTitleBracket", vec2(600.0f * uiScale,  350.0f * uiScale)},
+            {"LoseLevelNumber",  vec2(600.0f * uiScale,  380.0f * uiScale)},
+            {"LoseLevelName",    vec2(600.0f * uiScale,  310.0f * uiScale)},
+            {"LoseClockIcon",    vec2((600.0f - 180.0f) * uiScale,  180.0f * uiScale)},
+            {"LoseTimeLabel",    vec2((600.0f - 70.0f) * uiScale,   180.0f * uiScale)},
+            {"LoseTimeText",     vec2((600.0f + 130.0f) * uiScale,  180.0f * uiScale)},
+            {"LoseCoinIcon",     vec2((600.0f - 180.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseCoinText",     vec2((600.0f - 100.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseShellIcon",    vec2((600.0f + 60.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseShellText",    vec2((600.0f + 155.0f) * uiScale,  70.0f * uiScale)},
+            {"LoseSeparator1",   vec2(600.0f * uiScale,  120.0f * uiScale)},
+            {"LoseSeparator2",   vec2(600.0f * uiScale,   10.0f * uiScale)},
+            {"LoseRatingLabel",  vec2((600.0f - 80.0f) * uiScale,   -50.0f * uiScale)},
+            {"LoseRatingBadge",  vec2((600.0f + 100.0f) * uiScale,  -50.0f * uiScale)},
+            {"LoseSignHereCross",vec2(600.0f * uiScale, -140.0f * uiScale)},
+            {"LoseSignHere",     vec2(600.0f * uiScale, -160.0f * uiScale)},
+            {"LoseSignLabel",    vec2(600.0f * uiScale, -220.0f * uiScale)},
+            {"LoseRetryButton",   vec2(600.0f * uiScale, -300.0f * uiScale)},
+            {"LoseQuitButton",    vec2(600.0f * uiScale, -410.0f * uiScale)}
         };
 
         for (const auto& element : uiElements)
@@ -710,15 +710,15 @@ void WinLoseLogicSystem::CreateWinScreen()
     GetLevelInfo(statLevelNum, statLevelName);
 
     // Right panel X anchor (right third of screen)
-    float panelX = 550.0f * uiScale;
+    float panelX = 600.0f * uiScale;
 
     // win screen background
     GameObject* board = factory.CreateGameObject("WinScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 1920.0f * uiScale;
-    boardTransform->scaleY = 1080.0f * uiScale;
+    boardTransform->scaleX = 2080.0f * uiScale;
+    boardTransform->scaleY = 1170.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1152,7 +1152,7 @@ void WinLoseLogicSystem::CreateWinScreen2()
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
     float uiScale = 2.0f;
-    float panelX = 550.0f * uiScale;
+    float panelX = 600.0f * uiScale;
 
     std::string statLevelNum, statLevelName;
     GetLevelInfo(statLevelNum, statLevelName);
@@ -1162,8 +1162,8 @@ void WinLoseLogicSystem::CreateWinScreen2()
     auto* board2Transform = board2->AddComponent<TransformComponent>();
     board2Transform->posX = camPos.x;
     board2Transform->posY = camPos.y;
-    board2Transform->scaleX = 1920.0f * uiScale;
-    board2Transform->scaleY = 1080.0f * uiScale;
+    board2Transform->scaleX = 2080.0f * uiScale;
+    board2Transform->scaleY = 1170.0f * uiScale;
     auto* board2Render = board2->AddComponent<RenderComponent>();
     board2Render->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     board2Render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1329,7 +1329,7 @@ void WinLoseLogicSystem::HandleWinScreen2Buttons()
 
             std::string nextScene;
             if (currentScenePath.find("Level_1") != std::string::npos)
-                nextScene = "../Assets/Scenes/Level_2_V2.json";
+                nextScene = "../Assets/Scenes/Level_2.json";
             //else if (currentScenePath.find("Level_2_V2") != std::string::npos)
             //    nextScene = "../Assets/Scenes/Level_3.json";
             else
@@ -1535,15 +1535,15 @@ void WinLoseLogicSystem::TriggerLose()
     std::string statLevelNum, statLevelName;
     GetLevelInfo(statLevelNum, statLevelName);
 
-    float panelX = 550.0f * uiScale;
+    float panelX = 600.0f * uiScale;
 
     // lose screen background
     GameObject* board = factory.CreateGameObject("LoseScreen");
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 1920.0f * uiScale;
-    boardTransform->scaleY = 1080.0f * uiScale;
+    boardTransform->scaleX = 2080.0f * uiScale;
+    boardTransform->scaleY = 1170.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_over_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
