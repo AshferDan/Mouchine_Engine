@@ -25,7 +25,11 @@ Technology is prohibited.
 */
 GameObject *GameObjectFactory::CreateGameObject(const std::string &name)
 {
-    EntityID id = nextEntityID++;
+    EntityID id = GetSmallestAvailableID();
+    if (id >= nextEntityID) {
+        id = nextEntityID++;
+    }
+
     auto gameObject = std::make_unique<GameObject>(id, name);
     GameObject *ptr = gameObject.get();
 

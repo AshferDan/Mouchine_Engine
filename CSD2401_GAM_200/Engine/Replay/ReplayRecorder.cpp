@@ -21,7 +21,7 @@ void ReplayRecorder::StartRecording(const std::string& targetName)
 {
     m_targetName  = targetName;
     m_isRecording = true;
-    m_clock       = 0.0f;
+    m_clock       = 0.0;
     m_recording.clear();
 }
 
@@ -33,7 +33,7 @@ void ReplayRecorder::StopRecording()
 void ReplayRecorder::Reset()
 {
     m_isRecording = false;
-    m_clock       = 0.0f;
+    m_clock       = 0.0;
     m_recording.clear();
 }
 
@@ -49,7 +49,7 @@ void ReplayRecorder::Update(float dt)
         return;
 
     GhostKeyframe frame;
-    frame.timestamp = m_clock;
+    frame.timestamp = static_cast<float>(m_clock);
 
     // --- Transform ---
     auto* transform = target->GetComponent<TransformComponent>();
@@ -88,5 +88,8 @@ void ReplayRecorder::Update(float dt)
         }
     }
 
-    m_recording.push_back(frame);
+    // Cap to ~15 minutes at 60 fps to prevent unbounded memory growth
+    static constexpr std::size_t k_maxFrames = 54000;
+    if (m_recording.size() < k_maxFrames)
+        m_recording.push_back(frame);
 }

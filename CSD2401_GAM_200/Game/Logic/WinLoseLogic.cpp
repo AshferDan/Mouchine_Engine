@@ -266,11 +266,16 @@ void WinLoseLogicSystem::Update(float dt)
 
     if (isWaitingForWin)
     {
-        winDelayTimer -= dt;
-        if (winDelayTimer <= 0.0f)
+        // Only count down when a real delay is set (>= 0).
+        // -1.0f means the door animation is in control — no countdown needed.
+        if (winDelayTimer >= 0.0f)
         {
-            TriggerWin();
-            isWaitingForWin = false;
+            winDelayTimer -= dt;
+            if (winDelayTimer <= 0.0f)
+            {
+                TriggerWin();
+                isWaitingForWin = false;
+            }
         }
         return;
     }
@@ -583,7 +588,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         isWaitingForWin = true;
                         if (m_doorAnim)
                         {
-                            winDelayTimer = 1000000.0f;
+                            winDelayTimer = -1.0f; // door anim controls timing; no countdown needed
                             m_doorAnim->StartAnimation(
                                 [this]() { TriggerWin(); CreateWinScreen(); },
                                 [this]() { isWaitingForWin = false; },
@@ -602,7 +607,7 @@ void WinLoseLogicSystem::CheckWinZoneCollision()
                         isWaitingForWin = true;
                         if (m_doorAnim)
                         {
-                            winDelayTimer = 1000000.0f;
+                            winDelayTimer = -1.0f; // door anim controls timing; no countdown needed
                             m_doorAnim->StartAnimation(
                                 [this]() { TriggerWin(); CreateWinScreen(); },
                                 [this]() { isWaitingForWin = false; },
@@ -676,7 +681,7 @@ void WinLoseLogicSystem::TriggerWin()
 
     if (m_doorAnim && !m_doorAnim->IsAnimating())
     {
-        winDelayTimer = 1000000.0f;
+        winDelayTimer = -1.0f; // door anim controls timing; no countdown needed
         m_doorAnim->StartAnimation(
             [this]() { CreateWinScreen(); },  // doors closed — create screen behind them
             [this]() { isWaitingForWin = false; },
@@ -740,8 +745,23 @@ void WinLoseLogicSystem::CreateWinScreen()
     std::string statTime = FormatElapsedTime(m_elapsedTime);
     std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
     std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
-    std::string statLevelNum = "Level 1";
-    std::string statLevelName = "Barbershop";
+    std::string statLevelNum;
+    std::string statLevelName;
+    if (currentScenePath.find("Level_1") != std::string::npos)
+    {
+        statLevelNum  = "Level 1";
+        statLevelName = "Ocean View";
+    }
+    else if (currentScenePath.find("Level_2") != std::string::npos)
+    {
+        statLevelNum  = "Level 2";
+        statLevelName = "Barbershop";
+    }
+    else
+    {
+        statLevelNum  = "Level 3";
+        statLevelName = "???";
+    }
 
     // Right panel X anchor (right third of screen)
     float panelX = 550.0f * uiScale;
@@ -1264,8 +1284,23 @@ void WinLoseLogicSystem::TriggerLose()
     std::string statTime = FormatElapsedTime(m_elapsedTime);
     std::string statCoins = std::to_string(CORE->GetGameCallbacks()->GetCurrentCoins() * 10);
     std::string statShells = std::to_string(CORE->GetGameCallbacks()->GetCurrentShells()) + "/3";
-    std::string statLevelNum = "Level 1"; // TODO: replace with real level number
-    std::string statLevelName = "Barbershop"; // TODO: replace with real level name
+    std::string statLevelNum;
+    std::string statLevelName;
+    if (currentScenePath.find("Level_1") != std::string::npos)
+    {
+        statLevelNum  = "Level 1";
+        statLevelName = "Ocean View";
+    }
+    else if (currentScenePath.find("Level_2") != std::string::npos)
+    {
+        statLevelNum  = "Level 2";
+        statLevelName = "Barbershop";
+    }
+    else
+    {
+        statLevelNum  = "Level 3";
+        statLevelName = "???";
+    }
 
     float panelX = 550.0f * uiScale;
 
@@ -1616,7 +1651,7 @@ float WinLoseLogicSystem::CalculateRating() const
 {
     //(10000 / elapsedTime) * 1000 + (pickups * 500)
     // HARD CODED FOR NOW
-    int scorepercentage = 60 - static_cast<int>(m_elapsedTime / 60);
+    int scorepercentage = std::max(0, 60 - static_cast<int>(m_elapsedTime / 60));
     float currScore = (scorepercentage * 100.f) + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
     float totalScore = 100.f + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
     std::cout << "CalculateRating(): " << (currScore / totalScore) * 100 << '\n';

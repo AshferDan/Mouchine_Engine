@@ -89,7 +89,8 @@ int main()
                 GameManager::Instance().GameStateLoop(dt);
             }
             void OnEditorStop() override {
-                if (menuLogic) menuLogic->Reset();
+                if (menuLogic)    menuLogic->Reset();
+                if (winLoseLogic) winLoseLogic->Initialize(); // reset statics between play sessions
             }
             void OnLevelLoaded(const std::string& path) override {
                 if (pauseMenuLogic) pauseMenuLogic->SetCurrentScene(path);
