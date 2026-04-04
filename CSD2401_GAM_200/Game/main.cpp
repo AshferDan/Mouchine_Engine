@@ -137,6 +137,11 @@ int main()
             float GetLevelTimerLength()           const override { return gameTimer ? gameTimer->GetLevelTimerLength()   : 60.0f; }
             void  SetLevelTimerLength(float length)    override { if (gameTimer) gameTimer->SetLevelTimerLength(length); }
             void  AddTime(float amount)                override { if (gameTimer) gameTimer->AddTime(amount); }
+
+            void SetAudioFadeDurations(float winIn, float loseIn, float replayOut, float quitOut, float nextOut, float buffer) override
+            {
+                if (winLoseLogic) winLoseLogic->SetAudioFadeDurations(winIn, loseIn, replayOut, quitOut, nextOut, buffer);
+            }
         };
 
         static GameApp gameApp;

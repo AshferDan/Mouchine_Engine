@@ -84,4 +84,7 @@ public:
     virtual float GetLevelTimerLength()       const { return 60.0f; }
     virtual void  SetLevelTimerLength(float)        {}
     virtual void  AddTime(float)                    {}
+
+    // ── Audio fade durations (loaded from scene metadata) ────────────────────
+    virtual void SetAudioFadeDurations(float winIn, float loseIn, float replayOut, float quitOut, float nextOut, float buffer) {}
 };
