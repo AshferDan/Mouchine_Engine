@@ -34,6 +34,7 @@ void GameTimerSystem::Initialize()
     hasTriggeredTimeUp = false;
     hasTriggeredPanicSound = false;
     hasTriggeredLowPass = false;
+    lowPassRampTimer = 0.0f;
     loseDelayTimer = -1.0f;
 
     // Reset bar scaling variables
@@ -164,6 +165,7 @@ void GameTimerSystem::Update(float dt)
             if (hasTriggeredLowPass)
             {
                 hasTriggeredLowPass = false;
+    lowPassRampTimer = 0.0f;
                 CORE->GetAudioManager()->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});
             }
 
@@ -215,13 +217,21 @@ void GameTimerSystem::Update(float dt)
             std::cout << "Triggered panic timer (10 seconds left)\n";
         }
 
-        // Engage low-pass filter on all sounds except clock/urgency sounds
-        if (remainingTime <= lowPassThreshold && !hasTriggeredLowPass)
+        // Gradually ramp in the low-pass filter over lowPassRampDuration seconds
+        if (remainingTime <= lowPassThreshold)
         {
-            hasTriggeredLowPass = true;
-            CORE->GetAudioManager()->SetLowPassFilterExcluding(
-                true, 800.0f, 1.0f, { "timer_ending" });
-            std::cout << "[GameTimerSystem] Low-pass filter engaged (" << lowPassThreshold << "s left)\n";
+            if (!hasTriggeredLowPass)
+            {
+                hasTriggeredLowPass = true;
+                lowPassRampTimer = 0.0f;
+                std::cout << "[GameTimerSystem] Low-pass filter ramping in (" << lowPassThreshold << "s left)\n";
+            }
+
+            lowPassRampTimer += dt;
+            float t = std::min(lowPassRampTimer / lowPassRampDuration, 1.0f);
+            // Interpolate cutoff from 22000 Hz (open) down to 800 Hz (fully filtered)
+            float cutoff = 22000.0f + t * (800.0f - 22000.0f);
+            CORE->GetAudioManager()->SetLowPassFilterExcluding(true, cutoff, 1.0f, { "timer_ending" });
         }
 
         // check for lose condition aka time ran out
