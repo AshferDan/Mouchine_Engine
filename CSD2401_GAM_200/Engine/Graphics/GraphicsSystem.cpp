@@ -469,6 +469,9 @@ void GraphicsSystem::Update(float)
     // Always render scene into the FBO (needed for post-processing)
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     if (editorMode)
     {
         glViewport(0, 0, frameBufferWidth, frameBufferHeight);
@@ -876,45 +879,6 @@ void GraphicsSystem::Update(float)
             default:
                 break; // Batched shapes (Square/Circle) are already drawn
             }
-
-            // Draw debug outlines for ALL shapes
-            if (debugMode)
-            {
-                // std::cout << "went here" << std::endl;
-                auto *transform = obj->GetComponent<TransformComponent>();
-                if (transform)
-                {
-                    float x, y, sx, sy;
-                    transform->GetPosition(x, y);
-                    transform->GetScale(sx, sy);
-
-                    bool isScreenSpace = rend->isScreenSpace();
-                    mat4 debugVP = isScreenSpace ? screenProjectionMatrix : vp;
-
-                    if (hasCamBounds && !isScreenSpace)
-                    {
-                        float halfSX = sx * 0.5f;
-                        float halfSY = sy * 0.5f;
-
-                        if (x + halfSX < camLeft || x - halfSX > camRight || y + halfSY < camBottom || y - halfSY > camTop)
-                        {
-                            continue; // Skip objects outside camera bounds
-                        }
-                    }
-
-                    // Draw outlines based on the shape type
-                    if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
-                    {
-                        // For circles, the scale is interpreted as diameter, so radius is scale*0.5
-                        DrawCircleOutline(x, y, static_cast<float>(sx * 0.5), static_cast<int>(sy), {0, 1, 0, 1}, debugVP);
-                    }
-                    else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
-                    {
-                        // std::cout << "X: " << x << " Y: " << y << " SX: " << sx << " SY: " << sy << std::endl;
-                        DrawRectOutline(x, y, sx, sy, {0, 1, 0, 1}, debugVP);
-                    }
-                }
-            }
         }
 
         // Text rendering — collect for layer-sorted merged draw with sprite batches
@@ -1023,6 +987,54 @@ void GraphicsSystem::Update(float)
                 DrawCircleOutline(shape.p1.x, shape.p1.y, shape.radius, shape.segments, shape.color, vp);
                 break;
             }
+            }
+        }
+
+        // === Part 2: Draw Outlines for all Active GameObjects ===
+        for (auto& obj : gameObjects)
+        {
+            // 1. Basic safety and visibility checks
+            if (!obj->IsActive() || !LayerManager::IsLayerEnabled(obj->GetGameLayer()))
+            {
+                continue;
+            }
+
+            auto* rend = obj->GetComponent<RenderComponent>();
+            auto* transform = obj->GetComponent<TransformComponent>();
+
+            if (rend && rend->IsEnabled() && transform)
+            {
+                float x, y, sx, sy;
+                transform->GetPosition(x, y);
+                transform->GetScale(sx, sy);
+
+                bool isScreenSpace = rend->isScreenSpace();
+                mat4 debugVP = isScreenSpace ? screenProjectionMatrix : vp;
+
+                // 2. Camera Culling (Only draw outlines for things on screen to save performance)
+                if (hasCamBounds && !isScreenSpace)
+                {
+                    float halfSX = sx * 0.5f;
+                    float halfSY = sy * 0.5f;
+                    if (x + halfSX < camLeft || x - halfSX > camRight || y + halfSY < camBottom || y - halfSY > camTop)
+                    {
+                        continue;
+                    }
+                }
+
+                // 3. Draw the actual outline based on the object's shape
+                // Using a distinct color (Green) to differentiate from "System Shapes"
+                vec4 outlineColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+                if (rend->GetShapeType() == RenderComponent::ShapeType::Circle)
+                {
+                    // Note: Circle diameter is sx, so radius is sx * 0.5
+                    DrawCircleOutline(x, y, sx * 0.5f, static_cast<int>(sy), outlineColor, debugVP);
+                }
+                else if (rend->GetShapeType() == RenderComponent::ShapeType::Square)
+                {
+                    DrawRectOutline(x, y, sx, sy, outlineColor, debugVP);
+                }
             }
         }
     }
