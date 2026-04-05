@@ -705,14 +705,13 @@ void WinLoseLogicSystem::TriggerWin()
     if (coinIcon) coinIcon->SetActive(false);
     if (coinText) coinText->SetActive(false);
 
-    // Stop BGM; victory music starts after doors open
+    // Fade out BGM; victory music starts after doors open
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->StopSound("bgm_channel");
-        audioManager->SetCategoryVolume("music", 0.0f);
-        //audioManager->PlaySound("victory");
-        //audioManager->FadeInCategory("music", m_fadeWinIn);
+        audioManager->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});  // remove timer low-pass filter
+        audioManager->FadeOutAll(1.5f);
+        audioManager->FadeOutSound("timer_ending", 0.5f);
     }
     m_winBGMDelayTimer = 2.0f;
 
@@ -1574,8 +1573,8 @@ void WinLoseLogicSystem::TriggerLose()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->StopSound("bgm_channel");
-        audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
+        audioManager->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});  // remove timer low-pass filter
+        audioManager->FadeOutAll(1.0f);
         audioManager->PlaySound("gameover");
         audioManager->FadeInCategory("music", m_fadeLoseIn);
         audioManager->PauseSound("timer_ending_channel", false); // let timer_ending finish (bomb sound)

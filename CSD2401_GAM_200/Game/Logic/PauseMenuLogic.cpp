@@ -3332,6 +3332,13 @@ void PauseMenuLogicSystem::HandleMessage(const WindowFocusMessage& msg) {
             SetPauseMenuVisible(true);
         }
 
+        // Apply low pass filter just like ESC pause
+        AudioManager* audioManager = CORE ? CORE->GetAudioManager() : nullptr;
+        if (audioManager)
+        {
+            audioManager->SetLowPassFilter("bgm", true, 800.0f, 1.0f);
+        }
+
         return;
     }
 

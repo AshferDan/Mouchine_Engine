@@ -106,10 +106,7 @@ namespace CSharpScript
                 {
                     // shell effect
                     Pickups.CollectShell();
-                    //Audio.StopSound("shell_glow");
-                    //Audio.FadeOutCategory("shell_glow", 2);                   // waiting for xy to add fade by sound
-                    //Debug.Log("\n\n\n\n\n\n\n\n\n");
-                    Audio.FadeOutSound("shell_glow", 1);
+                    Audio.FadeOutSound("shell_glow", 3);
                     Audio.PlaySound("PU_Shell_sfx", "pu_sfx");
                     triggeredShellPU = true;
                     Transform.SetScale(PlayerMovement.pu_vfx, cachedPlayerSize.x * 2.0f, cachedPlayerSize.y * 2.0f);

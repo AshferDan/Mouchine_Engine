@@ -400,6 +400,7 @@ private:
 	bool firstTimeLoad = true;
 
     bool m_isWindowUnfocused = false;
+    bool m_pausedBeforeAltTab = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.
