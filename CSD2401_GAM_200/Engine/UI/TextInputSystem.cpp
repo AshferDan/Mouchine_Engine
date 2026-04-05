@@ -76,31 +76,6 @@ void TextInputSystem::Update(float dt)
     }
     m_backspaceWasHeld = backNow;
 
-    // --- Enter: confirm ---
-    bool enterNow = (glfwGetKey(win, GLFW_KEY_ENTER)    == GLFW_PRESS) ||
-                    (glfwGetKey(win, GLFW_KEY_KP_ENTER) == GLFW_PRESS);
-    if (enterNow && !m_enterWasHeld)
-    {
-        auto  cb     = m_onConfirm;
-        const std::string result = s_buffer;
-        Hide();
-        if (cb) cb(result);
-        return;
-    }
-    m_enterWasHeld = enterNow;
-
-    // --- Escape: cancel ---
-    bool escNow = (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS);
-    if (escNow && !m_escapeWasHeld)
-    {
-        m_consumedEscapeThisFrame = true;
-        auto cb = m_onCancel;
-        Hide();
-        if (cb) cb();
-        return;
-    }
-    m_escapeWasHeld = escNow;
-
     // --- Reposition UI and refresh the typed text each frame ---
     UpdateUI();
 }

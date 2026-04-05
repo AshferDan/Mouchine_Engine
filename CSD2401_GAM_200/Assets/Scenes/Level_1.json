@@ -2460,7 +2460,7 @@
                     "name": "Text FPS",
                     "localID": 59,
                     "parentID": 58,
-                    "active": false,
+                    "active": true,
                     "TransformComponent": {
                         "enabled": false,
                         "pos": [
@@ -2474,7 +2474,7 @@
                         "rotation": 0.0
                     },
                     "RenderComponent": {
-                        "enabled": false,
+                        "enabled": true,
                         "shapeType": "Square",
                         "texturePath": "",
                         "color": [
@@ -2484,7 +2484,7 @@
                             1.0
                         ],
                         "layer": 0,
-                        "screenSpace": false,
+                        "screenSpace": true,
                         "tileable": false,
                         "tileCount": [
                             1.0,
@@ -2492,7 +2492,7 @@
                         ]
                     },
                     "TextComponent": {
-                        "enabled": false,
+                        "enabled": true,
                         "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
                         "fontSize": 50,
                         "text": "FPS",
@@ -9363,7 +9363,11 @@
                         "OffsetXMid": 0.0,
                         "OffsetYMid": -100.0,
                         "OffsetXFront": 0.0,
-                        "OffsetYFront": 0.0
+                        "OffsetYFront": 0.0,
+                        "AutoScrollFarBack": 0.0,
+                        "AutoScrollBack": 0.0,
+                        "AutoScrollMid": 0.0,
+                        "AutoScrollFront": 0.0
                     },
                     "PickupManager": {
                         "Pickup_Coin_Name": "PU_Coin",
@@ -10023,12 +10027,12 @@
                     "TransformComponent": {
                         "enabled": false,
                         "pos": [
-                            52.92,
-                            13.7
+                            54.00,
+                            14.0
                         ],
                         "scale": [
-                            32.0,
-                            32.0
+                            50.0,
+                            50.0
                         ],
                         "rotation": 0.0
                     },
@@ -10069,12 +10073,12 @@
                     "TransformComponent": {
                         "enabled": false,
                         "pos": [
-                            49.32,
-                            13.7
+                            50.00,
+                            14.0
                         ],
                         "scale": [
-                            63.0,
-                            63.0
+                            100.0,
+                            100.0
                         ],
                         "rotation": 0.0
                     },
@@ -10161,12 +10165,12 @@
                     "TransformComponent": {
                         "enabled": false,
                         "pos": [
-                            46.09,
-                            13.7
+                            45.0,
+                            14.0
                         ],
                         "scale": [
-                            32.0,
-                            32.0
+                            50.0,
+                            50.0
                         ],
                         "rotation": 0.0
                     },

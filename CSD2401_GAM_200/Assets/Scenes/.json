@@ -473,7 +473,11 @@
             "OffsetXMid": 0.0,
             "OffsetYMid": 0.0,
             "OffsetXFront": 0.0,
-            "OffsetYFront": 0.0
+            "OffsetYFront": 0.0,
+            "AutoScrollFarBack": 0.0,
+            "AutoScrollBack": 0.0,
+            "AutoScrollMid": 0.0,
+            "AutoScrollFront": 0.0
           },
           "PickupManager": {
             "Pickup_Coin_Name": "",

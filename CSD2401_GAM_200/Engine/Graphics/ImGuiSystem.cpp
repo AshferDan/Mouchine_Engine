@@ -765,12 +765,24 @@ ImVec2 CursorToWorldPos(ImVec2 vpPos, ImVec2 vpSize)
     const float camZoom = CORE->GetLevelEditor()->GetCameraZoom();
     const vec2 camPos = { CORE->GetLevelEditor()->GetCameraX(), CORE->GetLevelEditor()->GetCameraY() };
 
+    // --- THE FIX: Factor in the GraphicsSystem 1080p resolution scale ---
+    // This calculates the hidden "zoom" that forces the 1920x1080 aspect ratio
+    float resScale = std::min(vpSize.x / 1920.0f, vpSize.y / 1080.0f);
+    if (resScale <= 0.0f) resScale = 1.0f; // Safety check
+
+    // [from top left] local cursor pos - viewports position - viewportsize/2 (so we can have 0,0 be centered)
+    float relX = cursorScreenPos.x - vpPos.x - (vpSize.x / 2.f);
+    float relY = (vpSize.y / 2.f) - (cursorScreenPos.y - vpPos.y);
+
     // Evil function that took me like an hour to figure out and prolly took even more years off my lifespan
     // but basically the gist is
     // [from top left] local cursor pos - viewports position - viewportsize/2 (so we can have 0,0 be centered) / camerazoom + camera position
     // camera zoom represents how zoomed in we are, so cursor needs to scale off that. Camera pos is alr in world space so just add it onto!
-    float worldx = (cursorScreenPos.x - vpPos.x - (vpSize.x / 2.f)) / camZoom + camPos.x;
-    float worldy = ((vpSize.y / 2.f) - (cursorScreenPos.y - vpPos.y)) / camZoom + camPos.y;
+
+    // Apply BOTH the resolution scale and the camera zoom to the relative mouse position!
+    float worldx = (relX / resScale) / camZoom + camPos.x;
+    float worldy = (relY / resScale) / camZoom + camPos.y;
+
     return ImVec2(worldx, worldy);
 }
 
