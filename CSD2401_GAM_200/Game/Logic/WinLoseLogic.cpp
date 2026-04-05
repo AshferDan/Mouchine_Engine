@@ -928,19 +928,19 @@ void WinLoseLogicSystem::CreateWinScreen()
     auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
 
     float score = CalculateRating();
-    if (score >= 85.0f)
+    if (score >= 70.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_S.png"));
     }
-    else if (score >= 75.0f)
+    else if (score >= 60.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_A.png"));
     }
-    else if (score >= 65.0f)
+    else if (score >= 50.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_B.png"));
     }
-    else if (score >= 50.0f)
+    else if (score >= 40.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_C.png"));
     }
