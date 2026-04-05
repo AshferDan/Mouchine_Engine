@@ -62,7 +62,7 @@ private:
 
     void BuildQuad(float halfW, float halfH);
     void BuildShader();
-    void DrawLogo(GLuint tex, float alpha, int imgW, int imgH);
+    void DrawLogo(GLuint tex, float alpha, int imgW, int imgH, int fbW, int fbH);
     void AdvanceState(float dt);
 
     int m_schoolW = 0, m_schoolH = 0;  // pixel dimensions of school logo

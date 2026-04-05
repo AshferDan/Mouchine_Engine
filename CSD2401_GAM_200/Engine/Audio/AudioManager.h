@@ -180,6 +180,13 @@ public:
     void PauseAllSounds(bool pause);
 
     /**
+     * @brief Pauses or resumes a specific channel.
+     * @param channelName Name of the channel.
+     * @param pause True to pause, false to resume.
+     */
+    void PauseSound(const std::string& channelName, bool pause);
+
+    /**
      * @brief Toggles muting on the FMOD master channel group.
      */
     void ToggleMute();
@@ -285,6 +292,21 @@ public:
      * @param targetVolume The target volume to fade to (default 1.0).
      */
     void FadeInCategory(const std::string& category, float duration, float targetVolume = 1.0f);
+
+    /**
+     * @brief Starts fading out a specific sound by name.
+     * @param soundName The name of the sound to fade out.
+     * @param duration The duration of the fade in seconds.
+     */
+    void FadeOutSound(const std::string& soundName, float duration);
+
+    /**
+     * @brief Starts fading in a specific sound by name.
+     * @param soundName The name of the sound to fade in.
+     * @param duration The duration of the fade in seconds.
+     * @param targetVolume The target volume to fade to (default 1.0).
+     */
+    void FadeInSound(const std::string& soundName, float duration, float targetVolume = 1.0f);
 
     /**
      * @brief Starts fading out all audio categories.
@@ -419,6 +441,7 @@ public:
 
 private:
     std::map<std::string, FadeState> categoryFadeStates;
+    std::map<std::string, FadeState> soundFadeStates;
 
     // Global low-pass filter state (used to auto-apply on PlaySound)
     bool                     m_globalLowPassActive    = false;

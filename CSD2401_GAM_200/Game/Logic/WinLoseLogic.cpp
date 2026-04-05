@@ -1570,6 +1570,7 @@ void WinLoseLogicSystem::TriggerLose()
         audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
         audioManager->PlaySound("gameover");
         audioManager->FadeInCategory("music", m_fadeLoseIn);
+        audioManager->PauseSound("timer_ending_channel", false); // let timer_ending finish (bomb sound)
     }
 
     // ---- Gather stats for the right-side panel ----

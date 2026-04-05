@@ -480,6 +480,17 @@ void AudioManager::PauseAllSounds(bool pause)
 }
 
 /**
+ * @brief Pauses or resumes a specific channel.
+ */
+void AudioManager::PauseSound(const std::string& channelName, bool pause)
+{
+    if (audioEngine)
+    {
+        audioEngine->pauseSound(channelName, pause);
+    }
+}
+
+/**
  * @brief Directly toggles FMOD master mute.
  */
 void AudioManager::ToggleMute()
@@ -627,9 +638,6 @@ void AudioManager::FadeOutCategory(const std::string& category, float duration)
         return;
     }
 
-    // Start from 1 volume
-    SetCategoryVolume(category, 1.0f);
-
     FadeState& fadeState = categoryFadeStates[category];
     fadeState.isFading = true;
     fadeState.isFadeIn = false;
@@ -677,6 +685,58 @@ void AudioManager::FadeInCategory(const std::string& category, float duration, f
     std::cout << "Starting fade in for category: " << category
               << " to volume " << targetVolume
               << " over " << duration << " seconds" << std::endl;
+}
+
+/**
+ * @brief Starts fading out a specific sound by name.
+ */
+void AudioManager::FadeOutSound(const std::string& soundName, float duration)
+{
+    auto it = soundDatabase.find(soundName);
+    if (it == soundDatabase.end())
+    {
+        std::cerr << "[AudioManager] FadeOutSound: sound not found: " << soundName << std::endl;
+        return;
+    }
+
+    std::string channelName = soundName + "_channel";
+    float currentVolume = it->second.volume;
+
+    auto categoryIt = categoryVolumes.find(it->second.category);
+    if (categoryIt != categoryVolumes.end())
+        currentVolume *= categoryIt->second;
+
+    FadeState& fadeState = soundFadeStates[soundName];
+    fadeState.isFading = true;
+    fadeState.isFadeIn = false;
+    fadeState.startVolume = currentVolume;
+    fadeState.targetVolume = 0.0f;
+    fadeState.currentTime = 0.0f;
+    fadeState.duration = duration;
+}
+
+/**
+ * @brief Starts fading in a specific sound by name.
+ */
+void AudioManager::FadeInSound(const std::string& soundName, float duration, float targetVolume)
+{
+    auto it = soundDatabase.find(soundName);
+    if (it == soundDatabase.end())
+    {
+        std::cerr << "[AudioManager] FadeInSound: sound not found: " << soundName << std::endl;
+        return;
+    }
+
+    std::string channelName = soundName + "_channel";
+    audioEngine->setVolume(channelName, 0.0f);
+
+    FadeState& fadeState = soundFadeStates[soundName];
+    fadeState.isFading = true;
+    fadeState.isFadeIn = true;
+    fadeState.startVolume = 0.0f;
+    fadeState.targetVolume = targetVolume;
+    fadeState.currentTime = 0.0f;
+    fadeState.duration = duration;
 }
 
 /**
@@ -731,6 +791,35 @@ void AudioManager::UpdateFade(float dt)
             SetCategoryVolume(category, newVolume);
             //std::cout << "[Fade] " << category << " volume: " << newVolume << " (" << (fadeState.isFadeIn ? "IN" : "OUT") << ")" << std::endl;
         }
+    }
+
+    // Per-sound fades
+    for (auto& pair : soundFadeStates)
+    {
+        const std::string& soundName = pair.first;
+        FadeState& fadeState = pair.second;
+
+        if (!fadeState.isFading)
+            continue;
+
+        fadeState.currentTime += dt;
+        float t = fadeState.currentTime / fadeState.duration;
+
+        float interpolatedValue;
+        if (t >= 1.0f)
+        {
+            interpolatedValue = 1.0f;
+            fadeState.isFading = false;
+        }
+        else
+        {
+            interpolatedValue = fadeState.isFadeIn ? t : t * t * t;
+        }
+
+        float newVolume = fadeState.startVolume + (fadeState.targetVolume - fadeState.startVolume) * interpolatedValue;
+        std::string channelName = soundName + "_channel";
+        if (audioEngine)
+            audioEngine->setVolume(channelName, newVolume);
     }
 }
 

@@ -516,11 +516,13 @@ void PauseMenuLogicSystem::Update(float dt)
         }
         else
         {
-            // no low pass filter when how to play closes
+            // restore low pass if returning to pause menu, otherwise remove it
             if (audioManager)
             {
-                audioManager->SetLowPassFilter("bgm", false);
-                //std::cout << "[PauseMenu] Low pass filter disabled for How To Play" << std::endl;
+                if (isPauseMenuActive)
+                    audioManager->SetLowPassFilter("bgm", true, 800.0f, 1.0f);
+                else
+                    audioManager->SetLowPassFilter("bgm", false);
             }
 
             // Hide how to play UI
