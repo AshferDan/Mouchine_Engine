@@ -23,6 +23,8 @@ Technology is prohibited.
 #include "transform.h"
 #include "PrefabManager.h"
 
+#include "BuildSizeAnalyzer.h"
+
 #include <imgui.h>
 #include <memory>
 #include <string>
@@ -371,7 +373,12 @@ public:
 private:
     // GUI rendering functions
     /**
-     * @brief Render the main menu bar (File menu with New/Save/Load)
+     * @brief Render the top main menu bar (File / Tools menus)
+     */
+    void RenderMainMenuBar();
+
+    /**
+     * @brief Render the Scene Manager floating panel
      */
     void RenderMenuBar();
 
@@ -471,4 +478,6 @@ private:
     std::string currentBGMChannel = "bgm_channel";
     float currentBGMVolume = 0.5f;
     static const int undoCapacity = 30;  // Maximum (action) history size
+
+    BuildSizeAnalyzer m_buildSizeAnalyzer;  ///< Build Size Analyzer tool window.
 };

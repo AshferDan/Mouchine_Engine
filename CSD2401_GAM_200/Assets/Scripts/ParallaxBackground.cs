@@ -77,6 +77,14 @@ namespace CSharpScript
         public float OffsetXMid     = 0f; public float OffsetYMid     = 0f;
         public float OffsetXFront   = 0f; public float OffsetYFront   = 0f;
 
+        // --- Per-layer autonomous scroll speed (world units per second).
+        //     Positive = scroll right, negative = scroll left.
+        //     Independent of camera movement — use for ambient motion (e.g. drifting clouds). ---
+        public float AutoScrollFarBack = 0f;
+        public float AutoScrollBack    = 0f;
+        public float AutoScrollMid     = 0f;
+        public float AutoScrollFront   = 0f;
+
         // Internal state
         private string[] _names;
         private string[] _namesL;
@@ -85,6 +93,8 @@ namespace CSharpScript
         private string[] _namesR2;   // optional second right copy (e.g. "Parallax_BG_R2")
         private float[]  _factorsX;
         private float[]  _factorsY;
+        private float[]  _autoScrolls;
+        private float[]  _autoScrollAccum = new float[LayerCount];  // accumulated auto-scroll X
         private vec2[]   _startWorldPos = new vec2[LayerCount];   // world pos of bg at init
         private vec2     _startCamPos;                            // camera pos at init
         private bool[]   _inited   = new bool[LayerCount];
@@ -98,6 +108,8 @@ namespace CSharpScript
             _names = new string[] { LayerFarBack, LayerBack, LayerMid, LayerFront };
             _factorsX = new float[] { FactorFarBack, FactorBack, FactorMid, FactorFront };
             _factorsY = new float[] { FactorYFarBack, FactorYBack, FactorYMid, FactorYFront };
+            _autoScrolls = new float[] { AutoScrollFarBack, AutoScrollBack, AutoScrollMid, AutoScrollFront };
+            _autoScrollAccum = new float[LayerCount];
 
             _namesL  = new string[LayerCount];
             _namesR  = new string[LayerCount];
@@ -138,6 +150,9 @@ namespace CSharpScript
                     if (!_inited[i]) continue;
                 }
 
+                // Accumulate autonomous scroll for this layer
+                _autoScrollAccum[i] += _autoScrolls[i] * dt;
+
                 float fx  = _factorsX[i];
                 float fy  = _factorsY[i];
                 vec2  off = GetOffset(i);
@@ -156,7 +171,7 @@ namespace CSharpScript
                     //   posX    = start world pos + full camera delta - drift wrap.
                     //   This is equivalent to the non-tiling formula when drift < tw,
                     //   and seamlessly repeats after each full tile-width of camera travel.
-                    float drift   = camDeltaX * (1f - fx);
+                    float drift   = camDeltaX * (1f - fx) - _autoScrollAccum[i];
                     float wrapped = drift % tw;
                     if (wrapped < 0f) wrapped += tw;
 
@@ -184,7 +199,7 @@ namespace CSharpScript
                 {
                     // No tiling — simple drift: background moves by (camDelta * fx).
                     // fx=0 → stays at start world pos. fx=1 → locked to camera.
-                    posX = _startWorldPos[i].x + camDeltaX * fx + off.x;
+                    posX = _startWorldPos[i].x + camDeltaX * fx + _autoScrollAccum[i] + off.x;
                 }
 
                 Transform.SetPosition(_names[i], posX, posY);
