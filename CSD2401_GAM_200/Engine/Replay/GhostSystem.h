@@ -310,6 +310,14 @@ public:
      */
     bool IsVsGhostMode() const { return m_vsGhostMode; }
 
+    /**
+     * @brief Explicitly sets the Vs-Ghost mode flag.
+     *        Call this after activating the ghost from the in-game pause menu leaderboard
+     *        so that WinLoseLogic does not overwrite the loaded recording on restart.
+     * @param enabled True to mark this session as Vs-Ghost, false to clear.
+     */
+    void SetVsGhostMode(bool enabled) { m_vsGhostMode = enabled; }
+
     // ===== Finish Trigger =====
 
 private:

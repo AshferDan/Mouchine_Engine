@@ -1570,6 +1570,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 ghost->LoadRecording(m_lbData[m_lbSelectedRank].name);
                 ghost->ResetGhostToggle();      // ensure flag is clean before toggling ON
                 ghost->ToggleGhostVisible();    // clones Hero → GhostHero, parks beside SafeZone (semi-transparent)
+                ghost->SetVsGhostMode(true);    // prevent WinLoseLogic from overwriting this recording on restart
 
                 // If the player is already past the SafeZone, kick off playback immediately.
                 // Otherwise WinLoseLogic::CheckSafeZoneExit() will start it on exit.
