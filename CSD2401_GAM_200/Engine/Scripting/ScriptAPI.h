@@ -488,6 +488,8 @@ namespace API {
     void FadeOutCategory(const std::string, float);
     void FadeInCategory(const std::string, float, float);
     void FadeOutAll(float);
+    void FadeOutSound(const std::string, float);
+    void FadeInSound(const std::string, float, float);
 
     // 3D Audio / Spatial Sound
     void Set3DListenerPosition(float x, float y);
