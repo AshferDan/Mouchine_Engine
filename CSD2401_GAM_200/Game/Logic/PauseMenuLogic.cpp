@@ -831,7 +831,6 @@ void PauseMenuLogicSystem::Update(float dt)
         static const float kSliderRepeatRate   = 0.08f; // seconds between repeat steps
         bool settingsSpacePressed = false;
         {
-            InputManager* inp = CORE->GetInputManager();
             if (hoveredButtonName.empty()) { kSettingsActive = false; kSettingsIdx = 0; } // reset on fresh open
             if (inp)
             {
@@ -1123,7 +1122,6 @@ void PauseMenuLogicSystem::Update(float dt)
         // Keyboard: SPACE confirms the back button
         bool htpSpacePressed = false;
         {
-            InputManager* inp = CORE->GetInputManager();
             if (inp)
             {
                 bool gpAny = inp->IsGamepadConnected() && (
@@ -1236,7 +1234,6 @@ void PauseMenuLogicSystem::Update(float dt)
         static bool kGhostActive = false;
         bool ghostSpacePressed = false;
         {
-            InputManager* inp = CORE->GetInputManager();
             if (hoveredButtonName.empty()) kGhostActive = false; // reset on fresh open
             if (inp)
             {
@@ -1678,7 +1675,6 @@ void PauseMenuLogicSystem::Update(float dt)
     static bool kPauseActive = false;
     bool spacePressed = false;
     {
-        InputManager* inp = CORE->GetInputManager();
         if (hoveredButtonName.empty()) kPauseActive = false; // reset on fresh open
         if (inp && !pendingSceneChange)
         {

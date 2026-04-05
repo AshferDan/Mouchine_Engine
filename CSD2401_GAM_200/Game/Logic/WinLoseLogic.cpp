@@ -1068,7 +1068,6 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
     static bool kWinActive = false;
     bool spacePressed = false;
     {
-        InputManager* inp = CORE->GetInputManager();
         if (inp && !pendingSceneChange)
         {
             if (isClicked && !currentHover.empty()) kWinActive = false; // mouse click takes over
@@ -1877,7 +1876,6 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
     static bool kLoseActive = false;
     bool spacePressed = false;
     {
-        InputManager* inp = CORE->GetInputManager();
         if (inp && !pendingSceneChange)
         {
             if (isClicked && !currentHover.empty()) kLoseActive = false;
