@@ -207,11 +207,6 @@ namespace CSharpScript
         private int _pauseResumeFreezeFrames = 0;
 
 
-        public override void OnAwake()
-        {
-            Debug.Log("\n\ntesting ON AWAKE\n\n");
-            Audio.AddSound("cb", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
-        }
 
         public PlayerMovement()
         {
@@ -219,6 +214,49 @@ namespace CSharpScript
             MoveStats = new PlayerMovementStats();
             pickupManager = new PickupManager();
             Debug.Log("PlayerMovement instantiated with new stats.");
+        }
+
+        public override void OnAwake()
+        {
+            Debug.Log("\n\n ON AWAKE \n\n");
+            // Add sounds
+            Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 1.0f, 1.5f, "sfx");
+            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", false, 1.0f, 2.0f, "sfx_loop");
+            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.25f, 1.25f, "sfx");
+            Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.25f, 0.9f, "sfx");
+            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 1.0f, 1.35f, "sfx");
+            Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.8f, 1.5f, "sfx_loop");
+            Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.15f, 1.1f, "sfx");
+            Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
+            Audio.AddSound("hurt_bass_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.4f, 1.0f, "sfx");
+
+            //footsteps
+            Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx3", "../Assets/audio/Player/Footstep/Footstep3.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx4", "../Assets/audio/Player/Footstep/Footstep4.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx5", "../Assets/audio/Player/Footstep/Footstep5.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx6", "../Assets/audio/Player/Footstep/Footstep6.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx7", "../Assets/audio/Player/Footstep/Footstep7.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx8", "../Assets/audio/Player/Footstep/Footstep8.wav", false, 0.25f, 1.0f, "sfx");
+            Audio.AddSound("footstep_sfx9", "../Assets/audio/Player/Footstep/Footstep9.wav", false, 0.25f, 1.0f, "sfx");
+            //landing
+            Audio.AddSound("land_sfx1", "../Assets/audio/Player/Land/Land1.wav", false, 0.3f, 1.0f, "sfx");
+            Audio.AddSound("land_sfx2", "../Assets/audio/Player/Land/Land2.wav", false, 0.3f, 1.0f, "sfx");
+            Audio.AddSound("land_sfx3", "../Assets/audio/Player/Land/Land3.wav", false, 0.3f, 1.0f, "sfx");
+            Audio.AddSound("land_sfx4", "../Assets/audio/Player/Land/Land4.wav", false, 0.3f, 1.0f, "sfx");
+            //hurt
+            Audio.AddSound("hurt_sfx1", "../Assets/audio/Player/Hurt/Hurt_01.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx2", "../Assets/audio/Player/Hurt/Hurt_02.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx3", "../Assets/audio/Player/Hurt/Hurt_03.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx4", "../Assets/audio/Player/Hurt/Hurt_04.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx5", "../Assets/audio/Player/Hurt/Hurt_05.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
+            Audio.AddSound("death_sfx", "../Assets/audio/Player/Death.wav", false, 1.0f, 1.0f, "sfx");
         }
 
         public override void OnStart()
@@ -314,34 +352,6 @@ namespace CSharpScript
                 Debug.Log("NPC Count: " + NPCs.Count().ToString());
             }
 
-            // wip to fix the vfx issue
-            //CSharpScript.GameObject.CreateAnimatedImage(
-            //    vfx_nontracking,
-            //    0, 0,
-            //    Transform.GetScale(OwnerName).x, Transform.GetScale(OwnerName).y,
-            //    "../Assets/spritesheet_player_vfx.png",
-            //    15, 11,
-            //    0, 0, 0, 1,
-            //    12.0f,
-            //    (int)CSharpScript.CollisionLayer.Player,
-            //    false,
-            //    false,
-            //    false
-            //);
-
-            // Add sounds
-            Audio.AddSound("jump_sfx", "../Assets/Audio/Player/Jump.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("groundpound_sfx", "../Assets/audio/Player/Groundpound.wav", false, 1.0f, 1.5f, "sfx");
-            Audio.AddSound("groundpound_falling_sfx", "../Assets/audio/Player/Groundpound_falling.wav", false, 1.0f, 2.0f, "sfx_loop");
-            Audio.AddSound("roll_sfx", "../Assets/audio/Player/Roll.wav", false, 0.25f, 1.25f, "sfx");
-            Audio.AddSound("wallslide_impact_sfx", "../Assets/audio/Player/Wallkick.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("wallslide_sfx", "../Assets/audio/Player/WallSlide.wav", false, 0.25f, 0.9f, "sfx");
-            Audio.AddSound("wallkick_fast_sfx", "../Assets/audio/Player/Dash.wav", false, 1.0f, 1.35f, "sfx");
-            Audio.AddSound("airglide_sfx", "../Assets/audio/Player/AirGlide.wav", false, 0.8f, 1.5f, "sfx_loop");
-            Audio.AddSound("turnskid_sfx", "../Assets/audio/Player/TurnSkid.wav", false, 0.15f, 1.1f, "sfx");
-            Audio.AddSound("bonk_sfx", "../Assets/audio/Player/WallBonk.wav", false, 0.2f, 1.1f, "sfx");
-            Audio.AddSound("hurt_bass_sfx", "../Assets/audio/Player/Hurt-Damage.wav", false, 0.4f, 1.0f, "sfx");
-
             // load 3D spatial sound for NPCs (scissors snip for lobster)
             for (int i = 0; i < NPCs.Count(); i++)
             {
@@ -358,7 +368,7 @@ namespace CSharpScript
                 }
                 else if (NPCs[i].name.Contains("NPC_Jellyfish"))
                 {
-                    audioPath = "../Assets/Audio/DoorGlow.wav";
+                    audioPath = "../Assets/Audio/hairscissors_snip" + ((i % 3) + 1).ToString() + ".wav";
                     soundName = "pedi_clip";
                     volume = 0.6f;
                 }
@@ -382,9 +392,9 @@ namespace CSharpScript
                 }
                 else if (NPCs[i].name.Contains("PU_Shell"))
                 {
-                    audioPath = "../Assets/Audio/DoorGlow.wav";
+                    audioPath = "../Assets/Audio/Pickups/PU_Shell_Hum.wav";
                     soundName = "shell_glow";
-                    volume = 0.6f;
+                    volume = 0.15f;
                 }
 
                 if (string.IsNullOrEmpty(audioPath) || string.IsNullOrEmpty(soundName))
@@ -394,34 +404,8 @@ namespace CSharpScript
                 }
 
                 NPCs[i].soundName = soundName;
-                Audio.Load3DSound(soundName, audioPath, true, 500.0f, 3000.0f, soundName, volume, 1.0f);
+                Audio.Load3DSound(soundName, audioPath, true, 500.0f, 3000.0f, "sfx", volume, 1.0f);
             }
-
-            //footsteps
-            Audio.AddSound("footstep_sfx1", "../Assets/audio/Player/Footstep/Footstep1.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx2", "../Assets/audio/Player/Footstep/Footstep2.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx3", "../Assets/audio/Player/Footstep/Footstep3.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx4", "../Assets/audio/Player/Footstep/Footstep4.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx5", "../Assets/audio/Player/Footstep/Footstep5.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx6", "../Assets/audio/Player/Footstep/Footstep6.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx7", "../Assets/audio/Player/Footstep/Footstep7.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx8", "../Assets/audio/Player/Footstep/Footstep8.wav", false, 0.25f, 1.0f, "sfx");
-            Audio.AddSound("footstep_sfx9", "../Assets/audio/Player/Footstep/Footstep9.wav", false, 0.25f, 1.0f, "sfx");
-            //landing
-            Audio.AddSound("land_sfx1", "../Assets/audio/Player/Land/Land1.wav", false, 0.3f, 1.0f, "sfx");
-            Audio.AddSound("land_sfx2", "../Assets/audio/Player/Land/Land2.wav", false, 0.3f, 1.0f, "sfx");
-            Audio.AddSound("land_sfx3", "../Assets/audio/Player/Land/Land3.wav", false, 0.3f, 1.0f, "sfx");
-            Audio.AddSound("land_sfx4", "../Assets/audio/Player/Land/Land4.wav", false, 0.3f, 1.0f, "sfx");
-            //hurt
-            Audio.AddSound("hurt_sfx1", "../Assets/audio/Player/Hurt/Hurt_01.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx2", "../Assets/audio/Player/Hurt/Hurt_02.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx3", "../Assets/audio/Player/Hurt/Hurt_03.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx4", "../Assets/audio/Player/Hurt/Hurt_04.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx5", "../Assets/audio/Player/Hurt/Hurt_05.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx6", "../Assets/audio/Player/Hurt/Hurt_06.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx7", "../Assets/audio/Player/Hurt/Hurt_07.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("hurt_sfx8", "../Assets/audio/Player/Hurt/Hurt_08.wav", false, 1.0f, 1.0f, "sfx");
-            Audio.AddSound("death_sfx", "../Assets/audio/Player/Death.wav"       , false, 1.0f, 1.0f, "sfx");
 
 
             // KEEP IN MIND! ALL SHOULD BE SPRITESHEET_R EXCEPT THOSE THAT REQUIRE FLIPPING (WALLSLIDE ETC)
@@ -518,7 +502,7 @@ namespace CSharpScript
                 isPlayerDead = true;
             }
 
-            #region LOBSTER 3D SCISSORS SOUND
+            #region 3D SOUND
 
             vec2 playerPos = Transform.GetPosition(OwnerName);
             Audio.Set3DListenerPosition(playerPos.x, playerPos.y);
@@ -556,7 +540,7 @@ namespace CSharpScript
                     if (NPCs[i].audioPlaying)
                     {
                         //Debug.Log("lobster_scissors" + (i).ToString());
-                        //Audio.StopSound("lobster_scissors" + (i).ToString());
+                        Audio.StopSound(NPCs[i].soundName);
                         NPCs[i].audioPlaying = false;
                     }
                 }
@@ -602,7 +586,7 @@ namespace CSharpScript
             // check if player is dead here
             HandlePlayerHealth();
             //Debug.Log(currState.ToString());
-            Debug.Log(GameTimer.GetRemainingTime().ToString());
+            //Debug.Log(GameTimer.GetRemainingTime().ToString());
 
             switch (currState)
             {
@@ -2023,23 +2007,26 @@ namespace CSharpScript
         #region Camera Effects
 
         // WIP ITS WEIRD ASF BUT IDKIDKIDKIDKIDK
-        vec2 currOffset = new vec2(0, 0); 
+        vec2 currOffset = new vec2(0, 0);
+        const float BASE_OFFSET = 0f;
+        const float MAX_SPEED = 1000f;     // match your actual max speed
+        const float MAX_OFFSET = 600f;     // double it, go big
+
+        float[] GEAR_LERP = { 0f, 0.04f, 0.08f, 0.12f };
+        float[] GEAR_OFFSET = { 300f, 350f, 425f, 600f };
+
         void HandleCameraTracking()
         {
             vec2 vel = Physics.GetVelocity(OwnerName);
+            int index = GetCurrentTentacleLevel();
+            float speed_factor = Math.Max(-1f, Math.Min(1f, vel.x / MAX_SPEED));
+            float target_offset = 0f;
+            Debug.Log($"vel.x: {vel.x}  index: {index}  speed_factor: {speed_factor}  currOffset: {currOffset.x}");
 
-            float leadStrength = 200f;  
-            float smoothSpeed = 100.0f; 
 
-            float targetX = vel.x * leadStrength;
-            float targetY = vel.y * leadStrength;
-            
-            currOffset.x = Utils.MathfMoveTowards(currOffset.x, targetX, smoothSpeed * fixeddt);
-            currOffset.y = Utils.MathfMoveTowards(currOffset.y, targetY, smoothSpeed * fixeddt);
-
-            //Debug.Log("offet x: " + currOffset.x.ToString() + " | offset y: " + currOffset.y.ToString());
-
-            Camera.SetFollowOffset(-currOffset.x, -currOffset.y);
+            target_offset = BASE_OFFSET - (speed_factor * GEAR_OFFSET[index]);
+            currOffset.x = target_offset;
+            Camera.SetFollowOffset(currOffset.x, 0);
         }
         #endregion
 
