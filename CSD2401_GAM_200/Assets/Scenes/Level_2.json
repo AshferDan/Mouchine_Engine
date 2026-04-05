@@ -508,9 +508,9 @@
             "LayerBack": "",
             "LayerMid": "Pillar_BackGround",
             "LayerFront": "",
-            "FactorFarBack": 0.10000000149011612,
+            "FactorFarBack": 0.5,
             "FactorBack": 0.0,
-            "FactorMid": 0.550000011920929,
+            "FactorMid": 0.25,
             "FactorFront": 0.0,
             "FactorYFarBack": 1.0,
             "FactorYBack": 1.0,
@@ -4537,7 +4537,9 @@
           125.0
         ]
       },
-      "children": []
+      "children": [
+        
+      ]
     },
     {
       "name": "Media_Player",
@@ -4945,7 +4947,7 @@
             "enabled": true,
             "pos": [
               650.3098754882813,
-              2815.493408203125
+              2763.293
             ],
             "scale": [
               861.5379638671875,
