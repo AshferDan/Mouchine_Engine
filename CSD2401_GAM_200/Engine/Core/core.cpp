@@ -636,6 +636,7 @@ void CoreEngine::HandleWindowFocusChanged(bool focused)
             return;
 
         m_isWindowUnfocused = true;
+        m_pausedBeforeAltTab = m_gamePause || (levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause);
 
         // Clear input so keys/buttons do not get "stuck"
         if (inputManager)
@@ -661,9 +662,8 @@ void CoreEngine::HandleWindowFocusChanged(bool focused)
     if (inputManager)
         inputManager->ResetState();
 
-    // Resume hard-paused audio only if game was not already paused before alt-tab
-    bool editorIsPaused = levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause;
-    if (!m_gamePause && !editorIsPaused && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+    // Resume audio only if game was not already paused before alt-tab
+    if (!m_pausedBeforeAltTab && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(false);
     }

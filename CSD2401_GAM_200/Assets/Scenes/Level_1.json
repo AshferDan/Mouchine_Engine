@@ -10298,48 +10298,6 @@
             ]
         },
         {
-            "name": "Pickup_vfx",
-            "localID": 202,
-            "parentID": 4294967295,
-            "active": false,
-            "TransformComponent": {
-                "enabled": false,
-                "pos": [
-                    33392.0234375,
-                    1277.38818359375
-                ],
-                "scale": [
-                    192.0,
-                    192.0
-                ],
-                "rotation": 0.0
-            },
-            "RenderComponent": {
-                "enabled": false,
-                "shapeType": "Square",
-                "texturePath": "../Assets/spritesheet_player_vfx.png",
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "layer": 0,
-                "screenSpace": false,
-                "tileable": false,
-                "tileCount": [
-                    1.0,
-                    1.0
-                ]
-            },
-            "Spritesheet": {
-                "enabled": false,
-                "defaultAnimation": "",
-                "animations": []
-            },
-            "children": []
-        },
-        {
             "name": "Plants (Props)",
             "localID": 203,
             "parentID": 4294967295,

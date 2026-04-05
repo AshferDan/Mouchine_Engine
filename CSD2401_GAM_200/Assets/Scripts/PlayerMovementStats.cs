@@ -137,7 +137,7 @@ namespace CSharpScript
 
 
         // Ground Pound
-        public float GPPauseTime = 0.3f;
+        public float GPPauseTime = 0.4f;
         public float GPFallSpeed = 1562.5f;                             // 50f * mod
         public float RollHeightToDurationDivisor = 2343.75f;            // 75f * mod
         public float GroundPoundMaxSpeedHeightThreshold = 80f;

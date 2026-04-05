@@ -305,19 +305,32 @@ public:
     static void SetFixedDeltaTime(double dt) { fixed_dt = dt; }
 
     /**
-     * @brief Requests a scene to be loaded on the next frame.
-     * @param sceneName The name of the scene file to load.
-     */
-    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false)
+         * @brief Requests a scene to be loaded on the next frame.
+         * @param sceneName The name of the scene file to load.
+         * @param autoPlay Whether to automatically enter play mode after loading.
+         * @param skipIrisClose If true, jumps straight to the load screen and opens the iris.
+         */
+    void RequestSceneLoad(const std::string& sceneName, bool autoPlay = false, bool skipIrisClose = false)
     {
         std::cout << "[RequestSceneLoad] scene: " << sceneName << std::endl;
         m_pendingScene = sceneName;
         m_hasPendingLoad = true;
         m_autoPlayAfterLoad = autoPlay;
+
         if (screenTransitionSystem && !firstTimeLoad)
         {
             std::cout << "[RequestSceneLoad] Starting transition" << std::endl;
-            screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
+
+            if (skipIrisClose)
+            {
+                // Jumps straight to LoadScreen -> IrisOpen
+                screenTransitionSystem->StartLoadScreenOnly("../Assets/loading.gif", []() {});
+            }
+            else
+            {
+                // Full transition: IrisClose -> LoadScreen -> IrisOpen
+                screenTransitionSystem->StartTransition("../Assets/loading.gif", []() {});
+            }
         }
         firstTimeLoad = false;
     }
@@ -387,6 +400,7 @@ private:
 	bool firstTimeLoad = true;
 
     bool m_isWindowUnfocused = false;
+    bool m_pausedBeforeAltTab = false;
 
     /**
      * @brief Updates the FPS and Delta Time counters.
