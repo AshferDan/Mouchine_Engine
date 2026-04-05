@@ -4537,139 +4537,7 @@
           125.0
         ]
       },
-      "children": [
-        {
-          "name": "Timer Bar",
-          "localID": 53,
-          "parentID": 52,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              -38.0,
-              0.0
-            ],
-            "scale": [
-              50.0,
-              50.0
-            ],
-            "rotation": 0.0
-          },
-          "children": [
-            {
-              "name": "LevelTimerBarFrame",
-              "localID": 54,
-              "parentID": 53,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  512.0,
-                  920.0
-                ],
-                "scale": [
-                  1000.0,
-                  125.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Time bar.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 11,
-                "screenSpace": true,
-                "tileable": false,
-                "tileCount": [
-                  1.0,
-                  1.0
-                ]
-              },
-              "children": []
-            },
-            {
-              "name": "LevelTimerBar",
-              "localID": 55,
-              "parentID": 53,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  520.6439819335938,
-                  920.0
-                ],
-                "scale": [
-                  977.6099853515625,
-                  100.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Time bar_blue.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 10,
-                "screenSpace": true,
-                "tileable": false,
-                "tileCount": [
-                  1.0,
-                  1.0
-                ]
-              },
-              "children": []
-            },
-            {
-              "name": "LevelTimerBarBackground",
-              "localID": 56,
-              "parentID": 53,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  512.0,
-                  920.0
-                ],
-                "scale": [
-                  1000.0,
-                  100.0
-                ],
-                "rotation": 0.0
-              },
-              "RenderComponent": {
-                "enabled": true,
-                "shapeType": "Square",
-                "texturePath": "../Assets/Sprites/Icons/Time bar_grey.png",
-                "color": [
-                  1.0,
-                  1.0,
-                  1.0,
-                  1.0
-                ],
-                "layer": 9,
-                "screenSpace": true,
-                "tileable": false,
-                "tileCount": [
-                  1.0,
-                  1.0
-                ]
-              },
-              "children": []
-            }
-          ]
-        }
-      ]
+      "children": []
     },
     {
       "name": "Media_Player",
@@ -8966,9 +8834,9 @@
           "name": "Timer Bar",
           "localID": 141,
           "parentID": 134,
-          "active": false,
+          "active": true,
           "TransformComponent": {
-            "enabled": false,
+            "enabled": true,
             "pos": [
               -1.9800000190734863,
               0.0
