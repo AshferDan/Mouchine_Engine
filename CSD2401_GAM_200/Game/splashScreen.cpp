@@ -1,7 +1,13 @@
 /* Start Header **************************************************************/
 /*!
 \file   SplashScreenSystem.cpp
-\brief  See SplashScreenSystem.h
+\author     Guan Shao Jun [85%]
+            Lee Hwee Min [ 1% - 8 lines]
+\par        shaojun.g@digipen.edu
+\date       April 03 2026
+\brief  Plays the DigiPen + game logo splash sequence on release startup.
+        Renders directly to the default framebuffer (no scene loaded yet).
+        Call Run() after engine Init() and before RequestSceneLoad().
 */
 /* End Header ****************************************************************/
 #include "SplashScreen.h"
