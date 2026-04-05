@@ -55,6 +55,8 @@ AudioManager::AudioManager(AudioEngine* engine) : audioEngine(engine), m_isMuted
     baseCategoryVolumes["ambient"] = 1.0f;
 
     masterVolume = 1.0f;  // Master at 100%
+
+    LoadSettings();
 }
 
 /**
@@ -267,11 +269,13 @@ void AudioManager::PlaySound(const std::string& soundName, const std::string& ch
     audioEngine->playSound(soundName, channel);
 
     // Apply volume (base volume * category volume)
+    // "bgm" category sounds are controlled by the "music" category volume
     float finalVolume = sound.volume;
-    auto categoryIt = categoryVolumes.find(sound.category);
+    std::string volumeCategory = (sound.category == "bgm") ? "music" : sound.category;
+    auto categoryIt = categoryVolumes.find(volumeCategory);
     if (categoryIt != categoryVolumes.end())
     {
-        std::cout << "[AudioManager] Category '" << sound.category << "' volume: " << categoryIt->second << std::endl;
+        std::cout << "[AudioManager] Category '" << volumeCategory << "' volume: " << categoryIt->second << std::endl;
         finalVolume *= categoryIt->second;
     }
 
