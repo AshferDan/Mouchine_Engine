@@ -131,8 +131,15 @@ void WinLoseLogicSystem::Update(float dt)
             ghost->SetLevelName(lvl);
 
             ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
-            ghost->LoadRecording("Level1_testing");
-            ghost->ResetGhostToggle();  // ghost is hidden by default each session
+
+            // In Vs-Ghost mode the recording was already loaded by GhostSystem's
+            // deferred handler (or will be on this same frame).  Do NOT overwrite it
+            // with the generic default and do NOT hide the ghost that was just parked.
+            if (!ghost->IsVsGhostMode())
+            {
+                ghost->LoadRecording("Level1_testing");
+                ghost->ResetGhostToggle();  // ghost hidden by default in normal sessions
+            }
         }
     }
 

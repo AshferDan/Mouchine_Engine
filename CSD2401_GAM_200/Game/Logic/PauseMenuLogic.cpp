@@ -1541,12 +1541,67 @@ void PauseMenuLogicSystem::Update(float dt)
             AudioManager* localAudio = CORE->GetAudioManager();
             if (localAudio) localAudio->TriggerEvent("UI_Click");
 
-            // Load selected recording and restart scene in VS Ghost mode
-            if (m_lbSelectedRank < static_cast<int>(m_lbData.size()))
+            GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+            GameObject* existingGhost = factory.FindGameObject("GhostHero");
+
+            if (existingGhost)
             {
-                GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-                if (ghost) ghost->RequestVsGhostOnLoad(m_lbData[m_lbSelectedRank].name);
+                // Ghost is already in the scene — remove it and its VFX, then resume
+                if (ghost)
+                {
+                    ghost->StopPlayback();
+                    ghost->ResetGhostToggle();
+                }
+                factory.QueueDestroyGameObject(existingGhost->GetID());
+                GameObject* existingVfx = factory.FindGameObject("GhostHero_vfx");
+                if (existingVfx) factory.QueueDestroyGameObject(existingVfx->GetID());
             }
+            else if (ghost && m_lbSelectedRank < static_cast<int>(m_lbData.size()))
+            {
+                // No ghost in scene — create one from the selected leaderboard recording
+                ghost->Configure("Hero", "GhostHero", "Hero_vfx", "GhostHero_vfx");
+
+                // Background layers vary by level
+                if (m_lbLevel == 1)
+                    ghost->ConfigureBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
+                else if (m_lbLevel == 2)
+                    ghost->ConfigureBackground("Parallax_BG", "Pillar_BackGround");
+
+                ghost->LoadRecording(m_lbData[m_lbSelectedRank].name);
+                ghost->ResetGhostToggle();      // ensure flag is clean before toggling ON
+                ghost->ToggleGhostVisible();    // clones Hero → GhostHero, parks beside SafeZone (semi-transparent)
+                ghost->SetVsGhostMode(true);    // prevent WinLoseLogic from overwriting this recording on restart
+
+                // If the player is already past the SafeZone, kick off playback immediately.
+                // Otherwise WinLoseLogic::CheckSafeZoneExit() will start it on exit.
+                bool playerInSafeZone = true;
+                GameObject* safeZone = factory.FindGameObject("SafeZone");
+                GameObject* player   = factory.FindGameObject("Hero");
+                if (safeZone && player && safeZone->IsActive() && player->IsActive())
+                {
+                    auto* szCol = safeZone->GetComponent<ColliderComponent>();
+                    auto* plCol = player->GetComponent<ColliderComponent>();
+                    if (szCol && plCol)
+                    {
+                        AABB szAABB = szCol->GetAABB();
+                        AABB plAABB = plCol->GetAABB();
+                        float szCX = (szAABB.min.x + szAABB.max.x) / 2.0f;
+                        float szCY = (szAABB.min.y + szAABB.max.y) / 2.0f;
+                        float plCX = (plAABB.min.x + plAABB.max.x) / 2.0f;
+                        float plCY = (plAABB.min.y + plAABB.max.y) / 2.0f;
+                        float halfW = (szAABB.max.x - szAABB.min.x) / 2.0f + (plAABB.max.x - plAABB.min.x) / 2.0f;
+                        float halfH = (szAABB.max.y - szAABB.min.y) / 2.0f + (plAABB.max.y - plAABB.min.y) / 2.0f;
+                        playerInSafeZone = (std::abs(plCX - szCX) < halfW) && (std::abs(plCY - szCY) < halfH);
+                    }
+                }
+                if (!playerInSafeZone)
+                {
+                    ghost->StopPlayback();
+                    ghost->StartPlayback();
+                }
+            }
+
+            // Close all UI and resume — no scene reload needed
             isLeaderboardOpen = false;
             hoveredButtonName.clear();
             DestroyLeaderboardUI();
