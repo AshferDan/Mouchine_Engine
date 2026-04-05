@@ -22,8 +22,8 @@
         "mode": "FOLLOW_TARGET",
         "zoom": 0.49999988079071045,
         "position": [
-          34480.9375,
-          14082.0703125
+          0.0,
+          0.0
         ],
         "followOffset": [
           -380.40716552734375,
@@ -586,7 +586,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -643,7 +643,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -700,7 +700,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -757,7 +757,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -814,7 +814,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -871,7 +871,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -928,7 +928,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -985,7 +985,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1042,7 +1042,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1099,7 +1099,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.007843137718737125
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1156,7 +1156,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1213,7 +1213,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1270,7 +1270,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1327,7 +1327,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1384,7 +1384,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1441,7 +1441,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1498,7 +1498,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1555,7 +1555,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1612,7 +1612,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1669,7 +1669,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1726,7 +1726,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1783,7 +1783,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1840,7 +1840,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1897,7 +1897,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -1954,7 +1954,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2011,7 +2011,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2068,7 +2068,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2125,7 +2125,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2159,7 +2159,7 @@
         },
         {
           "name": "Ground(19)",
-          "localID": 33,
+          "localID": 32,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2182,7 +2182,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2216,7 +2216,7 @@
         },
         {
           "name": "Ground(21)",
-          "localID": 35,
+          "localID": 33,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2239,7 +2239,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2273,7 +2273,7 @@
         },
         {
           "name": "Ground(22)",
-          "localID": 36,
+          "localID": 34,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2296,7 +2296,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2330,7 +2330,7 @@
         },
         {
           "name": "Ground(23)",
-          "localID": 37,
+          "localID": 35,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2353,7 +2353,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2387,7 +2387,7 @@
         },
         {
           "name": "Pillar(25)",
-          "localID": 39,
+          "localID": 36,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2410,7 +2410,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2444,7 +2444,7 @@
         },
         {
           "name": "Ground(27)",
-          "localID": 40,
+          "localID": 37,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2467,7 +2467,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2501,7 +2501,7 @@
         },
         {
           "name": "Ground(28)",
-          "localID": 41,
+          "localID": 38,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2524,7 +2524,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2558,7 +2558,7 @@
         },
         {
           "name": "Ground(29)",
-          "localID": 42,
+          "localID": 39,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2581,7 +2581,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2615,7 +2615,7 @@
         },
         {
           "name": "Ground(34)",
-          "localID": 43,
+          "localID": 40,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2638,7 +2638,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2672,7 +2672,7 @@
         },
         {
           "name": "Ground(35)",
-          "localID": 44,
+          "localID": 41,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2695,7 +2695,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2729,7 +2729,7 @@
         },
         {
           "name": "Ground(36)",
-          "localID": 45,
+          "localID": 42,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2752,7 +2752,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2786,7 +2786,7 @@
         },
         {
           "name": "Ground(38)",
-          "localID": 47,
+          "localID": 43,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2809,7 +2809,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2843,7 +2843,7 @@
         },
         {
           "name": "Ground(41)",
-          "localID": 50,
+          "localID": 44,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2866,7 +2866,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0313725508749485
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2900,7 +2900,7 @@
         },
         {
           "name": "Ground(42)",
-          "localID": 51,
+          "localID": 45,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2923,7 +2923,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -2957,7 +2957,7 @@
         },
         {
           "name": "Ground(45)",
-          "localID": 54,
+          "localID": 46,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -2980,7 +2980,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3014,7 +3014,7 @@
         },
         {
           "name": "Ground(47)",
-          "localID": 56,
+          "localID": 47,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3037,7 +3037,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3071,7 +3071,7 @@
         },
         {
           "name": "Ground(52)",
-          "localID": 61,
+          "localID": 48,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3094,7 +3094,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.07058823853731155
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3124,11 +3124,2462 @@
               818.9741821289063
             ]
           },
-          "children": []
+          "children": [
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 99,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  32137.265625,
+                  12585.1162109375
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 100,
+                  "parentID": 99,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      32137.265625,
+                      12555.0869140625
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 109,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  31726.45703125,
+                  13481.740234375
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 110,
+                  "parentID": 109,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      31723.515625,
+                      13442.04296875
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 111,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  33848.55078125,
+                  12588.0927734375
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 112,
+                  "parentID": 111,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      33848.55078125,
+                      12558.0634765625
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 113,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  34272.29296875,
+                  13483.4033203125
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 114,
+                  "parentID": 113,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      34269.3515625,
+                      13443.7060546875
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 115,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  31329.328125,
+                  14379.265625
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 116,
+                  "parentID": 115,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      31326.38671875,
+                      14339.568359375
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 117,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  34669.9765625,
+                  14377.9365234375
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 118,
+                  "parentID": 117,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      34667.03515625,
+                      14338.2392578125
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 119,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  30930.708984375,
+                  15273.64453125
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 120,
+                  "parentID": 119,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      30927.767578125,
+                      15233.947265625
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 121,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  35042.0546875,
+                  15269.6123046875
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 122,
+                  "parentID": 121,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      35039.11328125,
+                      15229.9150390625
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 123,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  37495.37890625,
+                  9959.6767578125
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 124,
+                  "parentID": 123,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      37495.37890625,
+                      9929.6474609375
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 125,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  37982.90234375,
+                  9960.4384765625
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 126,
+                  "parentID": 125,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      37982.90234375,
+                      9930.4091796875
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 127,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  39387.80859375,
+                  9960.4384765625
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 128,
+                  "parentID": 127,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      39387.80859375,
+                      9930.4091796875
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 129,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  40791.640625,
+                  9960.4384765625
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 130,
+                  "parentID": 129,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      40791.640625,
+                      9930.4091796875
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 131,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  41590.90625,
+                  9960.4384765625
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 132,
+                  "parentID": 131,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      41587.96484375,
+                      9920.7412109375
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 133,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  45620.6796875,
+                  9195.9423828125
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 134,
+                  "parentID": 133,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      45620.6796875,
+                      9165.9130859375
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 135,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  46656.46875,
+                  8488.5029296875
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 136,
+                  "parentID": 135,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      46656.46875,
+                      8458.4736328125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 137,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  44844.59765625,
+                  7847.6455078125
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 138,
+                  "parentID": 137,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      44844.59765625,
+                      7817.6162109375
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 139,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  45639.40625,
+                  7147.1357421875
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 140,
+                  "parentID": 139,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      45639.40625,
+                      7117.1064453125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 141,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  40912.71875,
+                  4520.7314453125
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 142,
+                  "parentID": 141,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      40912.71875,
+                      4490.7021484375
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 143,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  39461.71875,
+                  4524.63232421875
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 144,
+                  "parentID": 143,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      39461.71875,
+                      4494.60302734375
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 145,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  35752.421875,
+                  4520.34619140625
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 146,
+                  "parentID": 145,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      35752.421875,
+                      4490.31689453125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 147,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  34303.2109375,
+                  4520.34619140625
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 148,
+                  "parentID": 147,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      34303.2109375,
+                      4490.31689453125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 149,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  26099.1875,
+                  1705.60791015625
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 150,
+                  "parentID": 149,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      26099.1875,
+                      1675.57861328125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 151,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  28223.3046875,
+                  2407.035888671875
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 152,
+                  "parentID": 151,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      28223.3046875,
+                      2377.006591796875
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 153,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  27079.814453125,
+                  3050.570068359375
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 154,
+                  "parentID": 153,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      27079.814453125,
+                      3020.540771484375
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 155,
+              "parentID": 48,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  28709.025390625,
+                  3751.4638671875
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.34590524435043335
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 156,
+                  "parentID": 155,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      28709.025390625,
+                      3721.4345703125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.34590524435043335
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
         },
         {
           "name": "Ground(53)",
-          "localID": 62,
+          "localID": 49,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3151,7 +5602,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3185,7 +5636,7 @@
         },
         {
           "name": "Ground(54)",
-          "localID": 63,
+          "localID": 50,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3208,7 +5659,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3242,7 +5693,7 @@
         },
         {
           "name": "Ground(1)",
-          "localID": 34,
+          "localID": 51,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3265,7 +5716,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.007843137718737125
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3299,7 +5750,7 @@
         },
         {
           "name": "Ground(2)",
-          "localID": 85,
+          "localID": 52,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3322,7 +5773,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3356,7 +5807,7 @@
         },
         {
           "name": "Ground(3)",
-          "localID": 55,
+          "localID": 53,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3379,7 +5830,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3413,7 +5864,7 @@
         },
         {
           "name": "Ground(4)",
-          "localID": 52,
+          "localID": 54,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3436,7 +5887,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.007843137718737125
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3470,7 +5921,7 @@
         },
         {
           "name": "Ground(5)",
-          "localID": 53,
+          "localID": 55,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3493,7 +5944,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3507,7 +5958,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -3527,7 +5978,7 @@
         },
         {
           "name": "Ground(6)",
-          "localID": 86,
+          "localID": 56,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3550,7 +6001,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3564,7 +6015,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -3584,7 +6035,7 @@
         },
         {
           "name": "Ground(7)",
-          "localID": 87,
+          "localID": 57,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3607,7 +6058,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3641,7 +6092,7 @@
         },
         {
           "name": "Ground(8)",
-          "localID": 57,
+          "localID": 58,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3664,7 +6115,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3678,7 +6129,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -3698,7 +6149,7 @@
         },
         {
           "name": "Ground(9)",
-          "localID": 58,
+          "localID": 59,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3721,7 +6172,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0235294122248888
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3735,7 +6186,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -3755,7 +6206,7 @@
         },
         {
           "name": "Ground(11)",
-          "localID": 46,
+          "localID": 60,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3778,7 +6229,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3812,7 +6263,7 @@
         },
         {
           "name": "Ground(12)",
-          "localID": 48,
+          "localID": 61,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3835,7 +6286,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3869,7 +6320,7 @@
         },
         {
           "name": "Ground(13)",
-          "localID": 49,
+          "localID": 62,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3892,7 +6343,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3926,7 +6377,7 @@
         },
         {
           "name": "Ground(14)",
-          "localID": 60,
+          "localID": 63,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -3949,7 +6400,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -3983,7 +6434,7 @@
         },
         {
           "name": "Ground(15)",
-          "localID": 88,
+          "localID": 64,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4006,7 +6457,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4040,7 +6491,7 @@
         },
         {
           "name": "Ground(16)",
-          "localID": 89,
+          "localID": 65,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4063,7 +6514,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4097,7 +6548,7 @@
         },
         {
           "name": "Ground(17)",
-          "localID": 90,
+          "localID": 66,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4120,7 +6571,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4154,7 +6605,7 @@
         },
         {
           "name": "Ground(18)",
-          "localID": 91,
+          "localID": 67,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4177,7 +6628,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4211,7 +6662,7 @@
         },
         {
           "name": "Ground(19)",
-          "localID": 92,
+          "localID": 68,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4234,7 +6685,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4268,7 +6719,7 @@
         },
         {
           "name": "Ground(20)",
-          "localID": 93,
+          "localID": 69,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4291,7 +6742,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4305,7 +6756,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4325,7 +6776,7 @@
         },
         {
           "name": "Ground(21)",
-          "localID": 94,
+          "localID": 70,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4348,7 +6799,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4382,7 +6833,7 @@
         },
         {
           "name": "Ground(22)",
-          "localID": 95,
+          "localID": 71,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4405,7 +6856,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4419,7 +6870,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4439,7 +6890,7 @@
         },
         {
           "name": "Ground(23)",
-          "localID": 96,
+          "localID": 72,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4462,7 +6913,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4476,7 +6927,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4496,7 +6947,7 @@
         },
         {
           "name": "Ground(24)",
-          "localID": 97,
+          "localID": 73,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4519,7 +6970,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4533,7 +6984,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4553,7 +7004,7 @@
         },
         {
           "name": "Ground(25)",
-          "localID": 98,
+          "localID": 74,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4576,7 +7027,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4590,7 +7041,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4610,7 +7061,7 @@
         },
         {
           "name": "Ground(26)",
-          "localID": 99,
+          "localID": 75,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4633,7 +7084,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4647,7 +7098,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4667,7 +7118,7 @@
         },
         {
           "name": "Ground(27)",
-          "localID": 59,
+          "localID": 76,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4690,7 +7141,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4704,7 +7155,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": false,
             "velocity": [
               0.0,
@@ -4724,7 +7175,7 @@
         },
         {
           "name": "Ground(28)",
-          "localID": 38,
+          "localID": 77,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4747,7 +7198,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4761,7 +7212,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": true,
             "velocity": [
               0.0,
@@ -4781,7 +7232,7 @@
         },
         {
           "name": "Ground(29)",
-          "localID": 100,
+          "localID": 78,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4804,7 +7255,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4818,7 +7269,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": true,
             "velocity": [
               0.0,
@@ -4838,7 +7289,7 @@
         },
         {
           "name": "Ground(30)",
-          "localID": 101,
+          "localID": 79,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4861,7 +7312,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4895,7 +7346,7 @@
         },
         {
           "name": "Ground(31)",
-          "localID": 102,
+          "localID": 80,
           "parentID": 3,
           "active": true,
           "TransformComponent": {
@@ -4918,7 +7369,7 @@
               1.0,
               0.0,
               0.0,
-              0.29411765933036804
+              0.0
             ],
             "layer": 0,
             "screenSpace": false,
@@ -4932,7 +7383,7 @@
             "enabled": true,
             "mass": 1.0,
             "isStatic": true,
-            "useGravity": true,
+            "useGravity": false,
             "isGrounded": true,
             "velocity": [
               0.0,
@@ -4954,7 +7405,7 @@
     },
     {
       "name": "Tilemap",
-      "localID": 32,
+      "localID": 81,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -4994,7 +7445,7 @@
     },
     {
       "name": "Pickup_vfx",
-      "localID": 64,
+      "localID": 82,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5089,7 +7540,7 @@
     },
     {
       "name": "Hero_vfx",
-      "localID": 65,
+      "localID": 83,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5379,7 +7830,7 @@
     },
     {
       "name": "HAZARDS",
-      "localID": 66,
+      "localID": 84,
       "parentID": 4294967295,
       "active": true,
       "TransformComponent": {
@@ -5397,8 +7848,8 @@
       "children": [
         {
           "name": "HZ_Spike_Single",
-          "localID": 67,
-          "parentID": 66,
+          "localID": 85,
+          "parentID": 84,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5465,8 +7916,8 @@
           "children": [
             {
               "name": "Spike_Collider",
-              "localID": 68,
-              "parentID": 67,
+              "localID": 86,
+              "parentID": 85,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5493,8 +7944,8 @@
             },
             {
               "name": "HZ_Spike_Double",
-              "localID": 69,
-              "parentID": 67,
+              "localID": 87,
+              "parentID": 85,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5506,7 +7957,7 @@
                   494.9998474121094,
                   149.99993896484375
                 ],
-                "rotation": -179.15235900878906
+                "rotation": -179.15234375
               },
               "RenderComponent": {
                 "enabled": true,
@@ -5561,8 +8012,8 @@
               "children": [
                 {
                   "name": "Spike_Collider",
-                  "localID": 70,
-                  "parentID": 69,
+                  "localID": 88,
+                  "parentID": 87,
                   "active": true,
                   "TransformComponent": {
                     "enabled": true,
@@ -5574,7 +8025,7 @@
                       380.9998474121094,
                       89.09088897705078
                     ],
-                    "rotation": -179.15235900878906
+                    "rotation": -179.15234375
                   },
                   "ColliderComponent": {
                     "enabled": true,
@@ -5591,8 +8042,8 @@
             },
             {
               "name": "HZ_Spike_Double",
-              "localID": 71,
-              "parentID": 67,
+              "localID": 89,
+              "parentID": 85,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5659,8 +8110,8 @@
               "children": [
                 {
                   "name": "Spike_Collider",
-                  "localID": 72,
-                  "parentID": 71,
+                  "localID": 90,
+                  "parentID": 89,
                   "active": true,
                   "TransformComponent": {
                     "enabled": true,
@@ -5689,8 +8140,8 @@
             },
             {
               "name": "HZ_Spike_Single",
-              "localID": 73,
-              "parentID": 67,
+              "localID": 91,
+              "parentID": 85,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5757,8 +8208,8 @@
               "children": [
                 {
                   "name": "Spike_Collider",
-                  "localID": 74,
-                  "parentID": 73,
+                  "localID": 92,
+                  "parentID": 91,
                   "active": true,
                   "TransformComponent": {
                     "enabled": true,
@@ -5789,8 +8240,8 @@
         },
         {
           "name": "HZ_Spike_Double",
-          "localID": 75,
-          "parentID": 66,
+          "localID": 93,
+          "parentID": 84,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5857,8 +8308,8 @@
           "children": [
             {
               "name": "Spike_Collider",
-              "localID": 76,
-              "parentID": 75,
+              "localID": 94,
+              "parentID": 93,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5887,8 +8338,8 @@
         },
         {
           "name": "HZ_Spike_Double",
-          "localID": 77,
-          "parentID": 66,
+          "localID": 95,
+          "parentID": 84,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -5955,8 +8406,8 @@
           "children": [
             {
               "name": "Spike_Collider",
-              "localID": 78,
-              "parentID": 77,
+              "localID": 96,
+              "parentID": 95,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -5985,8 +8436,8 @@
         },
         {
           "name": "HZ_Spike_Single",
-          "localID": 79,
-          "parentID": 66,
+          "localID": 97,
+          "parentID": 84,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6053,8 +8504,8 @@
           "children": [
             {
               "name": "Spike_Collider",
-              "localID": 80,
-              "parentID": 79,
+              "localID": 98,
+              "parentID": 97,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6082,107 +8533,9 @@
           ]
         },
         {
-          "name": "HZ_Spike_Double",
-          "localID": 81,
-          "parentID": 66,
-          "active": true,
-          "TransformComponent": {
-            "enabled": true,
-            "pos": [
-              13012.2177734375,
-              15657.583984375
-            ],
-            "scale": [
-              494.9998474121094,
-              149.99990844726563
-            ],
-            "rotation": 0.34590521454811096
-          },
-          "RenderComponent": {
-            "enabled": true,
-            "shapeType": "Square",
-            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-            "color": [
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "layer": 0,
-            "screenSpace": false,
-            "tileable": true,
-            "tileCount": [
-              2.0,
-              1.0
-            ]
-          },
-          "Spritesheet": {
-            "enabled": true,
-            "defaultAnimation": "Candle",
-            "animations": [
-              {
-                "name": "Candle",
-                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-                "rows": 1,
-                "cols": 3,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 0,
-                "endCol": 2,
-                "fps": 5.0,
-                "pingPong": false,
-                "flipRows": false
-              },
-              {
-                "name": "Urchin",
-                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
-                "rows": 1,
-                "cols": 3,
-                "startRow": 0,
-                "startCol": 0,
-                "endRow": 0,
-                "endCol": 2,
-                "fps": 5.0,
-                "pingPong": false,
-                "flipRows": false
-              }
-            ]
-          },
-          "children": [
-            {
-              "name": "Spike_Collider",
-              "localID": 82,
-              "parentID": 81,
-              "active": true,
-              "TransformComponent": {
-                "enabled": true,
-                "pos": [
-                  13012.2177734375,
-                  15627.5546875
-                ],
-                "scale": [
-                  380.9998474121094,
-                  89.09087371826172
-                ],
-                "rotation": 0.34590521454811096
-              },
-              "ColliderComponent": {
-                "enabled": true,
-                "shape": "Square",
-                "layer": "Enemy",
-                "size": [
-                  381.0,
-                  89.0909194946289
-                ]
-              },
-              "children": []
-            }
-          ]
-        },
-        {
           "name": "HZ_Spike_Single",
-          "localID": 83,
-          "parentID": 66,
+          "localID": 101,
+          "parentID": 84,
           "active": true,
           "TransformComponent": {
             "enabled": true,
@@ -6249,8 +8602,8 @@
           "children": [
             {
               "name": "Spike_Collider",
-              "localID": 84,
-              "parentID": 83,
+              "localID": 102,
+              "parentID": 101,
               "active": true,
               "TransformComponent": {
                 "enabled": true,
@@ -6276,6 +8629,75 @@
               "children": []
             }
           ]
+        },
+        {
+          "name": "HZ_Spike_Double(32)",
+          "localID": 108,
+          "parentID": 84,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              13012.2177734375,
+              15657.583984375
+            ],
+            "scale": [
+              494.9998474121094,
+              149.99990844726563
+            ],
+            "rotation": 0.34590521454811096
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": []
         }
       ]
     },
@@ -6477,7 +8899,6 @@
       ]
     }
   ],
-  "TilemapFile": "../Assets/Tiles/L3_V11.tilemap",
   "AudioManager": {
     "sounds": [
       {
