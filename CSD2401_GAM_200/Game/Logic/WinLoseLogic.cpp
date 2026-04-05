@@ -734,8 +734,8 @@ void WinLoseLogicSystem::CreateWinScreen()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 2080.0f * uiScale;
-    boardTransform->scaleY = 1170.0f * uiScale;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1179,8 +1179,8 @@ void WinLoseLogicSystem::CreateWinScreen2()
     auto* board2Transform = board2->AddComponent<TransformComponent>();
     board2Transform->posX = camPos.x;
     board2Transform->posY = camPos.y;
-    board2Transform->scaleX = 2080.0f * uiScale;
-    board2Transform->scaleY = 1170.0f * uiScale;
+    board2Transform->scaleX = 1920.0f * uiScale;
+    board2Transform->scaleY = 1080.0f * uiScale;
     auto* board2Render = board2->AddComponent<RenderComponent>();
     board2Render->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     board2Render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1559,8 +1559,8 @@ void WinLoseLogicSystem::TriggerLose()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 2080.0f * uiScale;
-    boardTransform->scaleY = 1170.0f * uiScale;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_over_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));

@@ -41,9 +41,9 @@
       "name": "Title_GameObject",
       "localID": 2,
       "parentID": 4294967295,
-      "active": false,
+      "active": true,
       "TransformComponent": {
-        "enabled": false,
+        "enabled": true,
         "pos": [
           0.0,
           300.0
@@ -55,7 +55,7 @@
         "rotation": 0.0
       },
       "RenderComponent": {
-        "enabled": false,
+        "enabled": true,
         "shapeType": "Square",
         "texturePath": "../Assets/title_spritesheet.png",
         "color": [
@@ -73,7 +73,7 @@
         ]
       },
       "Spritesheet": {
-        "enabled": false,
+        "enabled": true,
         "defaultAnimation": "Title_Animation",
         "animations": [
           {

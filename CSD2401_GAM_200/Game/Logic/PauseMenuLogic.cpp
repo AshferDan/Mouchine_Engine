@@ -1707,7 +1707,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     GameObject* overlay = factory.CreateGameObject("PauseOverlay");
     auto* overlayTransform = overlay->AddComponent<TransformComponent>();
     overlayTransform->posX = 0.0f;
-    overlayTransform->posY = 0.0f;
+    overlayTransform->posY = -0.0f;
     overlayTransform->scaleX = 5000.0f * uiScale;
     overlayTransform->scaleY = 5000.0f * uiScale;
     auto* overlayRender = overlay->AddComponent<RenderComponent>();
@@ -1730,8 +1730,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = 0.0f;
     boardTransform->posY = 0.0f;
-    boardTransform->scaleX = 2080.0f * uiScale;
-    boardTransform->scaleY = 1170.0f * uiScale;
+    boardTransform->scaleX = 2000.0f * uiScale;
+    boardTransform->scaleY = 1100.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Pause_Menu_New.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1843,8 +1843,8 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 2080.0f * uiScale;
-    settingsTransform->scaleY = 1170.0f * uiScale;
+    settingsTransform->scaleX = 192.0f * uiScale;
+    settingsTransform->scaleY = 1080.0f * uiScale;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings_New.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -2652,9 +2652,9 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     GameObject* howToPlayScreen = factory.CreateGameObject("PauseScreen_HowToPlay");
     auto* howToPlayTransform = howToPlayScreen->AddComponent<TransformComponent>();
     howToPlayTransform->posX = 0.0f;
-    howToPlayTransform->posY = 0.0f;
-    howToPlayTransform->scaleX = 2080.0f * uiScale;
-    howToPlayTransform->scaleY = 1170.0f * uiScale;
+    howToPlayTransform->posY = -0.55f;
+    howToPlayTransform->scaleX = 2000.0f * uiScale;
+    howToPlayTransform->scaleY = 1100.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
     howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel_Keyboard.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -3458,7 +3458,7 @@ void PauseMenuLogicSystem::CreateLeaderboardUI()
     {
         auto* t = board->AddComponent<TransformComponent>();
         t->posX = 0.0f; t->posY = 0.0f;
-        t->scaleX = 2080.0f * s; t->scaleY = 1170.0f * s;
+        t->scaleX = 2000.0f * s; t->scaleY = 1100.0f * s;
         auto* r = board->AddComponent<RenderComponent>();
         r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_menu.png"));
         r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer);
