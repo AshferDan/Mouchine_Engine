@@ -544,6 +544,15 @@ namespace CSharpScript
                         NPCs[i].audioPlaying = false;
                     }
                 }
+
+                if (NPCs[i].name == "PU_Shell")
+                {
+                    if (Input.GetKeyPressed(Input.KeyCode.V))
+                    {
+                        Debug.Log("reached");
+                        Audio.FadeOutSound(NPCs[i].soundName, 0);
+                    }
+                }
             }
 
             #endregion
@@ -2011,21 +2020,39 @@ namespace CSharpScript
         const float BASE_OFFSET = 0f;
         const float MAX_SPEED = 1000f;     // match your actual max speed
         const float MAX_OFFSET = 600f;     // double it, go big
+        const float CAMERA_LERP = 0.12f;
 
         float[] GEAR_LERP = { 0f, 0.04f, 0.08f, 0.12f };
-        float[] GEAR_OFFSET = { 300f, 350f, 425f, 600f };
+        float[] GEAR_OFFSET = { 400f, 450f, 550f, 750f };
+        float WS_OFFSET = 400f;
+
+        float speed_factor = 0;
+        float target_offset = 0;
+
+        const float LERP_SAME_DIR = 0.04f;   // smooth, lazy when continuing same direction
+        const float LERP_SWITCH_DIR = 0.6f;  // snappy when switching sides
 
         void HandleCameraTracking()
         {
             vec2 vel = Physics.GetVelocity(OwnerName);
             int index = GetCurrentTentacleLevel();
-            float speed_factor = Math.Max(-1f, Math.Min(1f, vel.x / MAX_SPEED));
-            float target_offset = 0f;
-            Debug.Log($"vel.x: {vel.x}  index: {index}  speed_factor: {speed_factor}  currOffset: {currOffset.x}");
+            speed_factor = Math.Max(-1f, Math.Min(1f, vel.x / MAX_SPEED));
 
+            if (currState == PlayerState.WallSliding || currState == PlayerState.WallJumping)
+            {
+                target_offset = IsFacingRight ? WS_OFFSET : -WS_OFFSET;
+            }
+            else
+            {
+                target_offset = BASE_OFFSET - (speed_factor * GEAR_OFFSET[index]);
+            }
 
-            target_offset = BASE_OFFSET - (speed_factor * GEAR_OFFSET[index]);
-            currOffset.x = target_offset;
+            // switching sides if currOffset and target are on opposite sides of zero
+            bool isSwitchingDir = (target_offset > 0f) != (currOffset.x > 0f);
+            float lerp = isSwitchingDir ? LERP_SWITCH_DIR : LERP_SAME_DIR;
+
+            currOffset.x += (target_offset - currOffset.x) * lerp;
+
             Camera.SetFollowOffset(currOffset.x, 0);
         }
         #endregion
