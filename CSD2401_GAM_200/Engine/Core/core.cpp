@@ -662,7 +662,8 @@ void CoreEngine::HandleWindowFocusChanged(bool focused)
         inputManager->ResetState();
 
     // Resume hard-paused audio only if game was not already paused before alt-tab
-    if (!m_gamePause && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
+    bool editorIsPaused = levelEditor && levelEditor->GetEditorMode() == EditorMode::Pause;
+    if (!m_gamePause && !editorIsPaused && audioManager && !(cutsceneSystem && cutsceneSystem->IsPlaying()))
     {
         audioManager->PauseAllSounds(false);
     }
