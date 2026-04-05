@@ -74,7 +74,7 @@ void MenuLogicSystem::Update(float dt)
                 if (sounds.find("MainMenuBGM") != sounds.end())
                 {
                     // std::cout << "[MenuLogic] MainMenuBGM found, starting playback" << std::endl;
-                    audioManager->StopSound("bgm_channel");
+                    audioManager->FadeOutAll(1.0f);
                     audioManager->PlaySound("MainMenuBGM", "bgm_channel");
 
                     // fade in to user's saved volume setting
