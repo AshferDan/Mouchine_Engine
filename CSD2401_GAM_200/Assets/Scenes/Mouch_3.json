@@ -504,28 +504,28 @@
             "Pen_Bonk": 0.5
           },
           "ParallaxBackground": {
-            "LayerFarBack": "",
-            "LayerBack": "",
-            "LayerMid": "ƈ",
+            "LayerFarBack": "Parallax_BG_2",
+            "LayerBack": "MIdlayer_BackGround2",
+            "LayerMid": "Frontlayer_BackGround2",
             "LayerFront": "",
-            "FactorFarBack": 0.800000011920929,
-            "FactorBack": 0.30000001192092896,
-            "FactorMid": 0.699999988079071,
-            "FactorFront": 0.8999999761581421,
+            "FactorFarBack": 1.0,
+            "FactorBack": 1.0,
+            "FactorMid": 1.0,
+            "FactorFront": 0.0,
             "FactorYFarBack": 1.0,
             "FactorYBack": 1.0,
             "FactorYMid": 1.0,
             "FactorYFront": 1.0,
             "TileWidthFarBack": 4200.0,
-            "TileWidthBack": 0.0,
-            "TileWidthMid": 4150.0,
+            "TileWidthBack": 4200.0,
+            "TileWidthMid": 4200.0,
             "TileWidthFront": 0.0,
             "OffsetXFarBack": 0.0,
-            "OffsetYFarBack": 0.0,
+            "OffsetYFarBack": -100.0,
             "OffsetXBack": 0.0,
-            "OffsetYBack": 0.0,
+            "OffsetYBack": -100.0,
             "OffsetXMid": 0.0,
-            "OffsetYMid": 0.0,
+            "OffsetYMid": -100.0,
             "OffsetXFront": 0.0,
             "OffsetYFront": 0.0,
             "AutoScrollFarBack": 0.0,
@@ -8897,7 +8897,463 @@
           "children": []
         }
       ]
-    }
+    },
+  {
+    "name": "Parallax_2",
+    "localID": 157,
+    "parentID": 4294967295,
+    "active": true,
+    "TransformComponent": {
+      "enabled": true,
+      "pos": [
+        800.0,
+        0.0
+      ],
+      "scale": [
+        50.0,
+        50.0
+      ],
+      "rotation": 0.0
+    },
+    "children": [
+      {
+        "name": "Parallax_BG_2_R",
+        "localID": 158,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -3418.82275390625,
+            15433.0
+          ],
+          "scale": [
+            4200.0,
+            1920.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -110,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "Parallax_BG_2_L",
+        "localID": 159,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -11800.0,
+            15433.0
+          ],
+          "scale": [
+            4200.0,
+            1920.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -111,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "Parallax_BG_2",
+        "localID": 160,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -7609.99462890625,
+            15433.0
+          ],
+          "scale": [
+            4200.0,
+            1920.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_1_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -110,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": [
+          {
+            "name": "Below",
+            "localID": 161,
+            "parentID": 160,
+            "active": true,
+            "TransformComponent": {
+              "enabled": true,
+              "pos": [
+                -7609.99462890625,
+                13520.0
+              ],
+              "scale": [
+                4200.0,
+                1920.0
+              ],
+              "rotation": 0.0
+            },
+            "RenderComponent": {
+              "enabled": true,
+              "shapeType": "Square",
+              "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+              "color": [ 1.0, 1.0, 1.0, 1.0 ],
+              "layer": -109,
+              "screenSpace": false,
+              "tileable": false,
+              "tileCount": [ 1.0, 1.0 ]
+            },
+            "children": []
+          },
+          {
+            "name": "Below(1)",
+            "localID": 162,
+            "parentID": 160,
+            "active": true,
+            "TransformComponent": {
+              "enabled": true,
+              "pos": [
+                -11802.3466796875,
+                13520.0
+              ],
+              "scale": [
+                4200.0,
+                1920.0
+              ],
+              "rotation": 0.0
+            },
+            "RenderComponent": {
+              "enabled": true,
+              "shapeType": "Square",
+              "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+              "color": [ 1.0, 1.0, 1.0, 1.0 ],
+              "layer": -109,
+              "screenSpace": false,
+              "tileable": false,
+              "tileCount": [ 1.0, 1.0 ]
+            },
+            "children": []
+          },
+          {
+            "name": "Below(2)",
+            "localID": 163,
+            "parentID": 160,
+            "active": true,
+            "TransformComponent": {
+              "enabled": true,
+              "pos": [
+                -3409.99609375,
+                13520.0
+              ],
+              "scale": [
+                4200.0,
+                1920.0
+              ],
+              "rotation": 0.0
+            },
+            "RenderComponent": {
+              "enabled": true,
+              "shapeType": "Square",
+              "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+              "color": [ 1.0, 1.0, 1.0, 1.0 ],
+              "layer": -109,
+              "screenSpace": false,
+              "tileable": false,
+              "tileCount": [ 1.0, 1.0 ]
+            },
+            "children": []
+          },
+          {
+            "name": "Top",
+            "localID": 164,
+            "parentID": 160,
+            "active": true,
+            "TransformComponent": {
+              "enabled": true,
+              "pos": [
+                -7609.9951171875,
+                17310.0
+              ],
+              "scale": [
+                4200.0,
+                1920.0003662109375
+              ],
+              "rotation": 180.0
+            },
+            "RenderComponent": {
+              "enabled": true,
+              "shapeType": "Square",
+              "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+              "color": [ 1.0, 1.0, 1.0, 1.0 ],
+              "layer": -111,
+              "screenSpace": false,
+              "tileable": false,
+              "tileCount": [ 1.0, 1.0 ]
+            },
+            "children": []
+          },
+          {
+            "name": "Top(1)",
+            "localID": 165,
+            "parentID": 160,
+            "active": true,
+            "TransformComponent": {
+              "enabled": true,
+              "pos": [
+                -11802.3466796875,
+                17310.0
+              ],
+              "scale": [
+                4200.0,
+                1919.99951171875
+              ],
+              "rotation": 180.0
+            },
+            "RenderComponent": {
+              "enabled": true,
+              "shapeType": "Square",
+              "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+              "color": [ 1.0, 1.0, 1.0, 1.0 ],
+              "layer": -111,
+              "screenSpace": false,
+              "tileable": false,
+              "tileCount": [ 1.0, 1.0 ]
+            },
+            "children": []
+          },
+          {
+            "name": "Top(2)",
+            "localID": 166,
+            "parentID": 160,
+            "active": true,
+            "TransformComponent": {
+              "enabled": true,
+              "pos": [
+                -3409.99560546875,
+                17310.0
+              ],
+              "scale": [
+                4200.0,
+                1920.0018310546875
+              ],
+              "rotation": 180.0
+            },
+            "RenderComponent": {
+              "enabled": true,
+              "shapeType": "Square",
+              "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+              "color": [ 1.0, 1.0, 1.0, 1.0 ],
+              "layer": -111,
+              "screenSpace": false,
+              "tileable": false,
+              "tileCount": [ 1.0, 1.0 ]
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Frontlayer_BackGround2_R",
+        "localID": 167,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -3408.82275390625,
+            15140.0
+          ],
+          "scale": [
+            4200.0,
+            1320.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -109,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "Frontlayer_BackGround2_L",
+        "localID": 168,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -11809.998046875,
+            15140.0
+          ],
+          "scale": [
+            4200.0,
+            1320.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -110,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "MIdlayer_BackGround2_L",
+        "localID": 169,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -11809.998046875,
+            15430.0
+          ],
+          "scale": [
+            4200.0,
+            1920.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -111,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "MIdlayer_BackGround2_R",
+        "localID": 170,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -3408.82275390625,
+            15433.0
+          ],
+          "scale": [
+            4200.0,
+            1920.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -111,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "Frontlayer_BackGround2",
+        "localID": 171,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -7609.99462890625,
+            15140.0
+          ],
+          "scale": [
+            4200.0,
+            1320.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_2_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -109,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      },
+      {
+        "name": "MIdlayer_BackGround2",
+        "localID": 172,
+        "parentID": 157,
+        "active": true,
+        "TransformComponent": {
+          "enabled": true,
+          "pos": [
+            -7609.99462890625,
+            15433.0
+          ],
+          "scale": [
+            4200.0,
+            1920.0
+          ],
+          "rotation": 0.0
+        },
+        "RenderComponent": {
+          "enabled": true,
+          "shapeType": "Square",
+          "texturePath": "../Assets/Environment 2/BG_LAYER_3_DARK.png",
+          "color": [ 1.0, 1.0, 1.0, 1.0 ],
+          "layer": -111,
+          "screenSpace": false,
+          "tileable": false,
+          "tileCount": [ 1.0, 1.0 ]
+        },
+        "children": []
+      }
+    ]
+  }
   ],
   "AudioManager": {
     "sounds": [
