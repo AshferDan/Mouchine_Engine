@@ -1912,7 +1912,7 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 192.0f * uiScale;
+    settingsTransform->scaleX = 1920.0f * uiScale;
     settingsTransform->scaleY = 1080.0f * uiScale;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings_New.png"));
