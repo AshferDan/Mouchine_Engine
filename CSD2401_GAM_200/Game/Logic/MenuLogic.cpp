@@ -143,7 +143,7 @@ void MenuLogicSystem::Update(float dt)
 
             else if (currScreen == MenuScreens::Home && !selectedLevelScenePath.empty() && !m_selectedReplay.empty())
             {
-                CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                CORE->RequestSceneLoad(selectedLevelScenePath, true, true);
                 m_selectedReplay.clear();
                 selectedLevelScenePath.clear();
             }
@@ -151,7 +151,7 @@ void MenuLogicSystem::Update(float dt)
             {
                 if (!selectedLevelScenePath.empty())
                 {
-                    CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                    CORE->RequestSceneLoad(selectedLevelScenePath, true, true);
                     selectedLevelScenePath.clear();
                     currScreen = MenuScreens::Home;
                 }
@@ -178,7 +178,7 @@ void MenuLogicSystem::Update(float dt)
                     else
                     {
                         // No cutscene
-                        CORE->RequestSceneLoad(selectedLevelScenePath, true);
+                        CORE->RequestSceneLoad(selectedLevelScenePath, true, true);
                        
                     }
                     m_levelSelectDataLoaded = false;
