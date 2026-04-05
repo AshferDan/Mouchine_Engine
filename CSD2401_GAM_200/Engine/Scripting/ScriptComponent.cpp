@@ -182,8 +182,16 @@ void ScriptComponent::RemoveScript(ScriptID id)
 	auto it = ActiveScript.find(id);
 	if (it != ActiveScript.end())
 	{
-		std::cout << "ScriptComponent Removing " << it->second << " (ID: " << id << ")\n";
+		std::string name = it->second;
+		std::cout << "ScriptComponent Removing " << name << " (ID: " << id << ")\n";
 		ActiveScript.erase(it);
+
+		// Also detach from ScriptSystem so the Mono instance stops receiving OnUpdate calls.
+		if (owner && CORE)
+		{
+			auto scriptSys = CORE->GetScriptSystem();
+			if (scriptSys) scriptSys->RemoveScript(owner, name);
+		}
 	}
 }
 
