@@ -699,7 +699,7 @@ void WinLoseLogicSystem::TriggerWin()
         //audioManager->PlaySound("victory");
         //audioManager->FadeInCategory("music", m_fadeWinIn);
     }
-    m_winBGMDelayTimer = 1.5f;
+    m_winBGMDelayTimer = 2.0f;
 
     m_timerRunning = false; // stop elapsed-time counter
 }

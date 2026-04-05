@@ -20,7 +20,7 @@
       "RenderComponent": {
         "enabled": true,
         "shapeType": "Square",
-        "texturePath": "../Assets/MenuBackground.png",
+        "texturePath": "../Assets/Menu_No_TItle.png",
         "color": [
           1.0,
           1.0,
@@ -49,8 +49,8 @@
           300.0
         ],
         "scale": [
-          990.0,
-          1000.0
+          900.0,
+          900.0
         ],
         "rotation": 0.0
       },

@@ -81,13 +81,17 @@ namespace CSharpScript
         private string[] _names;
         private string[] _namesL;
         private string[] _namesR;
+        private string[] _namesL2;   // optional second left copy  (e.g. "Parallax_BG_L2")
+        private string[] _namesR2;   // optional second right copy (e.g. "Parallax_BG_R2")
         private float[]  _factorsX;
         private float[]  _factorsY;
         private vec2[]   _startWorldPos = new vec2[LayerCount];   // world pos of bg at init
         private vec2     _startCamPos;                            // camera pos at init
-        private bool[]   _inited  = new bool[LayerCount];
-        private bool[]   _initedL = new bool[LayerCount];
-        private bool[]   _initedR = new bool[LayerCount];
+        private bool[]   _inited   = new bool[LayerCount];
+        private bool[]   _initedL  = new bool[LayerCount];
+        private bool[]   _initedR  = new bool[LayerCount];
+        private bool[]   _initedL2 = new bool[LayerCount];
+        private bool[]   _initedR2 = new bool[LayerCount];
 
         public override void OnStart()
         {
@@ -95,12 +99,16 @@ namespace CSharpScript
             _factorsX = new float[] { FactorFarBack, FactorBack, FactorMid, FactorFront };
             _factorsY = new float[] { FactorYFarBack, FactorYBack, FactorYMid, FactorYFront };
 
-            _namesL = new string[LayerCount];
-            _namesR = new string[LayerCount];
+            _namesL  = new string[LayerCount];
+            _namesR  = new string[LayerCount];
+            _namesL2 = new string[LayerCount];
+            _namesR2 = new string[LayerCount];
             for (int i = 0; i < LayerCount; i++)
             {
-                _namesL[i] = _names[i] + "_L";
-                _namesR[i] = _names[i] + "_R";
+                _namesL[i]  = _names[i] + "_L";
+                _namesR[i]  = _names[i] + "_R";
+                _namesL2[i] = _names[i] + "_L2";
+                _namesR2[i] = _names[i] + "_R2";
             }
 
             // Snapshot camera position so parallax is relative to level start,
@@ -155,13 +163,22 @@ namespace CSharpScript
                     posX = _startWorldPos[i].x + camDeltaX - wrapped + off.x;
 
                     // Retry side-copy init in case they loaded after OnStart
-                    if (!_initedL[i] || !_initedR[i])
+                    if (!_initedL[i] || !_initedR[i] || !_initedL2[i] || !_initedR2[i])
                         TryInitLayer(i);
 
                     if (_initedL[i])
-                        Transform.SetPosition(_namesL[i], posX - tw, posY);
+                        Transform.SetPosition(_namesL[i],  posX - tw,       posY);
                     if (_initedR[i])
-                        Transform.SetPosition(_namesR[i], posX + tw, posY);
+                        Transform.SetPosition(_namesR[i],  posX + tw,       posY);
+
+                    // Optional extra copies (_L2 / _R2) — plain background sprites with
+                    // no decoration children.  They sit one extra tile-width out and
+                    // provide coverage when the camera is zoomed out wide enough that
+                    // three copies are insufficient (e.g. zoom 0.5 → viewport 3840 px).
+                    if (_initedL2[i])
+                        Transform.SetPosition(_namesL2[i], posX - 2f * tw,  posY);
+                    if (_initedR2[i])
+                        Transform.SetPosition(_namesR2[i], posX + 2f * tw,  posY);
                 }
                 else
                 {
@@ -207,6 +224,17 @@ namespace CSharpScript
                 {
                     vec2 s = Transform.GetScale(_namesR[i]);
                     if (s.x != 0f || s.y != 0f) _initedR[i] = true;
+                }
+                // Optional extra copies — only used if the objects exist in the scene.
+                if (!_initedL2[i] && !string.IsNullOrEmpty(_namesL2[i]))
+                {
+                    vec2 s = Transform.GetScale(_namesL2[i]);
+                    if (s.x != 0f || s.y != 0f) _initedL2[i] = true;
+                }
+                if (!_initedR2[i] && !string.IsNullOrEmpty(_namesR2[i]))
+                {
+                    vec2 s = Transform.GetScale(_namesR2[i]);
+                    if (s.x != 0f || s.y != 0f) _initedR2[i] = true;
                 }
             }
         }
