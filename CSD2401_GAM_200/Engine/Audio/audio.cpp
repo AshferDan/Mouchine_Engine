@@ -237,14 +237,18 @@ void AudioEngine::stopSound(const std::string& channelName) {
 void AudioEngine::stopAllSound() {
 	for (auto& pair : channels) {
 		if (pair.second) {
-			bool isPlaying = false;
-			pair.second->isPlaying(&isPlaying);
-			if (isPlaying) {
 				pair.second->stop();
-			}
+
 		}
 	}
 	channels.clear();
+	if (system)
+	{
+		FMOD::ChannelGroup* masterGroup = nullptr;
+		if (system->getMasterChannelGroup(&masterGroup) == FMOD_OK && masterGroup)
+			masterGroup->stop();
+	}
+
 	std::cout << "Stopped all sound" << std::endl;
 }
 

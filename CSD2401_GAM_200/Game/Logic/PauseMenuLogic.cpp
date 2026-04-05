@@ -516,11 +516,13 @@ void PauseMenuLogicSystem::Update(float dt)
         }
         else
         {
-            // no low pass filter when how to play closes
+            // restore low pass if returning to pause menu, otherwise remove it
             if (audioManager)
             {
-                audioManager->SetLowPassFilter("bgm", false);
-                //std::cout << "[PauseMenu] Low pass filter disabled for How To Play" << std::endl;
+                if (isPauseMenuActive)
+                    audioManager->SetLowPassFilter("bgm", true, 800.0f, 1.0f);
+                else
+                    audioManager->SetLowPassFilter("bgm", false);
             }
 
             // Hide how to play UI
@@ -1428,6 +1430,22 @@ void PauseMenuLogicSystem::Update(float dt)
         double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
         bool isClicked = InputManager::IsMouseLeftClicked();
 
+        // ESC closes the leaderboard and returns to the pause main menu
+        static bool escWasPressedLeaderboard = false;
+        if (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            if (!escWasPressedLeaderboard)
+            {
+                pendingLeaderboardClose = true;
+                leaderboardCloseTimer = 0.15f;
+                escWasPressedLeaderboard = true;
+            }
+        }
+        else
+        {
+            escWasPressedLeaderboard = false;
+        }
+
         std::string currentHover = "";
         if (IsMouseOver(factory.FindGameObject("PauseLB_Back"), mouseX, mouseY))
             currentHover = "PauseLB_Back";
@@ -1707,7 +1725,7 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     GameObject* overlay = factory.CreateGameObject("PauseOverlay");
     auto* overlayTransform = overlay->AddComponent<TransformComponent>();
     overlayTransform->posX = 0.0f;
-    overlayTransform->posY = 0.0f;
+    overlayTransform->posY = -0.0f;
     overlayTransform->scaleX = 5000.0f * uiScale;
     overlayTransform->scaleY = 5000.0f * uiScale;
     auto* overlayRender = overlay->AddComponent<RenderComponent>();
@@ -1730,8 +1748,8 @@ void PauseMenuLogicSystem::CreatePauseMenuUI()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = 0.0f;
     boardTransform->posY = 0.0f;
-    boardTransform->scaleX = 2080.0f * uiScale;
-    boardTransform->scaleY = 1170.0f * uiScale;
+    boardTransform->scaleX = 2000.0f * uiScale;
+    boardTransform->scaleY = 1100.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Pause_Menu_New.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1843,8 +1861,8 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
     settingsTransform->posX = 0.0f;
     settingsTransform->posY = 0.0f;
-    settingsTransform->scaleX = 2080.0f * uiScale;
-    settingsTransform->scaleY = 1170.0f * uiScale;
+    settingsTransform->scaleX = 192.0f * uiScale;
+    settingsTransform->scaleY = 1080.0f * uiScale;
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings_New.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -2652,9 +2670,9 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     GameObject* howToPlayScreen = factory.CreateGameObject("PauseScreen_HowToPlay");
     auto* howToPlayTransform = howToPlayScreen->AddComponent<TransformComponent>();
     howToPlayTransform->posX = 0.0f;
-    howToPlayTransform->posY = 0.0f;
-    howToPlayTransform->scaleX = 2080.0f * uiScale;
-    howToPlayTransform->scaleY = 1170.0f * uiScale;
+    howToPlayTransform->posY = -0.55f;
+    howToPlayTransform->scaleX = 2000.0f * uiScale;
+    howToPlayTransform->scaleY = 1100.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
     howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel_Keyboard.png"));
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -3458,7 +3476,7 @@ void PauseMenuLogicSystem::CreateLeaderboardUI()
     {
         auto* t = board->AddComponent<TransformComponent>();
         t->posX = 0.0f; t->posY = 0.0f;
-        t->scaleX = 2080.0f * s; t->scaleY = 1170.0f * s;
+        t->scaleX = 2000.0f * s; t->scaleY = 1100.0f * s;
         auto* r = board->AddComponent<RenderComponent>();
         r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Leaderboards_menu.png"));
         r->SetColor(vec4(1,1,1,1)); r->SetLayer(baseLayer);

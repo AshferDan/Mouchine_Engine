@@ -160,10 +160,6 @@ void SplashScreenSystem::Run()
 {
     if (!m_gfx) return;
 
-        GLuint currentTex = 0;
-        float  alpha = 1.f;
-        int    imgW = 1, imgH = 1;
-
     GLFWwindow* win = m_gfx->getWindow();
     m_prevTime = glfwGetTime();
     m_state = State::FadeInSchool;
@@ -176,10 +172,14 @@ void SplashScreenSystem::Run()
         float  dt = static_cast<float>(now - m_prevTime);
         m_prevTime = now;
 
+        // --- query actual framebuffer size (correct in both windowed and fullscreen) ---
+        int fbW, fbH;
+        glfwGetFramebufferSize(win, &fbW, &fbH);
+
         // --- resolve current logo and alpha ---
         GLuint currentTex = 0;
         float  alpha = 1.f;
-
+        int    imgW = 1, imgH = 1;
 
         switch (m_state)
         {
@@ -195,7 +195,6 @@ void SplashScreenSystem::Run()
             currentTex = m_schoolTex;  imgW = m_schoolW;  imgH = m_schoolH;
             alpha = 1.f - std::min(m_stateTime / m_fadeSecs, 1.f);
             break;
-            // Game logo states
         case State::FadeInGame:
             currentTex = m_gameTex;  imgW = m_gameW;  imgH = m_gameH;
             alpha = std::min(m_stateTime / m_fadeSecs, 1.f);
@@ -214,26 +213,19 @@ void SplashScreenSystem::Run()
 
         // --- render ---
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glViewport(0, 0, m_gfx->GetWindowWidth(), m_gfx->GetWindowHeight());
+        glViewport(0, 0, fbW, fbH);          // use actual framebuffer size
         glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (currentTex)
-            DrawLogo(currentTex, alpha, imgW, imgH);
+            DrawLogo(currentTex, alpha, imgW, imgH, fbW, fbH);  // pass fb dims
 
         glfwSwapBuffers(win);
         glfwPollEvents();
 
-        // --- advance state machine ---
         AdvanceState(dt);
     }
 
-    // -----------------------------------------------------------------------
-    // Full GL state reset — splash leaves blend/program/texture state dirty.
-    // Without this the main renderer's transparency breaks on its first frame.
-    // glPixelStorei is especially critical — misalignment silently corrupts
-    // all subsequent texture uploads (same bug as ScreenTransitionSystem).
-    // -----------------------------------------------------------------------
     glDisable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(0);
@@ -284,23 +276,19 @@ void SplashScreenSystem::AdvanceState(float dt)
 // ---------------------------------------------------------------------------
 // DrawLogo
 // ---------------------------------------------------------------------------
-void SplashScreenSystem::DrawLogo(GLuint tex, float alpha, int imgW, int imgH)
+void SplashScreenSystem::DrawLogo(GLuint tex, float alpha, int imgW, int imgH, int fbW, int fbH)
 {
     if (!m_progHandle || !m_quadVAO) return;
 
-    // --- compute NDC half-extents preserving aspect ratio ---
-    // coverage = how much of the screen height the logo occupies (0.0 - 1.0)
-    const float coverage = 0.4f;  // 40% of screen height — adjust to taste
+    const float coverage = 0.4f;
 
-    float screenAspect = (float)m_gfx->GetWindowWidth() / (float)m_gfx->GetWindowHeight();
+    // Use the passed-in framebuffer dimensions — correct in fullscreen
+    float screenAspect = (float)fbW / (float)fbH;
     float logoAspect = (float)imgW / (float)imgH;
 
-    // NDC height the logo should occupy
     float ndcH = coverage;
-    // NDC width scaled to preserve logo aspect, corrected for screen aspect
     float ndcW = ndcH * logoAspect / screenAspect;
 
-    // Clamp: if logo is too wide, fit by width instead
     if (ndcW > coverage)
     {
         ndcW = coverage;

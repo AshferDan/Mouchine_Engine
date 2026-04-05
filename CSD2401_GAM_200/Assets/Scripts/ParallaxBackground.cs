@@ -77,30 +77,50 @@ namespace CSharpScript
         public float OffsetXMid     = 0f; public float OffsetYMid     = 0f;
         public float OffsetXFront   = 0f; public float OffsetYFront   = 0f;
 
+        // --- Per-layer autonomous scroll speed (world units per second).
+        //     Positive = scroll right, negative = scroll left.
+        //     Independent of camera movement — use for ambient motion (e.g. drifting clouds). ---
+        public float AutoScrollFarBack = 0f;
+        public float AutoScrollBack    = 0f;
+        public float AutoScrollMid     = 0f;
+        public float AutoScrollFront   = 0f;
+
         // Internal state
         private string[] _names;
         private string[] _namesL;
         private string[] _namesR;
+        private string[] _namesL2;   // optional second left copy  (e.g. "Parallax_BG_L2")
+        private string[] _namesR2;   // optional second right copy (e.g. "Parallax_BG_R2")
         private float[]  _factorsX;
         private float[]  _factorsY;
+        private float[]  _autoScrolls;
+        private float[]  _autoScrollAccum = new float[LayerCount];  // accumulated auto-scroll X
         private vec2[]   _startWorldPos = new vec2[LayerCount];   // world pos of bg at init
         private vec2     _startCamPos;                            // camera pos at init
-        private bool[]   _inited  = new bool[LayerCount];
-        private bool[]   _initedL = new bool[LayerCount];
-        private bool[]   _initedR = new bool[LayerCount];
+        private bool[]   _inited   = new bool[LayerCount];
+        private bool[]   _initedL  = new bool[LayerCount];
+        private bool[]   _initedR  = new bool[LayerCount];
+        private bool[]   _initedL2 = new bool[LayerCount];
+        private bool[]   _initedR2 = new bool[LayerCount];
 
         public override void OnStart()
         {
             _names = new string[] { LayerFarBack, LayerBack, LayerMid, LayerFront };
             _factorsX = new float[] { FactorFarBack, FactorBack, FactorMid, FactorFront };
             _factorsY = new float[] { FactorYFarBack, FactorYBack, FactorYMid, FactorYFront };
+            _autoScrolls = new float[] { AutoScrollFarBack, AutoScrollBack, AutoScrollMid, AutoScrollFront };
+            _autoScrollAccum = new float[LayerCount];
 
-            _namesL = new string[LayerCount];
-            _namesR = new string[LayerCount];
+            _namesL  = new string[LayerCount];
+            _namesR  = new string[LayerCount];
+            _namesL2 = new string[LayerCount];
+            _namesR2 = new string[LayerCount];
             for (int i = 0; i < LayerCount; i++)
             {
-                _namesL[i] = _names[i] + "_L";
-                _namesR[i] = _names[i] + "_R";
+                _namesL[i]  = _names[i] + "_L";
+                _namesR[i]  = _names[i] + "_R";
+                _namesL2[i] = _names[i] + "_L2";
+                _namesR2[i] = _names[i] + "_R2";
             }
 
             // Snapshot camera position so parallax is relative to level start,
@@ -130,6 +150,9 @@ namespace CSharpScript
                     if (!_inited[i]) continue;
                 }
 
+                // Accumulate autonomous scroll for this layer
+                _autoScrollAccum[i] += _autoScrolls[i] * dt;
+
                 float fx  = _factorsX[i];
                 float fy  = _factorsY[i];
                 vec2  off = GetOffset(i);
@@ -148,26 +171,35 @@ namespace CSharpScript
                     //   posX    = start world pos + full camera delta - drift wrap.
                     //   This is equivalent to the non-tiling formula when drift < tw,
                     //   and seamlessly repeats after each full tile-width of camera travel.
-                    float drift   = camDeltaX * (1f - fx);
+                    float drift   = camDeltaX * (1f - fx) - _autoScrollAccum[i];
                     float wrapped = drift % tw;
                     if (wrapped < 0f) wrapped += tw;
 
                     posX = _startWorldPos[i].x + camDeltaX - wrapped + off.x;
 
                     // Retry side-copy init in case they loaded after OnStart
-                    if (!_initedL[i] || !_initedR[i])
+                    if (!_initedL[i] || !_initedR[i] || !_initedL2[i] || !_initedR2[i])
                         TryInitLayer(i);
 
                     if (_initedL[i])
-                        Transform.SetPosition(_namesL[i], posX - tw, posY);
+                        Transform.SetPosition(_namesL[i],  posX - tw,       posY);
                     if (_initedR[i])
-                        Transform.SetPosition(_namesR[i], posX + tw, posY);
+                        Transform.SetPosition(_namesR[i],  posX + tw,       posY);
+
+                    // Optional extra copies (_L2 / _R2) — plain background sprites with
+                    // no decoration children.  They sit one extra tile-width out and
+                    // provide coverage when the camera is zoomed out wide enough that
+                    // three copies are insufficient (e.g. zoom 0.5 → viewport 3840 px).
+                    if (_initedL2[i])
+                        Transform.SetPosition(_namesL2[i], posX - 2f * tw,  posY);
+                    if (_initedR2[i])
+                        Transform.SetPosition(_namesR2[i], posX + 2f * tw,  posY);
                 }
                 else
                 {
                     // No tiling — simple drift: background moves by (camDelta * fx).
                     // fx=0 → stays at start world pos. fx=1 → locked to camera.
-                    posX = _startWorldPos[i].x + camDeltaX * fx + off.x;
+                    posX = _startWorldPos[i].x + camDeltaX * fx + _autoScrollAccum[i] + off.x;
                 }
 
                 Transform.SetPosition(_names[i], posX, posY);
@@ -207,6 +239,17 @@ namespace CSharpScript
                 {
                     vec2 s = Transform.GetScale(_namesR[i]);
                     if (s.x != 0f || s.y != 0f) _initedR[i] = true;
+                }
+                // Optional extra copies — only used if the objects exist in the scene.
+                if (!_initedL2[i] && !string.IsNullOrEmpty(_namesL2[i]))
+                {
+                    vec2 s = Transform.GetScale(_namesL2[i]);
+                    if (s.x != 0f || s.y != 0f) _initedL2[i] = true;
+                }
+                if (!_initedR2[i] && !string.IsNullOrEmpty(_namesR2[i]))
+                {
+                    vec2 s = Transform.GetScale(_namesR2[i]);
+                    if (s.x != 0f || s.y != 0f) _initedR2[i] = true;
                 }
             }
         }

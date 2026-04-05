@@ -1007,6 +1007,18 @@ namespace CSharpScript
         public static extern void Load3DSound(string name, string filepath, bool loop = false,
                                               float minDistance = 100.0f, float maxDistance = 1000.0f,
                                               string category = "sfx", float volume = 1.0f, float pitch = 1.0f);
+
+        /// <summary>
+        /// Fades out a specific sound by name over the given duration.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeOutSound(string soundName, float duration);
+
+        /// <summary>
+        /// Fades in a specific sound by name over the given duration to the target volume.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void FadeInSound(string soundName, float duration, float targetVolume = 1.0f);
     }
 
     /// <summary>

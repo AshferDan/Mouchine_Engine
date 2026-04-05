@@ -272,6 +272,11 @@ if(TARGET mono)
     target_link_libraries(Engine PUBLIC mono)
 endif()
 
+# Windows system libraries required by BuildSizeAnalyzer (IFileDialog / COM)
+if(WIN32)
+    target_link_libraries(Engine PUBLIC ole32 Shell32)
+endif()
+
 # ======================= Game Executable ===============
 add_executable(Game
     ${Game_SRC}

@@ -1800,6 +1800,24 @@ bool Raycast(float x, float y, float dx, float dy, float distance, MonoString* s
         }
     }
 
+    void FadeOutSound(const std::string soundName, float duration)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeOutSound(soundName, duration);
+        }
+    }
+
+    void FadeInSound(const std::string soundName, float duration, float targetVolume)
+    {
+        AudioManager* audioManager = CORE->GetAudioManager();
+        if (audioManager)
+        {
+            audioManager->FadeInSound(soundName, duration, targetVolume);
+        }
+    }
+
     // 3D Audio / Spatial Sound
     void Set3DListenerPosition(float x, float y)
     {
