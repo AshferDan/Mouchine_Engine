@@ -520,7 +520,7 @@ namespace CSharpScript
                 {
                     if (!NPCs[i].audioPlaying)
                     {
-                        Audio.PlaySound(NPCs[i].soundName, NPCs[i].soundName);
+                        Audio.PlaySound(NPCs[i].soundName, NPCs[i].soundName + "_channel");
                         //Debug.Log("\n\n PLAYING SOUND: scissors_snip" + (i).ToString() + " | CHANNEL: lobster_scissors" + (i).ToString());
                         NPCs[i].audioPlaying = true;
                     }
@@ -529,11 +529,11 @@ namespace CSharpScript
                     float horizontalDist1 = Math.Abs(distX);
                     if (horizontalDist1 < 200.0f)
                     {
-                        Audio.Set3DSoundPosition(NPCs[i].soundName, playerPos.x, NPCs[i].pos.y);
+                        Audio.Set3DSoundPosition(NPCs[i].soundName + "_channel", playerPos.x, NPCs[i].pos.y);
                     }
                     else
                     {
-                        Audio.Set3DSoundPosition(NPCs[i].soundName, NPCs[i].pos.x, NPCs[i].pos.y);
+                        Audio.Set3DSoundPosition(NPCs[i].soundName + "_channel", NPCs[i].pos.x, NPCs[i].pos.y);
                     }
                 }
                 else
@@ -542,7 +542,7 @@ namespace CSharpScript
                     if (NPCs[i].audioPlaying)
                     {
                         //Debug.Log("lobster_scissors" + (i).ToString());
-                        Audio.StopSound(NPCs[i].soundName);
+                        Audio.StopSound(NPCs[i].soundName + "_channel");
                         NPCs[i].audioPlaying = false;
                     }
                 }
