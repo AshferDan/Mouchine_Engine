@@ -1,7 +1,7 @@
 ﻿/* Start Header ************************************************************************/
 /*!
 \file       PlayerMovement.cs
-\author     Ashfer [100% - 748 lines]
+\author     Ashfer [100% - 160 lines]
 \par        m.binafzalkhan@digipen.edu
 \date       Novenber, 26, 2025
 

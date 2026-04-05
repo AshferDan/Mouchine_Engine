@@ -906,19 +906,19 @@ void WinLoseLogicSystem::CreateWinScreen()
     auto* ratingBadgeR = ratingBadge->AddComponent<RenderComponent>();
 
     float score = CalculateRating();
-    if (score >= 85.0f)
+    if (score >= 70.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_S.png"));
     }
-    else if (score >= 75.0f)
+    else if (score >= 60.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_A.png"));
     }
-    else if (score >= 65.0f)
+    else if (score >= 50.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_B.png"));
     }
-    else if (score >= 50.0f)
+    else if (score >= 40.0f)
     {
         ratingBadgeR->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_C.png"));
     }
@@ -2083,11 +2083,19 @@ void WinLoseLogicSystem::GetLevelInfo(std::string& outLevelNum, std::string& out
 // helper function
 float WinLoseLogicSystem::CalculateRating() const
 {
-    //(10000 / elapsedTime) * 1000 + (pickups * 500)
-    // HARD CODED FOR NOW
-    int scorepercentage = std::max(0, 60 - static_cast<int>(m_elapsedTime / 60));
-    float currScore = (scorepercentage * 100.f) + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
-    float totalScore = 100.f + (CORE->GetGameCallbacks()->GetCurrentCoins() * 10.f) + (CORE->GetGameCallbacks()->GetCurrentShells() * 50.f);
-    std::cout << "CalculateRating(): " << (currScore / totalScore) * 100 << '\n';
-    return (currScore / totalScore) * 100;
+    int coins = CORE->GetGameCallbacks()->GetCurrentCoins();
+    int shells = CORE->GetGameCallbacks()->GetCurrentShells();
+    float levelLength = CORE->GetGameCallbacks()->GetLevelTimerLength();
+
+    float timeRatio = m_elapsedTime / levelLength;
+    float timeScore = timeRatio * 100;
+
+    int maxPickups = (CORE->GetGameCallbacks()->GetTotalCoins() * 10) + (CORE->GetGameCallbacks()->GetTotalShells() * 75);
+    int collectedPickups = (coins * 10) + (shells * 75);
+    float pickupScore = maxPickups > 0 ? (collectedPickups / (float)maxPickups) * 30.f : 30.f;
+
+    float rating = std::min(100.f, timeScore + pickupScore);
+    std::cout << "\n\n\n currShells:" << shells << " | totalShells: " << CORE->GetGameCallbacks()->GetTotalShells() << " | currCoin : " << coins << 
+        " | totalCoins : " << CORE->GetGameCallbacks()->GetTotalCoins() << " | CalculateRating() : " << rating << "\n\n\n";
+    return rating;
 }
