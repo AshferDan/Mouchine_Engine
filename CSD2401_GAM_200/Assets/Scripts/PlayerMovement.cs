@@ -483,24 +483,6 @@ namespace CSharpScript
         {
             if (OwnerName == null || OwnerName == "") return;
 
-            if (Input.GetKeyPressed(Input.KeyCode.L))
-            {
-                triggerSpeedBoost = true;
-            }
-            if (Input.GetKeyPressed(Input.KeyCode.Left))
-            {
-                Camera.SetFollowOffset(cam_offset.x + 200, 0);
-            }
-            if (Input.GetKeyPressed(Input.KeyCode.Right))
-            {
-                Camera.SetFollowOffset(cam_offset.x - 200, 0);
-            }
-            if (Input.GetKeyPressed(Input.KeyCode.P))
-            {
-                Animation.PlayAnimation(pu_vfx, "Clear");
-                isPlayerDead = true;
-            }
-
             #region 3D SOUND
 
             vec2 playerPos = Transform.GetPosition(OwnerName);
@@ -541,15 +523,6 @@ namespace CSharpScript
                         //Debug.Log("lobster_scissors" + (i).ToString());
                         Audio.StopSound(NPCs[i].soundName + "_channel");
                         NPCs[i].audioPlaying = false;
-                    }
-                }
-
-                if (NPCs[i].name == "PU_Shell")
-                {
-                    if (Input.GetKeyPressed(Input.KeyCode.V))
-                    {
-                        Debug.Log("reached");
-                        Audio.FadeOutSound(NPCs[i].soundName, 0);
                     }
                 }
             }
