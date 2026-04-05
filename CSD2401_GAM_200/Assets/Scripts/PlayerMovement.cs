@@ -85,7 +85,7 @@ namespace CSharpScript
         public PickupManager pickupManager;
 
         #region Variables
-        public bool isTimeAsResourceEnabled = true;
+        public bool isTimeAsResourceEnabled = false;
 
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
 
@@ -198,6 +198,8 @@ namespace CSharpScript
 
         // camera
         vec2 cam_offset = new vec2();
+        const float cameraZoomInit = 0.5f;
+        float cameraZoom = cameraZoomInit;
 
         public static string vfx = "Hero_vfx";
         public static string pu_vfx = "Pickup_vfx";
@@ -309,43 +311,43 @@ namespace CSharpScript
             // 3D audio stuff
             {
                 NPCs.Clear();
-                int totalGOs = GameObject.CountAllGameObjects();
+                int totalGOs = GameObject.GetHighestLocalID();
 
                 // lobter
                 for (int i = 1; i <= totalGOs; i++)                         // starts with 1 bc ids start from 1
                 {
                     string currGO = GameObject.FindGameObjectByID(i);       // gets name of GO
-                    if (string.IsNullOrEmpty(currGO)) continue;
+                    if (string.IsNullOrEmpty(currGO) || !GameObject.IsActiveByID(i)) continue;
 
-                    //Debug.Log("ID: " + i + " | Name: " + currGO);
+                    Debug.Log("ID: " + i + " | Name: " + currGO);
                     if (currGO.Contains("NPC_Lobster"))
                     {
-                        NPCData temp = new NPCData("NPC_Lobster", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("NPC_Lobster", (uint)i, Transform.GetPositionByID(i), false);
                         NPCs.Add(temp);
                     }
                     else if (currGO.Contains("NPC_Jellyfish"))
                     {
-                        NPCData temp = new NPCData("NPC_Jellyfish", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("NPC_Jellyfish", (uint)i, Transform.GetPositionByID(i), false);
                         NPCs.Add(temp);
                     }
                     else if (currGO.Contains("NPC_Lionfish"))
                     {
-                        NPCData temp = new NPCData("NPC_Lionfish", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("NPC_Lionfish", (uint)i, Transform.GetPositionByID(i), false);
                         NPCs.Add(temp);
                     }
                     else if (currGO.Contains("NPC_Pufferfish"))
                     {
-                        NPCData temp = new NPCData("NPC_Pufferfish", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("NPC_Pufferfish", (uint)i, Transform.GetPositionByID(i), false);
                         NPCs.Add(temp);
                     }
                     else if (currGO.Contains("EZ_Asset"))
                     {
-                        NPCData temp = new NPCData("EZ_Asset", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("EZ_Asset", (uint)i, Transform.GetPositionByID(i), false);
                         NPCs.Add(temp);
                     }
                     else if (currGO.Contains("PU_Shell"))
                     {
-                        NPCData temp = new NPCData("PU_Shell", (uint)i, Transform.GetPosition(currGO), false);
+                        NPCData temp = new NPCData("PU_Shell", (uint)i, Transform.GetPositionByID(i), false);
                         NPCs.Add(temp);
                     }
                 }
@@ -471,7 +473,7 @@ namespace CSharpScript
             Physics.SetMass(OwnerName, 0.0001f);
             _moveVelocity = new vec2(0, 0);
             cam_offset = Camera.GetFollowOffset();
-            Camera.SetZoom(0.5f);
+            Camera.SetZoom(cameraZoomInit);
 
             // starting anims
             //Animation.PlayAnimation(pu_vfx, "Clear");
@@ -841,13 +843,15 @@ namespace CSharpScript
             {
                 landAnimTimerBuffer = landAnimationLength;
             }
-            if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Bonking && currState != PlayerState.Falling)
+            if (Physics.GetVelocity(OwnerName).x == 0 && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && 
+                currState != PlayerState.Bonking && currState != PlayerState.Falling && currState != PlayerState.GroundPounding && currState != PlayerState.GroundPounding_Falling)
             {
                 currState = PlayerState.Idle;
             }
 
             // horizontal input = moving - trigger run animation
-            if ((InputManager.Movement.x != 0 || InputManager.RunIsHeld) && currState != PlayerState.Jumping && currState != PlayerState.WallSliding && currState != PlayerState.Rolling && currState != PlayerState.Falling)
+            if ((InputManager.Movement.x != 0 || InputManager.RunIsHeld) && currState != PlayerState.Jumping && currState != PlayerState.WallSliding &&
+                currState != PlayerState.Rolling && currState != PlayerState.Falling && currState != PlayerState.GroundPounding && currState != PlayerState.GroundPounding_Falling)
             {
                 int index = GetCurrentTentacleLevel();
                 if (index == 0)
@@ -2032,28 +2036,60 @@ namespace CSharpScript
         const float LERP_SAME_DIR = 0.04f;   // smooth, lazy when continuing same direction
         const float LERP_SWITCH_DIR = 0.6f;  // snappy when switching sides
 
+        const float GP_Y_OFFSET = 400f;     // how far down to pan, tune this
+        const float LERP_VERTICAL = 0.2f;  // vertical lerp speed
+
+        float target_y_offset = 0f;
+        const float LERP_ZOOM_IN = 0.1f;   // how fast it zooms out (ground pound)
+        const float LERP_ZOOM_OUT = 0.1f;  // how fast it resets back, tune this
+
+        bool camZoomOut_Run = false;
+
         void HandleCameraTracking()
         {
             vec2 vel = Physics.GetVelocity(OwnerName);
             int index = GetCurrentTentacleLevel();
             speed_factor = Math.Max(-1f, Math.Min(1f, vel.x / MAX_SPEED));
 
-            if (currState == PlayerState.WallSliding || currState == PlayerState.WallJumping)
+            if (currState == PlayerState.Running && camZoomOut_Run)
             {
+                if (index >= 2)
+                    cameraZoom += (cameraZoomInit * 0.85f - cameraZoom) * LERP_ZOOM_IN;
+            }
+            else if (currState == PlayerState.WallSliding || currState == PlayerState.WallJumping)
+            {
+                // pan acc to wallslide dir
                 target_offset = IsFacingRight ? WS_OFFSET : -WS_OFFSET;
+                target_y_offset = 0f;
+            }
+            else if (currState == PlayerState.GroundPounding)
+            {
+                // zoom out
+                target_offset = 0f;
+                target_y_offset = GP_Y_OFFSET;
+                cameraZoom += (cameraZoomInit * 0.75f - cameraZoom) * LERP_ZOOM_IN;
+            }
+            else if (currState == PlayerState.GroundPounding_Falling)
+            {
+                // zoom back to default
+                target_y_offset = 0f;
+                cameraZoom += (cameraZoomInit - cameraZoom) * LERP_ZOOM_OUT;
             }
             else
             {
+                // reset 
                 target_offset = BASE_OFFSET - (speed_factor * GEAR_OFFSET[index]);
+                target_y_offset = 0f;
+                cameraZoom += (cameraZoomInit - cameraZoom) * LERP_ZOOM_OUT; // also reset if we exit early
             }
 
-            // switching sides if currOffset and target are on opposite sides of zero
             bool isSwitchingDir = (target_offset > 0f) != (currOffset.x > 0f);
             float lerp = isSwitchingDir ? LERP_SWITCH_DIR : LERP_SAME_DIR;
-
             currOffset.x += (target_offset - currOffset.x) * lerp;
+            currOffset.y += (target_y_offset - currOffset.y) * LERP_VERTICAL;
 
-            Camera.SetFollowOffset(currOffset.x, 0);
+            Camera.SetFollowOffset(currOffset.x, currOffset.y);
+            Camera.SetZoom(cameraZoom);
         }
         #endregion
 
