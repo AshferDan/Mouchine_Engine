@@ -366,7 +366,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 // restart the current level
                 if (!currentScenePath.empty())
                 {
-                    CORE->RequestSceneLoad(currentScenePath, true);
+                    CORE->RequestSceneLoad(currentScenePath, true, true);
                 }
             }
             else if (hoveredButtonName == "PauseSettingsButton")
@@ -1533,7 +1533,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 CORE->SetGamePaused(false, false);
             }
             if (!currentScenePath.empty())
-                CORE->RequestSceneLoad(currentScenePath, true);
+                CORE->RequestSceneLoad(currentScenePath, true, true);
         }
         else if (isClicked && hoveredButtonName == "PauseLB_VsGhost")
         {
@@ -1560,7 +1560,7 @@ void PauseMenuLogicSystem::Update(float dt)
                 CORE->SetGamePaused(false, false);
             }
             if (!currentScenePath.empty())
-                CORE->RequestSceneLoad(currentScenePath, true);
+                CORE->RequestSceneLoad(currentScenePath, true, true);
         }
 
         return; // Don't process normal pause menu interactions

@@ -175,7 +175,7 @@ void WinLoseLogicSystem::Update(float dt)
         {
             //std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
             isPlayingCredits = false;
-            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true, true);
 
             hasPlayerWon = false;
             isWaitingForWin = false;
@@ -205,7 +205,22 @@ void WinLoseLogicSystem::Update(float dt)
             std::cout << "[WinLoseLogic] Fade complete! Loading scene..." << std::endl;
             // unpause right before loading to avoid showing game world
             CORE->SetGamePaused(false);
-            CORE->RequestSceneLoad(pendingScenePath, true);
+            // --- NEW TRANSITION LOGIC ---
+            // Check where we are going to determine the transition style
+            bool skipIrisClose = false;
+
+            if (pendingScenePath.find("Level") != std::string::npos)
+            {
+                // Replay or Next Level -> Jump straight to loading screen
+                skipIrisClose = true;
+            }
+            else
+            {
+                // Quitting to Main Menu or going to Credits -> Do full Iris Close
+                skipIrisClose = false;
+            }
+
+            CORE->RequestSceneLoad(pendingScenePath, true, skipIrisClose);
             pendingScenePath = "";
 
             hasPlayerWon = false;
