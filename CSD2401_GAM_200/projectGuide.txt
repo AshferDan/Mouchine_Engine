@@ -31,9 +31,9 @@ Player Controls
   D                   	Walk Right
   Spacebar             	Jump
   J			Dash
-  K			Roll
-  L			Wall Kick
+  K			Ground Pound
 
+ 
 System
 
 - IMGUI
@@ -47,16 +47,11 @@ System
   F3			When in step mode, advances frame by frame
   F4			FPS counter in game 
 
-- Batch Rendering
-  1                  	Spawn 2500 entities on screen
-  2                   	Destroy all entities
-
 - Audio
   M			Pause the BGM sound
 
 - Game State
-  ESC			Quit the game
-  P/Esc                 Pause Menu
+  Esc                 Pause Menu
 
 
 ===========================================================================================================

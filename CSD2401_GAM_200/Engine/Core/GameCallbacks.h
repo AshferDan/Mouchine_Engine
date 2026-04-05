@@ -3,7 +3,7 @@
 \file       GameCallbacks.h
 \author     Jonathan Fam Qian Wei
 \par        Fam.q@digipen.edu
-\date       2025
+\date       25/4/2026
 
 Copyright (C) 2025 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
@@ -86,5 +86,5 @@ public:
     virtual void  AddTime(float)                    {}
 
     // ── Audio fade durations (loaded from scene metadata) ────────────────────
-    virtual void SetAudioFadeDurations(float winIn, float loseIn, float replayOut, float quitOut, float nextOut, float buffer) {}
+    virtual void SetAudioFadeDurations(float /*winIn*/, float /*loseIn*/, float /*replayOut*/, float /*quitOut*/, float /*nextOut*/, float /*buffer*/) {}
 };

@@ -603,7 +603,6 @@ void MenuLogicSystem::Update(float dt)
 
         if (kbCount > 0)
         {
-            InputManager* inp = CORE->GetInputManager();
             if (inp)
             {
                 if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kbIdx = (kbIdx + 1) % kbCount;              kbActive = true; }

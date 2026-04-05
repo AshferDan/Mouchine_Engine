@@ -98,7 +98,7 @@ void TextInputSystem::Show(const std::string& title,
 {
     if (m_isActive) return;   // already open
 
-    // Font must be supplied by game code via SetFont() — the engine has no default.
+    
     if (m_fontPath.empty() || m_fontSize <= 0)
     {
         std::cerr << "[TextInputSystem] ERROR: Show() called before SetFont(). "
