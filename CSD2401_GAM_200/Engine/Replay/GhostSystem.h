@@ -78,6 +78,20 @@ public:
     }
 
     /**
+     * @brief Supply the background layer object names to record and replay.
+     *        Positions of these objects are sampled each frame during recording and
+     *        restored each frame during playback. Pass "" for unused slots.
+     *        Call before StartRecording / EnterReplayMode.
+     * @param b0..b3 Names of up to 4 background layer GameObjects.
+     */
+    void ConfigureBackground(const std::string& b0, const std::string& b1 = "",
+                             const std::string& b2 = "", const std::string& b3 = "")
+    {
+        m_bgLayers[0] = b0; m_bgLayers[1] = b1;
+        m_bgLayers[2] = b2; m_bgLayers[3] = b3;
+    }
+
+    /**
      * @brief Sets the human-readable level name that is embedded into saved replays.
      *        Call this from game code before SaveCurrentRun / SaveBestRun.
      * @param levelName The name of the level (e.g. "M4_LEVEL_FIXED").
@@ -310,6 +324,7 @@ private:
     std::string m_liveVfx;      ///< e.g. "Hero_vfx"  (optional)
     std::string m_ghostVfx;     ///< e.g. "GhostHero_vfx" (optional)
     std::string m_levelName;    ///< Human-readable level name serialised into replay JSON
+    std::string m_bgLayers[4];  ///< Background layer object names (set via ConfigureBackground())
 
     // Replay watch mode
     bool        m_isReplayMode = false;

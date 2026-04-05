@@ -78,12 +78,13 @@ private:
     static constexpr float k_holdDuration  = 1.0f;
     static constexpr float k_openDuration  = 0.7f;
 
-    // ── Screen-space positions for a 1920 x 1080 display ───────────────────
-    static constexpr float k_leftClosedX  =  480.0f;
-    static constexpr float k_leftOpenX    = -480.0f;   // off-screen left
-    static constexpr float k_rightClosedX = 1440.0f;
-    static constexpr float k_rightOpenX   = 2400.0f;   // off-screen right
-    static constexpr float k_doorY        =  540.0f;   // vertical centre
+    // ── Screen-space positions as 0-100 percentages of screen dimensions ───
+    // Graphics system converts: x = (x/100)*screenW, y = (y/100)*screenH
+    static constexpr float k_leftClosedX  =  25.0f;   //  480 / 1920 * 100
+    static constexpr float k_leftOpenX    = -25.0f;   // off-screen left
+    static constexpr float k_rightClosedX =  75.0f;   // 1440 / 1920 * 100
+    static constexpr float k_rightOpenX   = 125.0f;   // off-screen right
+    static constexpr float k_doorY        =  50.0f;   // vertical centre (540/1080*100)
 
     std::function<void()> m_onClosed;
     std::function<void()> m_onOpened;

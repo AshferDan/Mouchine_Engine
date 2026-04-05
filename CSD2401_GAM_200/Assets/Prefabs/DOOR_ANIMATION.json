@@ -27,8 +27,8 @@
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    1440.0,
-                    540.0
+                    75.0,
+                    50.0
                 ],
                 "scale": [
                     960.0,
@@ -64,8 +64,8 @@
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    480.0,
-                    540.0
+                    25.0,
+                    50.0
                 ],
                 "scale": [
                     960.0,

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find C:UsersJonathanDocumentsSITcsd2401f25_avidmoustacheenjoyersCSD2401_GAM_200 -name *.cs -type f)",
+      "Bash(grep -rl \"GhostSystem\\\\|GetGhostSystem\\\\|StartRecording\\\\|SaveCurrentRun\\\\|BeginRecording\" C:/Users/Jonathan/Documents/SIT/csd2401f25_avidmoustacheenjoyers/CSD2401_GAM_200 --include=*.cpp --include=*.h --include=*.cs)"
+    ]
+  }
+}

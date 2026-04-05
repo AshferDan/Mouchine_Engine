@@ -49,6 +49,17 @@ public:
     void Reset();
 
     /**
+     * @brief Sets the background layer object names to sample each frame.
+     *        Pass empty strings for unused slots.
+     */
+    void SetBgLayers(const std::string& b0, const std::string& b1,
+                     const std::string& b2, const std::string& b3)
+    {
+        m_bgLayers[0] = b0; m_bgLayers[1] = b1;
+        m_bgLayers[2] = b2; m_bgLayers[3] = b3;
+    }
+
+    /**
      * @brief Checks if the recorder is currently active.
      * @return True while actively recording.
      */
@@ -65,4 +76,5 @@ private:
     GhostRecording m_recording;
     double         m_clock      = 0.0;  // double avoids float precision loss after ~9h of recording
     bool           m_isRecording = false;
+    std::string    m_bgLayers[4];       // background layer object names (up to 4)
 };

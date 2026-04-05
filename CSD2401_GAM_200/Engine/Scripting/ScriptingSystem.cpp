@@ -100,6 +100,19 @@ static MonoString* Internal_FindGameObjectByID(int id)
     return mono_string_new(mono_domain_get(), result.c_str());
 }
 
+static bool Internal_IsGameObjectActive(MonoString* name)
+{
+    char* objName = mono_string_to_utf8(name);
+    bool result = API::IsGameObjectActive(objName);
+    mono_free(objName);
+    return result;
+}
+
+static bool Internal_IsGameObjectActiveByID(int id)
+{
+    return API::IsGameObjectActiveByID(id);
+}
+
 // === Transform ===
 static void Internal_SetPosition(MonoString *objectName, float x, float y)
 {
@@ -1501,6 +1514,23 @@ static float Internal_Ghost_GetBestRunTime()
     return API::Ghost::GetBestRunTime();
 }
 
+static bool Internal_Ghost_IsReplayMode()
+{
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    return ghost ? ghost->IsReplayMode() : false;
+}
+
+static void Internal_Ghost_ConfigureBackground(MonoString* b0, MonoString* b1,
+                                               MonoString* b2, MonoString* b3)
+{
+    char* s0 = mono_string_to_utf8(b0);
+    char* s1 = mono_string_to_utf8(b1);
+    char* s2 = mono_string_to_utf8(b2);
+    char* s3 = mono_string_to_utf8(b3);
+    API::Ghost::ConfigureBackground(s0, s1, s2, s3);
+    mono_free(s0); mono_free(s1); mono_free(s2); mono_free(s3);
+}
+
 MonoObject* ScriptSystem::CreateScriptInstance(const std::string& scriptClassName, GameObject* owner)
 {
     if (!coreAssembly || !coreImage)
@@ -1674,6 +1704,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByName", (void *)Internal_FindGameObjectByName);
     mono_add_internal_call("CSharpScript.GameObject::FindGameObjectByID",   (void *)Internal_FindGameObjectByID);
     mono_add_internal_call("CSharpScript.GameObject::CountAllGameObjects",  (void *)Internal_CountAllGameObjects);
+    mono_add_internal_call("CSharpScript.GameObject::IsActive",             (void *)Internal_IsGameObjectActive);
+    mono_add_internal_call("CSharpScript.GameObject::IsActiveByID",         (void *)Internal_IsGameObjectActiveByID);
     mono_add_internal_call("CSharpScript.GameObject::GetHighestLocalID",   (void *)Internal_GetHighestLocalID);
 
     // === GameTimer ===
@@ -1921,6 +1953,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Ghost::LoadRecording",     (void*)Internal_Ghost_LoadRecording);
     mono_add_internal_call("CSharpScript.Ghost::IsGhostAvailable",  (void*)Internal_Ghost_IsGhostAvailable);
     mono_add_internal_call("CSharpScript.Ghost::GetBestRunTime",    (void*)Internal_Ghost_GetBestRunTime);
+    mono_add_internal_call("CSharpScript.Ghost::IsReplayMode",          (void*)Internal_Ghost_IsReplayMode);
+    mono_add_internal_call("CSharpScript.Ghost::ConfigureBackground",   (void*)Internal_Ghost_ConfigureBackground);
 }
 
 MonoAssembly *ScriptSystem::LoadAssembly(const std::string &filepath)

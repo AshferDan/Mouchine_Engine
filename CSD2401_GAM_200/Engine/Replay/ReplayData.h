@@ -33,6 +33,10 @@ struct GhostKeyframe
     std::string vfxAnimName;
     int vfxAnimRow = 0;
     int vfxAnimCol = 0;
+
+    // Background layer positions (up to 4 layers configured via GhostSystem::ConfigureBackground)
+    float bgLayerX[4] = {0.f, 0.f, 0.f, 0.f};
+    float bgLayerY[4] = {0.f, 0.f, 0.f, 0.f};
 };
 
 /** 

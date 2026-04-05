@@ -14,6 +14,7 @@ Technology is prohibited.
 #include "DoorAnimationLogic.h"
 #include "Serialization.h"
 #include "ScriptComponent.h"
+#include "RenderComponent.h"
 #include <algorithm>
 #include <iostream>
 #include <unordered_set>
@@ -211,6 +212,13 @@ void DoorAnimationLogicSystem::SpawnDoors()
         std::cerr << "[DoorAnim] WARNING: could not find newly spawned Door_LEFT or Door_RIGHT!\n";
         return;
     }
+
+    // Mark both door panels as screen-space so they render at fixed screen
+    // positions and are not affected by the game camera.
+    if (auto* rc = leftObj->GetComponent<RenderComponent>())
+        rc->SetScreenSpace(true);
+    if (auto* rc = rightObj->GetComponent<RenderComponent>())
+        rc->SetScreenSpace(true);
 
     // Park both panels off-screen so they slide IN during CLOSING
     m_leftTransform->posX  = k_leftOpenX;

@@ -238,6 +238,20 @@ namespace CSharpScript
         public static extern int CountAllGameObjects();
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern int GetHighestLocalID();
+
+        /// <summary>
+        /// Returns true if the named GameObject exists and is currently active.
+        /// Returns false if the object is inactive or does not exist in the scene.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsActive(string name);
+
+        /// <summary>
+        /// Returns true if the GameObject with the given EntityID exists and is currently active.
+        /// Returns false if the object is inactive or does not exist in the scene.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern bool IsActiveByID(int id);
     }
 
     /// <summary>
@@ -1662,6 +1676,9 @@ namespace CSharpScript
                                              string liveVfx, string ghostVfx);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern void ConfigureBackground(string b0, string b1, string b2, string b3);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void StartRecording(string targetName);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
@@ -1684,6 +1701,9 @@ namespace CSharpScript
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern float GetBestRunTime();
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsReplayMode();
 
         /// <summary>Begin recording the named target's position and animation each tick.</summary>
         public static void BeginRecording(string targetName) => StartRecording(targetName);
@@ -1715,6 +1735,9 @@ namespace CSharpScript
         /// <summary>Best run time in seconds. Returns float.MaxValue if no run recorded yet.</summary>
         public static float BestTime() => GetBestRunTime();
 
+        /// <summary>True when the ghost replay is actively playing back.</summary>
+        public static bool InReplayMode() => IsReplayMode();
+
         /// <summary>
         /// Set the live player and ghost object names the system will use.
         /// Call once before Load() / BeginRecording() / BeginPlayback().
@@ -1726,6 +1749,18 @@ namespace CSharpScript
         public static void Setup(string liveTarget, string ghostTarget,
                                  string liveVfx = "", string ghostVfx = "")
             => Configure(liveTarget, ghostTarget, liveVfx, ghostVfx);
+
+        /// <summary>
+        /// Set the background layer object names whose X positions will be recorded
+        /// and replayed with the ghost. Call before BeginRecording() / entering replay mode.
+        /// <br/>
+        /// Level 1 example:
+        ///   Ghost.SetupBackground("Parallax_BG_2", "MIdlayer_BackGround2", "Frontlayer_BackGround2");
+        /// Level 2 example:
+        ///   Ghost.SetupBackground("Parallax_BG", "Pillar_BackGround");
+        /// </summary>
+        public static void SetupBackground(string b0, string b1 = "", string b2 = "", string b3 = "")
+            => ConfigureBackground(b0, b1, b2, b3);
     }
 
     /// <summary>

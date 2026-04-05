@@ -394,6 +394,18 @@ public:
     bool UpdateMasterLowPassFilterFrequency(float cutoffFrequency);
 
     /**
+     * @brief Applies a low pass filter to all currently playing sounds, excluding the specified ones.
+     *        Also stores the active state so sounds started after this call get the filter too.
+     * @param enable True to enable, false to disable
+     * @param cutoffFrequency Cutoff frequency in Hz (default: 800 Hz)
+     * @param resonance Filter resonance/Q factor (default: 1.0)
+     * @param excluded Sound names that should NOT be filtered
+     */
+    void SetLowPassFilterExcluding(bool enable, float cutoffFrequency,
+                                   float resonance,
+                                   const std::vector<std::string>& excluded);
+
+    /**
      * @brief Saves current audio settings from AUDIO SETTINGS!
      * @return True if settings were saved successfully.
      */
@@ -407,4 +419,10 @@ public:
 
 private:
     std::map<std::string, FadeState> categoryFadeStates;
+
+    // Global low-pass filter state (used to auto-apply on PlaySound)
+    bool                     m_globalLowPassActive    = false;
+    float                    m_globalLowPassCutoff    = 800.0f;
+    float                    m_globalLowPassResonance = 1.0f;
+    std::vector<std::string> m_lowPassExclusions;
 };

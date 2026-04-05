@@ -7259,7 +7259,7 @@
           "name": "Text FPS",
           "localID": 126,
           "parentID": 125,
-          "active": false,
+          "active": true,
           "TransformComponent": {
             "enabled": false,
             "pos": [
@@ -7273,7 +7273,7 @@
             "rotation": 0.0
           },
           "RenderComponent": {
-            "enabled": false,
+            "enabled": true,
             "shapeType": "Square",
             "texturePath": "",
             "color": [
@@ -7283,7 +7283,7 @@
               1.0
             ],
             "layer": 0,
-            "screenSpace": false,
+            "screenSpace": true,
             "tileable": false,
             "tileCount": [
               1.0,
@@ -7291,7 +7291,7 @@
             ]
           },
           "TextComponent": {
-            "enabled": false,
+            "enabled": true,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 50,
             "text": "FPS",
