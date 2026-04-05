@@ -1520,6 +1520,12 @@ static bool Internal_Ghost_IsReplayMode()
     return ghost ? ghost->IsReplayMode() : false;
 }
 
+static bool Internal_Ghost_IsGhostVisible()
+{
+    GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
+    return ghost ? ghost->IsGhostVisible() : false;
+}
+
 static void Internal_Ghost_ConfigureBackground(MonoString* b0, MonoString* b1,
                                                MonoString* b2, MonoString* b3)
 {
@@ -1954,6 +1960,7 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Ghost::IsGhostAvailable",  (void*)Internal_Ghost_IsGhostAvailable);
     mono_add_internal_call("CSharpScript.Ghost::GetBestRunTime",    (void*)Internal_Ghost_GetBestRunTime);
     mono_add_internal_call("CSharpScript.Ghost::IsReplayMode",          (void*)Internal_Ghost_IsReplayMode);
+    mono_add_internal_call("CSharpScript.Ghost::IsGhostVisible",        (void*)Internal_Ghost_IsGhostVisible);
     mono_add_internal_call("CSharpScript.Ghost::ConfigureBackground",   (void*)Internal_Ghost_ConfigureBackground);
 }
 
