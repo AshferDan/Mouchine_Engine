@@ -726,6 +726,18 @@ static void Internal_FadeOutAll(float duration) {
     API::FadeOutAll(duration);
 }
 
+static void Internal_FadeOutSound(MonoString* soundName, float duration) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::FadeOutSound(cName, duration);
+    mono_free(cName);
+}
+
+static void Internal_FadeInSound(MonoString* soundName, float duration, float targetVolume) {
+    char* cName = mono_string_to_utf8(soundName);
+    API::FadeInSound(cName, duration, targetVolume);
+    mono_free(cName);
+}
+
 // === 3D Audio / Spatial Sound ===
 static void Internal_Set3DListenerPosition(float x, float y) {
     API::Set3DListenerPosition(x, y);
@@ -1822,6 +1834,8 @@ void ScriptSystem::RegisterInternalCalls()
     mono_add_internal_call("CSharpScript.Audio::FadeOutCategory", (void*)Internal_FadeOutCategory);
     mono_add_internal_call("CSharpScript.Audio::FadeInCategory", (void*)Internal_FadeInCategory);
     mono_add_internal_call("CSharpScript.Audio::FadeOutAll", (void*)Internal_FadeOutAll);
+    mono_add_internal_call("CSharpScript.Audio::FadeOutSound", (void*)Internal_FadeOutSound);
+    mono_add_internal_call("CSharpScript.Audio::FadeInSound", (void*)Internal_FadeInSound);
     mono_add_internal_call("CSharpScript.Audio::Set3DListenerPosition", (void*)Internal_Set3DListenerPosition);
     mono_add_internal_call("CSharpScript.Audio::Set3DSoundPosition", (void*)Internal_Set3DSoundPosition);
     mono_add_internal_call("CSharpScript.Audio::Load3DSound", (void*)Internal_Load3DSound);

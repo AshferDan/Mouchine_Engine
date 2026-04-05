@@ -49,7 +49,9 @@ void DoorAnimationLogicSystem::Initialize()
     m_audioClosing   = true;
     m_audioOpening   = true;
 
-    API::AddSound("doorClose", "../Assets/Audio/play_button.wav", false, 1.0f, 1, "sfx");
+
+
+    
 }
 
 /**
@@ -122,7 +124,7 @@ void DoorAnimationLogicSystem::Update(float dt)
     case DoorAnimState::OPENING:
     {
         if (m_audioOpening) {
-            API::PlaySound("doorClose", "sfx");
+            API::PlaySound("doorOpen", "sfx");
             m_audioOpening = false;
         }
         float t = SmoothStep(m_timer / k_openDuration);
@@ -179,6 +181,8 @@ void DoorAnimationLogicSystem::SpawnDoors()
 
     // Load the prefab; creates DOOR_ANIMATION, Door_LEFT, Door_RIGHT
     Serialization::LoadPrefab("DOOR_ANIMATION");
+    API::AddSound("doorClose", "../Assets/Audio/Door_Close.wav", false, 1.0f, 1, "sfx");
+    API::AddSound("doorOpen", "../Assets/Audio/Door_Open.wav", false, 1.0f, 1, "sfx");
 
     // Find only the objects that did NOT exist before loading
     GameObject* leftObj  = nullptr;

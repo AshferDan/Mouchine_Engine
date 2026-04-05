@@ -696,13 +696,19 @@ void GraphicsSystem::Update(float)
             CORE->GetLevelEditor()->GetEditorMode() == EditorMode::Play /* &&
             rend->GetLayer() >= -100*/)
         {
-            float halfSX = sx * 0.5f;
-			float halfSY = sy * 0.5f;
+            // Skip culling for deep-background layers (parallax BGs use layer <= -100).
+            // Their tiled _R/_L copies have centres off-screen while still partially
+            // visible, so culling by AABB centre causes a gap.
+            // Name check is a secondary guard in case layer gets overridden at runtime.
+  
+                float halfSX = sx * 0.5f;
+                float halfSY = sy * 0.5f;
 
-            if (x + halfSX < camLeft || x - halfSX > camRight || y + halfSY < camBottom || y - halfSY > camTop)
-            {
-				continue; // Skip objects outside camera bounds
-            }
+                if (x + halfSX < camLeft || x - halfSX > camRight || y + halfSY < camBottom || y - halfSY > camTop)
+                {
+                    continue; // Skip objects outside camera bounds
+                }
+            
         }
 
 #endif // _DEBUG

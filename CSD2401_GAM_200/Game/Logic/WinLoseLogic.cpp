@@ -175,7 +175,7 @@ void WinLoseLogicSystem::Update(float dt)
         {
             //std::cout << "[WinZone] Credits finished - Loading main menu" << std::endl;
             isPlayingCredits = false;
-            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true);
+            CORE->RequestSceneLoad("../Assets/Scenes/MainMenu.json", true, true);
 
             hasPlayerWon = false;
             isWaitingForWin = false;
@@ -205,7 +205,22 @@ void WinLoseLogicSystem::Update(float dt)
             std::cout << "[WinLoseLogic] Fade complete! Loading scene..." << std::endl;
             // unpause right before loading to avoid showing game world
             CORE->SetGamePaused(false);
-            CORE->RequestSceneLoad(pendingScenePath, true);
+            // --- NEW TRANSITION LOGIC ---
+            // Check where we are going to determine the transition style
+            bool skipIrisClose = false;
+
+            if (pendingScenePath.find("Level") != std::string::npos)
+            {
+                // Replay or Next Level -> Jump straight to loading screen
+                skipIrisClose = true;
+            }
+            else
+            {
+                // Quitting to Main Menu or going to Credits -> Do full Iris Close
+                skipIrisClose = false;
+            }
+
+            CORE->RequestSceneLoad(pendingScenePath, true, skipIrisClose);
             pendingScenePath = "";
 
             hasPlayerWon = false;
@@ -690,16 +705,15 @@ void WinLoseLogicSystem::TriggerWin()
     if (coinIcon) coinIcon->SetActive(false);
     if (coinText) coinText->SetActive(false);
 
-    // Stop BGM; victory music starts after doors open
+    // Fade out BGM; victory music starts after doors open
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->StopSound("bgm_channel");
-        audioManager->SetCategoryVolume("music", 0.0f);
-        //audioManager->PlaySound("victory");
-        //audioManager->FadeInCategory("music", m_fadeWinIn);
+        audioManager->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});  // remove timer low-pass filter
+        audioManager->FadeOutAll(1.5f);
+        audioManager->FadeOutSound("timer_ending", 0.5f);
     }
-    m_winBGMDelayTimer = 1.5f;
+    m_winBGMDelayTimer = 2.0f;
 
     m_timerRunning = false; // stop elapsed-time counter
 }
@@ -734,8 +748,8 @@ void WinLoseLogicSystem::CreateWinScreen()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 2080.0f * uiScale;
-    boardTransform->scaleY = 1170.0f * uiScale;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -992,7 +1006,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     quitRender->SetLayer(102);
     quitBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
-        "Save Run", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "Next", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
     quitBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     hasCreatedWinScreen = true;
@@ -1020,6 +1034,21 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
+
+    // Dynamically update button label based on whether the player has typed a name
+    {
+        TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+        GameObject* btn = factory.FindGameObject("QuitButton");
+        if (btn)
+        {
+            auto* tc = btn->GetComponent<TextComponent>();
+            if (tc)
+            {
+                bool hasText = textInput && textInput->IsActive() && !textInput->GetCurrentText().empty();
+                tc->SetText(hasText ? "Save Run" : "Next");
+            }
+        }
+    }
 
     if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))
     {
@@ -1068,12 +1097,20 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
         if (hoveredButtonName == "QuitButton")
         {
-            std::cout << "[WinZone] Save Run clicked - Opening options screen" << std::endl;
-
-            // Confirm any in-progress name input before leaving
             TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
-            if (textInput && textInput->IsActive())
-                textInput->Confirm();
+            bool hasText = textInput && textInput->IsActive() && !textInput->GetCurrentText().empty();
+
+            if (hasText)
+            {
+                std::cout << "[WinZone] Save Run clicked - saving run then opening options screen" << std::endl;
+                textInput->Confirm();  // triggers the onConfirm callback which saves the run
+            }
+            else
+            {
+                std::cout << "[WinZone] Next clicked (no name entered) - skipping save, opening options screen" << std::endl;
+                if (textInput && textInput->IsActive())
+                    textInput->Hide();  // dismiss without saving
+            }
 
             if (audioManager)
             {
@@ -1179,8 +1216,8 @@ void WinLoseLogicSystem::CreateWinScreen2()
     auto* board2Transform = board2->AddComponent<TransformComponent>();
     board2Transform->posX = camPos.x;
     board2Transform->posY = camPos.y;
-    board2Transform->scaleX = 2080.0f * uiScale;
-    board2Transform->scaleY = 1170.0f * uiScale;
+    board2Transform->scaleX = 1920.0f * uiScale;
+    board2Transform->scaleY = 1080.0f * uiScale;
     auto* board2Render = board2->AddComponent<RenderComponent>();
     board2Render->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_win_screen.png"));
     board2Render->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -1557,10 +1594,11 @@ void WinLoseLogicSystem::TriggerLose()
     AudioManager* audioManager = CORE->GetAudioManager();
     if (audioManager)
     {
-        audioManager->StopSound("bgm_channel");
-        audioManager->SetCategoryVolume("music", 0.0f); // Start at 0
+        audioManager->SetLowPassFilterExcluding(false, 22000.0f, 1.0f, {});  // remove timer low-pass filter
+        audioManager->FadeOutAll(1.0f);
         audioManager->PlaySound("gameover");
         audioManager->FadeInCategory("music", m_fadeLoseIn);
+        audioManager->PauseSound("timer_ending_channel", false); // let timer_ending finish (bomb sound)
     }
 
     // ---- Gather stats for the right-side panel ----
@@ -1580,8 +1618,8 @@ void WinLoseLogicSystem::TriggerLose()
     auto* boardTransform = board->AddComponent<TransformComponent>();
     boardTransform->posX = camPos.x;
     boardTransform->posY = camPos.y;
-    boardTransform->scaleX = 2080.0f * uiScale;
-    boardTransform->scaleY = 1170.0f * uiScale;
+    boardTransform->scaleX = 1920.0f * uiScale;
+    boardTransform->scaleY = 1080.0f * uiScale;
     auto* boardRender = board->AddComponent<RenderComponent>();
     boardRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Game_over_screen.png"));
     boardRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));

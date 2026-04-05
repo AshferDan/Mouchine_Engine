@@ -171,6 +171,7 @@ int main()
 
         // CORE->RequestSceneLoad("Prefab_TestScene");
 #ifndef _DEBUG
+        //CORE->GetGraphicsSystem()->ToggleFullScreen();
         // Splash screen — runs before any scene is loaded
         SplashScreenSystem splash(
             CORE->GetGraphicsSystem(),

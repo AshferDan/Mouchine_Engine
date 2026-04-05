@@ -92,6 +92,10 @@ void LevelEditor::Update(float /*dt*/)
         return;
 
 
+    // Main menu bar — must come before the docking window so WorkPos is correct
+    if (editorMode != EditorMode::Play)
+        RenderMainMenuBar();
+
     // Full window docking
     ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->WorkPos);
@@ -123,6 +127,41 @@ void LevelEditor::Update(float /*dt*/)
     // show editor UI only when not in live Play
     if (editorMode != EditorMode::Play) {
         RenderMenuBar();
+    }
+
+    // Build Size Analyzer — render every frame (the window manages its own open/closed state)
+    m_buildSizeAnalyzer.Render();
+
+    if (showSaveDialog)
+    {
+        ImGui::OpenPopup("Save Level As##LevelEditor");
+        showSaveDialog = false;
+    }
+    if (ImGui::BeginPopupModal("Save Level As##LevelEditor", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Save level to file:");
+        ImGui::InputText("Filename##save", saveFilepath, sizeof(saveFilepath));
+        ImGui::TextDisabled("Will save to: ../Assets/Scenes/%s.json", saveFilepath);
+
+        ImGui::Spacing();
+        if (ImGui::Button("Save", ImVec2(120, 0)))
+        {
+            std::string filepath = saveFilepath;
+            if (filepath.find("../Assets/Scenes/") != 0)
+                filepath = "../Assets/Scenes/" + filepath;
+            if (filepath.size() < 5 || filepath.substr(filepath.size() - 5) != ".json")
+                filepath += ".json";
+            if (SaveLevel(filepath))
+                std::cout << "Level saved successfully to: " << filepath << std::endl;
+            else
+                std::cerr << "Failed to save level!" << std::endl;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
     }
 
     if (showLoadDialog)
@@ -643,7 +682,79 @@ void LevelEditor::RestoreSceneState()
 
 /*  GUI rendering  */
 /**
- * @brief Render the editor menu windows
+ * @brief Render the top-of-screen main menu bar with File and Tools menus.
+ */
+void LevelEditor::RenderMainMenuBar()
+{
+    if (!ImGui::BeginMainMenuBar())
+        return;
+
+    // ---- File menu ----
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("New Level", "Ctrl+N"))
+        {
+            CORE->GetImguiSystem()->ResetSelectedGameObject();
+            NewLevel();
+        }
+
+        ImGui::Separator();
+
+        // Save: quick-save to current file; opens Save As dialog if no file is loaded yet
+        const bool hasSavePath = (!currentFilename.empty() &&
+                                   currentFilename != "start level");
+        if (ImGui::MenuItem("Save", "Ctrl+S"))
+        {
+            if (hasSavePath)
+            {
+                std::string filepath = currentFilename;
+                if (filepath.find("../Assets/Scenes/") != 0)
+                    filepath = "../Assets/Scenes/" + filepath;
+                if (filepath.size() < 5 || filepath.substr(filepath.size() - 5) != ".json")
+                    filepath += ".json";
+                SaveLevel(filepath);
+            }
+            else
+            {
+                showSaveDialog = true;
+            }
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Open Scene...", "Ctrl+O"))
+            showLoadDialog = true;
+
+        ImGui::EndMenu();
+    }
+
+    // ---- Tools menu ----
+    if (ImGui::BeginMenu("Tools"))
+    {
+        if (ImGui::MenuItem("Build Size Analyzer", nullptr, m_buildSizeAnalyzer.IsOpen()))
+            m_buildSizeAnalyzer.Open();
+
+        ImGui::EndMenu();
+    }
+
+    // Show current scene name on the right side of the bar
+    if (!currentFilename.empty() && currentFilename != "start level")
+    {
+        const std::string label = "  Scene: " + currentFilename + "  ";
+        const float       barW  = ImGui::GetContentRegionAvail().x;
+        const float       textW = ImGui::CalcTextSize(label.c_str()).x;
+        if (textW < barW)
+        {
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + barW - textW);
+            ImGui::TextDisabled("%s", label.c_str());
+        }
+    }
+
+    ImGui::EndMainMenuBar();
+}
+
+/**
+ * @brief Render the Scene Manager floating panel
  */
 void LevelEditor::RenderMenuBar()
 {

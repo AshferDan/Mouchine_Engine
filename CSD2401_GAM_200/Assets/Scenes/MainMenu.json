@@ -20,7 +20,7 @@
       "RenderComponent": {
         "enabled": true,
         "shapeType": "Square",
-        "texturePath": "../Assets/MenuBackground.png",
+        "texturePath": "../Assets/Menu_No_TItle.png",
         "color": [
           1.0,
           1.0,
@@ -41,21 +41,21 @@
       "name": "Title_GameObject",
       "localID": 2,
       "parentID": 4294967295,
-      "active": false,
+      "active": true,
       "TransformComponent": {
-        "enabled": false,
+        "enabled": true,
         "pos": [
           0.0,
           300.0
         ],
         "scale": [
-          990.0,
-          1000.0
+          900.0,
+          900.0
         ],
         "rotation": 0.0
       },
       "RenderComponent": {
-        "enabled": false,
+        "enabled": true,
         "shapeType": "Square",
         "texturePath": "../Assets/title_spritesheet.png",
         "color": [
@@ -73,7 +73,7 @@
         ]
       },
       "Spritesheet": {
-        "enabled": false,
+        "enabled": true,
         "defaultAnimation": "Title_Animation",
         "animations": [
           {
@@ -3506,7 +3506,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "1st Player",
+            "text": "Rank:",
             "color": [
               0.0,
               0.0,
@@ -3557,7 +3557,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "1st Player",
+            "text": "Rank:",
             "color": [
               0.0,
               0.0,
@@ -3608,7 +3608,7 @@
             "enabled": false,
             "fontPath": "../Assets/FrederickatheGreat-Regular.ttf",
             "fontSize": 28,
-            "text": "1st Player",
+            "text": "Rank:",
             "color": [
               0.0,
               0.0,

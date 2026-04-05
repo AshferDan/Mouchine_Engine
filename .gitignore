@@ -32,3 +32,4 @@ Build/
 *.g.props
 CSD2401_GAM_200/Scripts/obj/GameScript.csproj.nuget.dgspec.json
 CSD2401_GAM_200/Scripts/obj/project.assets.json
+/CSD2401_GAM_200/.claude

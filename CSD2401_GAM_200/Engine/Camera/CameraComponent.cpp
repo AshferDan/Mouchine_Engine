@@ -31,7 +31,7 @@ CameraComponent::CameraComponent(GameObject* owner)
 	followTarget(nullptr),
 	followOffset(0.f, 0.f),
 	enableSmoothing(false),
-	smoothSpeed(5.f),
+	smoothSpeed(50.f),
 	useBounds(false),
 	boundsMin(-10000.f, -10000.f),
 	boundsMax(10000.f, 10000.f) {

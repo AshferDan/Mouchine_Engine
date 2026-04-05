@@ -376,45 +376,6 @@ void InputManager::Update(float)
     }
 
 
-    // F / G / H — replay watch mode controls (F=rewind, G=pause/resume, H=forward)
-    {
-        GhostSystem* ghost = CORE ? CORE->GetGhostSystem() : nullptr;
-        bool inReplay = ghost && ghost->IsReplayMode();
-
-        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        {
-            if (!singleTriggerKeys[GLFW_KEY_F] && inReplay)
-            {
-                ghost->SeekReplay(-10.0f);
-                std::cout << "[Replay] Rewind 10s" << std::endl;
-            }
-            singleTriggerKeys[GLFW_KEY_F] = true;
-        }
-        else { singleTriggerKeys[GLFW_KEY_F] = false; }
-
-        if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
-        {
-            if (!singleTriggerKeys[GLFW_KEY_G] && inReplay)
-            {
-                ghost->ToggleReplayPause();
-                std::cout << "[Replay] " << (ghost->IsReplayPaused() ? "Paused" : "Resumed") << std::endl;
-            }
-            singleTriggerKeys[GLFW_KEY_G] = true;
-        }
-        else { singleTriggerKeys[GLFW_KEY_G] = false; }
-
-        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-        {
-            if (!singleTriggerKeys[GLFW_KEY_H] && inReplay)
-            {
-                ghost->SeekReplay(10.0f);
-                std::cout << "[Replay] Forward 10s" << std::endl;
-            }
-            singleTriggerKeys[GLFW_KEY_H] = true;
-        }
-        else { singleTriggerKeys[GLFW_KEY_H] = false; }
-    }
-
     // handle M key for pausing and resuming background music
     if (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS)
     {

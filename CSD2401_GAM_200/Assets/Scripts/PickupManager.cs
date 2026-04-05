@@ -106,6 +106,7 @@ namespace CSharpScript
                 {
                     // shell effect
                     Pickups.CollectShell();
+                    Audio.FadeOutSound("shell_glow", 3);
                     Audio.PlaySound("PU_Shell_sfx", "pu_sfx");
                     triggeredShellPU = true;
                     Transform.SetScale(PlayerMovement.pu_vfx, cachedPlayerSize.x * 2.0f, cachedPlayerSize.y * 2.0f);
@@ -157,6 +158,14 @@ namespace CSharpScript
                     Animation.PlayAnimation(PlayerMovement.pu_vfx, "Clear");
                     timePUActive = false;
                     timePUTimer = 0.0f;
+                }
+
+                if (!string.IsNullOrEmpty(GameObject.FindGameObjectByName("LevelTimerBar")))
+                {
+                    if (timePUActive)
+                        Graphics.SetTexture("LevelTimerBar", "../Assets/Sprites/Icons/Time bar_green.png");
+                    else
+                        Graphics.SetTexture("LevelTimerBar", "../Assets/Sprites/Icons/Time bar_blue.png");
                 }
             }
         }
