@@ -2,14 +2,14 @@
     "GameObjects": [
         {
             "name": "HZ_Spike_Single",
-            "localID": 9,
-            "parentID": 4294967295,
+            "localID": 49,
+            "parentID": 48,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    924.7009887695313,
-                    -24.26714324951172
+                    18041.732421875,
+                    19369.328125
                 ],
                 "scale": [
                     252.0,
@@ -70,18 +70,18 @@
             "children": [
                 {
                     "name": "Spike_Collider",
-                    "localID": 11,
-                    "parentID": 9,
+                    "localID": 50,
+                    "parentID": 49,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            921.759765625,
-                            -86.97496032714844
+                            18038.791015625,
+                            19329.630859375
                         ],
                         "scale": [
-                            146.3699951171875,
-                            101.0
+                            125.93900299072266,
+                            69.6181640625
                         ],
                         "rotation": 0.0
                     },
@@ -90,8 +90,8 @@
                         "shape": "Square",
                         "layer": "Enemy",
                         "size": [
-                            146.3699951171875,
-                            101.0
+                            125.93900299072266,
+                            69.6181640625
                         ]
                     },
                     "children": []

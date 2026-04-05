@@ -2,20 +2,20 @@
     "GameObjects": [
         {
             "name": "HZ_Spike_Double",
-            "localID": 7,
-            "parentID": 4294967295,
+            "localID": 59,
+            "parentID": 48,
             "active": true,
             "TransformComponent": {
                 "enabled": true,
                 "pos": [
-                    517.3479614257813,
-                    -24.267162322998047
+                    9468.1142578125,
+                    16748.20703125
                 ],
                 "scale": [
-                    495.0,
-                    150.0
+                    494.9998474121094,
+                    149.99990844726563
                 ],
-                "rotation": 0.0
+                "rotation": 0.34590527415275574
             },
             "RenderComponent": {
                 "enabled": true,
@@ -70,28 +70,28 @@
             "children": [
                 {
                     "name": "Spike_Collider",
-                    "localID": 8,
-                    "parentID": 7,
+                    "localID": 60,
+                    "parentID": 59,
                     "active": true,
                     "TransformComponent": {
                         "enabled": true,
                         "pos": [
-                            517.3479614257813,
-                            -90.86384582519531
+                            9468.1142578125,
+                            16718.177734375
                         ],
                         "scale": [
-                            383.0,
-                            117.0
+                            380.9998474121094,
+                            89.09087371826172
                         ],
-                        "rotation": 0.0
+                        "rotation": 0.34590527415275574
                     },
                     "ColliderComponent": {
                         "enabled": true,
                         "shape": "Square",
                         "layer": "Enemy",
                         "size": [
-                            383.0,
-                            117.0
+                            381.0,
+                            89.0909194946289
                         ]
                     },
                     "children": []
