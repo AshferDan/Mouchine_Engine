@@ -116,11 +116,19 @@ void CutsceneSystem::Update(float dt) {
 			m_canSkip = true;
 	}
 
-	// Check if Skip (Spacebar) or Left click - only after skip block timer expires
+	// Check if Skip (any key or any gamepad button) - only after skip block timer expires
 	if (m_canSkip) {
-		if (CORE->GetInputManager()->IsAnyKeyPress()) {
-			StopCutscene(true);
+		InputManager* inp = CORE->GetInputManager();
+		bool skipPressed = inp->IsAnyKeyPress();
+		if (!skipPressed && inp->IsGamepadConnected())
+		{
+			for (int i = 0; i <= GLFW_GAMEPAD_BUTTON_LAST; ++i)
+			{
+				if (inp->IsGamepadButtonPressed(i)) { skipPressed = true; break; }
+			}
 		}
+		if (skipPressed)
+			StopCutscene(true);
 	}
 }
 

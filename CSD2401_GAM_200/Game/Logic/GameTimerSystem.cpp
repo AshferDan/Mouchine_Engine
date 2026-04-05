@@ -18,6 +18,8 @@ Technology is prohibited.
 #include "Collision.h"
 #include "transform.h"
 #include "stb_image.h"
+#include "Physics.h"
+#include "Animator.hpp"
 
 #include <cstdio>
 #include <iostream>
@@ -48,6 +50,15 @@ void GameTimerSystem::Initialize()
     uvBarMin = 0.0f;
     uvBarMax = 1.0f;
     uvBarWidth = 1.0f;
+
+    // Destroy speedlines overlay from any previous session
+    {
+        auto& fac = GameObjectFactory::Instance();
+        if (auto* slGO = fac.FindGameObject("SpeedlinesOverlay"))
+            fac.DestroyGameObject(slGO->GetID());
+    }
+    hasCreatedSpeedlines = false;
+    speedlinesAlpha = 0.0f;
 }
 
 /**
@@ -93,6 +104,8 @@ void GameTimerSystem::Update(float dt)
         {
             timerFrame->SetActive(false);
         }
+        if (auto* slGO = factory.FindGameObject("SpeedlinesOverlay"))
+            slGO->SetActive(false);
         return;
     }
 
@@ -115,6 +128,8 @@ void GameTimerSystem::Update(float dt)
         {
             timerFrame->SetActive(false);
         }
+        if (auto* slGO = factory.FindGameObject("SpeedlinesOverlay"))
+            slGO->SetActive(false);
         // Don't count down
         return;
     }
@@ -134,6 +149,8 @@ void GameTimerSystem::Update(float dt)
         {
             timerFrame->SetActive(false);
         }
+        if (auto* slGO = factory.FindGameObject("SpeedlinesOverlay"))
+            slGO->SetActive(false);
         return;
     }
 
@@ -204,10 +221,74 @@ void GameTimerSystem::Update(float dt)
     // only decrease time in play mode
     if (mode == EditorMode::Play)
     {
+        // Determine player speed tier for both decay rate and speedlines
+        // T0 (<562.5): 1.0s/s, T1 (<750): 0.9s/s, T2 (<937.5): 0.8s/s, T3 (>=937.5): 0.6s/s
+        float decayRate = 1.0f;
+        int speedTier = 0;
+        {
+            GameObject* heroGO = factory.FindGameObject("Hero");
+            if (heroGO)
+            {
+                auto* physComp = heroGO->GetComponent<PhysicsComponent>();
+                if (physComp)
+                {
+                    float vx = 0.0f, vy = 0.0f;
+                    physComp->GetVelocity(vx, vy);
+                    float speed = std::abs(vx);
+                    if      (speed >= 937.5f) { decayRate = 0.6f; speedTier = 3; }
+                    else if (speed >= 750.0f) { decayRate = 0.8f; speedTier = 2; }
+                    else if (speed >= 562.5f) { decayRate = 0.9f; speedTier = 1; }
+                }
+            }
+        }
+
         // Only decrement timer if player is outside SafeZone
         if (!IsPlayerInSafeZone())
         {
-            remainingTime -= dt;
+            remainingTime -= dt * decayRate;
+        }
+
+        // Speedlines overlay — fade in at T3, fade out otherwise
+        if (!hasCreatedSpeedlines)
+        {
+            GameObject* slGO = factory.CreateGameObject("SpeedlinesOverlay");
+            auto* slTransform = slGO->AddComponent<TransformComponent>(50.0f, 50.0f);
+            slTransform->SetScale(1920.0f, 1080.0f);
+
+            auto spritesheetComp = std::make_unique<Spritesheet>(
+                slGO,
+                "../Assets/Sprites/Sheets/speedlines_spritesheet.png",
+                2, 2);
+            GLuint slTexID = spritesheetComp->GetTextureID();
+
+            auto* slRender = slGO->AddComponent<RenderComponent>(slTexID);
+            slRender->SetScreenSpace(true);
+            slRender->SetLayer(20);
+            slRender->setAlpha(0.0f);
+
+            Spritesheet* slAnim = spritesheetComp.get();
+            slGO->AddComponent(std::move(spritesheetComp));
+            slAnim->SetAnimation(0, 3, 12.0f);
+
+            slGO->SetActive(true); // always active; alpha controls visibility
+            hasCreatedSpeedlines = true;
+        }
+
+        // Update alpha and apply to render component
+        {
+            float target = (speedTier == 3) ? 1.0f : 0.0f;
+            float step = dt / kSpeedlinesFadeDuration;
+            if (speedlinesAlpha < target)
+                speedlinesAlpha = std::min(speedlinesAlpha + step, target);
+            else if (speedlinesAlpha > target)
+                speedlinesAlpha = std::max(speedlinesAlpha - step, target);
+
+            if (auto* slGO = factory.FindGameObject("SpeedlinesOverlay"))
+            {
+                auto* slRender = slGO->GetComponent<RenderComponent>();
+                if (slRender)
+                    slRender->setAlpha(speedlinesAlpha);
+            }
         }
 
         if (remainingTime <= 22.05f && !hasTriggeredPanicSound)

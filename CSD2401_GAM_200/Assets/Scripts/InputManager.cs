@@ -38,11 +38,11 @@ namespace CSharpScript
         // Right Bumper = Run
         public static bool RunWasPressed =>
             Input.GetKeyPressed(Input.KeyCode.J) ||
-            Input.GetGamepadButtonPressed(Input.GamepadButton.RightBumper);
+            Input.GetGamepadButtonPressed(Input.GamepadButton.RightThumb);
 
         public static bool RunIsHeld =>
             Input.GetKeyHeld(Input.KeyCode.J) ||
-            Input.GetGamepadButtonHeld(Input.GamepadButton.RightBumper);
+            Input.GetGamepadButtonHeld(Input.GamepadButton.RightThumb);
 
         // Left Bumper = Wall Kick / Zipline
         public static bool WallKickWasPressed =>

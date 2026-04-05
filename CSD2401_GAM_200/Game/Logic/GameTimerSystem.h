@@ -135,6 +135,11 @@ private:
     float       uvBarWidth = 1.0f;
     bool        uvBoundsReady = false;
 
+    // Speedlines overlay
+    bool        hasCreatedSpeedlines = false;
+    float       speedlinesAlpha = 0.0f;       // current opacity (0=transparent, 1=opaque)
+    static constexpr float kSpeedlinesFadeDuration = 2.0f; // seconds to fade in or out
+
     /**
      * @brief Updates the timer's displayed UI bar fill amount.
      * @param totalSeconds Whole seconds to display.

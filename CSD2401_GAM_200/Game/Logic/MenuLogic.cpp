@@ -632,7 +632,7 @@ void MenuLogicSystem::Update(float dt)
         static const char* homeButtons[]        = { "PlayButton", "SettingsButton", "ExtraButton", "QuitButton" };
         static const char* quitButtons[]        = { "YesButton", "NoButton" };
         static const char* settingsButtons[]    = { "MasterMuteButton", "MusicMuteButton", "SFXMuteButton" };
-        static const char* levelSelectButtons[] = { "LevelSelectedButton", "Level_BackButton" };
+        static const char* levelSelectButtons[] = { "LevelSelectedButton" }; // unused — custom nav below
         static const char* extraButtons[]       = { "Leaderboard_Button", "HowToPlay_Button", "Credit_Button" };
         static const char* leaderboardButtons[] = { "Leaderboards_tab_1st", "Leaderboards_tab_2nd", "Leaderboards_tab_3rd", "ReplayButton", "Vs_Ghost_Button", "BackButton" };
 
@@ -643,7 +643,7 @@ void MenuLogicSystem::Update(float dt)
         case MenuScreens::Home:        kbButtons = homeButtons;        kbCount = 4; break;
         case MenuScreens::QUIT:        kbButtons = quitButtons;        kbCount = 2; break;
         case MenuScreens::Settings:    kbButtons = settingsButtons;    kbCount = 3; break;
-        case MenuScreens::LevelSelect: kbButtons = levelSelectButtons; kbCount = 2; break;
+        case MenuScreens::LevelSelect: break; // custom nav handled separately below
         case MenuScreens::Extra:       kbButtons = extraButtons;       kbCount = 3; break;
         case MenuScreens::HTP:         break;
         case MenuScreens::Leaderboard: kbButtons = leaderboardButtons; kbCount = 6; break;
@@ -655,14 +655,20 @@ void MenuLogicSystem::Update(float dt)
             InputManager* inp = CORE->GetInputManager();
             if (inp)
             {
-                if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kbIdx = (kbIdx + 1) % kbCount;              kbActive = true; }
-                if (inp->IsKeyPressed(GLFW_KEY_UP))   { kbIdx = ((kbIdx - 1) + kbCount) % kbCount;  kbActive = true; }
-                // D-pad maps to the same navigation as arrow keys
-                if (inp->IsGamepadConnected())
+                // QUIT screen uses LEFT/RIGHT; all other screens use UP/DOWN
+                bool navNext = false, navPrev = false;
+                if (currScreen == MenuScreens::QUIT)
                 {
-                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kbIdx = (kbIdx + 1) % kbCount;              kbActive = true; }
-                    if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kbIdx = ((kbIdx - 1) + kbCount) % kbCount;  kbActive = true; }
+                    navNext = inp->IsKeyPressed(GLFW_KEY_RIGHT) || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+                    navPrev = inp->IsKeyPressed(GLFW_KEY_LEFT)  || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
                 }
+                else
+                {
+                    navNext = inp->IsKeyPressed(GLFW_KEY_DOWN) || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+                    navPrev = inp->IsKeyPressed(GLFW_KEY_UP)   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP));
+                }
+                if (navNext) { kbIdx = (kbIdx + 1) % kbCount;              kbActive = true; }
+                if (navPrev) { kbIdx = ((kbIdx - 1) + kbCount) % kbCount;  kbActive = true; }
                 if (isClicked && !currentHover.empty()) kbActive = false;
                 // Deselect keyboard nav when mouse interacts with a slider
                 if (isMouseDown && isDraggingSlider) kbActive = false;
@@ -773,25 +779,6 @@ void MenuLogicSystem::Update(float dt)
                 }
                 else if (currScreen == MenuScreens::LevelSelect)
                 {
-                    // LEFT/RIGHT cycles through Level1 / Level2 / Level3 and auto-selects
-                    bool leftJust  = inp->IsKeyPressed(GLFW_KEY_LEFT)
-                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
-                    bool rightJust = inp->IsKeyPressed(GLFW_KEY_RIGHT)
-                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
-                    if (leftJust || rightJust)
-                    {
-                        static const char* kLevels[] = { "Level1Button", "Level2Button", "Level3Button" };
-                        int cur = 0;
-                        for (int i = 0; i < 3; i++)
-                            if (selectedLevelButtonName == kLevels[i]) { cur = i; break; }
-                        // If nothing selected yet, right goes to level 1, left goes to level 3
-                        if (selectedLevelButtonName.empty())
-                            cur = rightJust ? 0 : 2;
-                        else
-                            cur = rightJust ? (cur + 1) % 3 : ((cur - 1) + 3) % 3;
-                        HandleLevelSelectClick(kLevels[cur]);
-                        kbActive = true;
-                    }
                     kMenuSliderRepeatTimer = 0.0f;
                 }
                 else if (currScreen == MenuScreens::Leaderboard)
@@ -820,6 +807,70 @@ void MenuLogicSystem::Update(float dt)
             }
         }
 
+    }
+
+    // Custom LevelSelect navigation:
+    //   UP/DOWN  — row 0 (level 1/2/3) <-> row 1 (Start button)
+    //   LEFT/RIGHT — cycle Level1/Level2/Level3 (row 0 only, no auto-start)
+    //   SPACE/A    — confirm hovered item
+    //   ESC/B      — go back (Level_BackButton is mouse-only)
+    if (currScreen == MenuScreens::LevelSelect)
+    {
+        InputManager* lsInp = CORE->GetInputManager();
+        static const char* kLSLevels[] = { "Level1Button", "Level2Button", "Level3Button" };
+        static int  kLSLevelIdx = 0;
+        static int  kLSRow      = 0;   // 0 = level row, 1 = start row
+        static bool kLSActive   = false;
+        static MenuScreens kLSPrevScreen = MenuScreens::Home;
+
+        // Reset state when re-entering the screen
+        if (kLSPrevScreen != MenuScreens::LevelSelect) { kLSLevelIdx = 0; kLSRow = 0; kLSActive = false; }
+        kLSPrevScreen = currScreen;
+
+        if (lsInp)
+        {
+            bool upJust    = lsInp->IsKeyPressed(GLFW_KEY_UP)    || (lsInp->IsGamepadConnected() && lsInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP));
+            bool downJust  = lsInp->IsKeyPressed(GLFW_KEY_DOWN)  || (lsInp->IsGamepadConnected() && lsInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+            bool leftJust  = lsInp->IsKeyPressed(GLFW_KEY_LEFT)  || (lsInp->IsGamepadConnected() && lsInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+            bool rightJust = lsInp->IsKeyPressed(GLFW_KEY_RIGHT) || (lsInp->IsGamepadConnected() && lsInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+            bool backJust  = lsInp->IsKeyPressed(GLFW_KEY_ESCAPE)|| (lsInp->IsGamepadConnected() && lsInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_B));
+
+            // Sync level index with mouse selection when KB is inactive
+            if (!kLSActive)
+                for (int i = 0; i < 3; i++)
+                    if (selectedLevelButtonName == kLSLevels[i]) { kLSLevelIdx = i; break; }
+
+            if (upJust)   { if (kLSRow > 0) kLSRow--; kLSActive = true; }
+            if (downJust) { if (kLSRow < 1) kLSRow++; kLSActive = true; }
+
+            // LEFT/RIGHT only on the level row — just changes which level is highlighted
+            if (kLSRow == 0 && (leftJust || rightJust))
+            {
+                if (leftJust)  kLSLevelIdx = ((kLSLevelIdx - 1) + 3) % 3;
+                if (rightJust) kLSLevelIdx = (kLSLevelIdx + 1) % 3;
+                HandleLevelSelectClick(kLSLevels[kLSLevelIdx]); // updates visual selection
+                kLSActive = true;
+            }
+
+            // ESC/B goes back
+            if (backJust)
+            {
+                HandleLevelSelectClick("Level_BackButton");
+                kLSActive = false;
+                kLSRow = 0;
+            }
+
+            // Mouse click deactivates KB mode
+            if (isClicked && !currentHover.empty()) kLSActive = false;
+
+            // Override currentHover and spacePressed from keyboard
+            if (kLSActive)
+            {
+                currentHover = (kLSRow == 0) ? kLSLevels[kLSLevelIdx] : "LevelSelectedButton";
+                spacePressed = lsInp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                    (lsInp->IsGamepadConnected() && lsInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A));
+            }
+        }
     }
 
     std::string currentPressed = "";

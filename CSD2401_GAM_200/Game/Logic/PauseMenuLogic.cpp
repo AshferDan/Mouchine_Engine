@@ -54,7 +54,6 @@ void PauseMenuLogicSystem::Initialize()
     hasCreatedUI = false;
     hoveredButtonName = "";
     pendingSceneChange = false;
-    pauseOpenCooldown = 0.0f;
     isPauseSettingsOpen = false;
     hasCreatedSettingsUI = false;
     wasSettingsOpenLastFrame = false;
@@ -1499,6 +1498,72 @@ void PauseMenuLogicSystem::Update(float dt)
         double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
         bool isClicked = InputManager::IsMouseLeftClicked();
 
+        // Keyboard / controller navigation:
+        //   UP/DOWN    — cycle rank row tabs (which replay is selected)
+        //   LEFT/RIGHT — cycle between Back, Replay, VsGhost buttons
+        //   SPACE/A    — confirm highlighted action button
+        static const char* kLBActions[]  = { "PauseLB_Back", "PauseLB_Replay", "PauseLB_VsGhost" };
+        static const int   kLBActionCount = 3;
+        static int  kLBActionIdx = 0;
+        static bool kLBActive    = false;
+
+        std::string kbHover = ""; // what keyboard nav wants to highlight this frame
+        {
+            bool upJust    = inp->IsKeyPressed(GLFW_KEY_UP)    || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP));
+            bool downJust  = inp->IsKeyPressed(GLFW_KEY_DOWN)  || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+            bool leftJust  = inp->IsKeyPressed(GLFW_KEY_LEFT)  || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+            bool rightJust = inp->IsKeyPressed(GLFW_KEY_RIGHT) || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+
+            // UP/DOWN cycles rank row tabs
+            if (upJust || downJust)
+            {
+                int maxTabs = static_cast<int>(m_lbData.size());
+                if (maxTabs > 0)
+                {
+                    if (upJust)   m_lbSelectedRank = ((m_lbSelectedRank - 1) + maxTabs) % maxTabs;
+                    if (downJust) m_lbSelectedRank = (m_lbSelectedRank + 1) % maxTabs;
+                    const char* rowTabNames3[3] = { "PauseLB_RowTab_1", "PauseLB_RowTab_2", "PauseLB_RowTab_3" };
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        GameObject* tab = factory.FindGameObject(rowTabNames3[j]);
+                        if (tab)
+                        {
+                            auto* rc = tab->GetComponent<RenderComponent>();
+                            if (rc)
+                            {
+                                const char* tex = (j == m_lbSelectedRank)
+                                    ? "../Assets/Leaderboards_tab_yellow.png"
+                                    : "../Assets/Leaderboards_tab_grey.png";
+                                rc->SetTextureID(GraphicsSystem::LoadTexture(tex));
+                            }
+                        }
+                    }
+                    AudioManager* localAudio = CORE->GetAudioManager();
+                    if (localAudio) localAudio->TriggerEvent("UI_Click");
+                    kLBActive = true;
+                }
+            }
+
+            // LEFT/RIGHT cycles between Back, Replay, VsGhost
+            if (leftJust)
+            {
+                kLBActionIdx = (kLBActionIdx - 1 + kLBActionCount) % kLBActionCount;
+                kLBActive = true;
+            }
+            if (rightJust)
+            {
+                kLBActionIdx = (kLBActionIdx + 1) % kLBActionCount;
+                kLBActive = true;
+            }
+
+            if (isClicked) kLBActive = false;
+            if (kLBActive) kbHover = kLBActions[kLBActionIdx];
+        }
+
+        bool spaceConfirm = kLBActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+            (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+
+        // Mouse hover detection (overrides keyboard when mouse moves over a button)
         std::string currentHover = "";
         if (IsMouseOver(factory.FindGameObject("PauseLB_Back"), mouseX, mouseY))
             currentHover = "PauseLB_Back";
@@ -1507,17 +1572,21 @@ void PauseMenuLogicSystem::Update(float dt)
         else if (IsMouseOver(factory.FindGameObject("PauseLB_VsGhost"), mouseX, mouseY))
             currentHover = "PauseLB_VsGhost";
 
-        if (currentHover != hoveredButtonName)
+        if (!currentHover.empty()) kLBActive = false; // mouse takes over
+
+        // Final desired hover: mouse wins, else keyboard
+        std::string desiredHover = !currentHover.empty() ? currentHover : kbHover;
+        if (desiredHover != hoveredButtonName)
         {
             if (!hoveredButtonName.empty())
                 SetButtonTexture(hoveredButtonName, ButtonState::Normal);
-            if (!currentHover.empty())
+            if (!desiredHover.empty())
             {
-                SetButtonTexture(currentHover, ButtonState::Hover);
+                SetButtonTexture(desiredHover, ButtonState::Hover);
                 AudioManager* localAudio = CORE->GetAudioManager();
                 if (localAudio) localAudio->TriggerEvent("UI_Hover");
             }
-            hoveredButtonName = currentHover;
+            hoveredButtonName = desiredHover;
         }
 
         // Row tab click — selects rank (highlight yellow)
@@ -1553,7 +1622,7 @@ void PauseMenuLogicSystem::Update(float dt)
             }
         }
 
-        if (isClicked && hoveredButtonName == "PauseLB_Back")
+        if ((isClicked || spaceConfirm) && hoveredButtonName == "PauseLB_Back")
         {
             SetButtonTexture("PauseLB_Back", ButtonState::Pressed);
             AudioManager* localAudio = CORE->GetAudioManager();
@@ -1561,7 +1630,7 @@ void PauseMenuLogicSystem::Update(float dt)
             pendingLeaderboardClose = true;
             leaderboardCloseTimer = 0.15f;
         }
-        else if (isClicked && hoveredButtonName == "PauseLB_Replay")
+        else if ((isClicked || spaceConfirm) && hoveredButtonName == "PauseLB_Replay")
         {
             SetButtonTexture("PauseLB_Replay", ButtonState::Pressed);
             AudioManager* localAudio = CORE->GetAudioManager();
@@ -1588,7 +1657,7 @@ void PauseMenuLogicSystem::Update(float dt)
             if (!currentScenePath.empty())
                 CORE->RequestSceneLoad(currentScenePath, true);
         }
-        else if (isClicked && hoveredButtonName == "PauseLB_VsGhost")
+        else if ((isClicked || spaceConfirm) && hoveredButtonName == "PauseLB_VsGhost")
         {
             SetButtonTexture("PauseLB_VsGhost", ButtonState::Pressed);
             AudioManager* localAudio = CORE->GetAudioManager();

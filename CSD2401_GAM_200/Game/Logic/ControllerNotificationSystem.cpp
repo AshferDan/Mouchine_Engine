@@ -92,15 +92,15 @@ void ControllerNotificationSystem::ShowPopup(const std::string& message)
     auto& factory = GameObjectFactory::Instance();
     vec2 camPos = CameraManager::Instance().GetCameraPosition();
 
-    // Background panel (Extras_menu.png)
+    // Background panel
     m_background = factory.CreateGameObject("CtrlNotif_BG");
     auto* bt = m_background->AddComponent<TransformComponent>();
     bt->posX   = camPos.x;
     bt->posY   = camPos.y + 280.0f; // upper region of the screen
-    bt->scaleX = 650.0f;
-    bt->scaleY = 160.0f;
-    auto* br = m_background->AddComponent<RenderComponent>();
-    br->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Extras_menu.png"));
+    bt->scaleX = 975.0f;
+    bt->scaleY = 240.0f;
+    GLuint bgTex = GraphicsSystem::LoadTexture("../Assets/Sprites/Extras_menu.png");
+    auto* br = m_background->AddComponent<RenderComponent>(bgTex);
     br->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     br->SetLayer(200);
 

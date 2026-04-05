@@ -85,7 +85,7 @@ namespace CSharpScript
         public PickupManager pickupManager;
 
         #region Variables
-        public bool isTimeAsResourceEnabled = true;
+        public bool isTimeAsResourceEnabled = false;
 
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
 
