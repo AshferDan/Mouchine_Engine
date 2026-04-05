@@ -110,7 +110,7 @@ namespace CSharpScript
                     //Audio.FadeOutCategory("shell_glow", 2);                   // waiting for xy to add fade by sound
                     //Debug.Log("\n\n\n\n\n\n\n\n\n");
                     Audio.FadeOutSound("shell_glow", 1);
-                    //Audio.PlaySound("PU_Shell_sfx", "pu_sfx");
+                    Audio.PlaySound("PU_Shell_sfx", "pu_sfx");
                     triggeredShellPU = true;
                     Transform.SetScale(PlayerMovement.pu_vfx, cachedPlayerSize.x * 2.0f, cachedPlayerSize.y * 2.0f);
                 }
