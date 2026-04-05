@@ -195,6 +195,9 @@ void MenuLogicSystem::Update(float dt)
     }
 
     // -------------------- UI SETACTIVE HANDLING -------------------- //
+    static bool htpWasActive = false;
+    if (currScreen != MenuScreens::HTP) htpWasActive = false;
+
     if (currScreen == MenuScreens::Home)
     {
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
@@ -242,6 +245,29 @@ void MenuLogicSystem::Update(float dt)
 
         if (GameObjectFactory::Instance().FindGameObject("Screen_Settings"))
         {
+            // create selection highlight GOs if not yet created
+            static bool sMenuSettingsHLCreated = false;
+            if (!sMenuSettingsHLCreated && !factory.FindGameObject("Menu_KbSliderHL"))
+            {
+                auto* sliderHL = factory.CreateGameObject("Menu_KbSliderHL");
+                sliderHL->AddComponent<TransformComponent>();
+                auto* sliderHLRender = sliderHL->AddComponent<RenderComponent>();
+                sliderHLRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Sound_slider_box.png"));
+                sliderHLRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                sliderHLRender->SetLayer(1);
+                sliderHL->SetActive(false);
+
+                auto* muteHL = factory.CreateGameObject("Menu_KbMuteHL");
+                muteHL->AddComponent<TransformComponent>();
+                auto* muteHLRender = muteHL->AddComponent<RenderComponent>();
+                muteHLRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Sound_icon_on.png"));
+                muteHLRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+                muteHLRender->SetLayer(1);
+                muteHL->SetActive(false);
+
+                sMenuSettingsHLCreated = true;
+            }
+
             auto *settingsScreen = GameObjectFactory::Instance().FindGameObject("Screen_Settings");
             if (!settingsScreen->IsActive())
             {
@@ -524,6 +550,30 @@ void MenuLogicSystem::Update(float dt)
             extra->SetActive(false);
         if (auto *htp = GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
             htp->SetActive(true);
+
+        // Update control panel texture based on controller connection state
+        {
+            InputManager* _inp = CORE->GetInputManager();
+            bool ctrlConnected = _inp && _inp->IsGamepadConnected();
+            bool justEntered   = !htpWasActive;
+            bool justConn      = _inp && _inp->IsGamepadJustConnected();
+            bool justDisconn   = _inp && _inp->IsGamepadJustDisconnected();
+            if (justEntered || justConn || justDisconn)
+            {
+                if (auto* htp = GameObjectFactory::Instance().FindGameObject("Screen_HTP"))
+                {
+                    auto* rc = htp->GetComponent<RenderComponent>();
+                    if (rc)
+                    {
+                        const char* htpTex = ctrlConnected
+                            ? "../Assets/Sprites/M6_ControlPanel_Controller.png"
+                            : "../Assets/Sprites/M6_ControlPanel_Keyboard.png";
+                        rc->SetTextureID(GraphicsSystem::LoadTexture(htpTex));
+                    }
+                }
+            }
+            htpWasActive = true;
+        }
     }
 
     InputManager* inp = CORE->GetInputManager();
@@ -581,10 +631,9 @@ void MenuLogicSystem::Update(float dt)
 
         static const char* homeButtons[]        = { "PlayButton", "SettingsButton", "ExtraButton", "QuitButton" };
         static const char* quitButtons[]        = { "YesButton", "NoButton" };
-        static const char* settingsButtons[]    = { "MasterMuteButton", "MusicMuteButton", "SFXMuteButton", "BackButton" };
-        static const char* levelSelectButtons[] = { "Level1Button", "Level2Button", "Level3Button", "LevelSelectedButton", "Level_BackButton" };
-        static const char* extraButtons[]       = { "HowToPlay_Button", "Leaderboard_Button", "Credit_Button", "BackButton_Extra" };
-        static const char* htpButtons[]         = { "BackButton_HTP" };
+        static const char* settingsButtons[]    = { "MasterMuteButton", "MusicMuteButton", "SFXMuteButton" };
+        static const char* levelSelectButtons[] = { "LevelSelectedButton", "Level_BackButton" };
+        static const char* extraButtons[]       = { "Leaderboard_Button", "HowToPlay_Button", "Credit_Button" };
         static const char* leaderboardButtons[] = { "Leaderboards_tab_1st", "Leaderboards_tab_2nd", "Leaderboards_tab_3rd", "ReplayButton", "Vs_Ghost_Button", "BackButton" };
 
         const char** kbButtons = nullptr;
@@ -593,10 +642,10 @@ void MenuLogicSystem::Update(float dt)
         {
         case MenuScreens::Home:        kbButtons = homeButtons;        kbCount = 4; break;
         case MenuScreens::QUIT:        kbButtons = quitButtons;        kbCount = 2; break;
-        case MenuScreens::Settings:    kbButtons = settingsButtons;    kbCount = 4; break;
-        case MenuScreens::LevelSelect: kbButtons = levelSelectButtons; kbCount = 5; break;
-        case MenuScreens::Extra:       kbButtons = extraButtons;       kbCount = 4; break;
-        case MenuScreens::HTP:         kbButtons = htpButtons;         kbCount = 1; break;
+        case MenuScreens::Settings:    kbButtons = settingsButtons;    kbCount = 3; break;
+        case MenuScreens::LevelSelect: kbButtons = levelSelectButtons; kbCount = 2; break;
+        case MenuScreens::Extra:       kbButtons = extraButtons;       kbCount = 3; break;
+        case MenuScreens::HTP:         break;
         case MenuScreens::Leaderboard: kbButtons = leaderboardButtons; kbCount = 6; break;
         default: break;
         }
@@ -722,6 +771,29 @@ void MenuLogicSystem::Update(float dt)
                         }
                     }
                 }
+                else if (currScreen == MenuScreens::LevelSelect)
+                {
+                    // LEFT/RIGHT cycles through Level1 / Level2 / Level3 and auto-selects
+                    bool leftJust  = inp->IsKeyPressed(GLFW_KEY_LEFT)
+                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+                    bool rightJust = inp->IsKeyPressed(GLFW_KEY_RIGHT)
+                                   || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+                    if (leftJust || rightJust)
+                    {
+                        static const char* kLevels[] = { "Level1Button", "Level2Button", "Level3Button" };
+                        int cur = 0;
+                        for (int i = 0; i < 3; i++)
+                            if (selectedLevelButtonName == kLevels[i]) { cur = i; break; }
+                        // If nothing selected yet, right goes to level 1, left goes to level 3
+                        if (selectedLevelButtonName.empty())
+                            cur = rightJust ? 0 : 2;
+                        else
+                            cur = rightJust ? (cur + 1) % 3 : ((cur - 1) + 3) % 3;
+                        HandleLevelSelectClick(kLevels[cur]);
+                        kbActive = true;
+                    }
+                    kMenuSliderRepeatTimer = 0.0f;
+                }
                 else if (currScreen == MenuScreens::Leaderboard)
                 {
                     // cycle through Level 1 / 2 / 3 tabs
@@ -747,6 +819,7 @@ void MenuLogicSystem::Update(float dt)
                 }
             }
         }
+
     }
 
     std::string currentPressed = "";
@@ -805,6 +878,105 @@ void MenuLogicSystem::Update(float dt)
         if (isCurrentPressed != wasPressed)
         {
             SetButtonTexture(currentHover, true, isCurrentPressed);
+        }
+    }
+
+    // Update settings selection highlights (slider box + mute icon glow)
+    {
+        auto* sliderHL = factory.FindGameObject("Menu_KbSliderHL");
+        auto* muteHL   = factory.FindGameObject("Menu_KbMuteHL");
+        if (sliderHL || muteHL)
+        {
+            if (currScreen == MenuScreens::Settings)
+            {
+                int hlRow = -1;
+                if      (hoveredButtonName == "MasterMuteButton" || IsMouseOver(factory.FindGameObject("Slider_Bar_Back_Master"), mouseX, mouseY)) hlRow = 0;
+                else if (hoveredButtonName == "MusicMuteButton"  || IsMouseOver(factory.FindGameObject("Slider_Bar_Back_Music"),  mouseX, mouseY)) hlRow = 1;
+                else if (hoveredButtonName == "SFXMuteButton"    || IsMouseOver(factory.FindGameObject("Slider_Bar_Back_SFX"),    mouseX, mouseY)) hlRow = 2;
+
+                const char* barNames[]  = { "Slider_Bar_Back_Master", "Slider_Bar_Back_Music", "Slider_Bar_Back_SFX" };
+                const char* muteNames[] = { "MasterMuteButton",       "MusicMuteButton",       "SFXMuteButton"      };
+
+                if (hlRow >= 0)
+                {
+                    if (sliderHL)
+                    {
+                        auto* barBack = factory.FindGameObject(barNames[hlRow]);
+                        if (barBack)
+                        {
+                            auto* bt = barBack->GetComponent<TransformComponent>();
+                            auto* ht = sliderHL->GetComponent<TransformComponent>();
+                            if (bt && ht)
+                            {
+                                float cx, cy, sx, sy;
+                                bt->GetPosition(cx, cy);
+                                bt->GetScale(sx, sy);
+                                ht->SetPosition(cx, cy);
+                                ht->scaleX = sx;
+                                ht->scaleY = sy;
+                            }
+                        }
+                        sliderHL->SetActive(true);
+                    }
+                    if (muteHL)
+                    {
+                        auto* muteBtn = factory.FindGameObject(muteNames[hlRow]);
+                        if (muteBtn)
+                        {
+                            auto* bt = muteBtn->GetComponent<TransformComponent>();
+                            auto* ht = muteHL->GetComponent<TransformComponent>();
+                            if (bt && ht)
+                            {
+                                float cx, cy, sx, sy;
+                                bt->GetPosition(cx, cy);
+                                bt->GetScale(sx, sy);
+                                ht->SetPosition(cx, cy);
+                                ht->scaleX = sx;
+                                ht->scaleY = sy;
+                            }
+                        }
+                        muteHL->SetActive(true);
+                    }
+                }
+                else
+                {
+                    if (sliderHL) sliderHL->SetActive(false);
+                    if (muteHL)   muteHL->SetActive(false);
+                }
+            }
+            else
+            {
+                // Not on settings screen — ensure highlights are hidden
+                if (sliderHL) sliderHL->SetActive(false);
+                if (muteHL)   muteHL->SetActive(false);
+            }
+        }
+    }
+
+    // ESC or controller B button → go back from Extras / HTP / Settings screens
+    if (currScreen == MenuScreens::Extra || currScreen == MenuScreens::HTP || currScreen == MenuScreens::Settings)
+    {
+        InputManager* _inp = CORE->GetInputManager();
+        if (_inp)
+        {
+            bool escPressed = _inp->IsKeyPressed(GLFW_KEY_ESCAPE);
+            bool bPressed   = _inp->IsGamepadConnected() && _inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_B);
+            if (escPressed || bPressed)
+            {
+                if (currScreen == MenuScreens::Settings)
+                {
+                    TriggerUISound("BackButton");
+                    HandleImmediateButtonClick("BackButton");
+                }
+                else
+                {
+                    const std::string backBtn = (currScreen == MenuScreens::Extra)
+                        ? "BackButton_Extra" : "BackButton_HTP";
+                    TriggerUISound(backBtn);
+                    HandleImmediateButtonClick(backBtn);
+                }
+                return;
+            }
         }
     }
 
@@ -1557,13 +1729,9 @@ void MenuLogicSystem::SetButtonTexture(std::string buttonName, bool isHovered, b
     {
         bool canStart = !selectedLevelButtonName.empty();
 
-        if (!canStart)
+        if (!canStart || (!isPressed && !isHovered))
         {
             texturePath = "../Assets/Sprites/Icons/win_lose_button_dark.png";
-        }
-        else if (isPressed || isHovered)
-        {
-            texturePath = "../Assets/Sprites/Icons/win_lose_button.png";
         }
         else
         {

@@ -86,7 +86,9 @@ public:
     bool IsGamepadButtonHeld(int button);
     bool IsGamepadButtonReleased(int button);
     float GetGamepadAxis(int axis);
-    bool IsGamepadConnected() const { return m_gamepadConnected; }
+    bool IsGamepadConnected()       const { return m_gamepadConnected; }
+    bool IsGamepadJustConnected()   const { return  m_gamepadConnected && !m_prevGamepadConnected; }
+    bool IsGamepadJustDisconnected() const { return !m_gamepadConnected &&  m_prevGamepadConnected; }
 
     // Virtual cursor position driven by controller (for menu navigation)
     static double ControllerCursorX;
@@ -172,8 +174,9 @@ private:
 	std::map<int, KEY_STATE> m_mouseButtonStates;
     std::map<int, KEY_STATE> m_gamepadButtonStates;
     GLFWgamepadstate m_gamepadState{};
-    bool m_gamepadConnected = false;
-    bool m_usingController = false;
+    bool m_gamepadConnected     = false;
+    bool m_prevGamepadConnected = false;
+    bool m_usingController      = false;
 
     EntityID cachedPlayerID = 0;
 

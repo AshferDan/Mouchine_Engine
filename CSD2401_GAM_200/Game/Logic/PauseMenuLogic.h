@@ -137,6 +137,7 @@ private:
     bool hasCreatedUI = false;             // whether UI elements have been created
     bool pendingSceneChange = false;       // whether a scene change is pending
     float pendingTimer = 0.0f;             // timer for scene change delay
+    float pauseOpenCooldown = 0.0f;        // brief cooldown after opening to ignore ESC/B close
     std::string currentScenePath = "";
     bool isPauseSettingsOpen = false;      // whether pause settings screen is open
     bool hasCreatedSettingsUI = false;     // whether settings UI has been created

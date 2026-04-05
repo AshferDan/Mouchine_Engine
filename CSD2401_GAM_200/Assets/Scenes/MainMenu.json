@@ -1675,7 +1675,7 @@
               1.0,
               1.0
             ],
-            "layer": 2,
+            "layer": 3,
             "screenSpace": false,
             "tileable": false,
             "tileCount": [
@@ -1712,7 +1712,7 @@
               1.0,
               1.0
             ],
-            "layer": 1,
+            "layer": 2,
             "screenSpace": false,
             "tileable": false,
             "tileCount": [
@@ -1749,7 +1749,7 @@
               1.0,
               1.0
             ],
-            "layer": 2,
+            "layer": 3,
             "screenSpace": false,
             "tileable": false,
             "tileCount": [
@@ -1786,7 +1786,7 @@
               1.0,
               1.0
             ],
-            "layer": 1,
+            "layer": 2,
             "screenSpace": false,
             "tileable": false,
             "tileCount": [
@@ -1910,7 +1910,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 2,
+                "layer": 3,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -1947,7 +1947,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 1,
+                "layer": 2,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -1984,7 +1984,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 2,
+                "layer": 3,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -2021,7 +2021,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 1,
+                "layer": 2,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -2110,7 +2110,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 2,
+                "layer": 3,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -2147,7 +2147,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 1,
+                "layer": 2,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -2184,7 +2184,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 2,
+                "layer": 3,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [
@@ -2221,7 +2221,7 @@
                   1.0,
                   1.0
                 ],
-                "layer": 1,
+                "layer": 2,
                 "screenSpace": false,
                 "tileable": false,
                 "tileCount": [

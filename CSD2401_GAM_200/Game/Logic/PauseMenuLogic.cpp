@@ -54,6 +54,7 @@ void PauseMenuLogicSystem::Initialize()
     hasCreatedUI = false;
     hoveredButtonName = "";
     pendingSceneChange = false;
+    pauseOpenCooldown = 0.0f;
     isPauseSettingsOpen = false;
     hasCreatedSettingsUI = false;
     wasSettingsOpenLastFrame = false;
@@ -779,6 +780,22 @@ void PauseMenuLogicSystem::Update(float dt)
             return; // Don't process interactions during pending close
         }
 
+        // ESC / B → close settings
+        {
+            InputManager* escInp = CORE->GetInputManager();
+            if (escInp)
+            {
+                bool escPressed = escInp->IsKeyPressed(GLFW_KEY_ESCAPE);
+                bool bPressed   = escInp->IsGamepadConnected() && escInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_B);
+                if (escPressed || bPressed)
+                {
+                    pendingSettingsClose = true;
+                    settingsCloseTimer = 0.15f;
+                    return;
+                }
+            }
+        }
+
         // Check if back button is clicked to close settings
         InputManager* inp = CORE->GetInputManager();
         float renderW = (float)CORE->GetGraphicsSystem()->GetWindowWidth();
@@ -818,9 +835,9 @@ void PauseMenuLogicSystem::Update(float dt)
         // Keyboard navigation for settings sub-menu
         // Rows: 0=Master, 1=Music, 2=SFX, 3=Back
         static const char* kSettingsButtons[] = {
-            "PauseMasterMuteButton", "PauseMusicMuteButton", "PauseSFXMuteButton", "PauseBackButton"
+            "PauseMasterMuteButton", "PauseMusicMuteButton", "PauseSFXMuteButton"
         };
-        static const int   kSettingsCount  = 4;
+        static const int   kSettingsCount  = 3;
         static int         kSettingsIdx    = 0;
         static bool        kSettingsActive = false;
         // Key-repeat state for LEFT/RIGHT slider adjustment
@@ -1034,6 +1051,45 @@ void PauseMenuLogicSystem::Update(float dt)
             }
         }
 
+        // Update selection highlights (slider box + mute icon glow)
+        {
+            const float uiScale = 2.0f;
+            // Y positions matching bar backs for each row
+            static const float kRowBarY[]  = {  50.0f,  -75.0f, -200.0f };
+            static const float kRowMuteY[] = {  50.5f,  -74.5f, -199.5f };
+
+            int hlRow = -1;
+            if (kSettingsActive && kSettingsIdx <= 2)
+                hlRow = kSettingsIdx;
+            else if (hoveredButtonName == "PauseMasterMuteButton" || IsMouseOver(factory.FindGameObject("PauseSlider_Bar_Back_Master"), mouseX, mouseY))  hlRow = 0;
+            else if (hoveredButtonName == "PauseMusicMuteButton"  || IsMouseOver(factory.FindGameObject("PauseSlider_Bar_Back_Music"),  mouseX, mouseY))  hlRow = 1;
+            else if (hoveredButtonName == "PauseSFXMuteButton"    || IsMouseOver(factory.FindGameObject("PauseSlider_Bar_Back_SFX"),    mouseX, mouseY))  hlRow = 2;
+
+            vec2 camPos = CameraManager::Instance().GetCameraPosition();
+            auto* sliderHL = factory.FindGameObject("PauseKb_SliderHL");
+            auto* muteHL   = factory.FindGameObject("PauseKb_MuteHL");
+            if (hlRow >= 0 && hlRow <= 2)
+            {
+                if (sliderHL)
+                {
+                    auto* t = sliderHL->GetComponent<TransformComponent>();
+                    if (t) t->SetPosition(camPos.x + 200.0f * uiScale, camPos.y + kRowBarY[hlRow] * uiScale);
+                    sliderHL->SetActive(true);
+                }
+                if (muteHL)
+                {
+                    auto* t = muteHL->GetComponent<TransformComponent>();
+                    if (t) t->SetPosition(camPos.x + -200.0f * uiScale, camPos.y + kRowMuteY[hlRow] * uiScale);
+                    muteHL->SetActive(true);
+                }
+            }
+            else
+            {
+                if (sliderHL) sliderHL->SetActive(false);
+                if (muteHL)   muteHL->SetActive(false);
+            }
+        }
+
         // handle slider input — clear keyboard selection when mouse starts dragging
         bool isMouseDown = glfwGetMouseButton(glfwGetCurrentContext(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
         if (isMouseDown && isDraggingSlider)
@@ -1064,6 +1120,26 @@ void PauseMenuLogicSystem::Update(float dt)
                 hoveredButtonName.clear();
             }
             return;
+        }
+
+        // Swap control panel texture if controller is connected/disconnected while open
+        {
+            InputManager* _inp = CORE->GetInputManager();
+            if (_inp && (_inp->IsGamepadJustConnected() || _inp->IsGamepadJustDisconnected()))
+            {
+                auto* htpScreen = factory.FindGameObject("PauseScreen_HowToPlay");
+                if (htpScreen)
+                {
+                    auto* rc = htpScreen->GetComponent<RenderComponent>();
+                    if (rc)
+                    {
+                        const char* htpTex = _inp->IsGamepadConnected()
+                            ? "../Assets/Sprites/M6_ControlPanel_Controller.png"
+                            : "../Assets/Sprites/M6_ControlPanel_Keyboard.png";
+                        rc->SetTextureID(GraphicsSystem::LoadTexture(htpTex));
+                    }
+                }
+            }
         }
 
         // Check for ESC key or back button click to close
@@ -1118,20 +1194,15 @@ void PauseMenuLogicSystem::Update(float dt)
             currentHover = "HowToPlayBackButton";
         }
 
-        // Keyboard: SPACE confirms the back button
+        // Controller B button closes HTP (back button is mouse-only)
         bool htpSpacePressed = false;
         {
             InputManager* inp = CORE->GetInputManager();
-            if (inp)
+            if (inp && inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_B))
             {
-                bool gpAny = inp->IsGamepadConnected() && (
-                    inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN) ||
-                    inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP)   ||
-                    inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A));
-                if (inp->IsKeyPressed(GLFW_KEY_DOWN) || inp->IsKeyPressed(GLFW_KEY_UP) || inp->IsKeyPressed(GLFW_KEY_SPACE) || gpAny)
-                    currentHover = "HowToPlayBackButton";
-                htpSpacePressed = inp->IsKeyPressed(GLFW_KEY_SPACE) ||
-                    (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A));
+                if (howToPlayOpenedViaTab) CloseHowToPlay();
+                else { pendingHowToPlayClose = true; howToPlayCloseTimer = 0.15f; }
+                return;
             }
         }
 
@@ -1595,13 +1666,35 @@ void PauseMenuLogicSystem::Update(float dt)
         }
     }
 
-    // Keyboard selection: UP/DOWN to move between buttons, SPACE to confirm
-    static const char* kPauseButtons[] = {
-        "PauseResumeButton", "PauseSettingsButton", "PauseRestartButton",
-        "PauseMainMenuButton", "PauseHowToPlayButton", "PauseLeaderboardButton"
+    // ESC / B → resume (close pause menu)
+    if (pauseOpenCooldown > 0.0f) pauseOpenCooldown -= dt;
+    {
+        InputManager* escInp = CORE->GetInputManager();
+        if (escInp && !pendingSceneChange && pauseOpenCooldown <= 0.0f)
+        {
+            bool escPressed = escInp->IsKeyPressed(GLFW_KEY_ESCAPE);
+            bool bPressed   = escInp->IsGamepadConnected() && escInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_B);
+            if (escPressed || bPressed)
+            {
+                TogglePauseMenu();
+                return;
+            }
+        }
+    }
+
+    // 2D grid keyboard/controller navigation:
+    //   Row 0: [PauseRestartButton] [PauseHowToPlayButton]
+    //   Row 1: [PauseSettingsButton][PauseLeaderboardButton]
+    //   Row 2: [PauseMainMenuButton]
+    static const char* kPauseGrid[3][2] = {
+        { "PauseRestartButton",  "PauseHowToPlayButton"   },
+        { "PauseSettingsButton", "PauseLeaderboardButton" },
+        { "PauseMainMenuButton", nullptr                  }
     };
-    static const int kPauseCount = 6;
-    static int  kPauseIdx    = 0;
+    static const int kPauseMaxCol[] = { 1, 1, 0 }; // max col index per row
+    static const int kPauseRows = 3;
+    static int  kPauseRow    = 0;
+    static int  kPauseCol    = 0;
     static bool kPauseActive = false;
     bool spacePressed = false;
     {
@@ -1609,15 +1702,26 @@ void PauseMenuLogicSystem::Update(float dt)
         if (hoveredButtonName.empty()) kPauseActive = false; // reset on fresh open
         if (inp && !pendingSceneChange)
         {
-            if (inp->IsKeyPressed(GLFW_KEY_DOWN)) { kPauseIdx = (kPauseIdx + 1) % kPauseCount;                     kPauseActive = true; }
-            if (inp->IsKeyPressed(GLFW_KEY_UP))   { kPauseIdx = ((kPauseIdx - 1) + kPauseCount) % kPauseCount;     kPauseActive = true; }
-            if (inp->IsGamepadConnected())
+            bool upJust    = inp->IsKeyPressed(GLFW_KEY_UP)    || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP));
+            bool downJust  = inp->IsKeyPressed(GLFW_KEY_DOWN)  || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+            bool leftJust  = inp->IsKeyPressed(GLFW_KEY_LEFT)  || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_LEFT));
+            bool rightJust = inp->IsKeyPressed(GLFW_KEY_RIGHT) || (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_RIGHT));
+
+            if (upJust)
             {
-                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN)) { kPauseIdx = (kPauseIdx + 1) % kPauseCount;                     kPauseActive = true; }
-                if (inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP))   { kPauseIdx = ((kPauseIdx - 1) + kPauseCount) % kPauseCount;     kPauseActive = true; }
+                if (kPauseRow > 0) { kPauseRow--; kPauseCol = std::min(kPauseCol, kPauseMaxCol[kPauseRow]); }
+                kPauseActive = true;
             }
+            if (downJust)
+            {
+                if (kPauseRow < kPauseRows - 1) { kPauseRow++; kPauseCol = std::min(kPauseCol, kPauseMaxCol[kPauseRow]); }
+                kPauseActive = true;
+            }
+            if (leftJust  && kPauseCol > 0)                         { kPauseCol--; kPauseActive = true; }
+            if (rightJust && kPauseCol < kPauseMaxCol[kPauseRow])   { kPauseCol++; kPauseActive = true; }
+
             if (isClicked && !currentHover.empty()) kPauseActive = false;
-            if (kPauseActive) currentHover = kPauseButtons[kPauseIdx];
+            if (kPauseActive) currentHover = kPauseGrid[kPauseRow][kPauseCol];
             spacePressed = kPauseActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
                 (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
         }
@@ -1838,6 +1942,32 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     // Use a scale multiplier to make the UI larger
     float uiScale = 2.0f;
 
+    // Selection highlight - Slider row box (created first so it renders behind all other elements)
+    GameObject* sliderHL = factory.CreateGameObject("PauseKb_SliderHL");
+    auto* sliderHLTransform = sliderHL->AddComponent<TransformComponent>();
+    sliderHLTransform->posX = 200.0f * uiScale;
+    sliderHLTransform->posY = 50.0f * uiScale;
+    sliderHLTransform->scaleX = 670.0f * uiScale;
+    sliderHLTransform->scaleY = 110.0f * uiScale;
+    auto* sliderHLRender = sliderHL->AddComponent<RenderComponent>();
+    sliderHLRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Sound_slider_box.png"));
+    sliderHLRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    sliderHLRender->SetLayer(600);
+    sliderHL->SetActive(false);
+
+    // Selection highlight - Mute icon (created first so it renders behind mute button)
+    GameObject* muteHL = factory.CreateGameObject("PauseKb_MuteHL");
+    auto* muteHLTransform = muteHL->AddComponent<TransformComponent>();
+    muteHLTransform->posX = -200.0f * uiScale;
+    muteHLTransform->posY = 50.5f * uiScale;
+    muteHLTransform->scaleX = 125.0f * uiScale;
+    muteHLTransform->scaleY = 100.0f * uiScale;
+    auto* muteHLRender = muteHL->AddComponent<RenderComponent>();
+    muteHLRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Sound_icon_on.png"));
+    muteHLRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    muteHLRender->SetLayer(600);
+    muteHL->SetActive(false);
+
     // Settings screen background
     GameObject* settingsScreen = factory.CreateGameObject("PauseScreen_Settings");
     auto* settingsTransform = settingsScreen->AddComponent<TransformComponent>();
@@ -1848,7 +1978,7 @@ void PauseMenuLogicSystem::CreatePauseSettingsUI()
     auto* settingsRender = settingsScreen->AddComponent<RenderComponent>();
     settingsRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Settings_New.png"));
     settingsRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    settingsRender->SetLayer(601);
+    settingsRender->SetLayer(599);
 
     // Master Text
     GameObject* masterText = factory.CreateGameObject("PauseMasterText");
@@ -2095,6 +2225,13 @@ void PauseMenuLogicSystem::SetPauseSettingsVisible(bool show)
             obj->SetActive(show);
         }
     }
+
+    // Highlights are hidden by default; only shown when a row is selected/hovered
+    if (!show)
+    {
+        if (auto* hl = factory.FindGameObject("PauseKb_SliderHL")) hl->SetActive(false);
+        if (auto* hl = factory.FindGameObject("PauseKb_MuteHL"))   hl->SetActive(false);
+    }
 }
 
 /**
@@ -2158,7 +2295,9 @@ void PauseMenuLogicSystem::DestroyPauseSettingsUI()
         "PauseMasterMuteButton",
         "PauseMusicMuteButton",
         "PauseSFXMuteButton",
-        "PauseBackButton"
+        "PauseBackButton",
+        "PauseKb_SliderHL",
+        "PauseKb_MuteHL"
     };
 
     for (const auto& name : settingsElements)
@@ -2295,6 +2434,7 @@ void PauseMenuLogicSystem::TogglePauseMenu()
 
     isPauseMenuActive = !isPauseMenuActive;
     SetPauseMenuVisible(isPauseMenuActive);
+    if (isPauseMenuActive) pauseOpenCooldown = 0.15f; // ignore ESC/B for first 150ms after opening
 
     // Get audio manager for low pass filter and sound effects
     AudioManager* audioManager = CORE->GetAudioManager();
@@ -2656,7 +2796,13 @@ void PauseMenuLogicSystem::CreateHowToPlayUI()
     howToPlayTransform->scaleX = 2080.0f * uiScale;
     howToPlayTransform->scaleY = 1170.0f * uiScale;
     auto* howToPlayRender = howToPlayScreen->AddComponent<RenderComponent>();
-    howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/M6_ControlPanel_Keyboard.png"));
+    {
+        InputManager* _inp = CORE->GetInputManager();
+        const char* htpTex = (_inp && _inp->IsGamepadConnected())
+            ? "../Assets/Sprites/M6_ControlPanel_Controller.png"
+            : "../Assets/Sprites/M6_ControlPanel_Keyboard.png";
+        howToPlayRender->SetTextureID(GraphicsSystem::LoadTexture(htpTex));
+    }
     howToPlayRender->SetColor(vec4(1.0f, 1.0f, 1.0f, 1.0f));
     howToPlayRender->SetLayer(601);
 

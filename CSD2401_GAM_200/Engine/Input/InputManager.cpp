@@ -184,6 +184,7 @@ void InputManager::Update(float)
 
     // ---- Gamepad button state polling ----
     {
+        m_prevGamepadConnected = m_gamepadConnected;
         GLFWgamepadstate gpState{};
         m_gamepadConnected = (glfwGetGamepadState(GLFW_JOYSTICK_1, &gpState) == GLFW_TRUE);
         if (m_gamepadConnected)

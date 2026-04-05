@@ -64,19 +64,21 @@ int main()
 
         struct GameApp : public IGameCallbacksSystem
         {
-            MenuLogicSystem*         menuLogic      = nullptr;
-            PauseMenuLogicSystem*    pauseMenuLogic = nullptr;
-            WinLoseLogicSystem*      winLoseLogic   = nullptr;
-            GameTimerSystem*         gameTimer      = nullptr;
-            MediaPlayerLogicSystem*  mediaPlayer    = nullptr;
-            DoorAnimationLogicSystem* doorAnimLogic = nullptr;
-            PickupSystem             pickupSystem;
+            MenuLogicSystem*              menuLogic      = nullptr;
+            PauseMenuLogicSystem*         pauseMenuLogic = nullptr;
+            WinLoseLogicSystem*           winLoseLogic   = nullptr;
+            GameTimerSystem*              gameTimer      = nullptr;
+            MediaPlayerLogicSystem*       mediaPlayer    = nullptr;
+            DoorAnimationLogicSystem*     doorAnimLogic  = nullptr;
+            ControllerNotificationSystem* ctrlNotif      = nullptr;
+            PickupSystem                  pickupSystem;
 
             void FixedUpdatePlaying(float dt) override {
                 if (CORE->GetGhostSystem()->IsReplayMode()) return;
                 if (menuLogic) menuLogic->Update(dt);
             }
             void FixedUpdateAlways(float dt) override {
+                if (ctrlNotif) ctrlNotif->Update(dt); // always runs, even in replay/pause
                 if (CORE->GetGhostSystem()->IsReplayMode()) return;
                 if (pauseMenuLogic) pauseMenuLogic->Update(dt);
                 if (doorAnimLogic)  doorAnimLogic->Update(dt);  // must run even when paused
@@ -104,6 +106,7 @@ int main()
                 if (winLoseLogic)   winLoseLogic->Initialize();
                 if (mediaPlayer)    mediaPlayer->Initialize();
                 if (doorAnimLogic)  doorAnimLogic->Initialize();
+                if (ctrlNotif)      ctrlNotif->Initialize(); // clear stale GO pointers after scene reload
                 pickupSystem = PickupSystem();
             }
             bool IsPauseMenuActive()  const override { return pauseMenuLogic && pauseMenuLogic->IsPauseMenuActive(); }
@@ -152,6 +155,7 @@ int main()
         gameApp.gameTimer      = CORE->AddSystem<GameTimerSystem>();
         gameApp.mediaPlayer    = CORE->AddSystem<MediaPlayerLogicSystem>();
         gameApp.doorAnimLogic  = CORE->AddSystem<DoorAnimationLogicSystem>();
+        gameApp.ctrlNotif      = CORE->AddSystem<ControllerNotificationSystem>();
 
         gameApp.menuLogic->Initialize();
         gameApp.pauseMenuLogic->Initialize();
@@ -159,6 +163,7 @@ int main()
         gameApp.gameTimer->Initialize();
         gameApp.mediaPlayer->Initialize();
         gameApp.doorAnimLogic->Initialize();
+        gameApp.ctrlNotif->Initialize();
         gameApp.winLoseLogic->SetDoorAnimSystem(gameApp.doorAnimLogic);
 
         CORE->SetGameCallbacks(&gameApp);

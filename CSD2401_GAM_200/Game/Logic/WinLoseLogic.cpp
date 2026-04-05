@@ -1026,19 +1026,19 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
         currentHover = "QuitButton";
     }
 
-    // Keyboard selection: SPACE to confirm
-    static const char* kWinButtons[] = { "QuitButton" };
-    static int  kWinIdx    = 0;
-    static bool kWinActive = false;
+    // Keyboard/controller: SPACE or A confirms the single button
     bool spacePressed = false;
     {
-        InputManager* inp = CORE->GetInputManager();
         if (inp && !pendingSceneChange)
         {
-            if (isClicked && !currentHover.empty()) kWinActive = false; // mouse click takes over
-            if (kWinActive) currentHover = kWinButtons[kWinIdx];
-            spacePressed = kWinActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
-                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+            bool confirm = inp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                           (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A));
+            if (confirm)
+            {
+                currentHover = "QuitButton";
+                spacePressed = true;
+            }
+            if (isClicked && !currentHover.empty()) spacePressed = false;
         }
     }
 
@@ -1314,6 +1314,27 @@ void WinLoseLogicSystem::HandleWinScreen2Buttons()
     if (IsMouseOver(factory.FindGameObject("WinQuitButton"), mouseX, mouseY))
         currentHover = "WinQuitButton";
 
+    // Keyboard/controller UP/DOWN navigation
+    static const char* kWin2Buttons[] = { "WinContinueButton", "WinReplayButton", "WinQuitButton" };
+    static const int   kWin2Count  = 3;
+    static int         kWin2Idx    = 0;
+    static bool        kWin2Active = false;
+    bool spacePressed = false;
+    {
+        InputManager* navInp = CORE->GetInputManager();
+        if (navInp && !pendingSceneChange)
+        {
+            bool upJust   = navInp->IsKeyPressed(GLFW_KEY_UP)   || (navInp->IsGamepadConnected() && navInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP));
+            bool downJust = navInp->IsKeyPressed(GLFW_KEY_DOWN) || (navInp->IsGamepadConnected() && navInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+            if (upJust)   { kWin2Idx = ((kWin2Idx - 1) + kWin2Count) % kWin2Count; kWin2Active = true; }
+            if (downJust) { kWin2Idx = (kWin2Idx + 1) % kWin2Count;                kWin2Active = true; }
+            if (isClicked && !currentHover.empty()) kWin2Active = false;
+            if (kWin2Active) currentHover = kWin2Buttons[kWin2Idx];
+            spacePressed = kWin2Active && (navInp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (navInp->IsGamepadConnected() && navInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+        }
+    }
+
     if (currentHover != hoveredButtonName)
     {
         if (!hoveredButtonName.empty())
@@ -1330,7 +1351,7 @@ void WinLoseLogicSystem::HandleWinScreen2Buttons()
         hoveredButtonName = currentHover;
     }
 
-    if (isClicked && !hoveredButtonName.empty() && !pendingSceneChange)
+    if ((isClicked || spacePressed) && !hoveredButtonName.empty() && !pendingSceneChange)
     {
         AudioManager* audioManager = CORE->GetAudioManager();
 
@@ -1826,19 +1847,24 @@ void WinLoseLogicSystem::HandleLoseScreenButtons()
         currentHover = "LoseQuitButton";
     }
 
-    // Keyboard selection: SPACE to confirm
+    // Keyboard/controller UP/DOWN navigation
     static const char* kLoseButtons[] = { "LoseRetryButton", "LoseQuitButton" };
-    static int  kLoseIdx    = 0;
-    static bool kLoseActive = false;
+    static const int   kLoseCount  = 2;
+    static int         kLoseIdx    = 0;
+    static bool        kLoseActive = false;
     bool spacePressed = false;
     {
-        InputManager* inp = CORE->GetInputManager();
-        if (inp && !pendingSceneChange)
+        InputManager* navInp = CORE->GetInputManager();
+        if (navInp && !pendingSceneChange)
         {
+            bool upJust   = navInp->IsKeyPressed(GLFW_KEY_UP)   || (navInp->IsGamepadConnected() && navInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_UP));
+            bool downJust = navInp->IsKeyPressed(GLFW_KEY_DOWN) || (navInp->IsGamepadConnected() && navInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_DPAD_DOWN));
+            if (upJust)   { kLoseIdx = ((kLoseIdx - 1) + kLoseCount) % kLoseCount; kLoseActive = true; }
+            if (downJust) { kLoseIdx = (kLoseIdx + 1) % kLoseCount;                kLoseActive = true; }
             if (isClicked && !currentHover.empty()) kLoseActive = false;
             if (kLoseActive) currentHover = kLoseButtons[kLoseIdx];
-            spacePressed = kLoseActive && (inp->IsKeyPressed(GLFW_KEY_SPACE) ||
-                (inp->IsGamepadConnected() && inp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
+            spacePressed = kLoseActive && (navInp->IsKeyPressed(GLFW_KEY_SPACE) ||
+                (navInp->IsGamepadConnected() && navInp->IsGamepadButtonPressed(GLFW_GAMEPAD_BUTTON_A)));
         }
     }
 

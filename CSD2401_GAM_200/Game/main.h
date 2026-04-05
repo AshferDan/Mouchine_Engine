@@ -50,6 +50,7 @@ Technology is prohibited.
 #include "DoorAnimationLogic.h"
 #include "GameCallbacks.h"
 #include "SplashScreen.h"
+#include "ControllerNotificationSystem.h"
 #include "Utils.h"
 
 /**
