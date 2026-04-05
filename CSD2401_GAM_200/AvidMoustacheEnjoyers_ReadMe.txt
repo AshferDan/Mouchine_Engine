@@ -27,11 +27,8 @@ Player Controls
   D                   	Walk Right
   Spacebar             	Jump
   J			Dash
-  K			Roll
-  L			Wall Kick
-  F                     Rewind (Replay)
-  G                     Play (Replay)
-  H                     Forward (Replay)
+  K			Ground Pound
+
  
 System
 
@@ -50,8 +47,7 @@ System
   M			Pause the BGM sound
 
 - Game State
-  ESC			Quit the game
-  P/Esc                 Pause Menu
+  Esc                 Pause Menu
 
 ===========================================================================================================
 

@@ -97,11 +97,16 @@ namespace CSharpScript
         private float[]  _autoScrollAccum = new float[LayerCount];  // accumulated auto-scroll X
         private vec2[]   _startWorldPos = new vec2[LayerCount];   // world pos of bg at init
         private vec2     _startCamPos;                            // camera pos at init
-        private bool[]   _inited   = new bool[LayerCount];
-        private bool[]   _initedL  = new bool[LayerCount];
-        private bool[]   _initedR  = new bool[LayerCount];
-        private bool[]   _initedL2 = new bool[LayerCount];
-        private bool[]   _initedR2 = new bool[LayerCount];
+        private bool[]   _inited    = new bool[LayerCount];
+        private bool[]   _initedL   = new bool[LayerCount];
+        private bool[]   _initedR   = new bool[LayerCount];
+        private bool[]   _initedL2  = new bool[LayerCount];
+        private bool[]   _initedR2  = new bool[LayerCount];
+        // Once a lookup fails we stop retrying to avoid a linear FindGameObject scan every frame.
+        private bool[]   _absentL   = new bool[LayerCount];
+        private bool[]   _absentR   = new bool[LayerCount];
+        private bool[]   _absentL2  = new bool[LayerCount];
+        private bool[]   _absentR2  = new bool[LayerCount];
 
         public override void OnStart()
         {
@@ -137,8 +142,6 @@ namespace CSharpScript
             if (_names == null) OnStart();
 
             vec2 cam = Camera.GetPosition();
-
-            // How far the camera has moved since level start
             float camDeltaX = cam.x - _startCamPos.x;
             float camDeltaY = cam.y - _startCamPos.y;
 
@@ -177,8 +180,13 @@ namespace CSharpScript
 
                     posX = _startWorldPos[i].x + camDeltaX - wrapped + off.x;
 
-                    // Retry side-copy init in case they loaded after OnStart
-                    if (!_initedL[i] || !_initedR[i] || !_initedL2[i] || !_initedR2[i])
+                    // Retry side-copy init only while at least one copy is still pending
+                    // (not yet found AND not confirmed absent). Stops scanning once settled.
+                    bool pendingL  = !_initedL[i]  && !_absentL[i];
+                    bool pendingR  = !_initedR[i]  && !_absentR[i];
+                    bool pendingL2 = !_initedL2[i] && !_absentL2[i];
+                    bool pendingR2 = !_initedR2[i] && !_absentR2[i];
+                    if (pendingL || pendingR || pendingL2 || pendingR2)
                         TryInitLayer(i);
 
                     if (_initedL[i])
@@ -230,26 +238,31 @@ namespace CSharpScript
 
             if (GetTileWidth(i) > 0f)
             {
-                if (!_initedL[i] && !string.IsNullOrEmpty(_namesL[i]))
+                if (!_initedL[i] && !_absentL[i] && !string.IsNullOrEmpty(_namesL[i]))
                 {
                     vec2 s = Transform.GetScale(_namesL[i]);
                     if (s.x != 0f || s.y != 0f) _initedL[i] = true;
+                    else                          _absentL[i] = true;
                 }
-                if (!_initedR[i] && !string.IsNullOrEmpty(_namesR[i]))
+                if (!_initedR[i] && !_absentR[i] && !string.IsNullOrEmpty(_namesR[i]))
                 {
                     vec2 s = Transform.GetScale(_namesR[i]);
                     if (s.x != 0f || s.y != 0f) _initedR[i] = true;
+                    else                          _absentR[i] = true;
                 }
-                // Optional extra copies — only used if the objects exist in the scene.
-                if (!_initedL2[i] && !string.IsNullOrEmpty(_namesL2[i]))
+                // Optional extra copies — only probe if not already confirmed absent.
+                // Once the probe returns (0,0) we mark it absent and never scan again.
+                if (!_initedL2[i] && !_absentL2[i] && !string.IsNullOrEmpty(_namesL2[i]))
                 {
                     vec2 s = Transform.GetScale(_namesL2[i]);
                     if (s.x != 0f || s.y != 0f) _initedL2[i] = true;
+                    else                          _absentL2[i] = true;
                 }
-                if (!_initedR2[i] && !string.IsNullOrEmpty(_namesR2[i]))
+                if (!_initedR2[i] && !_absentR2[i] && !string.IsNullOrEmpty(_namesR2[i]))
                 {
                     vec2 s = Transform.GetScale(_namesR2[i]);
                     if (s.x != 0f || s.y != 0f) _initedR2[i] = true;
+                    else                          _absentR2[i] = true;
                 }
             }
         }
