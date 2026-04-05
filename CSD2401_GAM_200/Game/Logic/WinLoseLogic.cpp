@@ -992,7 +992,7 @@ void WinLoseLogicSystem::CreateWinScreen()
     quitRender->SetLayer(102);
     quitBtn->AddComponent<TextComponent>(
         "../Assets/FrederickatheGreat-Regular.ttf", static_cast<int>(38 * uiScale),
-        "Save Run", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
+        "Next", vec4(0.0f, 0.0f, 0.0f, 1.0f), false);
     quitBtn->GetComponent<TextComponent>()->SetLayer(102);
 
     hasCreatedWinScreen = true;
@@ -1020,6 +1020,21 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
     auto& factory = GameObjectFactory::Instance();
     std::string currentHover = "";
+
+    // Dynamically update button label based on whether the player has typed a name
+    {
+        TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
+        GameObject* btn = factory.FindGameObject("QuitButton");
+        if (btn)
+        {
+            auto* tc = btn->GetComponent<TextComponent>();
+            if (tc)
+            {
+                bool hasText = textInput && textInput->IsActive() && !textInput->GetCurrentText().empty();
+                tc->SetText(hasText ? "Save Run" : "Next");
+            }
+        }
+    }
 
     if (IsMouseOver(factory.FindGameObject("QuitButton"), mouseX, mouseY))
     {
@@ -1068,12 +1083,20 @@ void WinLoseLogicSystem::HandleWinScreenButtons()
 
         if (hoveredButtonName == "QuitButton")
         {
-            std::cout << "[WinZone] Save Run clicked - Opening options screen" << std::endl;
-
-            // Confirm any in-progress name input before leaving
             TextInputSystem* textInput = CORE ? CORE->GetTextInputSystem() : nullptr;
-            if (textInput && textInput->IsActive())
-                textInput->Confirm();
+            bool hasText = textInput && textInput->IsActive() && !textInput->GetCurrentText().empty();
+
+            if (hasText)
+            {
+                std::cout << "[WinZone] Save Run clicked - saving run then opening options screen" << std::endl;
+                textInput->Confirm();  // triggers the onConfirm callback which saves the run
+            }
+            else
+            {
+                std::cout << "[WinZone] Next clicked (no name entered) - skipping save, opening options screen" << std::endl;
+                if (textInput && textInput->IsActive())
+                    textInput->Hide();  // dismiss without saving
+            }
 
             if (audioManager)
             {

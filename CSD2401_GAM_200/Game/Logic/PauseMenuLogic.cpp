@@ -1428,6 +1428,22 @@ void PauseMenuLogicSystem::Update(float dt)
         double mouseY = _camPos.y + ndcY * (virtualH / (2.0f * _zoom));
         bool isClicked = InputManager::IsMouseLeftClicked();
 
+        // ESC closes the leaderboard and returns to the pause main menu
+        static bool escWasPressedLeaderboard = false;
+        if (glfwGetKey(glfwGetCurrentContext(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            if (!escWasPressedLeaderboard)
+            {
+                pendingLeaderboardClose = true;
+                leaderboardCloseTimer = 0.15f;
+                escWasPressedLeaderboard = true;
+            }
+        }
+        else
+        {
+            escWasPressedLeaderboard = false;
+        }
+
         std::string currentHover = "";
         if (IsMouseOver(factory.FindGameObject("PauseLB_Back"), mouseX, mouseY))
             currentHover = "PauseLB_Back";
