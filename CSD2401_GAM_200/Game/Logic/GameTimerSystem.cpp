@@ -134,6 +134,18 @@ void GameTimerSystem::Update(float dt)
         return;
     }
 
+    bool isPauseMenuActive = gameCb && gameCb->IsPauseMenuActive();
+    bool isWinScreenActive = gameCb && gameCb->IsWinScreenActive();
+    bool isLoseScreenActive = gameCb && gameCb->IsLoseScreenActive();
+
+    if (isPauseMenuActive || isWinScreenActive || isLoseScreenActive)
+    {
+        if (timerGO->IsActive()) timerGO->SetActive(false);
+        if (timerBackground && timerBackground->IsActive()) timerBackground->SetActive(false);
+        if (timerFrame && timerFrame->IsActive()) timerFrame->SetActive(false);
+        return;
+    }
+
     // hide timer if game is paused
     if (mode == EditorMode::Pause || CORE->IsGamePaused())
     {

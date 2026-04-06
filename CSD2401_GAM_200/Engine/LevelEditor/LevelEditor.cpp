@@ -1041,6 +1041,13 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
         // clear current level
         factory.Clear();
 
+        // Defensively reset serialization state in case a previous load failed mid-way
+        // (e.g., an exception before ResolveHierarchy) and left stale data in the maps.
+        Serialization::idToObject.clear();
+        Serialization::pendingHierarchy.clear();
+        Serialization::g_OldToNewID.clear();
+        Serialization::s_IsUndoRedoMode = false;
+
         // CRITICAL: Clear event queue AFTER factory.Clear() to remove OnDestroy events
         // that were queued during object destruction. Without this, memory address reuse
         // can cause new objects to have their scripts incorrectly removed.
@@ -1271,6 +1278,11 @@ bool LevelEditor::LoadLevel(const std::string& filepath)
     catch (const std::exception& e)
     {
         std::cerr << "Error loading level: " << e.what() << std::endl;
+        // Clean up serialization state so a subsequent load starts fresh.
+        Serialization::idToObject.clear();
+        Serialization::pendingHierarchy.clear();
+        Serialization::g_OldToNewID.clear();
+        Serialization::s_IsUndoRedoMode = false;
         return false;
     }
 }
@@ -1974,18 +1986,19 @@ void LevelEditor::PerformUndo() {
             }
             break;
         }
-        case EditorUndoCommand::ActionType::ObjectDeleted: 
+        case EditorUndoCommand::ActionType::ObjectDeleted:
         {
+            // Use undo mode so the restored object (and any nested children) get
+            // their original IDs back, keeping sibling order and parent references valid.
+            Serialization::s_IsUndoRedoMode = true;
             Serialization::DeserializeGameObject(undocmd.beforeJson);
-            Serialization::ResolveHierarchy(); // Reconnect hierarchy via parentID & children
+            Serialization::ResolveHierarchy(); // Parents restored here; s_IsUndoRedoMode reset inside
 
-            GameObject* restored = factory.GetGameObject(undocmd.entityID);
+            // ResolveHierarchy already called SetParent / AddChild for the restored object.
+            // Do NOT call parent->AddChild(restored) again — it would double-add the child
+            // and corrupt parent->children, causing duplicates in the next save.
+
             GameObject* parent = factory.GetGameObject(undocmd.parentID);
-
-             //Reattach restored object to parent
-            if (restored && parent) {
-                parent->AddChild(restored);
-            }
 
             if (parent && !undocmd.siblingOrderIDs.empty()) // Restore original sibling order
             {
@@ -1996,7 +2009,7 @@ void LevelEditor::PerformUndo() {
                     factory.ReorderRootObjects(undocmd.rootOrderIDs);
                 }
             }
-         
+
             break;
         }
 

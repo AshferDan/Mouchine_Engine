@@ -1717,6 +1717,9 @@ namespace CSharpScript
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool IsReplayMode();
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsGhostVisible();
+
         /// <summary>Begin recording the named target's position and animation each tick.</summary>
         public static void BeginRecording(string targetName) => StartRecording(targetName);
 
@@ -1749,6 +1752,9 @@ namespace CSharpScript
 
         /// <summary>True when the ghost replay is actively playing back.</summary>
         public static bool InReplayMode() => IsReplayMode();
+
+        /// <summary>True while the ghost is toggled visible (Vs Ghost or key-0 mode).</summary>
+        public static bool GhostActive() => IsGhostVisible();
 
         /// <summary>
         /// Set the live player and ghost object names the system will use.

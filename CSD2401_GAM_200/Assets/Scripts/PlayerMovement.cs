@@ -1,7 +1,7 @@
 ﻿/* Start Header ************************************************************************/
 /*!
 \file       PlayerMovement.cs
-\author     Ashfer [100% - 748 lines]
+\author     Ashfer [100% - 1919 lines]
 \par        m.binafzalkhan@digipen.edu
 \date       Novenber, 26, 2025
 
@@ -90,8 +90,6 @@ namespace CSharpScript
         public bool fRun, fJump, fIdle, fZipline, fGroundPound, fGlide, fRoll, fWallKick;
 
         // scissors sound flags
-        private bool _lobster1SoundPlaying = false;
-        private bool _lobster2SoundPlaying = false;
 
         // movement variables
         private vec2 _moveVelocity = new vec2(0, 0);
@@ -206,7 +204,6 @@ namespace CSharpScript
         public static string vfx_nontracking = "Hero_vfx_nontracking";
         #endregion
 
-        private int _pauseResumeFreezeFrames = 0;
 
 
 
@@ -486,24 +483,6 @@ namespace CSharpScript
         {
             if (OwnerName == null || OwnerName == "") return;
 
-            if (Input.GetKeyPressed(Input.KeyCode.L))
-            {
-                triggerSpeedBoost = true;
-            }
-            if (Input.GetKeyPressed(Input.KeyCode.Left))
-            {
-                Camera.SetFollowOffset(cam_offset.x + 200, 0);
-            }
-            if (Input.GetKeyPressed(Input.KeyCode.Right))
-            {
-                Camera.SetFollowOffset(cam_offset.x - 200, 0);
-            }
-            if (Input.GetKeyPressed(Input.KeyCode.P))
-            {
-                Animation.PlayAnimation(pu_vfx, "Clear");
-                isPlayerDead = true;
-            }
-
             #region 3D SOUND
 
             vec2 playerPos = Transform.GetPosition(OwnerName);
@@ -544,15 +523,6 @@ namespace CSharpScript
                         //Debug.Log("lobster_scissors" + (i).ToString());
                         Audio.StopSound(NPCs[i].soundName + "_channel");
                         NPCs[i].audioPlaying = false;
-                    }
-                }
-
-                if (NPCs[i].name == "PU_Shell")
-                {
-                    if (Input.GetKeyPressed(Input.KeyCode.V))
-                    {
-                        Debug.Log("reached");
-                        Audio.FadeOutSound(NPCs[i].soundName, 0);
                     }
                 }
             }
@@ -2107,7 +2077,6 @@ namespace CSharpScript
         // when the player takes damage and become invuln for a few seconds
         private float intervalTimer = 0f;
         private bool isVisible = false;
-        private bool _blinkRestoredAlpha = true;    // tracks whether alpha has been restored after immunity ended
         private void HandleBlinkEffect()
         {
             float defaultAlpha = Graphics.GetColor(OwnerName).z;    //1.0f
@@ -2483,8 +2452,6 @@ namespace CSharpScript
 
             currState = PlayerState.Idle;
 
-            // keep player frozen briefly after resume
-            _pauseResumeFreezeFrames = 3;
         }
 
         public void ResetVars()

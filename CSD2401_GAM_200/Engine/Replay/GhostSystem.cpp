@@ -23,6 +23,8 @@ Technology is prohibited.
 #include "Collidercomponent.h"
 #include "Physics.h"
 #include "Serialization.h"
+#include "RenderComponent.h"
+#include "ScriptComponent.h"
 #include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
 using json = nlohmann::ordered_json;
@@ -71,14 +73,22 @@ void GhostSystem::Update(float dt)
         }
     }
 
-    // Deferred Vs-Ghost-on-load: load recording without entering watch mode
+    // Deferred Vs-Ghost-on-load: load recording then create and park the ghost beside the SafeZone
     if (m_pendingVsGhostLoad && !m_liveTarget.empty())
     {
         if (GameObjectFactory::Instance().FindGameObject(m_liveTarget))
         {
             m_pendingVsGhostLoad = false;
             LoadRecording(m_pendingRecordingName);
-            std::cout << "[GhostSystem] Vs-Ghost recording loaded: " << m_pendingRecordingName << std::endl;
+
+            // Create GhostHero and GhostHero_vfx parked beside the SafeZone.
+            // Playback will start automatically when the player exits the SafeZone
+            // (triggered by WinLoseLogic::CheckSafeZoneExit).
+            if (!m_ghostVisible)
+                ToggleGhost();
+
+            std::cout << "[GhostSystem] Vs-Ghost ready: " << m_pendingRecordingName
+                      << " — ghost parked beside SafeZone.\n";
         }
     }
 
@@ -140,7 +150,29 @@ void GhostSystem::StartPlayback(const std::string& ghostObjectName)
         return;
     }
     const std::string& target = ghostObjectName.empty() ? m_ghostTarget : ghostObjectName;
-    m_player.SetBgLayers(m_bgLayers[0], m_bgLayers[1], m_bgLayers[2], m_bgLayers[3]);
+
+    // Restore full opacity now that the ghost is actively racing.
+    auto restoreAlpha = [](GameObject* obj)
+    {
+        if (!obj) return;
+        auto* rc = obj->GetComponent<RenderComponent>();
+        if (rc)
+        {
+            vec4 c = rc->GetColor();
+            c.w = 1.0f;
+            rc->SetColor(c);
+        }
+    };
+    auto& fac = GameObjectFactory::Instance();
+    restoreAlpha(fac.FindGameObject(target));
+    if (!m_ghostVfx.empty())
+        restoreAlpha(fac.FindGameObject(m_ghostVfx));
+
+    // This function is only called in Vs-Ghost mode (key-0, pause menu, SafeZone exit).
+    // Backgrounds are owned by the live ParallaxBackground script — do not replay them.
+    // EnterReplayMode() has its own path that does set bg layers for full watch-replay.
+    m_player.SetBgLayers("", "", "", "");
+
     m_player.StartPlayback(target, m_bestRecording);
     std::cout << "[GhostSystem] Ghost playback started on: " << ghostObjectName << std::endl;
 }
@@ -186,6 +218,11 @@ void GhostSystem::ToggleGhost()
                 {
                     ghost->RemoveComponent<ColliderComponent>();
                     ghost->RemoveComponent<PhysicsComponent>();
+
+                    // Remove the ParallaxBackground script — the ghost should not
+                    // shift the camera background layers as a side-effect of movement.
+                    auto* sc = ghost->GetComponent<ScriptComponent>();
+                    if (sc) sc->RemoveScript("ParallaxBackground");
                 }
             }
         }
@@ -198,22 +235,55 @@ void GhostSystem::ToggleGhost()
         if (ghost)    ghost->SetActive(true);
         if (ghostVfx) ghostVfx->SetActive(true);
 
-        // Park ghost at the first recorded frame — playback starts when the player leaves SafeZone
+        // Park ghost and its VFX beside the SafeZone (at the first recorded frame position).
+        // Playback will begin when the player leaves the SafeZone (triggered by game logic).
         if (ghost && !m_bestRecording.empty())
         {
+            const float parkX = m_bestRecording[0].posX;
+            const float parkY = m_bestRecording[0].posY;
+
             auto* tf = ghost->GetComponent<TransformComponent>();
             if (tf)
             {
-                tf->posX   = m_bestRecording[0].posX;
-                tf->posY   = m_bestRecording[0].posY;
+                tf->posX   = parkX;
+                tf->posY   = parkY;
                 tf->scaleX = m_bestRecording[0].scaleX;
                 tf->scaleY = m_bestRecording[0].scaleY;
             }
+
+            // Park the VFX companion at the same location (matches the offset applied during playback).
+            if (ghostVfx)
+            {
+                auto* vfxTf = ghostVfx->GetComponent<TransformComponent>();
+                if (vfxTf)
+                {
+                    vfxTf->posX = parkX;
+                    vfxTf->posY = parkY - 10.0f;
+                }
+            }
+
+            // Appear semi-transparent while waiting beside the SafeZone.
+            // Opacity is restored to 1.0 when playback begins (StartPlayback).
+            constexpr float kParkedAlpha = 0.45f;
+            auto setAlpha = [](GameObject* obj, float alpha)
+            {
+                if (!obj) return;
+                auto* rc = obj->GetComponent<RenderComponent>();
+                if (rc)
+                {
+                    vec4 c = rc->GetColor();
+                    c.w = alpha;
+                    rc->SetColor(c);
+                }
+            };
+            setAlpha(ghost,    kParkedAlpha);
+            setAlpha(ghostVfx, kParkedAlpha);
         }
-        std::cout << "[GhostSystem] Ghost toggled ON — waiting for SafeZone exit to begin playback.\n";
+        std::cout << "[GhostSystem] Ghost toggled ON — parked beside SafeZone, waiting for SafeZone exit to begin playback.\n";
     }
     else
     {
+        m_vsGhostMode = false;   // session ended
         m_player.StopPlayback();
         if (ghost)    factory.QueueDestroyGameObject(ghost->GetID());
         if (ghostVfx) factory.QueueDestroyGameObject(ghostVfx->GetID());

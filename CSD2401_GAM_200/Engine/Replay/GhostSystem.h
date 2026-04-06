@@ -301,7 +301,22 @@ public:
     {
         m_pendingRecordingName  = recordingName;
         m_pendingVsGhostLoad    = true;
+        m_vsGhostMode           = true;   // persists after pending load fires
     }
+
+    /**
+     * @brief Returns true while the session was started in Vs-Ghost mode
+     *        (from the main menu leaderboard). Cleared when the ghost is toggled OFF.
+     */
+    bool IsVsGhostMode() const { return m_vsGhostMode; }
+
+    /**
+     * @brief Explicitly sets the Vs-Ghost mode flag.
+     *        Call this after activating the ghost from the in-game pause menu leaderboard
+     *        so that WinLoseLogic does not overwrite the loaded recording on restart.
+     * @param enabled True to mark this session as Vs-Ghost, false to clear.
+     */
+    void SetVsGhostMode(bool enabled) { m_vsGhostMode = enabled; }
 
     // ===== Finish Trigger =====
 
@@ -337,5 +352,6 @@ private:
     // Deferred replay: set before scene load, fires once liveTarget exists in the new scene
     bool        m_pendingReplayLoad    = false;
     bool        m_pendingVsGhostLoad   = false;
+    bool        m_vsGhostMode          = false;  ///< True for the entire Vs-Ghost session; cleared on ghost-OFF
     std::string m_pendingRecordingName;
 };

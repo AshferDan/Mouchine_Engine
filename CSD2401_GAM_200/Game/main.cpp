@@ -171,7 +171,7 @@ int main()
 
         // CORE->RequestSceneLoad("Prefab_TestScene");
 #ifndef _DEBUG
-        //CORE->GetGraphicsSystem()->ToggleFullScreen();
+        CORE->GetGraphicsSystem()->ToggleFullScreen();
         // Splash screen — runs before any scene is loaded
         SplashScreenSystem splash(
             CORE->GetGraphicsSystem(),
@@ -340,7 +340,7 @@ int main()
             }
         }
 
-        GameObject* Wall3 = GameObjectFactory::Instance().CreateShape(
+        GameObjectFactory::Instance().CreateShape(
             "NPC_Lobster(1)",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             200.0f, 0.0f,                      // Center of screen
@@ -349,7 +349,7 @@ int main()
             vec4(1.0f, 1.0f, 1.0f, 0.6f)     // White (Script will change this to Yellow)
         );
 
-        GameObject* Wall4 = GameObjectFactory::Instance().CreateShape(
+        GameObjectFactory::Instance().CreateShape(
             "NPC_Lobster(2)",                  // <--- NAME MUST MATCH C#
             RenderComponent::ShapeType::Square,
             200.0f, 0.0f,                      // Center of screen

@@ -453,10 +453,10 @@ void MenuLogicSystem::Update(float dt)
                     if (auto* r = badge->GetComponent<RenderComponent>())
                     {
                         const char* texture = "../Assets/Sprites/Icons/Letterscore_dash.png";
-                        if (entry.rating >= 85.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
-                        else if (entry.rating >= 75.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
-                        else if (entry.rating >= 65.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
-                        else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
+                        if (entry.rating >= 70.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
+                        else if (entry.rating >= 60.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
+                        else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
+                        else if (entry.rating >= 40.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
                         r->SetTextureID(GraphicsSystem::LoadTexture(texture));
                     }
                 }
@@ -652,7 +652,6 @@ void MenuLogicSystem::Update(float dt)
 
         if (kbCount > 0)
         {
-            InputManager* inp = CORE->GetInputManager();
             if (inp)
             {
                 // QUIT screen uses LEFT/RIGHT; all other screens use UP/DOWN
@@ -2302,10 +2301,10 @@ void MenuLogicSystem::PopulateLeaderboard()
                 if (auto* r = ratingObj->GetComponent<RenderComponent>())
                 {
                     const char* texture = "../Assets/Sprites/Icons/Letterscore_dash.png";
-                    if (entry.rating >= 85.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
-                    else if (entry.rating >= 75.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
-                    else if (entry.rating >= 65.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
-                    else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
+                    if (entry.rating >= 70.0f)      texture = "../Assets/Sprites/Icons/Letterscore_S.png";
+                    else if (entry.rating >= 60.0f) texture = "../Assets/Sprites/Icons/Letterscore_A.png";
+                    else if (entry.rating >= 50.0f) texture = "../Assets/Sprites/Icons/Letterscore_B.png";
+                    else if (entry.rating >= 40.0f) texture = "../Assets/Sprites/Icons/Letterscore_C.png";
                     r->SetTextureID(GraphicsSystem::LoadTexture(texture));
                 }
             }
@@ -2319,8 +2318,8 @@ void MenuLogicSystem::PopulateLeaderboard()
                 if (auto *tc = timeObj->GetComponent<TextComponent>())
                     tc->SetText("--:--.--");
             if (ratingObj)
-                if (auto* tc = ratingObj->GetComponent<TextComponent>())
-                    tc->SetText("--.--%");
+                if (auto* r = ratingObj->GetComponent<RenderComponent>())
+                    r->SetTextureID(GraphicsSystem::LoadTexture("../Assets/Sprites/Icons/Letterscore_dash.png"));
         }
     }
 }

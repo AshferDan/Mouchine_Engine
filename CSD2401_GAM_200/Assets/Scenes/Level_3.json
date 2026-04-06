@@ -1,0 +1,6809 @@
+{
+  "GameObjects": [
+    {
+      "name": "MainCamera",
+      "localID": 1,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "CameraComponent": {
+        "enabled": true,
+        "mode": "FOLLOW_TARGET",
+        "zoom": 0.49999988079071045,
+        "position": [
+          34480.9375,
+          14082.0703125
+        ],
+        "followOffset": [
+          -380.40716552734375,
+          2.802596928649634e-45
+        ],
+        "smoothing": true,
+        "smoothingSpeed": 5.0,
+        "followTargetName": "Hero"
+      },
+      "children": []
+    },
+    {
+      "name": "Hero",
+      "localID": 2,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          1261.1075439453125,
+          15685.3701171875
+        ],
+        "scale": [
+          192.0,
+          192.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "../Assets/spritesheet_R.png",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "Spritesheet": {
+        "enabled": true,
+        "defaultAnimation": "Land",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 0,
+            "endRow": 2,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 3,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Death_Fall",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 4,
+            "endRow": 2,
+            "endCol": 6,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Death_Loop",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 2,
+            "startCol": 8,
+            "endRow": 2,
+            "endCol": 9,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 1,
+            "startCol": 0,
+            "endRow": 1,
+            "endCol": 2,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 9,
+            "startCol": 3,
+            "endRow": 9,
+            "endCol": 4,
+            "fps": 10.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Groundpound_Init",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 1,
+            "fps": 10.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 2,
+            "fps": 3.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Idle",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 11,
+            "startCol": 4,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 12.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 10,
+            "startCol": 3,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 5,
+            "fps": 14.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 16.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 12.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 16.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 22.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 6.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 7,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 4,
+            "startCol": 3,
+            "endRow": 4,
+            "endCol": 4,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Wallslide",
+            "filepath": "../Assets/spritesheet_L.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_R.png",
+            "rows": 13,
+            "cols": 10,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          }
+        ]
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 9.999999747378752e-05,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "ColliderComponent": {
+        "enabled": true,
+        "shape": "Square",
+        "layer": "Player",
+        "size": [
+          168.0,
+          192.0
+        ]
+      },
+      "ScriptComponent": {
+        "enabled": true,
+        "scripts": [
+          "PlayerMovement",
+          "PlayerMovementStats",
+          "ParallaxBackground",
+          "PickupManager"
+        ],
+        "fields": {
+          "PlayerMovement": {
+            "triggerSpeedBoost": false,
+            "isTimeAsResourceEnabled": false,
+            "fRun": false,
+            "fJump": true,
+            "fIdle": false,
+            "fZipline": false,
+            "fGroundPound": true,
+            "fGlide": false,
+            "fRoll": true,
+            "fWallKick": false,
+            "hitDirectionForce": 10.0,
+            "constForce": 5.0,
+            "inputForce": 7.5,
+            "vfx": "Hero_vfx",
+            "pu_vfx": "Pickup_vfx",
+            "vfx_nontracking": "Hero_vfx_nontracking"
+          },
+          "PlayerMovementStats": {
+            "Clamp_MaxRunSpeed": 1562.5,
+            "Clamp_MaxJumpHeight": 2500.0,
+            "T0_BaseSpeed": 31.25,
+            "T0_MaxSpeed": 375.0,
+            "T1_Threshold": 562.5,
+            "T2_Threshold": 750.0,
+            "T3_Threshold": 937.5,
+            "T3_MaxSpeed": 1000.0,
+            "UseToggleRun": false,
+            "RunBaseSpeed": 468.75,
+            "RunCoastDeceleration": 468.75,
+            "GroundAcceleration": 625.0,
+            "GroundDeceleration": 1562.5,
+            "AirAcceleration": 625.0,
+            "AirDeceleration": 156.25,
+            "TurnResetSpeed": 156.25,
+            "TentAcceleration": 312.5,
+            "SkidSpeedRetained": 0.25,
+            "T1_SkidDuration": 0.44999998807907104,
+            "T2_SkidDuration": 0.550000011920929,
+            "T3_SkidDuration": 0.800000011920929,
+            "SkidExitSpeed": 100.0,
+            "Speed_Multiplier": 1.5,
+            "Speed_Duration": 5.0,
+            "Time_PickupAmount": 10.0,
+            "T3_BonkDuration": 0.6499999761581421,
+            "GroundDetectionRayLength": 10.0,
+            "HeadDetectionRayLength": 0.019999999552965164,
+            "HeadWidth": 0.75,
+            "WallDetectionBoxLength": 100.0,
+            "EnableVariableJumpHeight": false,
+            "JumpHeight": 185.0,
+            "T1_JumpMultiplier": 1.0499999523162842,
+            "T2_JumpMultiplier": 1.0800000429153442,
+            "T3_JumpMultiplier": 1.149999976158142,
+            "JumpHeightCompensationFactor": 1.0540000200271606,
+            "TimeTillJumpApex": 0.3499999940395355,
+            "GravityOnReleaseMultiplier": 3.0,
+            "MaxFallSpeed": 1250.0,
+            "NumberOfJumpsAllowed": 1,
+            "TimeForUpwardsCancel": 0.019999999552965164,
+            "LandAnimationLength": 0.20000000298023224,
+            "ApexThreshold": 0.8999999761581421,
+            "ApexHangTime": 0.03999999910593033,
+            "JumpBufferTime": 0.10000000149011612,
+            "JumpCoyoteTime": 0.10000000149011612,
+            "GPCooldown": 1.0,
+            "RollCooldown": 0.5,
+            "WKCooldown": 0.5,
+            "GlideCooldown": 0.20000000298023224,
+            "WallCoyoteTime": 0.10000000149011612,
+            "WallSlidingSpeed": 125.0,
+            "WallSlidingTimeToTriggerSound": 0.25,
+            "WallSlideRestickCooldown": 0.5,
+            "WKBaseDuration": 0.25,
+            "WKSpeedModifier": 1093.75,
+            "WKVerticalModifier": 218.75,
+            "WKDurationMultiplier": 0.75,
+            "BaseRollDuration": 0.4000000059604645,
+            "MidRollDuration": 0.550000011920929,
+            "MaxRollDuration": 0.699999988079071,
+            "BaseRollSpeed": 1000.0,
+            "MidRollSpeed": 1093.75,
+            "MaxRollSpeed": 1250.0,
+            "GPPauseTime": 0.30000001192092896,
+            "GPFallSpeed": 1562.5,
+            "RollHeightToDurationDivisor": 2343.75,
+            "GroundPoundMaxSpeedHeightThreshold": 80.0,
+            "GPMaxDuration": 2.5,
+            "GlideFallSpeedMultiplier": 0.5,
+            "knockbackTime": 0.30000001192092896,
+            "hurtStunDuration": 0.75,
+            "hurtBlinkInterval": 0.20000000298023224,
+            "ZiplineSpeed": 937.5,
+            "ZiplineAttachDuration": 0.15000000596046448,
+            "ZiplineLaunchDuration": 0.25,
+            "ZiplineCoyoteTime": 0.20000000298023224,
+            "HazardTimeDeduction": 1.0,
+            "HurtImmunityLength": 2.0,
+            "Audio3D_ActiveDistance": 3000.0,
+            "Pen_Jump": 1.0,
+            "Pen_Run": 0.10000000149011612,
+            "Pen_Run_Interval": 1.0,
+            "Pen_Zipline": 1.0,
+            "Pen_Zipline_Interval": 0.20000000298023224,
+            "Pen_GroundPound": 1.0,
+            "Pen_Roll": 1.0,
+            "Pen_Glide": 0.5,
+            "Pen_Glide_Interval": 0.5,
+            "Pen_WallJump": 0.5,
+            "Pen_Hurt": 1.5,
+            "Pen_Bonk": 0.5
+          },
+          "ParallaxBackground": {
+            "LayerFarBack": "",
+            "LayerBack": "",
+            "LayerMid": "ƈ",
+            "LayerFront": "",
+            "FactorFarBack": 0.800000011920929,
+            "FactorBack": 0.30000001192092896,
+            "FactorMid": 0.699999988079071,
+            "FactorFront": 0.8999999761581421,
+            "FactorYFarBack": 1.0,
+            "FactorYBack": 1.0,
+            "FactorYMid": 1.0,
+            "FactorYFront": 1.0,
+            "TileWidthFarBack": 4200.0,
+            "TileWidthBack": 0.0,
+            "TileWidthMid": 4150.0,
+            "TileWidthFront": 0.0,
+            "OffsetXFarBack": 0.0,
+            "OffsetYFarBack": 0.0,
+            "OffsetXBack": 0.0,
+            "OffsetYBack": 0.0,
+            "OffsetXMid": 0.0,
+            "OffsetYMid": 0.0,
+            "OffsetXFront": 0.0,
+            "OffsetYFront": 0.0,
+            "AutoScrollFarBack": 0.0,
+            "AutoScrollBack": 0.0,
+            "AutoScrollMid": 0.0,
+            "AutoScrollFront": 0.0
+          },
+          "PickupManager": {
+            "Pickup_Coin_Name": "PU_Coin",
+            "Pickup_Shell_Name": "PU_Shell",
+            "Pickup_Speed_Name": "PU_Speed",
+            "Pickup_Time_Name": "PU_Time"
+          }
+        }
+      },
+      "children": []
+    },
+    {
+      "name": "COLLIDERS",
+      "localID": 3,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "children": [
+        {
+          "name": "Ground",
+          "localID": 4,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              18741.0625,
+              18584.345703125
+            ],
+            "scale": [
+              38012.92578125,
+              109.34420013427734
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              38012.92578125,
+              109.34420013427734
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(1)",
+          "localID": 5,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              13151.6123046875,
+              17434.67578125
+            ],
+            "scale": [
+              382.47900390625,
+              129.7808380126953
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              382.47900390625,
+              129.7808380126953
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(3)",
+          "localID": 6,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              6179.46923828125,
+              15731.0244140625
+            ],
+            "scale": [
+              2821.18798828125,
+              330.6247863769531
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              2821.18798828125,
+              330.6247863769531
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(4)",
+          "localID": 7,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              8478.88671875,
+              15932.3701171875
+            ],
+            "scale": [
+              386.86199951171875,
+              720.0665893554688
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              386.86199951171875,
+              720.0665893554688
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(6)",
+          "localID": 8,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              25313.029296875,
+              16183.673828125
+            ],
+            "scale": [
+              380.739990234375,
+              729.7752685546875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              380.739990234375,
+              729.7752685546875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(8)",
+          "localID": 9,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              11167.607421875,
+              16830.634765625
+            ],
+            "scale": [
+              768.3900146484375,
+              189.68533325195313
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              768.3900146484375,
+              189.68533325195313
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(10)",
+          "localID": 10,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              12288.1728515625,
+              17186.701171875
+            ],
+            "scale": [
+              574.760009765625,
+              129.7808380126953
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              574.760009765625,
+              129.7808380126953
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(11)",
+          "localID": 11,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              15615.4375,
+              16092.7763671875
+            ],
+            "scale": [
+              701.489990234375,
+              128.3090057373047
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              701.489990234375,
+              128.3090057373047
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(13)",
+          "localID": 12,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              28100.216796875,
+              16069.3486328125
+            ],
+            "scale": [
+              5301.009765625,
+              50.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5301.009765625,
+              50.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(14)",
+          "localID": 13,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              30379.986328125,
+              16927.771484375
+            ],
+            "scale": [
+              10113.7451171875,
+              123.90840148925781
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              10113.7451171875,
+              123.90840148925781
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar Bottom",
+          "localID": 14,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              29919.69921875,
+              11872.2021484375
+            ],
+            "scale": [
+              105.2509994506836,
+              128.0176544189453
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              105.2509994506836,
+              128.0176544189453
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar",
+          "localID": 15,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              29921.525390625,
+              12339.0888671875
+            ],
+            "scale": [
+              43.08100128173828,
+              1227.80126953125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              43.08100128173828,
+              1227.80126953125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar(1)",
+          "localID": 16,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              31.801040649414063,
+              17046.625
+            ],
+            "scale": [
+              43.08100128173828,
+              3156.585205078125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              43.08100128173828,
+              2160.92333984375
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar Bottom(2)",
+          "localID": 17,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              32.78596496582031,
+              15645.99609375
+            ],
+            "scale": [
+              105.2509994506836,
+              128.0176544189453
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              105.2509994506836,
+              128.0176544189453
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(3)",
+          "localID": 18,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              14397.19140625,
+              16893.041015625
+            ],
+            "scale": [
+              961.3109741210938,
+              1727.75
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              961.3109741210938,
+              1727.75
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar(4)",
+          "localID": 19,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              16799.708984375,
+              16752.1875
+            ],
+            "scale": [
+              43.08100128173828,
+              2160.92333984375
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              43.08100128173828,
+              2160.92333984375
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar Bottom(5)",
+          "localID": 20,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              16802.36328125,
+              15634.3076171875
+            ],
+            "scale": [
+              105.2509994506836,
+              128.0176544189453
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              105.2509994506836,
+              128.0176544189453
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(7)",
+          "localID": 21,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              21688.466796875,
+              16069.509765625
+            ],
+            "scale": [
+              6961.23486328125,
+              50.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              6961.23486328125,
+              50.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(8)",
+          "localID": 22,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              35138.05859375,
+              17436.728515625
+            ],
+            "scale": [
+              1986.10498046875,
+              1039.9727783203125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1986.10498046875,
+              1039.9727783203125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(9)",
+          "localID": 23,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              17282.322265625,
+              17883.779296875
+            ],
+            "scale": [
+              2113.362060546875,
+              129.44285583496094
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              2113.362060546875,
+              129.44285583496094
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(10)",
+          "localID": 24,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              46334.93359375,
+              7679.2646484375
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(11)",
+          "localID": 25,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              30311.029296875,
+              13823.5166015625
+            ],
+            "scale": [
+              891.1179809570313,
+              4539.43994140625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              891.1179809570313,
+              4539.43994140625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(12)",
+          "localID": 26,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              30750.68359375,
+              14718.6025390625
+            ],
+            "scale": [
+              769.7470092773438,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              769.7470092773438,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(13)",
+          "localID": 27,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              35679.60546875,
+              14625.7919921875
+            ],
+            "scale": [
+              889.1179809570313,
+              6149.279296875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              889.1179809570313,
+              6149.279296875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar(14)",
+          "localID": 28,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              18271.8046875,
+              16743.181640625
+            ],
+            "scale": [
+              43.08100128173828,
+              2160.92333984375
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              43.08100128173828,
+              2160.92333984375
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar Bottom(15)",
+          "localID": 29,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              18273.146484375,
+              16156.3505859375
+            ],
+            "scale": [
+              105.2509994506836,
+              128.0176544189453
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              105.2509994506836,
+              128.0176544189453
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(16)",
+          "localID": 30,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              24223.73046875,
+              17567.572265625
+            ],
+            "scale": [
+              761.7470092773438,
+              2179.811279296875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              761.7470092773438,
+              1172.926513671875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(17)",
+          "localID": 31,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              35247.0390625,
+              14719.6572265625
+            ],
+            "scale": [
+              785.7470092773438,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              785.7470092773438,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(19)",
+          "localID": 33,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              31141.6328125,
+              13822.6005859375
+            ],
+            "scale": [
+              769.7470092773438,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              769.7470092773438,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(21)",
+          "localID": 35,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              43686.40625,
+              12067.7314453125
+            ],
+            "scale": [
+              83.79299926757813,
+              2934.017822265625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              83.79299926757813,
+              2934.017822265625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(22)",
+          "localID": 36,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              31275.1328125,
+              12927.4208984375
+            ],
+            "scale": [
+              1256.803955078125,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1256.803955078125,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(23)",
+          "localID": 37,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              34856.7265625,
+              13825.9609375
+            ],
+            "scale": [
+              785.7470092773438,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              785.7470092773438,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Pillar(25)",
+          "localID": 39,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              15327.52734375,
+              17377.7578125
+            ],
+            "scale": [
+              44.08100128173828,
+              2659.197998046875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              44.08100128173828,
+              2254.240966796875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(27)",
+          "localID": 40,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              15650.611328125,
+              17375.23046875
+            ],
+            "scale": [
+              635.0700073242188,
+              128.3090057373047
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              635.0700073242188,
+              128.3090057373047
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(28)",
+          "localID": 41,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              16478.59765625,
+              16737.978515625
+            ],
+            "scale": [
+              635.0700073242188,
+              128.3090057373047
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              635.0700073242188,
+              128.3090057373047
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(29)",
+          "localID": 42,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              9759.5546875,
+              16510.025390625
+            ],
+            "scale": [
+              1023.4719848632813,
+              189.52207946777344
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1023.4719848632813,
+              189.52207946777344
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(34)",
+          "localID": 43,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              8401.1669921875,
+              15553.169921875
+            ],
+            "scale": [
+              16977.76953125,
+              50.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              16977.76953125,
+              50.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(35)",
+          "localID": 44,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              31457.361328125,
+              12031.701171875
+            ],
+            "scale": [
+              1798.781982421875,
+              952.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1798.781982421875,
+              952.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(36)",
+          "localID": 45,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              46012.18359375,
+              4556.18017578125
+            ],
+            "scale": [
+              6964.6708984375,
+              810.3817749023438
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              6964.6708984375,
+              810.3817749023438
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(38)",
+          "localID": 47,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              33526.03125,
+              10015.54296875
+            ],
+            "scale": [
+              7375.51318359375,
+              887.9486083984375
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              7375.51318359375,
+              887.9486083984375
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(41)",
+          "localID": 50,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              27135.427734375,
+              5313.55517578125
+            ],
+            "scale": [
+              5723.6240234375,
+              321.43682861328125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5723.6240234375,
+              321.43682861328125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(42)",
+          "localID": 51,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              39470.75390625,
+              12612.4404296875
+            ],
+            "scale": [
+              6763.80517578125,
+              330.1498107910156
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              6763.80517578125,
+              330.1498107910156
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(45)",
+          "localID": 54,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              37575.3203125,
+              5005.58154296875
+            ],
+            "scale": [
+              1724.5670166015625,
+              1325.7744140625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1724.5670166015625,
+              1325.7744140625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(47)",
+          "localID": 56,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              34110.6328125,
+              4292.779296875
+            ],
+            "scale": [
+              17353.6484375,
+              319.09588623046875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": false,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              17353.6484375,
+              319.09588623046875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(52)",
+          "localID": 61,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              38625.06640625,
+              10249.4013671875
+            ],
+            "scale": [
+              771.0570068359375,
+              818.9741821289063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              771.0570068359375,
+              818.9741821289063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(53)",
+          "localID": 62,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              40098.12109375,
+              10051.56640625
+            ],
+            "scale": [
+              776.10400390625,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              776.10400390625,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(54)",
+          "localID": 63,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              41247.34375,
+              10203.7314453125
+            ],
+            "scale": [
+              254.37600708007813,
+              1285.3017578125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              254.37600708007813,
+              1285.3017578125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(1)",
+          "localID": 34,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              34533.88671875,
+              12031.701171875
+            ],
+            "scale": [
+              1798.781982421875,
+              952.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1798.781982421875,
+              952.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(2)",
+          "localID": 85,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              34715.40234375,
+              12927.4208984375
+            ],
+            "scale": [
+              1256.803955078125,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              1256.803955078125,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(3)",
+          "localID": 55,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              37622.91796875,
+              16641.49609375
+            ],
+            "scale": [
+              134.73599243164063,
+              6782.64794921875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              134.73599243164063,
+              6782.64794921875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(4)",
+          "localID": 52,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              45386.953125,
+              6970.40478515625
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(5)",
+          "localID": 53,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              27440.833984375,
+              2241.06689453125
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(6)",
+          "localID": 86,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              25985.291015625,
+              130.76052856445313
+            ],
+            "scale": [
+              4061.443115234375,
+              315.5715026855469
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              4061.443115234375,
+              315.5715026855469
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(7)",
+          "localID": 87,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              42242.33203125,
+              10353.7197265625
+            ],
+            "scale": [
+              841.1510009765625,
+              1509.6201171875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              841.1510009765625,
+              1509.6201171875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(8)",
+          "localID": 57,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              35035.2890625,
+              4609.0224609375
+            ],
+            "scale": [
+              776.10400390625,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              776.10400390625,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(9)",
+          "localID": 58,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              36192.6640625,
+              4768.736328125
+            ],
+            "scale": [
+              254.37600708007813,
+              1285.3017578125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              254.37600708007813,
+              1285.3017578125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(11)",
+          "localID": 46,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              42334.41015625,
+              9727.8330078125
+            ],
+            "scale": [
+              12066.4384765625,
+              319.09588623046875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              12066.4384765625,
+              319.09588623046875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(12)",
+          "localID": 48,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              40703.171875,
+              13376.9453125
+            ],
+            "scale": [
+              6338.8671875,
+              330.1498107910156
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              6338.8671875,
+              330.1498107910156
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(13)",
+          "localID": 49,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              27440.833984375,
+              151.52218627929688
+            ],
+            "scale": [
+              127.73600006103516,
+              2944.826416015625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              127.73600006103516,
+              2944.826416015625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(14)",
+          "localID": 60,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              31353.755859375,
+              2901.005615234375
+            ],
+            "scale": [
+              132.73599243164063,
+              2934.01806640625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              132.73599243164063,
+              2934.01806640625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(15)",
+          "localID": 88,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              46334.93359375,
+              9024.42578125
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(16)",
+          "localID": 89,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              27440.833984375,
+              3584.411865234375
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(17)",
+          "localID": 90,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              45386.953125,
+              8322.3310546875
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(18)",
+          "localID": 91,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              28414.162109375,
+              2880.278564453125
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(19)",
+          "localID": 92,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              42431.9140625,
+              8342.71875
+            ],
+            "scale": [
+              132.73599243164063,
+              2934.01806640625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              132.73599243164063,
+              2934.01806640625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(20)",
+          "localID": 93,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              29910.712890625,
+              8784.7587890625
+            ],
+            "scale": [
+              134.73599243164063,
+              6782.64794921875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              134.73599243164063,
+              6782.64794921875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(21)",
+          "localID": 94,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              46478.70703125,
+              10753.78515625
+            ],
+            "scale": [
+              5723.6240234375,
+              321.43682861328125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5723.6240234375,
+              321.43682861328125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(22)",
+          "localID": 95,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              49151.23828125,
+              7703.5302734375
+            ],
+            "scale": [
+              134.73599243164063,
+              6782.64794921875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              134.73599243164063,
+              6782.64794921875
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(23)",
+          "localID": 96,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              41637.34765625,
+              4602.9111328125
+            ],
+            "scale": [
+              774.0570068359375,
+              1224.0504150390625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              774.0570068359375,
+              1224.0504150390625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(24)",
+          "localID": 97,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              33567.9921875,
+              4735.03955078125
+            ],
+            "scale": [
+              776.10400390625,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              776.10400390625,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(25)",
+          "localID": 98,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              39016.5546875,
+              4768.736328125
+            ],
+            "scale": [
+              254.37600708007813,
+              1285.3017578125
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              254.37600708007813,
+              1285.3017578125
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(26)",
+          "localID": 99,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              47327.484375,
+              6203.19140625
+            ],
+            "scale": [
+              2048.09912109375,
+              1581.79541015625
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              2048.09912109375,
+              1581.79541015625
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(27)",
+          "localID": 59,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              40163.0390625,
+              4609.0224609375
+            ],
+            "scale": [
+              776.10400390625,
+              958.8579711914063
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": false,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              776.10400390625,
+              958.8579711914063
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(28)",
+          "localID": 38,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              20097.56640625,
+              17281.30859375
+            ],
+            "scale": [
+              2108.10888671875,
+              1342.6829833984375
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": true,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              2108.10888671875,
+              1342.6829833984375
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(29)",
+          "localID": 100,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              31937.212890625,
+              17991.205078125
+            ],
+            "scale": [
+              2611.2041015625,
+              1342.6829833984375
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": true,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              2611.2041015625,
+              1342.6829833984375
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(30)",
+          "localID": 101,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              28414.162109375,
+              1534.593505859375
+            ],
+            "scale": [
+              5959.32177734375,
+              196.3804168701172
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": true,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              5959.32177734375,
+              196.3804168701172
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "Ground(31)",
+          "localID": 102,
+          "parentID": 3,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              24645.173828125,
+              2838.210693359375
+            ],
+            "scale": [
+              134.73599243164063,
+              6782.64794921875
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              1.0,
+              0.0,
+              0.0,
+              0.29411765933036804
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "PhysicsComponent": {
+            "enabled": true,
+            "mass": 1.0,
+            "isStatic": true,
+            "useGravity": true,
+            "isGrounded": true,
+            "velocity": [
+              0.0,
+              0.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Ground",
+            "size": [
+              134.73599243164063,
+              6782.64794921875
+            ]
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "Tilemap",
+      "localID": 32,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "TilemapDataHolder": {
+        "filepath": "../Assets/Tiles/L3_V11.tilemap"
+      },
+      "children": []
+    },
+    {
+      "name": "Pickup_vfx",
+      "localID": 64,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          15236.388671875,
+          17023.42578125
+        ],
+        "scale": [
+          288.0,
+          288.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "Spritesheet": {
+        "enabled": true,
+        "defaultAnimation": "",
+        "animations": [
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Shell",
+            "filepath": "../Assets/Sprites/Sheets/shell_vfx_spritehseet.png",
+            "rows": 1,
+            "cols": 10,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 9,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Speed",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 2,
+            "startCol": 4,
+            "endRow": 2,
+            "endCol": 10,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Time",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 1,
+            "startCol": 4,
+            "endRow": 1,
+            "endCol": 9,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "Hero_vfx",
+      "localID": 65,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          15236.388671875,
+          17013.42578125
+        ],
+        "scale": [
+          -192.0,
+          192.0
+        ],
+        "rotation": 0.0
+      },
+      "RenderComponent": {
+        "enabled": true,
+        "shapeType": "Square",
+        "texturePath": "",
+        "color": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "layer": 0,
+        "screenSpace": false,
+        "tileable": false,
+        "tileCount": [
+          1.0,
+          1.0
+        ]
+      },
+      "Spritesheet": {
+        "enabled": true,
+        "defaultAnimation": "Land",
+        "animations": [
+          {
+            "name": "Bonk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 0,
+            "endRow": 5,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Clear",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 10,
+            "endRow": 14,
+            "endCol": 10,
+            "fps": 0.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Dash",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 6,
+            "startCol": 0,
+            "endRow": 6,
+            "endCol": 2,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Death_Fall",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 4,
+            "endRow": 5,
+            "endCol": 7,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Death_Loop",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 5,
+            "startCol": 9,
+            "endRow": 5,
+            "endCol": 10,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Falling",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 12,
+            "startCol": 0,
+            "endRow": 12,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Glide",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 4,
+            "startCol": 0,
+            "endRow": 4,
+            "endCol": 2,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Groundpound",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 14,
+            "startCol": 0,
+            "endRow": 14,
+            "endCol": 2,
+            "fps": 10.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Hurt",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 3,
+            "startCol": 0,
+            "endRow": 3,
+            "endCol": 2,
+            "fps": 3.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Jump",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 0,
+            "endRow": 13,
+            "endCol": 4,
+            "fps": 12.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Land",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 13,
+            "startCol": 6,
+            "endRow": 13,
+            "endCol": 8,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Roll",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 11,
+            "startCol": 0,
+            "endRow": 11,
+            "endCol": 5,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run1",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run2",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 0,
+            "endRow": 9,
+            "endCol": 3,
+            "fps": 12.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Run3",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 9,
+            "startCol": 5,
+            "endRow": 9,
+            "endCol": 8,
+            "fps": 16.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Skidding",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 0,
+            "startCol": 0,
+            "endRow": 0,
+            "endCol": 4,
+            "fps": 6.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Walk",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 10,
+            "startCol": 0,
+            "endRow": 10,
+            "endCol": 4,
+            "fps": 8.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Wallkick",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 8,
+            "startCol": 0,
+            "endRow": 8,
+            "endCol": 3,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          },
+          {
+            "name": "Zipline",
+            "filepath": "../Assets/spritesheet_player_vfx.png",
+            "rows": 15,
+            "cols": 11,
+            "startRow": 7,
+            "startCol": 0,
+            "endRow": 7,
+            "endCol": 1,
+            "fps": 4.0,
+            "pingPong": false,
+            "flipRows": false
+          }
+        ]
+      },
+      "children": []
+    },
+    {
+      "name": "HAZARDS",
+      "localID": 66,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          0.0,
+          0.0
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "children": [
+        {
+          "name": "HZ_Spike_Single",
+          "localID": 67,
+          "parentID": 66,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              18041.732421875,
+              18025.54296875
+            ],
+            "scale": [
+              252.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "Spike_Collider",
+              "localID": 68,
+              "parentID": 67,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  18038.791015625,
+                  17985.845703125
+                ],
+                "scale": [
+                  125.93900299072266,
+                  69.6181640625
+                ],
+                "rotation": 0.0
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  125.93900299072266,
+                  69.6181640625
+                ]
+              },
+              "children": []
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 69,
+              "parentID": 67,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  14316.62109375,
+                  15959.7451171875
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99993896484375
+                ],
+                "rotation": -179.15235900878906
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 70,
+                  "parentID": 69,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      14316.62109375,
+                      15929.7158203125
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09088897705078
+                    ],
+                    "rotation": -179.15235900878906
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Double",
+              "localID": 71,
+              "parentID": 67,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  7817.5390625,
+                  15657.583984375
+                ],
+                "scale": [
+                  494.9998474121094,
+                  149.99990844726563
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": true,
+                "tileCount": [
+                  2.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 72,
+                  "parentID": 71,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      7817.5390625,
+                      15627.5546875
+                    ],
+                    "scale": [
+                      380.9998474121094,
+                      89.09087371826172
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      381.0,
+                      89.0909194946289
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "HZ_Spike_Single",
+              "localID": 73,
+              "parentID": 67,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  8181.203125,
+                  15657.583984375
+                ],
+                "scale": [
+                  252.0,
+                  150.0
+                ],
+                "rotation": 0.0
+              },
+              "RenderComponent": {
+                "enabled": true,
+                "shapeType": "Square",
+                "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "color": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "layer": 0,
+                "screenSpace": false,
+                "tileable": false,
+                "tileCount": [
+                  1.0,
+                  1.0
+                ]
+              },
+              "Spritesheet": {
+                "enabled": true,
+                "defaultAnimation": "Candle",
+                "animations": [
+                  {
+                    "name": "Candle",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  },
+                  {
+                    "name": "Urchin",
+                    "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                    "rows": 1,
+                    "cols": 3,
+                    "startRow": 0,
+                    "startCol": 0,
+                    "endRow": 0,
+                    "endCol": 2,
+                    "fps": 5.0,
+                    "pingPong": false,
+                    "flipRows": false
+                  }
+                ]
+              },
+              "children": [
+                {
+                  "name": "Spike_Collider",
+                  "localID": 74,
+                  "parentID": 73,
+                  "active": true,
+                  "TransformComponent": {
+                    "enabled": true,
+                    "pos": [
+                      8178.26171875,
+                      15617.88671875
+                    ],
+                    "scale": [
+                      125.93900299072266,
+                      69.6181640625
+                    ],
+                    "rotation": 0.0
+                  },
+                  "ColliderComponent": {
+                    "enabled": true,
+                    "shape": "Square",
+                    "layer": "Enemy",
+                    "size": [
+                      125.93900299072266,
+                      69.6181640625
+                    ]
+                  },
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "HZ_Spike_Double",
+          "localID": 75,
+          "parentID": 66,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              18803.3125,
+              18453.77734375
+            ],
+            "scale": [
+              495.00018310546875,
+              150.0
+            ],
+            "rotation": -179.4909210205078
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "Spike_Collider",
+              "localID": 76,
+              "parentID": 75,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  18803.3125,
+                  18423.748046875
+                ],
+                "scale": [
+                  381.00018310546875,
+                  89.0909194946289
+                ],
+                "rotation": -179.4909210205078
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  381.0,
+                  89.0909194946289
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "HZ_Spike_Double",
+          "localID": 77,
+          "parentID": 66,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              11044.2041015625,
+              15657.583984375
+            ],
+            "scale": [
+              494.9998474121094,
+              149.99990844726563
+            ],
+            "rotation": 0.34590521454811096
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "Spike_Collider",
+              "localID": 78,
+              "parentID": 77,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  11044.2041015625,
+                  15627.5546875
+                ],
+                "scale": [
+                  380.9998474121094,
+                  89.09087371826172
+                ],
+                "rotation": 0.34590521454811096
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  381.0,
+                  89.0909194946289
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "HZ_Spike_Single",
+          "localID": 79,
+          "parentID": 66,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              11427.7197265625,
+              15657.583984375
+            ],
+            "scale": [
+              252.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "Spike_Collider",
+              "localID": 80,
+              "parentID": 79,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  11424.7783203125,
+                  15617.88671875
+                ],
+                "scale": [
+                  125.93900299072266,
+                  69.6181640625
+                ],
+                "rotation": 0.0
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  125.93900299072266,
+                  69.6181640625
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "HZ_Spike_Double",
+          "localID": 81,
+          "parentID": 66,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              13012.2177734375,
+              15657.583984375
+            ],
+            "scale": [
+              494.9998474121094,
+              149.99990844726563
+            ],
+            "rotation": 0.34590521454811096
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": true,
+            "tileCount": [
+              2.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "Spike_Collider",
+              "localID": 82,
+              "parentID": 81,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  13012.2177734375,
+                  15627.5546875
+                ],
+                "scale": [
+                  380.9998474121094,
+                  89.09087371826172
+                ],
+                "rotation": 0.34590521454811096
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  381.0,
+                  89.0909194946289
+                ]
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "HZ_Spike_Single",
+          "localID": 83,
+          "parentID": 66,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              13392.830078125,
+              15657.583984375
+            ],
+            "scale": [
+              252.0,
+              150.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "Spritesheet": {
+            "enabled": true,
+            "defaultAnimation": "Candle",
+            "animations": [
+              {
+                "name": "Candle",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              },
+              {
+                "name": "Urchin",
+                "filepath": "../Assets/Sprites/Sheets/Sea_urchin_spritesheet.png",
+                "rows": 1,
+                "cols": 3,
+                "startRow": 0,
+                "startCol": 0,
+                "endRow": 0,
+                "endCol": 2,
+                "fps": 5.0,
+                "pingPong": false,
+                "flipRows": false
+              }
+            ]
+          },
+          "children": [
+            {
+              "name": "Spike_Collider",
+              "localID": 84,
+              "parentID": 83,
+              "active": true,
+              "TransformComponent": {
+                "enabled": true,
+                "pos": [
+                  13389.888671875,
+                  15617.88671875
+                ],
+                "scale": [
+                  125.93900299072266,
+                  69.6181640625
+                ],
+                "rotation": 0.0
+              },
+              "ColliderComponent": {
+                "enabled": true,
+                "shape": "Square",
+                "layer": "Enemy",
+                "size": [
+                  125.93900299072266,
+                  69.6181640625
+                ]
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "StartEndZones",
+      "localID": 103,
+      "parentID": 4294967295,
+      "active": true,
+      "TransformComponent": {
+        "enabled": true,
+        "pos": [
+          24124.408203125,
+          -1521.41650390625
+        ],
+        "scale": [
+          50.0,
+          50.0
+        ],
+        "rotation": 0.0
+      },
+      "PhysicsComponent": {
+        "enabled": true,
+        "mass": 0.0,
+        "isStatic": false,
+        "useGravity": true,
+        "isGrounded": false,
+        "velocity": [
+          0.0,
+          0.0
+        ]
+      },
+      "children": [
+        {
+          "name": "SZ_Asset",
+          "localID": 104,
+          "parentID": 103,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1229.84228515625,
+              15925.037109375
+            ],
+            "scale": [
+              1000.0,
+              746.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Props/Safe_zone.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "EZ_Asset",
+          "localID": 105,
+          "parentID": 103,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              26848.2421875,
+              538.6455688476563
+            ],
+            "scale": [
+              400.0,
+              512.0
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "../Assets/Sprites/Props/Exit zone.png",
+            "color": [
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "layer": 0,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "WinZone",
+          "localID": 106,
+          "parentID": 103,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              26848.2421875,
+              483.300537109375
+            ],
+            "scale": [
+              238.59100341796875,
+              452.6712951660156
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              0.0,
+              1.0,
+              0.0,
+              0.0
+            ],
+            "layer": 10,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Default",
+            "size": [
+              238.59100341796875,
+              452.6712951660156
+            ]
+          },
+          "children": []
+        },
+        {
+          "name": "SafeZone",
+          "localID": 107,
+          "parentID": 103,
+          "active": true,
+          "TransformComponent": {
+            "enabled": true,
+            "pos": [
+              1215.7159423828125,
+              15795.109375
+            ],
+            "scale": [
+              800.5,
+              399.6839904785156
+            ],
+            "rotation": 0.0
+          },
+          "RenderComponent": {
+            "enabled": true,
+            "shapeType": "Square",
+            "texturePath": "",
+            "color": [
+              0.0,
+              0.0,
+              1.0,
+              0.0
+            ],
+            "layer": 10,
+            "screenSpace": false,
+            "tileable": false,
+            "tileCount": [
+              1.0,
+              1.0
+            ]
+          },
+          "ColliderComponent": {
+            "enabled": true,
+            "shape": "Square",
+            "layer": "Platform",
+            "size": [
+              800.5,
+              515.6822509765625
+            ]
+          },
+          "children": []
+        }
+      ]
+    }
+  ],
+  "TilemapFile": "../Assets/Tiles/L3_V11.tilemap",
+  "AudioManager": {
+    "sounds": [
+      {
+        "name": "PU_Coin_sfx1",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin1.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "PU_Coin_sfx2",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin2.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "PU_Coin_sfx3",
+        "filepath": "../Assets/Audio/Pickups/PU_Coin3.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "PU_Shell_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Shell.wav",
+        "loop": false,
+        "volume": 0.8999999761581421,
+        "pitch": 1.0,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "PU_Speed_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Speed.wav",
+        "loop": false,
+        "volume": 0.8999999761581421,
+        "pitch": 1.0,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "PU_Time_Hum_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Time_Hum.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.2000000476837158,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "PU_Time_sfx",
+        "filepath": "../Assets/Audio/Pickups/PU_Time.wav",
+        "loop": false,
+        "volume": 0.699999988079071,
+        "pitch": 1.0,
+        "category": "pu_sfx"
+      },
+      {
+        "name": "airglide_sfx",
+        "filepath": "../Assets/audio/Player/AirGlide.wav",
+        "loop": false,
+        "volume": 0.800000011920929,
+        "pitch": 1.5,
+        "category": "sfx_loop"
+      },
+      {
+        "name": "bonk_sfx",
+        "filepath": "../Assets/audio/Player/WallBonk.wav",
+        "loop": false,
+        "volume": 0.20000000298023224,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "death_sfx",
+        "filepath": "../Assets/audio/Player/Death.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx1",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep1.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx2",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep2.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx3",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep3.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx4",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep4.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx5",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep5.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx6",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep6.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx7",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep7.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx8",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep8.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "footstep_sfx9",
+        "filepath": "../Assets/audio/Player/Footstep/Footstep9.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "groundpound_falling_sfx",
+        "filepath": "../Assets/audio/Player/Groundpound_falling.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 2.0,
+        "category": "sfx_loop"
+      },
+      {
+        "name": "groundpound_sfx",
+        "filepath": "../Assets/audio/Player/Groundpound.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.5,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_bass_sfx",
+        "filepath": "../Assets/audio/Player/Hurt-Damage.wav",
+        "loop": false,
+        "volume": 0.4000000059604645,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx1",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_01.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx2",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_02.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx3",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_03.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx4",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_04.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx5",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_05.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx6",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_06.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx7",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_07.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "hurt_sfx8",
+        "filepath": "../Assets/audio/Player/Hurt/Hurt_08.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "jump_sfx",
+        "filepath": "../Assets/Audio/Player/Jump.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx1",
+        "filepath": "../Assets/audio/Player/Land/Land1.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx2",
+        "filepath": "../Assets/audio/Player/Land/Land2.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx3",
+        "filepath": "../Assets/audio/Player/Land/Land3.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "land_sfx4",
+        "filepath": "../Assets/audio/Player/Land/Land4.wav",
+        "loop": false,
+        "volume": 0.30000001192092896,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "roll_sfx",
+        "filepath": "../Assets/audio/Player/Roll.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 1.25,
+        "category": "sfx"
+      },
+      {
+        "name": "turnskid_sfx",
+        "filepath": "../Assets/audio/Player/TurnSkid.wav",
+        "loop": false,
+        "volume": 0.15000000596046448,
+        "pitch": 1.100000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "wallkick_fast_sfx",
+        "filepath": "../Assets/audio/Player/Dash.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.350000023841858,
+        "category": "sfx"
+      },
+      {
+        "name": "wallslide_impact_sfx",
+        "filepath": "../Assets/audio/Player/Wallkick.wav",
+        "loop": false,
+        "volume": 1.0,
+        "pitch": 1.0,
+        "category": "sfx"
+      },
+      {
+        "name": "wallslide_sfx",
+        "filepath": "../Assets/audio/Player/WallSlide.wav",
+        "loop": false,
+        "volume": 0.25,
+        "pitch": 0.8999999761581421,
+        "category": "sfx"
+      }
+    ],
+    "events": []
+  },
+  "GameSettings": {
+    "LevelTimerLength": 60.0
+  }
+}
