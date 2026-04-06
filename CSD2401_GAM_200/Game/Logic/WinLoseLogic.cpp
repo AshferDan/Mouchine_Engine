@@ -1412,8 +1412,8 @@ void WinLoseLogicSystem::HandleWinScreen2Buttons()
             std::string nextScene;
             if (currentScenePath.find("Level_1") != std::string::npos)
                 nextScene = "../Assets/Scenes/Level_2.json";
-            //else if (currentScenePath.find("Level_2_V2") != std::string::npos)
-            //    nextScene = "../Assets/Scenes/Level_3.json";
+            else if (currentScenePath.find("Level_3") != std::string::npos)
+                nextScene = "../Assets/Scenes/Level_3.json";
             else
                 nextScene = "../Assets/Scenes/MainMenu.json";
 
@@ -2067,14 +2067,14 @@ void WinLoseLogicSystem::GetLevelInfo(std::string& outLevelNum, std::string& out
 
     // Map of level filenames to friendly display names
     static const std::map<std::string, std::string> levelNames = {
-        {"Level_1", "Barbershop"},
+        {"Level_1", "Wavy Cut"},
         {"Level_2", "Hair Salon"},
-        {"Level_2_V2", "Hair Salon"}
+        {"Level_3", "Ocean View"}
     };
 
     // override map for level number display
     static const std::map<std::string, std::string> levelNumbers = {
-        {"Level_2_V2", "Level 2"}
+        {"Level_3", "Level 2"}
     };
 
     auto numOverride = levelNumbers.find(levelFileName);

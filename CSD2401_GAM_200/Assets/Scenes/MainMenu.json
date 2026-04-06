@@ -132,9 +132,9 @@
       "name": "Logo",
       "localID": 4,
       "parentID": 4294967295,
-      "active": false,
+      "active": true,
       "TransformComponent": {
-        "enabled": false,
+        "enabled": true,
         "pos": [
           841.1119384765625,
           473.08123779296875
@@ -146,7 +146,7 @@
         "rotation": 0.0
       },
       "RenderComponent": {
-        "enabled": false,
+        "enabled": true,
         "shapeType": "Square",
         "texturePath": "../Assets/Sprites/Icons/Group_Logo_white.png",
         "color": [

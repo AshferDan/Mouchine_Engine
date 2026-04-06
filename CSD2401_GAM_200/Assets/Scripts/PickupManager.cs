@@ -174,10 +174,8 @@ namespace CSharpScript
         bool shellPUActive = false;
         public void HandleShellPU()
         {
-
             if (triggeredShellPU)
             {
-                GameTimer.AddTime(MoveStats.Time_PickupAmount);
                 timePUTimer = MoveStats.Time_PickupAmount;
                 shellPUTimer = (1.0f / 8f) * 10f;                    // 8 fps and 10 frames
                 Animation.PlayAnimation(PlayerMovement.pu_vfx, "Shell", false);
