@@ -151,22 +151,24 @@ void GhostSystem::StartPlayback(const std::string& ghostObjectName)
     }
     const std::string& target = ghostObjectName.empty() ? m_ghostTarget : ghostObjectName;
 
-    // Restore full opacity now that the ghost is actively racing.
-    auto restoreAlpha = [](GameObject* obj)
+    // Keep the ghost semi-transparent during playback so it is visually distinct
+    // from the live hero.
+    constexpr float kPlaybackAlpha = 0.3f;
+    auto applyAlpha = [](GameObject* obj, float alpha)
     {
         if (!obj) return;
         auto* rc = obj->GetComponent<RenderComponent>();
         if (rc)
         {
             vec4 c = rc->GetColor();
-            c.w = 1.0f;
+            c.w = alpha;
             rc->SetColor(c);
         }
     };
     auto& fac = GameObjectFactory::Instance();
-    restoreAlpha(fac.FindGameObject(target));
+    applyAlpha(fac.FindGameObject(target), kPlaybackAlpha);
     if (!m_ghostVfx.empty())
-        restoreAlpha(fac.FindGameObject(m_ghostVfx));
+        applyAlpha(fac.FindGameObject(m_ghostVfx), kPlaybackAlpha);
 
     // This function is only called in Vs-Ghost mode (key-0, pause menu, SafeZone exit).
     // Backgrounds are owned by the live ParallaxBackground script — do not replay them.
@@ -219,10 +221,20 @@ void GhostSystem::ToggleGhost()
                     ghost->RemoveComponent<ColliderComponent>();
                     ghost->RemoveComponent<PhysicsComponent>();
 
-                    // Remove the ParallaxBackground script — the ghost should not
-                    // shift the camera background layers as a side-effect of movement.
+                    // Remove scripts that must not run on the ghost:
+                    // - ParallaxBackground: would shift camera bg layers
+                    // - PickupManager / PlayerMovement / InputManager / Knockback:
+                    //   these use shared static state and would steal pickups or
+                    //   interfere with the live hero's power-up effects.
                     auto* sc = ghost->GetComponent<ScriptComponent>();
-                    if (sc) sc->RemoveScript("ParallaxBackground");
+                    if (sc)
+                    {
+                        sc->RemoveScript("ParallaxBackground");
+                        sc->RemoveScript("PickupManager");
+                        sc->RemoveScript("PlayerMovement");
+                        sc->RemoveScript("InputManager");
+                        sc->RemoveScript("Knockback");
+                    }
                 }
             }
         }
@@ -264,7 +276,7 @@ void GhostSystem::ToggleGhost()
 
             // Appear semi-transparent while waiting beside the SafeZone.
             // Opacity is restored to 1.0 when playback begins (StartPlayback).
-            constexpr float kParkedAlpha = 0.45f;
+            constexpr float kParkedAlpha = 0.3f;
             auto setAlpha = [](GameObject* obj, float alpha)
             {
                 if (!obj) return;
@@ -324,6 +336,16 @@ void GhostSystem::EnterReplayMode()
         {
             ghost->RemoveComponent<ColliderComponent>();
             ghost->RemoveComponent<PhysicsComponent>();
+
+            auto* sc = ghost->GetComponent<ScriptComponent>();
+            if (sc)
+            {
+                sc->RemoveScript("ParallaxBackground");
+                sc->RemoveScript("PickupManager");
+                sc->RemoveScript("PlayerMovement");
+                sc->RemoveScript("InputManager");
+                sc->RemoveScript("Knockback");
+            }
         }
     }
 

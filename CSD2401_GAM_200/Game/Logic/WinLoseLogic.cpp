@@ -1412,7 +1412,7 @@ void WinLoseLogicSystem::HandleWinScreen2Buttons()
             std::string nextScene;
             if (currentScenePath.find("Level_1") != std::string::npos)
                 nextScene = "../Assets/Scenes/Level_2.json";
-            else if (currentScenePath.find("Level_3") != std::string::npos)
+            else if (currentScenePath.find("Level_2") != std::string::npos)
                 nextScene = "../Assets/Scenes/Level_3.json";
             else
                 nextScene = "../Assets/Scenes/MainMenu.json";
