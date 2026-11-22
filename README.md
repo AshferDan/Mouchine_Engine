@@ -22,6 +22,19 @@ The game runs on a custom C++20 engine written from scratch by team **AvidMousta
 
 ---
 
+## My Roles
+
+Lead Game Designer and Gameplay Programmer, assisted in Engine development.
+
+Game Engine Development:
+- Implemented the engine’s interface using Dear ImGui, contributed to back-end development and abstracting it for ease of front-end use for non-technical staff.
+- Implemented staple engine features such as Prefabs, Gizmos, Game Object Hierarchy as well as designer friendly Quality of Life tools and more.
+
+Gameplay Programming + Design:
+- Designed developer tools and systems with modularity in mind for ease of maintenance and scalability, significantly increasing development efficiency.
+- Took the role of design lead, largely involved in the game’s design and the implementations of core game systems and mechanics. Held frequent playtests to understand user needs and create a better user experience.
+- Implementation and fine tuning of game feel and feedback.
+
 ## Controls
 
 ### Gameplay
