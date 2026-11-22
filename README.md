@@ -1,4 +1,4 @@
-I led an 8-person team building a C++ 2D engine with C# scripting and replay system and Component.
+I led an 8-person team building a C++ 2D engine with C# scripting and replay system and component system.
 
 Case studies
 ⭐ Flagship	Custom 2D Game Engine	Engine architecture, team leadership Engine and game Repo · Demo build
