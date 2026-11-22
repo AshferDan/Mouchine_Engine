@@ -111,7 +111,7 @@ macro(import_imgui)
     endif()
 endmacro()
 
-macro(import_imguizmo)  
+macro(import_imguizmo)
     if(NOT TARGET imguizmo)
         message(STATUS " Configuring Imguizmo...")
         FetchContent_Declare(
@@ -120,17 +120,11 @@ macro(import_imguizmo)
             GIT_TAG master
             GIT_SHALLOW TRUE
         )
+        set(IMGUIZMO_BUILD_EXAMPLE OFF CACHE BOOL "" FORCE)
         FetchContent_MakeAvailable(imguizmo)
 
-      
-        add_library(imguizmo STATIC
-            ${imguizmo_SOURCE_DIR}/ImGuizmo.cpp
-        )
-        
-        target_include_directories(imguizmo PUBLIC
-            ${imguizmo_SOURCE_DIR}
-        )
-        
+        # ImGuizmo's own CMakeLists.txt already defines the "imguizmo" target
+        # (built from its src/ dir); it just needs imgui's headers to compile.
         target_link_libraries(imguizmo PUBLIC imgui)
 
         message(STATUS "✓ Imguizmo configured")
